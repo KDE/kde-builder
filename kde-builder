@@ -21,8 +21,25 @@ parser = argparse.ArgumentParser(prog="ProgramName",
 parser.add_argument("--initial-setup", action="store_true")
 parser.add_argument("--install-distro-packages", action="store_true")
 parser.add_argument("--generate-config", action="store_true")
+parser.add_argument("--conda-env", type=str, help="conda environment name to run the script in")
 
 args, unknown = parser.parse_known_args()
+
+if args.conda_env is not None:
+    import json
+    save_file = os.path.join(RealBin, "builder_env.json")
+    json.dump(dict(os.environ), open(save_file, "w"))
+    os.environ["KDE_BUILDER_BUILD_ENV"] = save_file
+    # don't pass the --conda-env [env] arguments to the new process
+    conda_arg_loc = sys.argv.index("--conda-env")
+    sys.argv.pop(conda_arg_loc)
+    sys.argv.pop(conda_arg_loc)
+    command = ["conda", "run", "-n", args.conda_env, "python3", __file__] + sys.argv[1:]
+    try:
+        os.execvp(command[0], command)
+    except OSError as e:
+        print(f"Failed to start conda: {e}; make sure it is installed and in PATH.")
+    exit(1)
 
 setup_steps = []
 if args.initial_setup:

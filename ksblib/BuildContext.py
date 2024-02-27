@@ -100,6 +100,15 @@ class BuildContext(Module):
         if os.path.isdir("/usr/lib/x86_64-linux-gnu"):
             self.libname = "lib/x86_64-linux-gnu"
         
+        save_file = os.getenv("KDE_BUILDER_BUILD_ENV")
+        if save_file is not None:
+            try:
+                self._old_env = json.load(open(save_file, "r"))
+            except Exception as e:
+                print(f"Failed to load environment from {save_file}: {e}; proceeding with default environment.")
+                self._old_env = dict(os.environ)
+        else:
+            self._old_env = dict(os.environ)
         # These options are used for internal state, they are _not_ exposed as cmdline options
         self.GlobalOptions_private = {
             "debug-level": Debug.INFO,
@@ -292,7 +301,7 @@ class BuildContext(Module):
         
         # # Propagate HTTP proxy through environment unless overridden.
         proxy = self.getOption("http-proxy")
-        if proxy and "http_proxy" not in os.environ:
+        if proxy and "http_proxy" not in self._old_env:
             self.queueEnvironmentVariable("http_proxy", proxy)
     
     def resetEnvironment(self) -> None:
@@ -323,17 +332,20 @@ class BuildContext(Module):
         Debug().debug(f"\tQueueing g[{key}] to be set to y[{value}]")
         self.env[key] = value
     
-    def commitEnvironmentChanges(self) -> None:
+    def getEnvironment(self) -> dict:
         """
-        Applies all changes queued by queueEnvironmentVariable to the actual
-        environment irretrievably. Use this before exec()'ing another child, for
+        Returns env modified by all changes queued by queueEnvironmentVariable
+        Use this before exec()'ing another child, for
         instance.
         """
         Util.assert_isa(self, BuildContext)
-        
+
+        env = self._old_env.copy() 
         for key, value in self.env.items():
-            os.environ[key] = value
-            Debug().debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
+            # os.environ[key] = value
+            env[key] = value
+        
+        return env
     
     def prependEnvironmentValue(self, envName: str, items: str) -> None:  # pl2py: the items was a list in perl, but it was never used as list. So will type it as str.
         """
@@ -358,23 +370,10 @@ class BuildContext(Module):
         
         if envName in self.env:
             curPaths = self.env[envName].split(":")
-        elif envName in os.environ:
-            curPaths = os.environ.get(envName, "").split(":")
+        elif envName in self._old_env:
+            curPaths = self._old_env.get(envName, "").split(":")
         else:
             curPaths = []
-        
-        # pl2py: this is kde-builder specific code (not from kdesrc-build).
-        # Some modules use python packages in their build process. For example, breeze-gtk uses python-cairo.
-        # We want the build process to use system installed package rather than installed in virtual environment.
-        # We remove the current virtual environment path from PATH, because Cmake FindPython3 module always considers PATH,
-        # see https://cmake.org/cmake/help/latest/module/FindPython3.html
-        # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
-        if sys.prefix != sys.base_prefix and envName == "PATH":
-            if f"{sys.prefix}/bin" in curPaths:
-                Debug().debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
-                curPaths.remove(f"{sys.prefix}/bin")
-            else:
-                Debug().debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
         
         # Filter out entries to add that are already in the environment from
         # the system.

@@ -432,8 +432,8 @@ class Util:
             # Child. Note here that we need to avoid running our exit cleanup
             # handlers in here. For that we need POSIX::_exit.
             
-            # Apply altered environment variables.
-            module.buildContext().commitEnvironmentChanges()
+            # Get altered environment variables.
+            env = module.buildContext().getEnvironment()
             
             signal.signal(signal.SIGPIPE, signal.SIG_IGN)
             
@@ -493,7 +493,7 @@ class Util:
             
             # External command.
             try:
-                os.execvp(command[0], command)
+                os.execvpe(command[0], command, env)
             except OSError as e:
                 cmd_string = " ".join(command)
                 Debug().error(textwrap.dedent(f"""\

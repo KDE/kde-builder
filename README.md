@@ -40,6 +40,39 @@ sudo zypper install kde-builder
 
 ### Using virtual environment
 
+#### Conda (recommended)
+
+This method is recommended since it doesn't interfere with kde software relying on python, and require no changes to system python packages.
+
+Install Conda:
+
+* User install (no root needed): https://conda.io/projects/conda/en/latest/user-guide/install/index.html
+* Arch Linux: `yay -S conda`
+* Fedora 39: `sudo dnf install conda`
+
+Clone `kde-builder`:
+
+```bash
+git clone https://invent.kde.org/ashark/kde-builder.git
+```
+
+Create a conda environment with the required packages (default name is `kde`):
+
+```bash
+cd kde-builder
+conda env create -f environment.yml
+```
+
+Now you can run the script using the `kde-builder` command, just remember to pass the option `--conda-env kde` to the script:
+
+```bash
+kde-builder --conda-env kde <args>
+```
+
+Note: you should run this command without activating the conda environment.
+
+#### Pipenv
+
 Install Python 3.12:
 
 * Arch Linux: `yay -S python312`

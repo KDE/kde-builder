@@ -1,0 +1,12 @@
+name: kde
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - overrides
+  - promise
+  - pyyaml
+  - setproctitle
+  - pip
+  - pip:
+      - dbus-python>=1.3
