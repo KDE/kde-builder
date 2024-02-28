@@ -39,7 +39,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         metadataModule = Module(ctx, re.sub("/", "-", moduleName))
         
         # Hardcode the results instead of expanding out the project info
-        metadataModule.setOption({"repository": f"kde:{moduleName}"})
+        metadataModule.setOption({"repository": f"https://invent.kde.org/{moduleName}"})  # Do not use "kde:" alias here, because it may not yet be set at first run, causing git 128 exit status
         metadataModule.setOption({"#kde-project-path": moduleName})
         metadataModule.setScmType("metadata")
         metadataModule.setOption({"branch": "master"})
