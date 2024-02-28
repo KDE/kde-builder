@@ -171,7 +171,7 @@ class BuildContext(Module):
             "make-options": "",
             "ninja-options": "",
             "num-cores": "",  # Used for build constraints
-            "num-cores-low-mem": 2,  # Used only in rc-file but documented
+            "num-cores-low-mem": "2",  # Needs to be a string, not int
             "override-build-system": "",
             "persistent-data-file": "",
             "qmake-options": "",
