@@ -1,0 +1,15 @@
+default:
+  image: python:latest
+  before_script:
+    - apt update
+    - apt install -y cmake libdbus-1-dev
+    - cmake --version
+    - python --version
+    - pip install pipenv --quiet
+    - pipenv install --dev
+    - pipenv graph
+    - export PYTHONPATH="$PYTHONPATH:$(pwd)"
+
+unit_and_integration_tests:
+  script:
+    - pipenv run pytest
