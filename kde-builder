@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+
+import argparse
+# import inspect
+import os
+import sys
+import textwrap
+import traceback
+
+RealBin = os.path.abspath(os.path.dirname(__file__))
+
+parser = argparse.ArgumentParser(prog="ProgramName",
+                                 description="What the program does",
+                                 epilog="Text at the bottom of help",
+                                 add_help=False)
+parser.add_argument("--initial-setup", action="store_true")
+parser.add_argument("--install-distro-packages", action="store_true")
+parser.add_argument("--generate-config", action="store_true")
+
+args, unknown = parser.parse_known_args()
+
+setup_steps = []
+if args.initial_setup:
+    setup_steps = ["install-distro-packages", "generate-config"]
+else:
+    if args.install_distro_packages:
+        setup_steps.append("install-distro-packages")
+    if args.generate_config:
+        setup_steps.append("generate-config")
+
+if setup_steps:
+    from ksblib.FirstRun import FirstRun
+    from ksblib.Debug import Debug
+    
+    d = Debug()
+    d.setColorfulOutput(True)
+    fr = FirstRun()
+    exit(fr.setupUserSystem(RealBin, setup_steps))
+
+# from ksblib import Debug
+from ksblib.Version import Version
+from ksblib.Application import Application
+from ksblib.BuildException import BuildException
+from ksblib.Util.Util import Util
+
+Version.setBasePath(RealBin)
+
+# Script starts.
+
+# pl2py: Here there was a check if caller is "test" and if yes, it printed script version and returned 1. It was never used.
+
+app = None
+try:
+    app = Application(sys.argv[1:])  # the 0 element is script name
+    result = app.runAllModulePhases()
+    app.finish(result)
+except BuildException as err:
+    print(textwrap.dedent(f"""
+    kdesrc-build encountered an exceptional error condition:
+     ========
+        {err}
+     ========
+    Can't continue, so stopping now.
+
+    """))
+    
+    if err.exception_type == "Internal":
+        print("Please submit a bug against kdesrc-build on https://bugs.kde.org/")
+    
+    Util.print_filtered_traceback()
+    if app:
+        app.finish(99)  # noreturn
+    exit(99)  # if app couldn't be created
+
+except Exception as err:
+    # We encountered some other kind of error that didn't raise a ksb::BuildException
+    print(textwrap.dedent(f"""\
+    Encountered an error in the execution of the script.
+    --> {err}
+    Please submit a bug against kdesrc-build on https://bugs.kde.org/
+    """))
+    
+    Util.print_filtered_traceback()
+    if app:
+        app.finish(99)  # noreturn
+    exit(99)  # if app couldn't be created
