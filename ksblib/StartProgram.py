@@ -85,7 +85,7 @@ class StartProgram:
             f"Module:             {module}\n",
             f"Executable          {executable}\n",
             f"Revision:           {revision}\n",
-            f"Arguments:          {" ".join(args)}\n",
+            f"""Arguments:          {" ".join(args)}\n""",
             "#" * 80, "\n",
             "\n"
         )

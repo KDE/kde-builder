@@ -241,13 +241,10 @@ class Util_LoggedSubprocess:
                 return
         
         async def promise_waiter(event):
-            def blocking_wait():
-                nonlocal promise
-                promise = subprocess_run_p(_begin)
-                Promise.wait(promise)
-            
-            loop2 = asyncio.get_event_loop()
-            await loop2.run_in_executor(None, blocking_wait)  # because Promise.wait(promise) is not awaitable itself, we wrap it to the run_in_executor
+            nonlocal promise
+            promise = subprocess_run_p(_begin)
+            while promise.is_pending:  # because Promise.wait(promise) is not awaitable itself, we wait it in such way.
+                await asyncio.sleep(1)
             event.set()
         
         # pl2py: Now we need to run the on_progress_handler and the subprocess at the same time.

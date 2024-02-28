@@ -965,7 +965,7 @@ class Application:
             moduleSet.__class__ = ModuleSet_Qt
         return moduleSet
     
-    def _readConfigurationOptions(self, ctx, fh, cmdlineGlobalOptions, deferredOptionsRef) -> list[Module | Union[*WithSubclasses(ModuleSet)]]:
+    def _readConfigurationOptions(self, ctx, fh, cmdlineGlobalOptions, deferredOptionsRef) -> list[Module | ModuleSet]:  # for type_enforced: list[Module | Union[*WithSubclasses(ModuleSet)]]
         """
         Reads in the settings from the configuration, passed in as an open
         filehandle.

@@ -17,7 +17,7 @@ After switching to this project, those much wanted features (see the bugtracker)
 
 ## Installation
 
-This project targets Python version 3.12.
+This project targets Python version 3.11. But can be used with Python 3.10 or Python 3.12.
 
 ### Using distribution package
 
@@ -40,16 +40,18 @@ sudo zypper install kde-builder
 
 ### Using virtual environment
 
-Install Python 3.12:
+Assuming you want to use Python 3.11.
 
-* Arch Linux: `yay -S python312`
-* Fedora 39: `sudo dnf install python3.12`
-* openSUSE Tumbleweed: `sudo zypper install python312`
+Install Python 3.11:
+
+* Arch Linux: `yay -S python`
+* Fedora 39: `sudo dnf install python3.11`
+* openSUSE Tumbleweed: `sudo zypper install python311`
 * Debian/Ubuntu:
 ```
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install python3.12
+sudo apt install python3.11
 ```
 
 Install pipenv.
