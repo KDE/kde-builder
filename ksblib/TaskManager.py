@@ -486,6 +486,7 @@ class TaskManager:
         # running. Make it stop too.
         pid, status = os.waitpid(monitorPid, os.WNOHANG)
         if pid == 0:
+            time.sleep(1)  # Give it some time, this way it could finish ok without interrupting
             os.kill(monitorPid, signal.SIGINT)
             
             # Exit code is in $?.
