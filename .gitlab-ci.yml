@@ -1,5 +1,7 @@
 default:
-  image: python:latest
+  tags:
+    - Linux
+  image: python:3.11  # keep same version as defined in Pipfile
   before_script:
     - apt update
     - apt install -y cmake libdbus-1-dev
