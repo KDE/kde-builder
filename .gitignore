@@ -1,0 +1,6 @@
+.idea/
+.venv/
+__pycache__/
+*.py[cod]
+.kdesrc-build-data
+kdesrc-buildrc
