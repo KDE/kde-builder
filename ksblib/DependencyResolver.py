@@ -141,14 +141,14 @@ class DependencyResolver:
             r"\s*"  # Clear whitespace we didn't capture
             r"(?:\["  # Open a non-capture group...
             r"([^]:\s]+)"  # (2) Capture branch name without brackets
-            r"])?+"  # Close group, make optional, no backtracking
+            r"])?"  # Close group, make optional
             r"\s*"  # Clear whitespace we didn't capture
             r":"
             r"\s*"
             r"([^\s\[]+)"  # (3) Capture all non-whitespace (source item)
             r"(?:\s*\["  # Open a non-capture group...
             r"([^]\s]+)"  # (4) Capture branch name without brackets
-            r"])?+"  # Close group, make optional, no backtracking
+            r"])?"  # Close group, make optional
             r"\s*$"  # Ensure no trailing cruft. Any whitespace should end line
         )
         
