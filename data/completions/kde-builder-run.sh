@@ -1,4 +1,9 @@
 ## Autocomplete for kde-builder --run
+
+# SPDX-FileCopyrightText: 2021 Sebastian Engel <dev@sebastianengel.eu>
+#
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+
 function _comp_kde_builder_run
 {
   local cur
