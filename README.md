@@ -15,14 +15,33 @@ and this is a significant barrier for new contributions.
 
 After switching to this project, those much wanted features (see the bugtracker) can be implemented with ease.
 
-## Installation
+## Prerequisites
 
 This project targets Python version 3.11. But can be used with Python 3.10 or Python 3.12.
 
-### Using distribution package
+Install Python (assuming you want to use Python 3.11):
 
-If your distribution provides dependencies listed in `Pipfile`, or has packaged
-kde-builder, you can use that.
+* Arch Linux: `yay -S python`
+* Fedora 39: `sudo dnf install python3.11`
+* openSUSE Tumbleweed: `sudo zypper install python311`
+* Debian/Ubuntu:
+```
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.11
+```
+
+## Installation
+
+There are three ways of installation. Choose one of the ways that fits you most.
+
+| Installation way                                                       | Notes                                                          |
+|------------------------------------------------------------------------|----------------------------------------------------------------|
+| [Use distribution package](#using-distribution-package)                | The easiest way, but may be unavailable for some distributions |
+| [Manual checkout, use native environment](#using-native-environment)   | Require that all python dependencies are provided by distro    |
+| [Manual checkout, use virtual environment](#using-virtual-environment) | The most reliable way, but a bit more complicated to setup     |
+
+### Using distribution package
 
 #### Arch Linux
 
@@ -36,23 +55,33 @@ sudo zypper addrepo https://download.opensuse.org/repositories/home:/enmo/openSU
 sudo zypper install kde-builder
 ```
 
----
+### Using native environment
+
+Ensure your distribution provides python packages, that correspond project dependencies listed in `Pipfile`.
+
+Install all required dependencies manually via your package manager.
+
+Clone `kde-builder` to the folder where you store software (assume it is `~/.local`):
+
+```bash
+cd ~/.local/share
+git clone https://invent.kde.org/ashark/kde-builder.git
+```
+
+Create a symlink to the script (assuming the `~/.local/bin` is in your `PATH`):
+
+```bash
+ln -sf ~/.local/share/kde-builder ~/.local/bin
+```
+
+Make sure it works by running:
+
+```bash
+cd ~
+kde-builder --version
+```
 
 ### Using virtual environment
-
-Assuming you want to use Python 3.11.
-
-Install Python 3.11:
-
-* Arch Linux: `yay -S python`
-* Fedora 39: `sudo dnf install python3.11`
-* openSUSE Tumbleweed: `sudo zypper install python311`
-* Debian/Ubuntu:
-```
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt update
-sudo apt install python3.11
-```
 
 Install pipenv.
 
@@ -90,7 +119,7 @@ Make sure it works by running:
 
 ```bash
 cd ~
-kdesrc-build --version
+kde-builder --version
 ```
 
 Add these cmake options to your config:
