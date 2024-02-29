@@ -1,0 +1,20 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: kde-builder
+Upstream-Contact: KDE <community@kde.org>
+Source: https://invent.kde.org/sdk/kde-builder
+
+Files: tests/integration/fixtures/* data/kdesrc-buildrc.in
+Copyright: 2024 Andrew Shark <ashark@linuxcomp.ru>
+License: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+
+Files:  .gitignore
+        Pipfile
+        Pipfile.lock
+        doc/*  # will be remade later
+        data/vscode/*
+Copyright: none
+License: CC0-1.0
+
+Files:  logo.png
+Copyright: 2022 Manuel Jesús de la Fuente <m@nueljl.in>
+License: CC-BY-4.0

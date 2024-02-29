@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
+
 # Global options in the rc-file can be overridden on the command line just by
 # using their option name in a cmdline argument (as long as the argument isn't
 # already allocated, that is).
