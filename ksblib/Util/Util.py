@@ -678,6 +678,7 @@ class Util:
                 retval = multiprocessing.Value("i", -1)
                 subproc = multiprocessing.Process(target=target, args=(retval,))
                 subproc.start()
+                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
                 subproc.join()
                 return retval.value
             
@@ -899,6 +900,7 @@ class Util:
                 retval = multiprocessing.Value("i", -1)
                 subproc = multiprocessing.Process(target=target, args=(retval,))
                 subproc.start()
+                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
                 subproc.join()
                 return retval.value
             
@@ -960,6 +962,7 @@ class Util:
                     retval = multiprocessing.Value("i", -1)
                     subproc = multiprocessing.Process(target=target, args=(retval,))
                     subproc.start()
+                    # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
                     subproc.join()
                     if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
                         raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")

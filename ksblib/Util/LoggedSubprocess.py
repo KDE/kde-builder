@@ -190,10 +190,12 @@ class Util_LoggedSubprocess:
         succeeded = 0
         
         def subprocess_run_p(target: callable) -> Promise:
-            def subprocess_run():
+            async def subprocess_run():
                 retval = multiprocessing.Value("i", -1)
                 subproc = multiprocessing.Process(target=target, args=(retval,))
                 subproc.start()
+                while subproc.is_alive():
+                    await asyncio.sleep(1)
                 subproc.join()
                 return retval.value
             
