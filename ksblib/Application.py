@@ -448,7 +448,10 @@ class Application:
                 Debug().setPretending(False)
             
             if (updateDesired and not Debug().pretending()) or updateNeeded:
+                orig_wd = os.getcwd()
                 metadataModule.scm().updateInternal()
+                Debug().debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
+                Util.p_chdir(orig_wd)
                 # "last-metadata-update" will be set after config is read, so value will be overriden
                 
             Debug().setPretending(wasPretending)
