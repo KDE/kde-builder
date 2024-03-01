@@ -1796,8 +1796,8 @@ class Application:
     
     @staticmethod
     def _holdPerformancePowerProfileIfPossible():
-        bus = dbus.SystemBus()
         try:
+            bus = dbus.SystemBus()
             Debug().info("Holding performance profile")
             
             if Debug().pretending():
