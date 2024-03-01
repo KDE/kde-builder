@@ -1568,7 +1568,10 @@ class Application:
             match = re.search(pattern, line)
             if match:
                 def repl():
-                    return ctx.getOption(match.group(1)) or BuildException.croak_runtime(f"Invalid variable {match.group(1)}")
+                    optval = ctx.getOption(match.group(1))
+                    if optval is None:  # pl2py: perl // "logical defined-or" operator checks the definedness, not truth. So empty string is considered as normal value.
+                        BuildException.croak_runtime(f"Invalid variable {match.group(1)}")
+                    return optval
                 
                 line = re.sub(pattern, repl(), line)  # Replace all matching expressions, use extended regexp with comments, and replacement is Python code to execute.
             
