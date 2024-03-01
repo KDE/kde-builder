@@ -231,6 +231,7 @@ class FirstRun:
         fill_placeholder("compile-commands-export", "bool_to_str")
         fill_placeholder("generate-vscode-project-config", "bool_to_str")
         
+        os.makedirs(xdgConfigHome, exist_ok=True)
         with open(f"{xdgConfigHome}/kdesrc-buildrc", "w") as sampleFh:
             sampleFh.write(sampleRc)
         print()
