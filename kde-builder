@@ -61,16 +61,16 @@ try:
     app.finish(result)
 except BuildException as err:
     print(textwrap.dedent(f"""
-    kdesrc-build encountered an exceptional error condition:
+    kde-builder encountered an exceptional error condition:
      ========
         {err}
      ========
     Can't continue, so stopping now.
-
+    
     """))
     
     if err.exception_type == "Internal":
-        print("Please submit a bug against kdesrc-build on https://bugs.kde.org/")
+        print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
     
     Util.print_filtered_traceback()
     if app:
@@ -82,7 +82,7 @@ except Exception as err:
     print(textwrap.dedent(f"""\
     Encountered an error in the execution of the script.
     --> {err}
-    Please submit a bug against kdesrc-build on https://bugs.kde.org/
+    Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
     """))
     
     Util.print_filtered_traceback()
