@@ -29,6 +29,8 @@ class FirstRun:
     def __init__(self):
         self.oss = OSSupport()
         self.baseDir = None
+        self.supportedDistros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
+        self.supportedOtherOS = ["freebsd"]
     
     def setupUserSystem(self, baseDir, setup_steps: list) -> NoReturn:
         self.baseDir = baseDir
@@ -193,7 +195,7 @@ class FirstRun:
             sampleRc = data_file.read()
         
         numCores = None
-        if self.oss.vendorID() == "linux":
+        if self.oss.vendorID() in [*self.supportedDistros, "linux"]:
             numCores = int(subprocess.run(["nproc"], shell=True, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
         elif self.oss.vendorID() == "freebsd":
             numCores = int(subprocess.run(["sysctl", "-n", "hw.ncpu"], shell=True, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
@@ -271,9 +273,7 @@ class FirstRun:
         return cmd
     
     def _findBestVendorPackageList(self, deps_data_path) -> list:
-        # Debian handles Ubuntu also
-        supportedDistros = ["alpine", "arch", "debian", "fedora", "freebsd", "gentoo", "mageia", "opensuse"]
-        bestVendor = self.oss.bestDistroMatch(supportedDistros)
+        bestVendor = self.oss.bestDistroMatch(self.supportedDistros + self.supportedOtherOS)
         version = self.oss.vendorVersion()
         print(Debug().colorize(f"    Installing packages for b[{bestVendor}]/b[{version}]"))
         return self._packagesForVendor(bestVendor, version, deps_data_path)

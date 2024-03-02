@@ -111,7 +111,7 @@ class OSSupport:
         
         return mem_total
     
-    def bestDistroMatch(self, distros) -> str:
+    def bestDistroMatch(self, distros: list[str]) -> str:
         """
             # Might return 'fedora' if running on Scientific Linux
             distro = os.bestDistroMatch(["ubuntu", "fedora", "arch", "debian"]);
