@@ -471,7 +471,7 @@ class Cmdline:
             foundOptions["qmake-options"] = args.qmake_options[0]
         
         if args.qt_install_dir is not None:
-            foundOptions["qt-install-dir"] = args.qtdir[0]
+            foundOptions["qt-install-dir"] = args.qt_install_dir[0]
         
         if args.remove_after_install is not None:
             foundOptions["remove-after-install"] = args.remove_after_install[0]
