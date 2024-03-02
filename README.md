@@ -17,15 +17,10 @@ This project targets Python version 3.11. But can be used with Python 3.10 or Py
 
 Install Python (assuming you want to use Python 3.11):
 
-* Arch Linux: `yay -S python`
+* Arch Linux: `sudo pacman -S python`
 * Fedora 39: `sudo dnf install python3.11`
 * openSUSE Tumbleweed: `sudo zypper install python311`
-* Debian/Ubuntu:
-```
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt update
-sudo apt install python3.11
-```
+* Debian/Ubuntu: `sudo apt install python3`
 
 ## Installation
 
