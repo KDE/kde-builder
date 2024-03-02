@@ -1,19 +1,15 @@
 # KDE Builder
 
-This script streamlines the process of setting up and maintaining a development
+This tool streamlines the process of setting up and maintaining a development
 environment for KDE software.
 
 It does this by automating the process of downloading source code from the
 KDE source code repositories, building that source code, and installing it
 to your local system.
 
-### The goal of the project
-
-**KDE Builder** is a drop-in replacement for the **Kdesrc Build** project. It is the exact reimplementation
-of the predecessor script, but in Python - a much more acknowledged language. The original project is in Perl,
-and this is a significant barrier for new contributions.
-
-After switching to this project, those much wanted features (see the bugtracker) can be implemented with ease.
+**kde-builder** is a successor of a previously used tool called [**kdesrc-build**](https://invent.kde.org/sdk/kdesrc-build).  
+The predecessor project was written in Perl, and this was a significant barrier for new contributions.  
+The successor project is written in Python - a much more acknowledged language. This means that newly wanted features can be implemented with ease.  
 
 ## Prerequisites
 
@@ -65,13 +61,13 @@ Clone `kde-builder` to the folder where you store software (assume it is `~/.loc
 
 ```bash
 cd ~/.local/share
-git clone https://invent.kde.org/ashark/kde-builder.git
+git clone https://invent.kde.org/sdk/kde-builder.git
 ```
 
 Create a symlink to the script (assuming the `~/.local/bin` is in your `PATH`):
 
 ```bash
-ln -sf ~/.local/share/kde-builder ~/.local/bin
+ln -sf ~/.local/share/kde-builder/kde-builder ~/.local/bin
 ```
 
 Make sure it works by running:
@@ -94,7 +90,7 @@ Clone `kde-builder` to the folder where you store software (assume it is `~/.loc
 
 ```bash
 cd ~/.local/share
-git clone https://invent.kde.org/ashark/kde-builder.git
+git clone https://invent.kde.org/sdk/kde-builder.git
 ```
 
 Create a virtual environment with the required packages:
