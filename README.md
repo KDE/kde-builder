@@ -24,15 +24,16 @@ Install Python (assuming you want to use Python 3.11):
 
 ## Installation
 
-There are three ways of installation. Choose one of the ways that fits you most.
+There are three ways of installation. Choose the one that fits you most.
 
-| Installation way                                                       | Notes                                                          |
-|------------------------------------------------------------------------|----------------------------------------------------------------|
-| [Use distribution package](#using-distribution-package)                | The easiest way, but may be unavailable for some distributions |
-| [Manual checkout, use native environment](#using-native-environment)   | Require that all python dependencies are provided by distro    |
-| [Manual checkout, use virtual environment](#using-virtual-environment) | The most reliable way, but a bit more complicated to setup     |
+| Installation way                                                                                                 | Notes                                                           |
+|------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| [Using the kde-builder package available for your operating system](#using-distribution-package)                 | The easiest way, but may be unavailable for some distributions. |
+| [Manual git checkout of kde-builder, use Python packages from your operating system](#using-native-environment)  | Requires that all python dependencies be provided by distro.    |
+| [Manual git checkout of kde-builder, use a Python virtual environment](#using-virtual-environment)               | The most reliable way, but a bit more complicated to set up.    |
 
-### Using distribution package
+<a name="using-distribution-package"></a>
+### Installation option 1: Using the kde-builder package available for your operating system
 
 #### Arch Linux
 
@@ -46,7 +47,8 @@ sudo zypper addrepo https://download.opensuse.org/repositories/home:/enmo/openSU
 sudo zypper install kde-builder
 ```
 
-### Using native environment
+<a name="using-native-environment"></a>
+### Installation option 2: Using Python packages from your operating system
 
 Ensure your distribution provides python packages, that correspond project dependencies listed in `Pipfile`.
 
@@ -72,7 +74,8 @@ cd ~
 kde-builder --version
 ```
 
-### Using virtual environment
+<a name="using-virtual-environment"></a>
+### Installation option 3: Using a Python virtual environment
 
 Install pipenv.
 
