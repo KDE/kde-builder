@@ -13,7 +13,7 @@ The successor project is written in Python - a much more acknowledged language. 
 
 ## Prerequisites
 
-This project targets Python version 3.11. But can be used with Python 3.10 or Python 3.12.
+This project targets Python version 3.11 or newer.
 
 Install Python (assuming you want to use Python 3.11):
 
@@ -83,6 +83,23 @@ Install pipenv.
 * Fedora 39: `sudo dnf install pipenv`
 * openSUSE Tumbleweed: not available in the repositories. You will need to install it with `pip install`.
 * Debian/Ubuntu: pipenv package seems to be broken on Ubuntu 22.04 LTS. You will need to use `pip install pipenv`.
+* KDE neon is based on Ubuntu 22.04 LTS and has Python 3.10. Instructions for KDE neon:
+
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install python3.11
+
+python3.11 -m pip install --user pipenv
+# Restart the computer in order for the PATH environment variable to contain the directory "~/.local/bin".
+# Make sure that the directory "~/.local/bin" is in $PATH.
+echo $PATH
+which pipenv
+# Should say "~/.local/bin/pipenv".
+
+# For building from source code the Python module dbus-python.
+sudo apt install pkgconf cmake libdbus-1-dev libglib2.0-dev python3.11-dev
+```
 
 Clone `kde-builder` to the folder where you store software (assume it is `~/.local`):
 
@@ -99,12 +116,17 @@ pipenv install
 ```
 
 To be able to invoke the script by just its name, create a wrapper script.  
-Create a file `~/bin/kde-builder` (assuming the `~/bin` is in your `PATH`), make this file executable.  
-Add the following content to it:
+Create a file `~/.local/bin/kde-builder` (assuming that `~/.local/bin` is in your `PATH`). Add the following content to it:
 
 ```bash
 #!/bin/bash
 pipenv run python ~/.local/share/kde-builder/kde-builder $@
+```
+
+Make the file executable:
+
+```bash
+chmod u+x ~/.local/bin/kde-builder
 ```
 
 Make sure it works by running:
