@@ -104,9 +104,7 @@ Add the following content to it:
 
 ```bash
 #!/bin/bash
-
-cd ~/.local/share/kde-builder
-pipenv run python kde-builder $@
+pipenv run python ~/.local/share/kde-builder/kde-builder $@
 ```
 
 Make sure it works by running:
