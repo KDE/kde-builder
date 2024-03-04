@@ -1030,7 +1030,11 @@ class Util:
                 BuildException.croak_runtime(f"Could not delete '{dst}' symlink (needed to update target location). Please remove it manually.")
         
         if not os.path.exists(dst) and not os.path.islink(dst):  # pl2py: in perl the -e check also detects the symlinks, but in python the os.path.exists does not detect symlinks.
-            return os.symlink(src, dst)
+            try:
+                os.symlink(src, dst)  # pl2py: in Perl, symlink command returns 1 on success, 0 on failure. In Python os.symlink returns None on success, raises exception on failure.
+                return 1
+            except FileNotFoundError:
+                return 0
         
         return 1  # success (pointed to correct location already)
     
