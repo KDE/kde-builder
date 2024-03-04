@@ -1,7 +1,7 @@
 """
 DESCRIPTION
 
-A class that encapsulates generic option-handling tasks for kdesrc-build, used
+A class that encapsulates generic option-handling tasks for kde-builder, used
 to implement common functions within :class:`BuildContext`, :class:`Module`, and
 :class:`ModuleSet`.
 

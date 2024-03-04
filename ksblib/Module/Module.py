@@ -437,7 +437,7 @@ class Module(OptionsBase):
             # for --refresh-build for this module on next run. See also the
             # "needsRefreshed" subroutine.
             if fh := open(".refresh-me", "w"):
-                print("# Build directory will be re-generated next kdesrc-build run", file=fh)
+                print("# Build directory will be re-generated next kde-builder run", file=fh)
                 print("# due to failing to complete configuration on the last run", file=fh)
                 fh.close()
             return False

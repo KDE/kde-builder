@@ -21,11 +21,11 @@ global
     # relative to source-dir by default
     build-dir %{build-dir}
 
-    # qt-install-dir ~/kde/qt # Where to install Qt6 if kdesrc-build supplies it
+    # qt-install-dir ~/kde/qt # Where to install Qt6 if kde-builder supplies it
 
     cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
-    # kdesrc-build sets 2 options which is used in options like make-options or set-env
+    # kde-builder sets 2 options which is used in options like make-options or set-env
     # to help manage the number of compile jobs that happen during a build:
     #
     # 1. num-cores, which is just the number of detected CPU cores, and can be passed
@@ -37,7 +37,7 @@ global
     num-cores %{num_cores}
     num-cores-low-mem %{num_cores_low}
 
-    # kdesrc-build can install a sample .xsession file for "Custom"
+    # kde-builder can install a sample .xsession file for "Custom"
     # (or "XSession") logins,
     install-session-driver %{install-session-driver}
 
@@ -45,7 +45,7 @@ global
     # ~/.config/kde-env-master.sh
     install-environment-driver %{install-environment-driver}
 
-    # Stop the build process on the first failure. If set to false, when kdesrc-build
+    # Stop the build process on the first failure. If set to false, when kde-builder
     # encounters a build failure, it will attempt to continue building other modules, 
     # using libraries from the system in cases where they would otherwise be provided
     # by a module that has failed to build.

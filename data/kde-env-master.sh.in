@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # This sets the various environment variables needed to start Plasma (or other KDE
-# software built by kdesrc-build), or to run programs/build programs/etc. in the
+# software built by kde-builder), or to run programs/build programs/etc. in the
 # same environment, ideally without clashing with system-built KDE or Qt.
 #
 # This should not produce any output in order to make it usable by
@@ -10,7 +10,7 @@
 # See also the sample xsession setup script, which requires this file.
 #
 # Use by copying this script to $XDG_CONFIG_HOME/kde-env-master.sh (this will
-# be done for you by kdesrc-build later). 99% of the
+# be done for you by kde-builder later). 99% of the
 # time this means ~/.config/kde-env-master.sh
 #
 # NOTHING IN THIS FILE IS MODIFIABLE, OTHERWISE WARNINGS WILL BE GENERATED
@@ -21,22 +21,22 @@
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CONFIG_HOME
 
-# === Modifiable variables. Should be set automatically by kdesrc-build based
+# === Modifiable variables. Should be set automatically by kde-builder based
 # on kdesrc-buildrc settings. Nothing below this line is user-modifiable!
 
-# The KDESRC_BUILD_TESTING stuff is to allow the script to     # kdesrc-build: filter
-# be executable by testsuite. It is filtered from destination. # kdesrc-build: filter
-if ! test -n "$KDESRC_BUILD_TESTING"; then                     # kdesrc-build: filter
+# The KDESRC_BUILD_TESTING stuff is to allow the script to     # kde-builder: filter
+# be executable by testsuite. It is filtered from destination. # kde-builder: filter
+if ! test -n "$KDESRC_BUILD_TESTING"; then                     # kde-builder: filter
 # Where KDE libraries and applications are installed to.
 kde_prefix="<% install-dir %>"  # E.g. "$HOME/kf5"
 
 # Where Qt is installed to. If using the system Qt, leave blank and this script
 # will try to auto-detect.
 qt_prefix="<% qt-install-dir %>"    # E.g. "$HOME/qt5" or "/usr" on many systems.
-else                                                           # kdesrc-build: filter
-kde_prefix="$HOME/kf5"                                         # kdesrc-build: filter
-qt_prefix="$HOME/qt5"                                          # kdesrc-build: filter
-fi                                                             # kdesrc-build: filter
+else                                                           # kde-builder: filter
+kde_prefix="$HOME/kf5"                                         # kde-builder: filter
+qt_prefix="$HOME/qt5"                                          # kde-builder: filter
+fi                                                             # kde-builder: filter
 
 # === End of modifiable variables.
 
@@ -82,7 +82,7 @@ fi
 
 # There doesn't seem to be a great way to get this from CMake easily but we can
 # reason that if there's a /usr/lib64 (and it's not just a compat symlink),
-# there will likely end up being a $kde_prefix/lib64 once kdesrc-build gets
+# there will likely end up being a $kde_prefix/lib64 once kde-builder gets
 # done installing it
 libname=lib
 if test -d /usr/lib/x86_64-linux-gnu; then

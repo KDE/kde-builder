@@ -3,7 +3,7 @@
 # Written by Michael Jansen and Michael Pyne
 #
 # Use by copying this script to ~/.xsession (this will be done for you by
-# kdesrc-build later).
+# kde-builder later).
 #
 # From there, select "custom" session when logging in, in order to login using
 # this script.
@@ -14,11 +14,11 @@
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 
-. "${XDG_CONFIG_HOME}/kde-env-master.sh" # Should be installed by kdesrc-build
+. "${XDG_CONFIG_HOME}/kde-env-master.sh" # Should be installed by kde-builder
 
-# See .kde-env-master.sh for details on the kdesrc-build: filter stuff
+# See .kde-env-master.sh for details on the kde-builder: filter stuff
 
-if ! test -n "$KDESRC_BUILD_TESTING"; then # kdesrc-build: filter
+if ! test -n "$KDESRC_BUILD_TESTING"; then # kde-builder: filter
 # Read in user-specific customizations
 if test -f "$HOME/.xsession-local"; then
     . "$HOME/.xsession-local"
@@ -38,4 +38,4 @@ fi
 if test -f "$HOME/.xsession-logout"; then
     . "$HOME/.xsession-logout"
 fi
-fi # kdesrc-build: filter
+fi # kde-builder: filter

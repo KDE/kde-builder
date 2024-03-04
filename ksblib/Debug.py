@@ -7,7 +7,7 @@ from .Util.Conditional_Type_Enforced import conditional_type_enforced
 @conditional_type_enforced
 class Debug:
     """
-    Debugging routines and constants for use with kdesrc-build
+    Debugging routines and constants for use with kde-builder
     """
     
     # Debugging level constants.

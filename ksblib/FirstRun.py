@@ -94,7 +94,7 @@ class FirstRun:
         
         packages = self._findBestVendorPackageList(deps_data_path)
         if not packages:
-            print(Debug().colorize(f" r[b[*] Packages could not be installed, because kdesrc-build does not know your distribution ({vendor})"))
+            print(Debug().colorize(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})"))
             return
         
         installCmd = self._findBestInstallCmd()
@@ -240,7 +240,7 @@ class FirstRun:
     
     def _findBestInstallCmd(self) -> list:
         cmdsRef = {
-            "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kdesrc-build",
+            "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
             "cmd/install/fedora/unknown": "dnf -y install",

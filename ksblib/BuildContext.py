@@ -92,7 +92,7 @@ class BuildContext(Module):
         
         # There doesn't seem to be a great way to get this from CMake easily but we can
         # reason that if there's a /usr/lib64 (and it's not just a compat symlink),
-        # there will likely end up being a ${install-dir}/lib64 once kdesrc-build gets
+        # there will likely end up being a ${install-dir}/lib64 once kde-builder gets
         # done installing it
         self.libname = "lib"
         if os.path.isdir("/usr/lib64") and not os.path.islink("/usr/lib64"):
@@ -394,10 +394,10 @@ class BuildContext(Module):
     def takeLock(self) -> bool:
         """
         Tries to take the lock for our current base directory, which currently is
-        what passes for preventing people from accidentally running kdesrc-build
+        what passes for preventing people from accidentally running kde-builder
         multiple times at once.  The lock is based on the base directory instead
         of being global to allow for motivated and/or brave users to properly
-        configure kdesrc-build to run simultaneously with different
+        configure kde-builder to run simultaneously with different
         configurations.
         
         Return value is a boolean success flag.
@@ -429,7 +429,7 @@ class BuildContext(Module):
             pidFile.close()
             
             if pid:
-                # Recent kdesrc-build; we wrote a PID in there.
+                # Recent kde-builder; we wrote a PID in there.
                 pid = pid.removesuffix("\n")
                 
                 # See if something's running with this PID.
@@ -437,21 +437,21 @@ class BuildContext(Module):
                 try:
                     os.kill(int(pid), 0)
                     
-                    # Something *is* running, likely kdesrc-build.  Don't use error,
+                    # Something *is* running, likely kde-builder.  Don't use error,
                     # it'll scan for $!
-                    print(Debug().colorize(" r[*y[*r[*] kdesrc-build appears to be running.  Do you want to:\n"))
+                    print(Debug().colorize(" r[*y[*r[*] kde-builder appears to be running.  Do you want to:\n"))
                     print(Debug().colorize("  (b[Q])uit, (b[P])roceed anyways?: "))
                     
                     choice = input() or ""
                     choice = choice.removesuffix("\n")
                     
                     if choice.lower() != "p":
-                        print(Debug().colorize(" y[*] kdesrc-build run canceled."))
+                        print(Debug().colorize(" y[*] kde-builder run canceled."))
                         return False
                     
                     # We still can't grab the lockfile, let's just hope things
                     # work out.
-                    Debug().note(" y[*] kdesrc-build run in progress by user request.")
+                    Debug().note(" y[*] kde-builder run in progress by user request.")
                     return True
                 except (OSError, ProcessLookupError):
                     pass
@@ -461,7 +461,7 @@ class BuildContext(Module):
             
             # No pid found, optimistically assume the user isn't running
             # twice.
-            Debug().warning(" y[WARNING]: stale kdesrc-build lockfile found, deleting.")
+            Debug().warning(" y[WARNING]: stale kde-builder lockfile found, deleting.")
             os.unlink(lockfile)
             
             try:
@@ -480,7 +480,7 @@ class BuildContext(Module):
             
             # Even if we fail it's generally better to allow the script to proceed
             # without being a jerk about things, especially as more non-CLI-skilled
-            # users start using kdesrc-build to build KDE.
+            # users start using kde-builder to build KDE.
             return True
         
         os.write(LOCKFILE, str(os.getpid()).encode())
@@ -544,7 +544,7 @@ class BuildContext(Module):
         
         # Provide a directory to make it easy to see the last build for a module's
         # given phase (like cmake, build, install, etc.) without having to find the
-        # log dir for the specific kdesrc-build run.
+        # log dir for the specific kde-builder run.
         Util().super_mkdir(f"{baseLogPath}/latest-by-phase/{module}")
         
         # Add a symlink to the latest run for this module. 'latest' itself is
@@ -670,11 +670,11 @@ class BuildContext(Module):
             Debug().error(textwrap.dedent(f"""\
                 b[No configuration file is present.]
                 
-                kdesrc-build requires a configuration file to select which KDE software modules
+                kde-builder requires a configuration file to select which KDE software modules
                 to build, what options to build them with, the path to install to, etc.
                 
-                When run, kdesrc-build will use `kdesrc-buildrc' config file located in the
-                current working directory. If no such file exists, kdesrc-build will use
+                When run, kde-builder will use `kdesrc-buildrc' config file located in the
+                current working directory. If no such file exists, kde-builder will use
                 `{BuildContext.xdgConfigHomeShort}/kdesrc-buildrc' instead.
                 
                 You can generate config with b[--generate-config].
@@ -684,7 +684,7 @@ class BuildContext(Module):
     def baseConfigDirectory(self) -> str:
         """
         Returns the base directory that holds the configuration file. This is
-        typically used as the directory base for other necessary kdesrc-build
+        typically used as the directory base for other necessary kde-builder
         execution files, such as the persistent data store and lock file.
         
         The RC file must have been found and loaded first, obviously.
@@ -947,7 +947,7 @@ class BuildContext(Module):
     def setPersistentOption(self, moduleName, key, value) -> None:
         """
         Sets a "persistent" option which will be read in for a module when
-        kdesrc-build starts up and written back out at (normal) program exit.
+        kde-builder starts up and written back out at (normal) program exit.
         
         First parameter is the module name to set the option for, or 'global'.
         Second parameter is the name of the value to set (i.e. key)

@@ -25,4 +25,4 @@ class ModuleSet_Null(ModuleSet):
     @staticmethod
     @override(check_signature=False)
     def convertToModules(*_) -> NoReturn:
-        BuildException.croak_internal("kdesrc-build should not have made it to this call. :-(")
+        BuildException.croak_internal("kde-builder should not have made it to this call. :-(")

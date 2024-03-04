@@ -231,7 +231,7 @@ class Util:
         if not Util.locate_exe(program):
             BuildException.croak_runtime(f"Can't find {program} in PATH!")
         
-        execFailedError = "\t - kdesrc-build - exec failed!\n"
+        execFailedError = "\t - kde-builder - exec failed!\n"
         try:
             pipe_read, pipe_write = os.pipe()
             pid = os.fork()
@@ -466,7 +466,7 @@ class Util:
                     Debug().error(f"Error {e} opening log to {logpath}!")
             
             # Call internal function, name given by $command[1]
-            if command[0] == "kdesrc-build":
+            if command[0] == "kde-builder":
                 # No colors!
                 Debug().setColorfulOutput(False)
                 Debug().debug(f"Calling {command}[1]")
@@ -483,7 +483,7 @@ class Util:
             
             # Don't leave empty output files, give an indication of the particular
             # command run.
-            print("# kdesrc-build running: '" + "' '".join(command) + "'")
+            print("# kde-builder running: '" + "' '".join(command) + "'")
             print("# from directory: ", os.getcwd())
             
             # TODO: Implement this when appropriate, but also keep in mind that
@@ -500,7 +500,7 @@ class Util:
                     r[b[Unable to execute "{cmd_string}"]!
                     {e}
                     
-                    Please check your binpath setting (it controls the PATH used by kdesrc-build).
+                    Please check your binpath setting (it controls the PATH used by kde-builder).
                     Currently it is set to g[{os.environ.get("PATH")}].
                     """))
                 # Don't use return, this is the child still!
@@ -607,7 +607,7 @@ class Util:
           failure.
         
         I<NOTE>: This function has a special feature.  If the command passed into the
-        argument reference is 'kdesrc-build', then log_command will, when it forks,
+        argument reference is 'kde-builder', then log_command will, when it forks,
         execute the subroutine named by the second parameter rather than executing a
         child process.  The subroutine should include the full package name as well
         (otherwise the package containing log_command's implementation is used).  The

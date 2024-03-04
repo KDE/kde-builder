@@ -28,7 +28,7 @@ end options
 
 options test-set
     repository kde-projects
-    use-modules juk kdesrc-build
+    use-modules juk kde-builder
     cmake-generator Make
     cmake-options -DSET_FOO:BOOL=OFF
 end options
@@ -39,6 +39,6 @@ end options
 
 module-set workspace-stuff
     repository kde-projects
-    use-modules kdesrc-build
+    use-modules kde-builder
     cmake-options -DSET_FOO:BOOL=ON
 end module-set

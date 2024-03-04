@@ -67,7 +67,7 @@ class BuildSystem_Qt4(BuildSystem):
             Debug().warning(textwrap.dedent(f"""\
                 b[y[*]
                 b[y[*] You have the y[-prefix] option selected in your {module} configure flags.
-                b[y[*] kdesrc-build will correctly add the -prefix option to match your Qt
+                b[y[*] kde-builder will correctly add the -prefix option to match your Qt
                 b[y[*] directory setting, so you do not need to use -prefix yourself.
                 b[y[*]
                 """))

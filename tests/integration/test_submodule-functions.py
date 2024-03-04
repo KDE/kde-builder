@@ -36,11 +36,11 @@ def test_submodule():
     with open("README.md", 'w') as file:
         file.write("Initial content")
     
-    result = run_command("git config --local user.name kdesrc-build".split(" "))
+    result = run_command("git config --local user.name kde-builder".split(" "))
     if not result:
         raise SystemExit("Can't setup git username, subsequent tests will fail")
     
-    result = run_command("git config --local user.email kdesrc-build@kde.org".split(" "))
+    result = run_command("git config --local user.email kde-builder@kde.org".split(" "))
     if not result:
         raise SystemExit("Can't setup git username, subsequent tests will fail")
     
@@ -62,11 +62,11 @@ def test_submodule():
     with open("README.md", 'w') as file:
         file.write("Initial content")
     
-    result = run_command("git config --local user.name kdesrc-build".split(" "))
+    result = run_command("git config --local user.name kde-builder".split(" "))
     if not result:
         raise SystemExit("Can't setup git username, subsequent tests will fail")
     
-    result = run_command("git config --local user.email kdesrc-build@kde.org".split(" "))
+    result = run_command("git config --local user.email kde-builder@kde.org".split(" "))
     if not result:
         raise SystemExit("Can't setup git username, subsequent tests will fail")
     

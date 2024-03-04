@@ -74,7 +74,7 @@ class Application:
         if not workLoad.get("build", None):
             if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
                 return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
-                # Todo: Currently we still need to exit when normal use like `kdesrc-build --metadata-only`, because otherwise script tries to proceed with "my $result = $app->runAllModulePhases();". Fix it.
+                # Todo: Currently we still need to exit when normal use like `kde-builder --metadata-only`, because otherwise script tries to proceed with "my $result = $app->runAllModulePhases();". Fix it.
             print("No modules to build, exiting.\n")
             exit(0)  # todo When --metadata-only was used and $self->context->{rcFile} is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
         
@@ -220,16 +220,16 @@ class Application:
         missingModuleDescriptions = self._findMissingModules()
         if missingModuleDescriptions:
             print(textwrap.dedent("""
-                kdesrc-build requires some minimal support to operate, including support
-                from the Perl runtime that kdesrc-build is built upon.
-            
-                Some mandatory Perl modules are missing, and kdesrc-build cannot operate
+                kde-builder requires some minimal support to operate, including support
+                from the Perl runtime that kde-builder is built upon.
+                
+                Some mandatory Perl modules are missing, and kde-builder cannot operate
                 without them.  Please ensure these modules are installed and available to Perl:"""))
             for missingModuleDesc in missingModuleDescriptions:
                 print("\t" + missingModuleDesc)
             
-            print("\nkdesrc-build can do this for you on many distros:")
-            print("Run 'kdesrc-build --initial-setup'")
+            print("\nkde-builder can do this for you on many distros:")
+            print("Run 'kde-builder --initial-setup'")
             # TODO: Built-in mapping to popular distro package names??
             exit(1)
         
@@ -489,7 +489,7 @@ class Application:
                 testDeps = textwrap.dedent("""\
                                            juk: kcalc
                                            dolphin: konsole
-                                           kdesrc-build: juk
+                                           kde-builder: juk
                                            """)
                 import tempfile
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
@@ -619,7 +619,7 @@ class Application:
                  r[b[*] Aborting now to save a lot of wasted time.
                  y[b[*] export b[KDESRC_BUILD_IGNORE_MISSING_PROGRAMS=1] and re-run (perhaps with --no-src)
                  r[b[*] to continue anyways. If this check was in error please report a bug against
-                 y[b[*] kdesrc-build at https://bugs.kde.org/
+                 y[b[*] kde-builder at https://bugs.kde.org/
                 """))
                 result = 1
             else:
@@ -1329,7 +1329,7 @@ class Application:
     
     def _cleanup_log_directory(self, ctx) -> None:
         """
-        This function removes log directories from old kdesrc-build runs.  All log
+        This function removes log directories from old kde-builder runs.  All log
         directories not referenced by $log_dir/latest somehow are made to go away.
         
         Parameters:
@@ -1560,7 +1560,7 @@ class Application:
                 BuildException.croak_runtime(f"Failed to read from {sourcePath} at line {input_file.filelineno()}")
             
             # Some lines should only be present in the source as they aid with testing.
-            if "kdesrc-build: filter" in line:
+            if "kde-builder: filter" in line:
                 continue
             
             pattern = re.compile(
@@ -1616,7 +1616,7 @@ class Application:
                     
                     return
                 elif not Debug().pretending():
-                    shutil.copy(destFilePath, f"{destFilePath}.kdesrc-build-backup")
+                    shutil.copy(destFilePath, f"{destFilePath}.kde-builder-backup")
         
         if not Debug().pretending():
             Application._installTemplatedFile(sourceFilePath, destFilePath, ctx)
@@ -1631,7 +1631,7 @@ class Application:
         If a file already exists, then its md5sum is taken and if the same as what
         was previously installed, is overwritten. If not the same, the original file
         is left in place and the .xsession is instead installed to
-        .xsession-kdesrc-build
+        .xsession-kde-builder
         
         Error handling: Any errors will result in an exception being thrown.
         
@@ -1647,7 +1647,7 @@ class Application:
         xdgDataHome = os.environ.get("XDG_DATA_HOME") or f"""{os.environ.get("HOME")}/.local/share"""
         
         # First we have to find the source
-        searchPaths = [RealBinDir] + [f"{path}/apps/kdesrc-build" for path in [xdgDataHome] + xdgDataDirs]
+        searchPaths = [RealBinDir] + [f"{path}/apps/kde-builder" for path in [xdgDataHome] + xdgDataDirs]
         
         for i in range(len(searchPaths)):  # Remove trailing slashes
             searchPaths[i] = re.sub(r"/+$", "", searchPaths[i])
@@ -1658,7 +1658,7 @@ class Application:
         
         if not envScript or not sessionScript:
             Debug().warning("b[*] Unable to find helper files to setup a login session.")
-            Debug().warning("b[*] You will have to setup login yourself, or install kdesrc-build properly.")
+            Debug().warning("b[*] You will have to setup login yourself, or install kde-builder properly.")
             return
         
         destDir = os.environ.get("XDG_CONFIG_HOME") or f"""{os.environ.get("HOME")}/.config"""

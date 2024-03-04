@@ -53,7 +53,7 @@ class ModuleSet_Qt(ModuleSet):
         available in order to convert this module set to a list of ksb::Module.
         
         In our case, we will return ONLY ONE MODULE. That module will handle "sub
-        modules" via the init-repository script so from kdesrc-build's perspective it
+        modules" via the init-repository script so from kde-builder's perspective it
         is handled as a single unit.
         """
         return [self._makeQt5Module(ctx)]

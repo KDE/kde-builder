@@ -504,7 +504,7 @@ class ModuleResolver:
 =head2 IMPLEMENTATION
 
 This module uses a multi-pass option resolving system, in accordance with
-the way kdesrc-build handles options. Consider a simple kdesrc-buildrc:
+the way kde-builder handles options. Consider a simple kdesrc-buildrc:
 
  global
      cmake-options -DCMAKE_BUILD_TYPE=Debug
@@ -541,7 +541,7 @@ At the same time we'd expect that juk has all the options listed in ms-foo, but
 also the specific C<cxxflags> and C<custom-build-command> options shown,
 I<no matter how> the juk module had been referenced during the build.
 
-There are many ways to convince kdesrc-build to add a module into its build list:
+There are many ways to convince kde-builder to add a module into its build list:
 
 =over
 
@@ -559,7 +559,7 @@ C<use-modules> declaration within a C<kde-projects>-based module set. E.g. the
 C<module-set> where the C<include-dependencies> option is set to C<true>. This
 wouldn't apply to juk, but might apply to modules such as phonon. Note that
 "taglib" in this example would B<not> be a dependency of juk according to
-kdesrc-build (although it is in reality), since taglib is not a KDE module.
+kde-builder (although it is in reality), since taglib is not a KDE module.
 
 =back
 

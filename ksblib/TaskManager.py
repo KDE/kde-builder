@@ -573,7 +573,7 @@ class TaskManager:
             print(Debug().colorize(textwrap.dedent(f"""
 
                 y[b[*] Unable to add SSH identity, aborting.
-                y[b[*] If you don't want kdesrc-build to check in the future,
+                y[b[*] If you don't want kde-builder to check in the future,
                 y[b[*] Set the g[disable-agent-check] option to g[true] in your {rcfile}.
             
                 """)))

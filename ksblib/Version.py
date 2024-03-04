@@ -6,7 +6,7 @@ from .Util.Conditional_Type_Enforced import conditional_type_enforced
 @conditional_type_enforced
 class Version:
     """
-    This package is just a place to put the kdesrc-build version number
+    This package is just a place to put the kde-builder version number
     in one spot, so it only needs changed in one place for a version bump.
     """
     
@@ -20,7 +20,7 @@ class Version:
     def setBasePath(newPath: str) -> None:
         """
         Should be called before using ``scriptVersion`` to set the base path for the
-        script.  This is needed to auto-detect the version in git for kdesrc-build
+        script.  This is needed to auto-detect the version in git for kde-builder
         instances running from a git repo.
         """
         Version.SCRIPT_PATH = newPath if newPath else Version.SCRIPT_PATH
@@ -28,7 +28,7 @@ class Version:
     @staticmethod
     def scriptVersion() -> str:
         """
-        Call this function to return the kdesrc-build version.
+        Call this function to return the kde-builder version.
         ::
         
             version = ksblib.Version.scriptVersion()  # "22.07"

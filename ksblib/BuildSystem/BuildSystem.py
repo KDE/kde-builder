@@ -69,7 +69,7 @@ class BuildSystem:
          a: the user knows what they are doing, or
          b: they are using an SDK that knows what it is about
         
-        In either case, kdesrc-build will avoid touching the environment variables to
+        In either case, kde-builder will avoid touching the environment variables to
         give the custom configuration maximum 'power' (including foot shooting power).
         """
         return False
@@ -187,7 +187,7 @@ class BuildSystem:
         equivalent).
         
         If the build system returns false then that means auto-detection by
-        kdesrc-build should be used to set the -j flag to something appropriate.
+        kde-builder should be used to set the -j flag to something appropriate.
         
         The base implementation always returns false, this is meant to be overridden in
         subclasses.

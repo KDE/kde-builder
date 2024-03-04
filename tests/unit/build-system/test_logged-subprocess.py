@@ -20,7 +20,7 @@ def test_logged_subprocess():
     assert m.name == "test", "ksb::Module has a name"
     
     tmp = tempfile.mkdtemp()
-    ctx.setOption({"log-dir": f"{tmp}/kdesrc-build-test"})
+    ctx.setOption({"log-dir": f"{tmp}/kde-builder-test"})
     
     def func(mod):
         print(f"Calculating stuff for {mod}")
@@ -74,9 +74,9 @@ def test_logged_subprocess():
     assert prog1Exit == 0, "Program 1 exited correctly"
     assert prog2Exit != 0, "Program 2 failed"
     
-    assert os.path.isdir(f"{tmp}/kdesrc-build-test/latest/test"), "Test module had a 'latest' dir setup"
-    assert os.path.islink(f"{tmp}/kdesrc-build-test/latest-by-phase/test/test-suite-1.log"), "Test suite 1 phase log created"
-    assert os.path.islink(f"{tmp}/kdesrc-build-test/latest-by-phase/test/test-suite-2.log"), "Test suite 2 phase log created"
+    assert os.path.isdir(f"{tmp}/kde-builder-test/latest/test"), "Test module had a 'latest' dir setup"
+    assert os.path.islink(f"{tmp}/kde-builder-test/latest-by-phase/test/test-suite-1.log"), "Test suite 1 phase log created"
+    assert os.path.islink(f"{tmp}/kde-builder-test/latest-by-phase/test/test-suite-2.log"), "Test suite 2 phase log created"
     
     os.chdir(origdir)  # ensure we're out of the test directory
     shutil.rmtree(tmp)

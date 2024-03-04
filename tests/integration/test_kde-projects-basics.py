@@ -16,7 +16,7 @@ def test_kde_projects():
     assert len(moduleList) == 3, "Right number of modules (include-dependencies)"
     assert moduleList[0].name == "kcalc", "Right order: kcalc before juk (test dep data)"
     assert moduleList[1].name == "juk", "Right order: juk after kcalc (test dep data)"
-    assert moduleList[2].name == "kdesrc-build", "Right order: dolphin after juk (implicit order)"
+    assert moduleList[2].name == "kde-builder", "Right order: dolphin after juk (implicit order)"
     assert moduleList[0].getOption("tag") == "tag-setmod2", "options block works for indirect reference to kde-projects module"
     assert moduleList[0].getOption("cmake-generator") == "Ninja", "Global opts seen even with other options"
     assert moduleList[1].getOption("cmake-generator") == "Make", "options block works for kde-projects module-set"

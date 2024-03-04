@@ -114,7 +114,7 @@ class BuildException_Config(BuildException):
             e.g.
             module-set kdesdk-set
                 repository y[b[kde-sdk]
-                use-modules kdesrc-build kde-dev-scripts clazy
+                use-modules kde-builder kde-dev-scripts clazy
             end module-set
             """)
         return result

@@ -6,7 +6,7 @@ from typing import Callable
 @conditional_type_enforced
 class DebugOrderHints:
     """
-    This module is motivated by the desire to help the user debug a kdesrc-build
+    This module is motivated by the desire to help the user debug a kde-builder
     failure more easily. It provides support code to rank build failures on a per
     module from 'most' to 'least' interesting, as well as to sort the list of
     (all) failures by their respective rankings. This ranking is determined by

@@ -8,7 +8,7 @@ def test_safe_lndir():
     """
     Test safe_lndir_p
     """
-    tmpdir = tempfile.mkdtemp(prefix="kdesrc-build-testXXXXXX")
+    tmpdir = tempfile.mkdtemp(prefix="kde-builder-testXXXXXX")
     assert tmpdir, "tempdir created"
     
     file = os.path.join(tmpdir, "a")
@@ -23,7 +23,7 @@ def test_safe_lndir():
     open(file2, "a").close()
     assert os.path.exists(f"{tmpdir}/b/c/file2"), "second file created"
     
-    to = tempfile.mkdtemp(prefix="kdesrc-build-test2")
+    to = tempfile.mkdtemp(prefix="kde-builder-test2")
     promise = Util.safe_lndir_p(os.path.abspath(tmpdir), os.path.abspath(to))
     
     # These shouldn't exist until we let the promise start!

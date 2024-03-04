@@ -181,13 +181,13 @@ class Updater_Git(Updater):
                 Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
             else:
                 Debug().error(textwrap.dedent("""\
-                The source directory for b[$module] does not exist. kdesrc-build would download
+                The source directory for b[$module] does not exist. kde-builder would download
                 it, except there is already a file or directory present in the desired source
                 directory:
                 \ty[b[$srcdir]
 
                 Please either remove the source directory yourself and re-run this script, or
-                pass the b[--delete-my-patches] option to kdesrc-build and kdesrc-build will
+                pass the b[--delete-my-patches] option to kde-builder and kde-builder will
                 try to do so for you.
 
                 DO NOT FORGET TO VERIFY THERE ARE NO UNCOMMITTED CHANGES OR OTHER VALUABLE
@@ -330,7 +330,7 @@ class Updater_Git(Updater):
         Assumes the current directory is already set to the source directory.
         
         Returns a promise that resolves to the name of the remote (which will be
-        setup by kdesrc-build) to use for updates, or rejects with an error.
+        setup by kde-builder) to use for updates, or rejects with an error.
         
         See also the 'repository' module option.
         """
@@ -733,9 +733,9 @@ class Updater_Git(Updater):
         """
         module = self.module
         date = time.strftime("%F-%R", time.gmtime())  # ISO Date, hh:mm time
-        stashName = f"kdesrc-build auto-stash at {date}"
+        stashName = f"kde-builder auto-stash at {date}"
         
-        # first, log the git status prior to kdesrc-build taking over the reins in the repo
+        # first, log the git status prior to kde-builder taking over the reins in the repo
         promise = Util.run_logged_p(module, "git-status-before-update", None, ["git", "status"])
         
         oldStashCount, newStashCount = None, None  # Used in promises below
@@ -779,7 +779,7 @@ class Updater_Git(Updater):
             nonlocal newStashCount
             # next: check if the stash was truly necessary.
             # compare counts (not just testing if there is *any* stash) because there
-            # might have been a genuine user's stash already prior to kdesrc-build
+            # might have been a genuine user's stash already prior to kde-builder
             # taking over the reins in the repo.
             newStashCount = self.countStash()
             
@@ -873,7 +873,7 @@ class Updater_Git(Updater):
         like a plausible prior existing remote for a given configured repository URL.
         
         Note that the actual repository fetch URL is not necessarily the same as the
-        configured (expected) fetch URL: an upstream might have moved, or kdesrc-build
+        configured (expected) fetch URL: an upstream might have moved, or kde-builder
         configuration might have been updated to the same effect.
         
         Arguments:
@@ -1093,7 +1093,7 @@ class Updater_Git(Updater):
             if result != 0:
                 return False
         
-        # Remove old kdesrc-build installed aliases (kde: -> git://anongit.kde.org/)
+        # Remove old kde-builder installed aliases (kde: -> git://anongit.kde.org/)
         configOutput = subprocess.run("git config --global --get url.git://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
             Debug().whisper("\tRemoving outdated kde: alias (fetch: git://anongit.kde.org/)")

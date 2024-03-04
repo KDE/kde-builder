@@ -28,9 +28,9 @@ class Util_LoggedSubprocess:
     =head1 DESCRIPTION
     
     This is a subclass of L<Mojo::IOLoop::Subprocess> which integrates the functionality
-    of that class into kdesrc-build's logging and module tracking functions.
+    of that class into kde-builder's logging and module tracking functions.
     
-    Like Mojolicious (and unlike most of the rest of kdesrc-build), this is a
+    Like Mojolicious (and unlike most of the rest of kde-builder), this is a
     'fluent' interface due to the number of adjustables vars that must be set,
     including which module is being built, the log file to use, what directory to
     build from, etc.

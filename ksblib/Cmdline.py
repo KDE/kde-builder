@@ -23,7 +23,7 @@ class Cmdline:
     speed up simple operations by separating command line argument parsing from the
     heavyweight module list generation process.
     
-    Since kdesrc-build is intended to be non-interactive once it starts, the
+    Since kde-builder is intended to be non-interactive once it starts, the
     command-line is the primary interface to change program execution and has some
     complications as a result.
     
@@ -518,7 +518,7 @@ class Cmdline:
     @staticmethod
     def _showInfoAndExit() -> NoReturn:
         os_vendor = OSSupport().vendorID()
-        version = "kdesrc-build " + Version.scriptVersion()
+        version = "kde-builder " + Version.scriptVersion()
         print(textwrap.dedent(f"""\
             {version}
             OS: {os_vendor}"""))

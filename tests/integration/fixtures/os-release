@@ -2,7 +2,7 @@
 NAME="Totally Valid Name"
 
 # inline comments are not allowed, a comment must be alone on a line
-ID=kdesrc-build
+ID=kde-builder
 
 ID_LIKE="sabayon gentoo-hardened gentoo"
 

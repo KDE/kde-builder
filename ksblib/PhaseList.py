@@ -1,7 +1,7 @@
 """
 DESCRIPTION
 
-Handles the "phases" for kdesrc-build, e.g. a simple list of phases, and
+Handles the "phases" for kde-builder, e.g. a simple list of phases, and
 methods to add, clear, or filter out phases. Meant to be assigned to a
 :class:`Module`.
 
