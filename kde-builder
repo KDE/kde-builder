@@ -12,7 +12,7 @@ import sys
 import textwrap
 import traceback
 
-RealBin = os.path.abspath(os.path.dirname(__file__))
+RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(prog="ProgramName",
                                  description="What the program does",
@@ -40,7 +40,7 @@ if setup_steps:
     d = Debug()
     d.setColorfulOutput(True)
     fr = FirstRun()
-    exit(fr.setupUserSystem(RealBin, setup_steps))
+    exit(fr.setupUserSystem(RealBinDir, setup_steps))
 
 # from ksblib import Debug
 from ksblib.Version import Version
@@ -48,7 +48,7 @@ from ksblib.Application import Application
 from ksblib.BuildException import BuildException
 from ksblib.Util.Util import Util
 
-Version.setBasePath(RealBin)
+Version.setBasePath(RealBinDir)
 
 # Script starts.
 

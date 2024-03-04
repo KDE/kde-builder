@@ -1640,14 +1640,14 @@ class Application:
         
         Return value: There is no return value.
         """
-        RealBin = os.path.dirname(str(sys.modules["__main__"].__file__))
+        RealBinDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
         
         Util.assert_isa(ctx, BuildContext)
         xdgDataDirs = os.environ.get("XDG_DATA_DIRS").split(":") if os.environ.get("XDG_DATA_DIRS") else "/usr/local/share/:/usr/share/".split(":")
         xdgDataHome = os.environ.get("XDG_DATA_HOME") or f"""{os.environ.get("HOME")}/.local/share"""
         
         # First we have to find the source
-        searchPaths = [RealBin] + [f"{path}/apps/kdesrc-build" for path in [xdgDataHome] + xdgDataDirs]
+        searchPaths = [RealBinDir] + [f"{path}/apps/kdesrc-build" for path in [xdgDataHome] + xdgDataDirs]
         
         for i in range(len(searchPaths)):  # Remove trailing slashes
             searchPaths[i] = re.sub(r"/+$", "", searchPaths[i])
