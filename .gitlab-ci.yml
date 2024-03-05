@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+
 stages:
   - test
   - build
@@ -24,9 +27,9 @@ include:
   - project: sysadmin/ci-utilities
     file:
       - /gitlab-templates/website-sphinx-app-docs.yml
+      - /gitlab-templates/reuse-lint.yml
 
 variables:
-    EPUB_NAME: KDEBuilder
     WEBSITE_LANGUAGES: en
     DOC_ROOT: doc
 
