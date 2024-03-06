@@ -11,7 +11,6 @@ import fileinput
 import asyncio
 import hashlib
 import signal
-import dbus
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from .Util.Conditional_Type_Enforced import WithSubclasses
 from typing import NoReturn, Union
@@ -1797,19 +1796,31 @@ class Application:
     @staticmethod
     def _holdPerformancePowerProfileIfPossible():
         try:
-            bus = dbus.SystemBus()
-            Debug().info("Holding performance profile")
+            import dbus  # Do not import in the beginning of file, user may have not installed dbus-python module (we optionally require it)
             
-            if Debug().pretending():
+            # Even when dbus-python is not installed, this module may still be imported successfully.
+            # So check if dbus has some needed attributes, that way we will be sure that module can be used.
+            if not hasattr(dbus, "SystemBus"):
+                Debug().warning(f"Looks like python-dbus package is not installed. Will not request performance power profile.")
                 return
             
-            service = bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
-            ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
-            
-            # The hold will be automatically released once kde-builder exits
-            cookie = ppd.HoldProfile("performance", "Building awesome KDE software", "kde-builder")
-        except dbus.DBusException as e:
-            print(f"Error accessing PowerProfiles service: {e}")
+            try:
+                bus = dbus.SystemBus()
+                Debug().info("Holding performance profile")
+                
+                if Debug().pretending():
+                    return
+                
+                service = bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
+                ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
+                
+                # The hold will be automatically released once kde-builder exits
+                cookie = ppd.HoldProfile("performance", "Building awesome KDE software", "kde-builder")
+            except dbus.DBusException as e:
+                print(f"Error accessing PowerProfiles service: {e}")
+        except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
+            Debug().warning(f"Could not import dbus module. Will not request performance power profile.")
+            return
     
     @classmethod
     def init_moduleID(cls):
