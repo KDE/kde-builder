@@ -1,5 +1,5 @@
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..Debug import Debug
 from .Git import Updater_Git
@@ -13,7 +13,7 @@ class Updater_KDEProject(Updater_Git):
     """
     
     @staticmethod
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def name() -> str:
         return "proj"
     
@@ -32,7 +32,7 @@ class Updater_KDEProject(Updater_Git):
         modulePath = module.fullProjectPath()
         return resolver.findModuleBranch(modulePath, branchGroup)
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def _moduleIsNeeded(self) -> bool:
         """
         Reimplementation
@@ -49,7 +49,7 @@ class Updater_KDEProject(Updater_Git):
         return True
     
     @staticmethod
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def _isPlausibleExistingRemote(name, url, configuredUrl) -> bool:
         """
         Reimplementation
@@ -58,7 +58,7 @@ class Updater_KDEProject(Updater_Git):
         return url == configuredUrl or url.startswith("kde:")
     
     @staticmethod
-    @override
+    # @override
     def isPushUrlManaged() -> bool:
         """
         Reimplementation

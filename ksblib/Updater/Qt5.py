@@ -1,6 +1,6 @@
 import os.path
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 from promise import Promise
 
 from ..BuildException import BuildException
@@ -17,7 +17,7 @@ class Updater_Qt5(Updater_Git):
     """
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "qt5"
     
@@ -54,7 +54,7 @@ class Updater_Qt5(Updater_Git):
         
         return 1  # TODO: Count commits
     
-    @override
+    # @override
     def updateExistingClone(self) -> Promise:
         """
         Updates an existing Qt5 super module checkout.
@@ -70,7 +70,7 @@ class Updater_Qt5(Updater_Git):
         
         return promise
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def updateCheckout(self) -> Promise | int:
         """
         Either performs the initial checkout or updates the current git checkout

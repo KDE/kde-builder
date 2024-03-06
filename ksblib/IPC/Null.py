@@ -1,5 +1,5 @@
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .IPC import IPC
 
@@ -14,12 +14,12 @@ class IPC_Null(IPC):
         IPC.__init__(self)
         self.msgList = []  # List of messages.
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def sendMessage(self, msg) -> bool:
         self.msgList.append(msg)
         return True
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def receiveMessage(self) -> bytes:
         if not len(self.msgList) > 0:
             return b""

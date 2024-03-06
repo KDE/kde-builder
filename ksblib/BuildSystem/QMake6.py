@@ -1,7 +1,7 @@
 import glob
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..Util.Util import Util
 from ..BuildException import BuildException
@@ -16,16 +16,16 @@ class BuildSystem_QMake6(BuildSystem):
     """
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "qmake6"
     
     @staticmethod
-    @override
+    # @override
     def requiredPrograms() -> list:
         return ["qmake"]
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def needsBuilddirHack(self) -> bool:
         """
         I've never had problems with modern QMake-using modules being built in a
@@ -49,7 +49,7 @@ class BuildSystem_QMake6(BuildSystem):
         possibilities = ["qmake-qt6", "qmake6", "qmake-mac", "qmake"]
         return next((p for p in possibilities if Util.locate_exe(p)), None)
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean

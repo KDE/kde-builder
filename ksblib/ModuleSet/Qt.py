@@ -1,5 +1,5 @@
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..BuildContext import BuildContext
 # use ksb::BuildException;
@@ -46,7 +46,7 @@ class ModuleSet_Qt(ModuleSet):
         
         return newModule
     
-    @override
+    # @override
     def convertToModules(self, ctx) -> list[Module]:
         """
         This function should be called after options are read and build metadata is

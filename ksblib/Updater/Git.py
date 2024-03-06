@@ -5,7 +5,7 @@ import textwrap
 import inspect
 import time
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from promise import Promise
 
@@ -60,7 +60,7 @@ class Updater_Git(Updater):
         return numCommits
     
     @staticmethod
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def name() -> str:
         return "git"
     

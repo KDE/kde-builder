@@ -1,6 +1,6 @@
 import os
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 from promise import Promise
 
 from .BuildSystem import BuildSystem
@@ -15,7 +15,7 @@ class BuildSystem_Autotools(BuildSystem):
     """
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "autotools"
     
@@ -81,7 +81,7 @@ class BuildSystem_Autotools(BuildSystem):
         
         return Promise.resolve(configureCommand)
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean

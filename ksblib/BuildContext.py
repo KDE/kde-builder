@@ -11,7 +11,7 @@ import fileinput
 import datetime
 import errno
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .Debug import Debug
 from .PhaseList import PhaseList
@@ -230,7 +230,7 @@ class BuildContext(Module):
         Util.assert_isa(self, Module)
         Util.assert_isa(self, BuildContext)
     
-    @override
+    # @override
     def phases(self, phases=None):
         """
         Gets the ksb::PhaseList for this context, and optionally sets it first to
@@ -757,7 +757,7 @@ class BuildContext(Module):
         modules = [module for module in modules if module.name in self.errors]
         return modules
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def getOption(self, key) -> str | dict | list | bool:
         """
         Our immediate parent class Module overrides this, but we actually
@@ -768,7 +768,7 @@ class BuildContext(Module):
         """
         return OptionsBase.getOption(self, key)
     
-    @override
+    # @override
     def setOption(self, options: dict) -> None:
         
         # Special case handling.
@@ -901,7 +901,7 @@ class BuildContext(Module):
             Debug().error(f"Unable to save persistent module data: b[r[{e}]")
             return
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def getPersistentOption(self, moduleName, key=None) -> str | int | None:
         """
         Returns the value of a "persistent" option (normally read in as part of
@@ -927,7 +927,7 @@ class BuildContext(Module):
             return
         return persistent_opts[moduleName][key]
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def unsetPersistentOption(self, moduleName, key) -> None:
         """
         Clears a persistent option if set (for a given module and option-name).
@@ -943,7 +943,7 @@ class BuildContext(Module):
         if moduleName in persistent_opts and key in persistent_opts[moduleName]:
             del persistent_opts[moduleName][key]
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def setPersistentOption(self, moduleName, key, value) -> None:
         """
         Sets a "persistent" option which will be read in for a module when

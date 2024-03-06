@@ -2,7 +2,7 @@ import os.path
 import re
 import sys
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .BuildSystem import BuildSystem
 from ..BuildException import BuildException
@@ -161,11 +161,11 @@ class BuildSystem_KDECMake(BuildSystem):
             self.cmake_toolchain = self._determineCmakeToolchain()
         return self.cmake_toolchain
     
-    @override
+    # @override
     def hasToolchain(self) -> bool:
         return self.cmakeToolchain() != ""
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def supportsAutoParallelism(self) -> bool:
         """
         Returns true if CMake is run with ninja, which supports setting -j
@@ -195,16 +195,16 @@ class BuildSystem_KDECMake(BuildSystem):
         return self.cmake_generator
     
     @staticmethod
-    @override
+    # @override
     def needsInstalled() -> bool:
         return True
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "KDE CMake"
     
-    @override
+    # @override
     def prepareModuleBuildEnvironment(self, ctx, module, prefix) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
@@ -233,7 +233,7 @@ class BuildSystem_KDECMake(BuildSystem):
             ctx.prependEnvironmentValue("CMAKE_PREFIX_PATH", qt_installdir)
             ctx.prependEnvironmentValue("CMAKE_MODULE_PATH", f"{qt_installdir}/lib/cmake")
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def requiredPrograms(self) -> list:
         """
         This should return a list of executable names that must be present to
@@ -244,7 +244,7 @@ class BuildSystem_KDECMake(BuildSystem):
         required = BuildSystem_KDECMake.GENERATOR_MAP[generator]["requiredPrograms"]
         return required
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def buildCommands(self) -> list[str]:
         """
         Returns a list of possible build commands to run, any one of which should
@@ -255,11 +255,11 @@ class BuildSystem_KDECMake(BuildSystem):
         return progs
     
     @staticmethod
-    @override
+    # @override
     def configuredModuleFileName() -> str:
         return "cmake_install.cmake"
     
-    @override
+    # @override
     def runTestsuite(self) -> bool:
         Util.assert_isa(self, BuildSystem_KDECMake)
         module = self.module
@@ -299,7 +299,7 @@ class BuildSystem_KDECMake(BuildSystem):
             Debug().info("\tAll tests ran successfully.")
         return result
     
-    @override
+    # @override
     def installInternal(self, cmdPrefix: list) -> bool:
         """
         Re-implementing the one in BuildSystem since in CMake we want to call
@@ -319,7 +319,7 @@ class BuildSystem_KDECMake(BuildSystem):
             "logfile": "install",
         })["was_successful"]
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         
         Util.assert_isa(self, BuildSystem_KDECMake)
@@ -435,7 +435,7 @@ class BuildSystem_KDECMake(BuildSystem):
         except IOError as e:
             Debug().warning(f"\tCouldn't write to {file_path}: {e}")
     
-    @override
+    # @override
     def buildInternal(self, optionsName=None) -> dict:
         """
         Return value style: hashref to build results object (see ksb::BuildSystem::safe_make)

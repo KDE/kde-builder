@@ -2,7 +2,7 @@ import os.path
 import re
 import textwrap
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
@@ -16,16 +16,16 @@ class BuildSystem_Qt5(BuildSystem):
     """
     
     @staticmethod
-    @override
+    # @override
     def configuredModuleFileName() -> str:
         return "Makefile"
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "Qt5"
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean

@@ -1,6 +1,6 @@
 import os
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 import struct
 from .IPC import IPC
 from ..BuildException import BuildException
@@ -31,14 +31,14 @@ class IPC_Pipe(IPC):
         self.fh = os.fdopen(self.pipe_read, "rb", 0)  # Disable buffering and any possibility of IO 'interpretation' of the bytes
     
     @staticmethod
-    @override
+    # @override
     def supportsConcurrency() -> bool:
         """
         Reimplementation of ksb::IPC::supportsConcurrency
         """
         return True
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def sendMessage(self, msg: bytes) -> bool:
         """
         Required reimplementation of ksb::IPC::sendMessage
@@ -60,7 +60,7 @@ class IPC_Pipe(IPC):
         result = fh.read(length)
         return result
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def receiveMessage(self) -> bytes:
         """
         Required reimplementation of ksb::IPC::receiveMessage
@@ -76,6 +76,6 @@ class IPC_Pipe(IPC):
         
         return self._readNumberOfBytes(msgLength)
     
-    @override
+    # @override
     def close(self):
         self.fh.close()

@@ -1,7 +1,7 @@
 import re
 import json
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..BuildException import BuildException
 from ..Debug import Debug
@@ -21,7 +21,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     """
     
     @staticmethod
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def name() -> str:
         return "metadata"
     
@@ -74,7 +74,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
             BuildException.croak_runtime(f"Unable to load module group data from {path}! :(\n\t{e}")
         return json_hashref
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def updateInternal(self, ipc=IPC_Null()) -> None:
         if Debug().isTesting():
             return self._mockTestMetadata()

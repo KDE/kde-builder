@@ -1,5 +1,5 @@
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .BuildSystem import BuildSystem
 # use ksb::BuildException;
@@ -20,11 +20,11 @@ class BuildSystem_Meson(BuildSystem):
     """
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "meson"
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean
@@ -42,25 +42,25 @@ class BuildSystem_Meson(BuildSystem):
         return Util.await_exitcode(Util.run_logged_p(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions]))
     
     @staticmethod
-    @override
+    # @override
     def supportsAutoParallelism() -> bool:
         return True  # meson requires ninja so supports this by default
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def buildInternal(self) -> dict:
         return super().buildInternal("ninja-options")
     
     @staticmethod
-    @override
+    # @override
     def buildCommands() -> list[str]:
         return ["ninja"]
     
     @staticmethod
-    @override
+    # @override
     def requiredPrograms() -> list:
         return ["meson", "ninja"]
     
     @staticmethod
-    @override
+    # @override
     def configuredModuleFileName() -> str:
         return "build.ninja"

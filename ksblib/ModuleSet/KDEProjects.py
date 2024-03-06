@@ -1,7 +1,7 @@
 import os
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..BuildException import BuildException
 from ..KDEProjectsReader import KDEProjectsReader
@@ -142,7 +142,7 @@ class ModuleSet_KDEProjects(ModuleSet):
                 Debug().debug(f"--- Ignoring matched active module {newModule} in module set " + self.name)
         return moduleList
     
-    @override
+    # @override
     def convertToModules(self, ctx) -> list[Module]:
         """
         This function should be called after options are read and build metadata is

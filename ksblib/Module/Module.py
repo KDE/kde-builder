@@ -7,7 +7,7 @@ import textwrap
 import traceback
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from ..Util.Conditional_Type_Enforced import WithSubclasses
-from overrides import override
+# from overrides import override
 import copy
 
 from ..OptionsBase import OptionsBase
@@ -713,7 +713,7 @@ class Module(OptionsBase):
         Debug().info("")  # Print empty line.
         return returnValue
     
-    @override
+    # @override
     def setOption(self, options: dict) -> None:
         """
         This calls OptionsBase::setOption and performs any Module-specific
@@ -770,7 +770,7 @@ class Module(OptionsBase):
         
         OptionsBase.setOption(self, options)
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def getOption(self, key, levelLimit="allow-inherit") -> str | bool | dict | None:
         """
         This subroutine returns an option value for a given module.  Some globals

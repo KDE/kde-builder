@@ -1,6 +1,6 @@
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from ..OptionsBase import OptionsBase
 
@@ -114,7 +114,7 @@ class ModuleSet(OptionsBase):
         orderInList = self.module_order.get("newModule", len(self.module_search_decls))
         newModule.create_id = startOrder + orderInList
     
-    @override
+    # @override
     def setOption(self, options: dict) -> None:
         """
         Handles module-set specific options for OptionsBase's setOption

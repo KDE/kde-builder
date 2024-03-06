@@ -2,7 +2,7 @@ import os.path
 import re
 import textwrap
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from overrides import override
+# from overrides import override
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
@@ -16,23 +16,23 @@ class BuildSystem_Qt4(BuildSystem):
     because of how simple it is but don't tell anyone that.
     """
     
-    @override(check_signature=False)
+    # @override(check_signature=False)
     def needsInstalled(self) -> bool:
         Util.assert_isa(self, BuildSystem_Qt4)
         module = self.module
         return module.getOption("qt-install-dir") != module.fullpath("build")
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "Qt"
     
     @staticmethod
-    @override
+    # @override
     def needsBuilddirHack() -> bool:
         return True
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean

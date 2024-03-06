@@ -1,4 +1,4 @@
-from overrides import override
+# from overrides import override
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 
 from .BuildSystem import BuildSystem
@@ -13,16 +13,16 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
     """
     
     @staticmethod
-    @override
+    # @override
     def name() -> str:
         return "cmake-bootstrap"
     
     @staticmethod
-    @override
+    # @override
     def requiredPrograms() -> list:
         return ["c++", "make"]
     
-    @override
+    # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean
