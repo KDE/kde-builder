@@ -196,9 +196,9 @@ class FirstRun:
         
         numCores = None
         if self.oss.vendorID() in [*self.supportedDistros, "linux"]:
-            numCores = int(subprocess.run(["nproc"], shell=True, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
+            numCores = int(subprocess.run(["nproc"], shell=False, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
         elif self.oss.vendorID() == "freebsd":
-            numCores = int(subprocess.run(["sysctl", "-n", "hw.ncpu"], shell=True, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
+            numCores = int(subprocess.run(["sysctl", "-n", "hw.ncpu"], shell=False, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
         
         if not numCores:
             numCores = 4
