@@ -16,4 +16,4 @@ type_enforced = ">=1.3.0"
 exceptiongroup = "*"  # needed for python 3.10
 
 [requires]
-python_version = "3.10"
+python_version = "3.9"

@@ -12,6 +12,7 @@ SYNOPSIS
     mod.createBuildSystem() if phases.has('buildsystem')
     phases.filterOutPhase('update') if ctx.getOption('build-only')
 """
+from __future__ import annotations
 
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import textwrap
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn

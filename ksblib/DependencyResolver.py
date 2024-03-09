@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import re
 import json
 from .Util.Conditional_Type_Enforced import conditional_type_enforced

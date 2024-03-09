@@ -13,7 +13,7 @@ The successor project is written in Python - a much more acknowledged language. 
 
 ## Prerequisites
 
-This project targets Python version 3.11 or newer.
+This project targets Python version 3.9 or newer.
 
 Install Python (assuming you want to use Python 3.11):
 
