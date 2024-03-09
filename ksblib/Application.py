@@ -291,7 +291,7 @@ class Application:
                 Debug().error("b[y[--rebuild-failures] was specified, but unable to determine")
                 Debug().error("which modules have previously failed to build.")
                 BuildException.croak_runtime("Invalid --rebuild-failures flag")
-            selectors.extend(moduleList.split(", "))
+            selectors.extend(re.split(r",\s*", moduleList))
         
         if "list-installed" in cmdlineGlobalOptions:
             for key in ctx.persistent_options.keys():
