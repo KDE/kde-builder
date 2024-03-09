@@ -258,9 +258,7 @@ number, the "nicer" the program is.</para>
 <member>Available since</member><member>20.07</member>
 </simplelist>
 <para>This option is defined by &kdesrc-build; (when using <command>kdesrc-build --generate-config</command>), set to be the number of
-available CPUs (as indicated by the external application
-<application>nproc</application>). If &kdesrc-build; cannot detect the
-number of CPUs, this value is set to 4.</para>
+available CPUs. If &kdesrc-build; cannot detect the number of CPUs, this value is set to 4.</para>
 
 <para>See <xref linkend="make-options-example"/> for an example of this
 option's usage.</para>

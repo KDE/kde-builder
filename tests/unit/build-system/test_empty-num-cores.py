@@ -1,3 +1,4 @@
+import os
 import pytest
 import subprocess
 from ksblib.Module.Module import Module
@@ -29,8 +30,10 @@ def test_empty_numcores(mock_buildsystem):
     
     # The -j logic will take off one CPU if you ask for too many so try to ensure
     # test cases don't ask for too many.
-    max_cores = int(subprocess.run(["nproc"], shell=True, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
-    max_cores = int(max_cores // 2)
+    max_cores = os.cpu_count()
+    if max_cores is None:
+        max_cores = 2
+    
     if max_cores < 2:
         max_cores = 2
     

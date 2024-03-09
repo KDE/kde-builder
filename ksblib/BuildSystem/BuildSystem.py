@@ -97,10 +97,8 @@ class BuildSystem:
         if self.supportsAutoParallelism() and cores == "auto":
             return {}
         
-        try:
-            out = [line.removesuffix("\n") for line in Util.filter_program_output(None, "nproc")]
-            max_cores = max(1, int(out[0]))
-        except BuildException:
+        max_cores = os.cpu_count()
+        if not max_cores:
             max_cores = 1
         
         if cores == "auto" and max_cores > 1:

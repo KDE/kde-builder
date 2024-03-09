@@ -194,12 +194,7 @@ class FirstRun:
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kdesrc-buildrc.in", "r") as data_file:
             sampleRc = data_file.read()
         
-        numCores = None
-        if self.oss.vendorID() in [*self.supportedDistros, "linux"]:
-            numCores = int(subprocess.run(["nproc"], shell=False, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
-        elif self.oss.vendorID() == "freebsd":
-            numCores = int(subprocess.run(["sysctl", "-n", "hw.ncpu"], shell=False, capture_output=True, check=True).stdout.decode("utf-8").removesuffix("\n"))
-        
+        numCores = os.cpu_count()
         if not numCores:
             numCores = 4
         
