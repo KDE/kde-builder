@@ -57,6 +57,7 @@ Install all required dependencies manually via your package manager.
 Clone `kde-builder` to the folder where you store software (assume it is `~/.local`):
 
 ```bash
+mkdir -p ~/.local/share
 cd ~/.local/share
 git clone https://invent.kde.org/sdk/kde-builder.git
 ```
@@ -64,7 +65,10 @@ git clone https://invent.kde.org/sdk/kde-builder.git
 Create a symlink to the script (assuming the `~/.local/bin` is in your `PATH`):
 
 ```bash
+mkdir -p ~/.local/bin
 ln -sf ~/.local/share/kde-builder/kde-builder ~/.local/bin
+# Make sure that the directory "~/.local/bin" is in $PATH.
+echo $PATH
 ```
 
 Make sure it works by running:
