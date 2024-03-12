@@ -180,6 +180,7 @@ class Cmdline:
                 break
         
         if run_index != -1:
+            foundOptions["no-metadata"] = True  # Implied --no-metadata
             opts["start-program"] = options[run_index+1:len(options)]
             options = options[0:run_index]  # remove all after --run, and the --run itself # pl2py: in python the stop index is not included, so we add +1
     
