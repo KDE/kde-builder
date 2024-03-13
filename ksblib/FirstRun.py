@@ -116,7 +116,7 @@ class FirstRun:
         
         if packages:
             print(Debug().colorize(f""" b[*] Running 'b[{" ".join(installCmd + packages)}]'"""))
-            result = subprocess.run(installCmd + packages, shell=False, check=True)
+            result = subprocess.run(installCmd + packages, shell=False)
             exitStatus = result.returncode
         else:
             print(Debug().colorize(" b[*] All dependencies are already installed. No need to run installer. b[:)]"))
@@ -131,7 +131,7 @@ class FirstRun:
                 print(Debug().colorize(f""" b[*] Running 'b[{" ".join(commandLine)}]'"""))
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
-                result = subprocess.run(commandLine, shell=False, capture_output=True, check=True)
+                result = subprocess.run(commandLine, shell=False, capture_output=True)
                 if not everFailed:
                     everFailed = result.returncode != 0
         
