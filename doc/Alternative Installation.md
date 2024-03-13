@@ -81,7 +81,7 @@ Install pipenv.
 * Fedora 39: `sudo dnf install pipenv`
 * openSUSE Tumbleweed: not available in the repositories. You will need to install it with `pip install`.
 * Debian/Ubuntu: pipenv package seems to be broken on Ubuntu 22.04 LTS. You will need to use `pip install pipenv`.
-* KDE neon is based on Ubuntu 22.04 LTS and has Python 3.10. Instructions for KDE neon:
+* KDE neon is based on Ubuntu 22.04 LTS and has Python 3.10. Instructions for KDE neon (if you want to use python 3.11):
 
 ```bash
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -106,11 +106,14 @@ cd ~/.local/share
 git clone https://invent.kde.org/sdk/kde-builder.git
 ```
 
+Note that `Pipfile` uses python 3.9 version. That is made this way because the gitlab ci job uses it, to ensure python 3.9
+is correctly supported. If you want to use a more recent version, specify it with `--python /path/to/python`. 
+
 Create a virtual environment with the required packages:
 
 ```bash
 cd ~/.local/share/kde-builder
-pipenv install
+pipenv install --python /usr/bin/python3.11  # <-- use path to interpreter you want to use
 ```
 
 To be able to invoke the script by just its name, create a wrapper script.  
