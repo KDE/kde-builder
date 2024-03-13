@@ -6,7 +6,19 @@
 
 # This script installs kde-builder
 
-set -e  # exit on error
+set -eE  # exit on error, errtrace to still be able to trap errors
+
+
+Color_Off='\033[0m'       # Text Reset
+Red='\033[0;31m'          # Red
+Yellow='\033[0;33m'       # Yellow
+Green='\033[0;32m'        # Green
+
+
+err_report() {
+  echo -e "${Red}Exitted on error.${Color_Off}"
+}
+trap 'err_report' ERR  # When error happens, this function will run automatically before exit.
 
 install_runtime_packages() {
   echo "Installing runtime packages"
@@ -39,7 +51,7 @@ install_runtime_packages() {
   elif [ "$ID" = "freebsd" ]; then
     (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus py39-promise)
   else
-    echo "Warning: Unsupported OS: $ID, skipping installation of runtime packages." 1>&2
+    echo -e "${Yellow}Warning: Unsupported OS: $ID, skipping installation of runtime packages.${Color_Off}" 1>&2
   fi
 }
 
@@ -48,7 +60,7 @@ clone_or_update_repository() {
   cd ~/.local/share
   if [ -d kde-builder ]; then
     echo "Updating git repository"
-    git -C kde-builder pull
+    git -C kde-builder pull --ff-only
   else
     echo "Cloning git repository"
     git clone https://invent.kde.org/sdk/kde-builder.git
@@ -60,9 +72,11 @@ prepare_bin_path() {
   mkdir -p ~/.local/bin
 
   if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
-    echo "Your path is correctly set"
+    echo "Your PATH is correctly set."
   else
-    echo "Warning: Your path is missing ~/.local/bin, you might want to add it."
+    echo -e "${Red}Your PATH is missing ~/.local/bin, you might want to add it.${Color_Off}"
+    echo "Note, that if your ~/.profile adds ~/.local/bin to PATH only when it exists, you can just relaunch shell or run: source ~/.profile"
+    err_report  # manually show error message
     exit 1
   fi
 }
@@ -102,7 +116,7 @@ ensure_kde_builder_launches() {
 if [ -f /etc/os-release ]; then
   source /etc/os-release
 else
-  echo "Not found /etc/os-release file" 1>&2
+  echo "${Red}Not found /etc/os-release file.${Color_Off}" 1>&2
   exit 1
 fi
 
@@ -126,4 +140,4 @@ ensure_kde_builder_launches
 # Install zsh completions
 # Install kate syntax highlighter for kdesrc-buildrc
 
-echo "Installation finished."
+echo -e "${Green}Installation finished.${Color_Off}"
