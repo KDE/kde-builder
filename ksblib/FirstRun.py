@@ -126,6 +126,7 @@ class FirstRun:
         hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
         everFailed = False
         if exitStatus != 0 and self.oss.isDebianBased() and hasSudo:
+            print(Debug().colorize(" b[*] The previous command failed. Will retry installing packages one by one."))
             for onePackage in packages:
                 commandLine = f"sudo apt-get -q -y --no-install-recommends install {onePackage}".split(" ")
                 print(Debug().colorize(f""" b[*] Running 'b[{" ".join(commandLine)}]'"""))
