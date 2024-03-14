@@ -175,6 +175,8 @@ class BuildSystem:
         # that is apparently unable to guess.  Maybe it's better that it
         # doesn't guess anyways from a security point-of-view.
         buildCommand = next((bc for bc in self.buildCommands() if Util.locate_exe(bc)), None)
+        if buildCommand is None:
+            Debug().warning(" y[*] Not found any of these executables: '", "' '".join(self.buildCommands()), "'. buildCommand will be undefined.")
         return buildCommand
     
     @staticmethod
