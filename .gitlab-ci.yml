@@ -1,3 +1,7 @@
+stages:
+  - test
+  - build
+
 default:
   tags:
     - Linux
@@ -15,3 +19,55 @@ default:
 unit_and_integration_tests:
   script:
     - pipenv run pytest
+
+# --
+
+include:
+  - project: sysadmin/ci-utilities
+    file:
+      - /gitlab-templates/blocks/workflow.yml
+
+variables:
+  WEBSITE_LANGUAGES: en # space seperated list of languages to build
+  DOC_ROOT: "doc"
+
+build_sphinx_app_docs:
+  image: invent-registry.kde.org/sysadmin/ci-images/staticweb:latest
+  tags:
+    - Linux
+  stage: build
+  variables:
+    GIT_DEPTH: "3"
+  before_script:
+    - python3 -m pip install sphinx myst-parser sphinx-book-theme
+    - git clone https://invent.kde.org/sysadmin/ci-utilities.git
+    - git clone https://invent.kde.org/sysadmin/ci-notary-service.git
+  script:
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - |
+      langList=$WEBSITE_LANGUAGES
+      if [ $CI_COMMIT_REF_PROTECTED != "true" ]; then
+        langList=en
+      fi
+    - |
+      for langToBuild in $langList; do
+        # build html
+        sphinx-build -M html "$DOC_ROOT" "$DOC_ROOT"/_staging/$langToBuild -D language="$langToBuild" -w _logs/warnings-$langToBuild-html.log -j auto
+        mkdir -p public/$langToBuild/
+        mv "$DOC_ROOT"/_staging/$langToBuild/html/* public/$langToBuild/
+      done
+    # turn duplicated files like image for each language into symlinks to reduce file size
+    - rdfind -makesymlinks true -makeresultsfile true $CI_PROJECT_DIR/public/
+    - mv results.txt _logs/rdfind-log.txt
+    # make symlinks relative (rdfind creates absolute symlinks)
+    - symlinks -cr $CI_PROJECT_DIR/public/ | tee _logs/symlinks-log.txt
+    # Publish
+    - python3 -u ci-notary-service/publishwebsite.py --config ci-utilities/signing/publishwebsite.ini public/
+
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - _logs/
+      - public/
+      - task*.log
