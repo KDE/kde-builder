@@ -432,7 +432,7 @@ class Util:
             return 0
         else:
             # Child. Note here that we need to avoid running our exit cleanup
-            # handlers in here. For that we need POSIX::_exit.
+            # handlers in here. For that we need sys.exit.
             
             # Apply altered environment variables.
             module.buildContext().commitEnvironmentChanges()
@@ -442,7 +442,7 @@ class Util:
             def sigint_handler(signum, frame):
                 sys.stdout.close()  # This should be a pipe
                 sys.stderr.close()
-                sys.exit("EINTR")
+                sys.exit(signal.SIGINT)
             
             signal.signal(signal.SIGINT, sigint_handler)
             

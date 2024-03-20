@@ -398,7 +398,7 @@ class TaskManager:
             updaterPid = os.fork()
             
             def sigint_handler(sig, frame):
-                sys.exit("EINTR")
+                sys.exit(signal.SIGINT)
             
             signal.signal(signal.SIGINT, sigint_handler)
             
