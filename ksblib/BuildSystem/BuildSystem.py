@@ -259,7 +259,7 @@ class BuildSystem:
         Debug().info(f"\ty[{module}] does not support the b[run-tests] option")
         return False
     
-    def installInternal(self, cmdPrefix: list) -> bool:
+    def installInternal(self, cmdPrefix: list[str]) -> bool:
         """
         Used to install a module (that has already been built, tested, etc.)
         All options passed are prefixed to the eventual command to be run.
@@ -273,7 +273,7 @@ class BuildSystem:
             "prefix-options": cmdPrefix,
         })["was_successful"]
     
-    def uninstallInternal(self, cmdPrefix: list) -> bool:
+    def uninstallInternal(self, cmdPrefix: list[str]) -> bool:
         """
         Used to uninstall a previously installed module.
         All options passed are prefixed to the eventual command to be run.

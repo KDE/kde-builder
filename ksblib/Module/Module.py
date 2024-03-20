@@ -524,6 +524,7 @@ class Module(OptionsBase):
         self.setupEnvironment()
         
         makeInstallOpts = self.getOption("make-install-prefix").split(" ")
+        makeInstallOpts = [el for el in makeInstallOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         
         if not self.buildSystem().uninstallInternal(makeInstallOpts):
             Debug().error(f"\tUnable to uninstall r[{self}]!")

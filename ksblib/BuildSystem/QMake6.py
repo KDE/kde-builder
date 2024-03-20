@@ -59,7 +59,8 @@ class BuildSystem_QMake6(BuildSystem):
         builddir = module.fullpath("build")
         sourcedir = builddir if self.needsBuilddirHack() else module.fullpath("source")
         
-        qmakeOpts = module.getOption('qmake-options').split(" ")
+        qmakeOpts = module.getOption("qmake-options").split(" ")
+        qmakeOpts = [el for el in qmakeOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         projectFiles = glob.glob(f"{sourcedir}/*.pro")
         
         if not projectFiles and Debug().pretending():

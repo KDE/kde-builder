@@ -379,7 +379,7 @@ class Util:
             os.symlink(f"{logfile}", f"{logdir}/error.log")
     
     @staticmethod
-    def run_logged_command(module, filename: str, callbackRef, command: list) -> int:
+    def run_logged_command(module, filename: str, callbackRef, command: list[str]) -> int:
         """
         Common code for log_command and ksb::Util::LoggedSubprocess
         """

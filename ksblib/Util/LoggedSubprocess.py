@@ -110,7 +110,7 @@ class Util_LoggedSubprocess:
         self._chdir_to = chdir_to
         return self
     
-    def set_command(self, set_command):
+    def set_command(self, set_command: list[str]):
         """
         Sets the command, and any arguments, to be run, as a reference to a list. E.g.
         

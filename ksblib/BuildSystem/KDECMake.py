@@ -300,7 +300,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return result
     
     # @override
-    def installInternal(self, cmdPrefix: list) -> bool:
+    def installInternal(self, cmdPrefix: list[str]) -> bool:
         """
         Re-implementing the one in BuildSystem since in CMake we want to call
         make install/fast, so it only installs rather than building + installing
