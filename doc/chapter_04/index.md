@@ -1,5 +1,5 @@
 (kdesrc-buildrc)=
-# Configuring kdesrc-build
+# Configuring kde-builder
 
 ```{toctree}
 kdesrc-buildrc

@@ -1,10 +1,10 @@
 (other-features)=
-# Other kdesrc-build features
+# Other kde-builder features
 
 (changing-verbosity)=
-## Changing the amount of output from kdesrc-build
+## Changing the amount of output from kde-builder
 
-kdesrc-build has several options to control the amount of output the
+kde-builder has several options to control the amount of output the
 script generates. In any case, errors will always be output.
 
 | Debug level | Level name | Command line option |
@@ -18,10 +18,10 @@ script generates. In any case, errors will always be output.
 
 Table of debug levels
 
-(kdesrc-build-color)=
+(kde-builder-color)=
 ## Color output
 
-When being run from Konsole or a different terminal, kdesrc-build will
+When being run from Konsole or a different terminal, kde-builder will
 normally display with colorized text.
 
 You can disable this by using the `--no-color` on the command line, or
@@ -40,32 +40,32 @@ end global
 ## Removing unneeded directories after a build
 
 Are you short on disk space but still want to run a bleeding-edge KDE
-checkout? kdesrc-build can help reduce your disk usage when building KDE
+checkout? kde-builder can help reduce your disk usage when building KDE
 from Git.
 
 ```{note}
 Be aware that building KDE does take a lot of space. There are several
-major space-using pieces when using kdesrc-build:
+major space-using pieces when using kde-builder:
 ```
 
 1.  The actual source checkout can take up a fair amount of space. The
     default modules take up about 1.6 gigabytes of on-disk space. You
     can reduce this amount by making sure that you are only building as
-    many modules as you actually want. kdesrc-build will not delete
+    many modules as you actually want. kde-builder will not delete
     source code from disk even if you delete the entry from the
     [configuration file](../chapter_02/configure-data), so make sure that you go and
     delete unused source checkouts from the source directory. Note that
     the source files are downloaded from the Internet, you *should not*
     delete them if you are actually using them, at least until you are
-    done using kdesrc-build.
+    done using kde-builder.
 
     Also, if you already have a Qt installed by your distribution (and
     the odds are good that you do), you probably do not need to install
     the qt module. That will shave about 200 megabytes off of the
     on-disk source size.
 
-2.  kdesrc-build will create a separate build directory to build the
-    source code in. Sometimes kdesrc-build will have to copy a source
+2.  kde-builder will create a separate build directory to build the
+    source code in. Sometimes kde-builder will have to copy a source
     directory to create a fake build directory. When this happens,
     space-saving symlinks are used, so this should not be a hassle on
     disk space. The build directory will typically be much larger than
@@ -74,10 +74,10 @@ major space-using pieces when using kdesrc-build:
     only around 550 megabytes.
 
     Luckily, the build directory is not required after a module has
-    successfully been built and installed. kdesrc-build can
+    successfully been built and installed. kde-builder can
     automatically remove the build directory after installing a module,
     see the examples below for more information. Note that taking this
-    step will make it impossible for kdesrc-build to perform the
+    step will make it impossible for kde-builder to perform the
     time-saving incremental builds.
 
 3.  Finally, there is disk space required for the actual installation of

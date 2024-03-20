@@ -5,13 +5,13 @@
 ## KDE Software Organization
 
 KDE software is split into different components, many of which can be
-built by kdesrc-build. Understanding this organization will help you
+built by kde-builder. Understanding this organization will help you
 properly select the software modules that you want built.
 
 1.  At the lowest level comes the Qt library, which is a very powerful,
     cross-platform “toolkit” library. KDE is based on Qt, and some of
     the non-KDE libraries required by KDE are also based on Qt.
-    kdesrc-build can build Qt, or use the one already installed on your
+    kde-builder can build Qt, or use the one already installed on your
     system if it is a recent enough version.
 
 2.  On top of Qt are required libraries that are necessary for KDE
@@ -62,9 +62,9 @@ Example module entry in the configuration file
 :name: conf-module-example
 :caption:  Example module entry in the configuration file
 
-module kdesrc-build-git
+module kde-builder-git
     # Options for this module go here, example:
-    repository kde:kdesrc-build
+    repository kde:kde-builder
     make-options -j4 # Run 4 compiles at a time
 end module
 ```
@@ -74,7 +74,7 @@ In practice, this module construct is not usually used directly. Instead
 most modules are specified via module-sets as described below.
 ```
 
-When using only `module` entries, kdesrc-build builds them in the order
+When using only `module` entries, kde-builder builds them in the order
 you list, and does not attempt to download any other repositories other
 than what you specify directly.
 
@@ -84,7 +84,7 @@ than what you specify directly.
 The KDE source code is decomposed into a great number of relatively
 small Git-based repositories. To make it easier to manage the large
 number of repositories involved in any useful KDE-based install,
-kdesrc-build supports grouping multiple modules and treating the group
+kde-builder supports grouping multiple modules and treating the group
 as a “module set”.
 
 (module-set-concept)=
@@ -120,7 +120,7 @@ end module
 ```
 
 In [Example Using module sets](#example-using-module-sets) a brief module set is
-shown. When kdesrc-build encounters this module set, it acts as if, for
+shown. When kde-builder encounters this module set, it acts as if, for
 every module given in `use-modules`, that an individual module has been
 declared, with its `repository` equal to the module-set's `repository`
 followed immediately by the given module name.
@@ -136,14 +136,14 @@ the entire group of modules from the command line.
 ### Special Support for KDE module sets
 
 The module set support described so far is general to any Git-based
-modules. For the KDE Git repositories, kdesrc-build includes additional
+modules. For the KDE Git repositories, kde-builder includes additional
 features to make things easier for users and developers. This support is
 enabled by specifying `kde-projects` as the `repository` for the module
 set.
 
-kdesrc-build normally only builds the modules you have listed in your
+kde-builder normally only builds the modules you have listed in your
 configuration file, in the order you list them. But with a
-`kde-projects` module set, kdesrc-build can do dependency resolution of
+`kde-projects` module set, kde-builder can do dependency resolution of
 KDE-specific modules, and in addition automatically include modules into
 the build even if only indirectly specified.
 
@@ -192,13 +192,13 @@ use the [git-repository-base](#conf-git-repository-base) option.
 
 KDE's Git repositories allow for grouping related Git modules into
 collections of related modules (e.g. kdegraphics). Git doesn't recognize
-these groupings, but kdesrc-build can understand these groups, using
+these groupings, but kde-builder can understand these groups, using
 [module sets](#module-sets) with a `repository` option set to
 “`kde-projects`”.
 
-kdesrc-build will recognize that the `kde-projects` repository requires
+kde-builder will recognize that the `kde-projects` repository requires
 special handling, and adjust the build process appropriately. Among
-other things, kdesrc-build will:
+other things, kde-builder will:
 
 - Download the latest module database from the [KDE git
   archive]( https://commits.kde.org/).
@@ -206,16 +206,16 @@ other things, kdesrc-build will:
 - Try to find a module with the name given in the module set's
   `use-modules` setting in that database.
 
-- For every module that is found, kdesrc-build will lookup the
+- For every module that is found, kde-builder will lookup the
   appropriate repository in the database, based upon the
   [branch-group](#conf-branch-group) setting in effect. If a repository
-  exists and is active for the branch group, kdesrc-build will
+  exists and is active for the branch group, kde-builder will
   automatically use that to download or update the source code.
 
 ```{note}
 In the current database, some module groups not only have a collection
 of modules, but they *also* declare their own Git repository. In these
-situations kdesrc-build will currently prefer the group's Git repository
+situations kde-builder will currently prefer the group's Git repository
 instead of including the childrens' repositories.
 ```
 
@@ -234,9 +234,9 @@ end module-set
 
 ```{tip}
 `phonon/phonon` is used since (with the current project database)
-kdesrc-build would otherwise have to decide between the group of
+kde-builder would otherwise have to decide between the group of
 projects called “phonon” or the individual project named “phonon”.
-Currently kdesrc-build would pick the former, which would build many
+Currently kde-builder would pick the former, which would build many
 more backends than needed.
 ```
 
@@ -256,15 +256,15 @@ end module-set
 
 There are two important abilities demonstrated here:
 
-1.  kdesrc-build allows you to specify modules that are descendents of a
+1.  kde-builder allows you to specify modules that are descendents of a
     given module, without building the parent module, by using the
     syntax `module-name/*`. It is actually required in this case since
     the base module, kdegraphics, is marked as inactive so that it is
     not accidentally built along with its children modules. Specifying
-    the descendent modules allows kdesrc-build to skip around the
+    the descendent modules allows kde-builder to skip around the
     disabled module.
 
-2.  kdesrc-build will also not add a given module to the build list more
+2.  kde-builder will also not add a given module to the build list more
     than once. This allows us to manually set `kdegraphics/libs` to
     build first, before the rest of `kdegraphics`, without trying to
     build `kdegraphics/libs` twice. This used to be required for proper

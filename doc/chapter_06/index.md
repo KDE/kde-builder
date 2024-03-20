@@ -1,8 +1,8 @@
-(using-kdesrc-build)=
-# Using kdesrc-build
+(using-kde-builder)=
+# Using kde-builder
 
 ```{toctree}
-using-kdesrc-build
+using-kde-builder
 basic-features
 advanced-features
 developer-features

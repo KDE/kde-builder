@@ -1,13 +1,13 @@
 (configure-data)=
 # Setting the Configuration Data
 
-To use kdesrc-build, you should have a file in your `~/.config` (or in
+To use kde-builder, you should have a file in your `~/.config` (or in
 `$XDG_CONFIG_HOME`, if set) directory called `kdesrc-buildrc`, which
 sets the general options and specifies the modules you would like to
 download and build.
 
 ```{note}
-It is possible to use different configuration files for kdesrc-build,
+It is possible to use different configuration files for kde-builder,
 which is described in [](../chapter_04/index). If you need to use
 multiple configurations, please see that section. Here, we will assume
 that the configuration is stored in `~/.config/kdesrc-buildrc`.
@@ -27,16 +27,16 @@ settings that you may wish to alter include:
 - [branch-group](#conf-branch-group), which can be used to choose the
   appropriate branch of development for the KDE modules as a whole.
   There are many supported build configurations but you will likely want
-  to choose `kf5-qt5` so that kdesrc-build downloads the latest code
+  to choose `kf5-qt5` so that kde-builder downloads the latest code
   based on Qt 5 and KDE Frameworks 5.
 
 ```{tip}
-  kdesrc-build will use a default branch group if you do not choose one,
+  kde-builder will use a default branch group if you do not choose one,
   but this default will change over time, so it's better to choose one
   so that the branch group does not change unexpectedly.
 ```
 
-- [source-dir](#conf-source-dir), to control the directory kdesrc-build
+- [source-dir](#conf-source-dir), to control the directory kde-builder
   uses for downloading the source code, running the build process, and
   saving logs. This defaults to `~/kde/src`.
 
@@ -56,7 +56,7 @@ settings that you may wish to alter include:
   quicker builds, but requires more system resources.
 
 ```{tip}
-  kdesrc-build sets the option `num-cores` to the detected number of
+  kde-builder sets the option `num-cores` to the detected number of
   available processing cores. You can use this value in your own
   configuration file to avoid having to set it manually.
 ```
@@ -67,7 +67,7 @@ settings that you may wish to alter include:
 
 global
     # This environment variable is automatically used by make, including
-    # make commands not run by kdesrc-build directly, such as Qt's configure
+    # make commands not run by kde-builder directly, such as Qt's configure
     set-env MAKEFLAGS -j${num-cores}
     …
 end global

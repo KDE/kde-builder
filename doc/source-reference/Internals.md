@@ -35,9 +35,9 @@ and is then filtered (respecting --resume-{from,after})
 
 Command-line modules:
 
-kdesrc-build also constructs a list of command-line-passed modules. Since the
+kde-builder also constructs a list of command-line-passed modules. Since the
 module names are read before the configuration file is even named (let alone
-read) kdesrc-build has to hold onto the list until much later in
+read) kde-builder has to hold onto the list until much later in
 initialization before it can really figure out what's going on with the
 command line. So the sequence looks more like:
 

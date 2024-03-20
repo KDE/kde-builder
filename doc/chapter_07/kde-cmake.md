@@ -10,11 +10,11 @@ Wiki](https://community.kde.org/Guidelines_HOWTOs/CMake). Basically,
 instead of running `make -f Makefile.cvs`, then `configure`, then Make,
 we simply run CMake and then Make.
 
-kdesrc-build has support for CMake. A few features of kdesrc-build were
+kde-builder has support for CMake. A few features of kde-builder were
 really features of the underlying buildsystem, including
 [configure-flags](#conf-configure-flags) and
 [do-not-compile](#conf-do-not-compile). When equivalent features are
 available, they are provided. For instance, the equivalent to the
 configure-flags option is [cmake-options](#conf-cmake-options), and the
 [do-not-compile](#conf-do-not-compile) option is also supported for
-CMake as of kdesrc-build version 1.6.3.
+CMake as of kde-builder version 1.6.3.

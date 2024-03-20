@@ -1,5 +1,5 @@
 (kdesrc-buildrc-overview)=
-# Overview of kdesrc-build configuration
+# Overview of kde-builder configuration
 
 To use the script, you must have a file in your home directory called
 `.kdesrc-buildrc`, which describes the modules you would like to
@@ -72,10 +72,10 @@ actual git modules in the chosen `repository`. See
 In general, the entire line contents after the \<option-name\> is used
 as the \<option-value\>.
 
-One modification that kdesrc-build performs is that a sequence
+One modification that kde-builder performs is that a sequence
 "`${name-of-option}`" is replaced with the value of that option from the
 global configuration. This allows you to reference the value of existing
-options, including options already set by kdesrc-build.
+options, including options already set by kde-builder.
 
 To see an example of this in use, see [](#make-options-example).
 
@@ -146,21 +146,21 @@ module-set kde-multimedia-set
 end module-set
 
 # kmix is a part of kde/kdemultimedia group, even though we never named
-# kmix earlier in this file, kdesrc-build will figure out the change.
+# kmix earlier in this file, kde-builder will figure out the change.
 options kmix
   branch KDE/4.12
 end options
 ```
 
-Now when you run kdesrc-build, all of the KDE multimedia programs will
+Now when you run kde-builder, all of the KDE multimedia programs will
 be built from the “master” branch of the source repository, but KMix
 will be built from the older “KDE/4.12” branch. By using `options` you
 didn't have to individually list all the *other* KDE multimedia programs
 to give them the right branch option.
 
 ```{note}
-Note that this feature is only available in kdesrc-build from version
-1.16, or using the development version of kdesrc-build after 2014-01-12.
+Note that this feature is only available in kde-builder from version
+1.16, or using the development version of kde-builder after 2014-01-12.
 ```
 
 (kdesrc-buildrc-including)=
@@ -174,7 +174,7 @@ For example, you could have something like this:
 
 ```
 global
-    include ~/common-kdesrc-build-options
+    include ~/common-kde-builder-options
 
     # Insert specific options here.
 
@@ -197,7 +197,7 @@ global
   persistent-data-file ~/kde${_ver}/persistent-options.json
 end global
 
-include ~/kde6/src/kdesrc-build/data/build-include/kf${_ver}-qt${_ver}.ksb
+include ~/kde6/src/kde-builder/data/build-include/kf${_ver}-qt${_ver}.ksb
 ```
 
 (kdesrc-buildrc-common)=

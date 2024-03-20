@@ -8,9 +8,9 @@ sets to build to the command line.
 
 ```{code-block} none
 :name: example-subset-build
-:caption: Example output of a kdesrc-build specific module build
+:caption: Example output of a kde-builder specific module build
 
-% kdesrc-build --include-dependencies dolphin
+% kde-builder --include-dependencies dolphin
 Updating kde-build-metadata (to branch master)
 Updating sysadmin-repo-metadata (to branch master)
 
@@ -48,7 +48,7 @@ Your logs are saved in /home/kde-src/kdesrc/log/2018-01-20-07
 ```
 
 In this case, although only the \<dolphin\> application was specified,
-the `--include-dependencies` flag caused kdesrc-build to include the
+the `--include-dependencies` flag caused kde-builder to include the
 dependencies listed for \<dolphin\> (by setting the
 [include-dependencies](#conf-include-dependencies) option).
 

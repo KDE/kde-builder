@@ -1,11 +1,11 @@
-(kdesrc-build-logging)=
-# kdesrc-build's build logging
+(kde-builder-logging)=
+# kde-builder's build logging
 
 (logging-overview)=
 ## Logging overview
 
-Logging is a kdesrc-build feature whereby the output from every command
-that kdesrc-build runs is saved to a file for examination later, if
+Logging is a kde-builder feature whereby the output from every command
+that kde-builder runs is saved to a file for examination later, if
 necessary. This is done because it is often necessary to have the output
 of these programs when there is a build failure, because there are so
 many reasons why a build can fail in the first place.
@@ -20,17 +20,17 @@ value of the [source-dir](#conf-source-dir) option. The in rest of this
 section, this value will be referred to as `${log-dir}`).
 
 Under `${log-dir}`, is a set of directories, one for every time that
-kdesrc-build was run. Each directory is named with the date, and the run
-number. For instance, the second time that kdesrc-build is run on May
+kde-builder was run. Each directory is named with the date, and the run
+number. For instance, the second time that kde-builder is run on May
 26, 2004, it would create a directory called `2004-05-26-02`, where the
 2004-05-26 is for the date, and the -02 is the run number.
 
-For your convenience, kdesrc-build will also create a link to the logs
+For your convenience, kde-builder will also create a link to the logs
 for your latest run, called `latest`. So the logs for the most recent
-kdesrc-build run should always be under `${log-dir}/latest`.
+kde-builder run should always be under `${log-dir}/latest`.
 
-Now, each directory for a kdesrc-build run will itself contain a set of
-directories, one for every KDE module that kdesrc-build tries to build.
+Now, each directory for a kde-builder run will itself contain a set of
+directories, one for every KDE module that kde-builder tries to build.
 Also, a file called `build-status` will be contained in the directory,
 which will allow you to determine which modules built and which failed.
 
@@ -38,13 +38,13 @@ which will allow you to determine which modules built and which failed.
 If a module itself has a submodule (such as extragear/multimedia,
 playground/utils, or KDE/kdelibs), then there would actually be a
 matching layout in the log directory. For example, the logs for
-KDE/kdelibs after the last kdesrc-build run would be found in
+KDE/kdelibs after the last kde-builder run would be found in
 `${log-dir}/latest/KDE/kdelibs`, and not under
 `${log-dir}/latest/kdelibs`.
 ```
 
 In each module log directory, you will find a set of files for each
-operation that kdesrc-build performs. If kdesrc-build updates a module,
+operation that kde-builder performs. If kde-builder updates a module,
 you may see filenames such as `git-checkout-update.log` (for a module
 checkout or when updating a module that has already been checked out).
 If the `configure` command was run, then you would expect to see a
@@ -52,11 +52,11 @@ If the `configure` command was run, then you would expect to see a
 
 If an error occurred, you should be able to see an explanation of why in
 one of the files. To help you determine which file contains the error,
-kdesrc-build will create a link from the file containing the error (such
+kde-builder will create a link from the file containing the error (such
 as `build-1.log` to a file called `error.log`).
 
 The upshot to all of this is that to see why a module failed to build
-after your last kdesrc-build, the file you should look at first is
+after your last kde-builder, the file you should look at first is
 `${log-dir}/latest/module-name/error.log`.
 
 ```{tip}
@@ -64,9 +64,9 @@ If the file `error.log` is empty (especially after an installation),
 then perhaps there was no error. Some of the tools used by the KDE build
 system will sometimes mistakenly report an error when there was none.
 
-Also, some commands will evade kdesrc-build's output redirection and
+Also, some commands will evade kde-builder's output redirection and
 bypass the log file in certain circumstances (normally when performing
 the first Git checkout), and the error output in that case is not in the
 log file but is instead at the Konsole or terminal where you ran
-kdesrc-build.
+kde-builder.
 ```

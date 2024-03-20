@@ -2,15 +2,15 @@
 
 ## DESCRIPTION
 
-This is ksb::Module, one of the core classes within kdesrc-build. It represents
-any single "buildable" module that kdesrc-build can manage. It acts as a common
+This is ksb::Module, one of the core classes within kde-builder. It represents
+any single "buildable" module that kde-builder can manage. It acts as a common
 interface to the multiple types of build systems and source control management
-systems that kdesrc-build supports.
+systems that kde-builder supports.
 
 The many options available to the user are managed using setOption/getOption
 (but see also the ksb::OptionsBase class that this derives from).
 
-kdesrc-build manages persistent metadata for each module as well, see
+kde-builder manages persistent metadata for each module as well, see
 {set,get}PersistentOption
 
 ## METHODS
@@ -49,12 +49,12 @@ change settings, etc.
 
 * ``setOption``, sets a configuration option that can be checked later using
   getOption.  Normally set from user input (cmdline or rc-file) but supports
-  ways for kdesrc-build to internally override user settings or set hidden
+  ways for kde-builder to internally override user settings or set hidden
   flags for action in later phases. Does not survive beyond the current
   execution.
 
 * ``setPersistentOption``, sets an option to a string value that will be
-  read-in again on the next kdesrc-build run and can then be queried again.
+  read-in again on the next kde-builder run and can then be queried again.
 
 * ``unsetPersistentOption``, removes an existing persistent option.
 
@@ -162,7 +162,7 @@ just from the method name, sadly.
 * ``getPersistentOption``, similar to ``getOption``, only without the
   module/global magic and the append/mask magic, and the subprocess-support
   magic. But this function can return options that have been set in a previous
-  kdesrc-build run. kdesrc-build uses the location of the rc-file to determine
+  kde-builder run. kde-builder uses the location of the rc-file to determine
   where to look for data from prior runs.
 
 #### KDE-SPECIFIC HANDLERS
@@ -205,7 +205,7 @@ just from the method name, sadly.
   ``setupEnvironment``. This is needed since $ENV is not actually updated by
   ksb::BuildContext until after a new child process is ``fork``'ed.
 
-* ``setupEnvironment``, called by the kdesrc-build build driver, running in a
+* ``setupEnvironment``, called by the kde-builder build driver, running in a
   subprocess, before calling the appropriate update/build/install etc. method.
 
 * ``getPostBuildMessages``, which returns a list of messages intended to be shown

@@ -1,12 +1,12 @@
-# kdesrc-build documentation
+# kde-builder documentation
 
 Michael Pyne <mpyne@kde.org>
 v18.12, 2018-11-22
 
-kdesrc-build is intended to build KDE-based software from its source repository, although it can build
+kde-builder is intended to build KDE-based software from its source repository, although it can build
 other types of software from its native source control system(s) as well.
 
-This documentation is intended for developers to aid in hacking on kdesrc-build itself, or porting the same concepts
+This documentation is intended for developers to aid in hacking on kde-builder itself, or porting the same concepts
 to other build systems if necessary.
 
 ## Concepts
@@ -15,7 +15,7 @@ Some basic concepts are assumed throughout for brevity.
 
 ### Modules
 
-kdesrc-build uses the "module" as the most granular level of buildable
+kde-builder uses the "module" as the most granular level of buildable
 software. Each module has a name, unique in the list of all modules.
 Each module can have a specific source control system plugin (Git,
 KDE's git, etc.) and a build system plugin (qmake, CMake, KDE's
@@ -49,7 +49,7 @@ Each module can refer to the global build context.
 
 ### Configuration file (rc-file)
 
-kdesrc-build uses a configuration file (usually abbreviated the `rc-file`) to
+kde-builder uses a configuration file (usually abbreviated the `rc-file`) to
 store:
 
 . The list of modules to build, and
@@ -57,19 +57,19 @@ store:
 . The build or configuration options to use by default or on a per-module
 basis.
 
-When kdesrc-build is run, it will use `kdesrc-buildrc` located in the current
+When kde-builder is run, it will use `kdesrc-buildrc` located in the current
 working directory. If this file is not present, the global rc-file at
 `~/.config/kdesrc-build/kdesrc-buildrc`
 (`$XDG_CONFIG_HOME/kdesrc-build/kdesrc-buildrc`, if `XDG_CONFIG_HOME`
 environment variable is set) is used instead.
 
-If neither of above is found, kdesrc-build will fallback to `~/.kdesrc-buildrc`.
+If neither of above is found, kde-builder will fallback to `~/.kdesrc-buildrc`.
 This location is checked only for backward compatibility; it is advised to move
 the configuration file to the XDG compliant path instead.
 
 ### Command line
 
-kdesrc-build uses the command line (seen as "cmdline" in the source and commit
+kde-builder uses the command line (seen as "cmdline" in the source and commit
 logs) to override the list of modules to build (nearly always still requiring
 that any modules built are visible from the rc-file). The command line is also
 used to override various options (such as skipping source update phases),
@@ -84,7 +84,7 @@ With the adoption of git, KDE exploded to having hundreds of repositories. It
 would be annoying and error-prone to try to manually update the rc-file with
 the list of modules to build and the proper ordering.
 
-Because of this, kdesrc-build supports grouping modules into "module sets" of
+Because of this, kde-builder supports grouping modules into "module sets" of
 modules that have common options and a common repository URL prefix, as if the
 user had manually entered those modules one by one.
 
@@ -105,9 +105,9 @@ also supported!
 
 ### Pretend mode
 
-The user can pass a `--pretend` cmdline flag to have kdesrc-build not
+The user can pass a `--pretend` cmdline flag to have kde-builder not
 actually undertake the more time or resource intensive actions, so that the
-user can see what kdesrc-build would do and tweak their cmdline until it looks
+user can see what kde-builder would do and tweak their cmdline until it looks
 correct, and then remove the --pretend flag from there.
 
 This significantly influences the design of the script, both in action and
@@ -120,14 +120,14 @@ This is both to declutter the terminal output and to enable troubleshooting
 after a build failure.
 
 The logs are generally kept in a separate directory for each separate run of
-kdesrc-build.  A "latest" symlink is created for each module name, which points
+kde-builder.  A "latest" symlink is created for each module name, which points
 to the last instance of a script run.
 
 If a build ends in a failure, an error.log symlink is created in the specific
 log directory for that module, which points to the specific build phase output
 file where the build was determined to have failed.
 
-Sometimes there is no log though (e.g. an internal kdesrc-build failure outside
+Sometimes there is no log though (e.g. an internal kde-builder failure outside
 of log_command)!
 
 Some users prefer to have TTY output. For now the --debug cmdline option is
@@ -135,7 +135,7 @@ useful for that, but --debug has a significant amount of other changes as well.
 
 ## Basic flow
 
-For each script execution, kdesrc-build generically goes through the following
+For each script execution, kde-builder generically goes through the following
 steps:
 
 . Read the cmdline to determine global options, list of module *selectors*

@@ -3,5 +3,5 @@
 
 ```{toctree}
 features
-kdesrc-build-logging
+kde-builder-logging
 ```

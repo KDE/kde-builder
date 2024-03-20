@@ -10,15 +10,14 @@ the newly-built desktop is used.
 (session-driver)=
 ## Automatically installing a login driver
 
-Starting from version 1.16, kdesrc-build will try to install an
+Starting from version 1.16, kde-builder will try to install an
 appropriate login driver, that will allow you to login to your
-kdesrc-build-built KDE desktop from your login manager. This can be
+kde-builder built KDE desktop from your login manager. This can be
 disabled by using the `install-session-driver` configuration file
 option.
 
 ```{note}
-Session setup does not occur while kdesrc-build is running in pretend
-mode.
+Session setup does not occur while kde-builder is running in pretend mode.
 ```
 
 This driver works by setting up a custom “`xsession`” session type. This
@@ -58,14 +57,14 @@ types as follows:
 (proc-adding-xsession-type)=
 Procedure: Adding an .xsession login session type
 
-1. Create the file `/usr/share/xsessions/kdesrc-build.desktop`.
+1. Create the file `/usr/share/xsessions/kde-builder.desktop`.
 
 2. Ensure the file just created has the following text:
 
 ```
 Type=XSession
 Exec=<1>$HOME/.xsession
-Name=KDE Plasma Desktop (unstable; kdesrc-build)
+Name=KDE Plasma Desktop (unstable; kde-builder)
 ```
 
 (session-homedir)=
@@ -74,9 +73,9 @@ Name=KDE Plasma Desktop (unstable; kdesrc-build)
     does not allow for user-generic files.
 
 3. When the login manager is restarted, it should show a new session
-  type, “KDE Plasma Desktop (unstable; kdesrc-build)” in its list of
+  type, “KDE Plasma Desktop (unstable; kde-builder)” in its list of
   sessions, which should try to run the `.xsession` file installed by
-  kdesrc-build if it is selected when you login.
+  kde-builder if it is selected when you login.
 
 ```{note}
   It may be easiest to restart the computer to restart the login
@@ -93,4 +92,4 @@ instructions have been moved to an appendix (the section called [](#old-profile-
 
 If you intend to setup your own login support you can consult that
 appendix or view the `kde-env-master.sh.in` file included with the
-kdesrc-build source.
+kde-builder source.

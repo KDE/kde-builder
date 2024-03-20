@@ -1,11 +1,11 @@
-# kdesrc-build Documentation
+# kde-builder Documentation
 
 If you're reading this, it's probably from Gitlab. Welcome!
 
 The documentation in this directory is split into two major categories:
 
 1. Documentation for end users.
-2. Documentation for kdesrc-build developers.
+2. Documentation for kde-builder developers.
 
 ## End User Documentation
 
@@ -15,8 +15,8 @@ documentation standards.
 
 Most users access these docs at
 [docs.kde.org](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/), and
-kdesrc-build itself will show URLs to specific portions of this documentation
-if you run `kdesrc-build --help`, one pointing to the [table of configuration
+kde-builder itself will show URLs to specific portions of this documentation
+if you run `kde-builder --help`, one pointing to the [table of configuration
 options](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html)
 and the other to the [list of command-line
 options](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/cmdline.html).
@@ -29,61 +29,61 @@ directory and generate multiple HTML files from the index.docbook.
 ### Man page
 
 There is also a man page, also authored in Docbook, at
-`man-kdesrc-build.1.docbook`. It will
-be built and installed to the KDE-specific `MANPATH` if you build kdesrc-build
+`man-kde-builder.1.docbook`. It will
+be built and installed to the KDE-specific `MANPATH` if you build kde-builder
 with CMake.  The content is mostly the same as in the normal DocBook docs but
 can be more convenient at the command line, especially if Internet access is
 not available.
 
-## Documentation for kdesrc-build developers
+## Documentation for kde-builder developers
 
-Documentation for kdesrc-build itself is mostly within the source files, but I've put
+Documentation for kde-builder itself is mostly within the source files, but I've put
 scattered attempts together over time trying to improve that.
 
 Older bits of documentation can be found in source-reference directory.
 
-## kdesrc-build Tricks
+## kde-builder Tricks
 
-These are some kdesrc-build tricks that probably should be documented with the
+These are some kde-builder tricks that probably should be documented with the
 [KDE Community Wiki page](https://community.kde.org/Get_Involved/development#Set_up_kdesrc-build)
 but for now they're at least worth nothing here:
 
-- Use `kdesrc-build --rebuild-failures` (potentially with `--no-src`) to
-  rebuild modules that failed to build during the last kdesrc-build run. This
+- Use `kde-builder --rebuild-failures` (potentially with `--no-src`) to
+  rebuild modules that failed to build during the last kde-builder run. This
   is particularly useful when a silly local error breaks an important module
   and several dozen dependent modules.
 
 - Use the `--no-stop-on-failure` command-line option (or
-  the corresponding configuration file option) to make kdesrc-build not abort
+  the corresponding configuration file option) to make kde-builder not abort
   after the first module fails to build.
 
-- Either way if you're running kdesrc-build frequently as part of a
+- Either way if you're running kde-builder frequently as part of a
   debug/build/debug cycle, don't forget to throw `--no-src` on the command line
   as appropriate.  If the build failed halfway through it is likely that all
-  source updates completed, even for modules kdesrc-build didn't try to build.
+  source updates completed, even for modules kde-builder didn't try to build.
 
 - It is possible to build many module types that are not official KDE projects.
   This may be needed for upstream dependencies or simply because you only need
   a module to support your KDE-based workspace or application.
 
-- There are many ways to have kdesrc-build find the right configuration. If you
+- There are many ways to have kde-builder find the right configuration. If you
   have only a single configuration you want then a ~/.kdesrc-buildrc might be
   the right call. If you want to support multiple configurations, then you can
   create multiple directories and have a file "kdesrc-buildrc" in each
-  directory, which kdesrc-build will find if you run the script from that
+  directory, which kde-builder will find if you run the script from that
   directory.
 
-- Don't forget to have kdesrc-build update itself from git!
+- Don't forget to have kde-builder update itself from git!
 
-- You can use the 'branch' and 'tag' options to kdesrc-build to manually choose
+- You can use the 'branch' and 'tag' options to kde-builder to manually choose
   the proper git branch or tag to build. With KDE modules you should not
   normally need this. If even these options are not specific enough, then
   consider the 'revision' option, or manage the source code manually and use
   `--no-src` for that module.
 
 - You can refer to option values that have been previously set in your
-  kdesrc-build configuration file, by using the syntax ${option-name}. There's
-  no need for the option to be recognized by kdesrc-build, so you can set
+  kde-builder configuration file, by using the syntax ${option-name}. There's
+  no need for the option to be recognized by kde-builder, so you can set
   user-specific variables this way.
 
 - Low on disk space? Use the `remove-after-install` option to clean out
@@ -91,18 +91,18 @@ but for now they're at least worth nothing here:
   times go up.
 
 - Need help setting up environment variables to run your shiny new desktop?
-  kdesrc-build offers a sample ~/.xsession setup (which is supported by many
+  kde-builder offers a sample ~/.xsession setup (which is supported by many
   login managers), which can be used by enabling the `install-session-driver`
   option.
 
-- For KDE-based modules, kdesrc-build can install a module and all of its
+- For KDE-based modules, kde-builder can install a module and all of its
   dependencies, by using the `--include-dependencies` command line option.
   You can also use `--no-include-dependencies` if you just want to build
   a single module this time.
 
-- Use `--resume-from` (or `--resume-after`) to have kdesrc-build start the
+- Use `--resume-from` (or `--resume-after`) to have kde-builder start the
   build from a later module than normal, and `--stop-before` (or
-  `--stop-after`) to have kdesrc-build stop the build at an earlier module than
+  `--stop-after`) to have kde-builder stop the build at an earlier module than
   normal.
 
 - Use the `ignore-modules` option with your module sets if you want to build
@@ -111,15 +111,15 @@ but for now they're at least worth nothing here:
 - Annoyed by the default directory layout? Consider changing the `directory-layout`
   configuration file option.
 
-- kdesrc-build supports building from behind a proxy, for all you corporate
+- kde-builder supports building from behind a proxy, for all you corporate
   types trying to get the latest-and-greatest desktop. Just make sure your
   compilation toolchain is up to the challenge....
 
 - You can use the `custom-build-command` option to setup a custom build tool
   (assumed to be make-compatible). For instance, cmake supports the `ninja`
-  tool, and kdesrc-build can use `ninja` as well via this option.
+  tool, and kde-builder can use `ninja` as well via this option.
 
-- You can also wrap kdesrc-build itself in a script if you want to do things
+- You can also wrap kde-builder itself in a script if you want to do things
 like unusual pre-build setup, post-install cleanup, etc. This also goes well
 with the [`--query`][query] option.
 
@@ -127,12 +127,12 @@ with the [`--query`][query] option.
 
 - Is `build-when-unchanged` disabled? Did you try building from a clean build
   directory? If your answer to either is "No" then try using `--refresh-build`
-  with your next kdesrc-build run to force a clean build directory to be used.
+  with your next kde-builder run to force a clean build directory to be used.
 
-- If you've been running a kdesrc-build-based install for a long time then it
+- If you've been running a kde-builder-based install for a long time then it
   may be time to clean out the installation directory as well, especially if
   you don't use the [use-clean-install][] option to run `make uninstall` as
-  part of the install process. There's no kdesrc-build option to blow up your
+  part of the install process. There's no kde-builder option to blow up your
   installation prefix, but it's not hard to do yourself...
 
 [use-clean-install]: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html#conf-use-clean-install

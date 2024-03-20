@@ -1,5 +1,5 @@
-(kdesrc-build)=
-# KDE SRC Build manual
+(kde-builder)=
+# KDE Builder Documentation
 
 ```{toctree}
 :numbered:
@@ -15,4 +15,4 @@ chapter_appendix_A/appendix-modules
 chapter_appendix_B/appendix-profile
 ```
 
-[manual](man-kdesrc-build.1)
+[manual](man-kde-builder.1)

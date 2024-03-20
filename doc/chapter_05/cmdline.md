@@ -1,12 +1,12 @@
 (cmdline-usage)=
 # Command Line Usage
 
-kdesrc-build is designed to be run as follows:
+kde-builder is designed to be run as follows:
 
-kdesrc-build \[--options\] \[modules to build...\]
+kde-builder \[--options\] \[modules to build...\]
 
 If no modules to build are specified on the command line, then
-kdesrc-build will build all modules defined in its configuration file,
+kde-builder will build all modules defined in its configuration file,
 in the order listed in that file (although this can be modified by
 various configuration file options).
 
@@ -20,7 +20,7 @@ pass modules that are part of a module set, either as named on
 itself, if you have given it a name.
 
 In the specific case of module sets based against the [KDE project
-database](#kde-projects-module-sets), kdesrc-build will expand module
+database](#kde-projects-module-sets), kde-builder will expand module
 name components to determine the exact module you want. For example,
 kdesrc-build's KDE project entry locates the project in
 `extragear/utils/kdesrc-build`. You could specify any of the following
@@ -49,7 +49,7 @@ want.
 ## Commonly used command line options
 
 `--pretend` (or `-p`)  
-This option causes kdesrc-build to indicate what actions it would take,
+This option causes kde-builder to indicate what actions it would take,
 without actually really implementing them. This can be useful to make
 sure that the modules you think you are building will actually get
 built.
@@ -57,7 +57,7 @@ built.
 `--no-src`  
 This option skips the source update process. You might use it if you
 have very recently updated the source code (perhaps you did it manually
-or recently ran kdesrc-build) but still want to rebuild some modules.
+or recently ran kde-builder) but still want to rebuild some modules.
 
 `--no-include-dependencies` (or `-D`)  
 Only process the selected modules, skipping their dependencies. Useful
@@ -65,7 +65,7 @@ when you have changed only selected modules, and you are sure you do not
 need to rebuild the others.
 
 `--refresh-build` (or `-r`)  
-This option forces kdesrc-build to build the given modules from an
+This option forces kde-builder to build the given modules from an
 absolutely fresh start point. Any existing build directory for that
 module is removed and it is rebuilt. This option is useful if you have
 errors building a module, and sometimes is required when Qt or KDE

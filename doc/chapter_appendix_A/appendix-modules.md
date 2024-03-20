@@ -10,13 +10,13 @@ introduction of the [Git](https://git-scm.com/)-based [source code
 repositories](https://commits.kde.org/), these large modules were
 further split into many smaller modules.
 
-kdesrc-build uses this module concept as well. In essence, a “module” is
+kde-builder uses this module concept as well. In essence, a “module” is
 a grouping of code that can be downloaded, built, tested, and installed.
 
 (single-modules)=
 ### Individual modules
 
-It is easy to set kdesrc-build to build a single module. The following
+It is easy to set kde-builder to build a single module. The following
 listing is an example of what a declaration for a Git-based module would
 look like in [the configuration file](../chapter_04/kdesrc-buildrc).
 
@@ -38,7 +38,7 @@ is listed as an example only, it is not required.
 Now most KDE source modules are Git-based KDE, and are normally combined
 into groups of modules.
 
-kdesrc-build therefore supports groups of modules as well, using [module
+kde-builder therefore supports groups of modules as well, using [module
 sets](#module-sets). An example:
 
 ```
@@ -50,12 +50,12 @@ end module-set
 
 ```{tip}
 You can leave the module set name (\<base-modules\> in this case) empty
-if you like. This `repository` setting tells kdesrc-build where to
+if you like. This `repository` setting tells kde-builder where to
 download the source from, but you can also use a `git://` URL.
 ```
 
 One special feature of the “`repository` `kde-projects`” is that
-kdesrc-build will automatically include any Git modules that are grouped
+kde-builder will automatically include any Git modules that are grouped
 under the modules you list (in the KDE Project database).
 
 (module-branch-groups)=
@@ -70,7 +70,7 @@ So the concept of “branch groups” was developed, to allow users and
 developers to select one of only a few groups, and allow the script to
 automatically select the appropriate Git branch.
 
-kdesrc-build supports this feature as of version 1.16-pre2, via the
+kde-builder supports this feature as of version 1.16-pre2, via the
 [branch-group](#conf-branch-group) option.
 
 branch-group can be used in the configuration file as follows:
@@ -105,7 +105,7 @@ each Git module.
 
 This feature requires some data maintained by the KDE developers in a
 Git repository named `kde-build-metadata`, however this module will be
-included automatically by kdesrc-build (though you may see it appear in
+included automatically by kde-builder (though you may see it appear in
 the script output).
 
 ```{tip}

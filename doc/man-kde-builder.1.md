@@ -1,14 +1,14 @@
 Michael Pyne mpyne@kde.org
 Authored man page
 2019-08-31
-kdesrc-build 19.08
-kdesrc-build 1
+kde-builder 19.08
+kde-builder 1
 19.08
-kdesrc-build
+kde-builder
 
 Downloads, builds and installs KDE software.
 
-kdesrc-build
+kde-builder
 
 OPTIONS
 
@@ -16,10 +16,10 @@ Module name \| Module set name
 
 # DESCRIPTION
 
-The `kdesrc-build` command is used in order to download and build KDE
+The `kde-builder` command is used in order to download and build KDE
 software directly from its source Git repositories. It interfaces with
 the KDE project database, and supports controlling which options are
-passed to `make`(1) and `cmake`(1). The operation of `kdesrc-build` is
+passed to `make`(1) and `cmake`(1). The operation of `kde-builder` is
 driven by a configuration file, typically `~/.config/kdesrc-buildrc`
 (`$XDG_CONFIG_HOME/kdesrc-buildrc`, if `$XDG_CONFIG_HOME` is set).
 
@@ -30,19 +30,19 @@ in a `module` definition or `use-modules` declaration, or in a
 module listed in the KDE project database (and you can precede the
 module name with `+` to force this).
 
-`kdesrc-build` is designed to be able to be completely headless
+`kde-builder` is designed to be able to be completely headless
 (however, see **ENVIRONMENT**), and so typically ignores its input
 completely. Command output is logged instead of being shown on the
-kdesrc-build output.
+kde-builder output.
 
 Modules are built one after the other. If a module fails to update then
-it is not built. `kdesrc-build` will not abort just because of a module
+it is not built. `kde-builder` will not abort just because of a module
 failure, instead it will keep trying to update and build subsequent
-modules. By default, `kdesrc-build` will commence building a module as
+modules. By default, `kde-builder` will commence building a module as
 soon as the source code update is complete for that module, even if
 other updates are occurring concurrently.
 
-At the end `kdesrc-build` will show which modules failed to build, and
+At the end `kde-builder` will show which modules failed to build, and
 where the logs were kept for that build run.
 
 # OPTIONS
@@ -56,26 +56,26 @@ parser does not support combining short options into one at this point.
 Shows a brief synopsis and frequently-used command line options.
 
 `--show-info`  
-Shows information about kdesrc-build and the operating system which may
+Shows information about kde-builder and the operating system which may
 be useful in bug reports or when requesting help on forums or mailing
 lists.
 
 `--initial-setup`  
-Performs one-time setup for users running kdesrc-build on common
+Performs one-time setup for users running kde-builder on common
 distributions. This includes installation of known system dependencies,
 a default configuration file setup, and changes to your ~/.bashrc to
-make the software installed by kdesrc-build accessible. This is exactly
+make the software installed by kde-builder accessible. This is exactly
 equivalent to using "--install-distro-packages --generate-config" at the
-same time. In kdesrc-build (perl implementation) it additionally uses
+same time. In kde-builder (perl implementation) it additionally uses
 "--install-distro-packages-perl".
 
 `--install-distro-packages`  
 Installs distro packages (on supported Linux distributions) necessary to
-prepare the system for kdesrc-build to operate, and for the
+prepare the system for kde-builder to operate, and for the
 newly-installed KDE software to run.
 
 `--generate-config`  
-Generate the kdesrc-build configuration file.
+Generate the kde-builder configuration file.
 
 `-p, --pretend`  
 Operate in a "dry run" mode. No network accesses are made, no log files
@@ -103,7 +103,7 @@ Skips the metadata update phase for KDE modules. Other phases (including
 the source update phase) are included as normal. If you wish to avoid
 all network updates you should also pass `--no-src`.
 
-This option can be useful if you are frequently running `kdesrc-build`
+This option can be useful if you are frequently running `kde-builder`
 since the metadata itself does not change very often.
 
 `--no-install`  
@@ -132,16 +132,16 @@ performed if applicable, but this will change in a future release)
 `--metadata-only`  
 Only updates the build metadata needed for KDE modules, then exits. This
 is useful to allow the `--pretend` option to work if you've never run
-kdesrc-build. See also `--no-metadata`.
+kde-builder. See also `--no-metadata`.
 
 `-r, --refresh-build`  
 Removes the build directory for a module before the build phase starts.
-This has the desired side effect of forcing `kdesrc-build` to
+This has the desired side effect of forcing `kde-builder` to
 re-configure the module and build it from a "pristine" state with no
 existing temporary or intermediate output files. Use this option if you
 have problems getting a module to build but realize it will take longer
 (possibly much longer) for the build to complete as a result. When in
-doubt use this option for the entire `kdesrc-build` run.
+doubt use this option for the entire `kde-builder` run.
 
 `--reconfigure`  
 Force CMake to be re-run, but without deleting the build directory.
@@ -171,7 +171,7 @@ you've manually built/installed foo after fixing the build and just want
 to resume from there.
 
 `--resume`  
-This option can be used to run `kdesrc-build` after it has had a build
+This option can be used to run `kde-builder` after it has had a build
 failure.
 
 It resumes the build from the module that failed, using the list of
@@ -196,17 +196,17 @@ included in the build.
 This flag may be used with `--resume-from` or `--resume-after`.
 
 `-d, --include-dependencies`  
-This causes `kdesrc-build` to include not only the modules it would
+This causes `kde-builder` to include not only the modules it would
 normally build (either because they were specified on the command line,
 or mentioned in the configuration file), but also to include *known
 dependencies* of those modules in the build. This is normally the
 default; you can use `--no-include-dependencies` to disable this effect.
 
-Dependencies are “known” to `kdesrc-build` based on the contents of the
+Dependencies are “known” to `kde-builder` based on the contents of the
 special *kde-build-metadata* git repository, which is managed for you by
 the script (see also the `--metadata-only` option). The KDE community
 keeps the dependency information in that module up to date, so if
-`kdesrc-build` appears to show the wrong dependencies then it may be due
+`kde-builder` appears to show the wrong dependencies then it may be due
 to missing or incorrect dependency information.
 
 All known dependencies will be included, which may be more than you
@@ -219,27 +219,27 @@ configured dependencies to be included by default.
 
 `--rebuild-failures`  
 Use this option to build only those modules which failed to build on a
-previous `kdesrc-build` run. This is useful if a significant number of
+previous `kde-builder` run. This is useful if a significant number of
 failures occurred mixed with successful builds. After fixing the issue
 causing the build failures you can then easily build only the modules
 that failed previously.
 
 Note that the list of “previously-failed modules” is reset every time a
-`kdesrc-build` run finishes with some module failures. However it is not
+`kde-builder` run finishes with some module failures. However it is not
 reset by a completely successful build, so you can successfully rebuild
 a module or two and this flag will still work.
 
-This option was added for kdesrc-build 15.09.
+This option was added for kde-builder 15.09.
 
 `--stop-on-failure, --no-stop-on-failure`  
 This option causes the build to abort as soon as a failure occurs. This
-is the default. With negative flag, `kdesrc-build` will try to press on
+is the default. With negative flag, `kde-builder` will try to press on
 with the rest of the modules in the build to avoid wasting time in case
 the problem is with a single module.
 
 `-!, --ignore-modules`  
 Forces **ALL** modules that follow this option to be excluded from
-consideration by `kdesrc-build`. This might be useful if you know you
+consideration by `kde-builder`. This might be useful if you know you
 want to process all modules except for specific exceptions.
 
 `--rc-file=foo`  
@@ -248,8 +248,8 @@ Use the given file, \<foo\>, for the configuration instead of
 but it must exist.
 
 `--nice=foo`  
-Changes the CPU priority given to `kdesrc-build` (and all processes used
-by `kdesrc-build` e.g. `make`(1)). \<foo\> should be an integer number
+Changes the CPU priority given to `kde-builder` (and all processes used
+by `kde-builder` e.g. `make`(1)). \<foo\> should be an integer number
 between -20 and 19. Positive values are "nicer" to the rest of the
 system (i.e. lower priority).
 
@@ -267,7 +267,7 @@ All command line arguments present after this option are passed to
 \<foo\> as it is run.
 
 `--query=mode`  
-This command causes `kdesrc-build` to query a parameter of the modules
+This command causes `kde-builder` to query a parameter of the modules
 in the build list (either passed on the command line or read in from the
 configuration file), outputting the result to screen (one module per
 line).
@@ -275,27 +275,27 @@ line).
 This option must be provided with a “query mode”, which should be one of
 the following:
 
-- `source-dir`, which causes `kdesrc-build` to output the full path to
+- `source-dir`, which causes `kde-builder` to output the full path to
   where the module's source code is stored.
 
-- `build-dir`, which causes `kdesrc-build` to output the full path to
+- `build-dir`, which causes `kde-builder` to output the full path to
   where the module build process occurs.
 
-- `install-dir`, which causes `kdesrc-build` to output the full path to
+- `install-dir`, which causes `kde-builder` to output the full path to
   where the module will be installed.
 
-- `project-path`, which causes `kdesrc-build` to output the location of
+- `project-path`, which causes `kde-builder` to output the location of
   the module within the hierarchy of KDE source code repositories.
 
-- `branch`, which causes `kdesrc-build` to output the resolved git
+- `branch`, which causes `kde-builder` to output the resolved git
   branch that will be used for each module, based on the `tag`, `branch`
   and `branch-group` settings in effect.
 
-- `module-set`, which causes kdesrc-build to output the name of
+- `module-set`, which causes kde-builder to output the name of
   module-set which contains the module. This can be used to generate zsh
   autocompletion cache.
 
-- `build-system`, which causes kdesrc-build to output the name of build
+- `build-system`, which causes kde-builder to output the name of build
   system detected for the module. This can be used to debug build system
   auto-detection problems, or when developing tests for specific build
   systems.
@@ -304,9 +304,9 @@ the following:
   configuration file can be used, the resolved value of which will be
   listed for each module.
 
-This option was added with `kdesrc-build` 16.05.
+This option was added with `kde-builder` 16.05.
 
-For example, the command “`kdesrc-build` `--query` `branch`
+For example, the command “`kde-builder` `--query` `branch`
 `kactivities` `kdepim`” might end up with output like:
 
 ```
@@ -337,43 +337,43 @@ Disables "colorful output". This can be made permanent by setting the
 `colorful-output` option to false (or 0) in your configuration file.
 
 `--async`  
-Have `kdesrc-build` start the build process for a module as soon as the
-source code has finished downloading. Without this option `kdesrc-build`
+Have `kde-builder` start the build process for a module as soon as the
+source code has finished downloading. Without this option `kde-builder`
 performs all source updates at once and only then starts with the build
 process. This option is enabled by default.
 
 `--no-async`  
 Disables asynchronous building of modules. See `--async` for a more
-detailed description. Note that `kdesrc-build`'s output will be slightly
+detailed description. Note that `kde-builder`'s output will be slightly
 different in this mode.
 
 `--verbose`  
-Increases the level of verbosity of `kdesrc-build` output (which is
+Increases the level of verbosity of `kde-builder` output (which is
 already fairly verbose!)
 
 `-q, --quiet`  
-Makes `kdesrc-build` less noisy. Only important messages are shown.
+Makes `kde-builder` less noisy. Only important messages are shown.
 
 `--really-quiet`  
-Makes `kdesrc-build` even less noisy. Only warnings/errors are shown.
+Makes `kde-builder` even less noisy. Only warnings/errors are shown.
 
 `--debug`  
 This will fill your terminal with descriptions and debugging output,
-usually unintelligible, describing what `kdesrc-build` is doing (and
+usually unintelligible, describing what `kde-builder` is doing (and
 thinks it should be doing). The flag is included since the output may
 sometimes prove useful for debugging.
 
 `--force-build`  
-Normally when `kdesrc-build` notices that there is no source update on a
+Normally when `kde-builder` notices that there is no source update on a
 module which was previously successfully installed, it does not attempt
 to build or install that module. You can pass this flag to disable that
 behavior and always run `make`.
 
 `--delete-my-patches`  
-This option must be passed to allow `kdesrc-build` to remove conflicting
+This option must be passed to allow `kde-builder` to remove conflicting
 source directories. Currently even this only happens when trying to
 clone a git-based module if an existing source directory is present.
-Never specify this option unless it is suggested by `kdesrc-build`, and
+Never specify this option unless it is suggested by `kde-builder`, and
 only if you don't mind the source directories that are referenced being
 deleted and re-cloned.
 
@@ -400,14 +400,14 @@ failed, but is also used for any abnormal program end not otherwise
 covered below.
 
 **5**  
-A signal was received that killed `kdesrc-build`, but it attempted to
+A signal was received that killed `kde-builder`, but it attempted to
 perform normal closedown.
 
 **8**  
 Unknown option was passed on the command line.
 
 **99**  
-An exception was raised that forced `kdesrc-build` to abort early.
+An exception was raised that forced `kde-builder` to abort early.
 
 # ENVIRONMENT
 
@@ -422,21 +422,21 @@ to this variable (e.g. for running from `cron`(8)).
 
 `LC_`\*  
 Environment variables starting with LC\_ control the locale used by
-`kdesrc-build`. Although `kdesrc-build` is still not localizable at this
-point, many of the commands it uses are. `kdesrc-build` normally sets
+`kde-builder`. Although `kde-builder` is still not localizable at this
+point, many of the commands it uses are. `kde-builder` normally sets
 `LC_ALL`=C for commands that its must examine the output of but you can
-manually do this as well. If setting `LC_ALL`=C fixes a `kdesrc-build`
+manually do this as well. If setting `LC_ALL`=C fixes a `kde-builder`
 problem please submit a bug report.
 
 `SSH_AGENT_PID`  
 This environment variable is checked to see if `ssh-agent`(1) is
-running, but only if `kdesrc-build` determines that you are checking out
+running, but only if `kde-builder` determines that you are checking out
 a module that requires an SSH login (but you should know this as no
 module requires this by default).
 
 `KDESRC_BUILD_USE_TTY`  
-If set, this variable forces `kdesrc-build` not to close its input while
-executing system processes. Normally `kdesrc-build` closes `stdin` since
+If set, this variable forces `kde-builder` not to close its input while
+executing system processes. Normally `kde-builder` closes `stdin` since
 the `stdout` and `stderr` for its child processes are redirected and
 therefore the user would never see an input prompt anyways.
 
@@ -446,18 +446,18 @@ just after reading options and command line arguments and determining
 which modules to build. You pretty much never want to set this.
 
 others  
-Many programs are used by `kdesrc-build` in the course of its execution,
+Many programs are used by `kde-builder` in the course of its execution,
 including `git`(1), `make`(1), and `cmake`(1). Each of these programs
 may have their own response to environment variables being set.
-`kdesrc-build` will pass environment variables that are set when it is
+`kde-builder` will pass environment variables that are set when it is
 run onto these processes. You can ensure certain environment variables
 (e.g. `CC` or `CXX`) are set by using the `set-env` configuration file
 option.
 
 # SIGNALS
 
-kdesrc-build supports `SIGHUP`, which if received will cause
-kdesrc-build to exit after the current modules for the build thread (and
+kde-builder supports `SIGHUP`, which if received will cause
+kde-builder to exit after the current modules for the build thread (and
 update thread, if still active) have completed.
 
 # FILES
@@ -466,59 +466,59 @@ update thread, if still active) have completed.
 `$XDG_CONFIG_HOME` is set) - Default global configuration file.
 
 `kdesrc-buildrc` - If this file is found in the **current directory**
-when kdesrc-build is run, this file will be used for the configuration
+when kde-builder is run, this file will be used for the configuration
 instead of `~/.config/kdesrc-buildrc`.
 
 `~/.local/state/kdesrc-build-data` (`$XDG_STATE_DIR/kdesrc-buildrc`, if
-`$XDG_STATE_DIR` is set) - `kdesrc-build` uses this file to store
+`$XDG_STATE_DIR` is set) - `kde-builder` uses this file to store
 persistent data (such as last CMake options used, last revision
 successfully installed, etc.). It can be safely deleted.
 
 # BUGS
 
 See <https://bugs.kde.org/>. Be sure to search against the
-`kdesrc-build` product.
+`kde-builder` product.
 
 # EXAMPLE
 
-\$ `kdesrc-build`  
+\$ `kde-builder`  
 Downloads, builds and installs all modules listed in the configuration
 file, in the order defined therein.
 
-\$ `kdesrc-build --pretend`  
+\$ `kde-builder --pretend`  
 Same as above, except no permanent actions are taken (specifically no
 log files are created, downloads performed, build processes run, etc.).
 **EXCEPTION**: If you are trying to build a module defined in the KDE
 project database, and the database has not been downloaded yet,
-`kdesrc-build` will download the database since this can significantly
+`kde-builder` will download the database since this can significantly
 affect the final build order.
 
-\$ `kdesrc-build --no-src --refresh-build kdebase`  
+\$ `kde-builder --no-src --refresh-build kdebase`  
 Deletes the build directory for the *kdebase* module set
 (`--refresh-build`) and then starts the build process again without
 updating the source code in-between.
 
-\$ `kdesrc-build --rc-file /dev/null --pretend`  
-Forces `kdesrc-build` to read an empty configuration file and simulate
+\$ `kde-builder --rc-file /dev/null --pretend`  
+Forces `kde-builder` to read an empty configuration file and simulate
 the resultant build process. This shows what would happen by default
 with no configuration file, without an error message about a missing
 configuration file.
 
-\$ `kdesrc-build +kdebase/kde-baseapps`  
+\$ `kde-builder +kdebase/kde-baseapps`  
 Downloads, builds and installs the `kde-baseapps` module from the KDE
 project database. Since the module name is preceded by a `+` it is
 assumed to defined in the KDE project database even if this hasn't been
 specifically configured in the configuration file.
 
-The `kdebase/` portion forces `kdesrc-build` to ignore any
+The `kdebase/` portion forces `kde-builder` to ignore any
 `kde-baseapps` modules that are not children of the `kdebase`
 supermodule in the project database (although it is contrived for this
 example).
 
-\$ `kdesrc-build --refresh-build --cmake-options="-DCMAKE_BUILD_TYPE=Debug"`  
+\$ `kde-builder --refresh-build --cmake-options="-DCMAKE_BUILD_TYPE=Debug"`  
 Downloads, builds and installs all modules defined in the configuration
 file but overrides the `cmake-options` option to have the value given on
-the command line for this run only. Any further `kdesrc-build` runs will
+the command line for this run only. Any further `kde-builder` runs will
 use the `cmake-options` given in the configuration file.
 
 # SEE ALSO

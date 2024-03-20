@@ -1,7 +1,7 @@
 # IPC Notes
 
 To support the [async](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html#conf-async)
-parameter, which permits network updates to be run in parallel with the build process, kdesrc-build implements
+parameter, which permits network updates to be run in parallel with the build process, kde-builder implements
 some limited inter-process communication (IPC).
 
 In reality there are 3 separate long-term processes during an async build:
@@ -50,7 +50,7 @@ interface class with a couple of methods meant to be reimplemented by
 subclasses, and which implements the IPC API on top of those subclass-defined
 methods.
 
-The user code in kdesrc-build is required to create the IPC object before
+The user code in kde-builder is required to create the IPC object before
 forking using ["fork" in perlfunc](https://metacpan.org/pod/perlfunc#fork). The parent then declares that it will be the
 receiver and the child declared that it will be the sender.
 
@@ -126,15 +126,15 @@ supported by [Mojolicious](https://docs.mojolicious.org/).
 - Easier use of the Web and APIs
 
     A lot of this work was kicked off based on conversations at Akademy 2018, where
-    people asked about a way to track the progress of a kdesrc-build build using
-    APIs or RPC.  kdesrc-build isn't setup today to host a web server interface
+    people asked about a way to track the progress of a kde-builder build using
+    APIs or RPC.  kde-builder isn't setup today to host a web server interface
     **during** the build, and the [ksb::IPC](https://metacpan.org/pod/ksb%3A%3AIPC) stuff isn't helping on that front.
 
     But this is what Mojolicious is built for.
 
-    However not only would it be good to have kdesrc-build be able to feed
+    However not only would it be good to have kde-builder be able to feed
     information to e.g. a running Plasma applet, but it would also be good for
-    kdesrc-build to be able to make API calls to KDE infrastructure, for things
+    kde-builder to be able to make API calls to KDE infrastructure, for things
     like bug management, creating new work branches in Gitlab, and so on.
 
     For all these things it will be greatly helpful to have the Web-native
@@ -146,7 +146,7 @@ supported by [Mojolicious](https://docs.mojolicious.org/).
     hurt that their "promise"-based API is the same API you'd find in JavaScript,
     including browsers and Node.js ecosystems.
 
-    Unfortunately a lot of this is a fair bit different than what kdesrc-build has
+    Unfortunately a lot of this is a fair bit different than what kde-builder has
     been built to date.  But I think I understand how to port it over time without
     breaking everything.
 
@@ -174,7 +174,7 @@ supported by [Mojolicious](https://docs.mojolicious.org/).
     Ultimately, Mojolicious would permit the main process to split the work of the
     build process up to an even finer degree than "module update" or "module
     build".  This will allow the operating system a better opportunity to let
-    kdesrc-build use whatever is available between disk I/O, CPU, or network I/O.
+    kde-builder use whatever is available between disk I/O, CPU, or network I/O.
 
 ### The plan
 

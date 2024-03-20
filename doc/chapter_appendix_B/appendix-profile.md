@@ -6,11 +6,11 @@
 
 These instructions cover how to setup the profile required to ensure
 your computer can login to your newly-built KDE Plasma desktop.
-kdesrc-build will normally try to do this automatically (see the section called
+kde-builder will normally try to do this automatically (see the section called
 [](#session-driver)). This appendix section can be useful for those
-who cannot use kdesrc-build's support for login profile setup. However
+who cannot use kde-builder's support for login profile setup. However
 the instructions may not always be up-to-date, it can also be useful to
-consult the `kde-env-master.sh.in` file included with the kdesrc-build
+consult the `kde-env-master.sh.in` file included with the kde-builder
 source.
 
 (changing-profile)=
@@ -134,10 +134,10 @@ startx -- :1
 You can go back to the KDE desktop of your regular user by pressing the
 shortcut key for the already running desktop. This is normally
 Ctrl+Alt+F7, you may need to use F6 or F8
-instead. To return to your kdesrc-build-compiled KDE, you would use the
+instead. To return to your kde-builder compiled KDE, you would use the
 same sequence, except with the next function key. For example, if you
 needed to enter Ctrl+Alt+F7 to switch to
 your regular KDE, you would need to enter
 Ctrl+Alt+F8 to go back to your
-kdesrc-build KDE.
+kde-builder KDE.
 ````

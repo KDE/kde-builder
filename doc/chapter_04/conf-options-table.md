@@ -33,7 +33,7 @@ Related command-line option: [--async](#cmdline-async)
 Type: Boolean, Default value: True
 
 Set this option to `false` to disable the colorful output
-of kdesrc-build. Note that kdesrc-build will not output the color codes
+of kde-builder. Note that kde-builder will not output the color codes
 to anything but a terminal (such as xterm, Konsole, or the normal Linux
 console).
 
@@ -45,7 +45,7 @@ Related command-line option: [--color](#cmdline-color)
 Type: Boolean, Default value: False
 
 If you are using SSH to download the Git sources (such as if you are
-using the git+ssh protocol), this option controls if kdesrc-build will
+using the git+ssh protocol), this option controls if kde-builder will
 try and make sure that if you are using ssh-agent, it is actually
 managing some SSH identities. This is to try and prevent SSH from asking
 for your pass phrase for every module.
@@ -56,7 +56,7 @@ Related command-line option: --disable-agent-check, --no-disable-agent-check
 [`git-desired-protocol`](conf-git-desired-protocol)
 
 Type: String, Default value: git, History information: This option
-was added in kdesrc-build 1.16. Prior to 20.06 this option was used to
+was added in kde-builder 1.16. Prior to 20.06 this option was used to
 configure the fetch URL instead of the push URL. As of 20.06
 `https` is always used when updating KDE projects.
 
@@ -111,7 +111,7 @@ end module-set
 ```
 
 The module-set's `use-modules` option created two modules
-internally, with kdesrc-build behaving as if it had read:
+internally, with kde-builder behaving as if it had read:
 
 ```{code-block} shell
 module module1
@@ -124,7 +124,7 @@ end module
 ```
 
 The `kde:` Git repository prefix used above is a shortcut
-which will be setup by kdesrc-build automatically. See the TechBase
+which will be setup by kde-builder automatically. See the TechBase
 [URL Renaming](https://techbase.kde.org/Development/Git/Configuration#URL_Renaming)
 article for more information. Note that unlike most other
 options, this option can be specified multiple times in order to create
@@ -143,7 +143,7 @@ Type: Boolean, Default value: True, Available since: 17.08
 
 Install a shell script that can be sourced in a user's profile setup
 scripts to easily establish needed environment variables to run the
-Plasma desktop built by kdesrc-build.
+Plasma desktop built by kde-builder.
 
 This driver will alter the following files:
 
@@ -161,7 +161,7 @@ and ensuring that the [install-session-driver](#conf-install-session-driver) opt
 also disabled.
 
 ```{tip}
-kdesrc-build will not overwrite your existing files (if present)
+kde-builder will not overwrite your existing files (if present)
 unless you also pass the `--delete-my-settings` command-line
 option.
 ```
@@ -173,9 +173,9 @@ Related command-line option: --install-environment-driver, --no-install-environm
 
 Type: Boolean, Default value: True, Available since: 1.16
 
-If enabled, kdesrc-build will try to install a driver for the
+If enabled, kde-builder will try to install a driver for the
 graphical login manager that allows you to login to your
-kdesrc-build-built KDE desktop.
+kde-builder built KDE desktop.
 
 This driver will alter the following files:
 
@@ -189,7 +189,7 @@ feature also enables the [install-environment-driver](#conf-install-environment-
 feature.
 
 ```{tip}
-kdesrc-build will not overwrite your existing files (if present)
+kde-builder will not overwrite your existing files (if present)
 unless you also pass the `--delete-my-settings` command-line
 option.
 ```
@@ -202,7 +202,7 @@ Related command-line option: --install-session-driver, --no-install-session-driv
 Type: Integer, Default value: 10
 
 Set this option to a number between 20 and 0. The higher the number,
-the lower a priority kdesrc-build will set for itself, i.e. the higher
+the lower a priority kde-builder will set for itself, i.e. the higher
 the number, the "nicer" the program is.
 
 Related command-line option: [--nice](#cmdline-nice)
@@ -212,9 +212,9 @@ Related command-line option: [--nice](#cmdline-nice)
 
 Type: Integer, Default value: Depends on system, Available since: 20.07
 
-This option is defined by kdesrc-build (when using
-`kdesrc-build --generate-config`), set to be the number of
-available CPUs. If kdesrc-build cannot detect the number of CPUs, this
+This option is defined by kde-builder (when using
+`kde-builder --generate-config`), set to be the number of
+available CPUs. If kde-builder cannot detect the number of CPUs, this
 value is set to 4.
 
 See [](#make-options-example) for an example of this
@@ -227,8 +227,8 @@ Related command-line option: --num-cores \<value\>
 
 Type: Integer, Default value: Depends on system, Available since: 20.07
 
-This option is defined by kdesrc-build (when using
-`kdesrc-build --generate-config`), set to be the number of
+This option is defined by kde-builder (when using
+`kde-builder --generate-config`), set to be the number of
 CPUs that is deemed safe for heavyweight or other highly-intensive
 modules, such as `qtwebengine`, to avoid running out of
 memory during the build.
@@ -240,7 +240,7 @@ of total memory. At least 1 core will be specified, and no more than
 Although this option is intended to support Qt modules, you can use
 it for your any module in the same way that `num-cores` is used.
 
-If kdesrc-build cannot detect available memory then this value will be set to 2.
+If kde-builder cannot detect available memory then this value will be set to 2.
 
 Related command-line option: --num-cores-low-mem \<value\>
 
@@ -249,7 +249,7 @@ Related command-line option: --num-cores-low-mem \<value\>
 
 Type: String, Available since: 1.15
 
-Use this option to change where kdesrc-build stores its persistent
+Use this option to change where kde-builder stores its persistent
 data. The default is to store this data in a file called
 `.kdesrc-build-data`, placed in the same directory as the
 configuration file in use. If the global configuration file is in use,
@@ -267,7 +267,7 @@ Related command-line option: --persistent-data-file \<file\>
 Type: String, Available since: 1.14.2
 
 Set this option to control which private SSH key file is passed to
-the `ssh-add` command when kdesrc-build is downloading source
+the `ssh-add` command when kde-builder is downloading source
 code from repositories that require authentication. 
 
 See also: the section called [](#ssh-agent-reminder).
@@ -279,7 +279,7 @@ Type: Boolean, Default value: False, Available since: 1.12
 
 Use lower priority for disk and other I/O, which can significantly
 improve the responsiveness of the rest of the system at the expense of
-slightly longer running times for kdesrc-build.
+slightly longer running times for kde-builder.
 
 Related command-line option: --use-idle-io-priority, --no-use-idle-io-priority
 
@@ -288,7 +288,7 @@ Related command-line option: --use-idle-io-priority, --no-use-idle-io-priority
 
 Type: Boolean, Default value: False
 
-Allow kdesrc-build to also clone and pull from repositories marked as inactive.
+Allow kde-builder to also clone and pull from repositories marked as inactive.
 
 Related command-line option: --use-inactive-modules, --no-use-inactive-modules
 
@@ -331,7 +331,7 @@ Type: String, Available since: 1.16-pre2
 
 Set this option to a general group from which you want modules to be chosen.
 
-For supported Git module types, kdesrc-build will determine the
+For supported Git module types, kde-builder will determine the
 actual branch to use automatically based on rules encoded by the KDE
 developers (these rules may be viewed in the
 `kde-build-metadata` source repository in your source
@@ -385,17 +385,17 @@ Related command-line option: --build-dir \<path\>
 
 Type: Boolean, Default value: True
 
-Control whether kdesrc-build always tries to build a module that has
+Control whether kde-builder always tries to build a module that has
 not had any source code updates.
 
-If set to `true`, kdesrc-build always attempts the build
+If set to `true`, kde-builder always attempts the build
 phase for a module, even if the module did not have any source code
 updates. With this value it will more likely lead to a correct build.
 
-If set to `false`, kdesrc-build will only attempt to run
+If set to `false`, kde-builder will only attempt to run
 the build phase for a module if the module has a source code update, or
 in other situations where it is likely that a rebuild is actually
-required. This can save time, especially if you run kdesrc-build daily,
+required. This can save time, especially if you run kde-builder daily,
 or more frequently.
 
 ```{important}
@@ -431,11 +431,11 @@ Type: String
 
 Specify a toolchain file to use with CMake.
 
-When a valid toolchain file is configured, kdesrc-build will _no
+When a valid toolchain file is configured, kde-builder will _no
 longer set environment variables automatically_. You can use [set-env](#conf-set-env),
 [binpath](#conf-binpath) and [libpath](#conf-libpath) to fix up the environment
 manually if your toolchain file does not work out of the box with
-kdesrc-build. Refer to [the overview of standard flags added by kdesrc-build](#kdesrc-build-std-flags)
+kde-builder. Refer to [the overview of standard flags added by kde-builder](#kde-builder-std-flags)
 for more information.
 
 Note that if a valid toolchain is also specified through [cmake-options](#conf-cmake-options)
@@ -474,7 +474,7 @@ they should be given as they would be typed into CMake. For example:
 cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo
 ```
 
-Since this is a hassle, kdesrc-build takes pains to ensure that as
+Since this is a hassle, kde-builder takes pains to ensure that as
 long as the rest of the options are set correctly, you should be able to
 leave this option blank. (In other words, _required_ CMake
 parameters are set for you automatically)
@@ -526,7 +526,7 @@ Type: String
 
 This option can be set to run a different command (other than
 `make`, for example) in order to perform the build process.
-kdesrc-build should in general do the right thing, so you should not
+kde-builder should in general do the right thing, so you should not
 need to set this option. However it can be useful to use alternate build
 systems.
 
@@ -621,7 +621,7 @@ This option, if set, uses the specified URL as a proxy server to use
 for any HTTP network communications (for example, when downloading the
 [KDE project database](#kde-projects-module-sets)).
 
-In addition, kdesrc-build will try to ensure that the tools it
+In addition, kde-builder will try to ensure that the tools it
 depends on also use that proxy server, if possible, by setting the
 `http_proxy` environment variable to the indicated server,
 _if that environment variable is not already set_.
@@ -633,7 +633,7 @@ Related command-line option: --http-proxy \<value\>
 
 Type: String, Valid values: `flat`, `invent`, `metadata`, Default value: flat
 
-This option is used to configure the layout which kdesrc-build should
+This option is used to configure the layout which kde-builder should
 use when creating source and build directories.
 
 The `flat` layout will group all modules directly
@@ -648,14 +648,14 @@ mirroring the relative paths of repositories on [invent.kde.org](https://invent.
 layout would be `source/utilities/kate` using the
 `invent` layout instead. This layout only affects KDE
 projects. It is a good choice for people starting out with
-kdesrc-build.
+kde-builder.
 
 Finally, the `metadata` layout is the same as the old
 default behaviour. This layout organises KDE projects according to the
 project paths specified in the project metadata for these modules. This
 is a good choice if you want a directory layout which tracks with
 certain KDE processes, but note that this path is therefore not always
-stable. As a result, kdesrc-build may abandon an old copy of the
+stable. As a result, kde-builder may abandon an old copy of the
 repository and clone a new one for a project due to changes in the
 project metadata.
 
@@ -668,7 +668,7 @@ Type: Boolean, Default value: False
 
 Module setting overrides global
 
-Set this option to `true` to make kdesrc-build create VS
+Set this option to `true` to make kde-builder create VS
 Code project files (.vscode directory) in the module source
 directory.
 
@@ -687,7 +687,7 @@ Related command-line option: [--generate-vscode-project-config](#cmdline-generat
 
 Type: Boolean, Default value: True
 
-Controls if kdesrc-build will include known dependencies of this
+Controls if kde-builder will include known dependencies of this
 module in its build, without requiring you to mention those dependencies
 (even indirectly).
 
@@ -725,7 +725,7 @@ well.
 
 Changing this option for specific module allows you to install it to
 a different directory than where the KDE Platform libraries are
-installed, such as if you were using kdesrc-build only to build
+installed, such as if you were using kde-builder only to build
 applications.
 
 You can use `${MODULE}` or `$MODULE` in the
@@ -830,7 +830,7 @@ output or to manually reduce the number of parallel build jobs that
 `ninja` would use.
 
 ````{note}
-Note that this setting only controls ninja when used by kdesrc-build.
+Note that this setting only controls ninja when used by kde-builder.
 The Qt “webengine” module uses `ninja` indirectly, but only
 officially supports being built by `make`. In this situation,
 you can set `NINJAFLAGS` as a way to have `make`
@@ -854,7 +854,7 @@ Related command-line option: --ninja-options \<value\>
 Type: String, Default value: Auto detected, Valid values, KDE, Qt,
 qmake, generic, autotools, meson, Available since: 1.16
 
-Normally kdesrc-build will detect the appropriate build system to use
+Normally kde-builder will detect the appropriate build system to use
 for a module after it is downloaded. This is done by checking for the
 existence of specific files in the module's source directory.
 
@@ -919,7 +919,7 @@ Related command-line option: --qmake-options \<value\>
 Type: String
 
 This option controls where to install qt modules after build. If you
-do not specify this option, kdesrc-build will assume that Qt is provided
+do not specify this option, kde-builder will assume that Qt is provided
 by the operating system.
 
 Related command-line option: --qt-install-dir \<path\>
@@ -942,7 +942,7 @@ Possible values for this option are:
 
 Note that using this option can have a significant detrimental impact
 on both your bandwidth usage (if you use \<all\>) and the time taken
-to compile KDE software, since kdesrc-build will be unable to perform
+to compile KDE software, since kde-builder will be unable to perform
 incremental builds.
 
 Related command-line option: --remove-after-install \<value\>
@@ -962,7 +962,7 @@ conversion to use Git.
 
 Type: String, Available since: 1.16
 
-If this option is set to a value other than 0 (zero), kdesrc-build
+If this option is set to a value other than 0 (zero), kde-builder
 will force the source update to bring the module to the exact revision
 given, even if options like [branch](#conf-branch) are in
 effect. If the module is already at the given revision then it will not
@@ -978,7 +978,7 @@ Type: Boolean, Default value: False
 
 If set to `true`, then the module will be built with
 support for running its test suite, and the test suite will be executed
-as part of the build process. kdesrc-build will show a simple report of
+as part of the build process. kde-builder will show a simple report of
 the test results. This is useful for developers or those who want to
 ensure their system is setup correctly.
 
@@ -1044,7 +1044,7 @@ Related command-line option: --tag \<value\>
 
 Type: Boolean, Default value: False, Available since: 1.12
 
-Set this option to `true` in order to have kdesrc-build
+Set this option to `true` in order to have kde-builder
 run `make uninstall` directly before running
 `make install`.
 
@@ -1139,7 +1139,7 @@ Note that when specified in global section,
 [--ignore-modules](#cmdline-ignore-modules) cmdline option does
 not override this, but instead appends.
 
-Modules named by this option, which would be chosen by kdesrc-build
+Modules named by this option, which would be chosen by kde-builder
 due to a [use-modules](#conf-use-modules) option, are instead
 skipped entirely. Use this option when you want to build an entire
 [kde-projects](#kde-projects-module-sets) project grouping
@@ -1173,16 +1173,16 @@ This option allows you to easily specify many different modules to
 build at the same point in [the configuration file](./kdesrc-buildrc).
 
 Every identifier passed to this option is internally converted to a
-kdesrc-build module, with a [repository](#conf-repository) option set to the
+kde-builder module, with a [repository](#conf-repository) option set to the
 module-set's repository combined with the identifier name in order to
 setup the final repository to download from. All other options that are
 assigned in the module-set are also copied to the generated modules
 unaltered.
 
 The order that modules are defined in this option is important,
-because that is also the order that kdesrc-build will process the
+because that is also the order that kde-builder will process the
 generated modules when updating, building, and installing. All modules
-defined in the given module-set will be handled before kdesrc-build
+defined in the given module-set will be handled before kde-builder
 moves to the next module after the module-set.
 
 If you need to change the options for a generated module, simply

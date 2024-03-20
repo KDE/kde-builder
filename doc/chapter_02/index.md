@@ -1,7 +1,7 @@
 (getting-started)=
 # Getting Started
 
-In this chapter, we show how to use the kdesrc-build to checkout modules
+In this chapter, we show how to use the kde-builder to checkout modules
 from the KDE repository and build them. We also provide a basic
 explanation of the KDE source code structure and the steps you have to
 perform before running the script.
