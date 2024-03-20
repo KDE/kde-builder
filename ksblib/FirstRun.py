@@ -156,19 +156,25 @@ class FirstRun:
         
         # Try to detect the amount of total memory for a corresponding option for
         # heavyweight modules
+        mem_total = None
+        try:
+            mem_total = self.oss.detectTotalMemory()
+        except BuildException as e:
+            Debug().warning(str(e))
         
-        # 4 GiB is assumed if no info on memory is available, as this will
-        # calculate to 2 cores.
-        mem_total = self.oss.detectTotalMemory()
         if not mem_total:
+            # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
             mem_total = 4 * 1024 * 1024
+            Debug().warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
         
         rounded_mem = int(mem_total / 1024000.0)
         return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
     
-    # Return the highest number of cores we can use based on available memory, but
-    # without exceeding the base number of cores available.
-    def _getNumCoresForLowMemory(self, num_cores) -> int:
+    def _getNumCoresForLowMemory(self, num_cores: int) -> int:
+        """
+        Return the highest number of cores we can use based on available memory, but
+        without exceeding the base number of cores available.
+        """
         return min(self.suggestedNumCoresForLowMemory(), num_cores)
     
     def _setupBaseConfiguration(self) -> None:

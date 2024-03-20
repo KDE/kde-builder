@@ -109,7 +109,7 @@ class OSSupport:
                 mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
                 mem_total = int(mem_total)
         else:
-            BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendorID}")
+            BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendorID()}")
         
         return mem_total
     
