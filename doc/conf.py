@@ -16,6 +16,7 @@ extensions = [
 
 templates_path = ['_templates']
 exclude_patterns = ['_build']
+html_extra_path = ['404handler.php']  # bring our 404 handler in
 
 html_theme = "sphinx_book_theme"
 html_static_path = ['_static']
