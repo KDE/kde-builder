@@ -4,7 +4,7 @@
 ## Generic
 
 (cmdline-pretend)=
-`--pretend` (or `--dry-run` or `-p`)  
+[`--pretend`](cmdline-pretend) (or `--dry-run` or `-p`)  
 kde-builder will run through the update and build process, but instead
 of performing any actions to update or build, will instead output what
 the script would have done (e.g. what commands to run, general steps
@@ -25,7 +25,7 @@ required metadata first.
 ```
 
 (cmdline-include-dependencies)=
-`--include-dependencies` (or `-d`), `--no-include-dependencies` (or `-D`)  
+[`--include-dependencies`](cmdline-include-dependencies) (or `-d`), `--no-include-dependencies` (or `-D`)  
 This option causes kde-builder to automatically include other KDE and
 Qt modules in the build, if required for the modules you have requested
 to build on the command line or in your [configuration
@@ -40,7 +40,7 @@ The corresponding configuration file option is
 This option is enabled by default.
 
 (cmdline-ignore-modules)=
-`--ignore-modules` (or `-!`) `module [module ...]`  
+[`--ignore-modules`](cmdline-ignore-modules) (or `-!`) module \[module ...]  
 Do not include the modules passed on the rest of the command line in the
 update/build process (this is useful if you want to build most of the
 modules in your [configuration file](../chapter_02/configure-data) and just skip a
@@ -51,14 +51,14 @@ Note that this option does not override
 Instead, it appends it.
 
 (cmdline-run)=
-`--run` (or `--start-program`) \[-e\|--exec name\] \[-f\|--fork\] `program [parameters ...]`  
+[`--run`](cmdline-run) (or `--start-program`) \[-e\|--exec name\] \[-f\|--fork\] program \[parameters ...\]  
 This option interprets the next item on the command line as a program to
 run, and kde-builder will then finish reading the configuration file,
 source the prefix.sh to apply environment variables, and then execute
 the given program.
 
 (cmdline-revision)=
-`--revision` \<id\>  
+[`--revision`](cmdline-revision) \<id\>  
 This option causes kde-builder to checkout a specific numbered revision
 for each Git module, overriding any [branch](#conf-branch),
 [tag](#conf-tag), or [revision](#conf-revision) options already set for
@@ -68,7 +68,7 @@ This option is likely not a good idea, and is only supported for
 compatibility with older scripts.
 
 (cmdline-delete-my-patches)=
-`--delete-my-patches`, `--no-delete-my-patches`  
+[`--delete-my-patches`](cmdline-delete-my-patches), `--no-delete-my-patches`  
 This option is used to let kde-builder delete source directories that
 may contain user data, so that the module can be re-downloaded. This
 would normally only be useful for KDE developers (who might have local
@@ -78,7 +78,7 @@ You should not use this option normally, kde-builder will prompt to be
 re-run with it if it is needed.
 
 (cmdline-delete-my-settings)=
-`--delete-my-settings`, `--no-delete-my-settings`  
+[`--delete-my-settings`](cmdline-delete-my-settings), `--no-delete-my-settings`  
 This option is used to let kde-builder overwrite existing files which
 may contain user data.
 
@@ -87,7 +87,7 @@ You should not use this option normally, kde-builder will prompt to be
 re-run with it if it is needed.
 
 (cmdline-option-name)=
-`--<option-name>` \<value\>  
+[`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration
 file](../chapter_02/configure-data) for every module. For instance, to override the
 [log-dir](#conf-log-dir) option, you would do: `--log-dir /path/to/dir`.
@@ -101,14 +101,14 @@ command line options that are preferred by kde-builder.
 ```
 
 (cmdline-set-module-option-value)=
-`--set-module-option-value <module-name>,<option-name>,<option-value>`  
+[`--set-module-option-value`](cmdline-set-module-option-value) \<module-name\>,\<option-name\>,\<option-value\>  
 You can use this option to override an option in your [configuration
 file](../chapter_02/configure-data) for a specific module.
 
 ## Resuming and stopping
 
 (cmdline-resume-from)=
-`--resume-from` (or `--from` or `-f`) \<module\>  
+[`--resume-from`](cmdline-resume-from) (or `--from` or `-f`) \<module\>  
 This option is used to resume the build starting from the given module.
 You should not specify other module names on the command line.
 
@@ -123,7 +123,7 @@ option if you have fixed the build error and want kde-builder to
 complete the build.
 
 (cmdline-resume-after)=
-`--resume-after` (or `--after` or `-a`) \<module\>  
+[`--resume-after`](cmdline-resume-after) (or `--after` or `-a`) \<module\>  
 This option is used to resume the build starting after the given module.
 You should not specify other module names on the command line.
 
@@ -139,7 +139,7 @@ installed the module yourself, and want kde-builder to start again with
 the next module.
 
 (cmdline-resume)=
-`--resume`  
+[`--resume`](cmdline-resume)  
 This option can be used to run kde-builder after it has had a build
 failure.
 
@@ -151,7 +151,7 @@ you can quickly get back into building the modules you were building
 before, without fiddling with `--resume-from` and `--stop-before`.
 
 (cmdline-stop-before)=
-`--stop-before` (or `--until`) \<module\>  
+[`--stop-before`](cmdline-stop-before) (or `--until`) \<module\>  
 This option is used to stop the normal build process just *before* a
 module would ordinarily be built.
 
@@ -160,7 +160,7 @@ then `--stop-before moduleB` would cause kde-builder to only build
 `moduleA`.
 
 (cmdline-stop-after)=
-`--stop-after` (or `--to`) \<module\>  
+[`--stop-after`](cmdline-stop-after) (or `--to`) \<module\>  
 This option is used to stop the normal build process just *after* a
 module would ordinarily be built.
 
@@ -169,7 +169,7 @@ then `--stop-after moduleB` would cause kde-builder to build `moduleA`
 and `moduleB`.
 
 (cmdline-stop-on-failure)=
-`--stop-on-failure`, `--no-stop-on-failure`  
+[`--stop-on-failure`](cmdline-stop-on-failure), `--no-stop-on-failure`  
 This option controls if the build will be aborted as soon as a failure
 occurs. Default behavior is --stop-on-failure. You may override it if
 you wish to press on with the rest of the modules in the build, to avoid
@@ -179,7 +179,7 @@ See also the [stop-on-failure](#conf-stop-on-failure) configuration file
 option.
 
 (cmdline-rebuild-failures)=
-`--rebuild-failures`  
+[`--rebuild-failures`](cmdline-rebuild-failures)  
 Use this option to build only those modules which failed to build on a
 previous kde-builder run. This is useful if a significant number of
 failures occurred mixed with successful builds. After fixing the issue
@@ -196,7 +196,7 @@ a module or two and this flag will still work.
 ## Modules information
 
 (cmdline-query)=
-`--query` `mode`  
+[`--query`](cmdline-query) mode  
 This command causes kde-builder to query a parameter of the modules in
 the build list (either passed on the command line or read in from the
 configuration file), outputting the result to screen (one module per
@@ -246,7 +246,7 @@ kdepim: master
 ```
 
 (cmdline-dependency-tree)=
-`--dependency-tree`  
+[`--dependency-tree`](cmdline-dependency-tree)  
 Prints out dependency information on the modules that would be built
 using a tree format (recursive). Listed information also includes which
 specific commit/branch/tag is depended on and whether the dependency
@@ -254,20 +254,20 @@ would be built. Note: the generated output may become quite large for
 applications with many dependencies.
 
 (cmdline-dependency-tree-fullpath)=
-`--dependency-tree-fullpath`  
+[`--dependency-tree-fullpath`](cmdline-dependency-tree-fullpath)  
 Prints out dependency information on the modules that would be built
 using a tree format (recursive). In fullpath format. Note: the generated
 output may become quite large for applications with many dependencies.
 
 (cmdline-list-installed)=
-`--list-installed`  
+[`--list-installed`](cmdline-list-installed)  
 Print installed modules and exit. This can be used to generate
 autocompletion for the --run option.
 
 ## Exclude specific action
 
 (cmdline-no-metadata)=
-`--no-metadata` (or `-M`)  
+[`--no-metadata`](cmdline-no-metadata) (or `-M`)  
 Do not automatically download the extra metadata needed for KDE git
 modules. The source updates for the modules themselves will still occur
 unless you pass [--no-src](#cmdline-no-src) as well.
@@ -280,42 +280,42 @@ consider running kde-builder with the
 this option for subsequent runs.
 
 (cmdline-no-src)=
-`--no-src` (or `-S`)  
+[`--no-src`](cmdline-no-src) (or `-S`)  
 Skip contacting the Git server.
 
 (cmdline-no-build)=
-`--no-build`  
+[`--no-build`](cmdline-no-build)  
 Skip the build process.
 
 (cmdline-no-install)=
-`--no-install`  
+[`--no-install`](cmdline-no-install)  
 Do not automatically install packages after they are built.
 
 ## Only specific action
 
 (cmdline-metadata-only)=
-`--metadata-only`  
+[`--metadata-only`](cmdline-metadata-only)  
 Only perform the metadata download process. kde-builder normally
 handles this automatically, but you might manually use this to allow the
 `--pretend` command line option to work.
 
 (cmdline-src-only)=
-`--src-only` (or `-s`)  
+[`--src-only`](cmdline-src-only) (or `-s`)  
 Only perform the source update.
 
 (cmdline-build-only)=
-`--build-only`  
+[`--build-only`](cmdline-build-only)  
 Only perform the build process.
 
 (cmdline-install-only)=
-`--install-only`  
+[`--install-only`](cmdline-install-only)  
 If this is the only command-line option, it tries to install all the
 modules contained in `log/latest/build-status`. If command-line options
 are specified after this option, they are all assumed to be modules to
 install (even if they did not successfully build on the last run).
 
 (cmdline-build-system-only)=
-`--build-system-only`  
+[`--build-system-only`](cmdline-build-system-only)  
 This option causes kde-builder to abort building a module just before
 the `make` command would have been run. This is supported for
 compatibility with older versions only, this effect is not helpful for
@@ -324,7 +324,7 @@ the current KDE build system.
 ## Build behavior
 
 (cmdline-build-when-unchanged)=
-`--build-when-unchanged` (or `--force-build`), `--no-build-when-unchanged` (or `--no-force-build`)  
+[`--build-when-unchanged`](cmdline-build-when-unchanged) (or `--force-build`), `--no-build-when-unchanged` (or `--no-force-build`)  
 Enabling this option explicitly disables skipping the build process (an
 optimization controlled by the
 [build-when-unchanged](#conf-build-when-unchanged) option). This is
@@ -333,11 +333,11 @@ something that kde-builder cannot check. This option is enabled by
 default.
 
 (cmdline-refresh-build)=
-`--refresh-build` (or `-r`)  
+[`--refresh-build`](cmdline-refresh-build) (or `-r`)  
 Recreate the build system and make from scratch.
 
 (cmdline-reconfigure)=
-`--reconfigure`  
+[`--reconfigure`](cmdline-reconfigure)  
 Run `cmake` (for KDE modules) or `configure` (for Qt) again, without
 cleaning the build directory. You should not normally have to specify
 this, as kde-builder will detect when you change the relevant options
@@ -345,20 +345,20 @@ and automatically re-run the build setup. This option is implied if
 `--refresh-build` is used.
 
 (cmdline-install-dir)=
-`--install-dir path`  
+[`--install-dir path`](cmdline-install-dir)  
 This allows you to change the directory where modules will be installed
 to. This option implies [`--reconfigure`](#cmdline-reconfigure), but
 using [`--refresh-build`](#cmdline-refresh-build) may still be required.
 
 (cmdline-generate-vscode-project-config)=
-`--generate-vscode-project-config`, `--no-generate-vscode-project-config`  
+[`--generate-vscode-project-config`](cmdline-generate-vscode-project-config), `--no-generate-vscode-project-config`  
 Generate a `.vscode` directory with configurations for building and
 debugging in Visual Studio Code. This option is disabled by default.
 
 ## Script runtime
 
 (cmdline-async)=
-`--async`, `--no-async`  
+[`--async`](cmdline-async), `--no-async`  
 Enables or disables the [asynchronous mode](#conf-async), which can
 perform the source code updates and module builds at the same time. If
 disabled, the update will be performed in its entirety before the build
@@ -368,19 +368,19 @@ submitting a [bug report](https://bugs.kde.org/). This option is enabled
 by default.
 
 (cmdline-color)=
-`--color` (or `--colorful-output`), `--no-color` (or `--no-colorful-output`)  
+[`--color`](cmdline-color) (or `--colorful-output`), `--no-color` (or `--no-colorful-output`)  
 Enable or disable colorful output. By default, this option is enabled
 for interactive terminals.
 
 (cmdline-nice)=
-`--nice` (or `--niceness`) \<value\>  
+[`--nice`](cmdline-nice) (or `--niceness`) \<value\>  
 This value adjusts the computer CPU priority requested by kde-builder,
 and should be in the range of 0-20. 0 is highest priority (because it is
 the least “nice”), 20 is the lowest priority. This option defaults to
 10.
 
 (cmdline-rc-file)=
-`--rc-file` \<file\>  
+[`--rc-file`](cmdline-rc-file) \<file\>  
 The file to read the configuration options from. The default value for
 this parameter is `kdesrc-buildrc` (checked in the current working
 directory). If this file doesn't exist, `~/.config/kdesrc-buildrc`
@@ -390,7 +390,7 @@ be used instead. See also [](../chapter_04/index).
 ## Setup
 
 (cmdline-initial-setup)=
-`--initial-setup`  
+[`--initial-setup`](cmdline-initial-setup)  
 Has kde-builder perform the one-time initial setup necessary to prepare
 the system for kde-builder to operate, and for the newly-installed KDE
 software to run.
@@ -406,7 +406,7 @@ This option is exactly equivalent to using `--install-distro-packages`
 implementation) it additionally uses "--install-distro-packages-perl".
 
 (cmdline-install-distro-packages)=
-`--install-distro-packages`  
+[`--install-distro-packages`](cmdline-install-distro-packages)  
 Installs distro packages (on supported Linux distributions) necessary to
 prepare the system for kde-builder to operate, and for the
 newly-installed KDE software to run.
@@ -414,7 +414,7 @@ newly-installed KDE software to run.
 See also `--initial-setup`
 
 (cmdline-generate-config)=
-`--generate-config`  
+[`--generate-config`](cmdline-generate-config)  
 Generate the kde-builder configuration file.
 
 See also `--initial-setup`
@@ -422,44 +422,44 @@ See also `--initial-setup`
 ## Verbosity level
 
 (cmdline-debug)=
-`--debug`  
+[`--debug`](cmdline-debug)  
 Enables debug mode for the script. Currently, this means that all output
 will be dumped to the standard output in addition to being logged in the
 log directory like normal. Also, many functions are much more verbose
 about what they are doing in debugging mode.
 
 (cmdline-quiet)=
-`--quiet` (or `--quite` or `-q`)  
+[`--quiet`](cmdline-quiet) (or `--quite` or `-q`)  
 Do not be as noisy with the output. With this switch only the basics are
 output.
 
 (cmdline-really-quiet)=
-`--really-quiet`  
+[`--really-quiet`](cmdline-really-quiet)  
 Only output warnings and errors.
 
 (cmdline-verbose)=
-`--verbose`  
+[`--verbose`](cmdline-verbose)  
 Be very descriptive about what is going on, and what kde-builder is
 doing.
 
 ## Script information
 
 (cmdline-version)=
-`--version` (or `-v`)  
+[`--version`](cmdline-version) (or `-v`)  
 Display the program version.
 
 (cmdline-help)=
-`--help` (or `-h`)  
+[`--help`](cmdline-help) (or `-h`)  
 Only display simple help on this script.
 
 (cmdline-show-info)=
-`--show-info`  
+[`--show-info`](cmdline-show-info)  
 Displays information about kde-builder and the operating system, that
 may prove useful in bug reports or when asking for help in forums or
 mailing lists.
 
 (cmdline-show-options-specifiers)=
-`--show-options-specifiers`  
+[`--show-options-specifiers`](cmdline-show-options-specifiers)  
 Print the specifier lines (in the format that GetOpts::Long accepts) for
 all command line options supported by the script. This may be used by
 developers, for example, for generating zsh autocompletion functions.
