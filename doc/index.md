@@ -10,9 +10,8 @@ chapter_04/index
 chapter_05/index
 chapter_06/index
 chapter_07/index
-chapter_08/credits-and-license
-chapter_appendix_A/appendix-modules
-chapter_appendix_B/appendix-profile
+chapter_08/index
+chapter_09/credits-and-license
 ```
 
 [manual](man-kde-builder.1)

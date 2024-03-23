@@ -1,47 +1,5 @@
 # kde-builder Documentation
 
-If you're reading this, it's probably from Gitlab. Welcome!
-
-The documentation in this directory is split into two major categories:
-
-1. Documentation for end users.
-2. Documentation for kde-builder developers.
-
-## End User Documentation
-
-This documentation is not in *great* shape, but does exist. These docs are
-contained completely within index.docbook using the KDE DocBook XML
-documentation standards.
-
-Most users access these docs at
-[docs.kde.org](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/), and
-kde-builder itself will show URLs to specific portions of this documentation
-if you run `kde-builder --help`, one pointing to the [table of configuration
-options](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html)
-and the other to the [list of command-line
-options](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/cmdline.html).
-
-To build these docs locally for testing, use the `build-docs` shell script here
-in the doc/ directory (requires that you've already installed kdoctools
-framework!), which will symlink the base KDE DocBook theme into the doc/
-directory and generate multiple HTML files from the index.docbook.
-
-### Man page
-
-There is also a man page, also authored in Docbook, at
-`man-kde-builder.1.docbook`. It will
-be built and installed to the KDE-specific `MANPATH` if you build kde-builder
-with CMake.  The content is mostly the same as in the normal DocBook docs but
-can be more convenient at the command line, especially if Internet access is
-not available.
-
-## Documentation for kde-builder developers
-
-Documentation for kde-builder itself is mostly within the source files, but I've put
-scattered attempts together over time trying to improve that.
-
-Older bits of documentation can be found in source-reference directory.
-
 ## kde-builder Tricks
 
 These are some kde-builder tricks that probably should be documented with the

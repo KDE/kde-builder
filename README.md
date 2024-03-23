@@ -5,8 +5,7 @@ SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
 
 # KDE Builder
 
-This tool streamlines the process of setting up and maintaining a development
-environment for KDE software.
+This tool streamlines the process of setting up and maintaining a development environment for KDE software.
 
 It does this by automating the process of downloading source code from the
 KDE source code repositories, building that source code, and installing it
@@ -78,7 +77,7 @@ kde-builder kcalc --ignore-modules kxmlgui
 
 See the wiki page [Get_Involved/development](https://community.kde.org/Get_Involved/development).
 
-For more details, consult the project documentation. The most important pages are:
+For more details, consult the project documentation at https://kde-builder.kde.org/. The most important pages are:
 
-- [List of supported configuration options](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html)
-- [Supported command line parameters](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/supported-cmdline-params.html)
+- [List of supported configuration options](https://kde-builder.kde.org/en/chapter_04/conf-options-table.html)
+- [Supported command line parameters](https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html)

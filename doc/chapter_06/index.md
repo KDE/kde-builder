@@ -7,4 +7,5 @@ basic-features
 advanced-features
 developer-features
 other-features
+appendix-profile
 ```

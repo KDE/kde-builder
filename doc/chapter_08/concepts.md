@@ -1,19 +1,8 @@
-# kde-builder documentation
-
-Michael Pyne <mpyne@kde.org>
-v18.12, 2018-11-22
-
-kde-builder is intended to build KDE-based software from its source repository, although it can build
-other types of software from its native source control system(s) as well.
-
-This documentation is intended for developers to aid in hacking on kde-builder itself, or porting the same concepts
-to other build systems if necessary.
-
-## Concepts
+# Concepts
 
 Some basic concepts are assumed throughout for brevity.
 
-### Modules
+## Modules
 
 kde-builder uses the "module" as the most granular level of buildable
 software. Each module has a name, unique in the list of all modules.
@@ -21,7 +10,7 @@ Each module can have a specific source control system plugin (Git,
 KDE's git, etc.) and a build system plugin (qmake, CMake, KDE's
 CMake, autotools, etc.)
 
-### Build Phases
+## Build Phases
 
 A module's build process progresses through build phases, which are often
 optional.
@@ -40,14 +29,14 @@ phases, under the theory that the build phase is usually CPU-heavy so it makes
 sense to start on subsequent network (IO-heavy) updates while the build
 progresses.
 
-### Build Context
+## Build Context
 
 To group global settings and status together that exist across individual
 modules, a "build context" is used, shared across the entire application.
 
 Each module can refer to the global build context.
 
-### Configuration file (rc-file)
+## Configuration file (rc-file)
 
 kde-builder uses a configuration file (usually abbreviated the `rc-file`) to
 store:
@@ -67,7 +56,7 @@ If neither of above is found, kde-builder will fallback to `~/.kdesrc-buildrc`.
 This location is checked only for backward compatibility; it is advised to move
 the configuration file to the XDG compliant path instead.
 
-### Command line
+## Command line
 
 kde-builder uses the command line (seen as "cmdline" in the source and commit
 logs) to override the list of modules to build (nearly always still requiring
@@ -78,7 +67,7 @@ control output verbosity and so on.
 In theory every option in the rc-file can be set from the cmdline, and cmdline
 entries override and mask any options used by default or read from an rc-file.
 
-### Module Sets
+## Module Sets
 
 With the adoption of git, KDE exploded to having hundreds of repositories. It
 would be annoying and error-prone to try to manually update the rc-file with
@@ -92,7 +81,7 @@ NOTE: This is controlled by the `git-repository-base` option to set the URL
 prefix, the `repository` option to choose one of the defined bases, and the
 `use-modules` option to list module names.
 
-#### KDE module sets
+### KDE module sets
 
 To support the KDE repositories in particular, a special module set repository
 is defined, `kde-projects`. Use of this repository enables some extra magic
@@ -103,7 +92,7 @@ project structure.
 NOTE: Inclusion of modules is **separate** from dependency handling, which is
 also supported!
 
-### Pretend mode
+## Pretend mode
 
 The user can pass a `--pretend` cmdline flag to have kde-builder not
 actually undertake the more time or resource intensive actions, so that the
@@ -113,7 +102,7 @@ correct, and then remove the --pretend flag from there.
 This significantly influences the design of the script, both in action and
 output.
 
-### Logs and build output
+## Logs and build output
 
 All build commands are logged to a file (see `log_command` in ksb::Util).
 This is both to declutter the terminal output and to enable troubleshooting
@@ -133,7 +122,7 @@ of log_command)!
 Some users prefer to have TTY output. For now the --debug cmdline option is
 useful for that, but --debug has a significant amount of other changes as well.
 
-## Basic flow
+# Basic flow
 
 For each script execution, kde-builder generically goes through the following
 steps:
