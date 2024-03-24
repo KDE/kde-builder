@@ -82,3 +82,29 @@ Launch the built application.
 
 The full list of command line options is given in the section called
 [](#supported-cmdline-params).
+
+## Exit status
+
+**0**  
+Success
+
+**1**  
+Normally this means some part of the update, build or install process
+failed, but is also used for any abnormal program end not otherwise
+covered below.
+
+**5**  
+A signal was received that killed `kde-builder`, but it attempted to
+perform normal closedown.
+
+**8**  
+Unknown option was passed on the command line.
+
+**99**  
+An exception was raised that forced `kde-builder` to abort early.
+
+## Signals
+
+kde-builder supports `SIGHUP`, which if received will cause
+kde-builder to exit after the current modules for the build thread (and
+update thread, if still active) have completed.
