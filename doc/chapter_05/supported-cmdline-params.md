@@ -5,10 +5,13 @@
 
 (cmdline-pretend)=
 [`--pretend`](cmdline-pretend) (or `--dry-run` or `-p`)  
-kde-builder will run through the update and build process, but instead
-of performing any actions to update or build, will instead output what
-the script would have done (e.g. what commands to run, general steps
-being taken, etc.).
+Operate in a "dry run" mode. No network accesses are made, no log files
+are created, no modules are built, and no other permanent changes to
+disk are made. One *important exception* is that if you try to build a
+module that comes from the KDE project database, and the database hasn't
+been downloaded yet, the database will be downloaded since the
+pretend-mode output may change significantly based on the database
+results.
 
 ```{note}
 Simple read-only commands (such as reading file information) may still
@@ -76,6 +79,13 @@ changes that would be deleted).
 
 You should not use this option normally, kde-builder will prompt to be
 re-run with it if it is needed.
+
+This option must be passed to allow `kde-builder` to remove conflicting
+source directories. Currently even this only happens when trying to
+clone a git-based module if an existing source directory is present.
+Never specify this option unless it is suggested by `kde-builder`, and
+only if you don't mind the source directories that are referenced being
+deleted and re-cloned.
 
 (cmdline-delete-my-settings)=
 [`--delete-my-settings`](cmdline-delete-my-settings), `--no-delete-my-settings`  
@@ -268,8 +278,7 @@ autocompletion for the --run option.
 
 (cmdline-no-metadata)=
 [`--no-metadata`](cmdline-no-metadata) (or `-M`)  
-Do not automatically download the extra metadata needed for KDE git
-modules. The source updates for the modules themselves will still occur
+Skip the metadata update phase. The source updates for the modules themselves will still occur
 unless you pass [--no-src](#cmdline-no-src) as well.
 
 This can be useful if you are frequently re-running kde-builder since
@@ -281,23 +290,31 @@ this option for subsequent runs.
 
 (cmdline-no-src)=
 [`--no-src`](cmdline-no-src) (or `-S`)  
-Skip contacting the Git server.
+Skips the source update phase. Other phases are included as normal.
 
 (cmdline-no-build)=
 [`--no-build`](cmdline-no-build)  
-Skip the build process.
+Skip the build phase for the build. Internally the install phase
+depends on the build phase completing so this is effectively equivalent
+to `--src-only`, but the semantics may change in the future (e.g. when
+test suites are moved into their own phase).
+
+(cmdline-no-tests)=
+[`--no-tests`](cmdline-no-tests)=
+Disables running the test suite for CMake-based modules. To be fully
+effective this requires re-running CMake, which can be forced by using
+the `--reconfigure` or `--refresh-build` options.
 
 (cmdline-no-install)=
 [`--no-install`](cmdline-no-install)  
-Do not automatically install packages after they are built.
+Skip the install phase from the build. Other phases are included as normal.
 
 ## Only specific action
 
 (cmdline-metadata-only)=
 [`--metadata-only`](cmdline-metadata-only)  
 Only perform the metadata download process. kde-builder normally
-handles this automatically, but you might manually use this to allow the
-`--pretend` command line option to work.
+handles this automatically.
 
 (cmdline-src-only)=
 [`--src-only`](cmdline-src-only) (or `-s`)  
@@ -305,7 +322,9 @@ Only perform the source update.
 
 (cmdline-build-only)=
 [`--build-only`](cmdline-build-only)  
-Only perform the build process.
+Forces the build process to be performed without updating source code
+first. In addition, installation is not performed. (Testing is still
+performed if applicable, but this will change in a future release).
 
 (cmdline-install-only)=
 [`--install-only`](cmdline-install-only)  
@@ -314,8 +333,20 @@ modules contained in `log/latest/build-status`. If command-line options
 are specified after this option, they are all assumed to be modules to
 install (even if they did not successfully build on the last run).
 
+(cmdline-uninstall)=
+[`--uninstall`](cmdline-uninstall)
+Skips the update and build phase and immediately attempts to uninstall
+the modules given. **NOTE**: This is only supported for buildsystems
+that supports the `make uninstall` command (e.g. KDE CMake-based).
+
 (cmdline-build-system-only)=
 [`--build-system-only`](cmdline-build-system-only)  
+Interrupts the build process for each module built: The build process
+consists of normal setup up to and including running `cmake` or
+`configure` (as appropriate), but `make` is not run and no installation
+is attempted. This is mostly only useful to get things like
+`configure --help` and `cmake-gui` to work. Normally you want
+`--reconfigure` or `--refresh-build`.  
 This option causes kde-builder to abort building a module just before
 the `make` command would have been run. This is supported for
 compatibility with older versions only, this effect is not helpful for
@@ -334,12 +365,22 @@ default.
 
 (cmdline-refresh-build)=
 [`--refresh-build`](cmdline-refresh-build) (or `-r`)  
-Recreate the build system and make from scratch.
+Removes the build directory for a module before the build phase starts.
+This has the desired side effect of forcing `kde-builder` to
+re-configure the module and build it from a "pristine" state with no
+existing temporary or intermediate output files. Use this option if you
+have problems getting a module to build but realize it will take longer
+(possibly much longer) for the build to complete as a result. When in
+doubt use this option for the entire `kde-builder` run.
 
 (cmdline-reconfigure)=
 [`--reconfigure`](cmdline-reconfigure)  
 Run `cmake` (for KDE modules) or `configure` (for Qt) again, without
-cleaning the build directory. You should not normally have to specify
+cleaning the build directory.
+Usually you actually want `--refresh-build`, but if you are 100% sure
+your change to `cmake-options` will not invalidate your current
+intermediate output then this can save some time.
+You should not normally have to specify
 this, as kde-builder will detect when you change the relevant options
 and automatically re-run the build setup. This option is implied if
 `--refresh-build` is used.
@@ -376,8 +417,20 @@ for interactive terminals.
 [`--nice`](cmdline-nice) (or `--niceness`) \<value\>  
 This value adjusts the computer CPU priority requested by kde-builder,
 and should be in the range of 0-20. 0 is highest priority (because it is
-the least “nice”), 20 is the lowest priority. This option defaults to
-10.
+the least “nice”), 20 is the lowest priority. This option defaults to 10.  
+
+Changes the CPU priority given to `kde-builder` (and all processes used
+by `kde-builder` e.g. `make`(1)). \<foo\> should be an integer number
+between -20 and 19. Positive values are "nicer" to the rest of the
+system (i.e. lower priority).
+
+Note that the possible priorities available on your system may be
+different than listed here, see `nice`(2) for more information. Note
+also that this only changes *CPU* priority, often you want to change
+*I/O* priority on systems where that is supported. There is no
+command-line option for I/O priority adjustment, but there is a
+configuration file option: `use-idle-io-priority` (although like all
+options, there is a generic way to set this from the command line).
 
 (cmdline-rc-file)=
 [`--rc-file`](cmdline-rc-file) \<file\>  
@@ -398,12 +451,10 @@ software to run.
 This includes:
 
 - Installing known dependencies (on supported Linux distributions)
-
 - Adding required environment variables to `~/.bashrc`
 
 This option is exactly equivalent to using `--install-distro-packages`
-`--generate-config` at the same time. In kde-builder (perl
-implementation) it additionally uses "--install-distro-packages-perl".
+and `--generate-config` at the same time.
 
 (cmdline-install-distro-packages)=
 [`--install-distro-packages`](cmdline-install-distro-packages)  
@@ -430,8 +481,7 @@ about what they are doing in debugging mode.
 
 (cmdline-quiet)=
 [`--quiet`](cmdline-quiet) (or `--quite` or `-q`)  
-Do not be as noisy with the output. With this switch only the basics are
-output.
+Do not be as noisy with the output. With this switch only the basics are output.
 
 (cmdline-really-quiet)=
 [`--really-quiet`](cmdline-really-quiet)  
