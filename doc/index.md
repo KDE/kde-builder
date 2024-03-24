@@ -13,5 +13,3 @@ chapter_07/index
 chapter_08/index
 chapter_09/credits-and-license
 ```
-
-[manual](man-kde-builder.1)
