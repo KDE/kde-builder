@@ -29,7 +29,7 @@ install_runtime_packages() {
     # Does not have packages: py3-promise
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
     pip install promise --break-system-packages
-  elif [ "$ID" = "arch" ]; then
+  elif [ "$ID" = "arch" ] || [ "$ID" = "manjaro" ]; then
     (set -x; sudo pacman -S git dbus-python python-promise python-yaml python-setproctitle --needed)
   elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ] || [ "$ID" = "neon" ]; then
     (set -x; sudo apt update)
