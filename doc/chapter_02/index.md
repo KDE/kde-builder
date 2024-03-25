@@ -17,6 +17,7 @@ strategies and information about running your new KDE installation.
 
 ```{toctree}
 getting-started
+alternative-installation
 configure-data
 building-and-troubleshooting
 building-specific-modules

@@ -1,50 +1,42 @@
-<!--
-SPDX-License-Identifier: CC-BY-4.0
-SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
--->
-
 # Alternative Installation Methods
 
 If the `initial_setup.sh` installation method does not work for you, you can choose one of the alternative methods.
 
-## Prerequisites
+KDE Builder can use Python version 3.9 or newer.  
 
-This project can use Python version 3.9 or newer.
-
-Install Python (assuming you want to use Python 3.11):
+If python is not installed, do it now (assuming you want to use Python 3.11):
 
 * Arch Linux: `sudo pacman -S python`
 * Fedora 39: `sudo dnf install python3.11`
 * openSUSE Tumbleweed: `sudo zypper install python311`
 * Debian/Ubuntu: `sudo apt install python3`
 
-## Choose a method
-
 There are three ways of installation. Choose the one that fits you most.
 
-| Installation way                                                                                                 | Notes                                                           |
-|------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| [Using the kde-builder package available for your operating system](#using-distribution-package)                 | The easiest way, but may be unavailable for some distributions. |
-| [Manual git checkout of kde-builder, use Python packages from your operating system](#using-native-environment)  | Requires that all python dependencies be provided by distro.    |
-| [Manual git checkout of kde-builder, use a Python virtual environment](#using-virtual-environment)               | The most reliable way, but a bit more complicated to set up.    |
+| Installation way                                                                                                | Notes                                                           |
+|-----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| [Using the kde-builder package available for your operating system](#using-distribution-package)                | The easiest way, but may be unavailable for some distributions. |
+| [Manual git checkout of kde-builder, use Python packages from your operating system](#using-system-environment) | Requires that all python dependencies be provided by distro.    |
+| [Manual git checkout of kde-builder, use a Python virtual environment](#using-virtual-environment)              | The most reliable way, but a bit more complicated to set up.    |
 
-<a name="using-distribution-package"></a>
-### Installation option 1: Using the kde-builder package available for your operating system
+(using-distribution-package)=
+## Using the kde-builder package available for your operating system
 
-#### Arch Linux
+Arch Linux:
 
 ```
 yay -S kde-builder-git
 ```
 
-#### openSUSE Tumbleweed
+openSUSE Tumbleweed:
+
 ```
 sudo zypper addrepo https://download.opensuse.org/repositories/home:/enmo/openSUSE_Tumbleweed/home:enmo.repo
 sudo zypper install kde-builder
 ```
 
-<a name="using-native-environment"></a>
-### Installation option 2: Using Python packages from your operating system
+(using-system-environment)=
+## Using Python packages from your operating system
 
 Ensure your distribution provides python packages, that correspond project dependencies listed in `Pipfile`.
 
@@ -72,8 +64,8 @@ cd ~
 kde-builder --version
 ```
 
-<a name="using-virtual-environment"></a>
-### Installation option 3: Using a Python virtual environment
+(using-virtual-environment)=
+## Using a Python virtual environment
 
 Install pipenv.
 
