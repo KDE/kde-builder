@@ -6,4 +6,5 @@ appendix-modules
 Module
 Internals
 IPC-notes
+adding-new-options
 ```
