@@ -374,7 +374,7 @@ class BuildSystem_KDECMake(BuildSystem):
         
         os.mkdir(configDir)
         
-        baseDir = os.path.dirname(sys.modules["__main__"].__file__)
+        baseDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
         dataDir = f"{baseDir}/data/vscode"
         
         # c_cpp_properties.json configures C++, CMake & IntelliSense.
