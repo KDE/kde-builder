@@ -60,6 +60,11 @@ run, and kde-builder will then finish reading the configuration file,
 source the prefix.sh to apply environment variables, and then execute
 the given program.
 
+(cmdline-source-when-start-program)=
+[`--source-when-start-program`](cmdline-source-when-start-program) \<file\>  
+With this option, you can specify a path to shell file, which will be sourced before the module is launched with `--run` option.
+For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
+
 (cmdline-revision)=
 [`--revision`](cmdline-revision) \<id\>  
 This option causes kde-builder to checkout a specific numbered revision

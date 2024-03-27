@@ -261,6 +261,16 @@ persistent data.
 
 Related command-line option: --persistent-data-file \<file\>
 
+(conf-source-when-start-program)=
+[`source-when-start-program`](conf-source-when-start-program)
+
+Type: String
+
+With this option, you can specify a path to shell file, which will be sourced before the module is launched with `--run` option.
+For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
+
+Related command line option: [--source-when-start-program](cmdline-source-when-start-program)
+
 (conf-ssh-identity-file)=
 [`ssh-identity-file`](conf-ssh-identity-file)
 

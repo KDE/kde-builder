@@ -78,3 +78,9 @@ This table will help you determine where you should add new options or where to 
 \* Note that for "Has synonimic names" field, even if "No" is specified,
     the option still may have synonimic name, if the synonim is specified in
     `options_converted_to_canonical` and is handles specifically.
+
+Do not forget to regenerate zsh autocompletion script. For this, run `gen_zsh_completions.py` script:
+
+```bash
+./scripts/gen_zsh_completions.py > data/completions/zsh/_kde-builder
+```

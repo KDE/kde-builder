@@ -50,6 +50,7 @@ class StartProgram:
         
         executable = optExec or module
         buildData = ctx.persistent_options
+        extraRunEnv = ctx.getOption("source-when-start-program")
         
         if module not in buildData:
             print(f"Module {module} has not been built yet.")
@@ -70,6 +71,7 @@ class StartProgram:
         
         # Set up environment variables (dot command)
         . "{buildDir}/prefix.sh";
+        . "{extraRunEnv}"
         
         # Launch the program with optional arguments.
         if [ "{int(optFork)}" = 1 ]; then
