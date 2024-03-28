@@ -21,6 +21,12 @@ handlers:
     stream: ext://sys.stdout
 
 loggers:
+  asyncio:
+    level: WARNING
+#    level: DEBUG
+    handlers: [console-named]
+    propagate: no
+
   dependency-resolver:
     level: INFO
 #    level: DEBUG
