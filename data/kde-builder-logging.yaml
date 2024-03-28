@@ -27,6 +27,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  module-set:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
 root:
   level: DEBUG
   handlers: [console]

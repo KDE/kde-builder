@@ -9,10 +9,12 @@ from ..Module.Module import Module
 from ..Util.Util import Util
 
 from .ModuleSet import ModuleSet
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
+
+logger_moduleset = kbLogger.getLogger("module-set")
 
 
 class ModuleSet_KDEProjects(ModuleSet):
@@ -111,13 +113,11 @@ class ModuleSet_KDEProjects(ModuleSet):
             activeResults = [module for module in allModuleResults if module.get("active")]
 
         if not activeResults:
-            Debug().warning(f" y[b[*] Module y[{moduleSearchItem}] is apparently a KDE collection, but contains no\n" +
-                            "active modules to build!")
+            logger_moduleset.warning(f" y[b[*] Module y[{moduleSearchItem}] is apparently a KDE collection, but contains no\n" + "active modules to build!")
 
             if allModuleResults:
                 count = len(allModuleResults)
-                Debug().warning("\tAlthough no active modules are available, there were\n" +
-                                f"\t{count} inactive modules. Perhaps the git modules are not ready?")
+                logger_moduleset.warning("\tAlthough no active modules are available, there were\n" + f"\t{count} inactive modules. Perhaps the git modules are not ready?")
 
         # Setup module options.
         moduleList = []
@@ -141,7 +141,7 @@ class ModuleSet_KDEProjects(ModuleSet):
             if self.none_true([KDEProjectsReader._projectPathMatchesWildcardSearch(result["fullName"], element) for element in ignoreList]):
                 moduleList.append(newModule)
             else:
-                Debug().debug(f"--- Ignoring matched active module {newModule} in module set " + self.name)
+                logger_moduleset.debug(f"--- Ignoring matched active module {newModule} in module set " + self.name)
         return moduleList
 
     # @override
@@ -173,7 +173,7 @@ class ModuleSet_KDEProjects(ModuleSet):
             moduleList.extend(candidateModules)
 
         if not len(moduleList):
-            Debug().warning("No modules were defined for the module-set " + self.name)
-            Debug().warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger_moduleset.warning("No modules were defined for the module-set " + self.name)
+            logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 
         return moduleList
