@@ -8,11 +8,13 @@ from .BuildSystem import BuildSystem
 from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..Module.Module import Module
     from ..BuildContext import BuildContext
+
+logger_ide_proj = kbLogger.getLogger("ide_project_configs")
 
 
 class BuildSystem_KDECMake(BuildSystem):
@@ -331,7 +333,7 @@ class BuildSystem_KDECMake(BuildSystem):
         if module.getOption("generate-vscode-project-config"):
             self.generateVSCodeConfig(module)
         else:
-            Debug().debug("\tGenerating .vscode directory - disabled for this module")
+            logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
 
         # Use cmake to create the build directory (sh script return value
         # semantics).
@@ -356,7 +358,7 @@ class BuildSystem_KDECMake(BuildSystem):
         such as C++ support, correct build directory, and LSP / IntelliSense.
         """
         if Debug().pretending():
-            Debug().pretend("\tWould have generated .vscode directory")
+            logger_ide_proj.pretend("\tWould have generated .vscode directory")
             return False
 
         projectName = module.name
@@ -368,12 +370,12 @@ class BuildSystem_KDECMake(BuildSystem):
 
         if os.path.exists(configDir):
             if os.path.isdir(configDir):
-                Debug().debug("\tGenerating .vscode directory - skipping as it already exists")
+                logger_ide_proj.debug("\tGenerating .vscode directory - skipping as it already exists")
             elif os.path.isfile(configDir):
-                Debug().error("\tGenerating .vscode directory - cannot proceed, file .vscode exists")
+                logger_ide_proj.error("\tGenerating .vscode directory - cannot proceed, file .vscode exists")
             return False
         else:
-            Debug().debug(f"\tGenerating .vscode directory for {projectName}: {configDir}")
+            logger_ide_proj.debug(f"\tGenerating .vscode directory for {projectName}: {configDir}")
 
         os.mkdir(configDir)
 
