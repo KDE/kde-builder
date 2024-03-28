@@ -2,6 +2,7 @@ import os
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
+import logging
 
 from ..BuildException import BuildException
 from ..KDEProjectsReader import KDEProjectsReader
@@ -11,6 +12,7 @@ from ..Util.Util import Util
 from .ModuleSet import ModuleSet
 from ..Debug import Debug
 
+logger = logging.getLogger(__name__)
 
 @conditional_type_enforced
 class ModuleSet_KDEProjects(ModuleSet):
@@ -109,13 +111,13 @@ class ModuleSet_KDEProjects(ModuleSet):
             activeResults = [module for module in allModuleResults if module.get("active")]
         
         if not activeResults:
-            Debug().warning(f" y[b[*] Module y[{moduleSearchItem}] is apparently a KDE collection, but contains no\n" +
-                            "active modules to build!")
+            logger.warning(Debug().colorize(f" y[b[*] Module y[{moduleSearchItem}] is apparently a KDE collection, but contains no\n" +
+                           "active modules to build!"))
             
             if allModuleResults:
                 count = len(allModuleResults)
-                Debug().warning("\tAlthough no active modules are available, there were\n" +
-                                f"\t{count} inactive modules. Perhaps the git modules are not ready?")
+                logger.warning(Debug().colorize("\tAlthough no active modules are available, there were\n" +
+                               f"\t{count} inactive modules. Perhaps the git modules are not ready?"))
         
         # Setup module options.
         moduleList = []
@@ -139,7 +141,7 @@ class ModuleSet_KDEProjects(ModuleSet):
             if self.none_true([KDEProjectsReader._projectPathMatchesWildcardSearch(result["fullName"], element) for element in ignoreList]):
                 moduleList.append(newModule)
             else:
-                Debug().debug(f"--- Ignoring matched active module {newModule} in module set " + self.name)
+                logger.debug(Debug().colorize(f"--- Ignoring matched active module {newModule} in module set " + self.name))
         return moduleList
     
     # @override
@@ -171,7 +173,7 @@ class ModuleSet_KDEProjects(ModuleSet):
             moduleList.extend(candidateModules)
         
         if not len(moduleList):
-            Debug().warning("No modules were defined for the module-set " + self.name)
-            Debug().warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger.warning(Debug().warning("No modules were defined for the module-set " + self.name))
+            logger.warning(Debug().warning("You should use the g[b[use-modules] option to make the module-set useful."))
         
         return moduleList
