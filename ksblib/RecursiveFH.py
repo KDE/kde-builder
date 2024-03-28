@@ -5,10 +5,13 @@ import os
 import re
 import fileinput
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
+import logging
 
 from .BuildException import BuildException
 # from .Util import Util
 from .Debug import Debug
+
+logger_var_subst = logging.getLogger("variables_substitution")
 
 
 @conditional_type_enforced
@@ -157,7 +160,7 @@ class RecursiveFH:
                     if not ctx.hasOption(sub_var_name):
                         Debug().warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
                     
-                    Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+                    logger_var_subst.debug(Debug().colorize(f"Substituting ${sub_var_name} with {sub_var_value}"))
                     
                     filename = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, filename)
                     

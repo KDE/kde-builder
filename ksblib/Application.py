@@ -16,6 +16,7 @@ import signal
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from .Util.Conditional_Type_Enforced import WithSubclasses
 from typing import NoReturn, Union
+import logging
 
 from .BuildContext import BuildContext
 from ksblib.BuildException import BuildException, BuildException_Config
@@ -35,6 +36,8 @@ from .TaskManager import TaskManager
 from .Updater.Git import Updater_Git
 from .Util.Util import Util
 from .OptionsBase import OptionsBase
+
+logger_var_subst = logging.getLogger("variables_substitution")
 
 
 @conditional_type_enforced
@@ -783,7 +786,7 @@ class Application:
             if not ctx.hasOption(sub_var_name):
                 Debug().warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{fileName}:{fileReader.currentFilehandle().filelineno()}]\n *")
             
-            Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+            logger_var_subst.debug(Debug().colorize(f"Substituting ${sub_var_name} with {sub_var_value}"))
             
             value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
             
