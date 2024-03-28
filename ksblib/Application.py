@@ -431,7 +431,7 @@ class Application:
             
             sourceDir = metadataModule.getSourceDir()
             Debug().setPretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
-            if not Util().super_mkdir(sourceDir):
+            if not Util.super_mkdir(sourceDir):
                 updateNeeded = True
                 BuildException.croak_runtime(f"Could not create {sourceDir} directory!")
             Debug().setPretending(wasPretending)
@@ -858,15 +858,16 @@ class Application:
         """
         Util.assert_isa(module, OptionsBase)
         
-        self.init_moduleID()
+        if not hasattr(Application, "moduleID"):
+            Application.moduleID = 0
         
         # Just look for an end marker if terminator not provided.
         if not endRE:
             endRE = re.compile(r"^\s*end[\w\s]*$")
         
         self._markModuleSource(module, fileReader.currentFilename() + ":" + str(fileReader.currentFilehandle().filelineno()))
-        module.setOption({"#entry_num": self.moduleID})
-        self.moduleID += 1
+        module.setOption({"#entry_num": Application.moduleID})
+        Application.moduleID += 1
         
         phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
         all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
@@ -1664,7 +1665,7 @@ class Application:
         
         destDir = os.environ.get("XDG_CONFIG_HOME") or f"""{os.environ.get("HOME")}/.config"""
         if not os.path.isdir(destDir):
-            Util().super_mkdir(destDir)
+            Util.super_mkdir(destDir)
         
         Application._installCustomFile(ctx, envScript, f"{destDir}/kde-env-master.sh", "kde-env-master-digest")
         if ctx.getOption("install-session-driver"):
@@ -1823,11 +1824,6 @@ class Application:
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
             Debug().warning(f"Could not import dbus module. Will not request performance power profile.")
             return
-    
-    @classmethod
-    def init_moduleID(cls):
-        if not hasattr(cls, "moduleID"):
-            cls.moduleID = 0
     
     # Accessors
     

@@ -321,7 +321,7 @@ class BuildSystem:
             # Let users know we're done so they don't wonder why rm -rf is taking so
             # long and oh yeah, why's my HD so active?...
             Debug().info("\tOld build system cleaned, starting new build system.")
-        elif not Util().super_mkdir(builddir):
+        elif not Util.super_mkdir(builddir):
             Debug().error(f"\tUnable to create directory r[{builddir}].")
             return 0
         return 1
@@ -343,7 +343,7 @@ class BuildSystem:
         builddir = module.fullpath("build")
         srcdir = module.fullpath("source")
         
-        if not os.path.exists(f"{builddir}") and not Util().super_mkdir(f"{builddir}"):
+        if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
             Debug().error(f"\tUnable to create build directory for r[{module}]!!")
             return Promise.resolve(0)
         

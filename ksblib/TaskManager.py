@@ -123,7 +123,7 @@ class TaskManager:
         if not os.path.exists(kdesrc):
             Debug().whisper("KDE source download directory doesn't exist, creating.\n")
             
-            if not Util().super_mkdir(kdesrc):
+            if not Util.super_mkdir(kdesrc):
                 Debug().error(f"Unable to make directory r[{kdesrc}]!")
                 ipc.sendIPCMessage(IPC.ALL_FAILURE, "no-source-dir")
                 return 1

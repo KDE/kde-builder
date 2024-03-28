@@ -345,7 +345,7 @@ class Module(OptionsBase):
         
         # Ensure we're in a known directory before we start; some options remove
         # the old build directory that a previous module might have been using.
-        Util().super_mkdir(pathinfo["path"])
+        Util.super_mkdir(pathinfo["path"])
         Util.p_chdir(pathinfo["path"])
         
         if not self.setupBuildSystem():
@@ -646,7 +646,7 @@ class Module(OptionsBase):
         
         if kdesrc != module_src_dir:
             # This module has a different source directory, ensure it exists.
-            if not Util().super_mkdir(module_src_dir):
+            if not Util.super_mkdir(module_src_dir):
                 Debug().error(f"Unable to create separate source directory for r[{self}]: {module_src_dir}")
                 ipc.sendIPCMessage(IPC.MODULE_FAILURE, moduleName)
         

@@ -524,7 +524,7 @@ class BuildContext(Module):
             self.logPaths[baseLogPath] = f"{baseLogPath}/{date}-{log_id}"
         
         logDir = self.logPaths[baseLogPath]
-        Util().super_mkdir(logDir)
+        Util.super_mkdir(logDir)
         
         # global logs go to basedir directly
         if not isinstance(module, BuildContext):
@@ -543,12 +543,12 @@ class BuildContext(Module):
         logDir = self.getLogDirFor(module)
         
         # We create this here to avoid needless empty module directories everywhere
-        Util().super_mkdir(logDir)
+        Util.super_mkdir(logDir)
         
         # Provide a directory to make it easy to see the last build for a module's
         # given phase (like cmake, build, install, etc.) without having to find the
         # log dir for the specific kde-builder run.
-        Util().super_mkdir(f"{baseLogPath}/latest-by-phase/{module}")
+        Util.super_mkdir(f"{baseLogPath}/latest-by-phase/{module}")
         
         # Add a symlink to the latest run for this module. 'latest' itself is
         # a directory under the base log directory that holds symlinks mapping
@@ -560,7 +560,7 @@ class BuildContext(Module):
         if "/" in module.name:
             latestPath += f"/{modulePath}"
         
-        Util().super_mkdir(latestPath)
+        Util.super_mkdir(latestPath)
         
         symlink = f"{latestPath}/{moduleName}"
         Util.remake_symlink(logDir, symlink)
@@ -895,7 +895,7 @@ class BuildContext(Module):
         dir_name = os.path.dirname(fileName)
         
         if not os.path.isdir(dir_name):
-            Util().super_mkdir(dir_name)
+            Util.super_mkdir(dir_name)
         
         try:
             encodedJSON = json.dumps(self.persistent_options, indent=3)

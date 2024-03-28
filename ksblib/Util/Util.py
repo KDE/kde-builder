@@ -33,10 +33,6 @@ class Util:
     take a peek at the source.
     """
     
-    def __init__(self):
-        self.createdPaths = {}
-        pass
-    
     @staticmethod
     def list_has(listRef: list, value):
         """
@@ -138,7 +134,8 @@ class Util:
                 return 1
             BuildException.croak_runtime(f"Could not change to directory {dir}: {e}")
     
-    def super_mkdir(self, pathname):
+    @staticmethod
+    def super_mkdir(pathname):
         """
         Creates a directory, including any parent directories that may also need
         created.  Does nothing in pretend mode (but it does remember that it would
@@ -147,10 +144,13 @@ class Util:
         Throws an exception on failure. See L<File::Path>.
         """
         
+        if not hasattr(Util, "createdPaths"):
+            Util.createdPaths = {}
+        
         if Debug().pretending():
-            if pathname not in self.createdPaths and not os.path.exists(pathname):
+            if pathname not in Util.createdPaths and not os.path.exists(pathname):
                 Debug().pretend(f"\tWould have created g[{pathname}]")
-            self.createdPaths[pathname] = True
+            Util.createdPaths[pathname] = True
             return True
         else:
             Path(pathname).mkdir(parents=True, exist_ok=True)
@@ -874,7 +874,7 @@ class Util:
             BuildException.croak_internal("Both paths to safe_lndir_p must be absolute paths!")
         
         # Create destination directory.
-        if not Util().super_mkdir(to_path):
+        if not Util.super_mkdir(to_path):
             Debug().error(f"Couldn't create directory r[{to_path}]")
             return Promise.resolve(0)
         
@@ -887,7 +887,7 @@ class Util:
         #     if re.search(r"/\.git", dir) :
         #         return
         #
-        #     if not Util().super_mkdir(dir):
+        #     if not Util.super_mkdir(dir):
         #         BuildException.croak_runtime(f"Couldn't create directory {dir}: $!")
         #
         #     # Symlink the file.  Check if it's a regular file because File::Find

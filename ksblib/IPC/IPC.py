@@ -268,15 +268,15 @@ class IPC:
         result in a wait.
         """
         
-        if not hasattr(self, "waited"):
-            self.waited = 0
+        if not hasattr(IPC, "waited"):
+            IPC.waited = 0
         
-        if self.waited:
+        if IPC.waited:
             return
         
         buffer = ""
         ipcType = 0
-        self.waited = 1
+        IPC.waited = 1
         
         while ipcType != IPC.ALL_UPDATING:
             ipcType, buffer = self.receiveIPCMessage()
