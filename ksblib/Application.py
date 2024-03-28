@@ -19,7 +19,7 @@ from .BuildContext import BuildContext
 from ksblib.BuildException import BuildException, BuildException_Config
 from .BuildSystem.QMake import BuildSystem_QMake
 from .Cmdline import Cmdline
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .DebugOrderHints import DebugOrderHints
 from .DependencyResolver import DependencyResolver
 from .Module.Module import Module
@@ -36,6 +36,8 @@ from .OptionsBase import OptionsBase
 from typing import TYPE_CHECKING, Callable, Optional
 if TYPE_CHECKING:
     import fileinput
+
+logger_var_subst = kbLogger.getLogger("variables_substitution")
 
 
 class Application:
@@ -735,7 +737,7 @@ class Application:
             if not ctx.hasOption(sub_var_name):
                 Debug().warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{fileName}:{fileReader.currentFilehandle().filelineno()}]\n *")
 
-            Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+            logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
 
             value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
 

@@ -7,7 +7,9 @@ import fileinput
 
 from .BuildException import BuildException
 # from .Util import Util
-from .Debug import Debug
+from .Debug import Debug, kbLogger
+
+logger_var_subst = kbLogger.getLogger("variables_substitution")
 
 
 class RecursiveFH:
@@ -153,9 +155,9 @@ class RecursiveFH:
                 while sub_var_name:
                     sub_var_value = ctx.getOption(sub_var_name) or ""
                     if not ctx.hasOption(sub_var_name):
-                        Debug().warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
+                        logger_var_subst.warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
 
-                    Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+                    logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
 
                     filename = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, filename)
 
