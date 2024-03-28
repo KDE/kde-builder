@@ -11,8 +11,14 @@ import os
 import sys
 import textwrap
 import traceback
+import logging.config
+import yaml
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
+
+with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
+    config = yaml.safe_load(f.read())
+    logging.config.dictConfig(config)
 
 parser = argparse.ArgumentParser(prog="ProgramName",
                                  description="What the program does",

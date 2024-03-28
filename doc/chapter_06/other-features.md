@@ -7,6 +7,8 @@
 kde-builder has several options to control the amount of output the
 script generates. In any case, errors will always be output.
 
+Table of debug levels
+
 | Debug level | Level name | Command line option |
 |-------------|------------|---------------------|
 | 0           | DEBUG      | --debug             |
@@ -16,7 +18,24 @@ script generates. In any case, errors will always be output.
 | 4           | WARNING    | --really-quiet      |
 | 5           | ERROR      | No way to select    |
 
-Table of debug levels
+To enable separate loggers, for example, `ksblib.DependencyResolver` edit the 
+`kde-builder-logging.yaml` config. For example, to change it to DEBUG level, replace this line:
+
+```yaml
+...
+  ksblib.DependencyResolver:
+    level: INFO
+...
+```
+
+to this:
+
+```yaml
+...
+  ksblib.DependencyResolver:
+    level: DEBUG
+...
+```
 
 (kde-builder-color)=
 ## Color output

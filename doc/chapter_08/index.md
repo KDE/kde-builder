@@ -7,4 +7,5 @@ Module
 Internals
 IPC-notes
 adding-new-options
+adding-logger
 ```
