@@ -20,6 +20,9 @@ import codecs
 
 from ksblib.Debug import Debug
 from ksblib.BuildException import BuildException
+from typing import TYPE_CHECKING, Callable, Optional
+if TYPE_CHECKING:
+    from ..Module.Module import Module
 
 
 @conditional_type_enforced
@@ -379,7 +382,7 @@ class Util:
             os.symlink(f"{logfile}", f"{logdir}/error.log")
     
     @staticmethod
-    def run_logged_command(module, filename: str, callbackRef, command: list[str]) -> int:
+    def run_logged_command(module: Module, filename: str, callbackRef: Optional[Callable], command: list[str]) -> int:
         """
         Common code for log_command and ksb::Util::LoggedSubprocess
         """
@@ -575,7 +578,7 @@ class Util:
         return result
     
     @staticmethod
-    def log_command(module, filename: str, argRef, optionsRef=None) -> int:
+    def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
         """
         Subroutine to run a command, optionally filtering on the output of the child
         command. Use like:
@@ -624,7 +627,7 @@ class Util:
         if optionsRef is None:
             optionsRef = {}
         
-        command = list(argRef)
+        command = argRef
         callbackRef = optionsRef.get("callback", None)
         
         if Debug().pretending():
@@ -633,7 +636,7 @@ class Util:
         return Util.run_logged_command(module, filename, callbackRef, argRef)
     
     @staticmethod
-    def run_logged_p(module, filename: str, directory, argRef: list[str]) -> Promise:
+    def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str]) -> Promise:
         """
         This is similar to C<log_command> in that this runs the given command and
         arguments in a separate process. The difference is that this command
