@@ -418,6 +418,10 @@ by default.
 Enable or disable colorful output. By default, this option is enabled
 for interactive terminals.
 
+(cmdline-debug)=
+[`--debug`](cmdline-debug)  
+Enables `DEBUG` level for every logger of the kde-builder. See [](#changing-verbosity).
+
 (cmdline-nice)=
 [`--nice`](cmdline-nice) (or `--niceness`) \<value\>  
 This value adjusts the computer CPU priority requested by kde-builder,
@@ -474,28 +478,6 @@ See also `--initial-setup`
 Generate the kde-builder configuration file.
 
 See also `--initial-setup`
-
-## Verbosity level
-
-(cmdline-debug)=
-[`--debug`](cmdline-debug)  
-Enables debug mode for the script. Currently, this means that all output
-will be dumped to the standard output in addition to being logged in the
-log directory like normal. Also, many functions are much more verbose
-about what they are doing in debugging mode.
-
-(cmdline-quiet)=
-[`--quiet`](cmdline-quiet) (or `--quite` or `-q`)  
-Do not be as noisy with the output. With this switch only the basics are output.
-
-(cmdline-really-quiet)=
-[`--really-quiet`](cmdline-really-quiet)  
-Only output warnings and errors.
-
-(cmdline-verbose)=
-[`--verbose`](cmdline-verbose)  
-Be very descriptive about what is going on, and what kde-builder is
-doing.
 
 ## Script information
 
