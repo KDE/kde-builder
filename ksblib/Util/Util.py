@@ -499,7 +499,7 @@ class Util:
             # External command.
             try:
                 os.execvp(command[0], command)
-            except OSError as e:
+            except Exception as e:
                 cmd_string = " ".join(command)
                 Debug().error(textwrap.dedent(f"""\
                     r[b[Unable to execute "{cmd_string}"]!
