@@ -647,7 +647,7 @@ class Util:
         return Util.run_logged_command(module, filename, callbackRef, argRef)
 
     @staticmethod
-    def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str]) -> Promise:
+    def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> Promise:
         """
         This is similar to C<log_command> in that this runs the given command and
         arguments in a separate process. The difference is that this command
@@ -708,8 +708,7 @@ class Util:
             # of the return value, or sent earlier via a 'progress' event.
             if directory:
                 Util.p_chdir(directory)
-            retval.value = Util.log_command(module, filename, argRef)
-
+            retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
         promise = subprocess_run_p(func)
 
         def then_(exitcode):

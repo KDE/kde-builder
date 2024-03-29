@@ -14,7 +14,7 @@ from ksblib.Updater.Git import Updater_Git
 from ksblib.Debug import Debug
 
 
-def test_option_reading():
+def test_option_reading(monkeypatch):
     """
     Test basic option reading from rc-files
     """
@@ -22,7 +22,7 @@ def test_option_reading():
 
     CMD = []
 
-    def mock_run_logged_p(module, filename, directory, argRef):
+    def mock_run_logged_p(module, filename, directory, argRef, callbackRef=None):
         nonlocal CMD
         if not argRef:
             raise "No arg to module"
@@ -32,7 +32,7 @@ def test_option_reading():
 
         return Promise.resolve(0)
 
-    Util.run_logged_p = mock_run_logged_p
+    monkeypatch.setattr(Util, "run_logged_p", mock_run_logged_p)
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc".split(" "))
     moduleList = app.modules
 

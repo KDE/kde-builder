@@ -21,7 +21,7 @@ def test_cmake_prefix(monkeypatch):
     log_called = 0
 
     # Redefine log_command to capture whether it was properly called.
-    def mock_run_logged_p(module, filename, directory, argRef):
+    def mock_run_logged_p(module, filename, directory, argRef, callbackRef=None):
         nonlocal log_called
         nonlocal savedCommand
         log_called = 1

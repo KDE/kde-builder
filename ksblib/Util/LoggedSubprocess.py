@@ -232,8 +232,9 @@ class Util_LoggedSubprocess:
             if announceSub:
                 announceSub(module)
 
-            result = Util.run_logged_command(module, filename, callback, command)
-            logger_logged_cmd.info(f"{command[0]} complete, result {result}")
+            pr = Util.run_logged_p(module, filename, None, command, callback)
+            Promise.wait(pr)
+            result = pr.value
             retval.value = result
 
         promise = Promise()  # Just use Promise() here, to let PyCharm's inspector understand the type of "promise" variable.
