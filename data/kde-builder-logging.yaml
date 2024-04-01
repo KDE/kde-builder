@@ -39,6 +39,13 @@ loggers:
     handlers: [console]
     propagate: no
 
+  logged-command:
+    level: WARNING  # default
+#    level: INFO  # only shows the command with its parameters and its exit status
+#    level: DEBUG  # shows the whole output of command
+    handlers: [console]
+    propagate: no
+
   module-set:
     level: INFO
 #    level: DEBUG

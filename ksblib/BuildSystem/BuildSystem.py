@@ -4,17 +4,20 @@ import sys
 import re
 import time
 from promise import Promise
+import logging
 
 from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..Module.Module import Module
     from ..BuildContext import BuildContext
 
 # use ksb::StatusView;
+
+logger_logged_cmd = kbLogger.getLogger("logged-command")
 
 
 class BuildSystem:
@@ -472,7 +475,7 @@ class BuildSystem:
         # There are situations when we don't want progress output:
         # 1. If we're not printing to a terminal.
         # 2. When we're debugging (we'd interfere with debugging output).
-        if not sys.stderr.isatty() or Debug().debugging():
+        if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
             Debug().note(f"\t{message}")
 
             promise = Util.run_logged_p(module, filename, builddir, argRef)
@@ -493,6 +496,14 @@ class BuildSystem:
         statusViewer = ctx.statusViewer()
         statusViewer.setStatus(f"\t{message}")
         statusViewer.update()
+
+        if logger_logged_cmd.level == logging.INFO and ctx.statusViewer().cur_progress == -1:
+            # When user configured logged-command logger to not print the output of the command to console (i.e. logged-command level is higher than DEBUG), but still print the info of started and finished logged command,
+            # (i.e. logged-command level is lower than WARNING), in other words, when logged-command level is INFO, the user will want to see the initial status message.
+            # statusViewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".
+            # And then finally is replaced with "        Installing ark succeeded (after 3 seconds)".
+            # So to keep that initial line "        Installing ark", we need to add a new line after statusView prints its line and moves cursor to the beginning of line.
+            print("\n", end="")
 
         # TODO More details
         warnings = 0

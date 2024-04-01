@@ -17,11 +17,14 @@ import multiprocessing
 import traceback
 import codecs
 
-from ksblib.Debug import Debug
+from ksblib.Debug import Debug, kbLogger
 from ksblib.BuildException import BuildException
 from typing import TYPE_CHECKING, Callable, Optional
+import logging
 if TYPE_CHECKING:
     from ..Module.Module import Module
+
+logger_logged_cmd = kbLogger.getLogger("logged-command")
 
 
 class Util:
@@ -384,7 +387,7 @@ class Util:
         """
         Common code for log_command and ksb::Util::LoggedSubprocess
         """
-        Debug().debug(f"run_logged_command(): Module {module}, Command: ", " ".join(command))
+        logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             BuildException.croak_internal(f"Pass only base filename for {module}/{filename}")
@@ -400,7 +403,7 @@ class Util:
 
             dec = codecs.getincrementaldecoder('utf8')()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
 
-            if not callbackRef and Debug().debugging():
+            if not callbackRef and logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     # If no other callback given, pass to debug() if debug-mode is on.
                     while True:
@@ -455,7 +458,7 @@ class Util:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
 
-            if callbackRef or Debug().debugging():
+            if callbackRef or logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
                 # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
                 os.close(1)
@@ -629,7 +632,7 @@ class Util:
         callbackRef = optionsRef.get("callback", None)
 
         if Debug().pretending():
-            Debug().pretend("\tWould have run g['" + "' '".join(command) + "'")
+            logger_logged_cmd.pretend("\tWould have run g['" + "' '".join(command) + "'")
             return 0
         return Util.run_logged_command(module, filename, callbackRef, argRef)
 
@@ -669,7 +672,7 @@ class Util:
             directory = ""
         if Debug().pretending():
             args_str = "', '".join(argRef)
-            Debug().pretend(f"\tWould have run g{{'{args_str}'}}")
+            logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
             return Promise.resolve(0)
 
         # Do this before we fork so the path is finalized to prevent auto-detection
@@ -703,7 +706,7 @@ class Util:
             # This happens back in the main process, so we can reintegrate the
             # changes into our data structures if needed.
 
-            Debug().debug(f"run_logged_p(): {module} {filename} complete: {exitcode}"),
+            logger_logged_cmd.info(f"run_logged_p(): {module} {filename} complete: {exitcode}")
             if not exitcode == 0:
                 Util._setErrorLogfile(module, f"{filename}.log")
             return exitcode

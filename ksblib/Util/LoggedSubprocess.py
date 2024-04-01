@@ -5,8 +5,10 @@ import multiprocessing
 import asyncio
 
 from ..BuildException import BuildException
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from .Util import Util
+
+logger_logged_cmd = kbLogger.getLogger("logged-command")
 
 """
 =head1 EVENTS
@@ -164,7 +166,7 @@ class Util_LoggedSubprocess:
         command = argRef
 
         if Debug().pretending():
-            Debug().pretend(f"\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
+            logger_logged_cmd.pretend(f"\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
             a = Promise.resolve(0)
             return a
 
@@ -226,7 +228,7 @@ class Util_LoggedSubprocess:
                 announceSub(module)
 
             result = Util.run_logged_command(module, filename, callback, command)
-            Debug().whisper(f"{command[0]} complete, result {result}")
+            logger_logged_cmd.info(f"{command[0]} complete, result {result}")
             retval.value = result
 
         promise = Promise()  # Just use Promise() here, to let PyCharm's inspector understand the type of "promise" variable.
