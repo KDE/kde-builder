@@ -15,6 +15,7 @@ from .BuildException import BuildException
 import logging
 
 logger_ipc = kbLogger.getLogger("ipc")
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class TaskManager:
@@ -268,7 +269,7 @@ class TaskManager:
             moduleSet = module.moduleSet().name
             modOutput = moduleName
 
-            if Debug().debugging(Debug.WHISPER):
+            if logger_buildsystem.isEnabledFor(logging.DEBUG):
                 sysType = module.buildSystemType()
                 modOutput += f" (build system {sysType})"
 

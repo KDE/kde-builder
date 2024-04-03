@@ -5,7 +5,9 @@ import textwrap
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
+
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class BuildSystem_Qt5(BuildSystem):
@@ -34,7 +36,7 @@ class BuildSystem_Qt5(BuildSystem):
         script = f"{srcdir}/configure"
 
         if not os.path.exists(script) and not Debug().pretending():
-            Debug().error(f"\tMissing configure script for r[b[{module}]")
+            logger_buildsystem.error(f"\tMissing configure script for r[b[{module}]")
             return False
 
         commands = re.split(r"\s+", module.getOption("configure-flags"))
@@ -52,7 +54,7 @@ class BuildSystem_Qt5(BuildSystem):
         qt_installdir = module.getOption("qt-install-dir")
 
         if installdir and qt_installdir and installdir != qt_installdir:
-            Debug().warning(textwrap.dedent(f"""\
+            logger_buildsystem.warning(textwrap.dedent(f"""\
                 b[y[*]
                 b[y[*] Building the Qt module, but the install directory for Qt is not set to the
                 b[y[*] Qt directory to use.
@@ -70,7 +72,7 @@ class BuildSystem_Qt5(BuildSystem):
         # probably shouldn't anymore. :)
 
         if any(re.match(r"^-prefix(=.*)?$", command) for command in commands):
-            Debug().warning(textwrap.dedent(f"""\
+            logger_buildsystem.warning(textwrap.dedent(f"""\
                 b[y[*]
                 b[y[*] You have the y[-prefix] option selected in your {module} configure flags.
                 b[y[*] kde-builder will correctly add the -prefix option to match your Qt
@@ -89,8 +91,8 @@ class BuildSystem_Qt5(BuildSystem):
         if cur_flags == old_flags and not module.getOption("reconfigure") and os.path.exists(f"{builddir}/Makefile"):
             return True
 
-        Debug().note(f"\tb[r[LGPL license selected for Qt].  See {srcdir}/LICENSE.LGPL")
-        Debug().info("\tRunning g[configure]...")
+        logger_buildsystem.warning(f"\tb[r[LGPL license selected for Qt].  See {srcdir}/LICENSE.LGPL")
+        logger_buildsystem.info("\tRunning g[configure]...")
 
         module.setPersistentOption("last-configure-flags", cur_flags)
 
