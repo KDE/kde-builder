@@ -6,12 +6,15 @@ import time
 import signal
 import setproctitle
 import selectors
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .IPC.IPC import IPC
 from .IPC.Pipe import IPC_Pipe
 from .IPC.Null import IPC_Null
 from .Util.Util import Util
 from .BuildException import BuildException
+import logging
+
+logger_ipc = kbLogger.getLogger("ipc")
 
 
 class TaskManager:
@@ -67,7 +70,7 @@ class TaskManager:
 
         if ipc.supportsConcurrency():
             result = self._handle_async_build(ipc, ctx)
-            if Debug().debugging():
+            if logger_ipc.level == logging.DEBUG:
                 ipc.outputPendingLoggedMessages()
         else:
             Debug().whisper("Using no IPC mechanism\n")

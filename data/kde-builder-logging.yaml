@@ -39,6 +39,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  ipc:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   logged-command:
     level: WARNING  # default
 #    level: INFO  # only shows the command with its parameters and its exit status

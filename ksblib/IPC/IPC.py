@@ -10,6 +10,8 @@ from ..Debug import Debug, kbLogger
 if TYPE_CHECKING:
     from ..Module.Module import Module
 
+logger_ipc = kbLogger.getLogger("ipc")
+
 
 class IPC:
     """
@@ -236,7 +238,7 @@ class IPC:
         for module, logMessages in messages.items():
             nonEmptyMessages = [logMessage for logMessage in logMessages if logMessage.split(",", maxsplit=2)[2]]
             if nonEmptyMessages:
-                Debug().debug(f"Unhandled messages for module {module}:")
+                logger_ipc.debug(f"\nUnhandled messages for module {module}:")
                 for combined_msg in nonEmptyMessages:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
