@@ -38,4 +38,5 @@ html_theme_options = {
 myst_enable_extensions = [
     "attrs_inline",
     "attrs_block",
+    "deflist",
 ]
