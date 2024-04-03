@@ -14,12 +14,12 @@ extensions = [
     "myst_parser",
 ]
 
-templates_path = ['_templates']
-exclude_patterns = ['_build']
-html_extra_path = ['404handler.php']  # bring our 404 handler in
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "README.md"]
+html_extra_path = ["404handler.php"]  # bring our 404 handler in
 
 html_theme = "sphinx_book_theme"
-html_static_path = ['_static']
+html_static_path = ["_static"]
 git_cmd = "git log --date=format:'%Y-%m-%d %H:%M:%S %z' --pretty='format:%ad, commit %h' -n1"
 html_last_updated_fmt = os.popen(git_cmd).read()
 
