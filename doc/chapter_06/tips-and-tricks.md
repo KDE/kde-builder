@@ -1,10 +1,4 @@
-# kde-builder Documentation
-
-## kde-builder Tricks
-
-These are some kde-builder tricks that probably should be documented with the
-[KDE Community Wiki page](https://community.kde.org/Get_Involved/development#Set_up_kdesrc-build)
-but for now they're at least worth nothing here:
+# Tips and Tricks
 
 - Use `kde-builder --rebuild-failures` (potentially with `--no-src`) to
   rebuild modules that failed to build during the last kde-builder run. This
@@ -17,7 +11,7 @@ but for now they're at least worth nothing here:
 
 - Either way if you're running kde-builder frequently as part of a
   debug/build/debug cycle, don't forget to throw `--no-src` on the command line
-  as appropriate.  If the build failed halfway through it is likely that all
+  as appropriate. If the build failed halfway through it is likely that all
   source updates completed, even for modules kde-builder didn't try to build.
 
 - It is possible to build many module types that are not official KDE projects.
@@ -79,9 +73,9 @@ but for now they're at least worth nothing here:
 
 - You can also wrap kde-builder itself in a script if you want to do things
 like unusual pre-build setup, post-install cleanup, etc. This also goes well
-with the [`--query`][query] option.
+with the [`--query`](#cmdline-query) option.
 
-### Troubleshooting
+## Troubleshooting
 
 - Is `build-when-unchanged` disabled? Did you try building from a clean build
   directory? If your answer to either is "No" then try using `--refresh-build`
@@ -89,9 +83,6 @@ with the [`--query`][query] option.
 
 - If you've been running a kde-builder-based install for a long time then it
   may be time to clean out the installation directory as well, especially if
-  you don't use the [use-clean-install][] option to run `make uninstall` as
+  you don't use the [use-clean-install](#conf-use-clean-install) option to run `make uninstall` as
   part of the install process. There's no kde-builder option to blow up your
   installation prefix, but it's not hard to do yourself...
-
-[use-clean-install]: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html#conf-use-clean-install
-[query]: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/supported-cmdline-params.html#cmdline-query

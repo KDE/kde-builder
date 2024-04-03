@@ -7,5 +7,6 @@ basic-features
 advanced-features
 developer-features
 other-features
+tips-and-tricks
 appendix-profile
 ```
