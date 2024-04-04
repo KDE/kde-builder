@@ -1,10 +1,8 @@
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .IPC import IPC
 
 
-@conditional_type_enforced
 class IPC_Null(IPC):
     """
     Dummy IPC module in case SysVIPC doesn't work or async mode is not needed.

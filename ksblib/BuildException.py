@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import textwrap
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn
 
 
-@conditional_type_enforced
 class BuildException(Exception):
     """
     A class to wrap 'exception' messages for the script, allowing them to be
@@ -76,7 +74,6 @@ class BuildException(Exception):
         raise BuildException.make_exception("Internal", msg, 1)
 
 
-@conditional_type_enforced
 class BuildException_Config(BuildException):
     """
     A small subclass to hold the option name that caused a config exception to

@@ -7,8 +7,6 @@ import shutil
 import sys
 import textwrap
 import traceback
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from ..Util.Conditional_Type_Enforced import WithSubclasses
 # from overrides import override
 import copy
 
@@ -40,7 +38,6 @@ if TYPE_CHECKING:
     from ..ModuleSet.ModuleSet import ModuleSet
 
 
-@conditional_type_enforced
 class Module(OptionsBase):
     """
     DESCRIPTION
@@ -242,7 +239,7 @@ class Module(OptionsBase):
     def currentScmRevision(self) -> str:
         return self.scm().currentRevisionInternal()
     
-    def buildSystemFromName(self, name: str) -> WithSubclasses(BuildSystem):
+    def buildSystemFromName(self, name: str) -> BuildSystem:
         """
         Returns a new build system object, given the appropriate name.
         This is a sub-optimal way to fix the problem of allowing users to override
@@ -267,7 +264,7 @@ class Module(OptionsBase):
             BuildException.croak_runtime(f"Invalid build system {name} requested")
         return class_name(self)
     
-    def buildSystem(self) -> WithSubclasses(BuildSystem):
+    def buildSystem(self) -> BuildSystem:
         if self.build_obj and self.build_obj.name() != "generic":
             return self.build_obj
         

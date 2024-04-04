@@ -12,7 +12,6 @@ from pathlib import Path
 import subprocess
 import shlex
 import signal
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from promise import Promise
 import multiprocessing
 import traceback
@@ -25,7 +24,6 @@ if TYPE_CHECKING:
     from ..Module.Module import Module
 
 
-@conditional_type_enforced
 class Util:
     """
     Useful utilities, which are exported into the calling module's namespace by default.
@@ -1042,20 +1040,3 @@ class Util:
                 return 0
         
         return 1  # success (pointed to correct location already)
-    
-    @staticmethod
-    def print_filtered_traceback():
-        """
-        This is same as traceback.print_exc(), but we remove the type_enforced calls
-        """
-        tb = traceback.format_exc()
-        tb_lines = tb.splitlines()
-        index = 0
-        filtered_tb_lines = []
-        while len(tb_lines) > index:
-            if "enforcer.py" in tb_lines[index]:
-                index += 3
-                continue
-            filtered_tb_lines.append(tb_lines[index])
-            index += 1
-        print("\n".join(filtered_tb_lines))

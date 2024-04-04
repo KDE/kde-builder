@@ -72,7 +72,7 @@ except BuildException as err:
     if err.exception_type == "Internal":
         print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
     
-    Util.print_filtered_traceback()
+    traceback.print_exc()
     if app:
         app.finish(99)  # noreturn
     exit(99)  # if app couldn't be created
@@ -85,7 +85,7 @@ except Exception as err:
     Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
     """))
     
-    Util.print_filtered_traceback()
+    traceback.print_exc()
     if app:
         app.finish(99)  # noreturn
     exit(99)  # if app couldn't be created

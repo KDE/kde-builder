@@ -1,6 +1,5 @@
 import glob
 import re
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..Util.Util import Util
@@ -9,7 +8,6 @@ from .BuildSystem import BuildSystem
 from ..Debug import Debug
 
 
-@conditional_type_enforced
 class BuildSystem_QMake(BuildSystem):
     """
     A build system used to build modules that use qmake

@@ -1,6 +1,5 @@
 import os.path
 import re
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from pathlib import Path
 import yaml
 
@@ -8,7 +7,6 @@ from .BuildException import BuildException
 from .Debug import Debug
 
 
-@conditional_type_enforced
 class KDEProjectsReader:
     """
     Enumerates and provides basic metadata of KDE projects, based on

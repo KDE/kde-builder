@@ -1,5 +1,4 @@
 import os
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 from promise import Promise
 
@@ -8,7 +7,6 @@ from ..Util.Util import Util
 from ..Debug import Debug
 
 
-@conditional_type_enforced
 class BuildSystem_Autotools(BuildSystem):
     """
     This is a module used to support configuring with autotools.

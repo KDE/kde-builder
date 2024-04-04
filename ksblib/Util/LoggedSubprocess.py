@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from promise import Promise
 import multiprocessing
 import asyncio
@@ -24,7 +23,6 @@ is in place.
 """
 
 
-@conditional_type_enforced
 class Util_LoggedSubprocess:
     """
     =head1 DESCRIPTION

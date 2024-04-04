@@ -12,7 +12,6 @@ import re
 import fileinput
 import datetime
 import errno
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .Debug import Debug
@@ -33,7 +32,6 @@ from .Util.Util import Util
 # We derive from Module so that BuildContext acts like the 'global'
 # Module, with some extra functionality.
 # TODO: Derive from OptionsBase directly and remove getOption override
-@conditional_type_enforced
 class BuildContext(Module):
     """
     DESCRIPTION

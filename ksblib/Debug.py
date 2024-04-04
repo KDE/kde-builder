@@ -1,10 +1,8 @@
 import os
 import sys
 import re
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 
 
-@conditional_type_enforced
 class Debug:
     """
     Debugging routines and constants for use with kde-builder

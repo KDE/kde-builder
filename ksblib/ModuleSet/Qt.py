@@ -1,4 +1,3 @@
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..BuildContext import BuildContext
@@ -10,7 +9,6 @@ from ..Util.Util import Util
 from .ModuleSet import ModuleSet
 
 
-@conditional_type_enforced
 class ModuleSet_Qt(ModuleSet):
     """
     Class: ModuleSet::Qt

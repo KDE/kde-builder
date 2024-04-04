@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os.path
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 from promise import Promise
 
@@ -11,7 +10,6 @@ from .Git import Updater_Git
 from ..Debug import Debug
 
 
-@conditional_type_enforced
 class Updater_Qt5(Updater_Git):
     """
     Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated

@@ -1,6 +1,5 @@
 import re
 import json
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..BuildException import BuildException
@@ -10,7 +9,6 @@ from ..Util.Util import Util
 from .KDEProject import Updater_KDEProject
 
 
-@conditional_type_enforced
 class Updater_KDEProjectMetadata(Updater_KDEProject):
     """
     Updater used only to specifically update the "repo-metadata" module

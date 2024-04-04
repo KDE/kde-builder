@@ -1,12 +1,10 @@
 import os
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 import struct
 from .IPC import IPC
 from ..BuildException import BuildException
 
 
-@conditional_type_enforced
 class IPC_Pipe(IPC):
     """
     IPC class that uses pipes in addition to forking for IPC.

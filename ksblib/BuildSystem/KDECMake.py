@@ -2,7 +2,6 @@ from __future__ import annotations
 import os.path
 import re
 import sys
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .BuildSystem import BuildSystem
@@ -16,7 +15,6 @@ if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 
 
-@conditional_type_enforced
 class BuildSystem_KDECMake(BuildSystem):
     """
     Class responsible for building CMake-based modules, with special support for KDE modules.

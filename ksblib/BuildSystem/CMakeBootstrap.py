@@ -1,11 +1,9 @@
 # from overrides import override
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
 
 
-@conditional_type_enforced
 class BuildSystem_CMakeBootstrap(BuildSystem):
     """
     This is a module used to do only one thing: Bootstrap CMake onto a system

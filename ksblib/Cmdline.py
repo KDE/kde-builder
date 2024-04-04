@@ -3,7 +3,6 @@ import re
 import argparse
 import textwrap
 import __main__
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn
 
 from .BuildContext import BuildContext
@@ -13,7 +12,6 @@ from .OSSupport import OSSupport
 from .Version import Version
 
 
-@conditional_type_enforced
 class Cmdline:
     """
     DESCRIPTION

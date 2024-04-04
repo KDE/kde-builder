@@ -3,7 +3,6 @@ import re
 import subprocess
 import textwrap
 import time
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn
 
 from .OSSupport import OSSupport
@@ -12,7 +11,6 @@ from .BuildContext import BuildContext
 from .Debug import Debug
 
 
-@conditional_type_enforced
 class FirstRun:
     """
     DESCRIPTION

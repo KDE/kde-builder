@@ -13,8 +13,6 @@ import fileinput
 import asyncio
 import hashlib
 import signal
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
-from .Util.Conditional_Type_Enforced import WithSubclasses
 from typing import NoReturn, Union
 
 from .BuildContext import BuildContext
@@ -40,7 +38,6 @@ if TYPE_CHECKING:
     import fileinput
 
 
-@conditional_type_enforced
 class Application:
     """
     DESCRIPTION
@@ -471,7 +468,7 @@ class Application:
             Debug().warning(" b[r[*] Will attempt to press onward...")
             Debug().warning(f" b[r[*] Exception message: {err}")
             
-            Util.print_filtered_traceback()
+            traceback.print_exc()
     
     def _resolveModuleDependencyGraph(self, modules: list[Module]) -> dict:
         """
@@ -951,7 +948,7 @@ class Application:
         sourcesRef = optionsBase.getOption(key) or []
         return ", ".join(sourcesRef)
     
-    def _parseModuleSetOptions(self, ctx: BuildContext, fileReader: RecursiveFH, moduleSet: ModuleSet) -> WithSubclasses(ModuleSet):
+    def _parseModuleSetOptions(self, ctx: BuildContext, fileReader: RecursiveFH, moduleSet: ModuleSet) -> ModuleSet:
         """
         Reads in a "moduleset".
         
@@ -973,7 +970,7 @@ class Application:
             moduleSet.__class__ = ModuleSet_Qt
         return moduleSet
     
-    def _readConfigurationOptions(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:  # for type_enforced: list[Module | Union[*WithSubclasses(ModuleSet)]]
+    def _readConfigurationOptions(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:
         """
         Reads in the settings from the configuration, passed in as an open
         filehandle.

@@ -3,13 +3,11 @@ from __future__ import annotations
 import os
 from .BuildException import BuildException
 # import platform
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 import sys
 import subprocess
 import re
 
 
-@conditional_type_enforced
 class OSSupport:
     """
     DESCRIPTION

@@ -1,9 +1,7 @@
 import subprocess
 import os
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 
 
-@conditional_type_enforced
 class Version:
     """
     This package is just a place to put the kde-builder version number

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import json
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from functools import cmp_to_key
 from types import FunctionType
 
@@ -13,7 +12,6 @@ from .Module.Module import Module
 from .Debug import Debug
 
 
-@conditional_type_enforced
 class DependencyResolver:
     """
     Class: DependencyResolver

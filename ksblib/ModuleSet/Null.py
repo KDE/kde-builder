@@ -1,4 +1,3 @@
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn
 # from overrides import override
 
@@ -6,7 +5,6 @@ from .ModuleSet import ModuleSet
 from ..BuildException import BuildException
 
 
-@conditional_type_enforced
 class ModuleSet_Null(ModuleSet):
     """
     Used automatically by <Module> to represent the absence of a <ModuleSet> without

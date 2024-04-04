@@ -5,7 +5,6 @@ import textwrap
 import time
 import signal
 import setproctitle
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 import selectors
 from .Debug import Debug
 from .IPC.IPC import IPC
@@ -15,7 +14,6 @@ from .Util.Util import Util
 from .BuildException import BuildException
 
 
-@conditional_type_enforced
 class TaskManager:
     """
     =head1 SYNOPSIS

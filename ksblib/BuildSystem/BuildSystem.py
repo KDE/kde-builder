@@ -3,7 +3,6 @@ import os.path
 import sys
 import re
 import time
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from promise import Promise
 
 from ..BuildException import BuildException
@@ -18,7 +17,6 @@ if TYPE_CHECKING:
 # use ksb::StatusView;
 
 
-@conditional_type_enforced
 class BuildSystem:
     """
     =head1 SYNOPSIS

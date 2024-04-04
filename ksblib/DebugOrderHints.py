@@ -1,9 +1,7 @@
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from functools import cmp_to_key
 from typing import Callable
 
 
-@conditional_type_enforced
 class DebugOrderHints:
     """
     This module is motivated by the desire to help the user debug a kde-builder

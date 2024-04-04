@@ -6,11 +6,9 @@
 from __future__ import annotations
 
 import sys
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from .Debug import Debug
 
 
-@conditional_type_enforced
 class StatusView:
     def __init__(self):
         # defaultOpts

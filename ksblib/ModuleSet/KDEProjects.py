@@ -1,7 +1,6 @@
 from __future__ import annotations
 import os
 import re
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..BuildException import BuildException
@@ -16,7 +15,6 @@ if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 
 
-@conditional_type_enforced
 class ModuleSet_KDEProjects(ModuleSet):
     """
     This represents a collective grouping of modules that share common options,

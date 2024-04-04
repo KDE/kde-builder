@@ -22,14 +22,12 @@ from __future__ import annotations
 
 import copy
 import re
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 from .BuildException import BuildException_Config
 # use ksb::BuildException;
 # use ksb::Debug;
 from .Util.Util import Util
 
 
-@conditional_type_enforced
 class OptionsBase:
     def __init__(self):
         # We don't directly bless the options hash so that subclasses can

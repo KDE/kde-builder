@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 
-
-@conditional_type_enforced
 class Module_BranchGroupResolver:
     """
     This provides an object that can be used to lookup the appropriate git branch

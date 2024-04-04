@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..Debug import Debug
 from .Git import Updater_Git
 
 
-@conditional_type_enforced
 class Updater_KDEProject(Updater_Git):
     """
     An update class for KDE Project modules (i.e. those that use "repository

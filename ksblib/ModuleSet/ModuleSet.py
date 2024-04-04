@@ -1,6 +1,5 @@
 from __future__ import annotations
 import re
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from ..OptionsBase import OptionsBase
@@ -16,7 +15,6 @@ if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 
 
-@conditional_type_enforced
 class ModuleSet(OptionsBase):
     """
     This represents a collective grouping of modules that share common options,

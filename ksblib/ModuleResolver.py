@@ -2,7 +2,6 @@
 # handling.
 
 import copy
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 
 from .BuildException import BuildException
 from .Util import Util
@@ -11,7 +10,6 @@ from .ModuleSet.ModuleSet import ModuleSet
 from .Module.Module import Module
 
 
-@conditional_type_enforced
 class ModuleResolver:
     """
     A class that handles general management tasks associated with the

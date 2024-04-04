@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import struct
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 from typing import NoReturn, Callable, TYPE_CHECKING
 from enum import IntEnum
 from ..BuildException import BuildException
@@ -12,7 +11,6 @@ if TYPE_CHECKING:
     from ..Module.Module import Module
 
 
-@conditional_type_enforced
 class IPC:
     """
     Handles the asynchronous communications needed to perform update and build

@@ -1,7 +1,6 @@
 import os.path
 import re
 import textwrap
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .BuildSystem import BuildSystem
@@ -9,7 +8,6 @@ from ..Util.Util import Util
 from ..Debug import Debug
 
 
-@conditional_type_enforced
 class BuildSystem_Qt5(BuildSystem):
     """
     Build system for the Qt5 toolkit

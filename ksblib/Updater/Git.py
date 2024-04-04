@@ -5,7 +5,6 @@ import subprocess
 import textwrap
 import inspect
 import time
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from promise import Promise
@@ -27,7 +26,6 @@ if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 
 
-@conditional_type_enforced
 class Updater_Git(Updater):
     """
     Module which is responsible for updating git-based source code modules. Can

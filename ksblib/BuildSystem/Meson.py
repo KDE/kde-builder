@@ -1,4 +1,3 @@
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .BuildSystem import BuildSystem
@@ -8,7 +7,6 @@ from .BuildSystem import BuildSystem
 from ..Util.Util import Util
 
 
-@conditional_type_enforced
 class BuildSystem_Meson(BuildSystem):
     """
     This is a build system used to support configuring with L<Meson|https://mesonbuild.com/>.

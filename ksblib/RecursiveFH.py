@@ -4,14 +4,12 @@ import textwrap
 import os
 import re
 import fileinput
-from .Util.Conditional_Type_Enforced import conditional_type_enforced
 
 from .BuildException import BuildException
 # from .Util import Util
 from .Debug import Debug
 
 
-@conditional_type_enforced
 class RecursiveFH:
     # TODO: Replace make_exception with appropriate croak_* function.
     def __init__(self, rcfile, ctx):

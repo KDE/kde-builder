@@ -1,5 +1,4 @@
 from __future__ import annotations
-from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
 
 from .KDECMake import BuildSystem_KDECMake
@@ -9,7 +8,6 @@ if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 
 
-@conditional_type_enforced
 class BuildSystem_Qt6(BuildSystem_KDECMake):
     """
     Class responsible for building Qt6 CMake-based modules.
