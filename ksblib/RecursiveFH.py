@@ -10,6 +10,7 @@ from .BuildException import BuildException
 from .Debug import Debug, kbLogger
 
 logger_var_subst = kbLogger.getLogger("variables_substitution")
+logger_app = kbLogger.getLogger("application")
 
 
 class RecursiveFH:
@@ -124,7 +125,7 @@ class RecursiveFH:
                 if filename.endswith("-build-include"):
                     filename = re.sub(r"-build-include$", ".ksb", filename)  # replace the ending "-build-include" with ".ksb"
                     filename = re.sub(r".*/([^/]+)$", r"${module-definitions-dir}/\1", filename)  # extract the file name (after the last /), and append it to "${module-definitions-dir}/" string
-                    Debug().warning(textwrap.dedent(f"""\
+                    logger_app.warning(textwrap.dedent(f"""\
                     y[Warning:] The include line defined in {self.current_fn}:{fh.filelineno()} uses an old path to build-include file.
                     The module-definitions files are now located in repo-metadata.
                     The configuration file is intended to only have this include line (please manually edit your config):
@@ -134,7 +135,7 @@ class RecursiveFH:
                     """))
                 if "data/build-include" in filename:
                     filename = re.sub(r".*/data/build-include/([^/]+)$", r"${module-definitions-dir}/\1", filename)  # extract the file name (after the last /), and append it to "${module-definitions-dir}/" string
-                    Debug().warning(textwrap.dedent(f"""\
+                    logger_app.warning(textwrap.dedent(f"""\
                     y[Warning:] The include line defined in {self.current_fn}:{fh.filelineno()} uses an old path with data/build-include.
                     The module-definitions files are now located in repo-metadata.
                     The configuration file is intended to only have this include line (please manually edit your config):

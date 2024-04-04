@@ -6,10 +6,12 @@ import __main__
 from typing import NoReturn
 
 from .BuildContext import BuildContext
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .PhaseList import PhaseList
 from .OSSupport import OSSupport
 from .Version import Version
+
+logger_app = kbLogger.getLogger("application")
 
 
 class Cmdline:
@@ -183,7 +185,7 @@ class Cmdline:
             options = options[0:run_index]  # remove all after --run, and the --run itself # pl2py: in python the stop index is not included, so we add +1
 
             if not opts["start-program"]:  # check this here, because later the empty list will be treated as not wanting to start program
-                Debug().error("You need to specify a module with the --run option")
+                logger_app.error("You need to specify a module with the --run option")
                 exit(1)  # Do not continue
 
         supportedOptions.remove("set-module-option-value=s")  # specify differently, allowing it to be repeated in cmdline

@@ -8,7 +8,9 @@ from typing import NoReturn
 from .OSSupport import OSSupport
 from .BuildException import BuildException
 from .BuildContext import BuildContext
-from .Debug import Debug
+from .Debug import Debug, kbLogger
+
+logger_app = kbLogger.getLogger("application")
 
 
 class FirstRun:
@@ -158,12 +160,12 @@ class FirstRun:
         try:
             mem_total = self.oss.detectTotalMemory()
         except BuildException as e:
-            Debug().warning(str(e))
+            logger_app.warning(str(e))
 
         if not mem_total:
             # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
             mem_total = 4 * 1024 * 1024
-            Debug().warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
+            logger_app.warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
 
         rounded_mem = int(mem_total / 1024000.0)
         return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
