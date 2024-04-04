@@ -64,6 +64,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  updater:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   variables_substitution:
     level: INFO
 #    level: DEBUG

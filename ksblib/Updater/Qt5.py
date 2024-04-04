@@ -7,7 +7,9 @@ from promise import Promise
 from ..BuildException import BuildException
 from ..Util.Util import Util
 from .Git import Updater_Git
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
+
+logger_updater = kbLogger.getLogger("updater")
 
 
 class Updater_Qt5(Updater_Git):
@@ -45,7 +47,7 @@ class Updater_Qt5(Updater_Git):
 
         # -f forces a re-update if necessary
         command = [f"{srcdir}/init-repository", "-f", f"--module-subset={subset_arg}"]
-        Debug().note("\tUsing Qt 5 modules: ", ", ".join(modules))
+        logger_updater.warning("\tUsing Qt 5 modules: " + ", ".join(modules))
 
         result = Util.await_exitcode(Util.run_logged_p(module, "init-repository", srcdir, command))
 
@@ -92,8 +94,8 @@ class Updater_Qt5(Updater_Git):
 
             self._clone(module.getOption("repository"))
 
-            Debug().note("\tQt update script is installed, downloading remainder of Qt")
-            Debug().note("\tb[y[THIS WILL TAKE SOME TIME]")
+            logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
+            logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")
 
             # With the supermodule cloned, we then need to call into
             # init-repository to have it complete the checkout.
