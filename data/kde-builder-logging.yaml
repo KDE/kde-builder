@@ -27,6 +27,12 @@ loggers:
     handlers: [console-named]
     propagate: no
 
+  build-context:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   build-system:
     level: INFO
 #    level: DEBUG
