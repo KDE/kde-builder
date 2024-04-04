@@ -82,6 +82,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  taskmanager:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   util:
     level: INFO
 #    level: DEBUG

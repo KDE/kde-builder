@@ -16,6 +16,7 @@ import logging
 
 logger_ipc = kbLogger.getLogger("ipc")
 logger_buildsystem = kbLogger.getLogger("build-system")
+logger_taskmanager = kbLogger.getLogger("taskmanager")
 
 
 class TaskManager:
@@ -74,7 +75,7 @@ class TaskManager:
             if logger_ipc.level == logging.DEBUG:
                 ipc.outputPendingLoggedMessages()
         else:
-            Debug().whisper("Using no IPC mechanism\n")
+            logger_taskmanager.debug("Using no IPC mechanism\n")
 
             # If the user sends SIGHUP during the build, we should allow the
             # current module to complete and then exit early.
@@ -85,10 +86,10 @@ class TaskManager:
 
             signal.signal(signal.SIGHUP, handle_sighup)
 
-            Debug().note("\n b[<<<  Update Process  >>>]\n")
+            logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
             result = self._handle_updates(ipc, ctx)
 
-            Debug().note(" b[<<<  Build Process  >>>]\n")
+            logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
             result = self._handle_build(ipc, ctx) or result
 
         return result
@@ -123,10 +124,10 @@ class TaskManager:
 
         kdesrc = ctx.getSourceDir()
         if not os.path.exists(kdesrc):
-            Debug().whisper("KDE source download directory doesn't exist, creating.\n")
+            logger_taskmanager.debug("KDE source download directory doesn't exist, creating.\n")
 
             if not Util.super_mkdir(kdesrc):
-                Debug().error(f"Unable to make directory r[{kdesrc}]!")
+                logger_taskmanager.error(f"Unable to make directory r[{kdesrc}]!")
                 ipc.sendIPCMessage(IPC.ALL_FAILURE, "no-source-dir")
                 return 1
 
@@ -137,7 +138,7 @@ class TaskManager:
         hadError = 0
         for module in update_list:
             if self.DO_STOP:
-                Debug().note(" y[b[* * *] Early exit requested, aborting updates.")
+                logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
                 break
 
             ipc.setLoggedModule(module.name)
@@ -175,24 +176,24 @@ class TaskManager:
         ipc.forgetModule(module)
 
         if resultStatus == "failed":
-            Debug().error(f"\tUnable to update r[{module}], build canceled.")
+            logger_taskmanager.error(f"\tUnable to update r[{module}], build canceled.")
             fail_count += 1
             module.setPersistentOption("failure-count", fail_count)
             return "update"
         elif resultStatus == "success":
-            Debug().note(f"\tSource update complete for g[{module}]: {message}")
+            logger_taskmanager.warning(f"\tSource update complete for g[{module}]: {message}")
             whyRefresh = ipc.refreshReasonFor(module.name)
             if whyRefresh:
-                Debug().info(f"\t  Rebuilding because {whyRefresh}")
+                logger_taskmanager.info(f"\t  Rebuilding because {whyRefresh}")
 
         # Skip actually building a module if the user has selected to skip
         # builds when the source code was not actually updated. But, don't skip
         # if we didn't successfully build last time.
         elif resultStatus == "skipped" and not module.getOption("build-when-unchanged") and fail_count == 0:
-            Debug().note(f"\tSkipping g[{module}] because its source code has not changed.")
+            logger_taskmanager.warning(f"\tSkipping g[{module}] because its source code has not changed.")
             return 0
         elif resultStatus == "skipped":
-            Debug().note(f"\tNo changes to g[{module}] source code, but proceeding to build anyway.")
+            logger_taskmanager.warning(f"\tNo changes to g[{module}] source code, but proceeding to build anyway.")
 
         # If the build gets interrupted, ensure the persistent options that are
         # written reflect that the build failed by preemptively setting the future
@@ -244,7 +245,7 @@ class TaskManager:
         try:
             status_fh = open(outfile, "w")
         except OSError:
-            Debug().error(textwrap.dedent(f"""\
+            logger_taskmanager.error(textwrap.dedent(f"""\
              r[b[*] Unable to open output status file r[b[{outfile}]
              r[b[*] You won't be able to use the g[--resume] switch next run.
             """))
@@ -262,7 +263,7 @@ class TaskManager:
         while modules:
             module = modules.pop(0)
             if self.DO_STOP:
-                Debug().note(" y[b[* * *] Early exit requested, aborting updates.")
+                logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
                 break
 
             moduleName = module.name
@@ -276,7 +277,7 @@ class TaskManager:
             if moduleSet:
                 moduleSet = f" from g[{moduleSet}]"
 
-            Debug().note(f"Building g[{modOutput}]{moduleSet} ({cur_module}/{num_modules})")
+            logger_taskmanager.warning(f"Building g[{modOutput}]{moduleSet} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
             failedPhase = TaskManager._buildSingleModule(ipc, ctx, module, start_time)
@@ -294,7 +295,7 @@ class TaskManager:
                 result = 1
 
                 if module.getOption("stop-on-failure"):
-                    Debug().note(f"\n{module} didn't build, stopping here.")
+                    logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
                     return 1  # Error
 
                 statusViewer.numberModulesFailed(1 + statusViewer.numberModulesFailed())
@@ -327,7 +328,7 @@ class TaskManager:
                     pass
 
         if len(build_done) > 0:
-            Debug().info("<<<  g[PACKAGES SUCCESSFULLY BUILT]  >>>")
+            logger_taskmanager.info("<<<  g[PACKAGES SUCCESSFULLY BUILT]  >>>")
 
         successes = len(build_done)
         if successes == 1:
@@ -342,19 +343,19 @@ class TaskManager:
             built = open(f"{kdesrc}/successfully-built", "w")
             for module in build_done:
                 if successes <= 10:
-                    Debug().info(f"{module}")
+                    logger_taskmanager.info(f"{module}")
                 print(f"{module}", file=built)
             built.close()
 
             if successes > 10:
-                Debug().info(f"Built g[{successes}] {mods}")
+                logger_taskmanager.info(f"Built g[{successes}] {mods}")
         else:
             # Just print out the results
             if successes <= 10:
-                Debug().info("g[", "]\ng[".join(build_done), "]")
+                logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
             else:
                 if successes > 10:
-                    Debug().info(f"Built g[{successes}] {mods}")
+                    logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
     def _handle_async_build(self, ipc, ctx) -> int:
@@ -445,7 +446,7 @@ class TaskManager:
                 time.sleep(5)  # pl2py give some time to be sure updater pid will be finished, otherwise we could falsely write error message
                 pid, status = os.waitpid(updaterPid, os.WNOHANG)
                 if pid == 0:
-                    Debug().error(" r[b[***] updater thread is finished but hasn't exited?!?")
+                    logger_taskmanager.error(" r[b[***] updater thread is finished but hasn't exited?!?")
 
                 sys.exit(exitcode)
         else:
@@ -482,7 +483,7 @@ class TaskManager:
             # If an update fails the message will still be printed to the user, so
             # we don't need to note it separately here, and there's no need to list
             # one-by-one the modules that successfully updated.
-            Debug().whisper("Some modules were updated but not built")
+            logger_taskmanager.debug("Some modules were updated but not built")
 
         # It's possible if build fails on first module that git is still
         # running. Make it stop too.
@@ -522,7 +523,7 @@ class TaskManager:
 
         if not sshServers:
             return True
-        Debug().whisper("\tChecking for SSH Agent")
+        logger_taskmanager.debug("\tChecking for SSH Agent")
 
         # We're using ssh to download, see if ssh-agent is running.
         if "SSH_AGENT_PID" not in os.environ:
@@ -535,7 +536,7 @@ class TaskManager:
         if os.path.isdir("/proc") and not os.path.exists(f"/proc/{pid}"):
             # local $" = ', '; # override list interpolation separator
 
-            Debug().warning(textwrap.dedent(f"""\
+            logger_taskmanager.warning(textwrap.dedent(f"""\
                 y[b[ *] SSH Agent is enabled, but y[doesn't seem to be running].
                 y[b[ *] The agent is needed for these modules:
                 y[b[ *]   b[{sshServers}]
@@ -640,14 +641,14 @@ class TaskManager:
                         # Send the message (if we got one).
                         while msgs:
                             if not ipcToBuild.sendMessage(msgs.pop(0)):
-                                Debug().error("r[mon]: Build process stopped too soon!")
+                                logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                                 return 1
 
         sel.unregister(sendFH)  # stop watching the write pipe
         # Send all remaining messages.
         for msg in msgs:
             if not ipcToBuild.sendMessage(msg):
-                Debug().error("r[mon]: Build process stopped too soon!")
+                logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                 return 1
         ipcToBuild.close()
         return 0
