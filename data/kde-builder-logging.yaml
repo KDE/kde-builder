@@ -76,6 +76,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  util:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   variables_substitution:
     level: INFO
 #    level: DEBUG
