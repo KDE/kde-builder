@@ -24,7 +24,7 @@ class ModuleSet_Qt(ModuleSet):
     the magic value 'qt-projects', just as 'kde-projects' is used for KDE.
     """
     
-    def _makeQt5Module(self, ctx) -> Module:
+    def _makeQt5Module(self, ctx: BuildContext) -> Module:
         Util.assert_isa(self, __class__)
         Util.assert_isa(ctx, BuildContext)
         

@@ -35,6 +35,9 @@ from .TaskManager import TaskManager
 from .Updater.Git import Updater_Git
 from .Util.Util import Util
 from .OptionsBase import OptionsBase
+from typing import TYPE_CHECKING, Callable, Optional
+if TYPE_CHECKING:
+    import fileinput
 
 
 @conditional_type_enforced
@@ -128,7 +131,7 @@ class Application:
         return []
     
     @staticmethod
-    def _yieldModuleDependencyTreeEntry(nodeInfo, module, context) -> None:
+    def _yieldModuleDependencyTreeEntry(nodeInfo: dict, module: Module, context: dict) -> None:
         depth = nodeInfo["depth"]
         index = nodeInfo["idx"]
         count = nodeInfo["count"]
@@ -162,7 +165,7 @@ class Application:
         context["report"](connector + currentItem + " " + statusInfo)
     
     @staticmethod
-    def _yieldModuleDependencyTreeEntry_FullPath(nodeInfo, module, context) -> None:
+    def _yieldModuleDependencyTreeEntry_FullPath(nodeInfo: dict, module: Module, context: dict) -> None:
         depth = nodeInfo["depth"]
         currentItem = nodeInfo["currentItem"]
         
@@ -182,7 +185,7 @@ class Application:
         context["depth"] = depth + 1
         context["report"](connector + currentItem)
     
-    def generateModuleList(self, options) -> dict:
+    def generateModuleList(self, options: list) -> dict:
         """
         Generates the build context and module list based on the command line options
         and module selectors provided, resolves dependencies on those modules if needed,
@@ -470,7 +473,7 @@ class Application:
             
             Util.print_filtered_traceback()
     
-    def _resolveModuleDependencyGraph(self, modules) -> dict:
+    def _resolveModuleDependencyGraph(self, modules: list[Module]) -> dict:
         """
         Returns a graph of Modules according to the KDE project database dependency
         information.
@@ -674,7 +677,7 @@ class Application:
         
         return result
     
-    def finish(self, exitcode=0) -> NoReturn:
+    def finish(self, exitcode: int | bool = 0) -> NoReturn:
         """
         Exits the script cleanly, including removing any lock files created.
         Parameters:
@@ -707,7 +710,7 @@ class Application:
     # internal helper functions
     
     @staticmethod
-    def _readNextLogicalLine(fileReader) -> str | None:
+    def _readNextLogicalLine(fileReader: RecursiveFH) -> str | None:
         """
         Reads a "line" from a file. This line is stripped of comments and extraneous
         whitespace. Also, backslash-continued multiple lines are merged into a single
@@ -737,7 +740,7 @@ class Application:
         return None
     
     @staticmethod
-    def _splitOptionAndValue_and_substitute_value(ctx, input_line, fileReader) -> tuple:
+    def _splitOptionAndValue_and_substitute_value(ctx: BuildContext, input_line: str, fileReader: RecursiveFH) -> tuple:
         """
         Takes an input line, and extracts it into an option name, and simplified
         value. The value has "false" converted to False, white space simplified (like in
@@ -804,7 +807,7 @@ class Application:
         return option, value
     
     @staticmethod
-    def _validateModuleSet(ctx, moduleSet) -> None:
+    def _validateModuleSet(ctx: BuildContext, moduleSet: ModuleSet) -> None:
         """
         Ensures that the given ModuleSet has at least a valid repository and
         use-modules setting based on the given BuildContext.
@@ -846,7 +849,7 @@ class Application:
             
             raise BuildException.make_exception("Config", "Unknown repository base")
     
-    def _parseModuleOptions(self, ctx, fileReader, module, endRE=None):
+    def _parseModuleOptions(self, ctx: BuildContext, fileReader: RecursiveFH, module: OptionsBase, endRE=None):
         """
         Reads in the options from the config file and adds them to the option store.\n
         The first parameter is a BuildContext object to use for creating the returned ksb::Module under.\n
@@ -927,7 +930,7 @@ class Application:
         return module
     
     @staticmethod
-    def _markModuleSource(optionsBase, configSource) -> None:
+    def _markModuleSource(optionsBase: OptionsBase, configSource: str) -> None:
         """
         Marks the given OptionsBase subclass (i.e. Module or ModuleSet) as being
         read in from the given string (filename:line). An OptionsBase can be
@@ -940,7 +943,7 @@ class Application:
         optionsBase.setOption({key: sourcesRef})
     
     @staticmethod
-    def _getModuleSources(optionsBase) -> str:
+    def _getModuleSources(optionsBase: ModuleSet) -> str:
         """
         Returns rcfile sources for given OptionsBase (comma-separated).
         """
@@ -948,7 +951,7 @@ class Application:
         sourcesRef = optionsBase.getOption(key) or []
         return ", ".join(sourcesRef)
     
-    def _parseModuleSetOptions(self, ctx, fileReader, moduleSet) -> WithSubclasses(ModuleSet):
+    def _parseModuleSetOptions(self, ctx: BuildContext, fileReader: RecursiveFH, moduleSet: ModuleSet) -> WithSubclasses(ModuleSet):
         """
         Reads in a "moduleset".
         
@@ -970,7 +973,7 @@ class Application:
             moduleSet.__class__ = ModuleSet_Qt
         return moduleSet
     
-    def _readConfigurationOptions(self, ctx, fh, cmdlineGlobalOptions, deferredOptionsRef) -> list[Module | ModuleSet]:  # for type_enforced: list[Module | Union[*WithSubclasses(ModuleSet)]]
+    def _readConfigurationOptions(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:  # for type_enforced: list[Module | Union[*WithSubclasses(ModuleSet)]]
         """
         Reads in the settings from the configuration, passed in as an open
         filehandle.
@@ -1139,7 +1142,7 @@ class Application:
         return module_list
     
     @staticmethod
-    def _handle_install(ctx) -> bool:
+    def _handle_install(ctx: BuildContext) -> bool:
         """
         Handles the installation process.  Simply calls 'make install' in the build
         directory, though there is also provision for cleaning the build directory
@@ -1167,7 +1170,7 @@ class Application:
         return failed
     
     @staticmethod
-    def _handle_uninstall(ctx) -> bool:
+    def _handle_uninstall(ctx: BuildContext) -> bool:
         """
         Handles the uninstal process.  Simply calls 'make uninstall' in the build
         directory, while assuming that Qt or CMake actually handles it.
@@ -1200,7 +1203,7 @@ class Application:
         return failed
     
     @staticmethod
-    def _applyModuleFilters(ctx, moduleList) -> list:
+    def _applyModuleFilters(ctx: BuildContext, moduleList: list) -> list:
         """
         Applies any module-specific filtering that is necessary after reading command
         line and rc-file options. (This is as opposed to phase filters, which leave
@@ -1292,7 +1295,7 @@ class Application:
         
         return moduleList[startIndex:stopIndex + 1]  # pl2py: in python the stop index is not included, so we add +1
     
-    def _defineNewModuleFactory(self, resolver) -> None:
+    def _defineNewModuleFactory(self, resolver: ModuleResolver) -> None:
         """
         This defines the factory function needed for lower-level code to properly be
         able to create ksb::Module objects from just the module name, while still
@@ -1307,7 +1310,7 @@ class Application:
         # handles that fine as well.
     
     @staticmethod
-    def _updateModulePhases(modules):
+    def _updateModulePhases(modules: list[Module]):
         """
         Updates the built-in phase list for all Modules passed into this function in
         accordance with the options set by the user.
@@ -1329,7 +1332,7 @@ class Application:
                 module.phases.addPhase("test")
         return modules
     
-    def _cleanup_log_directory(self, ctx) -> None:
+    def _cleanup_log_directory(self, ctx: BuildContext) -> None:
         """
         This function removes log directories from old kde-builder runs.  All log
         directories not referenced by $log_dir/latest somehow are made to go away.
@@ -1367,7 +1370,7 @@ class Application:
                 Util.safe_rmtree(d)
     
     @staticmethod
-    def _output_possible_solution(ctx, fail_list) -> None:
+    def _output_possible_solution(ctx: BuildContext, fail_list: list) -> None:
         """
         Print out a "possible solution" message.
         It will display a list of command lines to run.
@@ -1406,7 +1409,7 @@ class Application:
             See https://community.kde.org/Get_Involved/development/Install_the_dependencies"""))
     
     @staticmethod
-    def _output_failed_module_list(ctx, message, fail_list: list) -> None:
+    def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list) -> None:
         """
         Print out an error message, and a list of modules that match that error
         message.  It will also display the log file name if one can be determined.
@@ -1458,7 +1461,7 @@ class Application:
                 Debug().warning(f"r[{module}] - g[{logfile}]")
     
     @staticmethod
-    def _output_failed_module_lists(ctx, moduleGraph) -> None:
+    def _output_failed_module_lists(ctx: BuildContext, moduleGraph: dict) -> None:
         """
         This subroutine reads the list of failed modules for each phase in the build
         context and calls _output_failed_module_list for all the module failures.
@@ -1518,7 +1521,7 @@ class Application:
         Application._output_possible_solution(ctx, actualFailures)
     
     @staticmethod
-    def _installTemplatedFile(sourcePath, destinationPath, ctx) -> None:
+    def _installTemplatedFile(sourcePath: str, destinationPath: str, ctx: BuildContext) -> None:
         """
         This function takes a given file and a build context, and installs it to a
         given location while expanding out template entries within the source file.
@@ -1586,7 +1589,7 @@ class Application:
                 BuildException.croak_runtime(f"Unable to write line to {destinationPath}: {e}")
     
     @staticmethod
-    def _installCustomFile(ctx, sourceFilePath, destFilePath, md5KeyName) -> None:
+    def _installCustomFile(ctx: BuildContext, sourceFilePath: str, destFilePath: str, md5KeyName: str) -> None:
         """
         This function installs a source file to a destination path, assuming the
         source file is a "templated" source file (see also _installTemplatedFile), and
@@ -1625,7 +1628,7 @@ class Application:
             ctx.setPersistentOption("/digests", md5KeyName, hashlib.md5(open(destFilePath, "rb").read()).hexdigest())
     
     @staticmethod
-    def _installCustomSessionDriver(ctx) -> None:
+    def _installCustomSessionDriver(ctx: BuildContext) -> None:
         """
         This function installs the included sample .xsession and environment variable
         setup files, and records the md5sum of the installed results.
@@ -1680,7 +1683,7 @@ class Application:
                     Debug().error("\tb[r[*] If this file is not executable you may not be able to login!")
     
     @staticmethod
-    def _checkForEssentialBuildPrograms(ctx):
+    def _checkForEssentialBuildPrograms(ctx: BuildContext):
         """
         This subroutine checks for programs which are absolutely essential to the
         *build* process and returns false if they are not all present. Right now this
@@ -1750,7 +1753,7 @@ class Application:
                 """))
         return not wasError
     
-    def _reachableModuleLogs(self, logdir) -> list:
+    def _reachableModuleLogs(self, logdir: str) -> list:
         """
         Returns a list of module directories IDs (based on YYYY-MM-DD-XX format) that must be kept due to being
         referenced from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.
@@ -1785,7 +1788,7 @@ class Application:
         return list(tempHash.keys())
     
     @staticmethod
-    def _installSignalHandlers(handlerRef) -> None:
+    def _installSignalHandlers(handlerRef: Callable) -> None:
         """
         Installs the given subroutine as a signal handler for a set of signals which
         could kill the program.

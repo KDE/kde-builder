@@ -13,7 +13,7 @@ class Module_BranchGroupResolver:
     See also https://community.kde.org/Infrastructure/Project_Metadata
     """
     
-    def __init__(self, jsonData):
+    def __init__(self, jsonData: dict):
         
         # Copy just the objects we want over.
         self.layers = jsonData.get("layers", [])

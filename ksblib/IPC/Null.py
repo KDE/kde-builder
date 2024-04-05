@@ -15,7 +15,7 @@ class IPC_Null(IPC):
         self.msgList = []  # List of messages.
     
     # @override(check_signature=False)
-    def sendMessage(self, msg) -> bool:
+    def sendMessage(self, msg: bytes) -> bool:
         self.msgList.append(msg)
         return True
     

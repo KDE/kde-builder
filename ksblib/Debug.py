@@ -139,7 +139,7 @@ class Debug:
     # functions.  Also, the terminal color is automatically reset to normal as
     # well so you don't need to manually add the ] to reset.
     
-    def print_clr(self, *args) -> None:
+    def print_clr(self, *args: str) -> None:
         """
         Subroutine used to actually display the data, calls ksb::Debug::colorize on each entry first.
         """

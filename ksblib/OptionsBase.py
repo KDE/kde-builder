@@ -48,14 +48,14 @@ class OptionsBase:
             return True
         return True if f"#{key}" in self.options.keys() else False
     
-    def hasOption(self, key) -> bool:
+    def hasOption(self, key: str) -> bool:
         """
         Returns true if the given option has been set for this module.
         Use `getOption` to return the actual value in this case.
         """
         return key in self.options.keys()
     
-    def getOption(self, key) -> str | dict | list | bool:
+    def getOption(self, key: str) -> str | dict | list | bool:
         """
         Returns the value of the given option. 'Sticky' options are returned in
         preference to this object's own option (this allows you to temporarily
@@ -128,7 +128,7 @@ class OptionsBase:
         for option in options:
             self.options[option] = options[option]
     
-    def deleteOption(self, key) -> None:
+    def deleteOption(self, key: str) -> None:
         """
         Removes the given option (and its value), if present.
         """

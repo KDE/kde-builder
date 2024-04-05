@@ -1,14 +1,18 @@
+from __future__ import annotations
 import os
 import textwrap
 from typing import NoReturn
 from .Debug import Debug
 from .Util.Conditional_Type_Enforced import conditional_type_enforced
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .BuildContext import BuildContext
 
 
 @conditional_type_enforced
 class StartProgram:
     @staticmethod
-    def executeCommandLineProgram(ctx, args: list) -> NoReturn:
+    def executeCommandLineProgram(ctx: BuildContext, args: list) -> NoReturn:
         """
         kde-builder --run [options] <module-name> [arguments]
         

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os.path
 import re
 import sys
@@ -9,6 +10,10 @@ from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
 from ..Debug import Debug
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..Module.Module import Module
+    from ..BuildContext import BuildContext
 
 
 @conditional_type_enforced
@@ -58,7 +63,7 @@ class BuildSystem_KDECMake(BuildSystem):
         self.cmake_toolchain = None
     
     @staticmethod
-    def _checkGeneratorIsWhitelisted(generator) -> bool:
+    def _checkGeneratorIsWhitelisted(generator: str) -> bool:
         return generator in BuildSystem_KDECMake.GENERATOR_MAP
     
     @staticmethod
@@ -112,7 +117,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return ""
     
     @staticmethod
-    def _checkToolchainOk(toolchain) -> bool:
+    def _checkToolchainOk(toolchain: str) -> bool:
         return toolchain != "" and os.path.isfile(toolchain) and os.access(toolchain, os.R_OK)
     
     @staticmethod
@@ -205,7 +210,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return "KDE CMake"
     
     # @override
-    def prepareModuleBuildEnvironment(self, ctx, module, prefix) -> None:
+    def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
         setup any needed environment variables, build context settings, etc., in preparation
@@ -345,7 +350,7 @@ class BuildSystem_KDECMake(BuildSystem):
                 Util.remake_symlink(f"{builddir}/compile_commands.json", f"{srcdir}/compile_commands.json")
         return True
     
-    def generateVSCodeConfig(self, module) -> bool:
+    def generateVSCodeConfig(self, module: Module) -> bool:
         """
         Generate default config files for VSCode.
         
@@ -400,7 +405,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return True
     
     @staticmethod
-    def _readFile(file_path) -> str:
+    def _readFile(file_path: str) -> str:
         """
         Reads the contents of a file.
         
@@ -419,7 +424,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return content
     
     @staticmethod
-    def _writeToFile(file_path, content) -> None:
+    def _writeToFile(file_path: str, content: str) -> None:
         """
         Writes content to a file.
         

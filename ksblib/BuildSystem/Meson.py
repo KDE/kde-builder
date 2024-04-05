@@ -57,7 +57,7 @@ class BuildSystem_Meson(BuildSystem):
     
     @staticmethod
     # @override
-    def requiredPrograms() -> list:
+    def requiredPrograms() -> list[str]:
         return ["meson", "ninja"]
     
     @staticmethod

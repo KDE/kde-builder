@@ -521,7 +521,7 @@ class DependencyResolver:
                 errors["trivialCycles"] += resolvErrors["trivialCycles"]
         return errors
     
-    def resolveToModuleGraph(self, modules) -> dict:
+    def resolveToModuleGraph(self, modules: list[Module]) -> dict:
         
         Util.assert_isa(self, DependencyResolver)
         

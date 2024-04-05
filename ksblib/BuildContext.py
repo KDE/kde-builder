@@ -245,7 +245,7 @@ class BuildContext(Module):
             self.phases = phases
         return self.phases
     
-    def addModule(self, module) -> None:
+    def addModule(self, module: Module) -> None:
         if not module:
             traceback.print_exc()
             raise Exception("No module to push")
@@ -503,7 +503,7 @@ class BuildContext(Module):
         except Exception as e:
             Debug().warning(f" y[*] Failed to close lock: {e}")
     
-    def getLogDirFor(self, module) -> str:
+    def getLogDirFor(self, module: Module) -> str:
         """
         This subroutine accepts a Module parameter, and returns the log directory
         for it. You can also pass a BuildContext (including this one) to get the
@@ -532,7 +532,7 @@ class BuildContext(Module):
         
         return logDir
     
-    def getLogPathFor(self, module, path) -> str:
+    def getLogPathFor(self, module: Module, path: str) -> str:
         """
         Constructs the appropriate full path to a log file based on the given
         basename (including extensions). Use this instead of getLogDirFor when you
@@ -576,7 +576,7 @@ class BuildContext(Module):
         """
         return self.rcFile
     
-    def setRcFile(self, file) -> None:
+    def setRcFile(self, file: str) -> None:
         """
         Forces the rc file to be read from to be that given by the first parameter.
         """
@@ -584,7 +584,7 @@ class BuildContext(Module):
         self.rcFile = None
     
     @staticmethod
-    def warnLegacyConfig(file) -> None:
+    def warnLegacyConfig(file: str) -> None:
         """
         Warns a user if the config file is stored in the old location.
         """
@@ -698,7 +698,7 @@ class BuildContext(Module):
             BuildException.croak_internal("Call to baseConfigDirectory before loadRcFile")
         return os.path.dirname(rcfile)
     
-    def modulesInPhase(self, phase) -> list:
+    def modulesInPhase(self, phase: str) -> list:
         modules_list = [module for module in self.moduleList() if module.phases.has(phase)]
         return modules_list
     
@@ -718,7 +718,7 @@ class BuildContext(Module):
                 return True
         return False
     
-    def lookupModule(self, moduleName):
+    def lookupModule(self, moduleName: str):
         """
         Searches for a module with a name that matches the provided parameter,
         and returns its ksb::Module object. Returns undef if no match was found.
@@ -737,11 +737,11 @@ class BuildContext(Module):
             BuildException.croak_internal(f"Detected 2 or more {moduleName} ksb::Module objects")
         return options[0]
     
-    def markModulePhaseFailed(self, phase, module) -> None:
+    def markModulePhaseFailed(self, phase: str, module: Module) -> None:
         Util.assert_isa(module, Module)
         self.errors[module.name] = phase
     
-    def failedModulesInPhase(self, phase) -> list:
+    def failedModulesInPhase(self, phase: str) -> list:
         """
         Returns a list (i.e. not a reference to, but a real list) of Modules that failed to
         complete the given phase.
@@ -761,7 +761,7 @@ class BuildContext(Module):
         return modules
     
     # @override(check_signature=False)
-    def getOption(self, key) -> str | dict | list | bool:
+    def getOption(self, key: str) -> str | dict | list | bool:
         """
         Our immediate parent class Module overrides this, but we actually
         want the OptionsBase version to be used instead, until we break the recursive
@@ -905,7 +905,7 @@ class BuildContext(Module):
             return
     
     # @override(check_signature=False)
-    def getPersistentOption(self, moduleName, key=None) -> str | int | None:
+    def getPersistentOption(self, moduleName: str, key=None) -> str | int | None:
         """
         Returns the value of a "persistent" option (normally read in as part of
         startup), or undef if there is no value stored.
@@ -931,7 +931,7 @@ class BuildContext(Module):
         return persistent_opts[moduleName][key]
     
     # @override(check_signature=False)
-    def unsetPersistentOption(self, moduleName, key) -> None:
+    def unsetPersistentOption(self, moduleName: str, key) -> None:
         """
         Clears a persistent option if set (for a given module and option-name).
         
@@ -947,7 +947,7 @@ class BuildContext(Module):
             del persistent_opts[moduleName][key]
     
     # @override(check_signature=False)
-    def setPersistentOption(self, moduleName, key, value) -> None:
+    def setPersistentOption(self, moduleName: str, key, value) -> None:
         """
         Sets a "persistent" option which will be read in for a module when
         kde-builder starts up and written back out at (normal) program exit.

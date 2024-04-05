@@ -17,7 +17,7 @@ class DebugOrderHints:
     """
     
     @staticmethod
-    def _getPhaseScore(phase) -> int:
+    def _getPhaseScore(phase: str) -> int:
         """
         Assumption: build & install phases are interesting.
         Install is particularly interesting because that should 'rarely' fail,

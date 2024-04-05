@@ -34,6 +34,10 @@ from ..BuildSystem.Qt6 import BuildSystem_Qt6
 from ..BuildSystem.KDECMake import BuildSystem_KDECMake
 from ..BuildSystem.CMakeBootstrap import BuildSystem_CMakeBootstrap
 from ..BuildSystem.Meson import BuildSystem_Meson
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..BuildContext import BuildContext
+    from ..ModuleSet.ModuleSet import ModuleSet
 
 
 @conditional_type_enforced
@@ -61,7 +65,7 @@ class Module(OptionsBase):
             print(f"module name: {module}")
     """
     
-    def __init__(self, ctx, name):
+    def __init__(self, ctx: BuildContext, name: str):
         self.ctx = ctx
         self.name = name
         
@@ -107,12 +111,12 @@ class Module(OptionsBase):
             self.module_set = ModuleSet_Null()
         return self.module_set
     
-    def setModuleSet(self, moduleSet) -> None:
+    def setModuleSet(self, moduleSet: ModuleSet) -> None:
         from ..ModuleSet.ModuleSet import ModuleSet
         Util.assert_isa(moduleSet, ModuleSet)
         self.module_set = moduleSet
     
-    def getSubdirPath(self, subdirOption) -> str:
+    def getSubdirPath(self, subdirOption: str) -> str:
         """
         Subroutine to retrieve a subdirectory path with tilde-expansion and
         relative path handling.
@@ -139,7 +143,7 @@ class Module(OptionsBase):
         
         return directory
     
-    def getInstallPathComponents(self, dirtype) -> dict:
+    def getInstallPathComponents(self, dirtype: str) -> dict:
         """
         Returns the directory that a module should be installed in.
         
@@ -213,7 +217,7 @@ class Module(OptionsBase):
             self.scm_obj = Updater_Git(self)
         return self.scm_obj
     
-    def setScmType(self, scmType) -> None:
+    def setScmType(self, scmType: str) -> None:
         newType = None
         if scmType == "git":
             newType = Updater_Git(self)
@@ -238,7 +242,7 @@ class Module(OptionsBase):
     def currentScmRevision(self) -> str:
         return self.scm().currentRevisionInternal()
     
-    def buildSystemFromName(self, name) -> WithSubclasses(BuildSystem):
+    def buildSystemFromName(self, name: str) -> WithSubclasses(BuildSystem):
         """
         Returns a new build system object, given the appropriate name.
         This is a sub-optimal way to fix the problem of allowing users to override
@@ -306,7 +310,7 @@ class Module(OptionsBase):
         self.build_obj = buildType
         return self.build_obj
     
-    def setBuildSystem(self, obj) -> None:
+    def setBuildSystem(self, obj: BuildSystem) -> None:
         """
         Sets the build system **object**, although you can find the build system
         type afterwards (see buildSystemType).
@@ -616,7 +620,7 @@ class Module(OptionsBase):
         """
         return self.buildContext().getLogDirFor(self)
     
-    def getLogPath(self, path) -> str:
+    def getLogPath(self, path: str) -> str:
         """
         Returns a full path that can be open()'d to write a log
         file, based on the given basename (with extension).
@@ -774,7 +778,7 @@ class Module(OptionsBase):
         OptionsBase.setOption(self, options)
     
     # @override(check_signature=False)
-    def getOption(self, key, levelLimit="allow-inherit") -> str | bool | dict | None:
+    def getOption(self, key: str, levelLimit="allow-inherit") -> str | bool | dict | None:
         """
         This subroutine returns an option value for a given module.  Some globals
         can't be overridden by a module's choice (but see 2nd parameter below).
@@ -833,7 +837,7 @@ class Module(OptionsBase):
         # set at all.
         return self.options.get(key, ctxValue)
     
-    def getPersistentOption(self, key) -> str | int | None:
+    def getPersistentOption(self, key: str) -> str | int | None:
         """
         Gets persistent options set for this module. First parameter is the name
         of the option to lookup. Undef is returned if the option is not set,
@@ -846,7 +850,7 @@ class Module(OptionsBase):
         """
         return self.buildContext().getPersistentOption(self.name, key)
     
-    def setPersistentOption(self, key, value) -> None:
+    def setPersistentOption(self, key: str, value) -> None:
         """
         Sets a persistent option (i.e. survives between processes) for this module.
         First parameter is the name of the persistent option.
@@ -856,14 +860,14 @@ class Module(OptionsBase):
         """
         return self.buildContext().setPersistentOption(self.name, key, value)
     
-    def unsetPersistentOption(self, key) -> None:
+    def unsetPersistentOption(self, key: str) -> None:
         """
         Unsets a persistent option for this module.
         Only parameter is the name of the option to unset.
         """
         self.buildContext().unsetPersistentOption(self.name, key)
     
-    def fullpath(self, dirtype) -> str:
+    def fullpath(self, dirtype: str) -> str:
         # Returns the path to the desired directory type (source or build),
         # including the module destination directory itself.
         Util.assert_in(dirtype, ["build", "source"])

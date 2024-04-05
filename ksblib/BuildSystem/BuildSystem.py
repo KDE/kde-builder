@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os.path
 import sys
 import re
@@ -9,7 +10,10 @@ from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
 from ..Debug import Debug
-
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..Module.Module import Module
+    from ..BuildContext import BuildContext
 
 # use ksb::StatusView;
 
@@ -131,7 +135,7 @@ class BuildSystem:
             return f"{builddir}/{confFileKey} is missing"
         return ""
     
-    def prepareModuleBuildEnvironment(self, ctx, module, prefix) -> None:
+    def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
         setup any needed environment variables, build context settings, etc., in preparation
@@ -194,7 +198,7 @@ class BuildSystem:
         """
         return False
     
-    def buildInternal(self, optionsName="make-options") -> dict:
+    def buildInternal(self, optionsName: str = "make-options") -> dict:
         """
         Return value style: hashref to build results object (see safe_make)
         """
@@ -445,7 +449,7 @@ class BuildSystem:
         
         return self._runBuildCommand(optsRef["message"], logname, args)
     
-    def _runBuildCommand(self, message, filename: str, argRef: list[str]) -> dict:
+    def _runBuildCommand(self, message: str, filename: str, argRef: list[str]) -> dict:
         """
         Subroutine to run make and process the build process output in order to
         provide completion updates.  This procedure takes the same arguments as

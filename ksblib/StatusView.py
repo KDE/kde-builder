@@ -117,7 +117,7 @@ class StatusView:
         StatusView._clearLineAndUpdate(Debug().colorize(msg))
     
     @staticmethod
-    def _clearLineAndUpdate(msg) -> None:
+    def _clearLineAndUpdate(msg: str) -> None:
         """
         Give escape sequence to return to column 1 and clear the entire line
         Then print message and return to column 1 again in case somewhere else

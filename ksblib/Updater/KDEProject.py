@@ -52,7 +52,7 @@ class Updater_KDEProject(Updater_Git):
     
     @staticmethod
     # @override(check_signature=False)
-    def _isPlausibleExistingRemote(name, url, configuredUrl) -> bool:
+    def _isPlausibleExistingRemote(name: str, url: str, configuredUrl: str) -> bool:
         """
         Reimplementation
         """

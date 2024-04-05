@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
 # from overrides import override
@@ -10,6 +11,9 @@ from ..Module.Module import Module
 
 from ..BuildException import BuildException_Config
 from ..Debug import Debug
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..BuildContext import BuildContext
 
 
 @conditional_type_enforced
@@ -43,7 +47,7 @@ class ModuleSet(OptionsBase):
     See also: git-repository-base, ModuleSet::KDEProjects, use-modules
     """
     
-    def __init__(self, ctx, name):
+    def __init__(self, ctx: BuildContext, name: str):
         OptionsBase.__init__(self)
         self.create_id = None
         
@@ -144,7 +148,7 @@ class ModuleSet(OptionsBase):
         # Actually set options.
         OptionsBase.setOption(self, options)
     
-    def convertToModules(self, ctx) -> list[Module]:
+    def convertToModules(self, ctx: BuildContext) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
         available in order to convert this module set to a list of ksb::Module.

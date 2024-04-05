@@ -22,7 +22,7 @@ class BuildSystem_QMake6(BuildSystem):
     
     @staticmethod
     # @override
-    def requiredPrograms() -> list:
+    def requiredPrograms() -> list[str]:
         return ["qmake"]
     
     # @override(check_signature=False)

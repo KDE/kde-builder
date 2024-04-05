@@ -3,10 +3,13 @@ from __future__ import annotations
 import re
 import struct
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
-from typing import NoReturn
+from typing import NoReturn, Callable, TYPE_CHECKING
 from enum import IntEnum
 from ..BuildException import BuildException
 from ..Debug import Debug
+
+if TYPE_CHECKING:
+    from ..Module.Module import Module
 
 
 @conditional_type_enforced
@@ -41,17 +44,14 @@ class IPC:
     def __init__(self):
         self.no_update = 0
         self.updated = {}
-        self.logged_module = "global"
+        self.logged_module: str = "global"
         self.messages = {}  # Holds log output from update process
         self.postbuild_msg = {}  # Like above but for post-build msgs
         self.why_refresh = {}  # If module should build despite not being updated, why?
         self.updates_done = 0
         self.opt_update_handler = None  # Callback for persistent option changes
-        
-        self.opt_update_handler = None
-        self.logged_module = None
     
-    def notifyPersistentOptionChange(self, moduleName, optName, optValue) -> None:
+    def notifyPersistentOptionChange(self, moduleName: str, optName: str, optValue: str) -> None:
         """
         Sends a message to the main/build process that a persistent option for the
         given module name must be changed. For use by processes that do not control
@@ -59,22 +59,22 @@ class IPC:
         """
         self.sendIPCMessage(IPC.MODULE_PERSIST_OPT, f"{moduleName},{optName},{optValue}")
     
-    def notifyNewPostBuildMessage(self, moduleName, msg) -> None:
+    def notifyNewPostBuildMessage(self, moduleName: str, msg) -> None:
         """
         Sends a message to the main/build process that a given message should be
         shown to the user at the end of the build.
         """
         self.sendIPCMessage(IPC.MODULE_POSTBUILD_MSG, f"{moduleName},{msg}")
     
-    def notifyUpdateSuccess(self, module, msg) -> None:
+    def notifyUpdateSuccess(self, module: str, msg: str) -> None:
         self.sendIPCMessage(IPC.MODULE_SUCCESS, f"{module},{msg}")
     
-    def setLoggedModule(self, moduleName) -> None:
+    def setLoggedModule(self, moduleName: str) -> None:
         # Sets which module messages stored by sendLogMessage are supposed to be
         # associated with.
         self.logged_module = moduleName
     
-    def sendLogMessage(self, msg) -> None:
+    def sendLogMessage(self, msg: str) -> None:
         """
         Sends a message to be logged by the process holding the TTY.
         The logged message is associated with the module set by setLoggedModule.
@@ -83,7 +83,7 @@ class IPC:
         self.sendIPCMessage(IPC.MODULE_LOGMSG, f"{loggedModule},{msg}")
     
     @staticmethod
-    def _printLoggedMessage(msg) -> None:
+    def _printLoggedMessage(msg: str) -> None:
         """
         Prints the given message out (adjusting to have proper whitespace
         if needed). For use with the log-message forwarding facility.
@@ -159,7 +159,7 @@ class IPC:
             BuildException.croak_internal(f"Unhandled IPC type: {ipcType}")
         return message
     
-    def setPersistentOptionHandler(self, handler) -> None:
+    def setPersistentOptionHandler(self, handler: Callable) -> None:
         """
         Used to assign a callback / subroutine to use for updating persistent
         options based on IPC update messages.  The sub should itself take a
@@ -167,7 +167,7 @@ class IPC:
         """
         self.opt_update_handler = handler
     
-    def refreshReasonFor(self, module) -> str:
+    def refreshReasonFor(self, module: str) -> str:
         """
         Returns a text reason to refresh a non-updated module, or an empty string if
         the module has been updated or has not yet been seen.
@@ -182,7 +182,7 @@ class IPC:
             # We ignore the return value in favor of ->{updates_done}
             self._updateSeenModulesFromMessage(ipcType, buffer)
     
-    def waitForModule(self, module) -> tuple:
+    def waitForModule(self, module: Module) -> tuple:
         """
         Waits for an update for a module with the given name.
         Returns a list containing whether the module was successfully updated,
@@ -242,7 +242,7 @@ class IPC:
                     Debug().print_clr(msg)
         self.messages = {}
     
-    def forgetModule(self, module) -> None:
+    def forgetModule(self, module: Module) -> None:
         """
         Flags the given module as something that can be ignored from now on.  For use
         after the module has been waited on
@@ -310,7 +310,7 @@ class IPC:
         return self.sendMessage(encodedMsg)
     
     @staticmethod
-    def unpackMsg(msg) -> tuple:
+    def unpackMsg(msg: bytes) -> tuple:
         """
         Static class function to unpack a message.
         
@@ -336,7 +336,7 @@ class IPC:
     # These must be reimplemented.  They must be able to handle scalars without
     # any extra frills.
     
-    def sendMessage(self, msg) -> NoReturn:
+    def sendMessage(self, msg: bytes) -> NoReturn:
         # sendMessage should accept one parameter (the message to send) and return
         # true on success, or false on failure.  $! should hold the error information
         # if false is returned.

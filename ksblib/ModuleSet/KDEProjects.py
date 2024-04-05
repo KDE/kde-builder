@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import re
 from ..Util.Conditional_Type_Enforced import conditional_type_enforced
@@ -10,6 +11,9 @@ from ..Util.Util import Util
 
 from .ModuleSet import ModuleSet
 from ..Debug import Debug
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..BuildContext import BuildContext
 
 
 @conditional_type_enforced
@@ -26,7 +30,7 @@ class ModuleSet_KDEProjects(ModuleSet):
     See also: ModuleSet
     """
     
-    def __init__(self, ctx, name):
+    def __init__(self, ctx: BuildContext, name: str):
         ModuleSet.__init__(self, ctx, name)
         self.projectsDataReader = None  # Will be filled in when we get fh
     
@@ -35,7 +39,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         return all(not element for element in input_list)
     
     @staticmethod
-    def _createMetadataModule(ctx, moduleName) -> Module:
+    def _createMetadataModule(ctx: BuildContext, moduleName: str) -> Module:
         metadataModule = Module(ctx, re.sub("/", "-", moduleName))
         
         # Hardcode the results instead of expanding out the project info
@@ -54,7 +58,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         return metadataModule
     
     @staticmethod
-    def getProjectMetadataModule(ctx_obj) -> Module:
+    def getProjectMetadataModule(ctx_obj: BuildContext) -> Module:
         """
         Static. Returns a <Module> that can be used to download the
         'repo-metadata' module, which itself contains information on each
@@ -68,7 +72,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         ctx = Util.assert_isa(ctx_obj, BuildContext)
         return ModuleSet_KDEProjects._createMetadataModule(ctx, "sysadmin/repo-metadata")
     
-    def _expandModuleCandidates(self, ctx, moduleSearchItem) -> list:
+    def _expandModuleCandidates(self, ctx: BuildContext, moduleSearchItem: str) -> list:
         """
         A class method which goes through the modules in our search list (assumed to
         be found in kde-projects), expands them into their equivalent git modules,
@@ -143,7 +147,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         return moduleList
     
     # @override
-    def convertToModules(self, ctx) -> list[Module]:
+    def convertToModules(self, ctx: BuildContext) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
         available in order to convert this module set to a list of ksb::Module.
