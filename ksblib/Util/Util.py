@@ -376,7 +376,7 @@ class Util:
             Debug().error("r[b[ * Unable to create symlink to error log file]")
             return
         
-        if os.path.exists(logfile):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
+        if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
             os.symlink(f"{logfile}", f"{logdir}/error.log")
     
     @staticmethod
