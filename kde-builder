@@ -20,21 +20,21 @@ def findMissingModules() -> list:
         "setproctitle",
     ]
     missingModules = []
-    
+
     def validateMod(mod_name):
         import importlib
-        
+
         try:
             importlib.import_module(mod_name)
             return True
         except ImportError:
             return False
-    
+
     for neededModule in requiredModules:
         if validateMod(neededModule):
             continue
         missingModules.append(neededModule)
-    
+
     return missingModules
 
 
@@ -45,7 +45,7 @@ if missingModuleDescriptions:
         Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:"""))
     for missingModuleDesc in missingModuleDescriptions:
         print("\t" + missingModuleDesc)
-    
+
     print("\nkde-builder can do this for you on many distros. Consult the installation process in project documentation.")
     exit(1)
 
@@ -75,7 +75,7 @@ else:
 if setup_steps:
     from ksblib.FirstRun import FirstRun
     from ksblib.Debug import Debug
-    
+
     d = Debug()
     d.setColorfulOutput(True)
     fr = FirstRun()
@@ -107,10 +107,10 @@ except BuildException as err:
     Can't continue, so stopping now.
     
     """))
-    
+
     if err.exception_type == "Internal":
         print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
-    
+
     traceback.print_exc()
     if app:
         app.finish(99)  # noreturn
@@ -123,7 +123,7 @@ except Exception as err:
     --> {err}
     Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
     """))
-    
+
     traceback.print_exc()
     if app:
         app.finish(99)  # noreturn

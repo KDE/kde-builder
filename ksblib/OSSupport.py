@@ -23,7 +23,7 @@ class OSSupport:
         os = OSSupport()  # Autodetects info on running system
         print("Current OS is: " + os.vendorID)
     """
-    
+
     def __init__(self, file: str | None = None):
         """
             os = OSSupport()
@@ -33,17 +33,17 @@ class OSSupport:
         
             os = OSSupport('/usr/lib/os-release')
         """
-        
+
         self.ID = None
         self.ID_LIKE = None
         self.VERSION_CODENAME = None
         self.VERSION_ID = None
-        
+
         # file might be None
         kvListRef = self._readOSRelease(file)
         for key in kvListRef.keys():
             setattr(self, key, kvListRef[key])
-    
+
     def vendorID(self) -> str:
         """
         Returns the vendor ID from the `os-release` specification, or
@@ -53,7 +53,7 @@ class OSSupport:
         N.B., this is **not the same as the operating system**!
         """
         return self.ID or "unknown"
-    
+
     def vendorVersion(self) -> str:
         """
             vendor = os.vendorVersion  # 'xenial', '17', etc.
@@ -69,22 +69,22 @@ class OSSupport:
             return self.VERSION_CODENAME
         else:
             return "unknown"
-    
+
     def isDebianBased(self) -> bool:
         """
         Returns boolean. 1 (true) if this is a Linux distribution based on Debian, 0 (false) otherwise.
         """
-        
+
         if self.ID == "debian":
             return True
-        
+
         likeDistros = self.ID_LIKE or ""
         if likeDistros:
             likeDistrosList = likeDistros.split(" ")
             if "debian" in likeDistrosList:
                 return True
         return False
-    
+
     def detectTotalMemory(self) -> int:
         """
         Returns the amount of installed memory, in kilobytes.  Linux and FreeBSD are
@@ -102,15 +102,15 @@ class OSSupport:
             # linux or potentially linux-compatible
             p = subprocess.run("cat /proc/meminfo", shell=True, capture_output=True)
             total_mem_line = next(line for line in p.stdout.decode().split("\n") if "MemTotal" in line)
-            
+
             if total_mem_line and p.returncode == 0:
                 mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
                 mem_total = int(mem_total)
         else:
             BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendorID()}")
-        
+
         return mem_total
-    
+
     def bestDistroMatch(self, distros: list[str]) -> str:
         """
             # Might return 'fedora' if running on Scientific Linux
@@ -124,43 +124,43 @@ class OSSupport:
         If no match is found, returns a generic os string (**not** None, '', or
         similar): 'linux' or 'freebsd' as the case may be.
         """
-        
+
         ids = [self.vendorID()]
         likeDistros = self.ID_LIKE or ""
         if likeDistros:
             for likeDistro in likeDistros.split(" "):
                 ids.append(likeDistro)
-        
+
         for an_id in ids:
             if any(an_id == distro for distro in distros):
                 return an_id
-        
+
         # Special cases that aren't linux
         if ids[0] == "freebsd":
             return ids[0]
         # .. everything else is generic linux
         return "linux"
-    
+
     @staticmethod
     def _readOSRelease(fileName: str | None) -> dict:
         files = [fileName] if fileName else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
         file = None
         error = None
-        
+
         while files:
             f = files.pop(0)
             if os.path.exists(f):
                 file = f
                 break
-        
+
         if not file:
             return {}
-        
+
         lines = None
         with open(file, "r") as fh:
             # skip comments and blank lines, and whitespace-only lines
             lines = [line.strip() for line in fh.readlines() if line.strip() and not line.strip().startswith("#")]
-        
+
         result = {}
         for line in lines:
             key, value = line.split("=")

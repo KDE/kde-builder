@@ -9,12 +9,12 @@ from ksblib.BuildContext import BuildContext
 @pytest.fixture
 def mock_buildsystem(monkeypatch):
     BuildSystem.madeArguments = []
-    
+
     # Defang the build command and just record the args passed to it
     def mock_safe_make(self, optsRef):
         BuildSystem.madeArguments = optsRef["make-options"]
         return {"was_successful": 1}
-    
+
     monkeypatch.setattr(BuildSystem, "safe_make", mock_safe_make)
 
 
@@ -27,18 +27,18 @@ def test_empty_numcores(mock_buildsystem):
     ctx = BuildContext()
     module = Module(ctx, "test")
     buildSystem = BuildSystem(module)
-    
+
     # The -j logic will take off one CPU if you ask for too many so try to ensure
     # test cases don't ask for too many.
     max_cores = os.cpu_count()
     if max_cores is None:
         max_cores = 2
-    
+
     if max_cores < 2:
         max_cores = 2
-    
+
     testOption = "make-options"
-    
+
     testMatrix = [
         ["a b -j", ["a", "b"], "Empty -j removed at end"],
         ["-j a b", ["a", "b"], "Empty -j removed at beginning"],
@@ -47,28 +47,28 @@ def test_empty_numcores(mock_buildsystem):
         ["a -j 17 b", ["a", "-j", "17", "b"], "Numeric -j left alone"],
         ["a -j17 b", ["a", "-j17", "b"], "Numeric -j left alone"],
     ]
-    
+
     for item in testMatrix:
         testString, resultRef, testName = item
         module.setOption({testOption: testString})
         buildSystem.buildInternal(testOption)
         assert BuildSystem.madeArguments == resultRef, testName
-        
+
         module.setOption({"num-cores": str(max_cores - 1)})
         buildSystem.buildInternal(testOption)
         assert BuildSystem.madeArguments == ["-j", str(max_cores - 1), *resultRef], f"{testName} with num-cores set"
         module.setOption({"num-cores": ""})
-    
+
     testOption = "ninja-options"
     module.setOption({"make-options": "not used"})
     module.setOption({"cmake-generator": "Kate - Ninja"})
-    
+
     for item in testMatrix:
         testString, resultRef, testName = item
         module.setOption({testOption: testString})
         buildSystem.buildInternal(testOption)
         assert BuildSystem.madeArguments == resultRef, testName
-    
+
         module.setOption({"num-cores": str(max_cores - 1)})
         buildSystem.buildInternal(testOption)
         assert BuildSystem.madeArguments == ['-j', str(max_cores - 1), *resultRef], f"{testName} with num-cores set"

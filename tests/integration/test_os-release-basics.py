@@ -13,7 +13,7 @@ def test_ossupport():
     assert opts["ID"] == "kde-builder", "Right ID"
     assert opts["ID_LIKE"] == "sabayon gentoo-hardened gentoo", "Right ID_LIKE"
     assert opts["SPECIAL"] == '$VAR \\ ` " is set', "Right SPECIAL"
-    
+
     # Use tests
     os = OSSupport("tests/integration/fixtures/os-release")
     assert isinstance(os, OSSupport)

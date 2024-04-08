@@ -65,7 +65,7 @@ class Util_LoggedSubprocess:
      });
     
     """
-    
+
     def __init__(self):
         """
         These attributes are the configurable options that should be set before calling
@@ -81,16 +81,16 @@ class Util_LoggedSubprocess:
         self._disable_translations = 0
         self._announcer = None
         # end of attributes
-        
+
         self.subscribers = {}
-    
+
     def module(self, module):
         """
         Sets the L<ksb::Module> that is being executed against.
         """
         self._module = module
         return self
-    
+
     def log_to(self, log_to):
         """
         Sets the base filename (without a .log extension) that should receive command output
@@ -98,7 +98,7 @@ class Util_LoggedSubprocess:
         """
         self._log_to = log_to
         return self
-    
+
     def chdir_to(self, chdir_to):
         """
         Sets the directory to run the command from just before execution in the child
@@ -107,7 +107,7 @@ class Util_LoggedSubprocess:
         """
         self._chdir_to = chdir_to
         return self
-    
+
     def set_command(self, set_command: list[str]):
         """
         Sets the command, and any arguments, to be run, as a reference to a list. E.g.
@@ -116,7 +116,7 @@ class Util_LoggedSubprocess:
         """
         self._set_command = set_command
         return self
-    
+
     def disable_translations(self, disable_translations: bool | None = None):
         """
         Optional. If set to a true value, causes the child process to attempt to
@@ -127,7 +127,7 @@ class Util_LoggedSubprocess:
         if disable_translations is not None:
             self._disable_translations = disable_translations
         return self
-    
+
     def announcer(self, announcer):
         """
         Optional. Can be set to a sub that will be called with a single parameter (the
@@ -138,7 +138,7 @@ class Util_LoggedSubprocess:
         """
         self._announcer = announcer
         return self
-    
+
     def start(self) -> Promise:
         """
         Begins the execution, if possible.  Returns a L<Mojo::Promise> that resolves to
@@ -158,20 +158,20 @@ class Util_LoggedSubprocess:
             BuildException.croak_internal("No command to run!")
         if not isinstance(argRef, list):
             BuildException.croak_internal("Command list needs to be a listref!")
-        
+
         dir_to_run_from = self._chdir_to
         announceSub = self._announcer
         command = argRef
-        
+
         if Debug().pretending():
             Debug().pretend(f"\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
             a = Promise.resolve(0)
             return a
-        
+
         # Install callback handler to feed child output to parent if the parent has
         # a callback to filter through it.
         needsCallback = self.has_subscribers("child_output")
-        
+
         if needsCallback:
             def func(data):
                 # pl2py: in perl they sent "child_data" here, we instead send just the line
@@ -179,16 +179,16 @@ class Util_LoggedSubprocess:
                 if line:
                     self.subscribers["child_output"](line)  # invoke the child_output subscriber
                     return
-                
+
                 if isinstance(data, dict):
                     raise Exception("unimplemented " + ", ".join(data.keys()))
-                
+
                 raise Exception(f"unimplemented {data}")
-            
+
             # pl2py: we will run "on progress handler" later below, because we need it to be run simultaneously with the subprocess
-        
+
         succeeded = 0
-        
+
         def subprocess_run_p(target: callable) -> Promise:
             async def subprocess_run():
                 retval = multiprocessing.Value("i", -1)
@@ -198,20 +198,20 @@ class Util_LoggedSubprocess:
                     await asyncio.sleep(1)
                 subproc.join()
                 return retval.value
-            
+
             p = Promise.promisify(subprocess_run)()
             return p
-        
+
         lines_queue = multiprocessing.Queue()
-        
+
         def _begin(retval):
             # in a child process
             if dir_to_run_from:
                 Util.p_chdir(dir_to_run_from)
-            
+
             if self.disable_translations():
                 Util.disable_locale_message_translation()
-            
+
             callback = None
             if needsCallback:
                 def clbk(line):
@@ -219,18 +219,18 @@ class Util_LoggedSubprocess:
                         return
                     # self._sendToParent(subp, line)
                     self._sendToParent(lines_queue, line.split("\n"))
-                
+
                 callback = clbk
-            
+
             if announceSub:
                 announceSub(module)
-            
+
             result = Util.run_logged_command(module, filename, callback, command)
             Debug().whisper(f"{command[0]} complete, result {result}")
             retval.value = result
-        
+
         promise = Promise()  # Just use Promise() here, to let PyCharm's inspector understand the type of "promise" variable.
-        
+
         async def on_progress_handler(subp_finished: multiprocessing.Event):
             if needsCallback:
                 nonlocal lines_queue
@@ -241,14 +241,14 @@ class Util_LoggedSubprocess:
                     await asyncio.sleep(1)
             else:
                 return
-        
+
         async def promise_waiter(event):
             nonlocal promise
             promise = subprocess_run_p(_begin)
             while promise.is_pending:  # because Promise.wait(promise) is not awaitable itself, we wait it in such way.
                 await asyncio.sleep(1)
             event.set()
-        
+
         # pl2py: Now we need to run the on_progress_handler and the subprocess at the same time.
         # so we create an async loop for this.
         loop = asyncio.get_event_loop()
@@ -256,25 +256,25 @@ class Util_LoggedSubprocess:
         task1 = loop.create_task(on_progress_handler(subproc_finished_event))
         task2 = loop.create_task(promise_waiter(subproc_finished_event))
         loop.run_until_complete(asyncio.gather(task1, task2))
-        
+
         # Now we have our promise finished, and we can continue
-        
+
         def _set_succeeded(exitcode):
             nonlocal succeeded
             succeeded = exitcode == 0
             return exitcode  # Don't change result, just pass it on
-        
+
         promise = promise.then(_set_succeeded)
-        
+
         def _finally():
             # If an exception was thrown or we didn't succeed, set error log
             if not succeeded:
                 Util._setErrorLogfile(module, f"{filename}.log")
-        
+
         Promise.wait(promise)
         _finally()
         return promise
-    
+
     @staticmethod
     def _sendToParent(queue, data: list):
         """
@@ -285,16 +285,16 @@ class Util_LoggedSubprocess:
         expansion we send a hashref which we can add different keys to if we need to
         support other use cases.
         """
-        
+
         # pl2py: In perl they sent progress event here with {"child_data": data}. We will not send progress event, instead the on_progress_handler will check for entries in queue in loop
         for line in data:
             if line:
                 queue.put(line)
-    
+
     def on(self, arg: dict):
         key = list(arg.keys())[0]
         val = arg[key]
         self.subscribers[key] = val
-    
+
     def has_subscribers(self, arg):
         return arg in self.subscribers.keys()

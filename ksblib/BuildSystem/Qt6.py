@@ -12,12 +12,12 @@ class BuildSystem_Qt6(BuildSystem_KDECMake):
     """
     Class responsible for building Qt6 CMake-based modules.
     """
-    
+
     @staticmethod
     # @override
     def name() -> str:
         return "Qt6"
-    
+
     # @override
     def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         # We're installing Qt6 modules, make sure our Qt directory matches our

@@ -38,7 +38,7 @@ def test_vote_for_dependencies():
             "allDeps": {}
         }
     }
-    
+
     expected1 = {
         "a": {
             "deps": {
@@ -91,5 +91,5 @@ def test_vote_for_dependencies():
             }
         }
     }
-    
+
     assert DependencyResolver._copyUpDependencies(graph1) == expected1, "should copy up dependencies correctly"

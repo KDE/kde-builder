@@ -30,13 +30,13 @@ class PhaseList:
         if not phases:
             phases = ["update", "build", "install"]
         self.phaselist = phases
-    
+
     def filterOutPhase(self, phase: str) -> None:
         """
         Removes the given phase from the list, if present.
         """
         self.phaselist = [item for item in self.phaselist if item != phase]
-    
+
     def addPhase(self, phase: str) -> None:
         """
         Adds the given phase to the phase list at the end.
@@ -46,13 +46,13 @@ class PhaseList:
         """
         if not self.has(phase):
             self.phaselist.append(phase)
-    
+
     def has(self, phase: str) -> bool:
         """
         Returns true if the given phase is in the phase list.
         """
         return any(element == phase for element in self.phaselist)
-    
+
     def phases(self, args: list | None = None) -> list:
         """
         If provided a list, clears the existing list of phases and
@@ -64,7 +64,7 @@ class PhaseList:
         if args:
             self.phaselist = args
         return self.phaselist
-    
+
     def clear(self) -> None:
         """
         Empties the phase list.

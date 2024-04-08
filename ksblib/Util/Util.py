@@ -33,7 +33,7 @@ class Util:
     Various helpful methods.  This documentation doesn't cover them all currently,
     take a peek at the source.
     """
-    
+
     @staticmethod
     def list_has(listRef: list, value):
         """
@@ -44,7 +44,7 @@ class Util:
         No need to use it in Python. We can just use `if "value" in listRef`.
         """
         return value in listRef
-    
+
     @staticmethod
     def locate_exe(prog: str, preferred: list | None = None):
         """
@@ -58,20 +58,20 @@ class Util:
         This assumes that the module environment has already been updated since
         binpath doesn't exactly correspond to $ENV{'PATH'}.
         """
-        
+
         if preferred is None:
             preferred = []
-        
+
         # If it starts with a / the path is already absolute.
         if re.match(r"^/", prog):
             return prog
-        
+
         paths = preferred if preferred else os.environ.get("PATH").split(":")
         for path in paths:
             if os.access(f"{path}/{prog}", os.X_OK):
                 return f"{path}/{prog}"
         return None
-    
+
     @staticmethod
     def assert_isa(obj, class_name):
         """
@@ -82,7 +82,7 @@ class Util:
         if not isinstance(obj, class_name):
             BuildException.croak_internal(f"{obj} is not of type {class_name}, but of type " + type(obj))
         return obj
-    
+
     @staticmethod
     def assert_in(val, listRef):
         """
@@ -92,9 +92,9 @@ class Util:
         """
         if val not in listRef:
             BuildException.croak_runtime(f"{val} is not a permissible value for its argument")
-        
+
         return val
-    
+
     @staticmethod
     def safe_unlink(path):
         """
@@ -104,7 +104,7 @@ class Util:
             Debug().pretend("\tWould have unlinked ", path, ".")
             return 1  # Return true
         return os.unlink(path)
-    
+
     @staticmethod
     def safe_system(cmd_list: list):
         """
@@ -116,10 +116,10 @@ class Util:
         if not Debug().pretending():
             Debug().whisper(f"\tExecuting g['", "' '".join(cmd_list), "'")
             return subprocess.run(cmd_list).returncode
-        
+
         Debug().pretend("\tWould have run g['" + "' '".join(cmd_list) + "'")
         return 0  # Return true (success code)
-    
+
     @staticmethod
     def p_chdir(Dir):
         """
@@ -127,14 +127,14 @@ class Util:
         we're switching to the directory when debugging.
         """
         Debug().debug(f"\tcd g[{Dir}]")
-        
+
         try:
             os.chdir(Dir)
         except OSError as e:
             if Debug().pretending():
                 return 1
             BuildException.croak_runtime(f"Could not change to directory {dir}: {e}")
-    
+
     @staticmethod
     def super_mkdir(pathname):
         """
@@ -144,10 +144,10 @@ class Util:
         
         Throws an exception on failure. See L<File::Path>.
         """
-        
+
         if not hasattr(Util, "createdPaths"):
             Util.createdPaths = {}
-        
+
         if Debug().pretending():
             if pathname not in Util.createdPaths and not os.path.exists(pathname):
                 Debug().pretend(f"\tWould have created g[{pathname}]")
@@ -156,7 +156,7 @@ class Util:
         else:
             Path(pathname).mkdir(parents=True, exist_ok=True)
             return True if os.path.exists(pathname) else False
-    
+
     @staticmethod
     def file_digest_md5(fileName):
         """
@@ -175,7 +175,7 @@ class Util:
                     break
                 md5.update(chunk)
         return md5.hexdigest()
-    
+
     @staticmethod
     def disable_locale_message_translation():
         """
@@ -194,12 +194,12 @@ class Util:
         # args, etc. to commands is under the UTF-8 encoding at this point, as
         # that is the only sane way for this en_US-based developer to handle
         # the task.  Patches (likely using Encode::Locale) are accepted. :P
-        
+
         os.environ["LC_MESSAGES"] = "C"
         if "LC_ALL" in os.environ:
             os.environ["LANG"] = os.environ["LC_ALL"]  # This is lower-priority "catch all"
             del os.environ["LC_ALL"]
-    
+
     @staticmethod
     def filter_program_output(filterRef, program, *args) -> list[str]:
         """
@@ -221,58 +221,58 @@ class Util:
         
         All remaining arguments are passed to the program.
         """
-        
+
         if filterRef is None:
             def filterRef(_):
                 return True  # Default to all lines
-        
+
         Debug().debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
-        
+
         # Check early for whether an executable exists since otherwise
         # it is possible for our fork-open below to "succeed" (i.e. fork()
         # happens OK) and then fail when it gets to the exec(2) syscall.
         if not Util.locate_exe(program):
             BuildException.croak_runtime(f"Can't find {program} in PATH!")
-        
+
         execFailedError = "\t - kde-builder - exec failed!\n"
         try:
             pipe_read, pipe_write = os.pipe()
             pid = os.fork()
         except OSError as e:
             raise BuildException.croak_internal(f"Can't fork: {e}")
-        
+
         if pid:
             # parent
             os.close(pipe_write)
-            
+
             if not pipe_read:
                 BuildException.croak_internal(f"Unable to open pipe to read {program} output")
-            
+
             childOutput = b""
             while True:
                 chunk = os.read(pipe_read, 4096)
                 if not chunk:
                     break
                 childOutput += chunk
-            
+
             _, exitCode = os.waitpid(pid, 0)  # we do it after we have read the pipe, because otherwise we could be deadlocked if pipe overflowed (for example for "git ls-files" command long output)
             childOutput = childOutput.decode()
-            
+
             if "\0" in childOutput:
                 childOutputs = [item + "\0" for item in childOutput.split("\0") if item]  # pl2py: for our git command terminated with --null
             else:
                 childOutputs = childOutput.split("\n")
                 childOutputs = childOutputs[:-1] if childOutputs[-1] == "" else childOutputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
                 childOutputs = list(map(lambda x: x + "\n", childOutputs))
-            
+
             lines = [line for line in childOutputs if filterRef(line)]
-            
+
             os.close(pipe_read)
-            
+
             # we can pass serious errors back to ourselves too.
             if exitCode == 99 and len(lines) >= 1 and lines[0] == execFailedError:
                 BuildException.croak_runtime(f"Failed to exec {program}, is it installed?")
-            
+
             if exitCode:
                 # other errors might still be serious but don't need a backtrace
                 if Debug().pretending():
@@ -283,13 +283,13 @@ class Util:
         else:
             os.close(pipe_read)
             Util.disable_locale_message_translation()
-            
+
             # We don't want stderr output on tty.
             devnull = open(os.devnull, "w")
             os.dup2(devnull.fileno(), 2)
-            
+
             os.dup2(pipe_write, 1)
-            
+
             try:
                 os.execvp(program, [program, *args])
             except OSError:
@@ -298,7 +298,7 @@ class Util:
                 exit(99)  # Helper proc, so don't use finish(), just die
             finally:
                 os.close(pipe_write)
-    
+
     @staticmethod
     def prettify_seconds(elapsed):
         """
@@ -308,24 +308,24 @@ class Util:
         """
         return_str = ""
         days = hours = minutes = seconds = fraction = ""
-        
+
         fraction = int(100 * (elapsed - int(elapsed)))
         elapsed = int(elapsed)
-        
+
         seconds = elapsed % 60
         elapsed = int(elapsed / 60)
-        
+
         minutes = elapsed % 60
         elapsed = int(elapsed / 60)
-        
+
         hours = elapsed % 24
         elapsed = int(elapsed / 24)
-        
+
         days = elapsed
-        
+
         if fraction:
             seconds = f"{seconds}.{fraction}"
-        
+
         str_list = []
         for x in ["days", "hours", "minutes", "seconds"]:
             # Use a symbolic reference without needing to disable strict refs.
@@ -335,17 +335,17 @@ class Util:
             text = x
             if value == 1:  # Make singular
                 text = re.sub(r"s$", "", text)
-            
+
             if value or x == "seconds":
                 str_list.append(f"{value} {text}")
-        
+
         # Add 'and ' in front of last element if there was more than one.
         if len(str_list) > 1:
             str_list.append("and " + str_list.pop(0))
-        
+
         return_str = ", ".join(str_list)
         return return_str
-    
+
     @staticmethod
     def _setErrorLogfile(module, logfile) -> None:
         """
@@ -356,50 +356,50 @@ class Util:
         """
         if not logfile:
             return
-        
+
         logdir = module.getLogDir()
-        
+
         if module.hasStickyOption("error-log-file"):
             Debug().error(f"{module} already has error log set, tried to set to r[b[{logfile}]")
             return
-        
+
         module.setOption({"#error-log-file": f"{logdir}/{logfile}"})
         Debug().debug(f"Logfile for {module} is {logfile}")
-        
+
         # Setup symlink in the module log directory pointing to the appropriate
         # file.  Make sure to remove it first if it already exists.
         if os.path.islink(f"{logdir}/error.log"):
             os.unlink(f"{logdir}/error.log")
-        
+
         if os.path.exists(f"{logdir}/error.log"):
             # Maybe it was a regular file?
             Debug().error("r[b[ * Unable to create symlink to error log file]")
             return
-        
+
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
             os.symlink(f"{logfile}", f"{logdir}/error.log")
-    
+
     @staticmethod
     def run_logged_command(module: Module, filename: str, callbackRef: Optional[Callable], command: list[str]) -> int:
         """
         Common code for log_command and ksb::Util::LoggedSubprocess
         """
         Debug().debug(f"run_logged_command(): Module {module}, Command: ", " ".join(command))
-        
+
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             BuildException.croak_internal(f"Pass only base filename for {module}/{filename}")
         logpath = module.getLogPath(f"{filename}.log")
-        
+
         # Fork a child, with its stdout connected to CHILD.
         pipe_read, pipe_write = os.pipe()
         pid = os.fork()
-        
+
         if pid:
             # Parent
             os.close(pipe_write)
-            
+
             dec = codecs.getincrementaldecoder('utf8')()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
-            
+
             if not callbackRef and Debug().debugging():
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     # If no other callback given, pass to debug() if debug-mode is on.
@@ -410,7 +410,7 @@ class Util:
                         if line.strip():
                             print(line.strip())
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
-            
+
             if callbackRef:
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     while True:
@@ -419,13 +419,13 @@ class Util:
                             break
                         callbackRef(line)  # Note that line may contain several lines (a string containing "\n")
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
-            
+
             _, return_code = os.waitpid(pid, 0)
             try:
                 os.close(pipe_read)
             except OSError as e:
                 BuildException.croak_internal(f"syscall failed waiting on log_command to finish: {e}")
-            
+
             # kernel stuff went OK but the child gave a failing exit code
             if return_code != 0:
                 Debug().debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
@@ -434,27 +434,27 @@ class Util:
         else:
             # Child. Note here that we need to avoid running our exit cleanup
             # handlers in here. For that we need sys.exit.
-            
+
             # Apply altered environment variables.
             module.buildContext().commitEnvironmentChanges()
-            
+
             signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-            
+
             def sigint_handler(signum, frame):
                 sys.stdout.close()  # This should be a pipe
                 sys.stderr.close()
                 sys.exit(signal.SIGINT)
-            
+
             signal.signal(signal.SIGINT, sigint_handler)
-            
+
             # Redirect STDIN to /dev/null so that the handle is open but fails when
             # being read from (to avoid waiting forever for e.g. a password prompt
             # that the user can't see.
-            
+
             if "KDESRC_BUILD_USE_TTY" not in os.environ:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
-            
+
             if callbackRef or Debug().debugging():
                 # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
                 # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
@@ -467,33 +467,33 @@ class Util:
                     os.dup2(f_logpath.fileno(), 1)  # open stdout, that will be the logpath file
                 except OSError as e:
                     Debug().error(f"Error {e} opening log to {logpath}!")
-            
+
             # Call internal function, name given by $command[1]
             if command[0] == "kde-builder":
                 # No colors!
                 Debug().setColorfulOutput(False)
                 Debug().debug(f"Calling {command}[1]")
-                
+
                 cmd = command[1]
                 del command[0:2]  # Remove first two elements.
-                
+
                 exitcode = int(cmd())
                 sys.exit(exitcode)
-            
+
             # Make sure we log everything.
             os.close(2)  # close stderr
             os.dup2(1, 2)  # open stderr, that will be our stdout
-            
+
             # Don't leave empty output files, give an indication of the particular
             # command run.
             print("# kde-builder running: '" + "' '".join(command) + "'")
             print("# from directory: ", os.getcwd())
-            
+
             # TODO: Implement this when appropriate, but also keep in mind that
             # filter_program_output might be a better idea if you're parsing
             # output, and that function already does this.
             # disable_locale_message_translation();
-            
+
             # External command.
             try:
                 os.execvp(command[0], command)
@@ -508,7 +508,7 @@ class Util:
                     """))
                 # Don't use return, this is the child still!
                 sys.exit(1)
-    
+
     @staticmethod
     def await_promise(promise: Promise):
         """
@@ -525,7 +525,7 @@ class Util:
         #     BuildException.croak_internal("Tried to await a promise when I/O loop active!")
         promise = promise.get()
         return promise
-    
+
     @staticmethod
     def await_exitcode(promise: Promise):
         """
@@ -543,14 +543,14 @@ class Util:
         serious bugs.
         """
         result = None
-        
+
         def func(exitcode):
             nonlocal result
             result = exitcode == 0
-        
+
         Util.await_promise(promise.then(func))
         return result
-    
+
     @staticmethod
     def await_result(promise: Promise):
         """
@@ -567,14 +567,14 @@ class Util:
         serious bugs.
         """
         result = None
-        
+
         def func(result_from_p):
             nonlocal result
             result = result_from_p
-        
+
         Util.await_promise(promise.then(func))
         return result
-    
+
     @staticmethod
     def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
         """
@@ -624,15 +624,15 @@ class Util:
         """
         if optionsRef is None:
             optionsRef = {}
-        
+
         command = argRef
         callbackRef = optionsRef.get("callback", None)
-        
+
         if Debug().pretending():
             Debug().pretend("\tWould have run g['" + "' '".join(command) + "'")
             return 0
         return Util.run_logged_command(module, filename, callbackRef, argRef)
-    
+
     @staticmethod
     def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str]) -> Promise:
         """
@@ -664,18 +664,18 @@ class Util:
         # TODO: For really concurrent code we need to have run_logged_p change to a
         # specific directory in the subprocess, add to this interface.
         """
-        
+
         if not directory:
             directory = ""
         if Debug().pretending():
             args_str = "', '".join(argRef)
             Debug().pretend(f"\tWould have run g{{'{args_str}'}}")
             return Promise.resolve(0)
-        
+
         # Do this before we fork so the path is finalized to prevent auto-detection
         # in the child
         logpath = module.getLogPath(f"{filename}.log")
-        
+
         def subprocess_run_p(target: callable) -> Promise:
             def subprocess_run():
                 retval = multiprocessing.Value("i", -1)
@@ -684,10 +684,10 @@ class Util:
                 # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
                 subproc.join()
                 return retval.value
-            
+
             p = Promise.promisify(subprocess_run)()
             return p
-        
+
         def func(retval):
             # This happens in a CHILD PROCESS, not in the main process!
             # This means that changes made by log_command or function calls made
@@ -696,21 +696,21 @@ class Util:
             if directory:
                 Util.p_chdir(directory)
             retval.value = Util.log_command(module, filename, argRef)
-        
+
         promise = subprocess_run_p(func)
-        
+
         def then_(exitcode):
             # This happens back in the main process, so we can reintegrate the
             # changes into our data structures if needed.
-            
+
             Debug().debug(f"run_logged_p(): {module} {filename} complete: {exitcode}"),
             if not exitcode == 0:
                 Util._setErrorLogfile(module, f"{filename}.log")
             return exitcode
-        
+
         promise = promise.then(then_)
         return promise
-    
+
     @staticmethod
     def split_quoted_on_whitespace(line):
         """
@@ -722,7 +722,7 @@ class Util:
         The quotes themselves are not returned.
         """
         return shlex.split(line.strip())
-    
+
     @staticmethod
     def pretend_open(path, defaultText: str = ""):
         """
@@ -740,7 +740,7 @@ class Util:
          false if there is an error opening an existing file (or if the file doesn't
          exist when not in pretend mode)
         """
-        
+
         if Debug().pretending() and not os.path.exists(path):
             try:
                 fh = StringIO(defaultText)
@@ -751,16 +751,16 @@ class Util:
                 fh = open(path, "r")
             except IOError:
                 return False
-        
+
         return fh
-    
+
     @staticmethod
     def any(subRef, listRef):
         """
         Returns true if the given function returns true for any item in the given list.
         """
         return any(subRef(item) for item in listRef)
-    
+
     # pl2py: perl specific, not needed
     # @staticmethod
     # def unique_items(*args):
@@ -775,7 +775,7 @@ class Util:
     #             seen[item] += 1
     #             results.append(item)
     #     return results
-    
+
     @staticmethod
     def safe_rmtree(path) -> bool:
         """
@@ -789,25 +789,25 @@ class Util:
         # Pretty user-visible path
         user_path = path
         user_path = re.sub(r"^" + os.environ["HOME"], "~", user_path)
-        
+
         if Debug().pretending():
             Debug().pretend(f"Would have removed all files/folders in {user_path}")
             return True
-        
+
         # Error out because we probably have a logic error even though it would
         # delete just fine.
         if not os.path.isdir(path):
             Debug().error(f"Cannot recursively remove {user_path}, as it is not a directory.")
             return False
-        
+
         try:
             shutil.rmtree(path)
-        
+
         except Exception as e:
             Debug().error(f"Unable to remove directory {user_path}: {e}")
             return False
         return True
-    
+
     @staticmethod
     def get_list_digest(args: list):
         """
@@ -821,12 +821,12 @@ class Util:
         Parameters: List of scalar values to hash.
         Return value: base64-encoded hash value.
         """
-        
+
         md5_hash = hashlib.md5()
         for arg in args:
             md5_hash.update(arg.encode())
         return base64.b64encode(md5_hash.digest()).decode().rstrip("=")
-    
+
     @staticmethod
     # Can just use `if not os.listdir(dir_path)` instead.
     def is_dir_empty(dir_path):
@@ -841,7 +841,7 @@ class Util:
         except OSError:
             return False
         return True
-    
+
     @staticmethod
     def safe_lndir_p(from_path: str, to_path: str) -> Promise:
         """
@@ -867,18 +867,18 @@ class Util:
         RETURN VALUE: A promise that resolves to a Boolean true (non-zero) if successful,
         Boolean false if unsuccessful.
         """
-        
+
         if Debug().pretending():
             return Promise.resolve(1)
-        
+
         if not os.path.isabs(from_path) or not os.path.isabs(to_path):
             BuildException.croak_internal("Both paths to safe_lndir_p must be absolute paths!")
-        
+
         # Create destination directory.
         if not Util.super_mkdir(to_path):
             Debug().error(f"Couldn't create directory r[{to_path}]")
             return Promise.resolve(0)
-        
+
         # # Create closure callback subroutine.
         # def wanted(root, dirs, files):
         #
@@ -897,7 +897,7 @@ class Util:
         #     if os.path.isfile(file) and not os.path.exists(f"{dir}/$_"):
         #         if not os.symlink(file, f"{dir}/$_"):
         #             BuildException.croak_runtime(f"Couldn't create file {dir}/$_: $!")
-        
+
         def subprocess_run_p(target: callable) -> Promise:
             def subprocess_run():
                 retval = multiprocessing.Value("i", -1)
@@ -906,10 +906,10 @@ class Util:
                 # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
                 subproc.join()
                 return retval.value
-            
+
             p = Promise.promisify(subprocess_run)()
             return p
-        
+
         def func(retval):
             # Happens in child process
             try:
@@ -917,9 +917,9 @@ class Util:
                     # wanted(root, dirs, files)
                     relative_path = os.path.relpath(root, from_path)
                     target_dir = os.path.join(to_path, relative_path)
-                    
+
                     os.makedirs(target_dir, exist_ok=True)
-                    
+
                     for file in files:
                         link_source = os.path.join(root, file)
                         link_target = os.path.join(target_dir, file)
@@ -928,10 +928,10 @@ class Util:
                 Debug().error(f"Unable to symlink {from_path} to {to_path}: {e}")
                 retval.value = 0
             retval.value = 1
-        
+
         promise = subprocess_run_p(func)
         return promise
-    
+
     @staticmethod
     def prune_under_directory_p(module, target_dir) -> Promise:
         """
@@ -948,7 +948,7 @@ class Util:
         Returns a promise resolving to boolean true on success, boolean false on
         failure.
         """
-        
+
         logpath = module.getLogPath("clean-builddir.log")
         log = None
         try:
@@ -956,9 +956,9 @@ class Util:
         except IOError as e:
             Debug().error(f"\tError opening logfile {logpath}: r[b[{e}]")
             Debug().error("\tContinuing without logging")
-        
+
         print(f"starting delete o {target_dir}", file=log)
-        
+
         try:
             def subprocess_run_p(target: callable) -> Promise:
                 def subprocess_run():
@@ -970,13 +970,13 @@ class Util:
                     if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
                         raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
                     return retval.value
-                
+
                 p = Promise.promisify(subprocess_run)()
                 return p
-            
+
             def func(retval):
                 errorRef = {}
-                
+
                 with os.scandir(target_dir) as entries:
                     for entry in entries:
                         if entry.is_dir() and not entry.is_symlink():
@@ -989,28 +989,28 @@ class Util:
                                 os.remove(entry.path)
                             except OSError as ex:
                                 errorRef[entry.path] = ex
-                
+
                 if errorRef and len(errorRef):
                     for file in errorRef:
                         msg = errorRef[file]
                         if not file:
                             file = "general error"
                         print(f"{file}: error: {msg}", file=log)
-                    
+
                     retval.value = 0
                 else:
                     retval.value = 1
                 log.close()
                 # pl2py: As we are in subprocess, we have "returned" the value via a shared variable.
                 # The actual (normal) return value cannot be read by the parent process.
-            
+
             promise = subprocess_run_p(func)
             return promise
-        
+
         except Exception as e:
             Debug().error(f"\tUnable to clean r[{target_dir}]:\n\ty[b[{e}]")
             return Promise.resolve(0)  # resolve, but to an error
-    
+
     @staticmethod
     def remake_symlink(src, dst):
         # Make a symlink from dst to src. If symlink exists, ensures that it points to the requested src.
@@ -1019,24 +1019,24 @@ class Util:
         #   dst - path to point from (symlink name)
         #
         # Return: 1 on success, 0 on failure.
-        
+
         if os.path.isfile(dst) and not os.path.islink(dst):  # if dst is not a symlink to file, but a regular file
             BuildException.croak_runtime(f"Could not create '{dst}' symlink, because file with this name exists. Please remove it manually.")
-        
+
         if os.path.isdir(dst) and not os.path.islink(dst):  # if dst is not a symlink to directory, but a regular directory
             BuildException.croak_runtime(f"Could not create '{dst}' symlink, because directory with this name exists. Please remove it manually.")
-        
+
         if os.path.islink(dst) and os.readlink(dst) != src:  # if dst points to wrong src
             try:
                 os.unlink(dst)  # delete wrong symlink
             except OSError:
                 BuildException.croak_runtime(f"Could not delete '{dst}' symlink (needed to update target location). Please remove it manually.")
-        
+
         if not os.path.exists(dst) and not os.path.islink(dst):  # pl2py: in perl the -e check also detects the symlinks, but in python the os.path.exists does not detect symlinks.
             try:
                 os.symlink(src, dst)  # pl2py: in Perl, symlink command returns 1 on success, 0 on failure. In Python os.symlink returns None on success, raises exception on failure.
                 return 1
             except FileNotFoundError:
                 return 0
-        
+
         return 1  # success (pointed to correct location already)

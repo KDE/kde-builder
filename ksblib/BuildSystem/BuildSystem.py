@@ -37,16 +37,16 @@ class BuildSystem:
     implementations of generic functions and supports hooks for subclasses to
     provide needed detailed functionality.
     """
-    
+
     def __init__(self, module):
         self.module = module
-        
+
         # This is simply the 'default' build system at this point, so options
         # intended for unique/bespoke build systems should be stripped from global
         # before being applied to a module.
         if not self.__class__.__name__ == "BuildSystem_KDECMake":
             self._maskGlobalBuildSystemOptions()
-    
+
     def _maskGlobalBuildSystemOptions(self) -> None:
         """
         Removes or masks global build system-related options, so that they aren't
@@ -56,13 +56,13 @@ class BuildSystem:
         module = self.module
         ctx = module.buildContext()
         buildSystemOptions = ["cmake-options", "cmake-generator", "configure-flags", "custom-build-command", "cxxflags", "make-options", "run-tests", "use-clean-install"]
-        
+
         for opt in buildSystemOptions:
             # If an option is present, and not set at module-level, it must be
             # global. Can't use getOption() method due to recursion.
             if ctx.options[opt] and not module.options.get(opt, None):
                 module.options[opt] = ""
-    
+
     def hasToolchain(self) -> bool:
         """
         Check if a (custom) toolchain is defined.
@@ -75,10 +75,10 @@ class BuildSystem:
         give the custom configuration maximum 'power' (including foot shooting power).
         """
         return False
-    
+
     def module(self):
         return self.module
-    
+
     def buildConstraints(self) -> dict:
         """
         Returns a hashref holding the resource constraints to try to apply during the
@@ -90,28 +90,28 @@ class BuildSystem:
         }
         """
         cores = self.module.getOption("num-cores")
-        
+
         # If set to empty, accept user's decision
         if not cores:
             return {}
-        
+
         # If the buildsystem can manage it and the user doesn't care, that's OK too
         if self.supportsAutoParallelism() and cores == "auto":
             return {}
-        
+
         max_cores = os.cpu_count()
         if not max_cores:
             max_cores = 1
-        
+
         if cores == "auto" and max_cores > 1:
             cores = max_cores
-        
+
         # If user sets cores to something silly, set it to a failsafe.
         if int(cores) <= 0:
             cores = 4
-        
+
         return {"compute": cores}
-    
+
     def needsRefreshed(self) -> str:
         """
         Subroutine to determine if a given module needs to have the build system
@@ -122,7 +122,7 @@ class BuildSystem:
         module = self.module
         builddir = module.fullpath("build")
         confFileKey = self.configuredModuleFileName()
-        
+
         if not os.path.exists(f"{builddir}"):
             return "the build directory doesn't exist"
         if os.path.exists(f"{builddir}/.refresh-me"):
@@ -132,7 +132,7 @@ class BuildSystem:
         if not os.path.exists(f"{builddir}/{confFileKey}"):
             return f"{builddir}/{confFileKey} is missing"
         return ""
-    
+
     def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
@@ -140,7 +140,7 @@ class BuildSystem:
         for the build and install phases. Should take `hasToolchain()` into account here.
         """
         pass
-    
+
     @staticmethod
     def needsInstalled() -> bool:
         """
@@ -148,7 +148,7 @@ class BuildSystem:
         used, or false if installation is not required or possible.
         """
         return True
-    
+
     @staticmethod
     def requiredPrograms() -> list:
         """
@@ -157,11 +157,11 @@ class BuildSystem:
         returned if there's no required programs.
         """
         return []
-    
+
     @staticmethod
     def name() -> str:
         return "generic"
-    
+
     @staticmethod
     def buildCommands() -> list[str]:
         """
@@ -171,7 +171,7 @@ class BuildSystem:
         # Non Linux systems can sometimes fail to build when GNU Make would work,
         # so prefer GNU Make if present, otherwise try regular make.
         return ["gmake", "make"]
-    
+
     def defaultBuildCommand(self) -> str:
         # Convert the path to an absolute path since I've encountered a sudo
         # that is apparently unable to guess.  Maybe it's better that it
@@ -180,7 +180,7 @@ class BuildSystem:
         if buildCommand is None:
             Debug().warning(" y[*] Not found any of these executables: '", "' '".join(self.buildCommands()), "'. buildCommand will be undefined.")
         return buildCommand
-    
+
     @staticmethod
     def supportsAutoParallelism() -> bool:
         """
@@ -195,44 +195,44 @@ class BuildSystem:
         subclasses.
         """
         return False
-    
+
     def buildInternal(self, optionsName: str = "make-options") -> dict:
         """
         Return value style: hashref to build results object (see safe_make)
         """
-        
+
         # I removed the default value to num-cores but forgot to account for old
         # configs that needed a value for num-cores, as this is handled
         # automatically below. So filter out the naked -j for configs where what
         # previously might have been "-j 4" is now only "-j". See
         # https://invent.kde.org/sdk/kdesrc-build/-/issues/78
         optionVal = self.module.getOption(optionsName)
-        
+
         # Look for -j being present but not being followed by digits
         if re.search(r"(^|[^a-zA-Z0-9_])-j$", optionVal) or re.search(r"(^|[^a-zA-Z_])-j(?! *[0-9]+)", optionVal):
             Debug().warning(" y[b[*] Removing empty -j setting during build for y[b[" + str(self.module) + "]")
             optionVal = re.sub(r"(^|[^a-zA-Z_])-j *", r"\1", optionVal)  # Remove the -j entirely for now
-        
+
         makeOptions = optionVal.split(" ")
         makeOptions = [el for el in makeOptions if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
-        
+
         # Look for CPU core limits to enforce. This handles core limits for all
         # current build systems.
         buildConstraints = self.buildConstraints()
         numCores = buildConstraints.get("compute", None)
-        
+
         if numCores:
             # Prepend parallelism arg to allow user settings to override
             makeOptions.insert(0, str(numCores))
             makeOptions.insert(0, "-j")
-        
+
         return self.safe_make({
             "target": None,
             "message": "Compiling...",
             "make-options": makeOptions,
             "logbase": "build",
         })
-    
+
     def configureInternal(self) -> bool:
         """
         Return value style: boolean
@@ -243,7 +243,7 @@ class BuildSystem:
         if Debug().pretending():
             return True
         BuildException.croak_internal("We were not supposed to get to this point...")
-    
+
     @staticmethod
     def configuredModuleFileName() -> str:
         """
@@ -251,7 +251,7 @@ class BuildSystem:
         if the module has been configured.
         """
         return "Makefile"
-    
+
     def runTestsuite(self) -> bool:
         """
         Runs the testsuite for the given module.
@@ -260,7 +260,7 @@ class BuildSystem:
         module = self.module
         Debug().info(f"\ty[{module}] does not support the b[run-tests] option")
         return False
-    
+
     def installInternal(self, cmdPrefix: list[str]) -> bool:
         """
         Used to install a module (that has already been built, tested, etc.)
@@ -268,13 +268,13 @@ class BuildSystem:
         Returns boolean false if unable to install, true otherwise.
         """
         module = self.module
-        
+
         return self.safe_make({
             "target": "install",
             "message": f"Installing g[{module}]",
             "prefix-options": cmdPrefix,
         })["was_successful"]
-    
+
     def uninstallInternal(self, cmdPrefix: list[str]) -> bool:
         """
         Used to uninstall a previously installed module.
@@ -288,7 +288,7 @@ class BuildSystem:
             "message": f"Uninstalling g[{module}]",
             "prefix-options": cmdPrefix,
         })["was_successful"]
-    
+
     def cleanBuildSystem(self) -> int:
         """
         Subroutine to clean the build system for the given module.  Works by
@@ -299,27 +299,27 @@ class BuildSystem:
         module = self.module
         srcdir = module.fullpath("source")
         builddir = module.fullpath("build")
-        
+
         if Debug().pretending():
             Debug().pretend(f"\tWould have cleaned build system for g[{module}]")
             return 1
-        
+
         # Use an existing directory
         if os.path.exists(builddir) and builddir != srcdir:
             Debug().info(f"\tRemoving files in build directory for g[{module}]")
-            
+
             clean_promise = Util.prune_under_directory_p(module, builddir)
             result = Util.await_result(clean_promise)
-            
+
             # This variant of log_command runs the sub prune_under_directory($builddir)
             # in a forked child, so that we can log its output.
             if not result:
                 Debug().error(f" r[b[*]\tFailed to clean build directory.  Verify the permissions are correct.")
                 return 0  # False for this function.
-            
+
             module.unsetPersistentOption("last-build-rev")
             # keep last-install-rev since that tracks the install dir.
-            
+
             # Let users know we're done so they don't wonder why rm -rf is taking so
             # long and oh yeah, why's my HD so active?...
             Debug().info("\tOld build system cleaned, starting new build system.")
@@ -327,11 +327,11 @@ class BuildSystem:
             Debug().error(f"\tUnable to create directory r[{builddir}].")
             return 0
         return 1
-    
+
     @staticmethod
     def needsBuilddirHack() -> bool:
         return False  # By default all build systems are assumed to be sane
-    
+
     def createBuildSystem(self) -> Promise:
         """
         Creates the build directory for the associated module, and handles
@@ -344,22 +344,22 @@ class BuildSystem:
         module = self.module
         builddir = module.fullpath("build")
         srcdir = module.fullpath("source")
-        
+
         if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
             Debug().error(f"\tUnable to create build directory for r[{module}]!!")
             return Promise.resolve(0)
-        
+
         if builddir != srcdir and self.needsBuilddirHack():
             def func(result):
                 if not result:
                     Debug().error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
                 return result
-            
+
             promise = Util.safe_lndir_p(srcdir, builddir).then(func)
             return promise
-        
+
         return Promise.resolve(1)
-    
+
     def safe_make(self, optsRef: dict) -> dict:
         """
         Subroutine to run the build command with the arguments given by the
@@ -396,11 +396,11 @@ class BuildSystem:
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
-        
+
         commandToUse = module.getOption("custom-build-command")
         buildCommand = None
         buildCommandLine = []
-        
+
         # Check for custom user command. We support command line options being
         # passed to the command as well.
         if commandToUse:
@@ -410,43 +410,43 @@ class BuildSystem:
         else:
             # command line options passed in optsRef
             commandToUse = buildCommand = self.defaultBuildCommand()
-        
+
         if not buildCommand:
             Debug().error(f" r[b[*] Unable to find the g[{commandToUse}] executable!")
             return {"was_successful": 0}
-        
+
         # Make it prettier if pretending (Remove leading directories).
         if Debug().pretending():
             buildCommand = re.sub(r"^/.*/", "", buildCommand)
-        
+
         # Simplify code by forcing lists to exist.
         if "prefix-options" not in optsRef:
             optsRef["prefix-options"] = []
         if "make-options" not in optsRef:
             optsRef["make-options"] = []
-        
+
         prefixOpts = optsRef["prefix-options"]
-        
+
         # If using sudo ensure that it doesn't wait on tty, but tries to read from
         # stdin (which should fail as we redirect that from /dev/null)
         if prefixOpts and prefixOpts[0] == "sudo" and [opt for opt in prefixOpts if opt != "-S"]:
             prefixOpts.insert(1, "-S")  # Add -S right after 'sudo'
-        
+
         # Assemble arguments
         args = [*prefixOpts, buildCommand, *buildCommandLine]
         if optsRef["target"]:
             args.append(optsRef["target"])
         args.extend(optsRef["make-options"])
-        
+
         logname = optsRef.get("logbase", optsRef.get("logfile", optsRef.get("target", "")))  # pl2py: if all of these are undefined, logname remains undef in perl. But undef in perl becomes empty string when stringified.
-        
+
         builddir = module.fullpath("build")
         builddir = re.sub(r"/*$", "", builddir)  # Remove trailing /
-        
+
         Util.p_chdir(builddir)
-        
+
         return self._runBuildCommand(optsRef["message"], logname, args)
-    
+
     def _runBuildCommand(self, message: str, filename: str, argRef: list[str]) -> dict:
         """
         Subroutine to run make and process the build process output in order to
@@ -463,21 +463,21 @@ class BuildSystem:
         
         The return value is a hashref as defined by safe_make
         """
-        
+
         module = self.module
         builddir = module.fullpath("build")
         resultRef = {"was_successful": 0}
         ctx = module.buildContext()
-        
+
         # There are situations when we don't want progress output:
         # 1. If we're not printing to a terminal.
         # 2. When we're debugging (we'd interfere with debugging output).
         if not sys.stderr.isatty() or Debug().debugging():
             Debug().note(f"\t{message}")
-            
+
             promise = Util.run_logged_p(module, filename, builddir, argRef)
             resultRef["was_successful"] = Util.await_exitcode(promise)
-            
+
             # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
             # When the module was built successfully, and you were using --debug, then you will get the message:
             #  "No changes from build, skipping install"
@@ -485,28 +485,28 @@ class BuildSystem:
             # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
             if not promise.is_rejected:
                 resultRef["work_done"] = 1
-            
+
             return resultRef
-        
+
         a_time = int(time.time())
-        
+
         statusViewer = ctx.statusViewer()
         statusViewer.setStatus(f"\t{message}")
         statusViewer.update()
-        
+
         # TODO More details
         warnings = 0
         workDoneFlag = 1
-        
+
         def log_command_callback(input_line):
             if input_line is None:
                 return
-            
+
             percentage = None
             match = re.search(r"^\[\s*([0-9]+)%]", input_line)
             if match:
                 percentage = int(match.group(1))
-            
+
             if percentage:
                 statusViewer.setProgressTotal(100)
                 statusViewer.setProgress(percentage)
@@ -515,29 +515,29 @@ class BuildSystem:
                 match = re.search(r"^\[([0-9]+)/([0-9]+)] ", input_line)
                 if match:
                     x, y = int(match.group(1)), int(match.group(2))
-                
+
                 if x and y:
                     # ninja-syntax
                     statusViewer.setProgressTotal(y)
                     statusViewer.setProgress(x)
-            
+
             # pl2py: was commented there
             # see sdk/kdesrc-build#107
             # breaks compile if there is nothing to build but just stuff to install after changes
             # $workDoneFlag = 0 if $input =~ /^ninja: no work to do/;
-            
+
             if "warning: " in input_line:
                 nonlocal warnings
                 warnings += 1
-        
+
         cmd = Util_LoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(argRef)
-        
+
         def on_child_output(line):
             # called in parent!
             log_command_callback(line)
-        
+
         cmd.on({"child_output": on_child_output})
-        
+
         def _then(exitcode):
             nonlocal resultRef
             resultRef = {
@@ -545,20 +545,20 @@ class BuildSystem:
                 "warnings": warnings,
                 "work_done": workDoneFlag,
             }
-        
+
         def _catch(err):
             Debug().error(f" r[b[*] Hit error building {module}: b[{err}]")
             resultRef["was_successful"] = 0
-        
+
         promise = cmd.start().then(_then).catch(_catch)
-        
+
         Promise.wait(promise)
-        
+
         # Cleanup TTY output.
         a_time = Util.prettify_seconds(int(time.time()) - a_time)
         status = "g[b[succeeded]" if resultRef["was_successful"] else "r[b[failed]"
         statusViewer.releaseTTY(f"\t{message} {status} (after {a_time})\n")
-        
+
         if warnings:
             if warnings < 3:
                 count = 1
@@ -568,9 +568,9 @@ class BuildSystem:
                 count = 3
             else:
                 count = 4
-            
+
             msg = f"""{"-" * count} b[y[{warnings}] {"-" * count}"""
             Debug().note(f"\tNote: {msg} compile warnings")
             self.module.setPersistentOption("last-compile-warnings", warnings)
-        
+
         return resultRef

@@ -45,5 +45,5 @@ def test_import_all():
     import ksblib.Util
     import ksblib.Util.LoggedSubprocess
     import ksblib.Version
-    
+
     assert True, "Able to compile and load all kde-builder modules."

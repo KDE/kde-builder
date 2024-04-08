@@ -26,10 +26,10 @@ class StartProgram:
         Launch kate-syntax-highlighter of module kate with '--list-themes' argument.
             kde-builder-launch -e kate-syntax-highlighter kate --list-themes
         """
-        
+
         optExec = None
         optFork = 0
-        
+
         # We cannot use GetOptionsFromArray here, because -e or -f could be meant to be arguments of module executable. But that would steal them.
         # We manually care of them, they can only appear in front of module/executable name.
         arg = None
@@ -44,30 +44,30 @@ class StartProgram:
                     exit(1)
                 continue
             break
-        
+
         module = arg
         if module is None:  # the case when user specified -e executable_name and/or -f, but then did not specified the module name
             Debug().error("The module name is missing")
             exit(1)
-        
+
         executable = optExec or module
         buildData = ctx.persistent_options
         extraRunEnv = ctx.getOption("source-when-start-program")
-        
+
         if module not in buildData:
             print(f"Module {module} has not been built yet.")
             exit(1)
-        
+
         buildDir = buildData[module]["build-dir"]
         installDir = buildData[module]["install-dir"]
         revision = buildData[module]["last-build-rev"]
         execPath = f"{installDir}/bin/{executable}"
-        
+
         if not os.path.exists(execPath):
             print(f"Program \"{executable}\" does not exist.")
             print("Try to set executable name with -e option.")
             exit(127)  # Command not found
-        
+
         script = textwrap.dedent(f"""\
         #!/bin/sh
         
@@ -82,7 +82,7 @@ class StartProgram:
             "{execPath}" $@
         fi
         """)
-        
+
         # Print run information
         Debug().note(
             "#" * 80, "\n",
@@ -93,10 +93,10 @@ class StartProgram:
             "#" * 80, "\n",
             "\n"
         )
-        
+
         if Debug().pretending():
             exit(0)
-        
+
         try:
             # Instead of embedding module_args in shell script with string interpolation, pass
             # them as arguments of the script. Let the shell handle the list through "$@",

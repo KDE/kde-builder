@@ -44,27 +44,27 @@ class ModuleSet(OptionsBase):
     
     See also: git-repository-base, ModuleSet::KDEProjects, use-modules
     """
-    
+
     def __init__(self, ctx: BuildContext, name: str):
         OptionsBase.__init__(self)
         self.create_id = None
-        
+
         # newOptions:
         self.name = name or ""
         self.module_search_decls = []
         self.module_ignore_decls = []
         self.module_order = {}  # maps module names to position in list
         self.phase_list = PhaseList(ctx.phases.phases())
-    
+
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
-    
+
     def name(self) -> str:
         return self.name
-    
+
     def setName(self, name) -> None:
         self.name = name
-    
+
     def phases(self):
         """
         Just returns a reference to the existing ksb::PhaseList, there's no way to
@@ -72,16 +72,16 @@ class ModuleSet(OptionsBase):
         ksb::PhaseList object itself.
         """
         return self.phase_list
-    
+
     def modulesToFind(self) -> list:
         return self.module_search_decls
-    
+
     def setModulesToFind(self, moduleDecls: list) -> None:
         declOrder = {moduleDecls[i]: i for i in range(len(moduleDecls))}
-        
+
         self.module_search_decls = moduleDecls
         self.module_order = declOrder
-    
+
     def moduleNamesToFind(self) -> list:
         """
         Same as modulesToFind, but strips away any path components to leave just
@@ -90,13 +90,13 @@ class ModuleSet(OptionsBase):
         result list.
         """
         return [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modulesToFind()]
-    
+
     def modulesToIgnore(self) -> list:
         return self.module_ignore_decls
-    
+
     def addModulesToIgnore(self, moduleDecls: list[str]) -> None:
         self.module_ignore_decls.extend(moduleDecls)
-    
+
     def _initializeNewModule(self, newModule: Module) -> None:
         """
         Should be called for each new ksb::Module created in order to setup common
@@ -106,22 +106,22 @@ class ModuleSet(OptionsBase):
         newModule.setScmType("git")
         newModule.phases.phases(self.phases().phases())
         newModule.mergeOptionsFrom(self)
-        
+
         # used for dependency sorting tiebreakers, by giving a fallback sort based
         # on order the user declared modules in use-modules, especially for third
         # party modules. Indirect deps won't have an entry and are given the max value
         # to sort at the end within the module-set.
         startOrder = self.create_id if self.create_id else 0
-        
+
         orderInList = self.module_order.get("newModule", len(self.module_search_decls))
         newModule.create_id = startOrder + orderInList
-    
+
     # @override
     def setOption(self, options: dict) -> None:
         """
         Handles module-set specific options for OptionsBase's setOption
         """
-        
+
         # Special-case handling
         if "use-modules" in options:
             modules = options["use-modules"].split(" ")
@@ -129,23 +129,23 @@ class ModuleSet(OptionsBase):
                 Debug().error("No modules were selected for module-set " + self.name)
                 Debug().error("in the y[use-modules] entry.")
                 raise BuildException_Config("use-modules", "Invalid use-modules")
-            
+
             self.setModulesToFind(modules)
             del options["use-modules"]
-        
+
         if "ignore-modules" in options:
             modules = options["ignore-modules"].split(" ")
             if not modules:
                 Debug().error("No modules were selected for module-set " + self.name)
                 Debug().error("in the y[ignore-modules] entry.")
                 raise BuildException_Config("ignore-modules", "Invalid ignore-modules")
-            
+
             self.addModulesToIgnore(modules)
             del options["ignore-modules"]
-        
+
         # Actually set options.
         OptionsBase.setOption(self, options)
-    
+
     def convertToModules(self, ctx: BuildContext) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
@@ -155,10 +155,10 @@ class ModuleSet(OptionsBase):
         """
         moduleList = []  # module names converted to ksb::Module objects.
         optionsRef = self.options
-        
+
         # Note: This returns a hashref, not a string.
         repoSet = ctx.getOption("git-repository-base")
-        
+
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no 'search' or 'ignore' to
@@ -166,20 +166,20 @@ class ModuleSet(OptionsBase):
         for moduleItem in self.modulesToFind():
             moduleName = moduleItem
             moduleName = re.sub(r"\.git$", "", moduleName)
-            
+
             newModule = Module(ctx, moduleName)
-            
+
             self._initializeNewModule(newModule)
-            
+
             moduleList.append(newModule)
-            
+
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
             selectedRepo = repoSet[optionsRef["repository"]]
             newModule.setOption({"repository": selectedRepo + moduleItem})
-        
+
         if not self.modulesToFind():
             Debug().warning(f"No modules were defined for the module-set {self.name}")
             Debug().warning("You should use the g[b[use-modules] option to make the module-set useful.")
-        
+
         return moduleList

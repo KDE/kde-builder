@@ -8,7 +8,7 @@ def mock_module_from_attrs(monkeypatch):
     def mock__init__(self, **kwargs):
         self.name = kwargs.get("name", None)
         self.create_id = kwargs.get("create_id", None)
-    
+
     monkeypatch.setattr(Module, "__init__", mock__init__)
 
 
@@ -55,7 +55,7 @@ def test_proper_order(graph1):
     """
     expected1 = [graph1[item]["module"] for item in ["a", "c", "b", "d", "e"]]
     actual1 = DependencyResolver.sortModulesIntoBuildOrder(graph1)
-    
+
     assert actual1 == expected1, "should sort modules into the proper build order"
 
 
@@ -69,11 +69,11 @@ def test_key_order_does_not_matter(graph1):
         "nllfmvrb": graph1["a"],
         "lexical2": graph1["d"],
     }
-    
+
     # corresponds to same order as the test above
     expected2 = [graph2[item]["module"] for item in ["nllfmvrb", "avdnrvrl", "lexical1", "lexical2", "lexicla3"]]
     actual2 = DependencyResolver.sortModulesIntoBuildOrder(graph2)
-    
+
     assert actual2 == expected2, "key order should not matter for build order"
 
 
@@ -87,8 +87,8 @@ def test_not_built_omitted(graph1):
     }
     graph3["a"]["build"] = 0
     graph3["b"]["module"] = None  # Empty module blocks should be treated as build == 0
-    
+
     expected3 = [graph3[item]["module"] for item in ("c", "d", "e")]
     actual3 = DependencyResolver.sortModulesIntoBuildOrder(graph3)
-    
+
     assert actual3 == expected3, "modules that are not to be built should be omitted"

@@ -16,9 +16,9 @@ class ModuleResolver:
     module build list, including option handling and resolution of module
     selectors into actual modules.
     """
-    
+
     # Public API
-    
+
     def __init__(self, ctx):
         """
         Creates a new C<ModuleResolver>. You must pass the appropriate
@@ -29,20 +29,20 @@ class ModuleResolver:
         """
         self.context = ctx
         self.ignoredSelectors = []
-        
+
         # Read in from rc-file
         self.inputModulesAndOptions = []
         self.cmdlineOptions = {}
-        
+
         # Holds options from 'options' blocks for modules
         self.deferredOptions = {}
-        
+
         # Holds Modules defined in course of expanding module-sets
         self.definedModules = {}
-        
+
         # Holds use-module mentions with their source module-set
         self.referencedModules = {}
-    
+
     def setCmdlineOptions(self, cmdlineOptionsRef) -> None:
         """
         Sets the options that should be applied to modules when they are created.
@@ -58,7 +58,7 @@ class ModuleResolver:
             })
         """
         self.cmdlineOptions = cmdlineOptionsRef
-    
+
     def setDeferredOptions(self, deferredOptionsRef) -> None:
         """
         Set options to apply later if a module set resolves to a named module, used
@@ -69,24 +69,24 @@ class ModuleResolver:
         repository/use-module items).  We want to handle the latter first, since
         we assume single 'options' blocks should still be able to override these.
         """
-        
+
         proj_db = self.context.getProjectDataReader()
         setIndices = []
         finalOpts = {}
-        
+
         for idx, deferredEntry in enumerate(deferredOptionsRef):
             opts = deferredEntry["opts"]
             repo = opts["repository"] if "repository" in opts else None
             referencedModules = opts.get("use-modules", None)
-            
+
             # Skip options blocks that don't reference module-sets
             if not referencedModules or repo != "kde-projects":
                 continue
-            
+
             del opts["use-modules"]
             del opts["repository"]
             setIndices.append(idx)  # so we can delete this once loop complete
-            
+
             # Use KDE project database to pull list of matching ksb::Modules
             for m in referencedModules.split(" "):
                 mods = proj_db.getModulesForProject(m)
@@ -94,28 +94,28 @@ class ModuleResolver:
                     name = mod["name"]
                     if name not in finalOpts:
                         finalOpts[name] = copy.deepcopy(opts)
-        
+
         # Delete options for module sets, so we don't accidentally process them now
         # that use-modules/repository keys are gone.  Must be done back-to-front so
         # indices don't change.
         setIndices.reverse()
         for index in setIndices:
             del deferredOptionsRef[index]
-        
+
         # Go through list a second time (which should be only single module options)
         # and overlay any new options on
-        
+
         for idx, deferredEntry in enumerate(deferredOptionsRef):
             name = deferredEntry["name"]
             opts = deferredEntry["opts"]
-            
+
             if name in finalOpts:
                 finalOpts[name].update(opts)
             else:
                 finalOpts[name] = opts
-        
+
         self.deferredOptions = finalOpts
-    
+
     def setIgnoredSelectors(self, ignoredSelectorsRef) -> None:
         """
         Declares all selectors that should be ignored by default in the process of
@@ -125,7 +125,7 @@ class ModuleResolver:
         You should pass a listref of selectors.
         """
         self.ignoredSelectors = ignoredSelectorsRef if ignoredSelectorsRef else []
-    
+
     def setInputModulesAndOptions(self, modOptsRef: list) -> None:
         """
         Declares the list of all modules and module-sets known to the program,
@@ -136,32 +136,32 @@ class ModuleResolver:
         You should pass a listref of Modules or ModuleSets (as appropriate).
         """
         self.inputModulesAndOptions = modOptsRef
-        
+
         # Build lookup tables
         self.definedModules = {mod.name: mod for mod in modOptsRef}
         self.referencedModules = self._listReferencedModules(modOptsRef)
-    
+
     def _applyOptions(self, modules: list) -> None:
         """
         Applies cmdline and deferred options to the given modules or module-sets.
         """
-        
+
         cmdlineOptionsRef = self.cmdlineOptions
         deferredOptionsRef = self.deferredOptions
-        
+
         for m in modules:
             name = m.name
             opts = copy.deepcopy(deferredOptionsRef.get(name, {}))
-            
+
             # Apply deferred options first
             if m.options.get("#entry_num", 0) > opts.get("#entry_num", 0):
                 # Our existing options were read in later so should not be overridden
                 for key in m.options:
                     if key in opts:
                         del opts[key]
-            
+
             m.setOption(opts)
-            
+
             # Most of time cmdline options will be empty
             if cmdlineOptionsRef:
                 moduleCmdlineArgs = {
@@ -169,17 +169,17 @@ class ModuleResolver:
                     **(cmdlineOptionsRef.get("global", {})),
                     **(cmdlineOptionsRef.get(name, {}))
                 }
-                
+
                 # Remove any options that would interfere with cmdline args
                 # to avoid any override behaviors in setOption()
                 for key in moduleCmdlineArgs:
                     if key in m.options:
                         del m.options[key]
-                
+
                 # Reapply module-specific cmdline options
                 m.setOption(moduleCmdlineArgs)
         return
-    
+
     @staticmethod
     def _listReferencedModules(moduleRefs) -> dict:
         """
@@ -189,14 +189,14 @@ class ModuleResolver:
         ModuleSet.
         """
         setEntryLookupTable = {}
-        
+
         for moduleSet in [moduleRef for moduleRef in moduleRefs if isinstance(moduleRef, ModuleSet)]:
             results = moduleSet.moduleNamesToFind()
-            
+
             setEntryLookupTable.update({result: moduleSet for result in results})
-        
+
         return setEntryLookupTable
-    
+
     def _expandSingleModuleSet(self, neededModuleSet) -> list[Module]:
         """
         Expands out a single module-set listed in referencedModules and places any
@@ -206,28 +206,28 @@ class ModuleResolver:
         selectedReason = "partial-expansion:" + neededModuleSet.name
         lookupTableRef = self.definedModules
         setEntryLookupTableRef = self.referencedModules
-        
+
         # expandModuleSets applies pending/cmdline options already.
         moduleResults = self.expandModuleSets([neededModuleSet])
         if not moduleResults:
             BuildException.croak_runtime(f"{neededModuleSet.name()} expanded to an empty list of modules!")
-        
+
         for moduleResult in moduleResults:
             moduleResult.setOption({"#selected-by": selectedReason})
-        
+
         # Copy entries into the lookup table, especially in case they're
         # from case 3
         lookupTableRef.update({moduleResult.name: moduleResult for moduleResult in moduleResults})
-        
+
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
         # in the lookup table if it uniquely matches a module at all).
         moduleSetReferents = [key for key, value in setEntryLookupTableRef.items() if value == neededModuleSet]
-        
+
         for key in moduleSetReferents:
             del setEntryLookupTableRef[key]
-        
+
         return moduleResults
-    
+
     def _resolveSingleSelector(self, selector: str) -> list:
         """
         Determines the most appropriate module to return for a given selector.
@@ -237,44 +237,44 @@ class ModuleResolver:
         ctx = self.context
         selectorName = selector
         results = []  # Will default to '$selector' if unset by end of sub
-        
+
         # In the remainder of this code, lookupTableRef is basically handling
         # case 1, while setEntryLookupTableRef handles case 2. No ksb::Modules
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
-        
+
         lookupTableRef = self.definedModules
         setEntryLookupTableRef = self.referencedModules
-        
+
         # Module selectors beginning with '+' force treatment as a kde-projects
         # module, which means they won't be matched here (we're only looking for
         # sets).
         forcedToKDEProject = selectorName[:1] == "+"
-        
+
         if forcedToKDEProject:
             selectorName = selectorName[1:]
-        
+
         # Checks cmdline options only.  This is intended to make
         # --no-include-dependencies suppress the action of include-dependencies in
         # the config file so make the absence of the flag imply
         # include-dependencies for now.
         defIncluding = ctx.getOption("include-dependencies")
         includingDeps = self.cmdlineOptions["global"].get("include-dependencies", defIncluding)
-        
+
         # See resolveSelectorsIntoModules for what the 3 "cases" mentioned below are.
-        
+
         # Case 2. We make these checks first since they may update %lookupTable
         if selectorName in setEntryLookupTableRef and selectorName not in lookupTableRef:
             neededModuleSet = setEntryLookupTableRef[selectorName]
             moduleResults = self._expandSingleModuleSet(neededModuleSet)
-            
+
             if not includingDeps:
                 for moduleResult in moduleResults:
                     moduleResult.setOption({"include-dependencies": False})
-            
+
             # Now lookupTable should be updated with expanded modules.
             selector = lookupTableRef.get(selectorName, None)
-            
+
             # If the selector doesn't match a name exactly it probably matches
             # a wildcard prefix. e.g. 'kdeedu' as a selector would pull in all kdeedu/*
             # modules, but kdeedu is not a module-name itself anymore. In this
@@ -283,24 +283,24 @@ class ModuleResolver:
                 results.extend(moduleResults)
             else:
                 selector.setOption({"#selected-by": "name"})
-        
+
         # Case 1
         elif selectorName in lookupTableRef:
             selector = lookupTableRef[selectorName]
             if not isinstance(selector, ModuleSet):
                 selector.setOption({"#selected-by": "name"})
-            
+
             if not isinstance(selector, ModuleSet) and not includingDeps:
                 # modules were manually selected on cmdline, so ignore
                 # module-based include-dependencies, unless
                 # include-dependencies also set on cmdline.
                 selector.setOption({"#include-dependencies": False})
-        
+
         elif isinstance(selector, Module):
             # We couldn't find anything better than what we were provided,
             # just use it.
             selector.setOption({"#selected-by": "best-guess-after-full-search"})
-        
+
         elif forcedToKDEProject:
             # Just assume it's a kde-projects module and expand away...
             selector = ModuleSet_KDEProjects(ctx, "forced_to_kde_project")
@@ -310,49 +310,49 @@ class ModuleResolver:
             # Case 3?
             selector = Module(ctx, selectorName)
             selector.phases.phases(ctx.phases.phases())
-            
+
             selector.setScmType("proj")
             selector.setOption({"#guessed-kde-project": True})
             selector.setOption({"#selected-by": "initial-guess"})
             selector.setOption({"#include-dependencies": includingDeps})
-        
+
         if not results:
             results.append(selector)
-        
+
         return results
-    
+
     def _expandAllUnexpandedModuleSets(self) -> None:
         unexpandedModuleSets = list(set(self.referencedModules.values()))  # pl2py they used Util.unique_items, we do not need it
         unexpandedModuleSets.sort(key=lambda x: x.name)
         for unexpandedModuleSet in unexpandedModuleSets:
             self._expandSingleModuleSet(unexpandedModuleSet)
-    
+
     def _resolveGuessedModules(self, modules: list) -> list:
         ctx = self.context
-        
+
         # We didn't necessarily fully expand all module-sets available in the
         # inputModulesAndOptions when we were resolving selectors.
         # Because of this we may need to go a step further and expand out all
         # remaining module-sets in rcFileModulesAndModuleSets if we have 'guess'
         # modules still left over (since they might be Case 3), and see if we can
         # then successfully match.
-        
+
         if not any(module.getOption("#guessed-kde-project", "module") for module in modules):
             return modules
-        
+
         lookupTableRef = self.definedModules
-        
+
         self._expandAllUnexpandedModuleSets()
-        
+
         results = []
-        
+
         # We use foreach since we *want* to be able to replace the iterated variable
         # if we find an existing module.
         for guessedModule in modules:
             if not guessedModule.getOption("#guessed-kde-project", "module"):
                 results.append(guessedModule)
                 continue
-            
+
             # If the module we want could be found from within our rc-file
             # module-sets (even implicitly), use it. Otherwise assume
             # kde-projects and evaluate now.
@@ -362,15 +362,15 @@ class ModuleResolver:
             else:
                 mod_set = ModuleSet_KDEProjects(ctx, "guessed_from_cmdline")
                 mod_set.setModulesToFind([guessedModule.name])
-                
+
                 setResults = self.expandModuleSets([mod_set])
                 searchItem = guessedModule.name
                 if not setResults:
                     BuildException.croak_runtime(f"{searchItem} doesn't match any modules.")
                 results.extend(setResults)
-        
+
         return results
-    
+
     def resolveSelectorsIntoModules(self, selectors: list[str]) -> list[Module]:
         """
         Resolves the given list of module selectors into ksb::Module objects,
@@ -402,7 +402,7 @@ class ModuleResolver:
         expanded. The desired options will be set for each ksb::Module returned.
         """
         ctx = self.context
-        
+
         # Basically there are 3 types of selectors at this point:
         # 1. Directly named and defined modules or module-sets.
         # 2. Referenced (but undefined) modules. These are mentioned in a
@@ -413,25 +413,25 @@ class ModuleResolver:
         #    (whether that's due to implicit wildcarding with use-modules, or due
         #    to dependency following). However we don't even know the names for
         #    these yet.
-        
+
         # We have to be careful to maintain order of selectors throughout.
         outputList = []
         for selector in selectors:
             if selector in self.ignoredSelectors:
                 continue
             outputList.extend(self._resolveSingleSelector(selector))
-        
+
         modules = self.expandModuleSets(outputList)
-        
+
         # If we have any 'guessed' modules then they had no obvious source in the
         # rc-file. But they might still be implicitly from one of our module-sets
         # (Case 3).
         # We want them to use ksb::Modules from the rc-file modules/module-sets
         # instead of our shell Modules, if possible.
         modules = self._resolveGuessedModules(modules)
-        
+
         return modules
-    
+
     def resolveModuleIfPresent(self, moduleName):
         """
         Similar to resolveSelectorsIntoModules(), except that no exceptions are
@@ -458,7 +458,7 @@ class ModuleResolver:
         """
         if self.referencedModules:
             self._expandAllUnexpandedModuleSets()
-        
+
         # We may not already know about modules that can be found in kde-projects,
         # so double-check by resolving module name into a kde-projects module-set
         # selector (the + syntax) and then expanding out the module-set so generated.
@@ -467,34 +467,34 @@ class ModuleResolver:
                 self._expandSingleModuleSet(*self._resolveSingleSelector("+" + moduleName))
             except BuildException:
                 pass
-        
+
         return self.definedModules.get(moduleName, None)
-    
+
     def expandModuleSets(self, buildModuleList: list) -> list:
         """
         Replaces ModuleSets in the given list with their component Modules, and
         returns the new list.
         """
         ctx = self.context
-        
+
         returnList = []
         for bm_set in buildModuleList:
             results = [bm_set]
-            
+
             # If a module-set, need to update first so it can then apply its
             # settings to modules it creates, otherwise update Module directly.
             self._applyOptions([bm_set])
-            
+
             if isinstance(bm_set, ModuleSet):
                 results = bm_set.convertToModules(ctx)
                 self._applyOptions(results)
             # else:
             #     pass
-            
+
             returnList.extend(results)
-        
+
         return returnList
-    
+
     # Internal API
 
 

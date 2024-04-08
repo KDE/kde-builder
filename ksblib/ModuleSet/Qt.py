@@ -21,29 +21,29 @@ class ModuleSet_Qt(ModuleSet):
     Use of this module-set is controlled by the 'repository' option being set to
     the magic value 'qt-projects', just as 'kde-projects' is used for KDE.
     """
-    
+
     def _makeQt5Module(self, ctx: BuildContext) -> Module:
         Util.assert_isa(self, __class__)
         Util.assert_isa(ctx, BuildContext)
-        
+
         newModule = Module(ctx, "Qt5")
-        
+
         self._initializeNewModule(newModule)
-        
+
         # Repo URL to the Qt5 "supermodule" that contains the documented
         # init-repository script.
         # See https://wiki.qt.io/Building_Qt_5_from_Git
         newModule.setOption({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
         newModule.setScmType("qt5")
         newModule.setBuildSystem(BuildSystem_Qt5(newModule))
-        
+
         # Convert the use-modules/ignore-modules entries into a form appropriate
         # for init-repository's module-subset option.
         modEntries = list(self.modulesToFind()) + ["-" + i for i in self.modulesToIgnore()]
         newModule.setOption({"use-qt5-modules": " ".join(modEntries)})
-        
+
         return newModule
-    
+
     # @override
     def convertToModules(self, ctx) -> list[Module]:
         """

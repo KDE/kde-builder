@@ -12,10 +12,10 @@ def test_cmdline_selector_not_eaten():
     See bug 402509 -- https://bugs.kde.org/show_bug.cgi?id=402509
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --stop-on-failure setmod3".split(" ")
-    
+
     app = Application(args)
     moduleList = app.modules
-    
+
     assert len(moduleList) == 1, "Right number of modules (just one)"
     assert moduleList[0].name == "setmod3", "mod list[2] == setmod3"
     Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -7,13 +7,13 @@ class Version:
     This package is just a place to put the kde-builder version number
     in one spot, so it only needs changed in one place for a version bump.
     """
-    
+
     # It is expected that future git tags will be in the form 'YY.MM' and will
     # be time-based instead of event-based as with previous releases.
     VERSION = "22.07"
     SCRIPT_PATH = ""  # For auto git-versioning
     SCRIPT_VERSION = VERSION
-    
+
     @staticmethod
     def setBasePath(newPath: str) -> None:
         """
@@ -22,7 +22,7 @@ class Version:
         instances running from a git repo.
         """
         Version.SCRIPT_PATH = newPath if newPath else Version.SCRIPT_PATH
-    
+
     @staticmethod
     def scriptVersion() -> str:
         """

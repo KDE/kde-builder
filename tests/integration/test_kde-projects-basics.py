@@ -6,13 +6,13 @@ def test_kde_projects():
     """
     Verify that test kde-project data still results in workable build.
     """
-    
+
     # The file has a module-set that only refers to juk but should expand to
     # kcalc juk in that order
     args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kdesrc-buildrc-with-deps".split(" ")
     app = Application(args)
     moduleList = app.modules
-    
+
     assert len(moduleList) == 3, "Right number of modules (include-dependencies)"
     assert moduleList[0].name == "kcalc", "Right order: kcalc before juk (test dep data)"
     assert moduleList[1].name == "juk", "Right order: juk after kcalc (test dep data)"

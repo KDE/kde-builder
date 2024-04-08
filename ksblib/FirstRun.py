@@ -23,29 +23,29 @@ class FirstRun:
         exitcode = ksblib.FirstRun.setupUserSystem()
         exit(exitcode)
     """
-    
+
     def __init__(self):
         self.oss = OSSupport()
         self.baseDir = None
         self.supportedDistros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
         self.supportedOtherOS = ["freebsd"]
-    
+
     def setupUserSystem(self, baseDir, setup_steps: list) -> NoReturn:
         self.baseDir = baseDir
-        
+
         try:
             if "install-distro-packages" in setup_steps:
                 print(Debug().colorize("=== install-distro-packages ==="))
-                
+
                 # The distro dependencies are listed in sysadmin/repo-metadata repository
                 # First, we need to download metadata with Application.
-                
+
                 from .Application import Application
                 Application(["--metadata-only", "--metadata-only"])  # invokes _downloadKDEProjectMetadata internally
                 # We use a hack to catch exactly this command line to make the app not exit. This way we do not influence the normal behavior, and we
                 # do not create a normal instance of Application, because it will create a lockfile.
                 # todo remove this hack after moving takeLock to another place before actual work from the Application::new
-                
+
                 metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
                 self._installSystemPackages(metadata_distro_deps_path)
             if "generate-config" in setup_steps:
@@ -55,11 +55,11 @@ class FirstRun:
             msg = e.message
             print(Debug().colorize(f"  b[r[*] r[{msg}]"))
             exit(1)
-        
+
         exit(0)
-    
+
     # Internal functions
-    
+
     @staticmethod
     def _readPackages(vendor, version, deps_data_path) -> dict:
         """
@@ -78,25 +78,25 @@ class FirstRun:
                     continue
                 packages[cur_key].append(line)
         return packages
-    
+
     @staticmethod
     def _throw(msg: str) -> NoReturn:
         raise BuildException.make_exception("Setup", msg)
-    
+
     def _installSystemPackages(self, deps_data_path) -> None:
-        
+
         vendor = self.oss.vendorID()
         osVersion = self.oss.vendorVersion()
-        
+
         print(Debug().colorize(f" b[-] Installing b[system packages] for b[{vendor}]..."))
-        
+
         packages = self._findBestVendorPackageList(deps_data_path)
         if not packages:
             print(Debug().colorize(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})"))
             return
-        
+
         installCmd = self._findBestInstallCmd()
-        
+
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
         if self.oss.vendorID() == "arch":
             required_packages_and_required_groups = packages
@@ -111,7 +111,7 @@ class FirstRun:
                     missing_packages_from_required_group = list(filter(None, missing_packages_from_required_group))  # Remove empty string element. It appears if there is no any unresolved package from the group
                     missing_packages_from_required_groups += missing_packages_from_required_group
             packages = missing_packages_not_grouped + missing_packages_from_required_groups
-        
+
         if packages:
             print(Debug().colorize(f""" b[*] Running 'b[{" ".join(installCmd + packages)}]'"""))
             result = subprocess.run(installCmd + packages, shell=False)
@@ -119,7 +119,7 @@ class FirstRun:
         else:
             print(Debug().colorize(" b[*] All dependencies are already installed. No need to run installer. b[:)]"))
             exitStatus = 0
-        
+
         # Install one at a time if we can, but check if sudo is present
         hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
         everFailed = False
@@ -133,16 +133,16 @@ class FirstRun:
                 result = subprocess.run(commandLine, shell=False, capture_output=True)
                 if not everFailed:
                     everFailed = result.returncode != 0
-        
+
         exitStatus = 0  # It is normal if some packages are not available.
         if everFailed:
             print(Debug().colorize(" y[b[*] Some packages failed to install, continuing to build."))
-        
+
         if exitStatus == 0:
             print(Debug().colorize(" b[*] b[g[Looks like the necessary packages were successfully installed!]"))
         else:
             print(Debug().colorize(f" r[b[*] Failed with exit status {exitStatus}. Ran into an error with the installer!"))
-    
+
     def suggestedNumCoresForLowMemory(self) -> int:
         """
         Returns the suggested number of cores to use for make jobs for build jobs where
@@ -151,7 +151,7 @@ class FirstRun:
         
             num_cores = ksb.FirstRun.suggestedNumCoresForLowMemory()
         """
-        
+
         # Try to detect the amount of total memory for a corresponding option for
         # heavyweight modules
         mem_total = None
@@ -159,22 +159,22 @@ class FirstRun:
             mem_total = self.oss.detectTotalMemory()
         except BuildException as e:
             Debug().warning(str(e))
-        
+
         if not mem_total:
             # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
             mem_total = 4 * 1024 * 1024
             Debug().warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
-        
+
         rounded_mem = int(mem_total / 1024000.0)
         return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
-    
+
     def _getNumCoresForLowMemory(self, num_cores: int) -> int:
         """
         Return the highest number of cores we can use based on available memory, but
         without exceeding the base number of cores available.
         """
         return min(self.suggestedNumCoresForLowMemory(), num_cores)
-    
+
     def _setupBaseConfiguration(self) -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
@@ -188,28 +188,28 @@ class FirstRun:
             if os.path.isfile(knownLocation):
                 locatedFile = knownLocation
                 break
-        
+
         if locatedFile:
             printableLocatedFile = locatedFile.replace(os.environ.get("HOME"), "~")
             print(Debug().colorize(f"b[*] You already have a configuration file: b[y[{printableLocatedFile}]"))
             return
-        
+
         print(Debug().colorize(f"b[*] Creating b[sample configuration file]: b[y[\"{xdgConfigHomeShort}/kdesrc-buildrc\"]..."))
-        
+
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kdesrc-buildrc.in", "r") as data_file:
             sampleRc = data_file.read()
-        
+
         numCores = os.cpu_count()
         if not numCores:
             numCores = 4
-        
+
         numCoresLow = self._getNumCoresForLowMemory(numCores)
-        
+
         sampleRc = sampleRc.replace("%{num_cores}", str(numCores))
         sampleRc = sampleRc.replace("%{num_cores_low}", str(numCoresLow))
-        
+
         gl = BuildContext().build_options["global"]  # real global defaults
-        
+
         def fill_placeholder(option_name, mode=""):
             value = gl[option_name]
             if mode == "bool_to_str":
@@ -220,7 +220,7 @@ class FirstRun:
                 value = re.sub(rf"""^{os.environ.get("HOME")}""", "~", value)
             nonlocal sampleRc
             sampleRc = sampleRc.replace(f"%{{{option_name}}}", value)
-        
+
         fill_placeholder("include-dependencies", "bool_to_str")
         fill_placeholder("install-dir", "home_to_tilde")
         fill_placeholder("source-dir", "home_to_tilde")
@@ -232,12 +232,12 @@ class FirstRun:
         fill_placeholder("compile-commands-linking", "bool_to_str")
         fill_placeholder("compile-commands-export", "bool_to_str")
         fill_placeholder("generate-vscode-project-config", "bool_to_str")
-        
+
         os.makedirs(xdgConfigHome, exist_ok=True)
         with open(f"{xdgConfigHome}/kdesrc-buildrc", "w") as sampleFh:
             sampleFh.write(sampleRc)
         print()
-    
+
     def _findBestInstallCmd(self) -> list:
         cmdsRef = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
@@ -248,36 +248,36 @@ class FirstRun:
             "cmd/install/gentoo/unknown": "emerge -v --noreplace",
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
         }
-        
+
         supportedDistros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmdsRef.keys()]
-        
+
         bestVendor = self.oss.bestDistroMatch(supportedDistros)
         print(Debug().colorize(f"    Using installer for b[{bestVendor}]"))
-        
+
         version = self.oss.vendorVersion()
         cmd = []
-        
+
         for opt in [f"{bestVendor}/{version}", f"{bestVendor}/unknown"]:
             key = f"cmd/install/{opt}"
             if key in cmdsRef.keys():
                 cmd = cmdsRef[key].split(" ")
                 break
-        
+
         if not cmd:
             self._throw(f"No installer for {bestVendor}!")
-        
+
         # If not running as root already, add sudo
         if os.geteuid() != 0:
             cmd.insert(0, "sudo")
-        
+
         return cmd
-    
+
     def _findBestVendorPackageList(self, deps_data_path) -> list:
         bestVendor = self.oss.bestDistroMatch(self.supportedDistros + self.supportedOtherOS)
         version = self.oss.vendorVersion()
         print(Debug().colorize(f"    Installing packages for b[{bestVendor}]/b[{version}]"))
         return self._packagesForVendor(bestVendor, version, deps_data_path)
-    
+
     def _packagesForVendor(self, vendor, version, deps_data_path) -> list:
         packages = self._readPackages(vendor, version, deps_data_path)
         for opt in [f"pkg/{vendor}/{version}", f"pkg/{vendor}/unknown"]:

@@ -12,17 +12,17 @@ class BuildSystem_QMake(BuildSystem):
     """
     A build system used to build modules that use qmake
     """
-    
+
     @staticmethod
     # @override
     def name() -> str:
         return "qmake"
-    
+
     @staticmethod
     # @override
     def requiredPrograms() -> list[str]:
         return ["qmake"]
-    
+
     # @override(check_signature=False)
     def needsBuilddirHack(self) -> bool:
         """
@@ -31,10 +31,10 @@ class BuildSystem_QMake(BuildSystem):
         (past qtbase).  Many seem fail with builddir != srcdir
         """
         module = self.module
-        
+
         # Assume code.qt.io modules all need hack for now
         return bool(re.search(r"qt\.io", module.getOption("repository")))
-    
+
     @staticmethod
     def absPathToQMake() -> str:
         """
@@ -46,7 +46,7 @@ class BuildSystem_QMake(BuildSystem):
         """
         possibilities = ["qmake-qt5", "qmake5", "qmake-mac", "qmake", "qmake-qt4", "qmake4"]
         return next((p for p in possibilities if Util.locate_exe(p)), None)
-    
+
     # @override
     def configureInternal(self) -> bool:
         """
@@ -56,26 +56,26 @@ class BuildSystem_QMake(BuildSystem):
         module = self.module
         builddir = module.fullpath("build")
         sourcedir = builddir if self.needsBuilddirHack() else module.fullpath("source")
-        
+
         qmakeOpts = module.getOption("qmake-options").split(" ")
         qmakeOpts = [el for el in qmakeOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         projectFiles = glob.glob(f"{sourcedir}/*.pro")
-        
+
         if not projectFiles and Debug().pretending():
             projectFiles = [f"{module}.pro"]
-        
+
         if not projectFiles or not projectFiles[0]:
             BuildException.croak_internal(f"No *.pro files could be found for {module}")
-        
+
         if len(projectFiles) > 1:
             Debug().error(f" b[r[*] Too many possible *.pro files for {module}")
             return False
-        
+
         qmake = self.absPathToQMake()
-        
+
         if not qmake:
             return False
-        
+
         Debug().info("\tRunning g[qmake]...")
-        
+
         return Util.await_exitcode(Util.run_logged_p(module, "qmake", builddir, [qmake, *qmakeOpts, projectFiles[0]]))

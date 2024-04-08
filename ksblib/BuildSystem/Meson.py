@@ -16,12 +16,12 @@ class BuildSystem_Meson(BuildSystem):
     
     Control the flags passed to Meson's setup step using the C<configure-flags> option.
     """
-    
+
     @staticmethod
     # @override
     def name() -> str:
         return "meson"
-    
+
     # @override
     def configureInternal(self) -> bool:
         """
@@ -32,32 +32,32 @@ class BuildSystem_Meson(BuildSystem):
         sourcedir = module.fullpath("source")
         buildDir = module.fullpath("build")
         installdir = module.installationPath()
-        
+
         # 'module'-limited option grabbing can return undef, so use //
         # to convert to empty string in that case.
         setupOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
-        
+
         return Util.await_exitcode(Util.run_logged_p(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions]))
-    
+
     @staticmethod
     # @override
     def supportsAutoParallelism() -> bool:
         return True  # meson requires ninja so supports this by default
-    
+
     # @override(check_signature=False)
     def buildInternal(self) -> dict:
         return super().buildInternal("ninja-options")
-    
+
     @staticmethod
     # @override
     def buildCommands() -> list[str]:
         return ["ninja"]
-    
+
     @staticmethod
     # @override
     def requiredPrograms() -> list[str]:
         return ["meson", "ninja"]
-    
+
     @staticmethod
     # @override
     def configuredModuleFileName() -> str:
