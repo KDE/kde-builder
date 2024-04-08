@@ -12,6 +12,45 @@ import sys
 import textwrap
 import traceback
 
+
+def findMissingModules() -> list:
+    requiredModules = [
+        "yaml",
+        "promise",
+        "setproctitle",
+    ]
+    missingModules = []
+    
+    def validateMod(mod_name):
+        import importlib
+        
+        try:
+            importlib.import_module(mod_name)
+            return True
+        except ImportError:
+            return False
+    
+    for neededModule in requiredModules:
+        if validateMod(neededModule):
+            continue
+        missingModules.append(neededModule)
+    
+    return missingModules
+
+
+# Ensure that required Python modules are available so that the user isn't surprised later with an exception
+missingModuleDescriptions = findMissingModules()
+if missingModuleDescriptions:
+    print(textwrap.dedent("""\
+        Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:"""))
+    for missingModuleDesc in missingModuleDescriptions:
+        print("\t" + missingModuleDesc)
+    
+    print("\nkde-builder can do this for you on many distros. Consult the installation process in project documentation.")
+    exit(1)
+
+# ---
+
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(prog="ProgramName",

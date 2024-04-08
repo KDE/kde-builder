@@ -98,36 +98,6 @@ class Application:
         self._installSignalHandlers(signal_handler)
     
     @staticmethod
-    def _findMissingModules() -> list:
-        # Perl specific, will just return empty list for now
-        """
-        # should be either strings of module names to be found or a listref containing
-        # a list of modules where any one of which will work.
-        requiredModules = [
-            "PyYAML"
-        ]
-        missingModules = []
-        
-        def validateMod(mod_name):
-            if mod_name in sys.modules:
-                return True
-            elif (spec := importlib.util.find_spec(mod_name)) is not None:
-                return True
-            else:
-                return False
-        
-        description = None
-        for neededModule in requiredModules:
-            if validateMod(neededModule):
-                continue
-            description = neededModule
-            
-            missingModules.append(description)
-        return missingModules
-        """
-        return []
-    
-    @staticmethod
     def _yieldModuleDependencyTreeEntry(nodeInfo: dict, module: Module, context: dict) -> None:
         depth = nodeInfo["depth"]
         index = nodeInfo["idx"]
@@ -215,24 +185,6 @@ class Application:
         cmdlineGlobalOptions: dict = cmdlineOptions["global"]
         ctx.phases.phases(opts["phases"])
         self.run_mode: str = opts["run_mode"]
-        
-        # Ensure some critical Perl modules are available so that the user isn't surprised
-        # later with a Perl exception
-        missingModuleDescriptions = self._findMissingModules()
-        if missingModuleDescriptions:
-            print(textwrap.dedent("""
-                kde-builder requires some minimal support to operate, including support
-                from the Perl runtime that kde-builder is built upon.
-                
-                Some mandatory Perl modules are missing, and kde-builder cannot operate
-                without them.  Please ensure these modules are installed and available to Perl:"""))
-            for missingModuleDesc in missingModuleDescriptions:
-                print("\t" + missingModuleDesc)
-            
-            print("\nkde-builder can do this for you on many distros:")
-            print("Run 'kde-builder --initial-setup'")
-            # TODO: Built-in mapping to popular distro package names??
-            exit(1)
         
         # Convert list to hash for lookup
         ignored_in_cmdline = {selector: True for selector in opts["ignore-modules"]}
