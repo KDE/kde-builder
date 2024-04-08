@@ -371,6 +371,7 @@ class Module(OptionsBase):
             Debug().info("\tSkipping install due to install-after-build setting")
             return True
         
+        self.ctx.statusViewer().__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().
         # TODO: Likewise this should be a phase to run.
         return self.install()
     
