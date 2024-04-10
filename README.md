@@ -19,7 +19,7 @@ The successor project is written in Python - a much more acknowledged language. 
 
 ```bash
 cd ~
-curl https://invent.kde.org/sdk/kde-builder/-/raw/master/scripts/initial_setup.sh?ref_type=heads > initial_setup.sh
+curl 'https://invent.kde.org/sdk/kde-builder/-/raw/master/scripts/initial_setup.sh?ref_type=heads' > initial_setup.sh
 bash initial_setup.sh
 ```
 
