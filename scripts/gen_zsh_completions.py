@@ -28,7 +28,6 @@ conflicting_sets.extend([
     {"--src-only", "--no-src"},
     {"--resume-from", "--resume-after"},
     {"--stop-before", "--stop-after"},
-    {"--quiet", "--really-quiet", "--verbose", "--debug"},
     {"--show-info", "--show-options-specifiers", "--version"},
     {"--metadata-only", "--no-metadata"},
     {"--build-only", "--no-build"},

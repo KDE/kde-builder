@@ -5,7 +5,7 @@ import struct
 from typing import NoReturn, Callable, TYPE_CHECKING
 from enum import IntEnum
 from ..BuildException import BuildException
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 
 if TYPE_CHECKING:
     from ..Module.Module import Module
@@ -72,23 +72,24 @@ class IPC:
         # associated with.
         self.logged_module = moduleName
 
-    def sendLogMessage(self, msg: str) -> None:
+    def sendLogMessage(self, logger_name: str, message_level: str, msg: str) -> None:
         """
         Sends a message to be logged by the process holding the TTY.
         The logged message is associated with the module set by setLoggedModule.
         """
         loggedModule = self.logged_module
-        self.sendIPCMessage(IPC.MODULE_LOGMSG, f"{loggedModule},{msg}")
+        self.sendIPCMessage(IPC.MODULE_LOGMSG, f"{loggedModule},{logger_name},{message_level},{msg}")
 
     @staticmethod
-    def _printLoggedMessage(msg: str) -> None:
+    def _printLoggedMessage(combined_msg: str) -> None:
         """
         Prints the given message out (adjusting to have proper whitespace
         if needed). For use with the log-message forwarding facility.
         """
+        logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
         if not re.match(r"^\s+", msg):
             msg = f"\t{msg}"
-        Debug().print_clr(msg)
+        kbLogger.print_clr(logger_name, message_level, msg)
 
     def _updateSeenModulesFromMessage(self, ipcType, buffer) -> str | None:
         """
@@ -233,11 +234,14 @@ class IPC:
         messages = self.messages
 
         for module, logMessages in messages.items():
-            nonEmptyMessages = [logMessage for logMessage in logMessages if logMessage]
+            nonEmptyMessages = [logMessage for logMessage in logMessages if logMessage.split(",", maxsplit=2)[2]]
             if nonEmptyMessages:
                 Debug().debug(f"Unhandled messages for module {module}:")
-                for msg in nonEmptyMessages:
-                    Debug().print_clr(msg)
+                for combined_msg in nonEmptyMessages:
+                    logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
+                    if not re.match(r"^\s+", msg):
+                        msg = f"\t{msg}"
+                    kbLogger.print_clr(logger_name, message_level, msg)
         self.messages = {}
 
     def forgetModule(self, module: Module) -> None:

@@ -102,7 +102,6 @@ class BuildContext(Module):
 
         # These options are used for internal state, they are _not_ exposed as cmdline options
         self.GlobalOptions_private = {
-            "debug-level": Debug.INFO,
             "filter-out-phases": "",
             "git-desired-protocol": "git",  # protocol to use for git *push* URLs (fetch requires https)
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
@@ -789,8 +788,6 @@ class BuildContext(Module):
             normalizedKey = normalizedKey.lstrip("#")  # Remove sticky key modifier.
             if normalizedKey == "colorful-output":
                 Debug().setColorfulOutput(value)
-            elif normalizedKey == "debug-level":
-                Debug().setDebugLevel(value)
             elif normalizedKey == "pretend":
                 Debug().setPretending(value)
 

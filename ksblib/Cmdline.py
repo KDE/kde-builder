@@ -299,15 +299,6 @@ class Cmdline:
             auxOptions["resume"] = True
             phases.filterOutPhase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
-        if args.verbose:
-            foundOptions["debug-level"] = Debug.WHISPER
-        if args.quiet:
-            foundOptions["debug-level"] = Debug.NOTE
-        if args.really_quiet:
-            foundOptions["debug-level"] = Debug.WARNING
-        if args.debug:
-            foundOptions["debug-level"] = Debug.DEBUG
-            print("Commandline was: " + ", ".join(savedOptions))
         # Hack to set module options
         if args.set_module_option_value:
             for module, option, value in args.set_module_option_value:
@@ -530,7 +521,7 @@ class Cmdline:
         # The initial setup options are handled outside of Cmdline (in the starting script).
         initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
 
-        for option in [*supportedOptions, *initial_options]:
+        for option in [*supportedOptions, *initial_options, "debug"]:
             print(option)
 
         exit()
@@ -585,11 +576,7 @@ class Cmdline:
 
         options_converted_to_canonical = [
             "d",  # --include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
-            "debug",
             "D",  # --no-include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
-            "quiet|quite|q",
-            "really-quiet",
-            "verbose",
         ]
 
         # For now, place the options we specified above

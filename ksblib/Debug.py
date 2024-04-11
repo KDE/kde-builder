@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import re
@@ -91,28 +92,14 @@ class Debug:
         else:
             self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD, self.DIM = [""] * 6
 
-    def isLogLevel(self, level) -> bool:
-        level = level if level else Debug.DEBUG
-        return self.debugLevel <= level
-
-    def debugging(self, level=None) -> bool:
-        """
-        Subroutine which returns true if debug mode is on.
-        """
-        if not level:
-            level = Debug.DEBUG
-        return self.isLogLevel(level)
-
-    def setDebugLevel(self, level) -> None:
-        self.debugLevel = level
-
     def setLogFile(self, fileName) -> None:
         if self.pretending():
             return
         try:
             self.screenLog = open(fileName, "w")
         except IOError:
-            self.error(f"Unable to open log file {fileName}!")
+            logger_root = logging.getLogger()
+            logger_root.error(f"Unable to open log file {fileName}!")
 
     def setIPC(self, ipc) -> None:
         """
@@ -125,74 +112,73 @@ class Debug:
         if not isinstance(ipc, IPC):
             raise ValueError(f"{ipc} isn't an IPC obj!")
 
-    # The next few subroutines are used to print output at different importance
+
+class kbLogger(logging.Logger):
+    _loggers = {}
+    levelNamesMapping = logging._nameToLevel
+
+    @classmethod
+    def getLogger(cls, name, level=logging.NOTSET):
+        if name not in cls._loggers:
+            logger = cls(name, level)
+            cls._loggers[name] = logger
+        return cls._loggers[name]
+
+    @staticmethod
+    def print_clr(logger_name: str, message_level: str, msg: str) -> None:
+        """
+        Subroutine used to actually display the data, calls ksb::Debug::colorize on each entry first.
+        """
+
+        d = Debug()
+        # If we have an IPC object that means there's multiple procs trying to
+        # share the same TTY. Just forward messages to the one proc that should be
+        # managing the TTY.
+        if d.ipc:
+            d.ipc.sendLogMessage(logger_name, message_level, msg)
+            return
+
+        kblogger = kbLogger.getLogger(logger_name)
+        real_level_method = getattr(super(kbLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
+        real_level_method(d.colorize(msg + "]"))
+
+        if d.screenLog is not None:  # todo: This should be just another handler for the logger
+            int_message_level = kbLogger.levelNamesMapping[message_level.upper()]
+            if kblogger.isEnabledFor(int_message_level):
+                savedColors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
+                # Remove color but still extract codes
+                d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = [""] * 5
+                print(d.colorize(msg), file=d.screenLog)
+                d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = savedColors
+
+    # The next few methods are used to print output at different importance
     # levels to allow for e.g. quiet switches, or verbose switches.  The levels are,
     # from least to most important:
-    # debug, whisper, info (default), note (quiet), warning (very-quiet), and error.
+    # debug, info, warning, and error.
     #
     # You can also use the pretend output subroutine, which is emitted if, and only
     # if pretend mode is enabled.
     #
-    # ksb::Debug::colorize is automatically run on the input for all of those
-    # functions.  Also, the terminal color is automatically reset to normal as
-    # well so you don't need to manually add the ] to reset.
+    # Debug.colorize() is automatically run on the input for all of those
+    # functions. Also, the terminal color is automatically reset to normal as
+    # well, so you don't need to manually add the "]" to reset.
 
-    def print_clr(self, *args: str) -> None:
-        """
-        Subroutine used to actually display the data, calls ksb::Debug::colorize on each entry first.
-        """
-        # If we have an IPC object that means there's multiple procs trying to
-        # share the same TTY. Just forward messages to the one proc that should be
-        # managing the TTY.
-        if self.ipc:
-            msg = "".join(args)
-            self.ipc.sendLogMessage(msg)
-            return
+    def debug(self, msg: str, *args, **kwargs) -> None:
+        kbLogger.print_clr(self.name, "debug", msg)
 
-        # Leading + prevents Perl from assuming the plain word "colorize" is actually
-        # a filehandle or future reserved word.
-        for arg in args:
-            print(self.colorize(arg), end="")
-        print(self.colorize("]\n"), end="")
+    def info(self, msg: str, *args, **kwargs) -> None:
+        kbLogger.print_clr(self.name, "info", msg)
 
-        if self.screenLog is not None:
-            savedColors = [self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD]
-            # Remove color but still extract codes
-            self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD = [""] * 5
+    def warning(self, msg: str, *args, **kwargs) -> None:
+        kbLogger.print_clr(self.name, "warning", msg)
 
-            for arg in args:
-                print(self.colorize(arg), end="", file=self.screenLog)
-            print("", file=self.screenLog)
+    def error(self, msg: str, *args, **kwargs) -> None:
+        # Todo: originally, error() did not called print_clr. It invoked colorize(), and just printed to stderr.
+        #  Check if that was made for some specific reason (error in ipc sending for example?).
+        #  For now will treat error() as other levels.
+        kbLogger.print_clr(self.name, "error", msg)
 
-            self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD = savedColors
-
-    def debug(self, *args) -> None:
-        if self.isLogLevel(self.DEBUG):
-            self.print_clr(*args)
-
-    def whisper(self, *args):
-        if self.isLogLevel(self.WHISPER):
-            self.print_clr(*args)
-
-    def info(self, *args) -> None:
-        if self.isLogLevel(self.INFO):
-            self.print_clr(*args)
-
-    def note(self, *args) -> None:
-        if self.isLogLevel(self.NOTE):
-            self.print_clr(*args)
-
-    def warning(self, *args) -> None:
-        if self.isLogLevel(self.WARNING):
-            self.print_clr(*args)
-
-    def error(self, *args) -> None:
-        for arg in args:
-            print(self.colorize(arg), file=sys.stderr, end="")
-        print(self.colorize("]"), file=sys.stderr)
-
-    def pretend(self, *args) -> None:
-        if self.pretending() and self.debugLevel <= self.WHISPER:
-            lines = [*args]
-            lines = [re.sub(r"(\w)", r"d[\1", line, 1) for line in lines]  # Add dim prefix. Clear suffix is actually implicit
-            self.print_clr(*lines)
+    def pretend(self, msg: str) -> None:
+        if Debug().pretending():
+            msg = re.sub(r"(\w)", r"d[\1", msg, 1)  # Add dim prefix. Clear suffix is actually implicit
+            kbLogger.print_clr(self.name, "debug", msg)

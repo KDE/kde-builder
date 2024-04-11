@@ -1,0 +1,27 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: "%(message)s"
+  named:
+    format: "+++%(name)s %(levelname)s %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  console-named:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: named
+    stream: ext://sys.stdout
+
+loggers:
+
+root:
+  level: DEBUG
+  handlers: [console]
