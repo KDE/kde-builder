@@ -1660,8 +1660,7 @@ class Application:
         for module in ctx.modulesInPhase("build"):
             progs = module.buildSystem().requiredPrograms()
 
-            # Deliberately used @, since requiredPrograms can return a list.
-            requiredPrograms = {x: 1 for x in progs}
+            requiredPrograms = {prog: 1 for prog in progs}
 
             for prog in progs:
                 if not modulesRequiringProgram.get(prog, None):
@@ -1674,6 +1673,7 @@ class Application:
                 "qmake": "Qt",
                 "cmake": "CMake",
                 "meson": "Meson",
+                "ninja": "Ninja",
             }
 
             preferredPath = Util.locate_exe(prog, preferred_paths)
@@ -1689,11 +1689,12 @@ class Application:
                     continue
 
                 wasError = 1
-                reqPackage = requiredPackages[prog] or prog
+                reqPackage = requiredPackages.get(prog) or prog
 
                 modulesNeeding = modulesRequiringProgram[prog].keys()
 
                 Debug().error(textwrap.dedent(f"""\
+                
                 Unable to find r[b[{prog}]. This program is absolutely essential for building
                 the modules: y[{", ".join(modulesNeeding)}].
                 

@@ -237,7 +237,7 @@ class BuildSystem_KDECMake(BuildSystem):
             ctx.prependEnvironmentValue("CMAKE_MODULE_PATH", f"{qt_installdir}/lib/cmake")
 
     # @override(check_signature=False)
-    def requiredPrograms(self) -> list:
+    def requiredPrograms(self) -> list[str]:
         """
         This should return a list of executable names that must be present to
         even bother attempting to use this build system. An empty list should be

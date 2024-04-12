@@ -17,7 +17,7 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
 
     @staticmethod
     # @override
-    def requiredPrograms() -> list:
+    def requiredPrograms() -> list[str]:
         return ["c++", "make"]
 
     # @override

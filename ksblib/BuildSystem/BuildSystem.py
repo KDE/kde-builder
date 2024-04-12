@@ -150,7 +150,7 @@ class BuildSystem:
         return True
 
     @staticmethod
-    def requiredPrograms() -> list:
+    def requiredPrograms() -> list[str]:
         """
         This should return a list of executable names that must be present to
         even bother attempting to use this build system. An empty list should be
