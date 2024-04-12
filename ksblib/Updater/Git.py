@@ -701,7 +701,7 @@ class Updater_Git(Updater):
             print(p.stderr, end="")  # pl2py: in case git warns about something, for example about deprecated grafts. Unfortunately, subprocess washes the colors, but not a big deal.
             count = p.stdout
             if count:
-                count.removesuffix("\n")
+                count = count.removesuffix("\n")
             Debug().debug(f"\tNumber of stashes found for b[{module}] is: b[{count}]")
             return int(count)
         else:
