@@ -6,10 +6,12 @@ import __main__
 from typing import NoReturn
 
 from .BuildContext import BuildContext
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .PhaseList import PhaseList
 from .OSSupport import OSSupport
 from .Version import Version
+
+logger_app = kbLogger.getLogger("application")
 
 
 class Cmdline:
@@ -183,7 +185,7 @@ class Cmdline:
             options = options[0:run_index]  # remove all after --run, and the --run itself # pl2py: in python the stop index is not included, so we add +1
 
             if not opts["start-program"]:  # check this here, because later the empty list will be treated as not wanting to start program
-                Debug().error("You need to specify a module with the --run option")
+                logger_app.error("You need to specify a module with the --run option")
                 exit(1)  # Do not continue
 
         supportedOptions.remove("set-module-option-value=s")  # specify differently, allowing it to be repeated in cmdline
@@ -299,15 +301,6 @@ class Cmdline:
             auxOptions["resume"] = True
             phases.filterOutPhase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
-        if args.verbose:
-            foundOptions["debug-level"] = Debug.WHISPER
-        if args.quiet:
-            foundOptions["debug-level"] = Debug.NOTE
-        if args.really_quiet:
-            foundOptions["debug-level"] = Debug.WARNING
-        if args.debug:
-            foundOptions["debug-level"] = Debug.DEBUG
-            print("Commandline was: " + ", ".join(savedOptions))
         # Hack to set module options
         if args.set_module_option_value:
             for module, option, value in args.set_module_option_value:
@@ -530,7 +523,7 @@ class Cmdline:
         # The initial setup options are handled outside of Cmdline (in the starting script).
         initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
 
-        for option in [*supportedOptions, *initial_options]:
+        for option in [*supportedOptions, *initial_options, "debug"]:
             print(option)
 
         exit()
@@ -585,11 +578,7 @@ class Cmdline:
 
         options_converted_to_canonical = [
             "d",  # --include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
-            "debug",
             "D",  # --no-include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
-            "quiet|quite|q",
-            "really-quiet",
-            "verbose",
         ]
 
         # For now, place the options we specified above

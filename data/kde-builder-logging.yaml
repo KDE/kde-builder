@@ -1,0 +1,111 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: "%(message)s"
+  named:
+    format: "+++%(name)s %(levelname)s %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+
+  console-named:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: named
+    stream: ext://sys.stdout
+
+loggers:
+  application:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  asyncio:
+    level: WARNING
+#    level: DEBUG
+    handlers: [console-named]
+    propagate: no
+
+  build-context:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  build-system:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  dependency-resolver:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  ide_project_configs:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  ipc:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  logged-command:
+    level: WARNING  # default
+#    level: INFO  # only shows the command with its parameters and its exit status
+#    level: DEBUG  # shows the whole output of command
+    handlers: [console]
+    propagate: no
+
+  module:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  module-set:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  updater:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  taskmanager:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  util:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+  variables_substitution:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
+root:
+  level: DEBUG
+  handlers: [console]

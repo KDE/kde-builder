@@ -5,7 +5,9 @@ import re
 from ..Util.Util import Util
 from ..BuildException import BuildException
 from .BuildSystem import BuildSystem
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
+
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class BuildSystem_QMake6(BuildSystem):
@@ -68,7 +70,7 @@ class BuildSystem_QMake6(BuildSystem):
             BuildException.croak_internal(f"No *.pro files could be found for {module}")
 
         if len(projectFiles) > 1:
-            Debug().error(f" b[r[*] Too many possible *.pro files for {module}")
+            logger_buildsystem.error(f" b[r[*] Too many possible *.pro files for {module}")
             return False
 
         qmake = self.absPathToQMake()
@@ -76,5 +78,6 @@ class BuildSystem_QMake6(BuildSystem):
         if not qmake:
             return False
 
-        Debug().info("\tRunning g[qmake]...")
+        logger_buildsystem.info("\tRunning g[qmake]...")
+
         return Util.await_exitcode(Util.run_logged_p(module, "qmake6", builddir, [qmake, *qmakeOpts, projectFiles[0]]))

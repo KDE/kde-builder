@@ -1,5 +1,8 @@
 # Changelog
 
+2024-04-14
+: Separated project-wide "Debug()" logger into separate loggers.
+
 2024-03-27
 : Added `source-when-start-program` option.
 

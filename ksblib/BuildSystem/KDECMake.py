@@ -8,11 +8,14 @@ from .BuildSystem import BuildSystem
 from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..Module.Module import Module
     from ..BuildContext import BuildContext
+
+logger_ide_proj = kbLogger.getLogger("ide_project_configs")
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class BuildSystem_KDECMake(BuildSystem):
@@ -277,7 +280,7 @@ class BuildSystem_KDECMake(BuildSystem):
         if module.getOption("run-tests") == "upload":
             make_target = "Experimental"
 
-        Debug().info("\tRunning test suite...")
+        logger_buildsystem.info("\tRunning test suite...")
 
         # Step 2: Run the tests.
         buildCommand = self.defaultBuildCommand()
@@ -297,9 +300,9 @@ class BuildSystem_KDECMake(BuildSystem):
 
         if not result:
             logDir = module.getLogDir()
-            Debug().warning(f"\t{numTests} tests failed for y[{module}], consult {logDir}/test-results.log for info")
+            logger_buildsystem.warning(f"\t{numTests} tests failed for y[{module}], consult {logDir}/test-results.log for info")
         else:
-            Debug().info("\tAll tests ran successfully.")
+            logger_buildsystem.info("\tAll tests ran successfully.")
         return result
 
     # @override
@@ -331,7 +334,7 @@ class BuildSystem_KDECMake(BuildSystem):
         if module.getOption("generate-vscode-project-config"):
             self.generateVSCodeConfig(module)
         else:
-            Debug().debug("\tGenerating .vscode directory - disabled for this module")
+            logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
 
         # Use cmake to create the build directory (sh script return value
         # semantics).
@@ -356,7 +359,7 @@ class BuildSystem_KDECMake(BuildSystem):
         such as C++ support, correct build directory, and LSP / IntelliSense.
         """
         if Debug().pretending():
-            Debug().pretend("\tWould have generated .vscode directory")
+            logger_ide_proj.pretend("\tWould have generated .vscode directory")
             return False
 
         projectName = module.name
@@ -368,12 +371,12 @@ class BuildSystem_KDECMake(BuildSystem):
 
         if os.path.exists(configDir):
             if os.path.isdir(configDir):
-                Debug().debug("\tGenerating .vscode directory - skipping as it already exists")
+                logger_ide_proj.debug("\tGenerating .vscode directory - skipping as it already exists")
             elif os.path.isfile(configDir):
-                Debug().error("\tGenerating .vscode directory - cannot proceed, file .vscode exists")
+                logger_ide_proj.error("\tGenerating .vscode directory - cannot proceed, file .vscode exists")
             return False
         else:
-            Debug().debug(f"\tGenerating .vscode directory for {projectName}: {configDir}")
+            logger_ide_proj.debug(f"\tGenerating .vscode directory for {projectName}: {configDir}")
 
         os.mkdir(configDir)
 
@@ -418,7 +421,7 @@ class BuildSystem_KDECMake(BuildSystem):
             with open(file_path, "r") as file:
                 content = file.read()
         except IOError as e:
-            Debug().warning(f"\tCouldn't open {file_path}: {e}")
+            logger_buildsystem.warning(f"\tCouldn't open {file_path}: {e}")
         return content
 
     @staticmethod
@@ -436,7 +439,7 @@ class BuildSystem_KDECMake(BuildSystem):
             with open(file_path, "w") as file:
                 file.write(content)
         except IOError as e:
-            Debug().warning(f"\tCouldn't write to {file_path}: {e}")
+            logger_buildsystem.warning(f"\tCouldn't write to {file_path}: {e}")
 
     # @override
     def buildInternal(self, optionsName=None) -> dict:
@@ -501,11 +504,11 @@ class BuildSystem_KDECMake(BuildSystem):
             commands.append(f"-DCMAKE_PREFIX_PATH={qt_installdir}")
 
         if module.getOption("run-tests") and [command for command in commands if not re.match(r"^\s*-DBUILD_TESTING(:BOOL)?=(ON|TRUE|1)\s*$", command)]:
-            Debug().whisper("Enabling tests")
+            logger_buildsystem.debug("Enabling tests")
             commands.append("-DBUILD_TESTING:BOOL=ON")
 
         if module.getOption("run-tests") == "upload":
-            Debug().whisper("Enabling upload of test results")
+            logger_buildsystem.debug("Enabling upload of test results")
             commands.append("-DBUILD_experimental:BOOL=ON")
 
         for item in reversed(["cmake", "-B", ".", "-S", srcdir, "-G", generator]):
@@ -516,7 +519,7 @@ class BuildSystem_KDECMake(BuildSystem):
 
         if old_options != Util.get_list_digest(commands) or module.getOption("reconfigure") or \
                 not os.path.exists(f"{builddir}/CMakeCache.txt"):  # File should exist only on successful cmake run
-            Debug().info(f"\tRunning g[cmake] targeting b[{generator}]...")
+            logger_buildsystem.info(f"\tRunning g[cmake] targeting b[{generator}]...")
 
             # Remove any stray CMakeCache.txt
             if os.path.exists(f"{srcdir}/CMakeCache.txt"):

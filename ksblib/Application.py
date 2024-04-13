@@ -19,7 +19,7 @@ from .BuildContext import BuildContext
 from ksblib.BuildException import BuildException, BuildException_Config
 from .BuildSystem.QMake import BuildSystem_QMake
 from .Cmdline import Cmdline
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .DebugOrderHints import DebugOrderHints
 from .DependencyResolver import DependencyResolver
 from .Module.Module import Module
@@ -36,6 +36,9 @@ from .OptionsBase import OptionsBase
 from typing import TYPE_CHECKING, Callable, Optional
 if TYPE_CHECKING:
     import fileinput
+
+logger_var_subst = kbLogger.getLogger("variables_substitution")
+logger_app = kbLogger.getLogger("application")
 
 
 class Application:
@@ -91,7 +94,7 @@ class Application:
 
         # Install signal handlers to ensure that the lockfile gets closed.
         def signal_handler(signum, frame):
-            Debug().note("Signal received, terminating.")
+            logger_app.warning("Signal received, terminating.")
             atexit.unregister(self.finish)  # Remove their finish, doin' it manually
             self.finish(5)
 
@@ -219,7 +222,7 @@ class Application:
         if ctx.getOption("metadata-update-skipped"):
             lastUpdate = ctx.getPersistentOption("global", "last-metadata-update") or 0
             if (int(time()) - lastUpdate) >= 7200:
-                Debug().warning(" r[b[*] Skipped metadata update, but it hasn't been updated recently!")
+                logger_app.warning(" r[b[*] Skipped metadata update, but it hasn't been updated recently!")
             ctx.setPersistentOption("global", "last-metadata-update", int(time()))
         else:
             ctx.setPersistentOption("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
@@ -232,16 +235,16 @@ class Application:
         if "resume" in cmdlineGlobalOptions:
             moduleList = ctx.getPersistentOption("global", "resume-list")
             if not moduleList:
-                Debug().error("b[--resume] specified, but unable to find resume point!")
-                Debug().error("Perhaps try b[--resume-from] or b[--resume-after]?")
+                logger_app.error("b[--resume] specified, but unable to find resume point!")
+                logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 BuildException.croak_runtime("Invalid --resume flag")
             selectors.extend(moduleList.split(", "))
 
         if "rebuild-failures" in cmdlineGlobalOptions:
             moduleList = ctx.getPersistentOption("global", "last-failed-module-list")
             if not moduleList:
-                Debug().error("b[y[--rebuild-failures] was specified, but unable to determine")
-                Debug().error("which modules have previously failed to build.")
+                logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
+                logger_app.error("which modules have previously failed to build.")
                 BuildException.croak_runtime("Invalid --rebuild-failures flag")
             selectors.extend(re.split(r",\s*", moduleList))
 
@@ -308,7 +311,7 @@ class Application:
         for module in modules:
             branch = resolver.findModuleBranch(module.fullProjectPath(), branchGroup) if module.isKDEProject() else True  # Just a placeholder truthy value
             if branch is not None and not branch:
-                Debug().whisper(f"Removing {module.fullProjectPath()} due to branch-group")
+                logger_app.debug(f"Removing {module.fullProjectPath()} due to branch-group")
             if branch is None or branch:  # This is the actual test
                 filtered_modules.append(module)
         modules = filtered_modules
@@ -396,14 +399,14 @@ class Application:
                 ctx.setOption({"metadata-update-skipped": 1})
 
             if updateNeeded and Debug().pretending():
-                Debug().warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
-                                " y[b[*] --pretend mode will resume after metadata is available.")
+                logger_app.warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
+                                   " y[b[*] --pretend mode will resume after metadata is available.")
                 Debug().setPretending(False)
 
             if (updateDesired and not Debug().pretending()) or updateNeeded:
                 orig_wd = os.getcwd()
                 metadataModule.scm().updateInternal()
-                Debug().debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
+                logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
                 Util.p_chdir(orig_wd)
                 # "last-metadata-update" will be set after config is read, so value will be overriden
 
@@ -416,9 +419,9 @@ class Application:
                 raise err
 
             # Assume previously-updated metadata will work if not updating
-            Debug().warning(" b[r[*] Unable to download required metadata for build process")
-            Debug().warning(" b[r[*] Will attempt to press onward...")
-            Debug().warning(f" b[r[*] Exception message: {err}")
+            logger_app.warning(" b[r[*] Unable to download required metadata for build process")
+            logger_app.warning(" b[r[*] Will attempt to press onward...")
+            logger_app.warning(f" b[r[*] Exception message: {err}")
 
             traceback.print_exc()
 
@@ -450,7 +453,7 @@ class Application:
                     temp_file_path = temp_file.name
 
                 dependencies = fileinput.FileInput(files=temp_file_path, mode="r")
-                Debug().debug(" -- Reading dependencies from test data")
+                logger_app.debug(" -- Reading dependencies from test data")
                 dependencyResolver.readDependencyData(dependencies)
                 dependencies.close()
 
@@ -467,7 +470,7 @@ class Application:
                         print(f"Unable to open {dependencyFile}: {e}")
                         exit(1)
 
-                    Debug().debug(f" -- Reading dependencies from {dependencyFile}")
+                    logger_app.debug(f" -- Reading dependencies from {dependencyFile}")
                     dependencyResolver.readDependencyData_v2(dependencies)
                 else:
                     dependencyFile = f"{srcdir}/dependencies/dependency-data-{branchGroup}"
@@ -476,7 +479,7 @@ class Application:
                     except Exception as e:
                         print(f"Unable to open {dependencyFile}: {e}")
 
-                    Debug().debug(f" -- Reading dependencies from {dependencyFile}")
+                    logger_app.debug(f" -- Reading dependencies from {dependencyFile}")
                     dependencyResolver.readDependencyData(dependencies)
 
                 dependencies.close()
@@ -484,9 +487,9 @@ class Application:
             graph = dependencyResolver.resolveToModuleGraph(modules)
 
         except Exception as e:
-            Debug().warning(" r[b[*] Problems encountered trying to determing correct module graph:")
-            Debug().warning(f" r[b[*] {e}")
-            Debug().warning(" r[b[*] Will attempt to continue.")
+            logger_app.warning(" r[b[*] Problems encountered trying to determing correct module graph:")
+            logger_app.warning(f" r[b[*] {e}")
+            logger_app.warning(" r[b[*] Will attempt to continue.")
 
             traceback.print_exc()
 
@@ -502,8 +505,8 @@ class Application:
 
         else:
             if not graph["graph"]:
-                Debug().warning(" r[b[*] Unable to determine correct module graph")
-                Debug().warning(" r[b[*] Will attempt to continue.")
+                logger_app.warning(" r[b[*] Unable to determine correct module graph")
+                logger_app.warning(" r[b[*] Will attempt to continue.")
 
         graph["exception"] = None
 
@@ -568,7 +571,7 @@ class Application:
 
             # Check for absolutely essential programs now.
             if not Application._checkForEssentialBuildPrograms(ctx) and not os.environ.get("KDESRC_BUILD_IGNORE_MISSING_PROGRAMS"):
-                Debug().error(textwrap.dedent("""\
+                logger_app.error(textwrap.dedent("""\
                  r[b[*] Aborting now to save a lot of wasted time.
                  y[b[*] export b[KDESRC_BUILD_IGNORE_MISSING_PROGRAMS=1] and re-run (perhaps with --no-src)
                  r[b[*] to continue anyways. If this check was in error please report a bug against
@@ -613,16 +616,17 @@ class Application:
             if not msgs:
                 continue
 
-            Debug().warning(f"\ny[Important notification for b[{m}]:")
+            logger_app.warning(f"\ny[Important notification for b[{m}]:")
             for msg in msgs:
-                Debug().warning(f"    {msg}")
+                logger_app.warning(f"    {msg}")
 
         color = "g[b["
         if result:
             color = "r[b["
 
         if not Debug().pretending():
-            Debug().info(f"\n{color}", ":-(" if result else ":-)")
+            smile = ":-(" if result else ":-)"
+            logger_app.info(f"\n{color}{smile}")
 
         return result
 
@@ -648,11 +652,11 @@ class Application:
         globalLogBase = ctx.getSubdirPath("log-dir")
         globalLogDir = ctx.getLogDir()
         # global first
-        Debug().note(f"Your logs are saved in y[{globalLogDir}]")
+        logger_app.warning(f"Your logs are saved in y[{globalLogDir}]")
 
         for base, log in ctx.logPaths.items():
             if base != globalLogBase:
-                Debug().note(f"  (additional logs are saved in y[{log}])")
+                logger_app.warning(f"  (additional logs are saved in y[{log}])")
 
         exit(exitcode)
 
@@ -733,9 +737,9 @@ class Application:
         while sub_var_name:
             sub_var_value = ctx.getOption(sub_var_name) or ""
             if not ctx.hasOption(sub_var_name):
-                Debug().warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{fileName}:{fileReader.currentFilehandle().filelineno()}]\n *")
+                logger_app.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{fileName}:{fileReader.currentFilehandle().filelineno()}]\n *")
 
-            Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+            logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
 
             value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
 
@@ -767,7 +771,7 @@ class Application:
         # re-read option from module set since it may be pre-set
         selectedRepo = moduleSet.getOption("repository")
         if not selectedRepo:
-            Debug().error(textwrap.dedent(f"""\
+            logger_app.error(textwrap.dedent(f"""\
             
             There was no repository selected for the y[b[{name}] module-set declared at
                 {rcSources}
@@ -785,7 +789,7 @@ class Application:
             moduleSetName = moduleSet.name
             moduleSetId = f"module-set ({moduleSetName})" if moduleSetName else "module-set"
 
-            Debug().error(textwrap.dedent(f"""\
+            logger_app.error(textwrap.dedent(f"""\
             There is no repository assigned to y[b[{selectedRepo}] when assigning a
             {moduleSetId} at {rcSources}.
             
@@ -841,7 +845,7 @@ class Application:
                 else:
                     endWord = "options"
 
-                Debug().error(f"Invalid configuration file {current_file} at line {fileReader.currentFilehandle().filelineno()}\nAdd an 'end {endWord}' before " + "starting a new module.\n")
+                logger_app.error(f"Invalid configuration file {current_file} at line {fileReader.currentFilehandle().filelineno()}\nAdd an 'end {endWord}' before " + "starting a new module.\n")
                 raise BuildException.make_exception("Config", f"Invalid file {current_file}")
 
             option, value = Application._splitOptionAndValue_and_substitute_value(ctx, line, fileReader)
@@ -850,11 +854,11 @@ class Application:
                 ctx.setOption({option: value})  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
             elif option not in all_possible_options:
                 if option == "kdedir":  # todo This message is temporary. Remove it after 09.04.2024.
-                    Debug().error("r[Please edit your config. Replace \"b[kdedir]r[\" with \"b[install-dir]r[\".")
+                    logger_app.error("r[Please edit your config. Replace \"b[kdedir]r[\" with \"b[install-dir]r[\".")
                 if option == "prefix":  # todo This message is temporary. Remove it after 14.04.2024.
-                    Debug().error("r[Please edit your config. Replace \"b[prefix]r[\" with \"b[install-dir]r[\".")
+                    logger_app.error("r[Please edit your config. Replace \"b[prefix]r[\" with \"b[install-dir]r[\".")
                 if option == "qtdir":  # todo This message is temporary. Remove it after 17.04.2024.
-                    Debug().error("r[Please edit your config. Replace \"b[qtdir]r[\" with \"b[qt-install-dir]r[\".")
+                    logger_app.error("r[Please edit your config. Replace \"b[qtdir]r[\" with \"b[qt-install-dir]r[\".")
                 raise BuildException_Config(option, f"Unrecognized option \"{option}\" found at {current_file}:{fileReader.currentFilehandle().filelineno()}")
 
             # This is addition of python version
@@ -970,8 +974,8 @@ class Application:
             # First command in .kdesrc-buildrc should be a global
             # options declaration, even if none are defined.
             if not re.match(r"^global\s*$", line):
-                Debug().error(f"Invalid configuration file: {rcfile}.")
-                Debug().error(f"Expecting global settings section at b[r[line {fh.filelineno()}]!")
+                logger_app.error(f"Invalid configuration file: {rcfile}.")
+                logger_app.error(f"Expecting global settings section at b[r[line {fh.filelineno()}]!")
                 raise BuildException.make_exception("Config", "Missing global section")
 
             # Now read in each global option.
@@ -1016,16 +1020,16 @@ class Application:
 
                 # modulename may be blank -- use the regex directly to match
                 if not moduleSetRE.match(line):
-                    Debug().error(f"Invalid configuration file {rcfile}!")
-                    Debug().error(f"Expecting a start of module section at r[b[line {fileReader.currentFilehandle().filelineno()}].")
+                    logger_app.error(f"Invalid configuration file {rcfile}!")
+                    logger_app.error(f"Expecting a start of module section at r[b[line {fileReader.currentFilehandle().filelineno()}].")
                     raise BuildException.make_exception("Config", "Ungrouped/Unknown option")
 
                 if modulename and modulename in seenModuleSets.keys():
-                    Debug().error(f"Duplicate module-set {modulename} at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
+                    logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
                     raise BuildException.make_exception("Config", f"Duplicate module-set {modulename} defined at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
 
                 if modulename and modulename in seenModules.keys():
-                    Debug().error(f"Name {modulename} for module-set at {rcfile}:{fileReader.currentFilehandle().filelineno()} is already in use on a module")
+                    logger_app.error(f"Name {modulename} for module-set at {rcfile}:{fileReader.currentFilehandle().filelineno()} is already in use on a module")
                     raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module-set defined at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
 
                 # A moduleset can give us more than one module to add.
@@ -1046,7 +1050,7 @@ class Application:
             # Duplicate module entry? (Note, this must be checked before the check
             # below for 'options' sets)
             elif modulename in seenModules and option_type != "options":
-                Debug().error(f"Duplicate module declaration b[r[{modulename}] on line {fileReader.currentFilehandle().filelineno()} of {rcfile}")
+                logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {fileReader.currentFilehandle().filelineno()} of {rcfile}")
                 raise BuildException.make_exception("Config", f"Duplicate module {modulename} declared at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
 
             # Module/module-set options overrides
@@ -1067,7 +1071,7 @@ class Application:
 
             # Must follow 'options' handling
             elif modulename in seenModuleSets:
-                Debug().error(f"Name {modulename} for module at {rcfile}:{fileReader.currentFilehandle().filelineno()} is already in use on a module-set")
+                logger_app.error(f"Name {modulename} for module at {rcfile}:{fileReader.currentFilehandle().filelineno()} is already in use on a module-set")
                 raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{fileReader.currentFilehandle().filelineno()}")
             else:
                 newModule = self._parseModuleOptions(ctx, fileReader, Module(ctx, modulename))
@@ -1085,7 +1089,7 @@ class Application:
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.
         if using_default:
-            Debug().warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
+            logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
             return []
 
         return module_list
@@ -1114,7 +1118,7 @@ class Application:
             failed = not module.install() or failed
 
             if failed and module.getOption("stop-on-failure"):
-                Debug().note("y[Stopping here].")
+                logger_app.warning("y[Stopping here].")
                 return True  # Error
         return failed
 
@@ -1147,7 +1151,7 @@ class Application:
             failed = not module.uninstall() or failed
 
             if failed and module.getOption("stop-on-failure"):
-                Debug().note("y[Stopping here].")
+                logger_app.warning("y[Stopping here].")
                 return True  # Error
         return failed
 
@@ -1175,12 +1179,12 @@ class Application:
         Util.assert_isa(ctx, BuildContext)
 
         if not ctx.getOption("resume-from") and not ctx.getOption("resume-after") and not ctx.getOption("stop-before") and not ctx.getOption("stop-after"):
-            Debug().debug("No command-line filter seems to be present.")
+            logger_app.debug("No command-line filter seems to be present.")
             return moduleList
 
         if ctx.getOption("resume-from") and ctx.getOption("resume-after"):
             # This one's an error.
-            Debug().error(textwrap.dedent("""\
+            logger_app.error(textwrap.dedent("""\
             You specified both r[b[--resume-from] and r[b[--resume-after] but you can only
             use one.
             """))
@@ -1188,7 +1192,7 @@ class Application:
 
         if ctx.getOption("stop-before") and ctx.getOption("stop-after"):
             # This one's an error.
-            Debug().error(textwrap.dedent("""\
+            logger_app.error(textwrap.dedent("""\
             You specified both r[b[--stop-before] and r[b[--stop-after] but you can only
             use one.
             """))
@@ -1201,7 +1205,7 @@ class Application:
         startIndex = len(moduleList)
 
         if resumePoint:
-            Debug().debug(f"Looking for {resumePoint} for --resume-* option")
+            logger_app.debug(f"Looking for {resumePoint} for --resume-* option")
 
             # || 0 is a hack to force Boolean context.
             filterInclusive = ctx.getOption("resume-from") or 0
@@ -1222,7 +1226,7 @@ class Application:
         stopIndex = 0
 
         if stopPoint:
-            Debug().debug(f"Looking for {stopPoint} for --stop-* option")
+            logger_app.debug(f"Looking for {stopPoint} for --stop-* option")
 
             # || 0 is a hack to force Boolean context.
             filterInclusive = ctx.getOption("stop-before") or 0
@@ -1264,7 +1268,7 @@ class Application:
         Updates the built-in phase list for all Modules passed into this function in
         accordance with the options set by the user.
         """
-        Debug().whisper("Filtering out module phases.")
+        logger_app.debug("Filtering out module phases.")
         for module in modules:
             if module.getOption("manual-update") or module.getOption("no-src"):
                 module.phases.clear()
@@ -1310,7 +1314,7 @@ class Application:
             needed_table.update({key: 1 for key in needed})
 
         length = len(dirs) - len(needed_table)
-        Debug().whisper(f"Removing g[b[{length}] out of g[b[{len(dirs) - 1}] old log directories...")
+        logger_app.debug(f"Removing g[b[{length}] out of g[b[{len(dirs) - 1}] old log directories...")
 
         for d in dirs:
             match = re.search(r"(\d{4}-\d{2}-\d{2}-\d{2})", d)
@@ -1351,7 +1355,7 @@ class Application:
 
         if len(moduleNames) > 0:
             names = ", ".join(fail_list)
-            Debug().warning(textwrap.dedent(f"""
+            logger_app.warning(textwrap.dedent(f"""
             Possible solution: Install the build dependencies for the modules:
             {names}
             You can use 'sudo apt build-dep <source_package>', 'sudo dnf builddep <package>', 'sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>' or a similar command for your distro of choice.
@@ -1382,13 +1386,13 @@ class Application:
         if not fail_list:
             return
 
-        Debug().debug(f"Message is {message}")
-        Debug().debug("\tfor ", ", ".join([str(m) for m in fail_list]))
+        logger_app.debug(f"Message is {message}")
+        logger_app.debug("\tfor " + ", ".join([str(m) for m in fail_list]))
 
         homedir = os.environ.get("HOME")
         logfile = None
 
-        Debug().warning(f"\nr[b[<<<  PACKAGES {message}  >>>]")
+        logger_app.warning(f"\nr[b[<<<  PACKAGES {message}  >>>]")
 
         for module in fail_list:
             logfile = module.getOption("#error-log-file")
@@ -1405,9 +1409,9 @@ class Application:
                 logfile = "No log file"
 
             if Debug().pretending():
-                Debug().warning(f"r[{module}]")
+                logger_app.warning(f"r[{module}]")
             if not Debug().pretending():
-                Debug().warning(f"r[{module}] - g[{logfile}]")
+                logger_app.warning(f"r[{module}] - g[{logfile}]")
 
     @staticmethod
     def _output_failed_module_lists(ctx: BuildContext, moduleGraph: dict) -> None:
@@ -1461,11 +1465,11 @@ class Application:
         if numSuggestedModules > top:
             sortedForDebug = DebugOrderHints.sortFailuresInDebugOrder(moduleGraph, extraDebugInfo, actualFailures)
 
-            Debug().info(f"\nThe following top {top} may be the most important to fix to " +
-                         "get the build to work, listed in order of 'probably most " +
-                         "interesting' to 'probably least interesting' failure:\n")
+            logger_app.info(f"\nThe following top {top} may be the most important to fix to " +
+                            "get the build to work, listed in order of 'probably most " +
+                            "interesting' to 'probably least interesting' failure:\n")
             for item in sortedForDebug[:top]:  # pl2py: in python the stop point is not included, so we add +1
-                Debug().info(f"\tr[b[{item}]")
+                logger_app.info(f"\tr[b[{item}]")
 
         Application._output_possible_solution(ctx, actualFailures)
 
@@ -1563,10 +1567,10 @@ class Application:
 
             if hashlib.md5(open(destFilePath, "rb").read()).hexdigest() != existingMD5:
                 if not ctx.getOption("#delete-my-settings"):
-                    Debug().error(f"\tr[*] Installing \"b[{baseName}]\" would overwrite an existing file:")
-                    Debug().error(f"\tr[*]  y[b[{destFilePath}]")
-                    Debug().error(f"\tr[*] If this is acceptable, please delete the existing file and re-run,")
-                    Debug().error(f"\tr[*] or pass b[--delete-my-settings] and re-run.")
+                    logger_app.error(f"\tr[*] Installing \"b[{baseName}]\" would overwrite an existing file:")
+                    logger_app.error(f"\tr[*]  y[b[{destFilePath}]")
+                    logger_app.error(f"\tr[*] If this is acceptable, please delete the existing file and re-run,")
+                    logger_app.error(f"\tr[*] or pass b[--delete-my-settings] and re-run.")
 
                     return
                 elif not Debug().pretending():
@@ -1611,8 +1615,8 @@ class Application:
         sessionScript = next((f for f in [f"{path}/data/xsession.sh.in" for path in searchPaths] if os.path.isfile(f)), None)
 
         if not envScript or not sessionScript:
-            Debug().warning("b[*] Unable to find helper files to setup a login session.")
-            Debug().warning("b[*] You will have to setup login yourself, or install kde-builder properly.")
+            logger_app.warning("b[*] Unable to find helper files to setup a login session.")
+            logger_app.warning("b[*] You will have to setup login yourself, or install kde-builder properly.")
             return
 
         destDir = os.environ.get("XDG_CONFIG_HOME") or f"""{os.environ.get("HOME")}/.config"""
@@ -1628,8 +1632,8 @@ class Application:
                 try:
                     os.chmod(f"""{os.environ.get("HOME")}/.xsession""", 0o744)
                 except Exception as e:
-                    Debug().error(f"\tb[r[*] Error making b[~/.xsession] executable: {e}")
-                    Debug().error("\tb[r[*] If this file is not executable you may not be able to login!")
+                    logger_app.error(f"\tb[r[*] Error making b[~/.xsession] executable: {e}")
+                    logger_app.error("\tb[r[*] If this file is not executable you may not be able to login!")
 
     @staticmethod
     def _checkForEssentialBuildPrograms(ctx: BuildContext):
@@ -1693,7 +1697,7 @@ class Application:
 
                 modulesNeeding = modulesRequiringProgram[prog].keys()
 
-                Debug().error(textwrap.dedent(f"""\
+                logger_app.error(textwrap.dedent(f"""\
                 
                 Unable to find r[b[{prog}]. This program is absolutely essential for building
                 the modules: y[{", ".join(modulesNeeding)}].
@@ -1757,12 +1761,12 @@ class Application:
             # Even when dbus-python is not installed, this module may still be imported successfully.
             # So check if dbus has some needed attributes, that way we will be sure that module can be used.
             if not hasattr(dbus, "SystemBus"):
-                Debug().warning(f"Looks like python-dbus package is not installed. Will not request performance power profile.")
+                logger_app.warning(f"Looks like python-dbus package is not installed. Will not request performance power profile.")
                 return
 
             try:
                 bus = dbus.SystemBus()
-                Debug().info("Holding performance profile")
+                logger_app.info("Holding performance profile")
 
                 if Debug().pretending():
                     return
@@ -1775,7 +1779,7 @@ class Application:
             except dbus.DBusException as e:
                 print(f"Error accessing PowerProfiles service: {e}")
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
-            Debug().warning(f"Could not import dbus module. Will not request performance power profile.")
+            logger_app.warning(f"Could not import dbus module. Will not request performance power profile.")
             return
 
     # Accessors

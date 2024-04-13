@@ -13,7 +13,7 @@ import copy
 from ..OptionsBase import OptionsBase
 from ..IPC.IPC import IPC
 from ..Util.Util import Util
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 
 from ..Updater.Git import Updater_Git
 from ..Updater.KDEProject import Updater_KDEProject
@@ -36,6 +36,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
     from ..ModuleSet.ModuleSet import ModuleSet
+
+logger_module = kbLogger.getLogger("module")
 
 
 class Module(OptionsBase):
@@ -341,7 +343,7 @@ class Module(OptionsBase):
         buildSystem = self.buildSystem()
 
         if buildSystem.name() == "generic" and not Debug().pretending() and not self.hasOption("custom-build-command"):
-            Debug().error(f"\tr[b[{self}] does not seem to have a build system to use.")
+            logger_module.error(f"\tr[b[{self}] does not seem to have a build system to use.")
             return False
 
         # Ensure we're in a known directory before we start; some options remove
@@ -365,10 +367,10 @@ class Module(OptionsBase):
             self.buildSystem().runTestsuite()
 
         if not buildResults.get("work_done", None) and not self.getOption("refresh-build") and self.getPersistentOption("last-install-rev") is not None:
-            Debug().info("\tNo changes from build, skipping install (--refresh-build this module to force install)")
+            logger_module.info("\tNo changes from build, skipping install (--refresh-build this module to force install)")
             return True
         elif not self.getOption("install-after-build"):
-            Debug().info("\tSkipping install due to install-after-build setting")
+            logger_module.info("\tSkipping install due to install-after-build setting")
             return True
 
         self.ctx.statusViewer().__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().
@@ -386,7 +388,7 @@ class Module(OptionsBase):
         buildSystem = self.buildSystem()
 
         if buildSystem.name() == "generic" and self.hasOption("custom-build-command"):
-            Debug().info(f" b[*] No build system detected for b[y[{self}], assuming custom build command will handle")
+            logger_module.info(f" b[*] No build system detected for b[y[{self}], assuming custom build command will handle")
             return True
 
         if buildSystem.name() == "generic" and not Debug().pretending():
@@ -398,13 +400,13 @@ class Module(OptionsBase):
         builddir = self.fullpath("build")
         oldBuildDir = self.getOption("#last-build-dir")
         if not Debug().pretending() and builddir != oldBuildDir and os.path.isdir(oldBuildDir) and not os.path.exists(builddir):
-            Debug().note(f" y[b[*] Build directory setting has changed to {builddir}.")
-            Debug().note(f" y[b[*] Moving old build directory at {oldBuildDir} to the new location.")
+            logger_module.warning(f" y[b[*] Build directory setting has changed to {builddir}.")
+            logger_module.warning(f" y[b[*] Moving old build directory at {oldBuildDir} to the new location.")
 
             try:
                 shutil.move(oldBuildDir, builddir)
             except Exception as e:
-                Debug().warning(textwrap.dedent(f"""\
+                logger_module.warning(textwrap.dedent(f"""\
                     r[b[*] Unable to move {oldBuildDir}
                     r[b[*] to {builddir}
                     r[b[*] Error: {e}
@@ -416,17 +418,17 @@ class Module(OptionsBase):
         if refreshReason != "":
             # The build system needs created, either because it doesn't exist, or
             # because the user has asked that it be completely rebuilt.
-            Debug().info(f"\tPreparing build system for y[{self}].")
+            logger_module.info(f"\tPreparing build system for y[{self}].")
 
             # Check to see if we're actually supposed to go through the
             # cleaning process.
             if not self.getOption("#cancel-clean") and not buildSystem.cleanBuildSystem():
-                Debug().warning(f"\tUnable to clean r[{self}]!")
+                logger_module.warning(f"\tUnable to clean r[{self}]!")
                 return False
 
         result = Util.await_result(buildSystem.createBuildSystem())
         if not result:
-            Debug().error(f"\tError creating r[{self}]'s build system!")
+            logger_module.error(f"\tError creating r[{self}]'s build system!")
             return False
 
         # Now we're in the checkout directory
@@ -435,7 +437,7 @@ class Module(OptionsBase):
         Util.p_chdir(builddir)
 
         if not buildSystem.configureInternal():
-            Debug().error(f"\tUnable to configure r[{self}] with " + self.buildSystemType())
+            logger_module.error(f"\tUnable to configure r[{self}] with " + self.buildSystemType())
 
             # Add undocumented ".refresh-me" file to build directory to flag
             # for --refresh-build for this module on next run. See also the
@@ -458,8 +460,8 @@ class Module(OptionsBase):
         buildSysFile = self.buildSystem().configuredModuleFileName()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{buildSysFile}"):
-            Debug().warning(f"\tThe build system doesn't exist for r[{self}].")
-            Debug().warning("\tTherefore, we can't install it. y[:-(].")
+            logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
+            logger_module.warning("\tTherefore, we can't install it. y[:-(].")
             return False
 
         self.setupEnvironment()
@@ -471,18 +473,18 @@ class Module(OptionsBase):
         # to weed out old unused files.
         if self.getOption("use-clean-install") and self.getPersistentOption("last-install-rev"):
             if not self.buildSystem().uninstallInternal(makeInstallOpts):
-                Debug().warning(f"\tUnable to uninstall r[{self}] before installing the new build.")
-                Debug().warning("\tContinuing anyways...")
+                logger_module.warning(f"\tUnable to uninstall r[{self}] before installing the new build.")
+                logger_module.warning("\tContinuing anyways...")
             else:
                 self.unsetPersistentOption("last-install-rev")
 
         if not self.buildSystem().installInternal(makeInstallOpts):
-            Debug().error(f"\tUnable to install r[{self}]!")
+            logger_module.error(f"\tUnable to install r[{self}]!")
             self.buildContext().markModulePhaseFailed("install", self)
             return False
 
         if Debug().pretending():
-            Debug().pretend(f"\tWould have installed g[{self}]")
+            logger_module.pretend(f"\tWould have installed g[{self}]")
             return True
 
         # Past this point we know we've successfully installed, for real.
@@ -496,12 +498,12 @@ class Module(OptionsBase):
         if remove_setting == "all":
             # Remove srcdir
             srcdir = self.fullpath("source")
-            Debug().note(f"\tRemoving b[r[{self} source].")
+            logger_module.warning(f"\tRemoving b[r[{self} source].")
             Util.safe_rmtree(srcdir)
 
         if remove_setting == "builddir" or remove_setting == "all":
             # Remove builddir
-            Debug().note(f"\tRemoving b[r[{self} build directory].")
+            logger_module.warning(f"\tRemoving b[r[{self} build directory].")
             Util.safe_rmtree(builddir)
 
             # We're likely already in the builddir, so chdir back to the root
@@ -519,8 +521,8 @@ class Module(OptionsBase):
         buildSysFile = self.buildSystem().configuredModuleFileName()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{buildSysFile}"):
-            Debug().warning(f"\tThe build system doesn't exist for r[{self}].")
-            Debug().warning("\tTherefore, we can't uninstall it.")
+            logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
+            logger_module.warning("\tTherefore, we can't uninstall it.")
             return False
 
         self.setupEnvironment()
@@ -529,12 +531,12 @@ class Module(OptionsBase):
         makeInstallOpts = [el for el in makeInstallOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         if not self.buildSystem().uninstallInternal(makeInstallOpts):
-            Debug().error(f"\tUnable to uninstall r[{self}]!")
+            logger_module.error(f"\tUnable to uninstall r[{self}]!")
             self.buildContext().markModulePhaseFailed("install", self)
             return False
 
         if Debug().pretending():
-            Debug().pretend(f"\tWould have uninstalled g[{self}]")
+            logger_module.pretend(f"\tWould have uninstalled g[{self}]")
             return True
 
         self.unsetPersistentOption("last-install-rev")
@@ -578,7 +580,7 @@ class Module(OptionsBase):
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
         # Let the toolchain files/definitions take care of themselves.
         if buildSystem.hasToolchain():
-            Debug().whisper(f"\tNot setting environment variables for b[{self}]: a custom toolchain is used")
+            logger_module.debug(f"\tNot setting environment variables for b[{self}]: a custom toolchain is used")
         else:
             installdir = self.getOption("install-dir")
             qt_installdir = self.getOption("qt-install-dir")
@@ -649,7 +651,7 @@ class Module(OptionsBase):
         if kdesrc != module_src_dir:
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
-                Debug().error(f"Unable to create separate source directory for r[{self}]: {module_src_dir}")
+                logger_module.error(f"Unable to create separate source directory for r[{self}]: {module_src_dir}")
                 ipc.sendIPCMessage(IPC.MODULE_FAILURE, moduleName)
 
         # Check for whether path to source dir has changed due to directory-layout
@@ -657,13 +659,13 @@ class Module(OptionsBase):
         fullpath = self.fullpath("source")
         oldSourceDir = self.getOption("#last-source-dir")
         if not Debug().pretending() and fullpath != oldSourceDir and os.path.isdir(oldSourceDir) and not os.path.exists(fullpath):
-            Debug().note(f" y[b[*] Source directory setting has changed to {fullpath}.")
-            Debug().note(f" y[b[*] Moving old source directory at {oldSourceDir} to the new location.")
+            logger_module.warning(f" y[b[*] Source directory setting has changed to {fullpath}.")
+            logger_module.warning(f" y[b[*] Moving old source directory at {oldSourceDir} to the new location.")
 
             try:
                 shutil.move(oldSourceDir, fullpath)
             except Exception as e:
-                Debug().warning(textwrap.dedent(f"""
+                logger_module.warning(textwrap.dedent(f"""
                     r[b[*] Unable to move {oldSourceDir}
                     r[b[*] to {fullpath}
                     r[b[*] Error: {e}
@@ -686,8 +688,8 @@ class Module(OptionsBase):
                     ctx.markModulePhaseFailed("build", self)
                 e = e.message
 
-            Debug().error(f"Error updating r[{self}], removing from list of packages to build.")
-            Debug().error(f" > y[{e}]")
+            logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
+            logger_module.error(f" > y[{e}]")
 
             ipc.sendIPCMessage(reason, moduleName)
             self.phases.filterOutPhase("build")
@@ -712,10 +714,10 @@ class Module(OptionsBase):
             # number of files updated doesn't get run, so manually mention it
             # here.
             if not ipc.supportsConcurrency():
-                Debug().info(f"\t{self} update complete, {message}")
+                logger_module.info(f"\t{self} update complete, {message}")
 
             returnValue = True
-        Debug().info("")  # Print empty line.
+        logger_module.info("")  # Print empty line.
         return returnValue
 
     # @override
@@ -728,7 +730,7 @@ class Module(OptionsBase):
         # Ensure we don't accidentally get fed module-set options
         for mso in ["use-modules", "ignore-modules"]:
             if mso in options:
-                Debug().error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
+                logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
                 raise BuildException_Config(mso, f"Option {mso} can only be used in module-set")
 
         # Special case handling.
@@ -910,7 +912,7 @@ class Module(OptionsBase):
             basePath = basePath or self.name  # Default if not provided in repo-metadata
         else:
             if not self.hasOption("#warned-invalid-directory-layout"):  # avoid spamming
-                Debug().warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
+                logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
                 self.setOption({"#warned-invalid-directory-layout": True})
             basePath = self.name
 

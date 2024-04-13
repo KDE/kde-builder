@@ -7,7 +7,10 @@ import fileinput
 
 from .BuildException import BuildException
 # from .Util import Util
-from .Debug import Debug
+from .Debug import Debug, kbLogger
+
+logger_var_subst = kbLogger.getLogger("variables_substitution")
+logger_app = kbLogger.getLogger("application")
 
 
 class RecursiveFH:
@@ -122,7 +125,7 @@ class RecursiveFH:
                 if filename.endswith("-build-include"):
                     filename = re.sub(r"-build-include$", ".ksb", filename)  # replace the ending "-build-include" with ".ksb"
                     filename = re.sub(r".*/([^/]+)$", r"${module-definitions-dir}/\1", filename)  # extract the file name (after the last /), and append it to "${module-definitions-dir}/" string
-                    Debug().warning(textwrap.dedent(f"""\
+                    logger_app.warning(textwrap.dedent(f"""\
                     y[Warning:] The include line defined in {self.current_fn}:{fh.filelineno()} uses an old path to build-include file.
                     The module-definitions files are now located in repo-metadata.
                     The configuration file is intended to only have this include line (please manually edit your config):
@@ -132,7 +135,7 @@ class RecursiveFH:
                     """))
                 if "data/build-include" in filename:
                     filename = re.sub(r".*/data/build-include/([^/]+)$", r"${module-definitions-dir}/\1", filename)  # extract the file name (after the last /), and append it to "${module-definitions-dir}/" string
-                    Debug().warning(textwrap.dedent(f"""\
+                    logger_app.warning(textwrap.dedent(f"""\
                     y[Warning:] The include line defined in {self.current_fn}:{fh.filelineno()} uses an old path with data/build-include.
                     The module-definitions files are now located in repo-metadata.
                     The configuration file is intended to only have this include line (please manually edit your config):
@@ -153,9 +156,9 @@ class RecursiveFH:
                 while sub_var_name:
                     sub_var_value = ctx.getOption(sub_var_name) or ""
                     if not ctx.hasOption(sub_var_name):
-                        Debug().warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
+                        logger_var_subst.warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
 
-                    Debug().debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+                    logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
 
                     filename = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, filename)
 

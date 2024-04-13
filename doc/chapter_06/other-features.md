@@ -4,19 +4,40 @@
 (changing-verbosity)=
 ## Changing the amount of output from kde-builder
 
-kde-builder has several options to control the amount of output the
-script generates. In any case, errors will always be output.
+kde-builder has several loggers, which you can configure to control the amount of output they generate.
 
-| Debug level | Level name | Command line option |
-|-------------|------------|---------------------|
-| 0           | DEBUG      | --debug             |
-| 1           | WHISPER    | --verbose           |
-| 2           | INFO       | Selected by default |
-| 3           | NOTE       | --quiet             |
-| 4           | WARNING    | --really-quiet      |
-| 5           | ERROR      | No way to select    |
+Loggers' default severity levels and formatters are defined in the `data/kde-builder-logging.yaml`.
 
-Table of debug levels
+To override specific loggers values, copy `data/kde-builder-logging.yaml` config to the `~/.config/kde-builder-logging.yaml`
+or to the current working directory. Alternatively, instead of copying file, you can just create a yaml file with only overridden values
+in the mentioned locations.
+
+For example, to change `application` logger to `DEBUG` level, the file will look like this:
+```yaml
+loggers:
+  application:
+    level: DEBUG
+```
+
+The order of loggers configs are read is the following:  
+1. kde-builder applies the default configuration from `data/kde-builder-logging.yaml` (from project root).  
+2. If the `./kde-builder-logging.yaml` file is found (from the current working directory), it overrides the default configuration.  
+3. If the file was not found in previous step, then if the `~/.config/kde-builder-logging.yaml` file is found, it overrides the default configuration.
+
+```{note}
+To temporary set all loggers to `DEBUG` level, use [`--debug`](#cmdline-debug) command line option.
+```
+
+This is a table of loggers severity levels. The lower level you choose, the more info will be printed.
+
+| Python logger levels |
+|:--------------------:|
+|    CRITICAL (50)     |
+|      ERROR (40)      |
+|     WARNING (30)     |
+|      INFO (20)       |
+|      DEBUG (10)      |
+|      NOTSET (0)      |
 
 (kde-builder-color)=
 ## Color output

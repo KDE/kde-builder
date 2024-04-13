@@ -9,10 +9,12 @@ from ..PhaseList import PhaseList
 from ..Module.Module import Module
 
 from ..BuildException import BuildException_Config
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
+
+logger_moduleset = kbLogger.getLogger("module-set")
 
 
 class ModuleSet(OptionsBase):
@@ -126,8 +128,8 @@ class ModuleSet(OptionsBase):
         if "use-modules" in options:
             modules = options["use-modules"].split(" ")
             if not modules:
-                Debug().error("No modules were selected for module-set " + self.name)
-                Debug().error("in the y[use-modules] entry.")
+                logger_moduleset.error("No modules were selected for module-set " + self.name)
+                logger_moduleset.error("in the y[use-modules] entry.")
                 raise BuildException_Config("use-modules", "Invalid use-modules")
 
             self.setModulesToFind(modules)
@@ -136,8 +138,8 @@ class ModuleSet(OptionsBase):
         if "ignore-modules" in options:
             modules = options["ignore-modules"].split(" ")
             if not modules:
-                Debug().error("No modules were selected for module-set " + self.name)
-                Debug().error("in the y[ignore-modules] entry.")
+                logger_moduleset.error("No modules were selected for module-set " + self.name)
+                logger_moduleset.error("in the y[ignore-modules] entry.")
                 raise BuildException_Config("ignore-modules", "Invalid ignore-modules")
 
             self.addModulesToIgnore(modules)
@@ -179,7 +181,7 @@ class ModuleSet(OptionsBase):
             newModule.setOption({"repository": selectedRepo + moduleItem})
 
         if not self.modulesToFind():
-            Debug().warning(f"No modules were defined for the module-set {self.name}")
-            Debug().warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
+            logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 
         return moduleList

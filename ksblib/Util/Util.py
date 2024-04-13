@@ -17,11 +17,15 @@ import multiprocessing
 import traceback
 import codecs
 
-from ksblib.Debug import Debug
+from ksblib.Debug import Debug, kbLogger
 from ksblib.BuildException import BuildException
 from typing import TYPE_CHECKING, Callable, Optional
+import logging
 if TYPE_CHECKING:
     from ..Module.Module import Module
+
+logger_logged_cmd = kbLogger.getLogger("logged-command")
+logger_util = kbLogger.getLogger("util")
 
 
 class Util:
@@ -101,7 +105,7 @@ class Util:
         Subroutine to unlink the given symlink if global-pretend isn't set.
         """
         if Debug().pretending():
-            Debug().pretend("\tWould have unlinked ", path, ".")
+            logger_util.pretend(f"\tWould have unlinked {path}.")
             return 1  # Return true
         return os.unlink(path)
 
@@ -114,10 +118,10 @@ class Util:
         Returns the shell error code, so 0 means success, non-zero means failure.
         """
         if not Debug().pretending():
-            Debug().whisper(f"\tExecuting g['", "' '".join(cmd_list), "'")
+            logger_util.debug(f"\tExecuting g['" + "' '".join(cmd_list) + "'")
             return subprocess.run(cmd_list).returncode
 
-        Debug().pretend("\tWould have run g['" + "' '".join(cmd_list) + "'")
+        logger_util.pretend("\tWould have run g['" + "' '".join(cmd_list) + "'")
         return 0  # Return true (success code)
 
     @staticmethod
@@ -126,7 +130,7 @@ class Util:
         Is exactly like "chdir", but it will also print out a message saying that
         we're switching to the directory when debugging.
         """
-        Debug().debug(f"\tcd g[{Dir}]")
+        logger_util.debug(f"\tcd g[{Dir}]")
 
         try:
             os.chdir(Dir)
@@ -150,7 +154,7 @@ class Util:
 
         if Debug().pretending():
             if pathname not in Util.createdPaths and not os.path.exists(pathname):
-                Debug().pretend(f"\tWould have created g[{pathname}]")
+                logger_util.pretend(f"\tWould have created g[{pathname}]")
             Util.createdPaths[pathname] = True
             return True
         else:
@@ -226,7 +230,7 @@ class Util:
             def filterRef(_):
                 return True  # Default to all lines
 
-        Debug().debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
+        logger_util.debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
 
         # Check early for whether an executable exists since otherwise
         # it is possible for our fork-open below to "succeed" (i.e. fork()
@@ -276,9 +280,9 @@ class Util:
             if exitCode:
                 # other errors might still be serious but don't need a backtrace
                 if Debug().pretending():
-                    Debug().whisper(f"{program} gave error exit code {exitCode}")
+                    logger_util.debug(f"{program} gave error exit code {exitCode}")
                 else:
-                    Debug().warning(f"{program} gave error exit code {exitCode}")
+                    logger_util.warning(f"{program} gave error exit code {exitCode}")
             return lines
         else:
             os.close(pipe_read)
@@ -360,11 +364,11 @@ class Util:
         logdir = module.getLogDir()
 
         if module.hasStickyOption("error-log-file"):
-            Debug().error(f"{module} already has error log set, tried to set to r[b[{logfile}]")
+            logger_util.error(f"{module} already has error log set, tried to set to r[b[{logfile}]")
             return
 
         module.setOption({"#error-log-file": f"{logdir}/{logfile}"})
-        Debug().debug(f"Logfile for {module} is {logfile}")
+        logger_util.debug(f"Logfile for {module} is {logfile}")
 
         # Setup symlink in the module log directory pointing to the appropriate
         # file.  Make sure to remove it first if it already exists.
@@ -373,7 +377,7 @@ class Util:
 
         if os.path.exists(f"{logdir}/error.log"):
             # Maybe it was a regular file?
-            Debug().error("r[b[ * Unable to create symlink to error log file]")
+            logger_util.error("r[b[ * Unable to create symlink to error log file]")
             return
 
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
@@ -384,7 +388,7 @@ class Util:
         """
         Common code for log_command and ksb::Util::LoggedSubprocess
         """
-        Debug().debug(f"run_logged_command(): Module {module}, Command: ", " ".join(command))
+        logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             BuildException.croak_internal(f"Pass only base filename for {module}/{filename}")
@@ -400,7 +404,7 @@ class Util:
 
             dec = codecs.getincrementaldecoder('utf8')()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
 
-            if not callbackRef and Debug().debugging():
+            if not callbackRef and logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     # If no other callback given, pass to debug() if debug-mode is on.
                     while True:
@@ -428,7 +432,7 @@ class Util:
 
             # kernel stuff went OK but the child gave a failing exit code
             if return_code != 0:
-                Debug().debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
+                logger_util.debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
                 return return_code
             return 0
         else:
@@ -455,7 +459,7 @@ class Util:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
 
-            if callbackRef or Debug().debugging():
+            if callbackRef or logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
                 # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
                 os.close(1)
@@ -466,13 +470,13 @@ class Util:
                     os.close(1)  # close stdout
                     os.dup2(f_logpath.fileno(), 1)  # open stdout, that will be the logpath file
                 except OSError as e:
-                    Debug().error(f"Error {e} opening log to {logpath}!")
+                    logger_util.error(f"Error {e} opening log to {logpath}!")
 
             # Call internal function, name given by $command[1]
             if command[0] == "kde-builder":
                 # No colors!
                 Debug().setColorfulOutput(False)
-                Debug().debug(f"Calling {command}[1]")
+                logger_util.debug(f"Calling {command[1]}")
 
                 cmd = command[1]
                 del command[0:2]  # Remove first two elements.
@@ -499,7 +503,7 @@ class Util:
                 os.execvp(command[0], command)
             except Exception as e:
                 cmd_string = " ".join(command)
-                Debug().error(textwrap.dedent(f"""\
+                logger_util.error(textwrap.dedent(f"""\
                     r[b[Unable to execute "{cmd_string}"]!
                     {e}
                     
@@ -629,7 +633,7 @@ class Util:
         callbackRef = optionsRef.get("callback", None)
 
         if Debug().pretending():
-            Debug().pretend("\tWould have run g['" + "' '".join(command) + "'")
+            logger_logged_cmd.pretend("\tWould have run g['" + "' '".join(command) + "'")
             return 0
         return Util.run_logged_command(module, filename, callbackRef, argRef)
 
@@ -669,7 +673,7 @@ class Util:
             directory = ""
         if Debug().pretending():
             args_str = "', '".join(argRef)
-            Debug().pretend(f"\tWould have run g{{'{args_str}'}}")
+            logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
             return Promise.resolve(0)
 
         # Do this before we fork so the path is finalized to prevent auto-detection
@@ -703,7 +707,7 @@ class Util:
             # This happens back in the main process, so we can reintegrate the
             # changes into our data structures if needed.
 
-            Debug().debug(f"run_logged_p(): {module} {filename} complete: {exitcode}"),
+            logger_logged_cmd.info(f"run_logged_p(): {module} {filename} complete: {exitcode}")
             if not exitcode == 0:
                 Util._setErrorLogfile(module, f"{filename}.log")
             return exitcode
@@ -791,20 +795,20 @@ class Util:
         user_path = re.sub(r"^" + os.environ["HOME"], "~", user_path)
 
         if Debug().pretending():
-            Debug().pretend(f"Would have removed all files/folders in {user_path}")
+            logger_util.pretend(f"Would have removed all files/folders in {user_path}")
             return True
 
         # Error out because we probably have a logic error even though it would
         # delete just fine.
         if not os.path.isdir(path):
-            Debug().error(f"Cannot recursively remove {user_path}, as it is not a directory.")
+            logger_util.error(f"Cannot recursively remove {user_path}, as it is not a directory.")
             return False
 
         try:
             shutil.rmtree(path)
 
         except Exception as e:
-            Debug().error(f"Unable to remove directory {user_path}: {e}")
+            logger_util.error(f"Unable to remove directory {user_path}: {e}")
             return False
         return True
 
@@ -876,7 +880,7 @@ class Util:
 
         # Create destination directory.
         if not Util.super_mkdir(to_path):
-            Debug().error(f"Couldn't create directory r[{to_path}]")
+            logger_util.error(f"Couldn't create directory r[{to_path}]")
             return Promise.resolve(0)
 
         # # Create closure callback subroutine.
@@ -925,7 +929,7 @@ class Util:
                         link_target = os.path.join(target_dir, file)
                         os.symlink(link_source, link_target)
             except Exception as e:
-                Debug().error(f"Unable to symlink {from_path} to {to_path}: {e}")
+                logger_util.error(f"Unable to symlink {from_path} to {to_path}: {e}")
                 retval.value = 0
             retval.value = 1
 
@@ -954,8 +958,8 @@ class Util:
         try:
             log = open(logpath, "w")
         except IOError as e:
-            Debug().error(f"\tError opening logfile {logpath}: r[b[{e}]")
-            Debug().error("\tContinuing without logging")
+            logger_util.error(f"\tError opening logfile {logpath}: r[b[{e}]")
+            logger_util.error("\tContinuing without logging")
 
         print(f"starting delete o {target_dir}", file=log)
 
@@ -1008,7 +1012,7 @@ class Util:
             return promise
 
         except Exception as e:
-            Debug().error(f"\tUnable to clean r[{target_dir}]:\n\ty[b[{e}]")
+            logger_util.error(f"\tUnable to clean r[{target_dir}]:\n\ty[b[{e}]")
             return Promise.resolve(0)  # resolve, but to an error
 
     @staticmethod

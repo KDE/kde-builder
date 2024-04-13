@@ -2,10 +2,13 @@ from __future__ import annotations
 import os
 import textwrap
 from typing import NoReturn
-from .Debug import Debug
+from .Debug import Debug, kbLogger
+
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .BuildContext import BuildContext
+
+logger_app = kbLogger.getLogger("application")
 
 
 class StartProgram:
@@ -40,14 +43,14 @@ class StartProgram:
             elif arg == "-e" or arg == "--exec":
                 optExec = args.pop(0)
                 if optExec is None:
-                    Debug().error("-e option requires a name of executable")
+                    logger_app.error("-e option requires a name of executable")
                     exit(1)
                 continue
             break
 
         module = arg
         if module is None:  # the case when user specified -e executable_name and/or -f, but then did not specified the module name
-            Debug().error("The module name is missing")
+            logger_app.error("The module name is missing")
             exit(1)
 
         executable = optExec or module
@@ -84,13 +87,13 @@ class StartProgram:
         """)
 
         # Print run information
-        Debug().note(
-            "#" * 80, "\n",
-            f"Module:             {module}\n",
-            f"Executable          {executable}\n",
-            f"Revision:           {revision}\n",
-            f"""Arguments:          {" ".join(args)}\n""",
-            "#" * 80, "\n",
+        logger_app.warning(
+            "#" * 80 + "\n" +
+            f"Module:             {module}\n" +
+            f"Executable          {executable}\n" +
+            f"Revision:           {revision}\n" +
+            f"""Arguments:          {" ".join(args)}\n""" +
+            "#" * 80 + "\n" +
             "\n"
         )
 
@@ -107,5 +110,5 @@ class StartProgram:
             os.execv("/bin/sh", ["/bin/sh", "-c", script, "kde-builder run script"] + args)
         except Exception as e:
             # If we get to here, that sucks, but don't continue.
-            Debug().error(f"Error executing {executable}: {e}")
+            logger_app.error(f"Error executing {executable}: {e}")
             exit(1)

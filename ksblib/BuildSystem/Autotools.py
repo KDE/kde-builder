@@ -4,7 +4,9 @@ from promise import Promise
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
+
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class BuildSystem_Autotools(BuildSystem):
@@ -110,7 +112,7 @@ class BuildSystem_Autotools(BuildSystem):
         promise = promise.then(_then2)
 
         def _catch(err):
-            Debug().error(f"\tError configuring {module}: r[b[{err}]")
+            logger_buildsystem.error(f"\tError configuring {module}: r[b[{err}]")
             return 0
 
         promise = promise.catch(_catch)

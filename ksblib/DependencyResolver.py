@@ -9,8 +9,9 @@ from .BuildException import BuildException
 from .Util.Util import Util
 from .Updater.Git import Updater_Git
 from .Module.Module import Module
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 
+logger_depres = kbLogger.getLogger("dependency-resolver")
 
 class DependencyResolver:
     """
@@ -175,7 +176,7 @@ class DependencyResolver:
 
             # Ignore "catch-all" dependencies where the source is the catch-all
             if sourceItem.endswith("*"):
-                Debug().warning("\tIgnoring dependency on wildcard module grouping " + f"on line {fh.filelineno()} of repo-metadata/dependencies/dependency-data")
+                logger_depres.warning("\tIgnoring dependency on wildcard module grouping " + f"on line {fh.filelineno()} of repo-metadata/dependencies/dependency-data")
                 continue
 
             dependentBranch = dependentBranch or "*"  # If no branch, apply catch-all flag
@@ -211,7 +212,7 @@ class DependencyResolver:
          open my $fh, '<', "/path/to/dependency-data.json" or die;
          $resolver->readDependencyData_v2($fh);
         """
-        Debug().note("b[***] USING y[b[V2 DEPENDENCY METADATA], BUILD IS UNSUPPORTED")
+        logger_depres.warning("b[***] USING y[b[V2 DEPENDENCY METADATA], BUILD IS UNSUPPORTED")
 
         json_data = fh.read()
 
@@ -267,14 +268,14 @@ class DependencyResolver:
         moduleDepEntryRef = dependenciesOfRef.get(f"{item}:*", None)
 
         if moduleDepEntryRef:
-            Debug().debug(f"handling dependencies for: {item} without branch (*)")
+            logger_depres.debug(f"handling dependencies for: {item} without branch (*)")
             directDeps.extend(moduleDepEntryRef["+"])
             exclusions.extend(moduleDepEntryRef["-"])
 
         if branch and branch != "*":
             moduleDepEntryRef = dependenciesOfRef.get(f"{item}:{branch}", None)
             if moduleDepEntryRef:
-                Debug().debug(f"handling dependencies for: {item} with branch ({branch})")
+                logger_depres.debug(f"handling dependencies for: {item} with branch ({branch})")
                 directDeps.extend(moduleDepEntryRef["+"])
                 exclusions.extend(moduleDepEntryRef["-"])
 
@@ -304,17 +305,17 @@ class DependencyResolver:
         for dep in directDeps:
             depPath, depBranch = re.match(r"^([^:]+):(.*)$", dep).groups()
             if not depPath:
-                Debug().error(f"r[Invalid dependency declaration: b[{dep}]]")
+                logger_depres.error(f"r[Invalid dependency declaration: b[{dep}]]")
                 result["syntaxErrors"] += 1
                 continue
             depItem = self._shortenModuleName(depPath)
             if depItem == item:
-                Debug().debug(f"\tBreaking trivial cycle of b[{depItem}] -> b[{item}]")
+                logger_depres.debug((f"\tBreaking trivial cycle of b[{depItem}] -> b[{item}]"))
                 result["trivialCycles"] += 1
                 continue
 
             if depItem in result["dependencies"]:
-                Debug().debug(f"\tSkipping duplicate direct dependency b[{depItem}] of b[{item}]")
+                logger_depres.debug(f"\tSkipping duplicate direct dependency b[{depItem}] of b[{item}]")
             else:
                 if not depBranch:
                     depBranch = ""
@@ -342,11 +343,11 @@ class DependencyResolver:
         depModuleGraph = moduleGraph[depItem]
         if depModuleGraph.setdefault("traces", {}).get("status", None):
             if depModuleGraph["traces"]["status"] == 2:
-                Debug().debug(f"Already resolved {depItem} -- skipping")
+                logger_depres.debug(f"Already resolved {depItem} -- skipping")
                 return depModuleGraph["traces"]["result"]
             else:
                 if not Debug().isTesting():
-                    Debug().error(f"Found a dependency cycle at: {depItem} while tracing {item}")
+                    logger_depres.error(f"Found a dependency cycle at: {depItem} while tracing {item}")
                 depModuleGraph["traces"]["result"] = 1
         else:
             depModuleGraph["traces"]["status"] = 1
@@ -370,8 +371,8 @@ class DependencyResolver:
 
         for item in sorted(moduleGraph.keys()):
             if DependencyResolver._detectDependencyCycle(moduleGraph, item, item):
-                Debug().error(f"Somehow there is a circular dependency involving b[{item}]! :(")
-                Debug().error("Please file a bug against repo-metadata about this!")
+                logger_depres.error(f"Somehow there is a circular dependency involving b[{item}]! :(")
+                logger_depres.error("Please file a bug against repo-metadata about this!")
                 errors += 1
         return errors
 
@@ -380,21 +381,21 @@ class DependencyResolver:
         allDeps = moduleGraph[item]["allDeps"]
 
         if "done" in allDeps:
-            Debug().debug(f"\tAlready copied up dependencies for b[{item}] -- skipping")
+            logger_depres.debug(f"\tAlready copied up dependencies for b[{item}] -- skipping")
         else:
-            Debug().debug(f"\tCopying up dependencies and transitive dependencies for item: b[{item}]")
+            logger_depres.debug(f"\tCopying up dependencies and transitive dependencies for item: b[{item}]")
             allDeps["items"] = {}
 
             names = moduleGraph[item]["deps"].keys()
             for name in names:
                 if name in allDeps["items"]:
-                    Debug().debug(f"\tAlready copied up (transitive) dependency on b[{name}] for b[{item}] -- skipping")
+                    logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{name}] for b[{item}] -- skipping")
                 else:
                     DependencyResolver._copyUpDependenciesForModule(moduleGraph, name)
                     copied = list(moduleGraph[name]["allDeps"]["items"])
                     for copy in copied:
                         if copy in allDeps["items"]:
-                            Debug().debug(f"\tAlready copied up (transitive) dependency on b[{copy}] for b[{item}] -- skipping")
+                            logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{copy}] for b[{item}] -- skipping")
                         else:
                             allDeps["items"][copy] = allDeps["items"].get(copy, 0) + 1
                     allDeps["items"][name] = allDeps["items"].get(name, 0) + 1
@@ -425,10 +426,10 @@ class DependencyResolver:
             if not module.isKDEProject():
                 projectPath = f"third-party/{projectPath}"
 
-            Debug().debug(f"\tUsing path: 'b[{projectPath}]' for item: b[{item}]")
+            logger_depres.debug(f"\tUsing path: 'b[{projectPath}]' for item: b[{item}]")
             return projectPath
 
-        Debug().debug(f"\tGuessing path: 'b[{path}]' for item: b[{item}]")
+        logger_depres.debug(f"\tGuessing path: 'b[{path}]' for item: b[{item}]")
         return path
 
     def _resolveDependenciesForModuleDescription(self, moduleGraph, moduleDesc) -> dict:
@@ -450,7 +451,7 @@ class DependencyResolver:
             "branchErrors": 0
         }
 
-        Debug().debug(f"Resolving dependencies for module: b[{item}]")
+        logger_depres.debug(f"Resolving dependencies for module: b[{item}]")
 
         for depItem in sorted(moduleGraph[item]["deps"].keys()):
             depInfo = moduleGraph[item]["deps"][depItem]
@@ -459,14 +460,14 @@ class DependencyResolver:
 
             prettyDepBranch = f"{depBranch}" if depBranch else "*"
 
-            Debug().debug(f"\tdep-resolv: b[{item}:{prettyBranch}] depends on b[{depItem}:{prettyDepBranch}]")
+            logger_depres.debug(f"\tdep-resolv: b[{item}:{prettyBranch}] depends on b[{depItem}:{prettyDepBranch}]")
 
             depModuleGraph = moduleGraph.get(depItem, None)
 
             if depModuleGraph:
                 previouslySelectedBranch = self._detectBranchConflict(moduleGraph, depItem, depBranch)
                 if previouslySelectedBranch:
-                    Debug().error(f"r[Found a dependency conflict in branches ('b[{previouslySelectedBranch}]' is not 'b[{prettyDepBranch}]') for b[{depItem}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches ('b[{previouslySelectedBranch}]' is not 'b[{prettyDepBranch}]') for b[{depItem}]! :(")
                     errors["branchErrors"] += 1
                 else:
                     if depBranch:
@@ -477,7 +478,7 @@ class DependencyResolver:
                 resolvedPath = DependencyResolver._getDependencyPathOf(depModule, depItem, depPath)
                 # May not exist, e.g. misspellings or 'virtual' dependencies like kf5umbrella.
                 if not depModule:
-                    Debug().debug(f"\tdep-resolve: Will not build virtual or undefined module: b[{depItem}]\n")
+                    logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined module: b[{depItem}]\n")
 
                 depLookupResult = self._lookupDirectDependencies(resolvedPath, depBranch)
 
@@ -504,14 +505,14 @@ class DependencyResolver:
                 }
 
                 if not moduleGraph[depItem]["build"]:
-                    Debug().debug(f" y[b[*] {item} depends on {depItem}, but no module builds {depItem} for this run.]")
+                    logger_depres.debug(f" y[b[*] {item} depends on {depItem}, but no module builds {depItem} for this run.]")
 
                 if depModule and depBranch and (self._getBranchOf(depModule) or "") != f"{depBranch}":
                     wrongBranch = self._getBranchOf(depModule) or "?"
-                    Debug().error(f" r[b[*] {item} needs {depItem}:{prettyDepBranch}, not {depItem}:{wrongBranch}]")
+                    logger_depres.error(f" r[b[*] {item} needs {depItem}:{prettyDepBranch}, not {depItem}:{wrongBranch}]")
                     errors["branchErrors"] += 1
 
-                Debug().debug(f"Resolving transitive dependencies for module: b[{item}] (via: b[{depItem}:{prettyDepBranch}])")
+                logger_depres.debug(f"Resolving transitive dependencies for module: b[{item}] (via: b[{depItem}:{prettyDepBranch}])")
                 resolvErrors = self._resolveDependenciesForModuleDescription(moduleGraph, depModuleDesc)
 
                 errors["branchErrors"] += resolvErrors["branchErrors"]
@@ -544,15 +545,15 @@ class DependencyResolver:
             path = DependencyResolver._getDependencyPathOf(module, item, "")
 
             if not path:
-                Debug().error(f"r[Unable to determine project/dependency path of module: {item}]")
+                logger_depres.error(f"r[Unable to determine project/dependency path of module: {item}]")
                 errors["pathErrors"] += 1
                 continue
 
             if item in moduleGraph and moduleGraph[item]:
-                Debug().debug(f"Module pulled in previously through (transitive) dependencies: {item}")
+                logger_depres.debug(f"Module pulled in previously through (transitive) dependencies: {item}")
                 previouslySelectedBranch = self._detectBranchConflict(moduleGraph, item, branch)
                 if previouslySelectedBranch:
-                    Debug().error(f"r[Found a dependency conflict in branches ('b[{previouslySelectedBranch}]' is not 'b[{branch}]') for b[{item}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches ('b[{previouslySelectedBranch}]' is not 'b[{branch}]') for b[{item}]! :(")
                     errors["branchErrors"] += 1
                 elif branch:
                     moduleGraph[item][branch] = branch
@@ -593,18 +594,18 @@ class DependencyResolver:
 
         pathErrors = errors["pathErrors"]
         if pathErrors:
-            Debug().error(f"Total of items which were not resolved due to path lookup failure: {pathErrors}")
+            logger_depres.error(f"Total of items which were not resolved due to path lookup failure: {pathErrors}")
 
         branchErrors = errors["branchErrors"]
         if branchErrors:
-            Debug().error(f"Total of branch conflicts detected: {branchErrors}")
+            logger_depres.error(f"Total of branch conflicts detected: {branchErrors}")
 
         syntaxErrors = errors["syntaxErrors"]
         if syntaxErrors:
-            Debug().error(f"Total of encountered syntax errors: {syntaxErrors}")
+            logger_depres.error(f"Total of encountered syntax errors: {syntaxErrors}")
 
         if syntaxErrors or pathErrors or branchErrors:
-            Debug().error("Unable to resolve dependency graph")
+            logger_depres.error("Unable to resolve dependency graph")
 
             result["graph"] = None
             return result
@@ -612,13 +613,13 @@ class DependencyResolver:
         trivialCycles = errors["trivialCycles"]
 
         if trivialCycles:
-            Debug().whisper(f"Total of 'trivial' dependency cycles detected & eliminated: {trivialCycles}")
+            logger_depres.debug(f"Total of 'trivial' dependency cycles detected & eliminated: {trivialCycles}")
 
         cycles = self._checkDependencyCycles(moduleGraph)
 
         if cycles:
-            Debug().error(f"Total of items with at least one circular dependency detected: {errors}")
-            Debug().error("Unable to resolve dependency graph")
+            logger_depres.error(f"Total of items with at least one circular dependency detected: {errors}")
+            logger_depres.error("Unable to resolve dependency graph")
 
             result["cycles"] = cycles
             result["graph"] = None

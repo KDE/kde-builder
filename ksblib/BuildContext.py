@@ -14,7 +14,7 @@ import datetime
 import errno
 # from overrides import override
 
-from .Debug import Debug
+from .Debug import Debug, kbLogger
 from .PhaseList import PhaseList
 from .Module.Module import Module
 from .Module.BranchGroupResolver import Module_BranchGroupResolver
@@ -27,6 +27,8 @@ from .OptionsBase import OptionsBase
 from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
 from .BuildException import BuildException
 from .Util.Util import Util
+
+logger_buildcontext = kbLogger.getLogger("build-context")
 
 
 # We derive from Module so that BuildContext acts like the 'global'
@@ -102,7 +104,6 @@ class BuildContext(Module):
 
         # These options are used for internal state, they are _not_ exposed as cmdline options
         self.GlobalOptions_private = {
-            "debug-level": Debug.INFO,
             "filter-out-phases": "",
             "git-desired-protocol": "git",  # protocol to use for git *push* URLs (fetch requires https)
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
@@ -250,14 +251,14 @@ class BuildContext(Module):
 
         path = None
         if module in self.modules:
-            Debug().debug("Skipping duplicate module ", module.name)
+            logger_buildcontext.debug("Skipping duplicate module " + module.name)
         elif ((path := module.fullProjectPath()) and
               any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
             # See if the name matches any given in the ignore list.
 
-            Debug().debug(f"Skipping ignored module {module}")
+            logger_buildcontext.debug(f"Skipping ignored module {module}")
         else:
-            Debug().debug(f"Adding {module} to module list")
+            logger_buildcontext.debug(f"Adding {module} to module list")
             self.modules.append(module)
 
     def moduleList(self) -> list[Module]:
@@ -286,7 +287,7 @@ class BuildContext(Module):
             # -p $$ is our PID, -c3 is idle priority
             # 0 return value means success
             if Util.safe_system(["ionice", "-c3", "-p", os.getpid()]) != 0:
-                Debug().warning(" b[y[*] Unable to lower I/O priority, continuing...")
+                logger_buildcontext.warning(" b[y[*] Unable to lower I/O priority, continuing...")
 
         # Get ready for logged output.
         Debug().setLogFile(self.getLogDirFor(self) + "/build-log")
@@ -321,7 +322,7 @@ class BuildContext(Module):
         if not value:
             return
 
-        Debug().debug(f"\tQueueing g[{key}] to be set to y[{value}]")
+        logger_buildcontext.debug(f"\tQueueing g[{key}] to be set to y[{value}]")
         self.env[key] = value
 
     def commitEnvironmentChanges(self) -> None:
@@ -334,7 +335,7 @@ class BuildContext(Module):
 
         for key, value in self.env.items():
             os.environ[key] = value
-            Debug().debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
+            logger_buildcontext.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
 
     def prependEnvironmentValue(self, envName: str, items: str) -> None:  # pl2py: the items was a list in perl, but it was never used as list. So will type it as str.
         """
@@ -372,15 +373,15 @@ class BuildContext(Module):
         # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
         if sys.prefix != sys.base_prefix and envName == "PATH":
             if f"{sys.prefix}/bin" in curPaths:
-                Debug().debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
+                logger_buildcontext.debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
                 curPaths.remove(f"{sys.prefix}/bin")
             else:
-                Debug().debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
+                logger_buildcontext.debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
 
         # Filter out entries to add that are already in the environment from
         # the system.
         for path in [item for item in [items] if item in curPaths]:
-            Debug().debug(f"\tNot prepending y[{path}] to y[{envName}] as it appears " + f"to already be defined in y[{envName}].")
+            logger_buildcontext.debug(f"\tNot prepending y[{path}] to y[{envName}] as it appears " + f"to already be defined in y[{envName}].")
 
         items = [item for item in [items] if item not in curPaths]
 
@@ -423,7 +424,7 @@ class BuildContext(Module):
             except OSError:
                 # Lockfile is there but we can't open it?!?  Maybe a race
                 # condition but I have to give up somewhere.
-                Debug().warning(f" WARNING: Can't open or create lockfile r[{lockfile}]")
+                logger_buildcontext.warning(f" WARNING: Can't open or create lockfile r[{lockfile}]")
                 return True
 
             pid = pidFile.read()
@@ -452,7 +453,7 @@ class BuildContext(Module):
 
                     # We still can't grab the lockfile, let's just hope things
                     # work out.
-                    Debug().note(" y[*] kde-builder run in progress by user request.")
+                    logger_buildcontext.warning(" y[*] kde-builder run in progress by user request.")
                     return True
                 except (OSError, ProcessLookupError):
                     pass
@@ -462,13 +463,13 @@ class BuildContext(Module):
 
             # No pid found, optimistically assume the user isn't running
             # twice.
-            Debug().warning(" y[WARNING]: stale kde-builder lockfile found, deleting.")
+            logger_buildcontext.warning(" y[WARNING]: stale kde-builder lockfile found, deleting.")
             os.unlink(lockfile)
 
             try:
                 LOCKFILE = os.open(lockfile, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
             except OSError:
-                Debug().error(f" r[*] Still unable to lock {lockfile}, proceeding anyways...")
+                logger_buildcontext.error(f" r[*] Still unable to lock {lockfile}, proceeding anyways...")
                 return True
             # Hope the sysopen worked... fall-through
         elif errorCode == errno.ENOTTY:
@@ -476,8 +477,8 @@ class BuildContext(Module):
             # glibc and Perl but I know that setting PERLIO=:stdio in the environment "fixes" things.
             pass
         elif errorCode != 0:  # Some other error occurred.
-            Debug().warning(f" r[*]: Error {errorCode} while creating lock file (is {baseDir} available?)")
-            Debug().warning(" r[*]: Continuing the script for now...")
+            logger_buildcontext.warning(f" r[*]: Error {errorCode} while creating lock file (is {baseDir} available?)")
+            logger_buildcontext.warning(" r[*]: Continuing the script for now...")
 
             # Even if we fail it's generally better to allow the script to proceed
             # without being a jerk about things, especially as more non-CLI-skilled
@@ -499,7 +500,7 @@ class BuildContext(Module):
         try:
             os.unlink(lockFile)
         except Exception as e:
-            Debug().warning(f" y[*] Failed to close lock: {e}")
+            logger_buildcontext.warning(f" y[*] Failed to close lock: {e}")
 
     def getLogDirFor(self, module: Module) -> str:
         """
@@ -589,7 +590,7 @@ class BuildContext(Module):
         if file.startswith(os.getenv("HOME")):
             file = re.sub(os.getenv("HOME"), "~", file)
         if file == "~/.kdesrc-buildrc":
-            Debug().warning(textwrap.dedent(f"""\
+            logger_buildcontext.warning(textwrap.dedent(f"""\
             The b[global configuration file] is stored in the old location. It will still be
             processed correctly, however, it's recommended to move it to the new location.
             Please move b[~/.kdesrc-buildrc] to b[{BuildContext.xdgConfigHomeShort}/kdesrc-buildrc]
@@ -623,7 +624,7 @@ class BuildContext(Module):
             # load the file, we need to fail to load at all.
             failedFile = rcFiles[0]
 
-            Debug().error(textwrap.dedent(f"""\
+            logger_buildcontext.error(textwrap.dedent(f"""\
             Unable to open config file {failedFile}
             
             Script stopping here since you specified --rc-file on the command line to
@@ -668,7 +669,7 @@ class BuildContext(Module):
         else:
             # If no configuration and no --rc-file option was used, warn the user and fail.
 
-            Debug().error(textwrap.dedent(f"""\
+            logger_buildcontext.error(textwrap.dedent(f"""\
                 b[No configuration file is present.]
                 
                 kde-builder requires a configuration file to select which KDE software modules
@@ -789,8 +790,6 @@ class BuildContext(Module):
             normalizedKey = normalizedKey.lstrip("#")  # Remove sticky key modifier.
             if normalizedKey == "colorful-output":
                 Debug().setColorfulOutput(value)
-            elif normalizedKey == "debug-level":
-                Debug().setDebugLevel(value)
             elif normalizedKey == "pretend":
                 Debug().setPretending(value)
 
@@ -823,7 +822,7 @@ class BuildContext(Module):
                 # ...But only if the specified rcfile isn't one of the default ones,
                 # to prevent the user from making an oopsie
                 if rcFilePath in BuildContext.rcfiles:
-                    Debug().warning("The specified rc file is one of the default ones. Ignoring it.")
+                    logger_buildcontext.warning("The specified rc file is one of the default ones. Ignoring it.")
                 else:
                     rcFileName = os.path.basename(rcFilePath)
                     file = f"{file}-{rcFileName}"
@@ -835,7 +834,7 @@ class BuildContext(Module):
                 file = legacyDataFile
 
             if file == legacyDataFile and not self.getOption("#warned-legacy-data-location"):
-                Debug().warning(textwrap.dedent(f"""\
+                logger_buildcontext.warning(textwrap.dedent(f"""\
                 The b[global data file] is stored in the old location. It will still be
                 processed correctly, however, it's recommended to move it to the new location.
                 Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdgStateHomeShort}/kdesrc-build-data]"""))
@@ -877,7 +876,7 @@ class BuildContext(Module):
         persistent_options = json.loads(persistent_data)
         e = "json exception"
         if not isinstance(persistent_options, dict):
-            Debug().error(f"Failed to read persistent module data: r[b[{e}]")
+            logger_buildcontext.error(f"Failed to read persistent module data: r[b[{e}]")
             return
         self.persistent_options = persistent_options
 
@@ -899,7 +898,7 @@ class BuildContext(Module):
             encodedJSON = json.dumps(self.persistent_options, indent=3)
             Path(fileName).write_text(encodedJSON)
         except Exception as e:
-            Debug().error(f"Unable to save persistent module data: b[r[{e}]")
+            logger_buildcontext.error(f"Unable to save persistent module data: b[r[{e}]")
             return
 
     # @override(check_signature=False)

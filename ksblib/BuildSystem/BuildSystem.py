@@ -4,17 +4,21 @@ import sys
 import re
 import time
 from promise import Promise
+import logging
 
 from ..BuildException import BuildException
 from ..Util.Util import Util
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..Module.Module import Module
     from ..BuildContext import BuildContext
 
 # use ksb::StatusView;
+
+logger_logged_cmd = kbLogger.getLogger("logged-command")
+logger_buildsystem = kbLogger.getLogger("build-system")
 
 
 class BuildSystem:
@@ -178,7 +182,7 @@ class BuildSystem:
         # doesn't guess anyways from a security point-of-view.
         buildCommand = next((bc for bc in self.buildCommands() if Util.locate_exe(bc)), None)
         if buildCommand is None:
-            Debug().warning(" y[*] Not found any of these executables: '", "' '".join(self.buildCommands()), "'. buildCommand will be undefined.")
+            logger_buildsystem.warning(" y[*] Not found any of these executables: '" + "' '".join(self.buildCommands()) + "'. buildCommand will be undefined.")
         return buildCommand
 
     @staticmethod
@@ -210,7 +214,7 @@ class BuildSystem:
 
         # Look for -j being present but not being followed by digits
         if re.search(r"(^|[^a-zA-Z0-9_])-j$", optionVal) or re.search(r"(^|[^a-zA-Z_])-j(?! *[0-9]+)", optionVal):
-            Debug().warning(" y[b[*] Removing empty -j setting during build for y[b[" + str(self.module) + "]")
+            logger_buildsystem.warning(" y[b[*] Removing empty -j setting during build for y[b[" + str(self.module) + "]")
             optionVal = re.sub(r"(^|[^a-zA-Z_])-j *", r"\1", optionVal)  # Remove the -j entirely for now
 
         makeOptions = optionVal.split(" ")
@@ -258,7 +262,7 @@ class BuildSystem:
         Returns true if a testsuite is present and all tests passed, false otherwise.
         """
         module = self.module
-        Debug().info(f"\ty[{module}] does not support the b[run-tests] option")
+        logger_buildsystem.info(f"\ty[{module}] does not support the b[run-tests] option")
         return False
 
     def installInternal(self, cmdPrefix: list[str]) -> bool:
@@ -301,12 +305,12 @@ class BuildSystem:
         builddir = module.fullpath("build")
 
         if Debug().pretending():
-            Debug().pretend(f"\tWould have cleaned build system for g[{module}]")
+            logger_buildsystem.pretend(f"\tWould have cleaned build system for g[{module}]")
             return 1
 
         # Use an existing directory
         if os.path.exists(builddir) and builddir != srcdir:
-            Debug().info(f"\tRemoving files in build directory for g[{module}]")
+            logger_buildsystem.info(f"\tRemoving files in build directory for g[{module}]")
 
             clean_promise = Util.prune_under_directory_p(module, builddir)
             result = Util.await_result(clean_promise)
@@ -314,7 +318,7 @@ class BuildSystem:
             # This variant of log_command runs the sub prune_under_directory($builddir)
             # in a forked child, so that we can log its output.
             if not result:
-                Debug().error(f" r[b[*]\tFailed to clean build directory.  Verify the permissions are correct.")
+                logger_buildsystem.error(f" r[b[*]\tFailed to clean build directory.  Verify the permissions are correct.")
                 return 0  # False for this function.
 
             module.unsetPersistentOption("last-build-rev")
@@ -322,9 +326,9 @@ class BuildSystem:
 
             # Let users know we're done so they don't wonder why rm -rf is taking so
             # long and oh yeah, why's my HD so active?...
-            Debug().info("\tOld build system cleaned, starting new build system.")
+            logger_buildsystem.info("\tOld build system cleaned, starting new build system.")
         elif not Util.super_mkdir(builddir):
-            Debug().error(f"\tUnable to create directory r[{builddir}].")
+            logger_buildsystem.error(f"\tUnable to create directory r[{builddir}].")
             return 0
         return 1
 
@@ -346,13 +350,13 @@ class BuildSystem:
         srcdir = module.fullpath("source")
 
         if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
-            Debug().error(f"\tUnable to create build directory for r[{module}]!!")
+            logger_buildsystem.error(f"\tUnable to create build directory for r[{module}]!!")
             return Promise.resolve(0)
 
         if builddir != srcdir and self.needsBuilddirHack():
             def func(result):
                 if not result:
-                    Debug().error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
+                    logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
                 return result
 
             promise = Util.safe_lndir_p(srcdir, builddir).then(func)
@@ -412,7 +416,7 @@ class BuildSystem:
             commandToUse = buildCommand = self.defaultBuildCommand()
 
         if not buildCommand:
-            Debug().error(f" r[b[*] Unable to find the g[{commandToUse}] executable!")
+            logger_buildsystem.error(f" r[b[*] Unable to find the g[{commandToUse}] executable!")
             return {"was_successful": 0}
 
         # Make it prettier if pretending (Remove leading directories).
@@ -472,8 +476,8 @@ class BuildSystem:
         # There are situations when we don't want progress output:
         # 1. If we're not printing to a terminal.
         # 2. When we're debugging (we'd interfere with debugging output).
-        if not sys.stderr.isatty() or Debug().debugging():
-            Debug().note(f"\t{message}")
+        if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
+            logger_buildsystem.warning(f"\t{message}")
 
             promise = Util.run_logged_p(module, filename, builddir, argRef)
             resultRef["was_successful"] = Util.await_exitcode(promise)
@@ -493,6 +497,14 @@ class BuildSystem:
         statusViewer = ctx.statusViewer()
         statusViewer.setStatus(f"\t{message}")
         statusViewer.update()
+
+        if logger_logged_cmd.level == logging.INFO and ctx.statusViewer().cur_progress == -1:
+            # When user configured logged-command logger to not print the output of the command to console (i.e. logged-command level is higher than DEBUG), but still print the info of started and finished logged command,
+            # (i.e. logged-command level is lower than WARNING), in other words, when logged-command level is INFO, the user will want to see the initial status message.
+            # statusViewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".
+            # And then finally is replaced with "        Installing ark succeeded (after 3 seconds)".
+            # So to keep that initial line "        Installing ark", we need to add a new line after statusView prints its line and moves cursor to the beginning of line.
+            print("\n", end="")
 
         # TODO More details
         warnings = 0
@@ -547,7 +559,7 @@ class BuildSystem:
             }
 
         def _catch(err):
-            Debug().error(f" r[b[*] Hit error building {module}: b[{err}]")
+            logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
             resultRef["was_successful"] = 0
 
         promise = cmd.start().then(_then).catch(_catch)
@@ -570,7 +582,7 @@ class BuildSystem:
                 count = 4
 
             msg = f"""{"-" * count} b[y[{warnings}] {"-" * count}"""
-            Debug().note(f"\tNote: {msg} compile warnings")
+            logger_buildsystem.warning(f"\tNote: {msg} compile warnings")
             self.module.setPersistentOption("last-compile-warnings", warnings)
 
         return resultRef

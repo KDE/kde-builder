@@ -8,7 +8,6 @@ _arguments \
   "(--src-only -S -s --no-src)"{--src-only,-S,-s,--no-src}"[Only perform/Skip update source code]" \
   "(--after --from --resume-after --resume-from -a -f)"{--after,--from,--resume-after,--resume-from,-a,-f}"[Skips modules until just before or after the given package, then operates as normal]"":::_kde-builder_modules" \
   "(--stop-after --stop-before --to --until)"{--stop-after,--stop-before,--to,--until}"[Stops just before or after the given package is reached]"":::_kde-builder_modules" \
-  "(--debug --quiet --quite --really-quiet --verbose -q)"{--debug,--quiet,--quite,--really-quiet,--verbose,-q}"[Change the level of verbosity]" \
   "(--show-info --show-options-specifiers --version -v)"{--show-info,--show-options-specifiers,--version,-v}"[Script information]" \
   "(--metadata-only -M --no-metadata)"{--metadata-only,-M,--no-metadata}"[Only perform/Skip the metadata download process]" \
   "(--build-only --no-build)"{--build-only,--no-build}"[Only perform/Skip the build process.]" \
@@ -30,6 +29,7 @@ _arguments \
   "--configure-flags""[Flags to pass to ./configure ]"":argument:" \
   "--custom-build-command""[Run a different command in order to perform the build process]"":argument:" \
   "--cxxflags""[Flags to use for building the module]"":argument:" \
+  "--debug" \
   "(--delete-my-patches --no-delete-my-patches)"{--delete-my-patches,--no-delete-my-patches}"[Let kde-builder delete source directories that may contain user data]" \
   "(--delete-my-settings --no-delete-my-settings)"{--delete-my-settings,--no-delete-my-settings}"[Overwrite existing files which may contain user data]" \
   "--dest-dir""[The name a module is given on disk]"":argument:" \

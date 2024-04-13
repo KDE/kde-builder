@@ -11,8 +11,12 @@ import os
 import sys
 import textwrap
 import traceback
+import logging.config
+import yaml
+from ksblib.Debug import kbLogger
 
 
+# <editor-fold desc="Check missing python modules">
 def findMissingModules() -> list:
     requiredModules = [
         "yaml",
@@ -48,6 +52,7 @@ if missingModuleDescriptions:
 
     print("\nkde-builder can do this for you on many distros. Consult the installation process in project documentation.")
     exit(1)
+# </editor-fold>
 
 # ---
 
@@ -60,8 +65,45 @@ parser = argparse.ArgumentParser(prog="ProgramName",
 parser.add_argument("--initial-setup", action="store_true")
 parser.add_argument("--install-distro-packages", action="store_true")
 parser.add_argument("--generate-config", action="store_true")
+parser.add_argument("--debug", action="store_true")
 
 args, unknown = parser.parse_known_args()
+
+# ---
+
+# <editor-fold desc="Applying loggers configuration">
+with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
+    config = yaml.safe_load(f.read())
+
+override_config = {}
+if os.path.exists(os.getcwd() + "/kde-builder-logging.yaml"):
+    with open(os.getcwd() + "/kde-builder-logging.yaml", "r") as f:
+        override_config = yaml.safe_load(f.read())
+elif os.path.exists(os.path.expanduser("~/.config/kde-builder-logging.yaml")):
+    with open(os.path.expanduser("~/.config/kde-builder-logging.yaml"), "r") as f:
+        override_config = yaml.safe_load(f.read())
+config.update(override_config)
+
+logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
+
+# Now will create our kbLogger loggers, set up their levels and handlers
+for logger_name, logger_config in config.get("loggers", {}).items():
+    level = logger_config.get("level", logging.NOTSET)  # get level from the config
+    handlers = logging.getLogger(logger_name).handlers  # get the object handlers that were set for standard logger (their formatters are already set)
+
+    kblogger = kbLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
+    for handler in handlers:
+        kblogger.addHandler(handler)
+
+if args.debug:
+    # setting all loggers to logging.DEBUG level
+    for logger_name, _ in config.get("loggers", {}).items():
+        kblogger = kbLogger.getLogger(logger_name)
+        kblogger.setLevel(logging.DEBUG)
+    sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
+# </editor-fold>
+
+# ---
 
 setup_steps = []
 if args.initial_setup:

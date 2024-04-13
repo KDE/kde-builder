@@ -17,13 +17,15 @@ from ..Util.Util import Util
 # use File::Basename; # basename
 # use File::Spec;     # tmpdir
 # use List::Util qw(first);
-from ..Debug import Debug
+from ..Debug import Debug, kbLogger
 
 from .Updater import Updater
 from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from ..Module.Module import Module
     from ..BuildContext import BuildContext
+
+logger_updater = kbLogger.getLogger("updater")
 
 
 class Updater_Git(Updater):
@@ -131,7 +133,7 @@ class Updater_Git(Updater):
 
         ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
 
-        Debug().note(f"Cloning g[{module}]")
+        logger_updater.warning(f"Cloning g[{module}]")
 
         Util.p_chdir(module.getSourceDir())
 
@@ -159,13 +161,13 @@ class Updater_Git(Updater):
                     BuildException.croak_runtime(f"Invalid username or email for git-user option: {name}" +
                                                  " (should be in format 'User Name <username@example.net>'")
 
-                Debug().whisper(f"\tAdding git identity {name} for new git module {module}")
+                logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
                 result = Util.safe_system(["git", "config", "--local", "user.name", username]) == 0
 
                 result = Util.safe_system(["git", "config", "--local", "user.email", email]) == 0 or result
 
                 if not result:
-                    Debug().warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
+                    logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
             return 1  # success
 
         promise = promise.then(_then)
@@ -179,11 +181,11 @@ class Updater_Git(Updater):
         """
         if os.path.exists(f"{srcdir}") and not os.listdir(srcdir):
             if module.getOption("#delete-my-patches"):
-                Debug().warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
-                Debug().warning(f"\tRemoving b[{srcdir}]")
+                logger_updater.warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
+                logger_updater.warning(f"\tRemoving b[{srcdir}]")
                 Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
             else:
-                Debug().error(textwrap.dedent("""\
+                logger_updater.error(textwrap.dedent("""\
                 The source directory for b[$module] does not exist. kde-builder would download
                 it, except there is already a file or directory present in the desired source
                 directory:
@@ -199,7 +201,7 @@ class Updater_Git(Updater):
                 """))
 
                 if os.path.exists(f"{srcdir}/.git"):
-                    Debug().error(f"git status of {srcdir}:")
+                    logger_updater.error(f"git status of {srcdir}:")
                     print(subprocess.check_output(["git", "status", srcdir]))
                 BuildException.croak_runtime("Conflicting source-dir present")
 
@@ -275,7 +277,7 @@ class Updater_Git(Updater):
 
         def first_fn(resolve, reject):
             if hasOldRemote:
-                Debug().whisper(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
+                logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
 
                 def ec_1(exitcode):
                     if not exitcode == 0:
@@ -283,7 +285,7 @@ class Updater_Git(Updater):
 
                 resolve(Util.run_logged_p(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo]).then(ec_1))
             else:
-                Debug().whisper(f"\tAdding new git remote {remote} of {module} ({repo})")
+                logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
 
                 def ec_2(exitcode):
                     if not exitcode == 0:
@@ -311,7 +313,7 @@ class Updater_Git(Updater):
             if not existingPushUrl:
                 return 1
 
-            Debug().info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
+            logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
 
             Util.run_logged_p(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
 
@@ -350,10 +352,10 @@ class Updater_Git(Updater):
             # Make a notice if the repository we're using has moved.
             old_repo = module.getPersistentOption("git-cloned-repository")
             if old_repo and (cur_repo != old_repo):
-                Debug().note(f" y[b[*]\ty[{module}]'s selected repository has changed")
-                Debug().note(f" y[b[*]\tfrom y[{old_repo}]")
-                Debug().note(f" y[b[*]\tto   b[{cur_repo}]")
-                Debug().note(" y[b[*]\tThe git remote named b[", Updater_Git.DEFAULT_GIT_REMOTE, "] has been updated")
+                logger_updater.warning(f" y[b[*]\ty[{module}]'s selected repository has changed")
+                logger_updater.warning(f" y[b[*]\tfrom y[{old_repo}]")
+                logger_updater.warning(f" y[b[*]\tto   b[{cur_repo}]")
+                logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater_Git.DEFAULT_GIT_REMOTE + "] has been updated")
 
                 # Update what we think is the current repository on-disk.
                 ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
@@ -388,7 +390,7 @@ class Updater_Git(Updater):
             if not branchName:
                 branchName = f"New branch to point to {remoteName}/{branch}"
 
-            Debug().info(textwrap.dedent(f"""\
+            logger_updater.info(textwrap.dedent(f"""\
                 y[b[*] The module y[b[{module}] had local changes from a different branch than expected:
                 y[b[*]   Expected branch: b[{branchName}]
                 y[b[*]   Actual branch:   b[{existingBranch}]
@@ -440,7 +442,7 @@ class Updater_Git(Updater):
 
                 def announcer_sub(_):
                     # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                    Debug().whisper(f"\tUpdating g[{module}] with new remote-tracking branch y[{newName}]")
+                    logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{newName}]")
 
                 cmd.log_to("git-checkout-branch") \
                     .set_command(["git", "checkout", "-b", newName, f"{remoteName}/{branch}"]) \
@@ -451,7 +453,7 @@ class Updater_Git(Updater):
             else:
                 def announcer_sub(_):
                     # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                    Debug().whisper(f"\tUpdating g[{module}] using existing branch g[{branchName}]")
+                    logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branchName}]")
 
                 cmd.log_to("git-checkout-update") \
                     .set_command(["git", "checkout", branchName]) \
@@ -509,7 +511,7 @@ class Updater_Git(Updater):
         srcdir = module.fullpath("source")
 
         def func(resolve, reject):
-            Debug().info(f"\tDetaching head to b[{commit}]")
+            logger_updater.info(f"\tDetaching head to b[{commit}]")
 
             def func_2(exitcode):  # need to adapt to boolean success flag
                 return exitcode == 0
@@ -544,7 +546,7 @@ class Updater_Git(Updater):
             nonlocal remoteName
             remoteName = _remoteName  # save for later
 
-            Debug().info(f"Fetching remote changes to g[{module}]")
+            logger_updater.info(f"Fetching remote changes to g[{module}]")
             return Util.run_logged_p(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName])
 
         # Download updated objects. This also updates remote heads so do this
@@ -562,7 +564,7 @@ class Updater_Git(Updater):
                 commitType = "branch"
                 commitId = self._detectDefaultRemoteHead(remoteName)
 
-            Debug().note(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
+            logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
             start_commit = self.commit_id("HEAD")
 
             def condition():
@@ -653,7 +655,7 @@ class Updater_Git(Updater):
         # In this case it's unclear which convention source modules will use between
         # 'master', 'main', or something entirely different.  So just don't guess...
         if not sourceTypeRef:
-            Debug().whisper(f"No branch specified for {module}, will use whatever git gives us")
+            logger_updater.debug(f"No branch specified for {module}, will use whatever git gives us")
             return "none", "none"
 
         # Likewise branch-group requires special handling. checkoutSource is
@@ -664,7 +666,7 @@ class Updater_Git(Updater):
 
             if not checkoutSource:
                 branchGroup = module.getOption("branch-group")
-                Debug().whisper(f"No specific branch set for {module} and {branchGroup}, using master!")
+                logger_updater.debug(f"No specific branch set for {module} and {branchGroup}, using master!")
                 checkoutSource = "master"
 
         if sourceTypeRef[0] == "tag" and not checkoutSource.startswith("^refs/tags/"):
@@ -702,10 +704,10 @@ class Updater_Git(Updater):
             count = p.stdout
             if count:
                 count = count.removesuffix("\n")
-            Debug().debug(f"\tNumber of stashes found for b[{module}] is: b[{count}]")
+            logger_updater.debug(f"\tNumber of stashes found for b[{module}] is: b[{count}]")
             return int(count)
         else:
-            Debug().debug(f"\tIt appears there is no stash for b[{module}]")
+            logger_updater.debug(f"\tIt appears there is no stash for b[{module}]")
             return 0
 
     def _notifyPostBuildMessage(self, *args: str) -> None:
@@ -752,7 +754,7 @@ class Updater_Git(Updater):
             # - we do not stash .gitignore'd files because they may be needed for builds?
             #   on the other hand that leaves a slight risk if upstream altered those
             #   (i.e. no longer truly .gitignore'd)
-            Debug().whisper("\tStashing local changes if any...")
+            logger_updater.debug("\tStashing local changes if any...")
 
             if Debug().pretending():  # probably best not to do anything if pretending
                 return Promise.resolve(0)
@@ -816,10 +818,10 @@ class Updater_Git(Updater):
                 if exitcode != 0:
                     message = f"r[b[*] Unable to restore local changes for b[{module}]! " + \
                               f"You should manually inspect the new stash: b[{stashName}]"
-                    Debug().warning(f"\t{message}")
+                    logger_updater.warning(f"\t{message}")
                     self._notifyPostBuildMessage(message)
                 else:
-                    Debug().info(f"\tb[*] You had local changes to b[{module}], which have been re-applied.")
+                    logger_updater.info(f"\tb[*] You had local changes to b[{module}], which have been re-applied.")
 
                 return 1  # success
 
@@ -917,7 +919,7 @@ class Updater_Git(Updater):
             outputs = self.slurp_git_config_output(r"git config --null --get-regexp remote\..*\.url .".split(" "))
         except Exception as e:
             print(e)
-            Debug().error("\tUnable to run git config, is there a setup error?")
+            logger_updater.error("\tUnable to run git config, is there a setup error?")
             return []
 
         results = []
@@ -1055,8 +1057,8 @@ class Updater_Git(Updater):
             pushUrlPrefix = "ssh://git@invent.kde.org/" if protocol == "git" else "https://invent.kde.org/"
             otherPushUrlPrefix = "https://invent.kde.org/" if protocol == "git" else "ssh://git@invent.kde.org/"
         else:
-            Debug().error(f" b[y[*] Invalid b[git-desired-protocol] {protocol}")
-            Debug().error(" b[y[*] Try setting this option to 'git' if you're not using a proxy")
+            logger_updater.error(f" b[y[*] Invalid b[git-desired-protocol] {protocol}")
+            logger_updater.error(" b[y[*] Try setting this option to 'git' if you're not using a proxy")
             BuildException.croak_runtime(f"Invalid git-desired-protocol: {protocol}")
 
         p = subprocess.run("git config --global --includes --get url.https://invent.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True)
@@ -1078,20 +1080,20 @@ class Updater_Git(Updater):
 
             if errNum in errors:
                 error = errors[errNum]
-            Debug().error(f" r[*] Unable to run b[git] command:\n\t{error}")
+            logger_updater.error(f" r[*] Unable to run b[git] command:\n\t{error}")
             return False
 
         # If we make it here, I'm just going to assume git works from here on out
         # on this simple task.
         if not re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper("\tAdding git download kde: alias (fetch: https://invent.kde.org/)")
+            logger_updater.debug("\tAdding git download kde: alias (fetch: https://invent.kde.org/)")
             result = Util.safe_system("git config --global --add url.https://invent.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
         configOutput = subprocess.run(f"git config --global --includes --get url.{pushUrlPrefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if not re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper(f"\tAdding git upload kde: alias (push: {pushUrlPrefix})")
+            logger_updater.debug(f"\tAdding git upload kde: alias (push: {pushUrlPrefix})")
             result = Util.safe_system(["git", "config", "--global", "--add", f"url.{pushUrlPrefix}.pushInsteadOf", "kde:"])
             if result != 0:
                 return False
@@ -1099,21 +1101,21 @@ class Updater_Git(Updater):
         # Remove old kde-builder installed aliases (kde: -> git://anongit.kde.org/)
         configOutput = subprocess.run("git config --global --get url.git://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper("\tRemoving outdated kde: alias (fetch: git://anongit.kde.org/)")
+            logger_updater.debug("\tRemoving outdated kde: alias (fetch: git://anongit.kde.org/)")
             result = Util.safe_system("git config --global --unset-all url.git://anongit.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
         configOutput = subprocess.run("git config --global --get url.https://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper("\tRemoving outdated kde: alias (fetch: https://anongit.kde.org/)")
+            logger_updater.debug("\tRemoving outdated kde: alias (fetch: https://anongit.kde.org/)")
             result = Util.safe_system("git config --global --unset-all url.https://anongit.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
         configOutput = subprocess.run("git config --global --get url.git@git.kde.org:.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper("\tRemoving outdated kde: alias (push: git@git.kde.org)")
+            logger_updater.debug("\tRemoving outdated kde: alias (push: git@git.kde.org)")
             result = Util.safe_system("git config --global --unset-all url.git@git.kde.org:.pushInsteadOf kde:".split(" "))
             if result != 0:
                 return False
@@ -1121,7 +1123,7 @@ class Updater_Git(Updater):
 
         configOutput = subprocess.run(f"git config --global --get url.{otherPushUrlPrefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
-            Debug().whisper(f"\tRemoving outdated kde: alias (push: {otherPushUrlPrefix})")
+            logger_updater.debug(f"\tRemoving outdated kde: alias (push: {otherPushUrlPrefix})")
             result = Util.safe_system(["git", "config", "--global", "--unset-all", f"url.{otherPushUrlPrefix}.pushInsteadOf", "kde:"])
             if result != 0:
                 return False
