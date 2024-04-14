@@ -17,4 +17,7 @@
             160,
         ]
     },
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+    "cmake.configureOnEdit": false,
+    "cmake.skipConfigureIfCachePresent": true,
 }
