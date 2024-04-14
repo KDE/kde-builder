@@ -51,6 +51,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  first-run:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   ide_project_configs:
     level: INFO
 #    level: DEBUG
