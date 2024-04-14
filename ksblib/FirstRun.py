@@ -139,31 +139,34 @@ class FirstRun:
             result = subprocess.run(installCmd + packages, shell=False)
             exitStatus = result.returncode
         else:
-            logger_fr.info(" b[*] All dependencies are already installed. No need to run installer. b[:)]")
+            logger_fr.info(" b[*] No packages to install, no need to run installer. b[:)]")
             exitStatus = 0
 
-        # Install one at a time if we can, but check if sudo is present
-        hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-        everFailed = False
-        if exitStatus != 0 and self.oss.isDebianBased() and hasSudo:
-            logger_fr.warning(" b[*] The previous command failed. Will retry installing packages one by one.")
+        if exitStatus != 0:
+            # Install one at a time if we can
+            individual_failed_packages = []
+
+            logger_fr.warning(" b[*] The command with all listed packages failed. Will retry installing packages one by one.\n")
             for onePackage in packages:
-                commandLine = f"sudo apt-get -q -y --no-install-recommends install {onePackage}".split(" ")
-                logger_fr.info(f""" b[*] Running 'b[{" ".join(commandLine)}]'""")
+                logger_fr.info(f"""\n b[*] Running 'b[{" ".join(installCmd + [onePackage])}]'""")
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
-                result = subprocess.run(commandLine, shell=False, capture_output=True)
-                if not everFailed:
-                    everFailed = result.returncode != 0
+                result = subprocess.run(installCmd + [onePackage], shell=False)
 
-        exitStatus = 0  # It is normal if some packages are not available.
-        if everFailed:
-            logger_fr.warning(" y[b[*] Some packages failed to install, continuing to build.")
+                if result.returncode != 0:
+                    individual_failed_packages.append(onePackage)
 
-        if exitStatus == 0:
-            logger_fr.info(" b[*] b[g[Looks like the necessary packages were successfully installed!]")
+            if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
+                logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
+
+            if individual_failed_packages:
+                logger_fr.warning("\n y[b[*] Some packages failed to install:\n" + "\n\t".join(individual_failed_packages))
+            else:
+                logger_fr.warning(f" r[b[*] Packages were installed individually, but the command to install them at once failed with exit status {exitStatus}. Please report this case.")
         else:
-            logger_fr.error(f" r[b[*] Failed with exit status {exitStatus}. Ran into an error with the installer!")
+            if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
+                logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
+            logger_fr.info(" b[*] b[g[Packages were successfully installed!]")
 
     def suggestedNumCoresForLowMemory(self) -> int:
         """
@@ -232,7 +235,7 @@ class FirstRun:
 
         gl = BuildContext().build_options["global"]  # real global defaults
 
-        def fill_placeholder(option_name, mode=""):
+        def fill_placeholder(option_name, mode="") -> None:
             value = gl[option_name]
             if mode == "bool_to_str":
                 # Perl doesn't have native boolean types, so config internally operates on 0 and 1.
@@ -261,7 +264,7 @@ class FirstRun:
             sampleFh.write(sampleRc)
         print()
 
-    def _findBestInstallCmd(self) -> list:
+    def _findBestInstallCmd(self) -> list[str]:
         cmdsRef = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
@@ -291,17 +294,21 @@ class FirstRun:
 
         # If not running as root already, add sudo
         if os.geteuid() != 0:
-            cmd.insert(0, "sudo")
-
+            hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+            if hasSudo:
+                cmd.insert(0, "sudo")
+            else:
+                logger_fr.error("r[*] You are missing g[sudo]! Cannot continue.")
+                exit(1)
         return cmd
 
-    def _findBestVendorPackageList(self, deps_data_path) -> list:
+    def _findBestVendorPackageList(self, deps_data_path) -> list[str]:
         bestVendor = self.oss.bestDistroMatch(self.supportedDistros + self.supportedOtherOS)
         version = self.oss.vendorVersion()
         logger_fr.info(f"    Installing packages for b[{bestVendor}]/b[{version}]")
         return self._packagesForVendor(bestVendor, version, deps_data_path)
 
-    def _packagesForVendor(self, vendor, version, deps_data_path) -> list:
+    def _packagesForVendor(self, vendor, version, deps_data_path) -> list[str]:
         packages = self._readPackages(vendor, version, deps_data_path)
         for opt in [f"pkg/{vendor}/{version}", f"pkg/{vendor}/unknown"]:
             if opt in packages.keys():
