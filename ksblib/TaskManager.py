@@ -87,8 +87,7 @@ class TaskManager:
             # current module to complete and then exit early.
             def handle_sighup(signum, frame):
                 print("[noasync] recv SIGHUP, will end after this module")
-                global DO_STOP
-                DO_STOP = 1
+                self.DO_STOP = 1
 
             signal.signal(signal.SIGHUP, handle_sighup)
 
@@ -498,7 +497,8 @@ class TaskManager:
             logger_taskmanager.debug("Some modules were updated but not built")
 
         pid, status = os.waitpid(monitorPid, 0)
-        result = 1 if os.WEXITSTATUS(status) != 0 else 0
+        if os.WEXITSTATUS(status) != 0:
+            result = 1
 
         monitorToBuildIPC.close()
         return result
