@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os.path
 import sys
 from urllib.parse import urlparse
@@ -13,6 +14,11 @@ from .IPC.Null import IPC_Null
 from .Util.Util import Util
 from .BuildException import BuildException
 import logging
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from BuildContext import BuildContext
+    from .Application import Application
+    from .Module.Module import Module
 
 logger_ipc = kbLogger.getLogger("ipc")
 logger_buildsystem = kbLogger.getLogger("build-system")
@@ -42,7 +48,7 @@ class TaskManager:
     aware of concurrency.
     """
 
-    def __init__(self, app):
+    def __init__(self, app: Application):
         from .Application import Application
         Util.assert_isa(app, Application)
 
@@ -96,7 +102,7 @@ class TaskManager:
 
     # Internal API
 
-    def _handle_updates(self, ipc, ctx) -> int:
+    def _handle_updates(self, ipc: IPC, ctx: BuildContext) -> int:
         """
         Subroutine to update a list of modules.
         
@@ -157,7 +163,7 @@ class TaskManager:
         return hadError
 
     @staticmethod
-    def _buildSingleModule(ipc, ctx, module, startTimeRef):
+    def _buildSingleModule(ipc: IPC, ctx: BuildContext, module: Module, startTimeRef: int) -> str | int:
         """
         Builds the given module.
         
@@ -206,7 +212,7 @@ class TaskManager:
             return 0
         return "build"  # phase failed at
 
-    def _handle_build(self, ipc, ctx) -> int:
+    def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
         Subroutine to handle the build process.
         
@@ -358,7 +364,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, ipc, ctx) -> int:
+    def _handle_async_build(self, ipc: IPC_Pipe, ctx: BuildContext) -> int:
         """
         This subroutine special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
@@ -497,7 +503,7 @@ class TaskManager:
         return result
 
     @staticmethod
-    def _check_for_ssh_agent(ctx):
+    def _check_for_ssh_agent(ctx: BuildContext):
         """
         Checks if we are supposed to use ssh agent by examining the environment, and
         if so checks if ssh-agent has a list of identities.  If it doesn't, we run
@@ -584,7 +590,7 @@ class TaskManager:
         return True
 
     @staticmethod
-    def _handle_monitoring(ipcToBuild, ipcFromUpdater) -> int:
+    def _handle_monitoring(ipcToBuild: IPC_Pipe, ipcFromUpdater: IPC_Pipe) -> int:
         """
         This is the main subroutine for the monitoring process when using IPC::Pipe.
         It reads in all status reports from the source update process and then holds
