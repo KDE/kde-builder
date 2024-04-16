@@ -624,9 +624,8 @@ class Application:
         if result:
             color = "r[b["
 
-        if not Debug().pretending():
-            smile = ":-(" if result else ":-)"
-            logger_app.info(f"\n{color}{smile}")
+        smile = ":-(" if result else ":-)"
+        logger_app.info(f"\n{color}{smile}")
 
         return result
 

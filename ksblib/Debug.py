@@ -173,9 +173,6 @@ class kbLogger(logging.Logger):
         kbLogger.print_clr(self.name, "warning", msg)
 
     def error(self, msg: str, *args, **kwargs) -> None:
-        # Todo: originally, error() did not called print_clr. It invoked colorize(), and just printed to stderr.
-        #  Check if that was made for some specific reason (error in ipc sending for example?).
-        #  For now will treat error() as other levels.
         kbLogger.print_clr(self.name, "error", msg)
 
     def pretend(self, msg: str) -> None:

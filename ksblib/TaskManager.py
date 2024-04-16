@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os.path
 import sys
 from urllib.parse import urlparse
@@ -13,6 +14,11 @@ from .IPC.Null import IPC_Null
 from .Util.Util import Util
 from .BuildException import BuildException
 import logging
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from BuildContext import BuildContext
+    from .Application import Application
+    from .Module.Module import Module
 
 logger_ipc = kbLogger.getLogger("ipc")
 logger_buildsystem = kbLogger.getLogger("build-system")
@@ -42,7 +48,7 @@ class TaskManager:
     aware of concurrency.
     """
 
-    def __init__(self, app):
+    def __init__(self, app: Application):
         from .Application import Application
         Util.assert_isa(app, Application)
 
@@ -81,8 +87,7 @@ class TaskManager:
             # current module to complete and then exit early.
             def handle_sighup(signum, frame):
                 print("[noasync] recv SIGHUP, will end after this module")
-                global DO_STOP
-                DO_STOP = 1
+                self.DO_STOP = 1
 
             signal.signal(signal.SIGHUP, handle_sighup)
 
@@ -96,7 +101,7 @@ class TaskManager:
 
     # Internal API
 
-    def _handle_updates(self, ipc, ctx) -> int:
+    def _handle_updates(self, ipc: IPC, ctx: BuildContext) -> int:
         """
         Subroutine to update a list of modules.
         
@@ -157,7 +162,7 @@ class TaskManager:
         return hadError
 
     @staticmethod
-    def _buildSingleModule(ipc, ctx, module, startTimeRef):
+    def _buildSingleModule(ipc: IPC, ctx: BuildContext, module: Module, startTimeRef: int) -> str | int:
         """
         Builds the given module.
         
@@ -206,7 +211,7 @@ class TaskManager:
             return 0
         return "build"  # phase failed at
 
-    def _handle_build(self, ipc, ctx) -> int:
+    def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
         Subroutine to handle the build process.
         
@@ -263,7 +268,7 @@ class TaskManager:
         while modules:
             module = modules.pop(0)
             if self.DO_STOP:
-                logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
+                logger_taskmanager.warning(f" y[b[* * *] Early exit requested, cancelling build of further modules.")
                 break
 
             moduleName = module.name
@@ -358,7 +363,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, ipc, ctx) -> int:
+    def _handle_async_build(self, monitorToBuildIPC: IPC_Pipe, ctx: BuildContext) -> int:
         """
         This subroutine special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
@@ -396,7 +401,7 @@ class TaskManager:
         updaterPid = None
 
         if monitorPid == 0:
-            # child
+            # child of build (i.e. monitor and updater)
             updaterToMonitorIPC = IPC_Pipe()
             updaterPid = os.fork()
 
@@ -406,11 +411,11 @@ class TaskManager:
             signal.signal(signal.SIGINT, sigint_handler)
 
             if updaterPid == 0:
-                # child of monitor
+                # child of monitor (i.e. updater)
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print("[updater] recv SIGHUP, will end after this module")
+                    print(f"[updater process] recv SIGHUP, will end after updating {updaterToMonitorIPC.logged_module} module.")
                     self.DO_STOP = 1
 
                 signal.signal(signal.SIGHUP, sighup_handler)
@@ -419,13 +424,15 @@ class TaskManager:
                 updaterToMonitorIPC.setSender()
                 Debug().setIPC(updaterToMonitorIPC)
 
-                sys.exit(self._handle_updates(updaterToMonitorIPC, ctx))
+                exitcode = self._handle_updates(updaterToMonitorIPC, ctx)
+                # print("Updater process exiting with code", exitcode)
+                sys.exit(exitcode)
             else:
                 # still monitor
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print("[monitor] recv SIGHUP, will end after this module")
+                    print(f"[monitor process] recv SIGHUP, will end after updater process finishes.")
 
                     # If we haven't recv'd yet, forward to monitor in case user didn't
                     # send to process group
@@ -436,18 +443,15 @@ class TaskManager:
                 signal.signal(signal.SIGHUP, sighup_handler)
 
                 setproctitle.setproctitle("kde-builder-monitor")
-                ipc.setSender()
+                monitorToBuildIPC.setSender()
                 updaterToMonitorIPC.setReceiver()
 
-                ipc.setLoggedModule("#monitor#")  # This /should/ never be used...
-                Debug().setIPC(ipc)
+                monitorToBuildIPC.setLoggedModule("#monitor#")  # This /should/ never be used...
+                Debug().setIPC(monitorToBuildIPC)
 
-                exitcode = self._handle_monitoring(ipc, updaterToMonitorIPC)
-                time.sleep(5)  # pl2py give some time to be sure updater pid will be finished, otherwise we could falsely write error message
-                pid, status = os.waitpid(updaterPid, os.WNOHANG)
-                if pid == 0:
-                    logger_taskmanager.error(" r[b[***] updater thread is finished but hasn't exited?!?")
-
+                exitcode = self._handle_monitoring(monitorToBuildIPC, updaterToMonitorIPC)
+                os.waitpid(updaterPid, 0)
+                # print("Monitor process exiting with code", exitcode)
                 sys.exit(exitcode)
         else:
             # Still the parent, let's do the build.
@@ -455,7 +459,7 @@ class TaskManager:
             # If the user sends SIGHUP during the build, we should allow the current
             # module to complete and then exit early.
             def signal_handler(signum, frame):
-                print("[ build ] recv SIGHUP, will end after this module")
+                print(f"[build process] recv SIGHUP, will end after this module")
 
                 # If we haven't recv'd yet, forward to monitor in case user didn't
                 # send to process group
@@ -466,15 +470,22 @@ class TaskManager:
             signal.signal(signal.SIGHUP, signal_handler)
 
             setproctitle.setproctitle("kde-builder-build")
-            ipc.setReceiver()
-            result = self._handle_build(ipc, ctx)
+            monitorToBuildIPC.setReceiver()
+            result = self._handle_build(monitorToBuildIPC, ctx)
 
-        ipc.waitForEnd()
-        ipc.close()
+            if result and ctx.getOption("stop-on-failure"):
+                # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
+                # We will ask monitor to ask updater to finish gracefully.
+                # If the monitor process already finished (in Zombie state), sending signal is not harmful (i.e. obviously has no effect, but will not raise exception).
+
+                # print("Asking to stop updates gracefully")
+                os.kill(monitorPid, signal.SIGHUP)
+
+        monitorToBuildIPC.waitForEnd()
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseenModulesRef = ipc.unacknowledgedModules()
+        unseenModulesRef = monitorToBuildIPC.unacknowledgedModules()
         if unseenModulesRef:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
@@ -485,19 +496,15 @@ class TaskManager:
             # one-by-one the modules that successfully updated.
             logger_taskmanager.debug("Some modules were updated but not built")
 
-        # It's possible if build fails on first module that git is still
-        # running. Make it stop too.
-        pid, status = os.waitpid(monitorPid, os.WNOHANG)
-        if pid == 0:
-            os.kill(monitorPid, signal.SIGINT)
+        pid, status = os.waitpid(monitorPid, 0)
+        if os.WEXITSTATUS(status) != 0:
+            result = 1
 
-            # Exit code is in $?.
-            pid, status = os.waitpid(monitorPid, 0)
-            result = 1 if os.WEXITSTATUS(status) != 0 else 0
+        monitorToBuildIPC.close()
         return result
 
     @staticmethod
-    def _check_for_ssh_agent(ctx):
+    def _check_for_ssh_agent(ctx: BuildContext):
         """
         Checks if we are supposed to use ssh agent by examining the environment, and
         if so checks if ssh-agent has a list of identities.  If it doesn't, we run
@@ -584,7 +591,7 @@ class TaskManager:
         return True
 
     @staticmethod
-    def _handle_monitoring(ipcToBuild, ipcFromUpdater) -> int:
+    def _handle_monitoring(ipcToBuild: IPC_Pipe, ipcFromUpdater: IPC_Pipe) -> int:
         """
         This is the main subroutine for the monitoring process when using IPC::Pipe.
         It reads in all status reports from the source update process and then holds
@@ -650,5 +657,4 @@ class TaskManager:
             if not ipcToBuild.sendMessage(msg):
                 logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                 return 1
-        ipcToBuild.close()
         return 0
