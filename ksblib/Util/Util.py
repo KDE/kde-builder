@@ -16,6 +16,7 @@ from promise import Promise
 import multiprocessing
 import traceback
 import codecs
+import setproctitle
 
 from ksblib.Debug import Debug, kbLogger
 from ksblib.BuildException import BuildException
@@ -438,6 +439,8 @@ class Util:
         else:
             # Child. Note here that we need to avoid running our exit cleanup
             # handlers in here. For that we need sys.exit.
+
+            setproctitle.setproctitle("kde-builder run_logged_command: " + " ".join(command))
 
             # Apply altered environment variables.
             module.buildContext().commitEnvironmentChanges()
