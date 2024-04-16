@@ -269,7 +269,7 @@ class TaskManager:
         while modules:
             module = modules.pop(0)
             if self.DO_STOP:
-                logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
+                logger_taskmanager.warning(f" y[b[* * *] Early exit requested, cancelling build of further modules.")
                 break
 
             moduleName = module.name
@@ -402,7 +402,7 @@ class TaskManager:
         updaterPid = None
 
         if monitorPid == 0:
-            # child
+            # child of build (i.e. monitor and updater)
             updaterToMonitorIPC = IPC_Pipe()
             updaterPid = os.fork()
 
@@ -412,11 +412,11 @@ class TaskManager:
             signal.signal(signal.SIGINT, sigint_handler)
 
             if updaterPid == 0:
-                # child of monitor
+                # child of monitor (i.e. updater)
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print("[updater] recv SIGHUP, will end after this module")
+                    print(f"[updater process] recv SIGHUP, will end after updating {updaterToMonitorIPC.logged_module} module.")
                     self.DO_STOP = 1
 
                 signal.signal(signal.SIGHUP, sighup_handler)
@@ -431,7 +431,7 @@ class TaskManager:
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print("[monitor] recv SIGHUP, will end after this module")
+                    print(f"[monitor process] recv SIGHUP, will end after updater process finishes.")
 
                     # If we haven't recv'd yet, forward to monitor in case user didn't
                     # send to process group
@@ -461,7 +461,7 @@ class TaskManager:
             # If the user sends SIGHUP during the build, we should allow the current
             # module to complete and then exit early.
             def signal_handler(signum, frame):
-                print("[ build ] recv SIGHUP, will end after this module")
+                print(f"[build process] recv SIGHUP, will end after this module")
 
                 # If we haven't recv'd yet, forward to monitor in case user didn't
                 # send to process group

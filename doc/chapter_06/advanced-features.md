@@ -161,7 +161,7 @@ If done successfully, you will see a message in the kde-builder output
 similar to:
 
 ```
-[ build ] recv SIGHUP, will end after this module
+[build process] recv SIGHUP, will end after this module
 ```
 
 ```{note}
