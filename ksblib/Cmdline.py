@@ -143,18 +143,10 @@ class Cmdline:
                     continue
 
                 optName = key.replace("-", "_")
-                optValue = BuildContext().GlobalOptions_with_negatable_form[key]
-
-                if not optValue:
-                    optValue = False
-                elif optValue == "":
-                    optValue = True
-                elif str(optValue).lower() == "false":
-                    optValue = False
 
                 flag_handlers += textwrap.dedent(f"""\
-                if args.{optName}:
-                    auxOptions[\"{key}\"] = {optValue}
+                if args.{optName} is not None:
+                    auxOptions[\"{key}\"] = args.{optName}
                 """)  # pl2py: initially in perl, it was added to foundOptions, assigned $flagHandler, and then the items with assigned code
                 # are filtered from foundOptions (to readOptionNames). So we skip all this and do the final result (put to auxOptions) in the first place.
 
