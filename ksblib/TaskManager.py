@@ -364,7 +364,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, ipc: IPC_Pipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, monitorToBuildIPC: IPC_Pipe, ctx: BuildContext) -> int:
         """
         This subroutine special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
@@ -442,13 +442,13 @@ class TaskManager:
                 signal.signal(signal.SIGHUP, sighup_handler)
 
                 setproctitle.setproctitle("kde-builder-monitor")
-                ipc.setSender()
+                monitorToBuildIPC.setSender()
                 updaterToMonitorIPC.setReceiver()
 
-                ipc.setLoggedModule("#monitor#")  # This /should/ never be used...
-                Debug().setIPC(ipc)
+                monitorToBuildIPC.setLoggedModule("#monitor#")  # This /should/ never be used...
+                Debug().setIPC(monitorToBuildIPC)
 
-                exitcode = self._handle_monitoring(ipc, updaterToMonitorIPC)
+                exitcode = self._handle_monitoring(monitorToBuildIPC, updaterToMonitorIPC)
                 time.sleep(5)  # pl2py give some time to be sure updater pid will be finished, otherwise we could falsely write error message
                 pid, status = os.waitpid(updaterPid, os.WNOHANG)
                 if pid == 0:
@@ -472,15 +472,14 @@ class TaskManager:
             signal.signal(signal.SIGHUP, signal_handler)
 
             setproctitle.setproctitle("kde-builder-build")
-            ipc.setReceiver()
-            result = self._handle_build(ipc, ctx)
+            monitorToBuildIPC.setReceiver()
+            result = self._handle_build(monitorToBuildIPC, ctx)
 
-        ipc.waitForEnd()
-        ipc.close()
+        monitorToBuildIPC.waitForEnd()
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseenModulesRef = ipc.unacknowledgedModules()
+        unseenModulesRef = monitorToBuildIPC.unacknowledgedModules()
         if unseenModulesRef:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
@@ -500,6 +499,8 @@ class TaskManager:
             # Exit code is in $?.
             pid, status = os.waitpid(monitorPid, 0)
             result = 1 if os.WEXITSTATUS(status) != 0 else 0
+
+        monitorToBuildIPC.close()
         return result
 
     @staticmethod
@@ -656,5 +657,4 @@ class TaskManager:
             if not ipcToBuild.sendMessage(msg):
                 logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                 return 1
-        ipcToBuild.close()
         return 0
