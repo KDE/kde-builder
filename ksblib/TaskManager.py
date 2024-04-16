@@ -425,7 +425,9 @@ class TaskManager:
                 updaterToMonitorIPC.setSender()
                 Debug().setIPC(updaterToMonitorIPC)
 
-                sys.exit(self._handle_updates(updaterToMonitorIPC, ctx))
+                exitcode = self._handle_updates(updaterToMonitorIPC, ctx)
+                # print("Updater process exiting with code", exitcode)
+                sys.exit(exitcode)
             else:
                 # still monitor
                 # If the user sends SIGHUP during the build, we should allow the
@@ -449,11 +451,8 @@ class TaskManager:
                 Debug().setIPC(monitorToBuildIPC)
 
                 exitcode = self._handle_monitoring(monitorToBuildIPC, updaterToMonitorIPC)
-                time.sleep(5)  # pl2py give some time to be sure updater pid will be finished, otherwise we could falsely write error message
-                pid, status = os.waitpid(updaterPid, os.WNOHANG)
-                if pid == 0:
-                    logger_taskmanager.error(" r[b[***] updater thread is finished but hasn't exited?!?")
-
+                os.waitpid(updaterPid, 0)
+                # print("Monitor process exiting with code", exitcode)
                 sys.exit(exitcode)
         else:
             # Still the parent, let's do the build.
@@ -475,6 +474,14 @@ class TaskManager:
             monitorToBuildIPC.setReceiver()
             result = self._handle_build(monitorToBuildIPC, ctx)
 
+            if result and ctx.getOption("stop-on-failure"):
+                # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
+                # We will ask monitor to ask updater to finish gracefully.
+                # If the monitor process already finished (in Zombie state), sending signal is not harmful (i.e. obviously has no effect, but will not raise exception).
+
+                # print("Asking to stop updates gracefully")
+                os.kill(monitorPid, signal.SIGHUP)
+
         monitorToBuildIPC.waitForEnd()
 
         # Display a message for updated modules not listed because they were not
@@ -490,15 +497,8 @@ class TaskManager:
             # one-by-one the modules that successfully updated.
             logger_taskmanager.debug("Some modules were updated but not built")
 
-        # It's possible if build fails on first module that git is still
-        # running. Make it stop too.
-        pid, status = os.waitpid(monitorPid, os.WNOHANG)
-        if pid == 0:
-            os.kill(monitorPid, signal.SIGINT)
-
-            # Exit code is in $?.
-            pid, status = os.waitpid(monitorPid, 0)
-            result = 1 if os.WEXITSTATUS(status) != 0 else 0
+        pid, status = os.waitpid(monitorPid, 0)
+        result = 1 if os.WEXITSTATUS(status) != 0 else 0
 
         monitorToBuildIPC.close()
         return result
