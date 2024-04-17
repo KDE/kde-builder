@@ -103,6 +103,7 @@ class FirstRun:
             return
 
         installCmd = self._findBestInstallCmd()
+        not_found_in_repo_packages = []
 
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
         if self.oss.vendorID() == "arch":
@@ -118,6 +119,20 @@ class FirstRun:
                     missing_packages_from_required_group = list(filter(None, missing_packages_from_required_group))  # Remove empty string element. It appears if there is no any unresolved package from the group
                     missing_packages_from_required_groups += missing_packages_from_required_group
             packages = missing_packages_not_grouped + missing_packages_from_required_groups
+
+        if self.oss.isDebianBased():
+            all_available_packages = subprocess.run("apt list", shell=True, capture_output=True).stdout.decode("utf-8").removesuffix("\n").split("\n")
+            all_available_packages.pop(0)  # The 0 element is "Listing..."
+            all_available_packages = [pkg.split("/")[0] for pkg in all_available_packages]
+
+            for package in packages:
+                if package not in all_available_packages:
+                    not_found_in_repo_packages.append(package)
+            if not_found_in_repo_packages:
+                logger_fr.warning(" y[*] These packages were not found in repositories:\n\t" + "\n\t".join(not_found_in_repo_packages))
+                logger_fr.warning(" y[*] Removing them from the list of installation")
+                for package in not_found_in_repo_packages:
+                    packages.remove(package)
 
         if packages:
             logger_fr.info(f""" b[*] Running 'b[{" ".join(installCmd + packages)}]'""")
