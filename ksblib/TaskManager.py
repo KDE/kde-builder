@@ -303,6 +303,8 @@ class TaskManager:
                     logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
                     return 1  # Error
 
+                logfile = module.getOption("#error-log-file")
+                logger_taskmanager.info("\tError log: r[" + logfile)
                 statusViewer.numberModulesFailed(1 + statusViewer.numberModulesFailed())
             else:
                 # Success
