@@ -1,5 +1,8 @@
 # Changelog
 
+2024-04-19
+: Renamed config option `git-desired-protocol` to `git-push-protocol`.
+
 2024-04-14
 : Separated project-wide "Debug()" logger into separate loggers.
 

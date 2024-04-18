@@ -52,34 +52,27 @@ for your pass phrase for every module.
 
 Related command-line option: --disable-agent-check, --no-disable-agent-check
 
-(conf-git-desired-protocol)=
-[`git-desired-protocol`](conf-git-desired-protocol)
+(conf-git-push-protocol)=
+[`git-push-protocol`](conf-git-push-protocol)
 
-Type: String, Default value: git, History information: This option
-was added in kde-builder 1.16. Prior to 20.06 this option was used to
-configure the fetch URL instead of the push URL. As of 20.06
-`https` is always used when updating KDE projects.
+Type: String, Possible values: https, git, Default value: git.
 
-This option only applies to modules from a [KDE project](#kde-projects-module-sets) repository.
+This option controls which network protocol to use when pushing to kde project repositories. Normally the very-efficient
+`git` protocol is used, but this may be blocked in some networks (e.g. corporate intranets, public Wi-Fi). An alternative
+protocol which is much better supported is the `https` protocol used for Internet websites.
 
-What this option actually does is configure which network protocol to
-prefer when pushing source code for these modules. Normally the
-very-efficient `git` protocol is used, but this may be
-blocked in some networks (e.g. corporate intranets, public Wi-Fi). An
-alternative protocol which is much better supported is the
-`https` protocol used for Internet web sites.
-
-If you are using one of these constrained networks you can set this
-option to `http` to prefer `https` communications
-instead.
+If you are using one of these constrained networks you can set this option to `https`. In any other situation you
+should not set this option, as the default protocol is most efficient.
 
 ```{tip}
-You may also need the [http-proxy](#conf-http-proxy)
-option if an HTTP proxy is also needed for network traffic.
+You may also need the [http-proxy](#conf-http-proxy) option if an HTTP proxy is also needed for network traffic.
 ```
 
-In any other situation you should not set this option as the default
-protocol is most efficient.
+This option only applies to modules that are [KDE projects](#kde-projects-module-sets).
+
+```{note}
+The protocol for fetching KDE projects is always `https`.
+```
 
 (conf-git-repository-base)=
 [`git-repository-base`](conf-git-repository-base)

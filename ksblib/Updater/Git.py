@@ -1048,7 +1048,7 @@ class Updater_Git(Updater):
         
         Returns false on failure of any sort, true otherwise.
         """
-        protocol = contextOptions.getOption("git-desired-protocol") or "git"
+        protocol = contextOptions.getOption("git-push-protocol") or "git"
 
         pushUrlPrefix = ""
         otherPushUrlPrefix = ""
@@ -1057,9 +1057,9 @@ class Updater_Git(Updater):
             pushUrlPrefix = "ssh://git@invent.kde.org/" if protocol == "git" else "https://invent.kde.org/"
             otherPushUrlPrefix = "https://invent.kde.org/" if protocol == "git" else "ssh://git@invent.kde.org/"
         else:
-            logger_updater.error(f" b[y[*] Invalid b[git-desired-protocol] {protocol}")
+            logger_updater.error(f" b[y[*] Invalid b[git-push-protocol] {protocol}")
             logger_updater.error(" b[y[*] Try setting this option to 'git' if you're not using a proxy")
-            BuildException.croak_runtime(f"Invalid git-desired-protocol: {protocol}")
+            BuildException.croak_runtime(f"Invalid git-push-protocol: {protocol}")
 
         p = subprocess.run("git config --global --includes --get url.https://invent.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True)
         configOutput = p.stdout.removesuffix("\n")
@@ -1119,8 +1119,8 @@ class Updater_Git(Updater):
             result = Util.safe_system("git config --global --unset-all url.git@git.kde.org:.pushInsteadOf kde:".split(" "))
             if result != 0:
                 return False
-        # remove outdated alias if git-desired-protocol gets flipped
 
+        # remove outdated alias if git-push-protocol gets flipped
         configOutput = subprocess.run(f"git config --global --get url.{otherPushUrlPrefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
         if re.search(r"^kde:\s*$", configOutput):
             logger_updater.debug(f"\tRemoving outdated kde: alias (push: {otherPushUrlPrefix})")

@@ -98,7 +98,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         Throws:
          Runtime - if the kde-projects database was required but couldn't be
          downloaded or read.
-         Runtime - if the git-desired-protocol is unsupported.
+         Runtime - if the git-push-protocol is unsupported.
          Runtime - if an "assumed" kde-projects module was not actually one.
         """
         allModuleResults = ctx.getProjectDataReader().getModulesForProject(moduleSearchItem)
