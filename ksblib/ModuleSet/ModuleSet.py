@@ -115,7 +115,7 @@ class ModuleSet(OptionsBase):
         # to sort at the end within the module-set.
         startOrder = self.create_id if self.create_id else 0
 
-        orderInList = self.module_order.get("newModule", len(self.module_search_decls))
+        orderInList = self.module_order.get(f"{newModule}", len(self.module_search_decls))
         newModule.create_id = startOrder + orderInList
 
     # @override
