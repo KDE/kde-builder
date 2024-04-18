@@ -395,6 +395,9 @@ class Application:
             updateDesired = not ctx.getOption("no-metadata") and ctx.phases.has("update")
             updateNeeded = (not os.path.exists(moduleSource)) or (not os.listdir(moduleSource))
 
+            if updateNeeded:
+                Updater_Git.verifyGitConfig(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status
+
             if not updateDesired and not updateNeeded:
                 ctx.setOption({"metadata-update-skipped": 1})
 

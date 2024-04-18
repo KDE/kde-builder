@@ -111,7 +111,7 @@ class Util:
         return os.unlink(path)
 
     @staticmethod
-    def safe_system(cmd_list: list):
+    def safe_system(cmd_list: list[str]) -> int:
         """
         Subroutine to execute the system call on the given list if the pretend
         global option is not set.
