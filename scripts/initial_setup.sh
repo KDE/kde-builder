@@ -16,7 +16,7 @@ Green='\033[0;32m'        # Green
 
 
 err_report() {
-  echo -e "${Red}Exitted on error.${Color_Off}"
+  echo -e "${Red}Exited on error at line $(caller).${Color_Off}"
 }
 trap 'err_report' ERR  # When error happens, this function will run automatically before exit.
 
@@ -117,6 +117,12 @@ make_symlink_in_bin_path() {
   ln -sf ~/.local/share/kde-builder/kde-builder ~/.local/bin
 }
 
+install_icon_and_desktop_file() {
+  echo "Installing icon and desktop file"
+  cp -v ~/.local/share/kde-builder/logo.png ~/.local/share/icons/kde-builder.png
+  cp -v ~/.local/share/kde-builder/data/kde-builder.desktop.in ~/.local/share/applications/kde-builder.desktop
+}
+
 ensure_kde_builder_launches() {
   echo "Ensuring kde-builder could be launched"
   cd ~
@@ -146,10 +152,11 @@ else
   make_symlink_in_bin_path
 fi
 
+install_icon_and_desktop_file
+
 ensure_kde_builder_launches
 
 # todo:
-# Install desktop file - to support icon in power profile
 # Install rendered documentation for KHelpCenter
 # Install zsh completions
 # Install kate syntax highlighter for kdesrc-buildrc

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=KDE Builder
+Comment=Tool to manage building KDE software from source
+GenericName=Software build tool
+Icon=.local/share/icons/kde-builder.png
+Type=Application
+Categories=KDE;Development;Qt;
+Keywords=kdesrc-build;kde-builder;
+Exec=kdialog --msgbox "KDE Builder does not have a gui. Please read the documentation at https://kde-builder.kde.org"
+NoDisplay=true

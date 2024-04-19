@@ -566,7 +566,7 @@ class Application:
         result = None  # shell-style (0 == success)
 
         # If power-profiles-daemon is in use, request switching to performance mode.
-        Application._holdPerformancePowerProfileIfPossible()
+        self._holdPerformancePowerProfileIfPossible()
 
         if runMode == "build":
             # build and (by default) install.  This will involve two simultaneous
@@ -1751,8 +1751,7 @@ class Application:
         for sig in signals:
             signal.signal(sig, handlerRef)
 
-    @staticmethod
-    def _holdPerformancePowerProfileIfPossible():
+    def _holdPerformancePowerProfileIfPossible(self):
         try:
             import dbus  # Do not import in the beginning of file, user may have not installed dbus-python module (we optionally require it)
 
@@ -1764,16 +1763,18 @@ class Application:
 
             try:
                 bus = dbus.SystemBus()
-                logger_app.info("Holding performance profile")
 
                 if Debug().pretending():
+                    logger_app.info("d[Would hold performance profile")
                     return
+
+                logger_app.info("Holding performance profile")
 
                 service = bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
                 ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
 
                 # The hold will be automatically released once kde-builder exits
-                cookie = ppd.HoldProfile("performance", "Building awesome KDE software", "kde-builder")
+                cookie = ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
             except dbus.DBusException as e:
                 print(f"Error accessing PowerProfiles service: {e}")
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
