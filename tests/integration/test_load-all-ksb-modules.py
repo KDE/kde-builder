@@ -30,7 +30,7 @@ def test_import_all():
     import ksblib.ModuleSet
     import ksblib.ModuleSet.KDEProjects
     import ksblib.ModuleSet.Null
-    import ksblib.ModuleSet.Qt
+    import ksblib.ModuleSet.Qt5
     import ksblib.OptionsBase
     import ksblib.OSSupport
     import ksblib.PhaseList

@@ -1,18 +1,14 @@
 # from overrides import override
 
 from ..BuildContext import BuildContext
-# use ksb::BuildException;
 from ..BuildSystem.Qt5 import BuildSystem_Qt5
-# use ksb::Debug;
 from ..Module.Module import Module
 from ..Util.Util import Util
 from .ModuleSet import ModuleSet
 
 
-class ModuleSet_Qt(ModuleSet):
+class ModuleSet_Qt5(ModuleSet):
     """
-    Class: ModuleSet::Qt
-    
     This represents a collection of Qt5 source code modules that are collectively
     kept up to date by Qt's init-repository script. This module set is
     essentially used to make sure that generated ksb::Modules use proper scm()

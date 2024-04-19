@@ -42,7 +42,8 @@ class BuildSystem_Qt5(BuildSystem):
         commands = re.split(r"\s+", module.getOption("configure-flags"))
         commands.append("-confirm-license")
         commands.append("-opensource")
-        commands.append("-nomake examples")
+        commands.append("-nomake")
+        commands.append("examples")
         commands.append("-nomake")
         commands.append("tests")
 

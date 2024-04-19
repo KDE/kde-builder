@@ -26,7 +26,7 @@ from .Module.Module import Module
 from .ModuleResolver import ModuleResolver
 from .ModuleSet.ModuleSet import ModuleSet
 from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
-from .ModuleSet.Qt import ModuleSet_Qt
+from .ModuleSet.Qt5 import ModuleSet_Qt5
 from .RecursiveFH import RecursiveFH
 from .StartProgram import StartProgram
 from .TaskManager import TaskManager
@@ -921,7 +921,7 @@ class Application:
         if moduleSet.getOption("repository") == Application.KDE_PROJECT_ID:
             moduleSet.__class__ = ModuleSet_KDEProjects
         elif moduleSet.getOption("repository") == Application.QT_PROJECT_ID:
-            moduleSet.__class__ = ModuleSet_Qt
+            moduleSet.__class__ = ModuleSet_Qt5
         return moduleSet
 
     def _readConfigurationOptions(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:
