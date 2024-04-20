@@ -94,7 +94,7 @@ global
 end global
 
 options kdepim
-  log-dir /custom/path/logs${_ver} # ← you can use custom variable just like a standard
+  log-dir /custom/path/logs${_ver} # ← you can use custom variable just like a standard one
 end options
 ```
 

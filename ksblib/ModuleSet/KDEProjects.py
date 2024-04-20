@@ -48,6 +48,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         metadataModule.setScmType("metadata")
         metadataModule.setOption({"branch": "master"})
         metadataModule.setOption({"source-dir":  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state")})
+        metadataModule.setOption({"log-dir": "log"})  # overwrite default value, because user may store his directories not under "~/kde"
 
         moduleSet = ModuleSet_KDEProjects(ctx, "<kde-projects dependencies>")
         metadataModule.setModuleSet(moduleSet)

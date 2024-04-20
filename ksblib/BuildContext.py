@@ -167,7 +167,7 @@ class BuildContext(Module):
             "install-dir": os.getenv("HOME") + "/kde/usr",
             "libname": self.libname,
             "libpath": "",
-            "log-dir": "log",
+            "log-dir": os.getenv("HOME") + "/kde/log",
             "make-install-prefix": "",  # Some people need sudo
             "make-options": "",
             "ninja-options": "",

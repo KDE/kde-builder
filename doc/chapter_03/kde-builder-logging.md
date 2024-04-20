@@ -15,9 +15,7 @@ many reasons why a build can fail in the first place.
 
 The logs are always stored under the log directory. The destination of
 the log directory is controlled by the [log-dir](#conf-log-dir) option,
-which defaults to `${source-dir}/log` (where `${source-dir}` is the
-value of the [source-dir](#conf-source-dir) option. The in rest of this
-section, this value will be referred to as `${log-dir}`).
+which defaults to `~/kde/log`. In the rest of this section, this value will be referred to as `${log-dir}`.
 
 Under `${log-dir}`, is a set of directories, one for every time that
 kde-builder was run. Each directory is named with the date, and the run
@@ -39,8 +37,7 @@ If a module itself has a submodule (such as extragear/multimedia,
 playground/utils, or KDE/kdelibs), then there would actually be a
 matching layout in the log directory. For example, the logs for
 KDE/kdelibs after the last kde-builder run would be found in
-`${log-dir}/latest/KDE/kdelibs`, and not under
-`${log-dir}/latest/kdelibs`.
+`${log-dir}/latest/KDE/kdelibs`, and not under `${log-dir}/latest/kdelibs`.
 ```
 
 In each module log directory, you will find a set of files for each

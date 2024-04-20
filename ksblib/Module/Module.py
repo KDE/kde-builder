@@ -117,10 +117,8 @@ class Module(OptionsBase):
 
     def getSubdirPath(self, subdirOption: str) -> str:
         """
-        Subroutine to retrieve a subdirectory path with tilde-expansion and
-        relative path handling.
-        The parameter is the option key (e.g. build-dir or log-dir) to read and
-        interpret.
+        Function to retrieve a subdirectory path with tilde-expansion and relative path handling.
+        The parameter is the option key (e.g. build-dir or log-dir) to read and interpret.
         """
         directory = self.getOption(subdirOption)
 
@@ -146,32 +144,32 @@ class Module(OptionsBase):
         """
         Returns the directory that a module should be installed in.
         
-        NOTE: The return value is a hash. The key 'module' will return the final
-        module name, the key 'path' will return the full path to the module. The
-        key 'fullpath' will return their concatenation.
+        NOTE: The return value is a dict.
+        The key "module" will return the final module name.
+        The key "path" will return the full path to the module.
+        The key "fullpath" will return their concatenation.
         
-        For example, with $module == 'KDE/kdelibs', and no change in the dest-dir
-        option, you'd get something like:
-        
-        > {
-        >   'path'     => '/home/user/kdesrc/KDE',
-        >   'module'   => 'kdelibs',
-        >   'fullpath' => '/home/user/kdesrc/KDE/kdelibs'
-        > }
+        For example, with module == "KDE/kdelibs", and no change in the dest-dir option, you'd get something like:
+        ::
+            {
+              "path": "/home/user/kde/src/KDE",
+              "module": "kdelibs",
+              "fullpath": "/home/user/kde/src/KDE/kdelibs"
+            }
         
         If dest-dir were changed to e.g. extragear-multimedia, you'd get:
-        
-        > {
-        >   'path'     => '/home/user/kdesrc',
-        >   'module'   => 'extragear-multimedia',
-        >   'fullpath' => '/home/user/kdesrc/extragear-multimedia'
-        > }
+        ::
+            {
+              "path": "/home/user/kde/src",
+              "module": "extragear-multimedia",
+              "fullpath": "/home/user/kde/src/extragear-multimedia"
+            }
         
         Parameters:
-          pathType - Either 'source' or 'build'.
+          dirtype - Either "source" or "build".
         
         Returns:
-          hash (Not a hashref; See description).
+          dict
         """
         module = self
         Util.assert_isa(module, Module)

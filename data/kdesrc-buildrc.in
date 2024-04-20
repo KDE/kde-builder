@@ -1,6 +1,5 @@
-# This file controls options to apply when configuring/building modules, and
-# controls which modules are built in the first place.
-# List of all options: https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html
+# This file controls options to apply when configuring/building modules, and controls which modules are built in the first place.
+# List of all options: https://kde-builder.kde.org/en/chapter_04/conf-options-table.html
 
 global
     branch-group kf6-qt6
@@ -11,17 +10,11 @@ global
     # modules being installed that you didn't need.
     include-dependencies %{include-dependencies}
 
-    # Install directory for KDE software
-    install-dir %{install-dir}
-
-    # Directory for downloaded source code
-    source-dir %{source-dir}
-
-    # Directory to build KDE into before installing
-    # relative to source-dir by default
-    build-dir %{build-dir}
-
-    # qt-install-dir ~/kde/qt # Where to install Qt6 if kde-builder supplies it
+    source-dir %{source-dir}  # Directory for downloaded source code
+    build-dir %{build-dir}  # Directory to build KDE into before installing
+    install-dir %{install-dir}  # Directory to install KDE software into
+    # qt-install-dir ~/kde/qt # Directory to install Qt if kde-builder supplies it
+    log-dir %{log-dir}  # Directory to write logs into
 
     cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo
 

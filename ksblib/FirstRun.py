@@ -224,9 +224,10 @@ class FirstRun:
             sampleRc = sampleRc.replace(f"%{{{option_name}}}", value)
 
         fill_placeholder("include-dependencies", "bool_to_str")
-        fill_placeholder("install-dir", "home_to_tilde")
         fill_placeholder("source-dir", "home_to_tilde")
         fill_placeholder("build-dir", "home_to_tilde")
+        fill_placeholder("install-dir", "home_to_tilde")
+        fill_placeholder("log-dir", "home_to_tilde")
         fill_placeholder("install-session-driver", "bool_to_str")
         fill_placeholder("install-environment-driver", "bool_to_str")
         fill_placeholder("stop-on-failure", "bool_to_str")
