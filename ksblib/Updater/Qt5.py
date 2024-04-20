@@ -66,6 +66,7 @@ class Updater_Qt5(Updater_Git):
 
         # Update init-repository and the shell of the super module itself.
         promise = super().updateExistingClone()
+        Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
 
         # updateRepository has init-repository work to update the source
         self._updateRepository()
@@ -92,7 +93,8 @@ class Updater_Qt5(Updater_Git):
         else:
             self._verifySafeToCloneIntoSourceDir(module, srcdir)
 
-            self._clone(module.getOption("repository"))
+            promise = self._clone(module.getOption("repository"))
+            Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
 
             logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
             logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")
