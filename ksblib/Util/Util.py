@@ -706,6 +706,7 @@ class Util:
             # This means that changes made by log_command or function calls made
             # via log_command will not be saved or noted unless they are made part
             # of the return value, or sent earlier via a 'progress' event.
+            setproctitle.setproctitle("kde-builder " + " ".join(argRef))  # better indicate what is the process
             if directory:
                 Util.p_chdir(directory)
             retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
@@ -715,7 +716,7 @@ class Util:
             # This happens back in the main process, so we can reintegrate the
             # changes into our data structures if needed.
 
-            logger_logged_cmd.info(f"run_logged_p(): {module} {filename} complete: {exitcode}")
+            logger_logged_cmd.info(f"run_logged_p() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
             if not exitcode == 0:
                 Util._setErrorLogfile(module, f"{filename}.log")
             return exitcode

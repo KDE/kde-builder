@@ -43,9 +43,9 @@ class Version:
         """
         can_run_git = subprocess.call("type " + "git", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
         if Version.SCRIPT_PATH and can_run_git and os.path.isdir(f"{Version.SCRIPT_PATH}/.git"):
-            result = subprocess.run(["git", f"--git-dir={Version.SCRIPT_PATH}/.git", "describe"], shell=False, capture_output=True, check=False)
+            result = subprocess.run(['printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"'], shell=True, capture_output=True, check=False, cwd=Version.SCRIPT_PATH)
             output = result.stdout.decode("utf-8").removesuffix("\n")
             ok = result.returncode == 0
             if ok and output:
-                return f"{Version.SCRIPT_VERSION} ({output})"
+                return f"{output}"
         return Version.SCRIPT_VERSION
