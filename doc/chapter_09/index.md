@@ -2,5 +2,4 @@
 
 ```{toctree}
 changelog
-credits-and-license
 ```
