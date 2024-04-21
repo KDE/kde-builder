@@ -1,0 +1,33 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: kde-builder
+Upstream-Contact: KDE <community@kde.org>
+Source: https://invent.kde.org/sdk/kde-builder
+
+Files:  tests/integration/fixtures/*
+Copyright: 2018, 2019, 2021, 2023 Michael Pyne <mpyne@kde.org>
+License: CC0-1.0
+
+Files:  .gitignore
+        data/kdesrc-buildrc.in
+        data/kde-builder-logging.yaml
+        data/kde-builder.desktop.in
+        data/vscode/*
+        doc/conf.py
+        Pipfile
+        doc/_static/gitlab_build_sphinx_app_docs_job_select.png
+Copyright: none
+License: CC0-1.0
+
+Files:  doc/404handler.php
+Copyright:  2021 Ben Cooksley <bcooksley@kde.org>
+License: MIT
+
+Files:  doc/*.md
+Copyright:  2003 - 2023 Michael Pyne <mpyne@kde.org>
+            2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+            2004 - 2024 KDE Contributors (see git history) <community@kde.org>
+License: CC-BY-4.0
+
+Files:  logo.png
+Copyright: 2022 Manuel Jesús de la Fuente <m@nueljl.in>
+License: CC-BY-4.0

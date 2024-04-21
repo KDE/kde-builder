@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: 2022 Michael Pyne <mpyne@kde.org>
+# SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+#
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+
 def test_import_all():
     """
     Loads every single ksb module to make sure they all compile.

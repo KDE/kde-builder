@@ -1,5 +1,10 @@
 #autoload
 
+# SPDX-FileCopyrightText: 2022 Ivan Tkachenko <me@ratijas.tk>
+# SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+#
+# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+
 local expl
 local -aU kde_builder_modules
 local -aU kde_builder_module_sets
