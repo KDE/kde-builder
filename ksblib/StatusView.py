@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2015 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
 #
-# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # Helper used to handle a generic 'progress update' status for the module
 # build, update, install, etc. processes.

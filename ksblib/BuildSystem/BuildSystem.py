@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2012, 2015, 2018, 2021, 2022 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
 #
-# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
 import os.path
