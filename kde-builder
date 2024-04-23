@@ -7,14 +7,14 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
 
 import argparse
-# import inspect
+import logging.config
 import os
 import sys
 import textwrap
 import traceback
-import logging.config
-import yaml
 from ksblib.Debug import kbLogger
+
+RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 
 # <editor-fold desc="Check missing python modules">
@@ -51,16 +51,16 @@ if missingModuleDescriptions:
     for missingModuleDesc in missingModuleDescriptions:
         print("\t" + missingModuleDesc)
 
-    print("\nkde-builder can do this for you on many distros. Consult the installation process in project documentation.")
+    print("\nKDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org\n"
+          "Ensure you have successfully executed this script:\n"
+          f"\t{RealBinDir}/scripts/initial_setup.sh")
     exit(1)
 # </editor-fold>
 
 # ---
 
-import setproctitle
+import setproctitle  # noqa: E402
 setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
-
-RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 parser = argparse.ArgumentParser(prog="ProgramName",
                                  description="What the program does",
@@ -74,6 +74,8 @@ parser.add_argument("--debug", action="store_true")
 args, unknown = parser.parse_known_args()
 
 # ---
+
+import yaml  # noqa: E402
 
 # <editor-fold desc="Applying loggers configuration">
 with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
@@ -144,11 +146,9 @@ if setup_steps:
     fr = FirstRun()
     exit(fr.setupUserSystem(RealBinDir, setup_steps))
 
-# from ksblib import Debug
-from ksblib.Version import Version
-from ksblib.Application import Application
-from ksblib.BuildException import BuildException
-from ksblib.Util.Util import Util
+from ksblib.Version import Version  # noqa: E402
+from ksblib.Application import Application  # noqa: E402
+from ksblib.BuildException import BuildException  # noqa: E402
 
 Version.setBasePath(RealBinDir)
 
