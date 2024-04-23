@@ -266,7 +266,7 @@ class FirstRun:
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
-            "cmd/install/fedora/unknown": "dnf -y install",
+            "cmd/install/fedora/unknown": "dnf -y install --skip-broken",
             "cmd/install/freebsd/unknown": "pkg install -y",
             "cmd/install/gentoo/unknown": "emerge -v --noreplace",
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
