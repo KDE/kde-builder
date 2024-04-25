@@ -184,7 +184,7 @@ class BuildContext(Module):
             "qmake-options": "",
             "qt-install-dir": "",
             "remove-after-install": "none",  # { none, builddir, all }
-            "revision": "",  # Was only useful for Subversion modules at cmdline. TODO Implement for git?
+            "revision": "",
             "source-dir": os.getenv("HOME") + "/kde/src",
             "source-when-start-program": "/dev/null",
             "tag": "",

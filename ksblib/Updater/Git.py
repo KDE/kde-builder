@@ -382,9 +382,9 @@ class Updater_Git(Updater):
         # not, and if we stashed local changes, then we might dump a bunch of
         # conflicts in the repo if we un-stash those changes after a branch switch.
         # See issue #67.
-        existingBranch = Util.filter_program_output(None, "git", "branch", "--show-current")
+        existingBranch = next(iter(Util.filter_program_output(None, "git", "branch", "--show-current")), None)
         if existingBranch is not None:
-            existingBranch = existingBranch[0].removesuffix("\n")
+            existingBranch = existingBranch.removesuffix("\n")
 
         # The result is empty if in 'detached HEAD' state where we should also
         # clearly not switch branches if there are local changes.
@@ -522,9 +522,8 @@ class Updater_Git(Updater):
             def func_2(exitcode):  # need to adapt to boolean success flag
                 return exitcode == 0
 
-            promise = Util.run_logged_p(module, "git-checkout-commit", srcdir, ["git", "checkout", commit]) \
-                .then(func_2)
-            Promise.resolve(promise)
+            promise = Util.run_logged_p(module, "git-checkout-commit", srcdir, ["git", "checkout", commit]).then(func_2)
+            resolve(promise)
 
         return Promise(func)
 
