@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2003 - 2023 Michael Pyne <mpyne@kde.org>
-# SPDX-FileCopyrightText: 2004 - 2024 KDE Contributors (see git history) <community@kde.org>
+# SPDX-FileCopyrightText: 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023 Michael Pyne <mpyne@kde.org>
+# SPDX-FileCopyrightText: 2019 Johan Ouwerkerk <jm.ouwerkerk@gmail.com>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
 #
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
