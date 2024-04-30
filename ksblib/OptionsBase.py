@@ -163,5 +163,5 @@ class OptionsBase:
             for key in value:
                 self.options["set-env"][key] = value[key]
         else:
-            var, envValue = value.split(" ", maxsplit=2)
+            var, envValue = value.split(" ", maxsplit=1)
             self.options["set-env"][var] = envValue
