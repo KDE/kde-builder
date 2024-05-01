@@ -1,5 +1,8 @@
 # Changelog
 
+2024-05-01
+: The list of missing optional packages is now printed from the cmake configure command.
+
 2024-04-19
 : Renamed config option `git-desired-protocol` to `git-push-protocol`.
 

@@ -535,7 +535,60 @@ class BuildSystem_KDECMake(BuildSystem):
 
             module.setPersistentOption("last-cmake-options", Util.get_list_digest(commands))
 
+            cmd = Util_LoggedSubprocess().module(module).log_to("cmake").chdir_to(builddir).set_command(commands)
+
+            reading_optional_packages_not_found = False
+            optional_packages_not_found = []
+
+            def on_child_output(line):
+                nonlocal reading_optional_packages_not_found
+                nonlocal optional_packages_not_found
+                if line == "-- The following OPTIONAL packages have not been found:":
+                    reading_optional_packages_not_found = True
+                    return
+
+                # Example output from cmake:
+                #
+                # -- The following OPTIONAL packages have not been found:
+                #
+                #  * packagekitqt6 (required version >= 1.0.1), Library that exposes PackageKit resources, <https://www.freedesktop.org/software/PackageKit/>
+                #    Required to build the PackageKit backend
+                #  * SeleniumWebDriverATSPI, Server component for selenium tests using Linux accessibility infrastructure, <https://invent.kde.org/sdk/selenium-webdriver-at-spi>
+                #    Needed for GUI tests
+                #  * Snapd, Library that exposes Snapd, <https://www.snapcraft.io>
+                #    Required to build the Snap backend
+                #
+                # -- Found clang-format version 17
+
+                # Another example (without comma at the end of name of package):
+                # -- The following OPTIONAL packages have not been found:
+                #
+                #  * Qt6QmlCompilerPlusPrivate
+                #
+                # -- Found clang-format version 17
+
+                if reading_optional_packages_not_found:
+                    if not line.startswith("-- "):
+                        if line.startswith(" * "):
+                            match = re.search(r"^ \* (.*?),", line)
+                            if match:
+                                cmake_package = match.group(1)
+                            else:
+                                cmake_package = line.removeprefix(" * ")
+                            optional_packages_not_found.append(cmake_package)
+                    else:
+                        reading_optional_packages_not_found = False
+
+            cmd.on({"child_output": on_child_output})
+
             # await_result, not await_exitcode, to match return semantic
-            return Util.await_result(Util.run_logged_p(module, "cmake", builddir, commands))
+            result = Util.await_result(cmd.start())
+
+            if optional_packages_not_found:
+                logger_buildsystem.warning("\t  Some optional dependencies were not found:")
+                for package in optional_packages_not_found:
+                    logger_buildsystem.warning(f"\t    {package}")
+                module.addPostBuildMessage("Some optional dependencies were not found: " + ", ".join(optional_packages_not_found))
+            return result
         # Skip cmake run
         return 0

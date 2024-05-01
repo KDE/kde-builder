@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
 
 import os
-from ksblib.Util.Util import Util  # load early so we can override
+from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess  # load early so we can override
 from promise import Promise
 
 # Now we can load ksb::Application, which will load a bunch more modules all
@@ -18,21 +18,27 @@ def test_option_reading(monkeypatch):
     """
     Test basic option reading from rc-files
     """
-    # Override ksb::Util::log_command for final test to see if it is called with 'cmake'
 
     CMD = []
 
-    def mock_run_logged_p(module, filename, directory, argRef, callbackRef=None):
+    # Override Util_LoggedSubprocess.set_command for final test to see if it is called with 'cmake'
+    def mock_set_command(self, set_command: list[str]):
         nonlocal CMD
-        if not argRef:
+        if not set_command:
             raise "No arg to module"
-        command = argRef
+        command = set_command
         if "cmake" in command:
             CMD = command
+        return self
 
+    monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
+
+    # Override start.
+    def mock_start(self) -> Promise:
         return Promise.resolve(0)
 
-    monkeypatch.setattr(Util, "run_logged_p", mock_run_logged_p)
+    monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
+
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc".split(" "))
     moduleList = app.modules
 
@@ -63,7 +69,7 @@ def test_option_reading(monkeypatch):
     moduleList[1].setOption({"override-build-system": "kde"})
 
     # Should do nothing in --pretend
-    assert moduleList[1].setupBuildSystem(), 'setup fake build system'
+    assert moduleList[1].setupBuildSystem(), "setup fake build system"
 
     assert CMD, "run_logged_p cmake was called"
     assert len(CMD) == 12

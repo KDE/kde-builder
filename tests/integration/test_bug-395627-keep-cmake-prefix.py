@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
 
-from ksblib.Util import Util
+from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess
 from ksblib.Application import Application
 from ksblib.BuildSystem.KDECMake import BuildSystem_KDECMake
 from promise import Promise
@@ -18,17 +18,23 @@ def test_cmake_prefix(monkeypatch):
     """
 
     savedCommand = []
-    log_called = 0
+    set_command_called = 0
 
-    # Redefine log_command to capture whether it was properly called.
-    def mock_run_logged_p(module, filename, directory, argRef, callbackRef=None):
-        nonlocal log_called
+    # Redefine set_command to capture whether it was properly called.
+    def mock_set_command(self, set_command: list[str]):
+        nonlocal set_command_called
         nonlocal savedCommand
-        log_called = 1
-        savedCommand = argRef
+        set_command_called = 1
+        savedCommand = set_command
+        return self
+
+    monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
+
+    # Redefine start.
+    def mock_start(self) -> Promise:
         return Promise.resolve(0)  # success
 
-    monkeypatch.setattr(Util.Util, "run_logged_p", mock_run_logged_p)
+    monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
 
     args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kdesrc-buildrc".split(" ")
     app = Application(args)
@@ -39,7 +45,7 @@ def test_cmake_prefix(monkeypatch):
 
     # This requires log_command to be overridden above
     result = moduleList[0].setupBuildSystem()
-    assert log_called == 1, "Overridden log_command was called"
+    assert set_command_called == 1, "Overridden set_command was called"
     assert result, "Setup build system for auto-set prefix path"
 
     # We should expect an auto-set -DCMAKE_PREFIX_PATH passed to cmake somewhere
