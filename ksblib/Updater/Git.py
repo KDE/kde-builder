@@ -283,21 +283,15 @@ class Updater_Git(Updater):
 
         def first_fn(resolve, reject):
             if hasOldRemote:
-                logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
+                return resolve(1)
 
-                def ec_1(exitcode):
-                    if not exitcode == 0:
-                        BuildException.croak_runtime(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
+            logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
 
-                resolve(Util.run_logged_p(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo]).then(ec_1))
-            else:
-                logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
+            def ec_2(exitcode):
+                if not exitcode == 0:
+                    BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
 
-                def ec_2(exitcode):
-                    if not exitcode == 0:
-                        BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
-
-                resolve(Util.run_logged_p(module, "git-add-remote", None, ["git", "remote", "add", remote, repo]).then(ec_2))
+            resolve(Util.run_logged_p(module, "git-add-remote", None, ["git", "remote", "add", remote, repo]).then(ec_2))
 
         p = Promise(first_fn)
 
