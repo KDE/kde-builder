@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (getting-started)=
 # Getting Started
 

@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 # Developers documentation
 
 ```{toctree}

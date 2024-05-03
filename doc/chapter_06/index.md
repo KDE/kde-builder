@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (using-kde-builder)=
 # Using kde-builder
 

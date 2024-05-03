@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (kde-builder)=
 # KDE Builder Documentation
 

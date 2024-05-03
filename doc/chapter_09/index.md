@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 # Changelog and License
 
 ```{toctree}

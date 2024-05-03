@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (kdesrc-buildrc)=
 # Configuring kde-builder
 

@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (features)=
 # Script Features
 

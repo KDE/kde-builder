@@ -1,3 +1,7 @@
+---
+nosearch:
+---
+
 (cmdline)=
 # Command Line Options and Environment Variables
 
