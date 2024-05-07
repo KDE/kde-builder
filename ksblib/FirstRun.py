@@ -135,7 +135,13 @@ class FirstRun:
                     packages.remove(package)
 
         if packages:
-            logger_fr.info(f""" b[*] Running 'b[{" ".join(installCmd + packages)}]'""")
+            logger_fr.info(f""" b[*] Would run 'b[{" ".join(installCmd + packages)}]'""")
+            answer = input("   Do you want to continue? [Y/n]: ")
+            if answer in ["Y", "y", ""]:
+                pass
+            else:
+                print("Interrupted by user.")
+                return
             result = subprocess.run(installCmd + packages, shell=False)
             exitStatus = result.returncode
         else:
@@ -147,6 +153,13 @@ class FirstRun:
             individual_failed_packages = []
 
             logger_fr.warning(" b[*] The command with all listed packages failed. Will retry installing packages one by one.\n")
+            answer = input("   Do you want to continue? [Y/n]: ")
+            if answer in ["Y", "y", ""]:
+                pass
+            else:
+                print("Interrupted by user.")
+                return
+
             for onePackage in packages:
                 logger_fr.info(f"""\n b[*] Running 'b[{" ".join(installCmd + [onePackage])}]'""")
                 # Allow for Ctrl+C.
