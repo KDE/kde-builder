@@ -15,7 +15,7 @@ from .BuildException import BuildException
 from .BuildContext import BuildContext
 from .Debug import Debug, kbLogger
 
-logger_app = kbLogger.getLogger("application")
+logger_fr = kbLogger.getLogger("first-run")
 
 
 class FirstRun:
@@ -42,7 +42,7 @@ class FirstRun:
 
         try:
             if "install-distro-packages" in setup_steps:
-                print(Debug().colorize("=== install-distro-packages ==="))
+                logger_fr.warning("=== install-distro-packages ===")
 
                 # The distro dependencies are listed in sysadmin/repo-metadata repository
                 # First, we need to download metadata with Application.
@@ -56,11 +56,11 @@ class FirstRun:
                 metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
                 self._installSystemPackages(metadata_distro_deps_path)
             if "generate-config" in setup_steps:
-                print(Debug().colorize("=== generate-config ==="))
+                logger_fr.warning("=== generate-config ===")
                 self._setupBaseConfiguration()
         except BuildException as e:
             msg = e.message
-            print(Debug().colorize(f"  b[r[*] r[{msg}]"))
+            logger_fr.error(f"  b[r[*] r[{msg}]")
             exit(1)
 
         exit(0)
@@ -95,14 +95,15 @@ class FirstRun:
         vendor = self.oss.vendorID()
         osVersion = self.oss.vendorVersion()
 
-        print(Debug().colorize(f" b[-] Installing b[system packages] for b[{vendor}]..."))
+        logger_fr.info(f" b[-] Installing b[system packages] for b[{vendor}]...")
 
         packages = self._findBestVendorPackageList(deps_data_path)
         if not packages:
-            print(Debug().colorize(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})"))
+            logger_fr.error(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})")
             return
 
         installCmd = self._findBestInstallCmd()
+        not_found_in_repo_packages = []
 
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
         if self.oss.vendorID() == "arch":
@@ -119,36 +120,66 @@ class FirstRun:
                     missing_packages_from_required_groups += missing_packages_from_required_group
             packages = missing_packages_not_grouped + missing_packages_from_required_groups
 
+        if self.oss.isDebianBased():
+            all_available_packages = subprocess.run("apt list", shell=True, capture_output=True).stdout.decode("utf-8").removesuffix("\n").split("\n")
+            all_available_packages.pop(0)  # The 0 element is "Listing..."
+            all_available_packages = [pkg.split("/")[0] for pkg in all_available_packages]
+
+            for package in packages:
+                if package not in all_available_packages:
+                    not_found_in_repo_packages.append(package)
+            if not_found_in_repo_packages:
+                logger_fr.warning(" y[*] These packages were not found in repositories:\n\t" + "\n\t".join(not_found_in_repo_packages))
+                logger_fr.warning(" y[*] Removing them from the list of installation")
+                for package in not_found_in_repo_packages:
+                    packages.remove(package)
+
         if packages:
-            print(Debug().colorize(f""" b[*] Running 'b[{" ".join(installCmd + packages)}]'"""))
+            logger_fr.info(f""" b[*] Would run 'b[{" ".join(installCmd + packages)}]'""")
+            answer = input("   Do you want to continue? [Y/n]: ")
+            if answer in ["Y", "y", ""]:
+                pass
+            else:
+                print("Interrupted by user.")
+                return
             result = subprocess.run(installCmd + packages, shell=False)
             exitStatus = result.returncode
         else:
-            print(Debug().colorize(" b[*] All dependencies are already installed. No need to run installer. b[:)]"))
+            logger_fr.info(" b[*] No packages to install, no need to run installer. b[:)]")
             exitStatus = 0
 
-        # Install one at a time if we can, but check if sudo is present
-        hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-        everFailed = False
-        if exitStatus != 0 and self.oss.isDebianBased() and hasSudo:
-            print(Debug().colorize(" b[*] The previous command failed. Will retry installing packages one by one."))
+        if exitStatus != 0:
+            # Install one at a time if we can
+            individual_failed_packages = []
+
+            logger_fr.warning(" b[*] The command with all listed packages failed. Will retry installing packages one by one.\n")
+            answer = input("   Do you want to continue? [Y/n]: ")
+            if answer in ["Y", "y", ""]:
+                pass
+            else:
+                print("Interrupted by user.")
+                return
+
             for onePackage in packages:
-                commandLine = f"sudo apt-get -q -y --no-install-recommends install {onePackage}".split(" ")
-                print(Debug().colorize(f""" b[*] Running 'b[{" ".join(commandLine)}]'"""))
+                logger_fr.info(f"""\n b[*] Running 'b[{" ".join(installCmd + [onePackage])}]'""")
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
-                result = subprocess.run(commandLine, shell=False, capture_output=True)
-                if not everFailed:
-                    everFailed = result.returncode != 0
+                result = subprocess.run(installCmd + [onePackage], shell=False)
 
-        exitStatus = 0  # It is normal if some packages are not available.
-        if everFailed:
-            print(Debug().colorize(" y[b[*] Some packages failed to install, continuing to build."))
+                if result.returncode != 0:
+                    individual_failed_packages.append(onePackage)
 
-        if exitStatus == 0:
-            print(Debug().colorize(" b[*] b[g[Looks like the necessary packages were successfully installed!]"))
+            if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
+                logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
+
+            if individual_failed_packages:
+                logger_fr.warning("\n y[b[*] Some packages failed to install:\n" + "\n\t".join(individual_failed_packages))
+            else:
+                logger_fr.warning(f" r[b[*] Packages were installed individually, but the command to install them at once failed with exit status {exitStatus}. Please report this case.")
         else:
-            print(Debug().colorize(f" r[b[*] Failed with exit status {exitStatus}. Ran into an error with the installer!"))
+            if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
+                logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
+            logger_fr.info(" b[*] b[g[Packages were successfully installed!]")
 
     def suggestedNumCoresForLowMemory(self) -> int:
         """
@@ -165,12 +196,12 @@ class FirstRun:
         try:
             mem_total = self.oss.detectTotalMemory()
         except BuildException as e:
-            logger_app.warning(str(e))
+            logger_fr.warning(str(e))
 
         if not mem_total:
             # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
             mem_total = 4 * 1024 * 1024
-            logger_app.warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
+            logger_fr.warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
 
         rounded_mem = int(mem_total / 1024000.0)
         return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
@@ -198,10 +229,10 @@ class FirstRun:
 
         if locatedFile:
             printableLocatedFile = locatedFile.replace(os.environ.get("HOME"), "~")
-            print(Debug().colorize(f"b[*] You already have a configuration file: b[y[{printableLocatedFile}]"))
+            logger_fr.warning(f"b[*] You already have a configuration file: b[y[{printableLocatedFile}]")
             return
 
-        print(Debug().colorize(f"b[*] Creating b[sample configuration file]: b[y[\"{xdgConfigHomeShort}/kdesrc-buildrc\"]..."))
+        logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdgConfigHomeShort}/kdesrc-buildrc\"]...")
 
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kdesrc-buildrc.in", "r") as data_file:
             sampleRc = data_file.read()
@@ -217,7 +248,7 @@ class FirstRun:
 
         gl = BuildContext().build_options["global"]  # real global defaults
 
-        def fill_placeholder(option_name, mode=""):
+        def fill_placeholder(option_name, mode="") -> None:
             value = gl[option_name]
             if mode == "bool_to_str":
                 # Perl doesn't have native boolean types, so config internally operates on 0 and 1.
@@ -246,12 +277,12 @@ class FirstRun:
             sampleFh.write(sampleRc)
         print()
 
-    def _findBestInstallCmd(self) -> list:
+    def _findBestInstallCmd(self) -> list[str]:
         cmdsRef = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
-            "cmd/install/fedora/unknown": "dnf -y install",
+            "cmd/install/fedora/unknown": "dnf -y install --skip-broken",
             "cmd/install/freebsd/unknown": "pkg install -y",
             "cmd/install/gentoo/unknown": "emerge -v --noreplace",
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
@@ -260,7 +291,7 @@ class FirstRun:
         supportedDistros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmdsRef.keys()]
 
         bestVendor = self.oss.bestDistroMatch(supportedDistros)
-        print(Debug().colorize(f"    Using installer for b[{bestVendor}]"))
+        logger_fr.info(f"    Using installer for b[{bestVendor}]")
 
         version = self.oss.vendorVersion()
         cmd = []
@@ -276,17 +307,21 @@ class FirstRun:
 
         # If not running as root already, add sudo
         if os.geteuid() != 0:
-            cmd.insert(0, "sudo")
-
+            hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+            if hasSudo:
+                cmd.insert(0, "sudo")
+            else:
+                logger_fr.error("r[*] You are missing g[sudo]! Cannot continue.")
+                exit(1)
         return cmd
 
-    def _findBestVendorPackageList(self, deps_data_path) -> list:
+    def _findBestVendorPackageList(self, deps_data_path) -> list[str]:
         bestVendor = self.oss.bestDistroMatch(self.supportedDistros + self.supportedOtherOS)
         version = self.oss.vendorVersion()
-        print(Debug().colorize(f"    Installing packages for b[{bestVendor}]/b[{version}]"))
+        logger_fr.info(f"    Installing packages for b[{bestVendor}]/b[{version}]")
         return self._packagesForVendor(bestVendor, version, deps_data_path)
 
-    def _packagesForVendor(self, vendor, version, deps_data_path) -> list:
+    def _packagesForVendor(self, vendor, version, deps_data_path) -> list[str]:
         packages = self._readPackages(vendor, version, deps_data_path)
         for opt in [f"pkg/{vendor}/{version}", f"pkg/{vendor}/unknown"]:
             if opt in packages.keys():
