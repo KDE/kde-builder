@@ -1764,11 +1764,11 @@ class Application:
             # Even when dbus-python is not installed, this module may still be imported successfully.
             # So check if dbus has some needed attributes, that way we will be sure that module can be used.
             if not hasattr(dbus, "SystemBus"):
-                logger_app.warning(f"Looks like python-dbus package is not installed. Will not request performance power profile.")
+                logger_app.warning("Looks like python-dbus package is not installed. Skipping dbus calls.")
                 return
 
             try:
-                bus = dbus.SystemBus()
+                system_bus = dbus.SystemBus()
 
                 if Debug().pretending():
                     logger_app.info("d[Would hold performance profile")
@@ -1776,15 +1776,23 @@ class Application:
 
                 logger_app.info("Holding performance profile")
 
-                service = bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
+                service = system_bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
                 ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
 
                 # The hold will be automatically released once kde-builder exits
-                cookie = ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
+                performance_cookie = ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
+
+                session_bus = dbus.SessionBus()
+                proxy = session_bus.get_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
+                iface = dbus.Interface(proxy, "org.freedesktop.PowerManagement.Inhibit")
+
+                # The inhibition will be automatically released once kde-builder exits
+                sleep_cookie = iface.Inhibit("kde-builder", "Building modules")
+
             except dbus.DBusException as e:
-                print(f"Error accessing PowerProfiles service: {e}")
+                logger_app.warning(f"Error accessing dbus: {e}")
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
-            logger_app.warning(f"Could not import dbus module. Will not request performance power profile.")
+            logger_app.warning("Could not import dbus module. Skipping dbus calls.")
             return
 
     # Accessors
