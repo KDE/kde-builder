@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
 # SPDX-FileCopyrightText: 2024 KDE Contributors (see git history) <community@kde.org>
 #
-# SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted-GPL
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # This script installs kde-builder
 

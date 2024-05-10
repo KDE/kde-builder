@@ -25,8 +25,8 @@ License: MIT
 Files:  doc/*.md
 Copyright:  2003 - 2023 Michael Pyne <mpyne@kde.org>
             2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
-            2004 - 2024 KDE Contributors (see git history) <community@kde.org>
-License: CC-BY-4.0
+            2004 - 2024 kdesrc-build contributors
+License: GFDL-1.2-no-invariants-or-later
 
 Files:  logo.png
 Copyright: 2022 Manuel Jesús de la Fuente <m@nueljl.in>
