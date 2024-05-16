@@ -85,9 +85,14 @@ class StartProgram:
         
         # Launch the program with optional arguments.
         if [ "{int(optFork)}" = 1 ]; then
-            setsid -f "{execPath}" $@
+            nohup {execPath} "$@" >/dev/null 2>&1 & 
+            disown
+            echo "PID:                $!"
+            printf '%.0s#' {{1..80}}; printf "\n\n"
         else
-            "{execPath}" $@
+            echo "PID:                $$"
+            printf '%.0s#' {{1..80}}; printf "\n\n"
+            exec "{execPath}" $@
         fi
         """)
 
@@ -97,9 +102,7 @@ class StartProgram:
             f"Module:             {module}\n" +
             f"Executable          {executable}\n" +
             f"Revision:           {revision}\n" +
-            f"""Arguments:          {" ".join(args)}\n""" +
-            "#" * 80 + "\n" +
-            "\n"
+            f"""Arguments:          {" ".join(args)}"""
         )
 
         if Debug().pretending():
