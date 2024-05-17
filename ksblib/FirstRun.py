@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from __future__ import annotations
 import os
 import re
 import subprocess
@@ -31,11 +32,12 @@ class FirstRun:
         exit(exitcode)
     """
 
-    def __init__(self):
+    def __init__(self, prefilled_prompt_answer: str | None = None):
         self.oss = OSSupport()
         self.baseDir = None
         self.supportedDistros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
         self.supportedOtherOS = ["freebsd"]
+        self.prefilled_prompt_answer = prefilled_prompt_answer
 
     def setupUserSystem(self, baseDir, setup_steps: list) -> NoReturn:
         self.baseDir = baseDir
@@ -90,6 +92,18 @@ class FirstRun:
     def _throw(msg: str) -> NoReturn:
         raise BuildException.make_exception("Setup", msg)
 
+    def confirmed_to_continue(self) -> bool:
+        if self.prefilled_prompt_answer is None:
+            answer = input("   Do you want to continue? [Y/n]: ")
+        else:
+            answer = self.prefilled_prompt_answer
+
+        answer = answer.lower()
+        if answer in ["y", "yes", ""]:
+            return True
+        else:
+            return False
+
     def _installSystemPackages(self, deps_data_path) -> None:
 
         vendor = self.oss.vendorID()
@@ -136,12 +150,10 @@ class FirstRun:
 
         if packages:
             logger_fr.info(f""" b[*] Would run 'b[{" ".join(installCmd + packages)}]'""")
-            answer = input("   Do you want to continue? [Y/n]: ")
-            if answer in ["Y", "y", ""]:
-                pass
-            else:
+            if not self.confirmed_to_continue():
                 print("Interrupted by user.")
                 return
+
             result = subprocess.run(installCmd + packages, shell=False)
             exitStatus = result.returncode
         else:
@@ -153,10 +165,7 @@ class FirstRun:
             individual_failed_packages = []
 
             logger_fr.warning(" b[*] The command with all listed packages failed. Will retry installing packages one by one.\n")
-            answer = input("   Do you want to continue? [Y/n]: ")
-            if answer in ["Y", "y", ""]:
-                pass
-            else:
+            if not self.confirmed_to_continue():
                 print("Interrupted by user.")
                 return
 

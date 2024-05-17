@@ -479,6 +479,10 @@ Generate the kde-builder configuration file.
 
 See also `--initial-setup`
 
+(cmdline-prompt-answer)=
+[`--prompt-answer`](cmdline-prompt-answer) \<value\>  
+Prevent the interactive prompts, and use the _value_ as the prompt answer. Such prompts can be seen in install-distro-packages step.
+
 ## Script information
 
 (cmdline-version)=

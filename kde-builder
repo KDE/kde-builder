@@ -68,6 +68,7 @@ parser = argparse.ArgumentParser(prog="ProgramName",
 parser.add_argument("--initial-setup", action="store_true")
 parser.add_argument("--install-distro-packages", action="store_true")
 parser.add_argument("--generate-config", action="store_true")
+parser.add_argument("--prompt-answer",  nargs=1)
 parser.add_argument("--debug", action="store_true")
 
 args, unknown = parser.parse_known_args()
@@ -142,7 +143,8 @@ if setup_steps:
 
     d = Debug()
     d.setColorfulOutput(True)
-    fr = FirstRun()
+    prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
+    fr = FirstRun(prompt_answer)
     exit(fr.setupUserSystem(RealBinDir, setup_steps))
 
 from ksblib.Version import Version  # noqa: E402
