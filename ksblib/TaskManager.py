@@ -412,13 +412,19 @@ class TaskManager:
             updaterToMonitorIPC = IPC_Pipe()
             updaterPid = os.fork()
 
-            def sigint_handler(sig, frame):
-                sys.exit(signal.SIGINT)
-
-            signal.signal(signal.SIGINT, sigint_handler)
-
             if updaterPid == 0:
                 # child of monitor (i.e. updater)
+
+                def sigint_handler(sig, frame):
+                    # print("[updater process] received SIGINT.")
+                    def unraisable_hook(unraisable):
+                        pass
+
+                    sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
+                    sys.exit(signal.SIGINT)
+
+                signal.signal(signal.SIGINT, sigint_handler)
+
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
@@ -436,6 +442,18 @@ class TaskManager:
                 sys.exit(exitcode)
             else:
                 # still monitor
+
+                def sigint_handler(sig, frame):
+                    # print("[monitor process] received SIGINT.")
+
+                    def unraisable_hook(unraisable):
+                        pass
+
+                    sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
+                    sys.exit(signal.SIGINT)
+
+                signal.signal(signal.SIGINT, sigint_handler)
+
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):

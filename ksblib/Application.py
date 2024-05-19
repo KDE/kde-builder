@@ -14,7 +14,7 @@ import sys
 import textwrap
 import re
 import traceback
-from time import time
+from time import time, sleep
 import fileinput
 import asyncio
 import hashlib
@@ -98,11 +98,35 @@ class Application:
             print(f"{sys.argv[0]} is already running!\n")
             exit(1)  # Don't finish(), it's not our lockfile!!
 
+        os.setpgrp()  # Create our own process group, its id will be equal to self._base_pid. Needed to send signal to the whole group when exiting.
+        self._already_got_signal = False  # Used to prevent secondary invocation of signal handler
+
         # Install signal handlers to ensure that the lockfile gets closed.
         def signal_handler(signum, frame):
-            logger_app.warning("Signal received, terminating.")
-            atexit.unregister(self.finish)  # Remove their finish, doin' it manually
-            self.finish(5)
+            # import setproctitle
+            if self._already_got_signal:
+                # if not os.getpid() == self._base_pid:
+                #     print(f"\nWarning: Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in main process {os.getpid()} ({setproctitle.getproctitle()}), but already received it, ignoring.")
+                # else:
+                #     print(f"\nWarning: Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in subprocess {os.getpid()} ({setproctitle.getproctitle()}), but already received it, ignoring.")
+                return
+
+            self._already_got_signal = True
+
+            if not os.getpid() == self._base_pid:
+                # print(f"\Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in subprocess {os.getpid()} ({setproctitle.getproctitle()}).")
+                sys.exit(signum)
+            else:
+                print(f"\nSignal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received, terminating.")
+                self._already_got_signal = True
+                signal.signal(signal.SIGINT, signal.SIG_IGN)  # Ignoring the SIGINT signal from now, so when we send it to group, it will be ignored in current process.
+                os.killpg(self._base_pid, signal.SIGINT)  # Sending SIGINT to all processes in our process group.
+                # Even after we sent it to all processes in group, the updater process sometimes got hanged with futex_wait_queue.
+                # As a crutch for now, will send this signal again, after a bit of waiting.
+                sleep(0.3)
+                os.killpg(self._base_pid, signal.SIGINT)  # Sending it again.
+                atexit.unregister(self.finish)  # Remove their finish, doin' it manually
+                self.finish(5)
 
         self._installSignalHandlers(signal_handler)
 
