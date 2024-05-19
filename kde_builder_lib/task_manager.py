@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 
 import setproctitle
 
+import subprocess
 from .build_exception import BuildException
 from .debug import Debug
 from .debug import KBLogger
@@ -24,7 +25,6 @@ from .ipc.ipc import IPC
 from .ipc.null import IPCNull
 from .ipc.pipe import IPCPipe
 from .util.util import Util
-
 if TYPE_CHECKING:
     from build_context import BuildContext
     from .application import Application
@@ -318,7 +318,7 @@ class TaskManager:
                     module_list = ", ".join([f"{elem}" for elem in [module] + modules])
                     ctx.set_persistent_option("global", "resume-list", module_list)
                 result = 1
-
+                subprocess.run(f"""kdeconnect-cli -d $(kdeconnect-cli -a --id-only) --ping-msg "{module}: Failed on {failed_phase} after {elapsed}.\"""", shell=True)
                 if module.get_option("stop-on-failure"):
                     logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
                     return 1  # Error
