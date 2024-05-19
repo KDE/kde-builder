@@ -12,6 +12,7 @@ import time
 import signal
 import setproctitle
 import selectors
+import subprocess
 from .Debug import Debug, kbLogger
 from .IPC.IPC import IPC
 from .IPC.Pipe import IPC_Pipe
@@ -303,7 +304,7 @@ class TaskManager:
                     moduleList = ", ".join([f"{elem}" for elem in [module] + modules])
                     ctx.setPersistentOption("global", "resume-list", moduleList)
                 result = 1
-
+                subprocess.run(f"""kdeconnect-cli -d $(kdeconnect-cli -a --id-only) --ping-msg "{module}: Failed on {failedPhase} after {elapsed}.\"""", shell=True)
                 if module.getOption("stop-on-failure"):
                     logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
                     return 1  # Error
