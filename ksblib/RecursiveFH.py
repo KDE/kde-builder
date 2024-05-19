@@ -34,7 +34,7 @@ class RecursiveFH:
     def addFile(self, fh, fn) -> None:
         """
         Adds a new filehandle to read config data from.
-        
+
         This should be called in conjunction with pushBasePath to allow for recursive
         includes from different folders to maintain the correct notion of the current
         cwd at each recursion level.
@@ -90,9 +90,9 @@ class RecursiveFH:
         opens the given file and starts reading from it instead. The original
         file is not read again until the entire included file has been read. This
         works recursively as necessary.
-        
+
         No further modification is performed to returned lines.
-        
+
         None is returned on end-of-file (but only of the initial filehandle, not
         included files from there)
         """

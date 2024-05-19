@@ -20,7 +20,7 @@ logger_updater = kbLogger.getLogger("updater")
 class Updater_Qt5(Updater_Git):
     """
     Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated
-    'init-repository' script to keep the source up to date and coherent.
+    "init-repository" script to keep the source up to date and coherent.
     """
 
     @staticmethod
@@ -32,7 +32,7 @@ class Updater_Qt5(Updater_Git):
         """
         Handles calling init-repository to clone or update the appropriate Qt 5
         submodules.
-        
+
         Returns number of commits updated (or rather, will...)
         """
         module = self.module
@@ -83,10 +83,11 @@ class Updater_Qt5(Updater_Git):
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
-        
+
         If errors are encountered, an exception is raised.
-        
-        Returns the number of *commits* affected.
+
+        Returns:
+             The number of *commits* affected.
         """
         Util.assert_isa(self, Updater_Qt5)
         module = self.module

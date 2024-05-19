@@ -21,11 +21,10 @@ class KDEProjectsReader:
     def __init__(self, projectMetadataModule):
         """
         Constructs a new KDEProjectsReader. This doesn't contradict any part of the class
-        documentation which claims this class is a singleton however. This should be
-        called as a method (e.g. KDEProjectsReader->new(...)).
-        
+        documentation which claims this class is a singleton.
+
         Parameters:
-         $projectMetadataModule - ksb::Module reference to the repo-metadata module.
+            projectMetadataModule: :class:`Module` that is the repo-metadata module.
         """
 
         # pl2py: no need to check _verifyYAMLModuleLoaded()
@@ -110,7 +109,7 @@ class KDEProjectsReader:
 
     def getModulesForProject(self, proj: str) -> list:
         """
-        Note on $proj: A /-separated path is fine, in which case we look
+        Note on ``proj``: A "/"-separated path is fine, in which case we look
         for the right-most part of the full path which matches all of searchProject.
         e.g. kde/kdebase/kde-runtime would be matched by a proj of either
         "kdebase/kde-runtime" or simply "kde-runtime".
@@ -157,22 +156,24 @@ class KDEProjectsReader:
     @staticmethod
     def _projectPathMatchesWildcardSearch(projectPath, searchItem) -> bool:
         """
-        Utility subroutine, returns true if the given kde-project full path (e.g.
+        Returns true if the given kde-project full path (e.g.
         kde/kdelibs/nepomuk-core) matches the given search item.
-        
+
         The search item itself is based on path-components. Each path component in
         the search item must be present in the equivalent path component in the
-        module's project path for a match. A '*' in a path component position for the
+        module's project path for a match. A "*" in a path component position for the
         search item matches any project path component.
-        
+
         Finally, the search is pinned to search for a common suffix. E.g. a search
-        item of 'kdelibs' would match a project path of 'kde/kdelibs' but not
-        'kde/kdelibs/nepomuk-core'. However, 'kdelibs/*' would match
-        'kde/kdelibs/nepomuk-core'.
-        
-        First parameter is the full project path from the kde-projects database.
-        Second parameter is the search item.
-        Returns true if they match, false otherwise.
+        item of "kdelibs" would match a project path of "kde/kdelibs" but not
+        "kde/kdelibs/nepomuk-core". However, "kdelibs/*" would match
+        "kde/kdelibs/nepomuk-core".
+
+        Parameters:
+            projectPath: The full project path from the kde-projects database.
+            searchItem: The search item.
+        Returns:
+             True if they match, False otherwise.
         """
 
         searchParts = searchItem.split("/")

@@ -29,7 +29,7 @@ class StatusView:
 
     def setStatus(self, newStatus) -> None:
         """
-        Sets the 'base' message to show as part of the update. E.g. "Compiling..."
+        Sets the "base" message to show as part of the update. E.g. "Compiling..."
         """
         self.status = Debug().colorize(newStatus)
 

@@ -33,11 +33,13 @@ class BuildException(Exception):
     @staticmethod
     def make_exception(exception_type: str, msg: str, levels=None):
         """
-        Returns a Perl exception object to pass to 'die' function
-        The returned reference will be an instance of ksb::BuildException.
-        
-        First parameter: Exception type, 'Exception' if undef
-        Second parameter: Message to show to user
+        Returns an exception object to pass to 'raise' function
+        The returned object will be an instance of :class:`BuildException`.
+
+        Parameters:
+            exception_type: Exception type, 'Exception' if not defined.
+            msg: Message to show to user
+            levels: Number of levels to remove from backtrace.
         """
         exception_type = exception_type if exception_type else "Exception"
         message = msg
@@ -53,10 +55,7 @@ class BuildException(Exception):
     @staticmethod
     def had_an_exception(e):
         """
-        Helper function to return $@ if $@ is a ksb::BuildException.
-        
-        This function assumes that an eval block had just been used in order to set
-        or clear $@ as appropriate.
+        Helper function to return exception if exception is a :class:`BuildException`.
         """
         if e and isinstance(e, BuildException):
             return e
@@ -83,8 +82,8 @@ class BuildException_Config(BuildException):
     """
     A small subclass to hold the option name that caused a config exception to
     be thrown.
-    
-    Typically, this will be caught by config-reading code in ksb::Application,
+
+    Typically, this will be caught by config-reading code in :class:`Application`,
     which will add filename and line number information to the message.
     """
 
@@ -99,7 +98,7 @@ class BuildException_Config(BuildException):
     def optionUsageExplanation(optionName) -> str | None:
         """
         Should return a lengthy explanation of how to use a given option for use in
-        error messages, or undef if no explanation is unavailable.
+        error messages, or None if no explanation is unavailable.
         """
         result = None
 

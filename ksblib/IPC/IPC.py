@@ -22,8 +22,8 @@ class IPC:
     """
     Handles the asynchronous communications needed to perform update and build
     processes at the same time. This can be thought of as a partially-abstract
-    class, really you should use IPC::Null (which is fully synchronous) or
-    IPC::Pipe, which both fall back to common methods implemented here.
+    class, really you should use IPC_Null (which is fully synchronous) or
+    IPC_Pipe, which both fall back to common methods implemented here.
     """
 
     # IPC message types
@@ -253,7 +253,7 @@ class IPC:
 
     def forgetModule(self, module: Module) -> None:
         """
-        Flags the given module as something that can be ignored from now on.  For use
+        Flags the given module as something that can be ignored from now on. For use
         after the module has been waited on
         """
         modulename = module.name
@@ -261,7 +261,7 @@ class IPC:
 
     def unacknowledgedModules(self) -> dict:
         """
-        Returns a hashref mapping module *names* to update statuses, for modules that
+        Returns a dict mapping module *names* to update statuses, for modules that
         have not already been marked as ignorable using forgetModule()
         """
         return self.updated
@@ -269,9 +269,9 @@ class IPC:
     def waitForStreamStart(self) -> None:
         """
         Waits on the IPC connection until one of the ALL_* IPC codes is returned.
-        If ksb::IPC::ALL_SKIPPED is returned then the 'no_update' entry will be set in
-        $self to flag that you shouldn't wait.
-        If ksb::IPC::ALL_FAILURE is returned then an exception will be thrown due to the
+        If IPC.ALL_SKIPPED is returned then the 'no_update' entry will be set in
+        self to flag that you shouldn't wait.
+        If IPC.ALL_FAILURE is returned then an exception will be thrown due to the
         fatal error.
         This method can be called multiple times, but only the first time will
         result in a wait.
@@ -309,9 +309,10 @@ class IPC:
     def sendIPCMessage(self, ipcType, msg: str) -> bool:
         """
         Sends an IPC message along with some IPC type information.
-        
-        First parameter is the IPC type to send.
-        Second parameter is the actual message.
+
+        Parameters:
+            ipcType: The IPC type to send.
+            msg: The actual message.
         All remaining parameters are sent to the object's sendMessage()
          procedure.
         """
@@ -322,10 +323,12 @@ class IPC:
     def unpackMsg(msg: bytes) -> tuple:
         """
         Static class function to unpack a message.
-        
-        First parameter is the message.
-        
-        Returns the IPC message type and message content.
+
+        Parameters:
+            msg: The message.
+
+        Returns:
+             The IPC message type and message content.
         """
         returnType, outBuffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
         return returnType, outBuffer
@@ -334,8 +337,9 @@ class IPC:
         """
         Receives an IPC message and decodes it into the message and its
         associated type information.
-        
-        Returns the list with IPC type and message content, or list with two None on failure.
+
+        Returns:
+             The list with IPC type and message content, or list with two None on failure.
         """
         if self.updates_done:
             BuildException.croak_internal("Trying to pull message from closed IPC channel!")
@@ -354,8 +358,7 @@ class IPC:
     def receiveMessage(self) -> NoReturn:
         """
         receiveMessage should return a message received from the other side, or
-        undef for EOF or error.  On error, $! should be set to hold the error
-        information.
+        None for EOF or error.
         """
         BuildException.croak_internal("Unimplemented.")
 

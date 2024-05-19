@@ -26,14 +26,14 @@ class ModuleSet(OptionsBase):
     """
     This represents a collective grouping of modules that share common options,
     and share a common repository (in this case, based on the git-repository-base
-    option, but see also the more common ModuleSet::KDEProjects which is used for
+    option, but see also the more common ModuleSet_KDEProjects which is used for
     the special kde-projects repositories).
-    
+
     This is parsed from module-set declarations in the rc-file.
-    
+
     The major conceit here is several things:
-    
-    1. A hash of options to set for each module read into this module set.
+
+    1. A dict of options to set for each module read into this module set.
     2. A list of module search declarations to be used to construct modules for
     this module set (in the case of kde-projects repository). For other
     repository types we can still consider it a 'search', but with the
@@ -46,10 +46,10 @@ class ModuleSet(OptionsBase):
     for option grouping as per 1.).
     4. A name, which must not be empty, although user-specified names cannot be
     assumed to be unique.
-    5. A ksb::PhaseList describing what phases of the build a module should
+    5. A PhaseList describing what phases of the build a module should
     participate in by default.
-    
-    See also: git-repository-base, ModuleSet::KDEProjects, use-modules
+
+    See also: git-repository-base, ModuleSet_KDEProjects, use-modules
     """
 
     def __init__(self, ctx: BuildContext, name: str):
@@ -74,9 +74,9 @@ class ModuleSet(OptionsBase):
 
     def phases(self):
         """
-        Just returns a reference to the existing ksb::PhaseList, there's no way to
+        Just returns a reference to the existing PhaseList, there's no way to
         replace this, though you can alter the underlying phases through the
-        ksb::PhaseList object itself.
+        PhaseList object itself.
         """
         return self.phase_list
 
@@ -106,7 +106,7 @@ class ModuleSet(OptionsBase):
 
     def _initializeNewModule(self, newModule: Module) -> None:
         """
-        Should be called for each new ksb::Module created in order to setup common
+        Should be called for each new ksb::Module created in order to set up common
         module options.
         """
         newModule.setModuleSet(self)
@@ -156,7 +156,7 @@ class ModuleSet(OptionsBase):
     def convertToModules(self, ctx: BuildContext) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
-        available in order to convert this module set to a list of ksb::Module.
+        available in order to convert this module set to a list of Module.
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """

@@ -16,11 +16,11 @@ class ModuleSet_Qt5(ModuleSet):
     """
     This represents a collection of Qt5 source code modules that are collectively
     kept up to date by Qt's init-repository script. This module set is
-    essentially used to make sure that generated ksb::Modules use proper scm()
+    essentially used to make sure that generated Modules use proper scm()
     and buildSystems()
-    
-    Use of this module-set is controlled by the 'repository' option being set to
-    the magic value 'qt-projects', just as 'kde-projects' is used for KDE.
+
+    Use of this module-set is controlled by the "repository" option being set to
+    the magic value "qt-projects", just as "kde-projects" is used for KDE.
     """
 
     def _makeQt5Module(self, ctx: BuildContext) -> Module:

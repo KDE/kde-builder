@@ -15,16 +15,16 @@ import re
 
 class OSSupport:
     """
-    DESCRIPTION
-    
     Provides support code for handling distro-specific functionality, such as lists
     of package dependencies, command lines to update packages in the first place,
     and so on.
-    
+
     See https://www.freedesktop.org/software/systemd/man/os-release.html for the
     relevant specification.
-    
-    SYNOPSIS
+
+    Example:
+    ::
+
         os = OSSupport()  # Autodetects info on running system
         print("Current OS is: " + os.vendorID)
     """
@@ -32,10 +32,10 @@ class OSSupport:
     def __init__(self, file: str | None = None):
         """
             os = OSSupport()
-        
+
         Manually point to os-release:
         ::
-        
+
             os = OSSupport('/usr/lib/os-release')
         """
 
@@ -54,6 +54,7 @@ class OSSupport:
         Returns the vendor ID from the `os-release` specification, or
         'unknown' if /etc/os-release could not be read.
         ::
+
             vendor = os.vendorID  # 'gentoo', 'debian', etc.
         N.B., this is **not the same as the operating system**!
         """
@@ -62,7 +63,7 @@ class OSSupport:
     def vendorVersion(self) -> str:
         """
             vendor = os.vendorVersion  # 'xenial', '17', etc.
-        
+
         Returns the vendor Version from the `os-release` specification.
         The first available value from `VERSION_ID` and then
         `VERSION_CODENAME` is used, and 'unknown' is returned if neither
@@ -92,7 +93,7 @@ class OSSupport:
 
     def detectTotalMemory(self) -> int:
         """
-        Returns the amount of installed memory, in kilobytes.  Linux and FreeBSD are
+        Returns the amount of installed memory, in kilobytes. Linux and FreeBSD are
         supported.
         Throws a runtime exception if unable to autodetect memory capacity.
             mem_total_KiB = os.detectTotalMemory()
@@ -118,16 +119,16 @@ class OSSupport:
 
     def bestDistroMatch(self, distros: list[str]) -> str:
         """
-            # Might return 'fedora' if running on Scientific Linux
+            # Might return "fedora" if running on Scientific Linux
             distro = os.bestDistroMatch(["ubuntu", "fedora", "arch", "debian"]);
-        
+
         This uses the ID (and if needed, ID_LIKE) parameter in
         /etc/os-release to find the best possible match amongst the
         provided distro IDs. The list of distros should be ordered with
         most specific distro first.
-        
-        If no match is found, returns a generic os string (**not** None, '', or
-        similar): 'linux' or 'freebsd' as the case may be.
+
+        If no match is found, returns a generic os string (**not** None, "", or
+        similar): "linux" or "freebsd" as the case may be.
         """
 
         ids = [self.vendorID()]

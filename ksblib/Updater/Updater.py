@@ -11,7 +11,7 @@ from ..BuildException import BuildException
 class Updater:
     """
     Base class for classes that handle updating the source code for a given
-    L<ksb::Module>.  It should not be used directly.
+    ``Module``. It should not be used directly.
     """
 
     def __init__(self, module):

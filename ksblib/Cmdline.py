@@ -21,42 +21,40 @@ logger_app = kbLogger.getLogger("application")
 
 class Cmdline:
     """
-    DESCRIPTION
-    
-    This package centralizes handling of command line options, to simplify handling
+    This class centralizes handling of command line options, to simplify handling
     of user command input, for automated testing using mock command lines, and to
     speed up simple operations by separating command line argument parsing from the
     heavyweight module list generation process.
-    
+
     Since kde-builder is intended to be non-interactive once it starts, the
     command-line is the primary interface to change program execution and has some
     complications as a result.
-    
-    SYNOPSIS
+
+    Example:
     ::
-    
+
         # may exit! for things like --help, --version
         opts = Cmdline.readCommandLineOptionsAndSelectors()
-        
+
         ctx.setOption(**opts["opts"]["global"])
-        
+
         module_list = lookForModSelectors(*opts["selectors"])
-        
+
         if opts["run_mode"] == 'query':
         # handle query option
         exit(0)
-        
+
         # ... let's build
         for module in module_list:
         # override module options from rc-file
         module.setOption(**opts["opts"][module.name()])
-    
+
     At the command line, the user can specify things like:
-    * Modules or module-sets to build (by name)
-    * Command line options (such as ``--pretend`` or ``--no-src``), which normally apply globally (i.e. overriding module-specific options in the config file)
-    * Command line options that apply to specific modules (using ``--set-module-option-value``)
-    * Build modes (install, build only, query)
-    * Modules to *ignore* building, using ``--ignore-modules``, which gobbles up all remaining options.
+        * Modules or module-sets to build (by name)
+        * Command line options (such as ``--pretend`` or ``--no-src``), which normally apply globally (i.e. overriding module-specific options in the config file)
+        * Command line options that apply to specific modules (using ``--set-module-option-value``)
+        * Build modes (install, build only, query)
+        * Modules to *ignore* building, using ``--ignore-modules``, which gobbles up all remaining options.
     """
 
     def __init__(self):
@@ -66,10 +64,10 @@ class Cmdline:
         """
         This function decodes the command line options passed into it and returns a
         dictionary describing what actions to take.
-        
+
         The resulting object will be shaped as follows:
         ::
-        
+
             returned_dict = {
                 "opts": { # see BuildContext's "internalGlobalOptions"
                     'global': {
@@ -102,7 +100,7 @@ class Cmdline:
                     # etc.  USUALLY EMPTY
                 ],
             }
-        
+
         Note this function may throw an exception in the event of an error, or exit the
         program entirely.
         """

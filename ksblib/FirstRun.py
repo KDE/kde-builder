@@ -21,14 +21,12 @@ logger_fr = kbLogger.getLogger("first-run")
 
 class FirstRun:
     """
-    DESCRIPTION
-    
     Performs initial-install setup, implementing the ``--initial-setup`` option.
-    
-    SYNOPSIS
+
+    Examples:
     ::
-    
-        exitcode = ksblib.FirstRun.setupUserSystem()
+
+        exitcode = FirstRun.setupUserSystem()
         exit(exitcode)
     """
 
@@ -72,7 +70,7 @@ class FirstRun:
     @staticmethod
     def _readPackages(vendor, version, deps_data_path) -> dict:
         """
-        Reads from the files from data/pkg and dumps the contents in a hash keyed by filename (the "[pkg/vendor/version]" part between each resource)
+        Reads from the files from data/pkg and dumps the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
         """
         packages = {}
         cur_key = ""
@@ -194,9 +192,8 @@ class FirstRun:
         """
         Returns the suggested number of cores to use for make jobs for build jobs where
         memory is a bottleneck, such as qtwebengine.
-        ::
-        
-            num_cores = ksb.FirstRun.suggestedNumCoresForLowMemory()
+
+            num_cores = FirstRun.suggestedNumCoresForLowMemory()
         """
 
         # Try to detect the amount of total memory for a corresponding option for

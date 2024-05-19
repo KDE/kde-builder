@@ -32,25 +32,24 @@ logger_taskmanager = kbLogger.getLogger("taskmanager")
 
 class TaskManager:
     """
-    =head1 SYNOPSIS
-    
-     assert_isa($app, 'ksb::Application');
-     my $mgr = ksb::TaskManager->new($app);
-    
-     # build context must be setup first
-     my $result = eval { $mgr->runAllTasks(); }
-    
-     # all module updates/builds/etc. complete
-    
-    =head1 DESCRIPTION
-    
-    This module consolidates the actual orchestration of all the module update,
+    This class consolidates the actual orchestration of all the module update,
     buildsystem setup, configure, build, and install jobs once the
-    L<ksb::Application> has setup the L<ksb::BuildContext> for the current build.
-    
+    :class:`Application` has set up the :class:`BuildContext` for the current build.
+
     In particular, the concurrent portion of the build is concentrated more-or-less
     entirely within "runAllTasks", although other parts of the script have to be
     aware of concurrency.
+
+    Examples:
+    ::
+
+        Util.assert_isa(app, Application)
+        mgr = TaskManager(app)
+
+        # build context must be setup first
+        result = mgr.runAllTasks()
+
+        # all module updates/builds/etc. complete
     """
 
     def __init__(self, app: Application):
@@ -62,7 +61,7 @@ class TaskManager:
 
     def runAllTasks(self):
         """
-        returns shell-style result code
+        Returns shell-style result code
         """
         # What we're going to do is fork another child to perform the source
         # updates while we build.  Setup for this first by initializing some
@@ -108,17 +107,18 @@ class TaskManager:
 
     def _handle_updates(self, ipc: IPC, ctx: BuildContext) -> int:
         """
-        Subroutine to update a list of modules.
-        
+        Function to update a list of modules.
+
         Parameters:
-        1. IPC module to pass results to.
-        2. Build Context, which will be used to determine the module update list.
-        
+            ipc: IPC module to pass results to.
+            ctx: Build Context, which will be used to determine the module update list.
+
         The ipc parameter contains an object that is responsible for communicating
-        the status of building the modules.  This function must account for every
-        module in $ctx's update phase to the ipc object before returning.
-        
-        Returns 0 on success, non-zero on error.
+        the status of building the modules. This function must account for every
+        module in ctx's update phase to the ipc object before returning.
+
+        Returns:
+             0 on success, non-zero on error.
         """
         update_list = ctx.modulesInPhase("update")
 
@@ -170,8 +170,9 @@ class TaskManager:
     def _buildSingleModule(ipc: IPC, ctx: BuildContext, module: Module, startTimeRef: int) -> str | int:
         """
         Builds the given module.
-        
-        Return value is the failure phase, or 0 on success.
+
+        Returns:
+             The failure phase, or 0 on success.
         """
         ctx.resetEnvironment()
         module.setupEnvironment()
@@ -218,23 +219,24 @@ class TaskManager:
 
     def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
-        Subroutine to handle the build process.
-        
+        Function to handle the build process.
+
         Parameters:
-        1. IPC object to receive results from.
-        2. Build Context, which is used to determine list of modules to build.
-        
+            ipc: IPC object to receive results from.
+            ctx: Build Context, which is used to determine list of modules to build.
+
         If the packages are not already checked-out and/or updated, this
         subroutine WILL NOT do so for you.
-        
+
         This subroutine assumes that the source directory has already been set up.
         It will create the build directory if it doesn't already exist.
-        
-        If $builddir/$module/.refresh-me exists, the subroutine will
+
+        If builddir/module/.refresh-me exists, the function will
         completely rebuild the module (as if --refresh-build were passed for that
         module).
-        
-        Returns 0 for success, non-zero for failure.
+
+        Returns:
+             0 for success, non-zero for failure.
         """
         modules = ctx.modulesInPhase("build")
 
@@ -372,23 +374,24 @@ class TaskManager:
 
     def _handle_async_build(self, monitorToBuildIPC: IPC_Pipe, ctx: BuildContext) -> int:
         """
-        This subroutine special-cases the handling of the update and build phases, by
+        This function special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
-        
+
         Only one thread or process of execution will return from this procedure. Any
         other processes will be forced to exit after running their assigned module
         phase(s).
-        
-        We also redirect ksb::Debug output messages to be sent to a single process
+
+        We also redirect :class:`Debug` output messages to be sent to a single process
         for display on the terminal instead of allowing them all to interrupt each
         other.
-        
+
         Parameters:
-        1. IPC Object to use for sending/receiving update/build status. It must be
-        an object type that supports IPC concurrency (e.g. IPC::Pipe).
-        2. Build Context to use, from which the module lists will be determined.
-        
-        Returns 0 on success, non-zero on failure.
+            monitorToBuildIPC: IPC Object to use for sending/receiving update/build status. It must be
+                an object type that supports IPC concurrency (e.g. IPC::Pipe).
+            ctx: Build Context to use, from which the module lists will be determined.
+
+        Returns:
+             0 on success, non-zero on failure.
         """
         # The exact method for async is that two children are forked.  One child
         # is a source update process.  The other child is a monitor process which will
@@ -532,12 +535,12 @@ class TaskManager:
     def _check_for_ssh_agent(ctx: BuildContext):
         """
         Checks if we are supposed to use ssh agent by examining the environment, and
-        if so checks if ssh-agent has a list of identities.  If it doesn't, we run
-        ssh-add (with no arguments) and inform the user.  This can be controlled with
+        if so, checks if ssh-agent has a list of identities. If it doesn't, we run
+        ssh-add (with no arguments) and inform the user. This can be controlled with
         the disable-agent-check parameter.
-        
+
         Parameters:
-        1. Build context
+            ctx: Build context
         """
         # Don't bother with all this if the user isn't even using SSH.
         if Debug().pretending():
@@ -618,20 +621,21 @@ class TaskManager:
     @staticmethod
     def _handle_monitoring(ipcToBuild: IPC_Pipe, ipcFromUpdater: IPC_Pipe) -> int:
         """
-        This is the main subroutine for the monitoring process when using IPC::Pipe.
+        This is the main function for the monitoring process when using :class:`IPC_Pipe`.
         It reads in all status reports from the source update process and then holds
-        on to them.  When the build process is ready to read information we send what
-        we have.  Otherwise we're waiting on the update process to send us something.
-        
+        on to them. When the build process is ready to read information we send what
+        we have. Otherwise, we're waiting on the update process to send us something.
+
         This convoluted arrangement is required to allow the source update
         process to go from start to finish without undue interruption on it waiting
         to write out its status to the build process (which is usually busy).
-        
+
         Parameters:
-        1. the IPC object to use to send to build process.
-        2. the IPC object to use to receive from update process.
-        
-        Returns 0 on success, non-zero on failure.
+            ipcToBuild: the IPC object to use to send to build process.
+            ipcFromUpdater: the IPC object to use to receive from update process.
+
+        Returns:
+             0 on success, non-zero on failure.
         """
         msgs = []  # Message queue.
 

@@ -49,16 +49,15 @@ logger_app = kbLogger.getLogger("application")
 
 class Application:
     """
-    DESCRIPTION
-    
     Contains the application-layer logic (e.g. creating a build context, reading
-    options, parsing command-line, etc.).  Most of the specific tasks are delegated
+    options, parsing command-line, etc.). Most of the specific tasks are delegated
     to supporting classes, this class primarily does the orchestration that goes
     from reading command line options, choosing which modules to build, overseeing
     the build process, and reporting the results to the user.
-    
-    SYNOPSIS
+
+    Examples:
     ::
+
         app = ksblib.Application.Application(sys.argv)
         result = app.runAllModulePhases()
         app.finish(result)
@@ -190,16 +189,16 @@ class Application:
         Generates the build context and module list based on the command line options
         and module selectors provided, resolves dependencies on those modules if needed,
         filters out ignored or skipped modules, and sets up the module factory.
-        
+
         After this function is called all module set selectors will have been
         expanded, and we will have downloaded kde-projects metadata.
-        
-        Returns: a dict containing the following entries:
-        
-         - selectedModules: the selected modules to build
-         - dependencyInfo: reference to dependency info object as created by :class:`DependencyResolver`
-         - build: whether to actually perform a build action
-        
+
+        Returns:
+            dict: A dict containing the following entries:
+
+            - selectedModules: the selected modules to build
+            - dependencyInfo: reference to dependency info object as created by :class:`DependencyResolver`
+            - build: whether to actually perform a build action
         """
         argv = options
 
@@ -402,8 +401,6 @@ class Application:
         Causes kde-projects metadata to be downloaded (unless --pretend, --no-src, or
         --no-metadata is in effect, although we'll download even in --pretend if
         nothing is available).
-        
-        No return value.
         """
 
         ctx = self.context
@@ -462,7 +459,7 @@ class Application:
         """
         Returns a graph of Modules according to the KDE project database dependency
         information.
-        
+
         The sysadmin/repo-metadata repository must have already been updated, and the
         module factory must be setup. The modules for which to calculate the graph
         must be passed in as arguments
@@ -548,8 +545,7 @@ class Application:
     def runAllModulePhases(self) -> int | bool:
         """
         Runs all update, build, install, etc. phases. Basically this *is* the
-        script.
-        The metadata module must already have performed its update by this point.
+        script. The metadata module must already have performed its update by this point.
         """
         ctx = self.context
         modules = self.modules
@@ -666,7 +662,7 @@ class Application:
         """
         Exits the script cleanly, including removing any lock files created.
         Parameters:
-         [exit] - Optional; if passed, is used as the exit code, otherwise 0 is used.
+            exitcode: Optional; if passed, is used as the exit code, otherwise 0 is used.
         """
         ctx = self.context
 
@@ -700,9 +696,11 @@ class Application:
         Reads a "line" from a file. This line is stripped of comments and extraneous
         whitespace. Also, backslash-continued multiple lines are merged into a single
         line.
-        
-        First parameter is the reference to the filehandle to read from.
-        Returns the text of the line.
+
+        Parameters:
+            fileReader: The reference to the filehandle to read from.
+        Returns:
+             The text of the line.
         """
         line = fileReader.readLine()
         while line:
@@ -731,10 +729,12 @@ class Application:
         value. The value has "false" converted to False, white space simplified (like in
         Qt), tildes (~) in what appear to be path-like entries are converted to
         the home directory path, and reference to global option is substituted with its value.
-        
-        First parameter is the build context (used for translating option values).
-        Second parameter is the line to split.
-        Return value is (option-name, option-value)
+
+        Parameters:
+            ctx: The build context (used for translating option values).
+            input_line: The line to split.
+        Returns:
+             Tuple (option-name, option-value)
         """
         Util.assert_isa(ctx, BuildContext)
         fileName = fileReader.currentFilename()
@@ -794,7 +794,7 @@ class Application:
     @staticmethod
     def _validateModuleSet(ctx: BuildContext, moduleSet: ModuleSet) -> None:
         """
-        Ensures that the given ModuleSet has at least a valid repository and
+        Ensures that the given :class:`ModuleSet` has at least a valid repository and
         use-modules setting based on the given BuildContext.
         """
         name = moduleSet.name if moduleSet.name else "unnamed"
@@ -836,13 +836,16 @@ class Application:
 
     def _parseModuleOptions(self, ctx: BuildContext, fileReader: RecursiveFH, module: OptionsBase, endRE=None):
         """
-        Reads in the options from the config file and adds them to the option store.\n
-        The first parameter is a BuildContext object to use for creating the returned ksb::Module under.\n
-        The second parameter is a reference to the file handle to read from.\n
-        The third parameter is the ksb::OptionsBase to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.\n
-        The fourth parameter is optional, if provided it should be a regexp for the terminator to use for the block being parsed in the rc file.\n
-        The return value is the ksb::OptionsBase provided, with options set as given in
-        the configuration file section being processed.
+        Reads in the options from the config file and adds them to the option store.
+
+        Parameters:
+            ctx: A BuildContext object to use for creating the returned :class:`Module` under.
+            fileReader: A reference to the file handle to read from.
+            module: The :class:`OptionsBase` to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.
+            endRE: Optional, if provided it should be a regexp for the terminator to use for the block being parsed in the rc file.
+
+        Returns:
+            The provided :class:`OptionsBase`, with options set as given in the configuration file section being processed.
         """
         Util.assert_isa(module, OptionsBase)
 
@@ -913,9 +916,8 @@ class Application:
     @staticmethod
     def _markModuleSource(optionsBase: OptionsBase, configSource: str) -> None:
         """
-        Marks the given OptionsBase subclass (i.e. Module or ModuleSet) as being
-        read in from the given string (filename:line). An OptionsBase can be
-        tagged under multiple files.
+        Marks the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being
+        read in from the given string (filename:line). An OptionsBase can be tagged under multiple files.
         """
         key = "#defined-at"
         sourcesRef = optionsBase.getOption(key) if optionsBase.hasOption(key) else []
@@ -926,7 +928,8 @@ class Application:
     @staticmethod
     def _getModuleSources(optionsBase: ModuleSet) -> str:
         """
-        Returns rcfile sources for given OptionsBase (comma-separated).
+        Returns:
+             rcfile sources for given OptionsBase (comma-separated).
         """
         key = "#defined-at"
         sourcesRef = optionsBase.getOption(key) or []
@@ -935,13 +938,15 @@ class Application:
     def _parseModuleSetOptions(self, ctx: BuildContext, fileReader: RecursiveFH, moduleSet: ModuleSet) -> ModuleSet:
         """
         Reads in a "moduleset".
-        
-        First parameter is the build context.
-        Second parameter is the filehandle to the config file to read from.
-        Third parameter is the ksb::ModuleSet to use.
-        
-        Returns the ksb::ModuleSet passed in with read-in options set, which may need
-        to be further expanded (see ksb::ModuleSet::convertToModules).
+
+        Parameters:
+            ctx: The build context.
+            fileReader: The filehandle to the config file to read from.
+            moduleSet: The :class:`ModuleSet` to use.
+
+        Returns:
+            The :class:`ModuleSet` passed in with read-in options set, which may need
+            to be further expanded (see :meth:`ModuleSet.convertToModules`).
         """
         moduleSet = self._parseModuleOptions(ctx, fileReader, moduleSet, re.compile(r"^end\s+module(-?set)?$"))
 
@@ -956,34 +961,26 @@ class Application:
 
     def _readConfigurationOptions(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:
         """
-        Reads in the settings from the configuration, passed in as an open
-        filehandle.
-        
-        Phase:
-         initialization - Do not call <finish> from this function.
-        
+        Reads in the settings from the configuration, passed in as an open filehandle.
+
         Parameters:
-         ctx - The <BuildContext> to update based on the configuration read and
-         any pending command-line options (see cmdlineGlobalOptions).
-        
-         filehandle - The I/O object to read from. Must handle _eof_ and _readline_
-         methods (e.g. <IO::Handle> subclass).
-        
-         cmdlineGlobalOptions - An input hashref mapping command line options to their
-         values (if any), so that these may override conflicting entries in the rc-file
-        
-         deferredOptions - An out parameter: a listref containing hashrefs mapping
-         module names to options set by any 'options' blocks read in by this function.
-         Each key (identified by the name of the 'options' block) will point to a
-         hashref value holding the options to apply.
-        
+            ctx: The :class:`BuildContext` to update based on the configuration read and
+                any pending command-line options (see global options in BuildContext).
+            fh: The I/O filehandle object to read from.
+            cmdlineGlobalOptions: An input dict mapping command line options to their
+                values (if any), so that these may override conflicting entries in the rc-file.
+            deferredOptionsRef: A list containing dicts mapping module names to options
+                set by any 'options' blocks read in by this function.
+                Each key (identified by the name of the 'options' block) will point to a
+                dict value holding the options to apply.
+
         Returns:
-         @module - Heterogeneous list of <Modules> and <ModuleSets> defined in the
-         configuration file. No module sets will have been expanded out (either
-         kde-projects or standard sets).
-        
-        Throws:
-         - Config exceptions.
+            Heterogeneous list of :class:`Module` and :class:`ModuleSet` defined in the
+            configuration file. No module sets will have been expanded out (either
+            kde-projects or standard sets).
+
+        Raises:
+            BuildException_Config
         """
         module_list = []
         rcfile = ctx.rcFile
@@ -1125,15 +1122,16 @@ class Application:
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
         """
-        Handles the installation process.  Simply calls 'make install' in the build
+        Handles the installation process. Simply calls 'make install' in the build
         directory, though there is also provision for cleaning the build directory
         afterwards, or stopping immediately if there is a build failure (normally
         every built module is attempted to be installed).
-        
+
         Parameters:
-        1. Build Context, from which the install list is generated.
-        
-        Return value is a shell-style success code (0 == success)
+            ctx: BuildContext from which the install list is generated.
+
+        Returns:
+             Shell-style success code (0 == success)
         """
         Util.assert_isa(ctx, BuildContext)
         modules = ctx.modulesInPhase("install")
@@ -1153,20 +1151,21 @@ class Application:
     @staticmethod
     def _handle_uninstall(ctx: BuildContext) -> bool:
         """
-        Handles the uninstal process.  Simply calls 'make uninstall' in the build
+        Handles the uninstall process. Simply calls 'make uninstall' in the build
         directory, while assuming that Qt or CMake actually handles it.
-        
+
         The order of the modules is often significant, and it may work better to
-        uninstall modules in reverse order from how they were installed. However this
+        uninstall modules in reverse order from how they were installed. However, this
         code does not automatically reverse the order; modules are uninstalled in the
         order determined by the build context.
-        
+
         This function obeys the 'stop-on-failure' option supported by _handle_install.
-        
+
         Parameters:
-        1. Build Context, from which the uninstall list is generated.
-        
-        Return value is a shell-style success code (0 == success)
+            ctx: Build Context from which the uninstall list is generated.
+
+        Returns:
+             Shell-style success code (0 == success)
         """
         Util.assert_isa(ctx, BuildContext)
         modules = ctx.modulesInPhase("uninstall")
@@ -1190,19 +1189,19 @@ class Application:
         line and rc-file options. (This is as opposed to phase filters, which leave
         each module as-is but change the phases they operate as part of, this
         function could remove a module entirely from the build).
-        
+
         Used for --resume-{from,after} and --stop-{before,after}, but more could be
         added in theory.
-        This subroutine supports --{resume,stop}-* for both modules and module-sets.
-        
+        This function supports --{resume,stop}-* for both modules and module-sets.
+
         Parameters:
-         ctx - <BuildContext> in use.
-         @modules - List of <Modules> or <ModuleSets> to apply filters on.
-        
+            ctx: :class:`BuildContext` in use.
+            moduleList: List of :class:`Module` or :class:`ModuleSet` to apply filters on.
+
         Returns:
-         list of <Modules> or <ModuleSets> with any inclusion/exclusion filters
-         applied. Do not assume this list will be a strict subset of the input list,
-         however the order will not change amongst the input modules.
+            List of :class:`Modules` or :class:`ModuleSet` with any inclusion/exclusion filters
+            applied. Do not assume this list will be a strict subset of the input list,
+            however the order will not change amongst the input modules.
         """
         Util.assert_isa(ctx, BuildContext)
 
@@ -1279,7 +1278,7 @@ class Application:
     def _defineNewModuleFactory(self, resolver: ModuleResolver) -> None:
         """
         This defines the factory function needed for lower-level code to properly be
-        able to create ksb::Module objects from just the module name, while still
+        able to create :class:`Module` objects from just the module name, while still
         having the options be properly set and having the module properly tied into a
         context.
         """
@@ -1315,13 +1314,14 @@ class Application:
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:
         """
-        This function removes log directories from old kde-builder runs.  All log
-        directories not referenced by $log_dir/latest somehow are made to go away.
-        
+        This function removes log directories from old kde-builder runs. All log
+        directories not referenced by log_dir/latest somehow are made to go away.
+
         Parameters:
-        1. Build context.
-        
-        No return value.
+            ctx: Build context.
+
+        Returns:
+            None
         """
         Util.assert_isa(ctx, BuildContext)
         logdir = ctx.getSubdirPath("log-dir")
@@ -1355,15 +1355,16 @@ class Application:
         """
         Print out a "possible solution" message.
         It will display a list of command lines to run.
-        
+
         No message is printed out if the list of failed modules is empty, so this
         function can be called unconditionally.
-        
+
         Parameters:
-        1. Build Context
-        2. List of ksb::Modules that had failed to build/configure/cmake.
-        
-        No return value.
+            ctx: Build Context
+            fail_list: List of :class:`Module` that had failed to build/configure/cmake.
+
+        Returns:
+            None
         """
 
         Util.assert_isa(ctx, BuildContext)
@@ -1393,20 +1394,21 @@ class Application:
     def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list) -> None:
         """
         Print out an error message, and a list of modules that match that error
-        message.  It will also display the log file name if one can be determined.
+        message. It will also display the log file name if one can be determined.
         The message will be displayed all in uppercase, with PACKAGES prepended, so
         all you have to do is give a descriptive message of what this list of
         packages failed at doing.
-        
+
         No message is printed out if the list of failed modules is empty, so this
         function can be called unconditionally.
-        
+
         Parameters:
-        1. Build Context
-        2. Message to print (e.g. 'failed to foo')
-        3. List of ksb::Modules that had failed to foo
-        
-        No return value.
+            ctx: Build Context
+            message: Message to print (e.g. 'failed to foo')
+            fail_list: List of :class:`Module` that had failed to foo
+
+        Returns:
+            None
         """
         Util.assert_isa(ctx, BuildContext)
         message = message.upper()  # Be annoying
@@ -1444,14 +1446,15 @@ class Application:
     @staticmethod
     def _output_failed_module_lists(ctx: BuildContext, moduleGraph: dict) -> None:
         """
-        This subroutine reads the list of failed modules for each phase in the build
+        This function reads the list of failed modules for each phase in the build
         context and calls _output_failed_module_list for all the module failures.
-        
+
         Parameters:
-        1. Build context
-        
+            ctx: Build context
+            moduleGraph:
+
         Return value:
-        None
+            None
         """
         Util.assert_isa(ctx, BuildContext)
 
@@ -1506,26 +1509,27 @@ class Application:
         """
         This function takes a given file and a build context, and installs it to a
         given location while expanding out template entries within the source file.
-        
+
         The template language is *extremely* simple: <% foo %> is replaced entirely
-        with the result of $ctx->getOption(foo). If the result
+        with the result of `ctx.getOption(foo)`. If the result
         evaluates false for any reason than an exception is thrown. No quoting of
         any sort is used in the result, and there is no way to prevent expansion of
         something that resembles the template format.
-        
+
         Multiple template entries on a line will be replaced.
-        
+
         The destination file will be created if it does not exist. If the file
         already exists then an exception will be thrown.
-        
+
         Error handling: Any errors will result in an exception being thrown.
-        
+
         Parameters:
-        1. Pathname to the source file (use absolute paths)
-        2. Pathname to the destination file (use absolute paths)
-        3. Build context to use for looking up template values
-        
-        Return value: There is no return value.
+            sourcePath: Pathname to the source file (use absolute paths)
+            destinationPath: Pathname to the destination file (use absolute paths)
+            ctx: Build context to use for looking up template values
+
+        Returns:
+             None
         """
 
         Util.assert_isa(ctx, BuildContext)
@@ -1576,16 +1580,17 @@ class Application:
         source file is a "templated" source file (see also _installTemplatedFile), and
         records a digest of the file actually installed. This function will overwrite
         a destination if the destination is identical to the last-installed file.
-        
+
         Error handling: Any errors will result in an exception being thrown.
-        
+
         Parameters:
-        1. Build context to use for looking up template values,
-        2. The full path to the source file.
-        3. The full path to the destination file (incl. name)
-        4. The key name to use for searching/recording installed MD5 digest.
+            ctx: Build context to use for looking up template values.
+            sourceFilePath: The full path to the source file.
+            destFilePath: The full path to the destination file (incl. name).
+            md5KeyName: The key name to use for searching/recording installed MD5 digest.
         
-        Return value: There is no return value.
+        Returns:
+             None
         """
         Util.assert_isa(ctx, BuildContext)
         baseName = os.path.basename(sourceFilePath)
@@ -1613,18 +1618,19 @@ class Application:
         """
         This function installs the included sample .xsession and environment variable
         setup files, and records the md5sum of the installed results.
-        
+
         If a file already exists, then its md5sum is taken and if the same as what
         was previously installed, is overwritten. If not the same, the original file
         is left in place and the .xsession is instead installed to
         .xsession-kde-builder
-        
+
         Error handling: Any errors will result in an exception being thrown.
-        
+
         Parameters:
-        1. Build context to use for looking up template values,
-        
-        Return value: There is no return value.
+            ctx: Build context to use for looking up template values,
+
+        Returns:
+             None
         """
         RealBinDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
@@ -1666,16 +1672,16 @@ class Application:
     @staticmethod
     def _checkForEssentialBuildPrograms(ctx: BuildContext):
         """
-        This subroutine checks for programs which are absolutely essential to the
+        This function checks for programs which are absolutely essential to the
         *build* process and returns false if they are not all present. Right now this
         just means qmake and cmake (although this depends on what modules are
         actually present in the build context).
-        
+
         Parameters:
-        1. Build context
-        
-        Return value:
-        None
+            ctx: Build context
+
+        Returns:
+            None
         """
         Util.assert_isa(ctx, BuildContext)
         installdir = ctx.getOption("install-dir")
@@ -1739,12 +1745,12 @@ class Application:
         """
         Returns a list of module directories IDs (based on YYYY-MM-DD-XX format) that must be kept due to being
         referenced from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.
-        
+
         This function may call itself recursively if needed.
-        
+
         Parameters:
-        1. The log directory under which to search for symlinks, including the "/latest" or "/latest-by-phase"
-           part of the path.
+            logdir: The log directory under which to search for symlinks, including the "/latest" or "/latest-by-phase"
+            part of the path.
         """
         links = []
 
@@ -1772,10 +1778,11 @@ class Application:
     @staticmethod
     def _installSignalHandlers(handlerRef: Callable) -> None:
         """
-        Installs the given subroutine as a signal handler for a set of signals which
+        Installs the given function as a signal handler for a set of signals which
         could kill the program.
-        
-        First parameter is a reference to the sub to act as the handler.
+
+        Parameters:
+            handlerRef: A function to act as the handler.
         """
         signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGABRT, signal.SIGTERM, signal.SIGPIPE]
         for sig in signals:

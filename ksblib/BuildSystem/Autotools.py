@@ -16,7 +16,7 @@ logger_buildsystem = kbLogger.getLogger("build-system")
 
 class BuildSystem_Autotools(BuildSystem):
     """
-    This is a module used to support configuring with autotools.
+    This is a class used to support configuring with autotools.
     """
 
     @staticmethod
@@ -27,9 +27,9 @@ class BuildSystem_Autotools(BuildSystem):
     def _findConfigureCommands(self) -> Promise:
         """
         Returns a promise that resolves to the specific configure command to use.
-        
+
         This may execute commands to re-run autoconf to generate the script.
-        
+
         If these commands fail the promise will reject.
         """
         module = self.module

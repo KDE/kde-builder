@@ -8,10 +8,10 @@ from __future__ import annotations
 
 class Module_BranchGroupResolver:
     """
-    This provides an object that can be used to lookup the appropriate git branch
+    This provides an object that can be used to look up the appropriate git branch
     to use for a given KDE project module and given desired logical branch group, using
     supplied JSON data (from repo-metadata's /dependencies directory).
-    
+
     See also https://community.kde.org/Infrastructure/Project_Metadata
     """
 

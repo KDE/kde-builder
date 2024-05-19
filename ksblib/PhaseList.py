@@ -4,18 +4,18 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 """
-DESCRIPTION
-
 Handles the "phases" for kde-builder, e.g. a simple list of phases, and
 methods to add, clear, or filter out phases. Meant to be assigned to a
 :class:`Module`.
 
-SYNOPSIS
+Example:
 ::
 
     phases = PhaseList()
-    mod.createBuildSystem() if phases.has('buildsystem')
-    phases.filterOutPhase('update') if ctx.getOption('build-only')
+    if phases.has("buildsystem"):
+        mod.createBuildSystem()
+    if ctx.getOption("build-only"):
+        phases.filterOutPhase("update")
 """
 from __future__ import annotations
 
@@ -26,10 +26,10 @@ class PhaseList:
         Constructs a new phase list, with the provided list of phases or
         a default set if none are provided.
         ::
-        
+
             phases1 = PhaseList() # default phases
             print("phases are " + phases1.phaselist.join(', '))
-        
+
             phases2 = PhaseList(["update", "test", "install"])
         """
         if not phases:
@@ -45,7 +45,7 @@ class PhaseList:
     def addPhase(self, phase: str) -> None:
         """
         Adds the given phase to the phase list at the end.
-        
+
         This is probably a misfeature; use insert at index to add the phase
         in the right spot if it's not at the end.
         """

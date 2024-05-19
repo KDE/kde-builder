@@ -37,7 +37,7 @@ logger_updater = kbLogger.getLogger("updater")
 class Updater_Git(Updater):
     """
     Module which is responsible for updating git-based source code modules. Can
-    have some features overridden by subclassing (see ksb::Updater::KDEProject
+    have some features overridden by subclassing (see Updater_KDEProject
     for an example).
     """
 
@@ -127,10 +127,11 @@ class Updater_Git(Updater):
     def _clone(self, git_repo: str) -> Promise:
         """
         Perform a git clone to checkout the latest branch of a given git module
-        
+
         First parameter is the repository (typically URL) to use.
-        
-        Returns a promise that resolves to 1, or rejects if an error occurs.
+
+        Returns:
+             A promise that resolves to 1, or rejects if an error occurs.
         """
         Util.assert_isa(self, Updater_Git)
         module = self.module
@@ -215,7 +216,7 @@ class Updater_Git(Updater):
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
-        
+
         Returns a promise that resolves to the number of *commits* affected, or
         rejects with an update error.
         """
@@ -262,9 +263,10 @@ class Updater_Git(Updater):
     @staticmethod
     def isPushUrlManaged() -> bool:
         """
-        Determine whether or not _setupRemote should manage the configuration of the git push URL for the repo.
-        
-        Return value: boolean indicating whether or not _setupRemote should assume control over the push URL.
+        Determine whether _setupRemote should manage the configuration of the git push URL for the repo.
+
+        Returns:
+             Boolean indicating whether _setupRemote should assume control over the push URL.
         """
         return False
 
@@ -272,10 +274,12 @@ class Updater_Git(Updater):
         """
         Ensures the given remote is pre-configured for the module's git repository.
         The remote is either set up from scratch or its URLs are updated.
-        
-        Param $remote name (alias) of the remote to configure
-        
-        Returns a promise that resolves to 1, or rejects with an error.
+
+        Parameters:
+            remote: name (alias) of the remote to configure
+
+        Returns:
+             A promise that resolves to 1, or rejects with an error.
         """
         module = self.module
         repo = module.getOption("repository")
@@ -337,12 +341,13 @@ class Updater_Git(Updater):
         """
         Selects a git remote for the user's selected repository (preferring a
         defined remote if available, using 'origin' otherwise).
-        
+
         Assumes the current directory is already set to the source directory.
-        
-        Returns a promise that resolves to the name of the remote (which will be
-        setup by kde-builder) to use for updates, or rejects with an error.
-        
+
+        Returns:
+            A promise that resolves to the name of the remote (which will be
+            setup by kde-builder) to use for updates, or rejects with an error.
+
         See also the 'repository' module option.
         """
         Util.assert_isa(self, Updater_Git)
@@ -415,16 +420,17 @@ class Updater_Git(Updater):
         a given remote-tracking branch. Any existing local branch with the given
         branch set as upstream will be used if one exists, otherwise one will be
         created. The given branch will be rebased into the local branch.
-        
+
         No checkout is done, this should be performed first.
         Assumes we're already in the needed source dir.
-        Assumes we're in a clean working directory (use git-stash to achieve
-          if necessary).
-        
-        First parameter is the remote to use.
-        Second parameter is the branch to update to.
-        
-        Returns a promise resolving to a boolean success flag.
+        Assumes we're in a clean working directory (use git-stash to achieve if necessary).
+
+        Parameters:
+            remoteName: The remote to use.
+            branch: The branch to update to.
+
+        Returns:
+             A promise resolving to a boolean success flag.
         Exception may be thrown if unable to create a local branch.
         """
         module = self.module
@@ -501,17 +507,18 @@ class Updater_Git(Updater):
         even if there is a local branch which happens to be pointed to the
         desired commit. Based the given commit is used directly, no rebase/merge
         is performed.
-        
+
         No checkout is done, this should be performed first.
         Assumes we're already in the needed source dir.
-        Assumes we're in a clean working directory (use git-stash to achieve
-          if necessary).
-        
-        First parameter is the commit to update to. This can be in pretty
-            much any format that git itself will respect (e.g. tag, sha1, etc.).
-            It is recommended to use refs/$foo/$bar syntax for specificity.
-        
-        Returns a promise resolving to a boolean success flag.
+        Assumes we're in a clean working directory (use git-stash to achieve if necessary).
+
+        Parameters:
+            commit: The commit to update to. This can be in pretty
+                much any format that git itself will respect (e.g. tag, sha1, etc.).
+                It is recommended to use refs/$foo/$bar syntax for specificity.
+
+        Returns:
+             A promise resolving to a boolean success flag.
         """
         module = self.module
         srcdir = module.fullpath("source")
@@ -621,7 +628,7 @@ class Updater_Git(Updater):
         """
         Goes through all the various combination of git checkout selection options in
         various orders of priority.
-        
+
         Returns a *list* containing: (the resultant symbolic ref/or SHA1,'branch' or
         'tag' (to determine if something like git-pull would be suitable or whether
         you have a detached HEAD)). Since the sym-ref is returned first that should
@@ -682,10 +689,10 @@ class Updater_Git(Updater):
     @staticmethod
     def _hasSubmodules() -> bool:
         """
-        Tries to check whether the git module is using submodules or not. Currently
+        Tries to check whether the git module is using submodules or not. Currently,
         we just check the .git/config file (using git-config) to determine whether
         there are any 'active' submodules.
-        
+
         MUST BE RUN FROM THE SOURCE DIR
         """
         # The git-config line shows all option names of the form submodule.foo.active,
@@ -730,16 +737,17 @@ class Updater_Git(Updater):
         update routine in order to advance the given module to the desired head.
         Finally, if changes were stashed, they are applied and the stash stack is
         popped.
-        
+
         It is assumed that the required remote has been setup already, that we
         are on the right branch, and that we are already in the correct
         directory.
-        
-        First parameter is a reference to the subroutine to run. This subroutine
-        should need no parameters and return a boolean success indicator. It may
-        throw exceptions.
-        
-        Returns a promise that resolves to 1, or rejects with an exception.
+
+        Parameters:
+            updateSub: The function to run. This function should need no parameters and return
+                a boolean success indicator. It may throw exceptions.
+
+        Returns:
+             A promise that resolves to 1, or rejects with an exception.
         """
         module = self.module
         date = time.strftime("%F-%R", time.gmtime())  # ISO Date, hh:mm time
@@ -841,18 +849,21 @@ class Updater_Git(Updater):
 
     def getRemoteBranchName(self, remoteName: str, branchName: str) -> str:
         """
-        This subroutine finds an existing remote-tracking branch name for the
+        This function finds an existing remote-tracking branch name for the
         given repository's named remote. For instance if the user was using the
-        local remote-tracking branch called 'qt-stable' to track kde-qt's master
-        branch, this subroutine would return the branchname 'qt-stable' when
-        passed kde-qt and 'master'.
-        
+        local remote-tracking branch called "qt-stable" to track kde-qt's master
+        branch, this subroutine would return the branchname "qt-stable" when
+        passed kde-qt and "master".
+
         The current directory must be the source directory of the git module.
-        
-        First parameter : The git remote to use (normally origin).
-        Second parameter: The remote head name to find a local branch for.
-        Returns: Empty string if no match is found, or the name of the local
-                 remote-tracking branch if one exists.
+
+        Parameters:
+            remoteName: The git remote to use (normally origin).
+            branchName: The remote head name to find a local branch for.
+
+        Returns:
+            Empty string if no match is found, or the name of the local
+            remote-tracking branch if one exists.
         """
         Util.assert_isa(self, Updater_Git)
 
@@ -885,13 +896,14 @@ class Updater_Git(Updater):
         Note that the actual repository fetch URL is not necessarily the same as the
         configured (expected) fetch URL: an upstream might have moved, or kde-builder
         configuration might have been updated to the same effect.
-        
-        Arguments:
-          - name : name of the remote found
-          - url : the configured (fetch) URL
-          - configuredURL : the configured URL for the module (the expected fetch URL).
-        
-        Return value: whether the remote will be conisdered for bestRemoteName
+
+        Parameters:
+            name: name of the remote found
+            url: the configured (fetch) URL
+            configuredUrl: the configured URL for the module (the expected fetch URL).
+
+        Returns:
+             Whether the remote will be considered for bestRemoteName
         """
         Util.assert_isa(self, Updater_Git)
         # name - not used, subclasses might want to filter on remote name
@@ -899,18 +911,18 @@ class Updater_Git(Updater):
 
     def bestRemoteName(self) -> list:
         """
-        99% of the time the 'origin' remote will be what we want anyways, and
+        99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
         should try to utilize when doing checkouts for instance. To aid in this,
         this subroutine returns a list of all remote aliased matching the
         supplied repository (besides the internal alias that is).
-        
+
         Assumes that we are already in the proper source directory.
-        
-        First parameter: Repository URL to match.
-        Returns: A list of matching remote names (list in case the user hates us
-        and has aliased more than one remote to the same repo). Obviously the list
-        will be empty if no remote names were found.
+
+        Returns:
+             A list of matching remote names (list in case the user hates us
+            and has aliased more than one remote to the same repo). Obviously the list
+            will be empty if no remote names were found.
         """
         Util.assert_isa(self, Updater_Git)
         module = self.module
@@ -949,26 +961,27 @@ class Updater_Git(Updater):
 
     def makeBranchname(self, remoteName: str, branch: str) -> str:
         """
-        Generates a potential new branch name for the case where we have to setup
+        Generates a potential new branch name for the case where we have to set up
         a new remote-tracking branch for a repository/branch. There are several
         criteria that go into this:
-        * The local branch name will be equal to the remote branch name to match usual
+        - The local branch name will be equal to the remote branch name to match usual
           Git convention.
-        * The name chosen must not already exist. This methods tests for that.
-        * The repo name chosen should be (ideally) a remote name that the user has
+        - The name chosen must not already exist. This method tests for that.
+        - The repo name chosen should be (ideally) a remote name that the user has
           added. If not, we'll try to autogenerate a repo name (but not add a
           remote!) based on the repository.git part of the URI.
-        
+
         As with nearly all git support functions, we should be running in the
         source directory of the git module.  Don't call this function unless
         you've already checked that a suitable remote-tracking branch doesn't
         exist.
-        
-        First parameter: The name of a git remote to use.
-        Second parameter: The name of the remote head we need to make a branch name
-        of.
-        Returns: A useful branch name that doesn't already exist, or '' if no
-        name can be generated.
+
+        Parameters:
+            remoteName: The name of a git remote to use.
+            branch: The name of the remote head we need to make a branch name of.
+        Returns:
+             A useful branch name that doesn't already exist, or "" if no
+            name can be generated.
         """
         Util.assert_isa(self, Updater_Git)
         if not remoteName:
@@ -992,7 +1005,7 @@ class Updater_Git(Updater):
         Returns the number of lines in the output of the given command. The command
         and all required arguments should be passed as a normal list, and the current
         directory should already be set as appropriate.
-        
+
         Return value is the number of lines of output.
         Exceptions are raised if the command could not be run.
         """
@@ -1011,7 +1024,7 @@ class Updater_Git(Updater):
     @staticmethod
     def slurp_git_config_output(args: list) -> list:
         """
-        A simple wrapper that is used to split the output of 'git config --null'
+        A simple wrapper that is used to split the output of "git config --null"
         correctly. All parameters are then passed to filter_program_output (so look
         there for help on usage).
         """
@@ -1045,13 +1058,14 @@ class Updater_Git(Updater):
     @staticmethod
     def verifyGitConfig(contextOptions: BuildContext) -> bool:
         """
-        Subroutine to add the 'kde:' alias to the user's git config if it's not
+        Function to add the "kde:" alias to the user's git config if it's not
         already set.
-        
+
         Call this as a static class function, not as an object method
-        (i.e. ksb::Updater::Git::verifyGitConfig, not $foo->verifyGitConfig)
-        
-        Returns false on failure of any sort, true otherwise.
+        (i.e. Updater_Git.verifyGitConfig, not foo.verifyGitConfig)
+
+        Returns:
+             False on failure of any sort, True otherwise.
         """
         protocol = contextOptions.getOption("git-push-protocol") or "git"
 

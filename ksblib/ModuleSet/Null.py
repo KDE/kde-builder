@@ -12,7 +12,7 @@ from ..BuildException import BuildException
 
 class ModuleSet_Null(ModuleSet):
     """
-    Used automatically by <Module> to represent the absence of a <ModuleSet> without
+    Used automatically by ``Module`` to represent the absence of a ``ModuleSet`` without
     requiring definedness checks.
     """
 

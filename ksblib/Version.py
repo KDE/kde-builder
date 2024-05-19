@@ -9,7 +9,7 @@ import os
 
 class Version:
     """
-    This package is just a place to put the kde-builder version number
+    This class is just a place to put the kde-builder version number
     in one spot, so it only needs changed in one place for a version bump.
     """
 
@@ -23,7 +23,7 @@ class Version:
     def setBasePath(newPath: str) -> None:
         """
         Should be called before using ``scriptVersion`` to set the base path for the
-        script.  This is needed to auto-detect the version in git for kde-builder
+        script. This is needed to auto-detect the version in git for kde-builder
         instances running from a git repo.
         """
         Version.SCRIPT_PATH = newPath if newPath else Version.SCRIPT_PATH
@@ -33,9 +33,9 @@ class Version:
         """
         Call this function to return the kde-builder version.
         ::
-        
+
             version = ksblib.Version.scriptVersion()  # "22.07"
-        
+
         If the script is running from within its git repository (and ``setBasePath`` has
         been called), this function will try to auto-detect the git SHA1 ID of the
         current checkout and append the ID (in ``git-describe`` format) to the output

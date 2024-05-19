@@ -37,15 +37,17 @@ class IPC_Pipe(IPC):
     # @override
     def supportsConcurrency() -> bool:
         """
-        Reimplementation of ksb::IPC::supportsConcurrency
+        Reimplementation of :meth:`IPC.supportsConcurrency`.
         """
         return True
 
     # @override(check_signature=False)
     def sendMessage(self, msg: bytes) -> bool:
         """
-        Required reimplementation of ksb::IPC::sendMessage
-        First parameter is the (encoded) message to send.
+        Required reimplementation of :meth:`IPC.sendMessage`.
+
+        Parameters:
+             msg: The (encoded) message to send.
         """
 
         # Since streaming does not provide message boundaries, we will insert
@@ -66,7 +68,7 @@ class IPC_Pipe(IPC):
     # @override(check_signature=False)
     def receiveMessage(self) -> bytes:
         """
-        Required reimplementation of ksb::IPC::receiveMessage
+        Required reimplementation of :meth:`IPC.receiveMessage`.
         """
         # Read unsigned short with msg length, then the message
         msgLength = self._readNumberOfBytes(2)

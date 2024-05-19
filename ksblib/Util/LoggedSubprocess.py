@@ -32,53 +32,51 @@ is in place.
 
 class Util_LoggedSubprocess:
     """
-    =head1 DESCRIPTION
-    
-    This is a subclass of L<Mojo::IOLoop::Subprocess> which integrates the functionality
-    of that class into kde-builder's logging and module tracking functions.
-    
-    Like Mojolicious (and unlike most of the rest of kde-builder), this is a
-    'fluent' interface due to the number of adjustables vars that must be set,
+    This integrates the functionality subprocess into kde-builder's logging and module tracking functions.
+
+    Unlike most of the rest of kde-builder, this is a "fluent" interface due to the number of adjustables vars that must be set,
     including which module is being built, the log file to use, what directory to
     build from, etc.
-    
-    =head1 SYNOPSIS
-    
-     my $cmd = ksb::Util::LoggedSubprocess->new
-         ->module($module)           # required
-         ->log_to($filename)         # required
-         ->set_command($argRef)      # required
-         ->chdir_to($builddir)       # optional
-         ->announcer(sub ($mod) {    # optional
-             note("g[$mod] starting update")
-         })
-         ;
-    
-     # optional, can have child output forwarded back to parent for processing
-     $cmd->on(child_output => sub ($cmd, $line) {
-         # called in parent!
-         $log_command_callback->($line);
-     });
-    
-     # once ready, call ->start to obtain a Mojo::Promise that
-     # can be waited on or chained from, pending the result of
-     # computation in a separate child process.
-     my $promise = $cmd->start->then(sub ($exitcode) {
-         $resultRef = {
-             was_successful => $exitcode == 0,
-             warnings       => $warnings,
-             work_done      => $workDoneFlag,
-         };
-     });
-    
+
+    Examples:
+    ::
+
+        def announ(mod):
+             logger.note(f"g[{mod}] starting update")
+
+        cmd = Util_LoggedSubprocess(
+         .module(module)           # required
+         .log_to(filename)         # required
+         .set_command(argRef)      # required
+         .chdir_to(builddir)       # optional
+         .announcer(announ)  # optional
+        )
+
+        def child_outp(cmd, line):
+            # called in parent!
+            log_command_callback(line)
+
+        # optional, can have child output forwarded back to parent for processing
+        cmd.on(child_output: child_outp)
+
+        def func(exitcode):
+            resultRef = {
+             "was_successful": exitcode == 0,
+             "warnings"      : warnings,
+             "work_done"     : workDoneFlag,
+            }
+
+        # once ready, call .start() to obtain a Promise that
+        # can be waited on or chained from, pending the result of
+        # computation in a separate child process.
+        promise = cmd.start().then(func)
     """
 
     def __init__(self):
         """
         These attributes are the configurable options that should be set before calling
-        C<start> to execute the desired command.  If called without arguments, returns
-        the existing value. See L<Mojo::Base> for more information on how attributes
-        work.
+        ``start`` to execute the desired command. If called without arguments, returns
+        the existing value.
         """
         # start of attributes
         self._module = None
@@ -93,7 +91,7 @@ class Util_LoggedSubprocess:
 
     def module(self, module):
         """
-        Sets the L<ksb::Module> that is being executed against.
+        Sets the ``Module`` that is being executed against.
         """
         self._module = module
         return self
@@ -109,7 +107,7 @@ class Util_LoggedSubprocess:
     def chdir_to(self, chdir_to):
         """
         Sets the directory to run the command from just before execution in the child
-        process. Optional, if not set the directory will not be changed.  The directory is
+        process. Optional, if not set the directory will not be changed. The directory is
         never changed for the parent process!
         """
         self._chdir_to = chdir_to
@@ -118,8 +116,8 @@ class Util_LoggedSubprocess:
     def set_command(self, set_command: list[str]):
         """
         Sets the command, and any arguments, to be run, as a reference to a list. E.g.
-        
-        $cmd->set_command(['make', '-j4']);
+
+            cmd.set_command(["make", "-j4"])
         """
         self._set_command = set_command
         return self
@@ -138,8 +136,8 @@ class Util_LoggedSubprocess:
     def announcer(self, announcer):
         """
         Optional. Can be set to a sub that will be called with a single parameter (the
-        ksb::Module being built) in the child process just before the build starts.
-        
+        ``Module`` being built) in the child process just before the build starts.
+
         You can use this to make an announcement just before the command is run since
         there's no way to guarantee the timing in a longer build.
         """
@@ -148,12 +146,12 @@ class Util_LoggedSubprocess:
 
     def start(self) -> Promise:
         """
-        Begins the execution, if possible.  Returns a L<Mojo::Promise> that resolves to
-        the exit code of the command being run.  0 indicates success, non-zero
+        Begins the execution, if possible. Returns a Promise that resolves to
+        the exit code of the command being run. 0 indicates success, non-zero
         indicates failure.
-        
-        Exceptions may be thrown, which L<Mojo::Promise> will catch and convert into
-        a rejected promise. You must install a L<Mojo::Promise/"catch"> handler
+
+        Exceptions may be thrown, which Promise will catch and convert into
+        a rejected promise. You must install Promise "catch" handler
         on the promise to handle this condition.
         """
         from ..Module.Module import Module
@@ -286,11 +284,11 @@ class Util_LoggedSubprocess:
     @staticmethod
     def _sendToParent(queue, data: list):
         """
-        Sends the given data to the parent process.  Our calling code and this
+        Sends the given data to the parent process. Our calling code and this
         package must share the same single channel (over the 'progress' event
-        supported by Mojolicious).  Although we only support handling for the calling
+        supported by Mojolicious). Although we only support handling for the calling
         code (to send line-by-line output back to the parent), to support future
-        expansion we send a hashref which we can add different keys to if we need to
+        expansion we send a dict which we can add different keys to if we need to
         support other use cases.
         """
 

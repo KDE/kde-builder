@@ -21,16 +21,16 @@ class StartProgram:
     def executeCommandLineProgram(ctx: BuildContext, args: list) -> NoReturn:
         """
         kde-builder --run [options] <module-name> [arguments]
-        
+
         OPTIONS
         "-e", "--exec" <program> Specify program of the module. Default to module name.
         "-f", "--fork" Launch the program in a new session.
-        
+
         EXAMPLES
-        
+
         Launch kate in a new session with '-l 5 file1.txt' arguments.
             kde-builder --run -f kate -l 5 file1.txt
-        
+
         Launch kate-syntax-highlighter of module kate with '--list-themes' argument.
             kde-builder-launch -e kate-syntax-highlighter kate --list-themes
         """

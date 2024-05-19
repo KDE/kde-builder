@@ -4,24 +4,20 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 """
-DESCRIPTION
-
 A class that encapsulates generic option-handling tasks for kde-builder, used
 to implement common functions within :class:`BuildContext`, :class:`Module`, and
 :class:`ModuleSet`.
 
 There is some internal trickery to ensure that program code can override
 user-selected options in certain situations, which is why we don't simply
-use a hash table directly. These are the so-called 'sticky' options, seen
+use a dict table directly. These are the so-called 'sticky' options, seen
 internally as options with a name starting with #.
 
-INTENT
-
-This module is mostly used to encapsulate common code for handling module and
+This class is mostly used to encapsulate common code for handling module and
 module-set options, for use by major subclasses.
 
 The code in this class simply gets/sets options. To parse options and determine
-what options to set, see :class:Application and its friends.
+what options to set, see :class:`Application` and its friends.
 """
 from __future__ import annotations
 
@@ -42,7 +38,7 @@ class OptionsBase:
 
     def hasStickyOption(self, key: str) -> bool:
         """
-        Returns true if the given option has been overridden by a 'sticky' option.
+        Returns true if the given option has been overridden by a "sticky" option.
         Use `getOption` to return the actual value in this case.
         """
         key = key.removeprefix("#")  # Remove sticky marker.
@@ -60,16 +56,16 @@ class OptionsBase:
 
     def getOption(self, key: str) -> str | dict | list | bool:
         """
-        Returns the value of the given option. 'Sticky' options are returned in
+        Returns the value of the given option. "Sticky" options are returned in
         preference to this object's own option (this allows you to temporarily
         override an option with a sticky option without overwriting the option
         value). If no such option is present, returns an empty string.
-        
+
         Note that :class:`Module` has its own, much more involved override of this
         method. Note further that although `None` is not returned directly by
         this method, that it's possible for sticky options to be set to `None` (if
         you're setting sticky option values, it's probably best not to do that).
-        
+
         May return type - example which uses this type:
          list - "#defined-at"
          dict - "git-repository-base"
@@ -88,11 +84,11 @@ class OptionsBase:
             self.setOption(options)
         Normally seen as simply:
             self.setOption(option, value)
-        
+
         For the vast majority of possible options, setting the same option again
         overwrites any previous value. However, for `set-env` options, additional
         option sets instead will **append** to previously-set values.
-        
+
         If you need to perform special handling based on option values, subclass
         this function, but be sure to call **this** setOption() with the resulting
         set of options (if any are left to set).
@@ -152,11 +148,12 @@ class OptionsBase:
     def _processSetEnvOption(self, value) -> None:
         """
         Handles setting set-env options.
-        
-        value - Either a hashref (in which case it is simply merged into our
-            existing options) or a string value of the option as read from the
-            rc-file (which will have the env-var to set as the first item, the
-            value for the env-var to take as the rest of the value).
+
+        Parameters:
+            value: Either a dict (in which case it is simply merged into our
+                existing options) or a string value of the option as read from the
+                rc-file (which will have the env-var to set as the first item, the
+                value for the env-var to take as the rest of the value).
         """
 
         if type(value) is dict:

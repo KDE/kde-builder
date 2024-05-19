@@ -28,23 +28,21 @@ logger_buildsystem = kbLogger.getLogger("build-system")
 
 class BuildSystem:
     """
-    =head1 SYNOPSIS
-    
-     my $buildsys = $module->buildSystem(); # auto-detects
-    
-     $buildsys->prepareModuleBuildEnvironment()
-       unless $buildsys->hasToolchain();
-    
-     my $results = $buildsys->buildInternal();
-    
-     $buildsys->installInternal()
-       if ($results->{was_successful} && $buildsys->needsInstalled());
-    
-    =head1 DESCRIPTION
-    
     Abstract base module for the various build systems, includes built-in
     implementations of generic functions and supports hooks for subclasses to
     provide needed detailed functionality.
+
+    ::
+
+        buildsys = module.buildSystem()  # auto-detects
+
+        if not buildsys.hasToolchain():
+            buildsys.prepareModuleBuildEnvironment()
+
+        results = buildsys.buildInternal()
+
+        if (results["was_successful"] and buildsys.needsInstalled()):
+            buildsys.installInternal()
     """
 
     def __init__(self, module):
@@ -76,12 +74,11 @@ class BuildSystem:
         """
         Check if a (custom) toolchain is defined.
         If a build system is configured with a (custom) toolchain, it is assumed that
-        
-         a: the user knows what they are doing, or
-         b: they are using an SDK that knows what it is about
-        
+         - the user knows what they are doing, or
+         - they are using an SDK that knows what it is about
+
         In either case, kde-builder will avoid touching the environment variables to
-        give the custom configuration maximum 'power' (including foot shooting power).
+        give the custom configuration maximum "power" (including foot shooting power).
         """
         return False
 
@@ -90,13 +87,15 @@ class BuildSystem:
 
     def buildConstraints(self) -> dict:
         """
-        Returns a hashref holding the resource constraints to try to apply during the
-        build.  Buildsystems should apply the constraints they understand before
+        Returns a dict holding the resource constraints to try to apply during the
+        build. Buildsystems should apply the constraints they understand before
         running the build command.
-        {
-          'compute' => OPTIONAL, if set a max number of CPU cores to use, or '1' if unable to tell
-          # no other constraints supported
-        }
+        ::
+
+            {
+              "compute": OPTIONAL, if set a max number of CPU cores to use, or '1' if unable to tell
+              # no other constraints supported
+            }
         """
         cores = self.module.getOption("num-cores")
 
@@ -123,9 +122,9 @@ class BuildSystem:
 
     def needsRefreshed(self) -> str:
         """
-        Subroutine to determine if a given module needs to have the build system
+        Function to determine if a given module needs to have the build system
         recreated from scratch.
-        If so, it returns a non empty string
+        If so, it returns a non-empty string
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -145,7 +144,7 @@ class BuildSystem:
     def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
-        setup any needed environment variables, build context settings, etc., in preparation
+        set up any needed environment variables, build context settings, etc., in preparation
         for the build and install phases. Should take `hasToolchain()` into account here.
         """
         pass
@@ -196,10 +195,10 @@ class BuildSystem:
         Returns a boolean value indicating if the buildsystem will automatically
         perform a parallel build without needing the -j command line option (or
         equivalent).
-        
+
         If the build system returns false then that means auto-detection by
         kde-builder should be used to set the -j flag to something appropriate.
-        
+
         The base implementation always returns false, this is meant to be overridden in
         subclasses.
         """
@@ -207,7 +206,7 @@ class BuildSystem:
 
     def buildInternal(self, optionsName: str = "make-options") -> dict:
         """
-        Return value style: hashref to build results object (see safe_make)
+        Return value style: dict to build results object (see safe_make)
         """
 
         # I removed the default value to num-cores but forgot to account for old
@@ -300,9 +299,10 @@ class BuildSystem:
 
     def cleanBuildSystem(self) -> int:
         """
-        Subroutine to clean the build system for the given module.  Works by
+        Function to clean the build system for the given module. Works by
         recursively deleting the directory and then recreating it.
-        Returns 0 for failure, non-zero for success.
+        Returns:
+             0 for failure, non-zero for success.
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -346,8 +346,9 @@ class BuildSystem:
         Creates the build directory for the associated module, and handles
         pre-configure setup that might be necessary to permit the build to complete
         from the build directory.
-        
-        Returns a promise that resolves to a boolean result value (true == success)
+
+        Returns:
+             A promise that resolves to a boolean result value (true == success)
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -371,37 +372,41 @@ class BuildSystem:
 
     def safe_make(self, optsRef: dict) -> dict:
         """
-        Subroutine to run the build command with the arguments given by the
-        passed hash, laid out as:
-        {
-           target         => undef, or a valid build target e.g. 'install',
-           message        => 'Compiling.../Installing.../etc.'
-           make-options   => [ list of command line arguments to pass to make. See
-                               make-options ],
-           prefix-options => [ list of command line arguments to prefix *before* the
-                               make command, used for make-install-prefix support for
-                               e.g. sudo ],
-           logbase        => 'base-log-filename',
-        }
-        
+        Function to run the build command with the arguments given by the
+        passed dict, laid out as:
+        ::
+
+            {
+               target         : None, or a valid build target e.g. 'install',
+               message        : 'Compiling.../Installing.../etc.'
+               make-options   : [ list of command line arguments to pass to make. See
+                                   make-options ],
+               prefix-options : [ list of command line arguments to prefix *before* the
+                                   make command, used for make-install-prefix support for
+                                   e.g. sudo ],
+               logbase        : 'base-log-filename',
+            }
+
         target and message are required. logbase is required if target is left
         undefined, but otherwise defaults to the same value as target.
-        
+
         Note that the make command is based on the results of the 'buildCommands'
         subroutine which should be overridden if necessary by subclasses. Each
         command should be the command name (i.e. no path). The user may override
         the command used (for build only) by using the 'custom-build-command'
         option.
-        
+
         The first command name found which resolves to an executable on the
         system will be used, if no command this function will fail.
-        
-        Returns a hashref:
-        {
-          was_successful => $bool, (if successful)
-          warnings       => $int,  (num of warnings, in [0..INT_MAX])
-          work_done      => $bool, (true if the make command had work to do, may be needlessly set)
-        }
+
+        Returns a dict:
+        ::
+
+            {
+              was_successful : $bool, (if successful)
+              warnings       : $int,  (num of warnings, in [0..INT_MAX])
+              work_done      : $bool, (true if the make command had work to do, may be needlessly set)
+            }
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -458,19 +463,18 @@ class BuildSystem:
 
     def _runBuildCommand(self, message: str, filename: str, argRef: list[str]) -> dict:
         """
-        Subroutine to run make and process the build process output in order to
-        provide completion updates.  This procedure takes the same arguments as
+        Function to run make and process the build process output in order to
+        provide completion updates. This procedure takes the same arguments as
         log_command() (described here as well), except that the callback argument
         is not used.
-        
-        First parameter is the message to display to the user while the build
-          happens.
-        Second parameter is the name of the log file to use (relative to the log
-          directory).
-        Third parameter is a reference to an array with the command and its
-          arguments.  i.e. ['command', 'arg1', 'arg2']
-        
-        The return value is a hashref as defined by safe_make
+
+        Parameters:
+            message: The message to display to the user while the build happens.
+            filename: The name of the log file to use (relative to the log directory).
+            argRef: An array with the command and its arguments. i.e. ['command', 'arg1', 'arg2']
+
+        Returns:
+             Dict as defined by safe_make
         """
 
         module = self.module

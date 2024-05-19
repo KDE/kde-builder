@@ -17,7 +17,7 @@ logger_buildsystem = kbLogger.getLogger("build-system")
 
 class BuildSystem_Qt4(BuildSystem):
     """
-    Build system for the Qt4 toolkit.  It actually works for Qt6 qtbase as well
+    Build system for the Qt4 toolkit. It actually works for Qt6 qtbase as well
     because of how simple it is but don't tell anyone that.
     """
 

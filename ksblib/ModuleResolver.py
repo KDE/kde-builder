@@ -26,11 +26,11 @@ class ModuleResolver:
 
     def __init__(self, ctx):
         """
-        Creates a new C<ModuleResolver>. You must pass the appropriate
-        C<BuildContext> Don't forget to call setCmdlineOptions(),
+        Creates a new :class:`ModuleResolver`. You must pass the appropriate
+        :class:`BuildContext` Don't forget to call setCmdlineOptions(),
         setIgnoredSelectors() and setInputModulesAndOptions().
-        
-         my $resolver = ModuleResolver->new($ctx);
+
+            resolver = ModuleResolver(ctx)
         """
         self.context = ctx
         self.ignoredSelectors = []
@@ -52,27 +52,27 @@ class ModuleResolver:
         """
         Sets the options that should be applied to modules when they are created.
         No special handling for global options is performed here (but see
-        ksb::OptionsBase::getOption and its friends).
-        
-        You should pass in a hashref, where module-names are keys to values which
-        are themselves hashrefs of option-name => value pairs:
-        
-         $resolver->setCmdlineOptions(
-            { mod1 => { 'cmake-options' => 'foo', ... },
-              mod2 => { }
-            })
+        :meth:`OptionsBase.getOption` and its friends).
+
+        You should pass in a dict, where module-names are keys to values which
+        are themselves dicts of option-name: value pairs:
+
+             resolver.setCmdlineOptions(
+                { mod1: {"cmake-options": "foo", ... },
+                  mod2: {}
+                })
         """
         self.cmdlineOptions = cmdlineOptionsRef
 
     def setDeferredOptions(self, deferredOptionsRef) -> None:
         """
         Set options to apply later if a module set resolves to a named module, used
-        for 'options' blocks.
-        
-        Each object in the hash can be either options for a later ksb::Module,
-        or options for an entire set of ksb::Modules (as determined by use of
-        repository/use-module items).  We want to handle the latter first, since
-        we assume single 'options' blocks should still be able to override these.
+        for "options" blocks.
+
+        Each object in the hash can be either options for a later :class:`Module`,
+        or options for an entire set of :class:`Modules` (as determined by use of
+        repository/use-module items). We want to handle the latter first, since
+        we assume single "options" blocks should still be able to override these.
         """
 
         proj_db = self.context.getProjectDataReader()
@@ -126,19 +126,19 @@ class ModuleResolver:
         Declares all selectors that should be ignored by default in the process of
         expanding module sets. Any modules matching these selectors would be elided
         from any expanded module sets by default.
-        
-        You should pass a listref of selectors.
+
+        You should pass a list of selectors.
         """
         self.ignoredSelectors = ignoredSelectorsRef if ignoredSelectorsRef else []
 
     def setInputModulesAndOptions(self, modOptsRef: list) -> None:
         """
         Declares the list of all modules and module-sets known to the program,
-        along with their base options. Modules should be ksb::Module objects,
-        module-sets should be ksb::ModuleSet objects, no other types should be
+        along with their base options. Modules should be :class:`Module` objects,
+        module-sets should be :class:`ModuleSet` objects, no other types should be
         present in the list.
-        
-        You should pass a listref of Modules or ModuleSets (as appropriate).
+
+        You should pass a list of Module or ModuleSet (as appropriate).
         """
         self.inputModulesAndOptions = modOptsRef
 
@@ -188,8 +188,8 @@ class ModuleResolver:
     @staticmethod
     def _listReferencedModules(moduleRefs) -> dict:
         """
-        Returns a hash table of all module names referenced in use-module
-        declarations for any ModuleSets included within the input list.  Each entry
+        Returns a dict table of all module names referenced in use-module
+        declarations for any ModuleSet included within the input list. Each entry
         in the hash table will map the referenced module name to the source
         ModuleSet.
         """
@@ -205,8 +205,8 @@ class ModuleResolver:
     def _expandSingleModuleSet(self, neededModuleSet) -> list[Module]:
         """
         Expands out a single module-set listed in referencedModules and places any
-        ksb::Modules created as a result within the lookup table of Modules.
-        Returns the list of created ksb::Modules
+        Modules created as a result within the lookup table of Modules.
+        Returns the list of created Modules.
         """
         selectedReason = "partial-expansion:" + neededModuleSet.name
         lookupTableRef = self.definedModules
@@ -378,33 +378,32 @@ class ModuleResolver:
 
     def resolveSelectorsIntoModules(self, selectors: list[str]) -> list[Module]:
         """
-        Resolves the given list of module selectors into ksb::Module objects,
+        Resolves the given list of module selectors into :class:`Module` objects,
         using the pending command-line options, ignore-selectors and available
         modules/module-sets.
-        
-        Selectors always choose an available ksb::Module or ksb::ModuleSet if
+
+        Selectors always choose an available :class:`Module` or :class:`ModuleSet` if
         present (based on the name() of each Module or ModuleSet, including any
         use-modules entries for ModuleSet objects). If a selector cannot be
         directly found then ModuleSet objects may be expanded into their
         constituent Module objects and the search performed again. If a selector
         still cannot be found an exception is thrown.
-        
+
         Any embedded ModuleSets are expanded to Modules in the return value.
-        
+
         The list of selected Modules is returned, in the approximate order of the
         input list (selectors for module-sets are expanded in arbitrary order).
-        
+
         If you are just looking for a Module that should already be present, see
         resolveModuleIfPresent().
-        
-         my @modules = eval { $resolver->resolveSelectorsIntoModules('kdelibs', 'juk'); }
-         
-         
-        Resolves already-stored module selectors into ksb::Modules, based on
+
+            modules = resolver.resolveSelectorsIntoModules("kdelibs", "juk")
+
+        Resolves already-stored module selectors into :class:`Module`, based on
         the options, modules, and module-sets set.
-        
-        Returns a list of ksb::Modules in build order, with any module-sets fully
-        expanded. The desired options will be set for each ksb::Module returned.
+
+        Returns a list of :class:`Module` in build order, with any module-sets fully
+        expanded. The desired options will be set for each :class:`Module` returned.
         """
         ctx = self.context
 
@@ -441,25 +440,6 @@ class ModuleResolver:
         """
         Similar to resolveSelectorsIntoModules(), except that no exceptions are
         thrown if the module doesn't exist. Only a single module name is supported.
-        
-        =item expandModuleSets
-        
-        Converts any ksb::ModuleSet objects in the given list of Modules and
-        ModuleSets into their component ksb::Module objects (with proper options
-        set, and ignored modules not present). These component objects are spliced
-        into the list of module-type objects, replacing the ModuleSet they came
-        from.
-        
-        The list of ksb::Module objects is then returned. The list passed in is
-        not actually modified in this process.
-        
-        Similar to resolveSelectorsIntoModules, except that in this case no
-        'guessing' for Modules is allowed; the requested module is returned if
-        present, or undef otherwise. Also unlike resolveSelectorsIntoModules, no
-        exceptions are thrown if the module is not present.
-        
-        The only major side-effect is that all known module-sets are expanded if
-        necessary before resorting to returning undef.
         """
         if self.referencedModules:
             self._expandAllUnexpandedModuleSets()
@@ -479,6 +459,23 @@ class ModuleResolver:
         """
         Replaces ModuleSets in the given list with their component Modules, and
         returns the new list.
+
+        Converts any :class:`ModuleSet` objects in the given list of Modules and
+        ModuleSets into their component :class:`Module` objects (with proper options
+        set, and ignored modules not present). These component objects are spliced
+        into the list of module-type objects, replacing the ModuleSet they came
+        from.
+
+        The list of Module objects is then returned. The list passed in is
+        not actually modified in this process.
+
+        Similar to resolveSelectorsIntoModules, except that in this case no
+        'guessing' for Modules is allowed; the requested module is returned if
+        present, or None otherwise. Also unlike resolveSelectorsIntoModules, no
+        exceptions are thrown if the module is not present.
+
+        The only major side-effect is that all known module-sets are expanded if
+        necessary before resorting to returning None.
         """
         ctx = self.context
 

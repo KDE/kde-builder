@@ -220,7 +220,7 @@ class BuildSystem_KDECMake(BuildSystem):
     def prepareModuleBuildEnvironment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
-        setup any needed environment variables, build context settings, etc., in preparation
+        set up any needed environment variables, build context settings, etc., in preparation
         for the build and install phases.
         """
 
@@ -360,7 +360,7 @@ class BuildSystem_KDECMake(BuildSystem):
     def generateVSCodeConfig(self, module: Module) -> bool:
         """
         Generate default config files for VSCode.
-        
+
         This populates the settings VSCode needs to work with most KDE projects,
         such as C++ support, correct build directory, and LSP / IntelliSense.
         """
@@ -415,11 +415,12 @@ class BuildSystem_KDECMake(BuildSystem):
     def _readFile(file_path: str) -> str:
         """
         Reads the contents of a file.
-        
-        Arguments:
-         $file_path: The path to the file to read.
-        
-        Returns: The contents of the file as a string.
+
+        Parameters:
+            file_path: The path to the file to read.
+
+        Returns:
+             The contents of the file as a string.
         """
 
         content = ""  # Avoid lefting content uninitialized. We still need to return empty string in case file could not be opened.
@@ -434,12 +435,10 @@ class BuildSystem_KDECMake(BuildSystem):
     def _writeToFile(file_path: str, content: str) -> None:
         """
         Writes content to a file.
-        
-        Arguments:
-         $file_path: The path to the file to write to.
-         $content: The content to write to the file.
-        
-        Returns: Nothing.
+
+        Parameters:
+            file_path: The path to the file to write to.
+            content: The content to write to the file.
         """
         try:
             with open(file_path, "w") as file:
@@ -450,7 +449,7 @@ class BuildSystem_KDECMake(BuildSystem):
     # @override
     def buildInternal(self, optionsName=None) -> dict:
         """
-        Return value style: hashref to build results object (see ksb::BuildSystem::safe_make)
+        Return value style: dict to build results object (see :meth:`BuildSystem.safe_make`)
         """
         generator = self.cmakeGenerator()
         defaultOptionsName = BuildSystem_KDECMake.GENERATOR_MAP[generator]["optionsName"]
@@ -462,12 +461,12 @@ class BuildSystem_KDECMake(BuildSystem):
 
     def _safe_run_cmake(self) -> int:
         """
-        Subroutine to run CMake to create the build directory for a module.
+        Function to run CMake to create the build directory for a module.
         CMake is not actually run if pretend mode is enabled.
-        
-        First parameter is the module to run cmake on.
-        Return value is the shell return value as returned by log_command().  i.e.
-        0 for success, non-zero for failure.
+
+        Returns:
+            The shell return value as returned by log_command().  i.e.
+            0 for success, non-zero for failure.
         """
         module = self.module
         generator = self.cmakeGenerator()

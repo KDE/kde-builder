@@ -45,11 +45,11 @@ class BuildSystem_QMake(BuildSystem):
     @staticmethod
     def absPathToQMake() -> str:
         """
-        Returns the absolute path to 'qmake'. Note the actual executable name may
-        not necessarily be 'qmake' as some distributions rename it to allow for
+        Returns the absolute path to "qmake". Note the actual executable name may
+        not necessarily be "qmake" as some distributions rename it to allow for
         co-installability with Qt 3 (and 5...)
-        If no suitable qmake can be found, undef is returned.
-        This is a "static class method" i.e. use ksb::BuildSystem::QMake::absPathToQMake()
+        If no suitable qmake can be found, None is returned.
+        This is a "static class method" i.e. use :meth:`BuildSystem.QMake.absPathToQMake()`.
         """
         possibilities = ["qmake-qt5", "qmake5", "qmake-mac", "qmake", "qmake-qt4", "qmake4"]
         return next((p for p in possibilities if Util.locate_exe(p)), None)

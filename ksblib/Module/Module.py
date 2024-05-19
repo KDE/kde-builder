@@ -48,23 +48,21 @@ logger_module = kbLogger.getLogger("module")
 
 class Module(OptionsBase):
     """
-    DESCRIPTION
-    
     A subclass of :class:`OptionsBase`, which represents a source code module of some
     sort that can be updated, built, tested and installed.
-    
+
     This uses abstract interfaces to represent the buildsystem and the source code
     version control system (:class:`BuildSystem` and :class:`Updater` respectively).
-    
-    Includes a stringifying overload and can be sorted amongst other ksblib.Modules.
-    
-    SYNOPSIS
+
+    Includes a stringifying and can be sorted amongst other Modules.
+
+    Examples:
     ::
-    
-        module = ksblib.Module(ctx, 'module-name')
-        module.update() or die "no update!"
-        module.build() or die "no build/install!"
-    
+
+        module = Module(ctx, "module-name")
+        module.update() or raise "no update!"
+        module.build() or raise "no build/install!"
+
         modulesFromSet = moduleSet.convertToModules(ctx)
         for module in modulesFromSet:
             print(f"module name: {module}")
@@ -149,12 +147,12 @@ class Module(OptionsBase):
     def getInstallPathComponents(self, dirtype: str) -> dict:
         """
         Returns the directory that a module should be installed in.
-        
+
         NOTE: The return value is a dict.
         The key "module" will return the final module name.
         The key "path" will return the full path to the module.
         The key "fullpath" will return their concatenation.
-        
+
         For example, with module == "KDE/kdelibs", and no change in the dest-dir option, you'd get something like:
         ::
             {
@@ -162,7 +160,7 @@ class Module(OptionsBase):
               "module": "kdelibs",
               "fullpath": "/home/user/kde/src/KDE/kdelibs"
             }
-        
+
         If dest-dir were changed to e.g. extragear-multimedia, you'd get:
         ::
             {
@@ -170,12 +168,12 @@ class Module(OptionsBase):
               "module": "extragear-multimedia",
               "fullpath": "/home/user/kde/src/extragear-multimedia"
             }
-        
+
         Parameters:
-          dirtype - Either "source" or "build".
-        
+            dirtype - Either "source" or "build".
+
         Returns:
-          dict
+            dict
         """
         module = self
         Util.assert_isa(module, Module)

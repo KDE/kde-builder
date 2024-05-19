@@ -38,20 +38,17 @@ logger_util = kbLogger.getLogger("util")
 class Util:
     """
     Useful utilities, which are exported into the calling module's namespace by default.
-    
-    =head1 DESCRIPTION
-    
-    Various helpful methods.  This documentation doesn't cover them all currently,
-    take a peek at the source.
     """
 
     @staticmethod
     def list_has(listRef: list, value):
         """
         Function to work around a Perl language limitation.
-        First parameter is a reference to the list to search. ALWAYS.
-        Second parameter is the value to search for.
-        Returns true if the value is in the list
+        Parameters:
+            listRef: The list to search. ALWAYS.
+            value: The value to search for.
+        Returns:
+             True if the value is in the list
         No need to use it in Python. We can just use `if "value" in listRef`.
         """
         return value in listRef
@@ -59,15 +56,17 @@ class Util:
     @staticmethod
     def locate_exe(prog: str, preferred: list | None = None):
         """
-        Subroutine to return the path to the given executable based on the
+        Function to return the path to the given executable based on
         either the given paths or the current PATH.
         E.g.:
-        locate_exe('make') -> '/usr/bin/make'
-        locate_exe('make', 'foo', 'bar') -> /foo/make
-        If the executable is not found undef is returned.
-        
+        ::
+
+            locate_exe("make") -> "/usr/bin/make"
+            locate_exe("make", "foo", "bar") -> /foo/make
+            If the executable is not found None is returned.
+
         This assumes that the module environment has already been updated since
-        binpath doesn't exactly correspond to $ENV{'PATH'}.
+        binpath doesn't exactly correspond to os.environ["PATH"].
         """
 
         if preferred is None:
@@ -88,7 +87,7 @@ class Util:
         """
         Throws an exception if the first parameter is not an object at all, or if
         it is not an object of the type given by the second parameter (which
-        should be a string of the class name. There is no return value;
+        should be a string of the class name). There is no return value.
         """
         if not isinstance(obj, class_name):
             BuildException.croak_internal(f"{obj} is not of type {class_name}, but of type " + type(obj))
@@ -98,8 +97,10 @@ class Util:
     def assert_in(val, listRef):
         """
         Throws an exception if the first parameter is not included in the
-        provided list of possible alternatives. The list of alternatives must
-        be passed as a reference, as the second parameter.
+        provided list of possible alternatives.
+        Parameters:
+            val: The value to check.
+            listRef: List of alternatives.
         """
         if val not in listRef:
             BuildException.croak_runtime(f"{val} is not a permissible value for its argument")
@@ -109,7 +110,7 @@ class Util:
     @staticmethod
     def safe_unlink(path):
         """
-        Subroutine to unlink the given symlink if global-pretend isn't set.
+        Function to unlink the given symlink if global-pretend isn't set.
         """
         if Debug().pretending():
             logger_util.pretend(f"\tWould have unlinked {path}.")
@@ -119,10 +120,11 @@ class Util:
     @staticmethod
     def safe_system(cmd_list: list[str]) -> int:
         """
-        Subroutine to execute the system call on the given list if the pretend
+        Function to execute the system call on the given list if the pretend
         global option is not set.
-        
-        Returns the shell error code, so 0 means success, non-zero means failure.
+
+        Returns:
+             The shell error code, so 0 means success, non-zero means failure.
         """
         if not Debug().pretending():
             logger_util.debug(f"\tExecuting g['" + "' '".join(cmd_list) + "'")
@@ -150,10 +152,10 @@ class Util:
     def super_mkdir(pathname):
         """
         Creates a directory, including any parent directories that may also need
-        created.  Does nothing in pretend mode (but it does remember that it would
+        created. Does nothing in pretend mode (but it does remember that it would
         have created the path to avoid message spam).
-        
-        Throws an exception on failure. See L<File::Path>.
+
+        Throws an exception on failure. See Path.
         """
 
         if not hasattr(Util, "createdPaths"):
@@ -172,10 +174,13 @@ class Util:
     def file_digest_md5(fileName):
         """
         Calculates the MD5 digest of a file already on-disk. The digest is
-        returned as a hex string digest as from Digest::MD5::md5_hex
-        
-        First parameter: File name to read
-        Return value: hex string MD5 digest of file.
+        returned as a hex string digest as from md5.hexdigest
+
+        Parameters:
+             fileName: File name to read
+
+        Returns:
+            hex string MD5 digest of file.
         An exception is thrown if an error occurs reading the file.
         """
         md5 = hashlib.md5()
@@ -193,7 +198,7 @@ class Util:
         This function is intended to disable the message translation catalog
         settings in the program environment, so that any child processes executed
         will have their output untranslated (and therefore scrapeable).
-        
+
         As such this should only be called for a forked child about to exec as
         there is no easy way to undo this within the process.
         """
@@ -214,22 +219,23 @@ class Util:
     @staticmethod
     def filter_program_output(filterRef, program, *args) -> list[str]:
         """
-        Returns an array of lines output from a program.  Use this only if you expect
+        Returns an array of lines output from a program. Use this only if you expect
         that the output after filtering will be short.
-        
-         my $filter = sub { return 1 if /^U/ };
-         my @output = filter_program_output($filter, 'git', 'describe', 'HEAD');
-        
+
+            def filter(arg):
+                if arg.upper():
+                    return 1
+            output = filter_program_output(filter, "git", "describe", "HEAD")
+
         Since there is no way to disambiguate no output from an error, this function
-        will call C<die> on error, wrap in C<eval> if this bugs you.
-        
-        First parameter is subroutine reference to use as a filter (this sub will
-        be passed a line at a time and should return true if the line should be
-        returned).  If no filtering is desired pass C<undef>.
-        
-        Second parameter is the program to run (either full path or something
-        accessible in $PATH).
-        
+        will call ``raise`` on error, wrap in try-catch if this bugs you.
+
+        Parameters:
+            filterRef: function to use as a filter (this function  will
+                be passed a line at a time and should return true if the line should be
+                returned). If no filtering is desired pass None.
+            program: The program to run (either full path or something
+                accessible in $PATH).
         All remaining arguments are passed to the program.
         """
 
@@ -313,8 +319,8 @@ class Util:
     @staticmethod
     def prettify_seconds(elapsed):
         """
-        Subroutine to return a string suitable for displaying an elapsed time,
-        (like a stopwatch) would.  The first parameter is the number of seconds
+        Function to return a string suitable for displaying an elapsed time,
+        (like a stopwatch) would. The first parameter is the number of seconds
         elapsed.
         """
         return_str = ""
@@ -360,10 +366,11 @@ class Util:
     @staticmethod
     def _setErrorLogfile(module, logfile) -> None:
         """
-        Subroutine to mark a file as being the error log for a module.  This also
+        Function to mark a file as being the error log for a module. This also
         creates a symlink in the module log directory for easy viewing.
-        First parameter is the module in question.
-        Second parameter is the filename in the log directory of the error log.
+        Parameters:
+            module: The module in question.
+            logfile: The filename in the log directory of the error log.
         """
         if not logfile:
             return
@@ -393,7 +400,7 @@ class Util:
     @staticmethod
     def run_logged_command(module: Module, filename: str, callbackRef: Optional[Callable], command: list[str]) -> int:
         """
-        Common code for log_command and ksb::Util::LoggedSubprocess
+        Common code for log_command and Util_LoggedSubprocess
         """
         logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 
@@ -525,12 +532,12 @@ class Util:
     @staticmethod
     def await_promise(promise: Promise):
         """
-        Takes a promise on input and calls ->wait on it, blocking until the promise
-        resolves.  Returns the promise passed in.
-        
+        Takes a promise on input and calls .wait() on it, blocking until the promise
+        resolves. Returns the promise passed in.
+
         You should not use this function except as a porting aid to convert
         log_command()-based async code to use promises.
-        
+
         Throws an exception if the I/O loop is already in operation, as this indicates
         serious bugs.
         """
@@ -543,15 +550,15 @@ class Util:
     def await_exitcode(promise: Promise):
         """
         Takes a promise on input, adds a handler to extract the final result (treating
-        it as a shell-style exit code), and calls ->wait on it, blocking until the
+        it as a shell-style exit code), and calls .wait() on it, blocking until the
         promise resolves or rejects.
-        
+
         You should not use this function except as a porting aid to convert
         log_command()-based async code to use promises.
-        
+
         Returns a boolean value (true if the promise exitcode resolved to 0, false
         otherwise).
-        
+
         Throws an exception if the I/O loop is already in operation, as this indicates
         serious bugs.
         """
@@ -567,15 +574,15 @@ class Util:
     @staticmethod
     def await_result(promise: Promise):
         """
-        Takes a promise on input, adds a handler to extract the final result (as a
-        scalar), and calls ->wait on it, blocking until the promise resolves or
+        Takes a promise on input, adds a handler to extract the final result,
+        and calls .wait() on it, blocking until the promise resolves or
         rejects.
-        
+
         You should not use this function except as a porting aid to convert
         log_command()-based async code to use promises.
-        
-        Returns the scalar result.
-        
+
+        Returns the result.
+
         Throws an exception if the I/O loop is already in operation, as this indicates
         serious bugs.
         """
@@ -591,49 +598,45 @@ class Util:
     @staticmethod
     def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
         """
-        Subroutine to run a command, optionally filtering on the output of the child
+        Function to run a command, optionally filtering on the output of the child
         command. Use like:
-        
-         my $exitcode = log_command($module, 'build-output', [qw(make -j4)]);
-        
+
+            exitcode = log_command(module, "build-output", ["make", "-j4"])
+
         After the required three parameters (module, base name for log file, and a list
-        with the command and arguments) you can pass a hash reference of optional
+        with the command and arguments) you can pass a dict of optional
         features:
-        
-        =over
-        
-        =item C<callback =E<gt> sub ($line) { ... }>
-        
-        A reference to a subroutine to have each line of child output passed to.  This
-        output is not supposed to be printed to the screen by the subroutine, normally
-        the output is only logged.  However this is useful for e.g. munging out the
+
+            def callback(line):
+                ...
+
+        A function to have each line of child output passed to. This
+        output is not supposed to be printed to the screen by the function, normally
+        the output is only logged. However, this is useful for e.g. munging out the
         progress of the build.
-        
+
         If you wish to run short commands and look through their output, prefer
-        L<"filter_program_output"> instead, as this disables message translation.
-        
-        =for comment
-        #  'no_translate' => any true value will cause a flag to be set to request
+        ``filter_program_output`` instead, as this disables message translation.
+
+        #  "no_translate": any true value will cause a flag to be set to request
         #  the executed child process to not translate (for locale purposes) its
         #  output, so that it can be screen-scraped.
-        
-        =back
-        
+
         The return value is the shell return code, so 0 is success, and non-zero is
-          failure.
-        
-        I<NOTE>: This function has a special feature.  If the command passed into the
+        failure.
+
+        `NOTE`: This function has a special feature. If the command passed into the
         argument reference is 'kde-builder', then log_command will, when it forks,
-        execute the subroutine named by the second parameter rather than executing a
-        child process.  The subroutine should include the full package name as well
-        (otherwise the package containing log_command's implementation is used).  The
-        remaining arguments in the list are passed to the subroutine that is called.
-        
-        =head3 Pretend handling
-        
-        The program is not actually executed in pretend mode.  If you need the program
-        to always be run, use a Perl IPC mechanism like L<system|perlfunc/"system"> or
-        a utility like L<"filter_program_output">.
+        execute the function named by the second parameter rather than executing a
+        child process. The subroutine should include the full python module name as well
+        (otherwise the package containing log_command's implementation is used). The
+        remaining arguments in the list are passed to the function that is called.
+
+        Pretend handling:
+
+        The program is not actually executed in pretend mode. If you need the program
+        to always be run, use a python IPC mechanism like os.system(), subprocess, or
+        a utility like ``filter_program_output``.
         """
         if optionsRef is None:
             optionsRef = {}
@@ -649,33 +652,35 @@ class Util:
     @staticmethod
     def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> Promise:
         """
-        This is similar to C<log_command> in that this runs the given command and
+        This is similar to ``log_command`` in that this runs the given command and
         arguments in a separate process. The difference is that this command
-        I<does not wait> for the process to finish, and instead returns a
-        L<Mojo::Promise> that resolves to the exit status of the sub-process.
-        
+        `does not wait` for the process to finish, and instead returns a
+        Promise that resolves to the exit status of the sub-process.
+
         Another important difference is that fewer options are currently supported.
         In particular there is no built-in way to filter the program output or to
         force off locale translations.
-        
+
         This is useful in permitting concurrent code without needing to resolve
         significant changes from a separate thread of execution over time.
-        
+
         Note that concurrent code should be careful about accessing global state
         simultaneously. This includes things like the current working directory, which
-        is shared across the entire process.  run_logged_p allows you to pass a param
+        is shared across the entire process. run_logged_p allows you to pass a param
         to set the working directory to use in the *subprocess* it creates so that
         there is no contention over the main process's current working directory.
-        If the C<$directory> param is C<undef> then the directory is not changed.
-        
-         my $builddir = $module->fullpath('build'); # need to pass dir to use
-         my $promise = run_logged_p($module, 'build', $builddir, [qw(make -j8)]);
-         $promise->then(sub ($result) {
-           say "Process result: $result";
-         })->wait;
-        
-        # TODO: For really concurrent code we need to have run_logged_p change to a
-        # specific directory in the subprocess, add to this interface.
+        If the ``directory`` param is None then the directory is not changed.
+        ::
+
+            builddir = module.fullpath("build")  # need to pass dir to use
+            promise = run_logged_p(module, "build", builddir, ["make", "-j8"])
+            def func(result):
+                print(f"Process result: {result}")
+
+            promise.then(func).wait()
+
+        TODO: For really concurrent code we need to have run_logged_p change to a
+         specific directory in the subprocess, add to this interface.
         """
 
         if not directory:
@@ -727,31 +732,31 @@ class Util:
     @staticmethod
     def split_quoted_on_whitespace(line):
         """
-        This subroutine acts like split(' ', $_) except that double-quoted strings
+        This function acts like split(" ", arg) except that double-quoted strings
         are not split in the process.
-        
-        First parameter: String to split on whitespace.
-        Return value: A list of the individual words and quoted values in the string.
-        The quotes themselves are not returned.
+
+        Parameters:
+            line: String to split on whitespace.
+        Returns:
+            A list of the individual words and quoted values in the string.
+            The quotes themselves are not returned.
         """
         return shlex.split(line.strip())
 
     @staticmethod
     def pretend_open(path, defaultText: str = ""):
         """
-        Function: pretend_open
-        
         Opens the given file and returns a filehandle to it if the file actually exists or the script is not in pretend mode.
         If the script is in pretend mode and the file is not already present then an open filehandle to an empty string is returned.
-        
+
         Parameters:
-         filename - Path to the file to open.
-         default  - String to use if the file doesn't exist in pretend mode
-        
+            path: Path to the file to open.
+            defaultText: String to use if the file doesn't exist in pretend mode
+
         Returns:
-         filehandle on success (supports readline() and eof()), can return boolean
-         false if there is an error opening an existing file (or if the file doesn't
-         exist when not in pretend mode)
+            filehandle on success (supports readline() and eof()), can return boolean
+            false if there is an error opening an existing file (or if the file doesn't
+            exist when not in pretend mode)
         """
 
         if Debug().pretending() and not os.path.exists(path):
@@ -792,12 +797,13 @@ class Util:
     @staticmethod
     def safe_rmtree(path) -> bool:
         """
-        Subroutine to delete a directory and all files and subdirectories within.
-        Does nothing in pretend mode.  An analog to "rm -rf" from Linux.
-        Requires File::Find module.
-        
-        First parameter: Path to delete
-        Returns boolean true on success, boolean false for failure.
+        Function to delete a directory and all files and subdirectories within.
+        Does nothing in pretend mode. An analog to "rm -rf" from Linux.
+
+        Parameters:
+             path: Path to delete
+        Returns:
+             Boolean true on success, boolean false for failure.
         """
         # Pretty user-visible path
         user_path = path
@@ -824,15 +830,17 @@ class Util:
     @staticmethod
     def get_list_digest(args: list):
         """
-        Returns a hash digest of the given options in the list.  The return value is
+        Returns a hash digest of the given options in the list. The return value is
         base64-encoded at this time.
-        
+
         Note: Don't be dumb and pass data that depends on execution state as the
         returned hash is almost certainly not useful for whatever you're doing with
         it.  (i.e. passing a reference to a list is not helpful, pass the list itself)
-        
-        Parameters: List of scalar values to hash.
-        Return value: base64-encoded hash value.
+
+        Parameters:
+             args: List of scalar values to hash.
+        Returns:
+             base64-encoded hash value.
         """
 
         md5_hash = hashlib.md5()
@@ -858,27 +866,31 @@ class Util:
     @staticmethod
     def safe_lndir_p(from_path: str, to_path: str) -> Promise:
         """
-        Subroutine to recursively symlink a directory into another location, in a
-        similar fashion to how the XFree/X.org lndir() program does it.  This is
+        function to recursively symlink a directory into another location, in a
+        similar fashion to how the XFree/X.org lndir() program does it. This is
         reimplemented here since some systems lndir doesn't seem to work right.
-        
+
         As a special exception to the GNU GPL, you may use and redistribute this
         function however you would like (i.e. consider it public domain).
-        
-        Use by passing two I<absolute> paths, the first being where to symlink files
+
+        Use by passing two `absolute` paths, the first being where to symlink files
         from, and the second being what directory to symlink them into.
-        
-         my $promise = safe_lndir_p('/path/to/symlink', '/where/to/put/symlinks');
-         $promise->then(sub ($result) {
-            say "success" if $result;
-         });
-        
-        All intervening directories will be created as needed.  In addition, you may
+        ::
+
+            promise = safe_lndir_p("/path/to/symlink", "/where/to/put/symlinks")
+            def func(result):
+                if result:
+                    print("success")
+
+            promise.then(func)
+
+        All intervening directories will be created as needed. In addition, you may
         safely run this function again if you only want to catch additional files in
         the source directory.
-        
-        RETURN VALUE: A promise that resolves to a Boolean true (non-zero) if successful,
-        Boolean false if unsuccessful.
+
+        Returns:
+            A promise that resolves to a Boolean true (non-zero) if successful,
+            Boolean false if unsuccessful.
         """
 
         if Debug().pretending():
@@ -948,18 +960,19 @@ class Util:
     @staticmethod
     def prune_under_directory_p(module, target_dir) -> Promise:
         """
-        Subroutine to delete recursively, everything under the given directory, unless
+        Function to delete recursively, everything under the given directory, unless
         we're in pretend mode.
-        
-        Used from L<ksb::BuildSystem> to handle cleaning a build directory.
-        
-        i.e. the effect is similar to C<rm -r $arg/* $arg/.*>.
-        
-         # promise resolves to a boolean success flag
-         my $promise = prune_under_directory_p($module, '/path/to/clean');
-        
-        Returns a promise resolving to boolean true on success, boolean false on
-        failure.
+
+        Used from :class:`BuildSystem` to handle cleaning a build directory.
+
+        i.e. the effect is similar to `rm -r arg/* arg/.*`.
+        ::
+
+            # promise resolves to a boolean success flag
+            promise = prune_under_directory_p(module, "/path/to/clean")
+
+        Returns:
+            A promise resolving to boolean true on success, boolean false on failure.
         """
 
         logpath = module.getLogPath("clean-builddir.log")

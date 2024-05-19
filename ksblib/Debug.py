@@ -132,7 +132,7 @@ class kbLogger(logging.Logger):
     @staticmethod
     def print_clr(logger_name: str, message_level: str, msg: str) -> None:
         """
-        Subroutine used to actually display the data, calls ksb::Debug::colorize on each entry first.
+        Subroutine used to actually display the data, calls :meth:`Debug.colorize` on each entry first.
         """
 
         d = Debug()

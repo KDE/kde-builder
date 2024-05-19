@@ -21,11 +21,9 @@ logger_depres = kbLogger.getLogger("dependency-resolver")
 
 class DependencyResolver:
     """
-    Class: DependencyResolver
-    
-    This module handles resolving dependencies between modules. Each "module"
+    This class handles resolving dependencies between modules. Each "module"
     from the perspective of this resolver is simply a module full name, as
-    given by the KDE Project database.  (e.g. extragear/utils/kdesrc-build)
+    given by the KDE Project database (e.g. extragear/utils/kdesrc-build).
     """
 
     # sub uniq
@@ -36,21 +34,17 @@ class DependencyResolver:
 
     def __init__(self, moduleFactoryRef):
         """
-        Constructor: new
-        
-        Constructs a new <DependencyResolver>.
-        
         Parameters:
-        
-          moduleFactoryRef - Reference to a sub that creates ksb::Modules from
-            kde-project module names. Used for ksb::Modules for which the user
+            moduleFactoryRef: Function that creates :class:`Module` from
+            kde-project module names. Used for :class:`Module` for which the user
             requested recursive dependency inclusion.
-        
-        Synposis:
-        
-        > my $resolver = new DependencyResolver($modNewRef);
-        > $resolver->readDependencyData(open my $fh, '<', 'file.txt');
-        > $resolver->resolveDependencies(@modules);
+
+        Example:
+        ::
+            resolver = DependencyResolver(modNew)
+            fh = os.open('file.txt', "r")
+            resolver.readDependencyData(fh)
+            resolver.resolveDependencies(modules)
         """
 
         # hash table mapping short module names (m) to a hashref key by branch
@@ -73,28 +67,22 @@ class DependencyResolver:
     @staticmethod
     def _shortenModuleName(name) -> str:
         """
-        Internal:
-        
         This method returns the 'short' module name of kde-project full project paths.
         E.g. 'kde/kdelibs/foo' would be shortened to 'foo'.
-        
-        This is a static function, not an object method.
-        
+
         Parameters:
-        
-         path - A string holding the full module virtual path
-        
+            name: A string holding the full module virtual path
+
         Returns:
-        
-         The module name.
+            The module name.
         """
         name = re.sub(r"^.*/", "", name)  # Uses greedy capture by default
         return name
 
     def _addDependency(self, depName, depBranch, srcName, srcBranch, depKey="+") -> None:
         """
-        Adds an edge in the dependency graph from C<$depName> (at the given branch) to
-        C<$srcName> (at its respective branch). Use C<*> as the branch name if it is
+        Adds an edge in the dependency graph from ``depName`` (at the given branch) to
+        ``srcName`` (at its respective branch). Use ``*`` as the branch name if it is
         not important.
         """
         dependenciesOfRef = self.dependenciesOf
@@ -127,17 +115,14 @@ class DependencyResolver:
 
     def readDependencyData(self, fh) -> None:
         """
-        Method: readDependencyData
-        
         Reads in dependency data in a pseudo-Makefile format.
         See repo-metadata/dependencies/dependency-data.
-        
+
         Parameters:
-         $self - The DependencyResolver object.
-         $fh   - Filehandle to read dependencies from (should already be open).
-        
-        Exceptions:
-         Can throw an exception on I/O errors or malformed dependencies.
+            fh: Filehandle to read dependencies from (should already be opened).
+
+        Raises:
+            Exception: Can throw an exception on I/O errors or malformed dependencies.
         """
         Util.assert_isa(self, DependencyResolver)
 
@@ -212,11 +197,13 @@ class DependencyResolver:
         """
         Reads in v2-format dependency data from KDE repository database, using the KDE
         'invent' repository naming convention.
-        
+
         Throws exception on read failure.
-        
-         open my $fh, '<', "/path/to/dependency-data.json" or die;
-         $resolver->readDependencyData_v2($fh);
+
+        ::
+
+            fh = open("/path/to/dependency-data.json", "r")
+            resolver.readDependencyData_v2(fh)
         """
         logger_depres.warning("b[***] USING y[b[V2 DEPENDENCY METADATA], BUILD IS UNSUPPORTED")
 
@@ -246,15 +233,9 @@ class DependencyResolver:
 
     def _canonicalizeDependencies(self) -> None:
         """
-        Function: _canonicalizeDependencies
-        
         Ensures that all stored dependencies are stored in a way that allows for
         reproducable dependency ordering (assuming the same dependency items and same
         selectors are used).
-        
-        Parameters: none
-        
-        Returns: none
         """
         dependenciesOfRef = self.dependenciesOf
 
@@ -756,14 +737,10 @@ class DependencyResolver:
     @staticmethod
     def _getBranchOf(module) -> str | None:
         """
-        Function: getBranchOf
-        
-        Internal:
-        
         This function extracts the branch of the given Module by calling its
         scm object's branch-determining method. It also ensures that the branch
         returned was really intended to be a branch (as opposed to a detached HEAD);
-        undef is returned when the desired commit is not a branch name, otherwise
+        None is returned when the desired commit is not a branch name, otherwise
         the user-requested branch name is returned.
         """
 

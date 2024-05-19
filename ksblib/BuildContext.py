@@ -41,38 +41,36 @@ logger_buildcontext = kbLogger.getLogger("build-context")
 # TODO: Derive from OptionsBase directly and remove getOption override
 class BuildContext(Module):
     """
-    DESCRIPTION
-    
-    This contains the information needed about the build context, e.g.  list of
+    This contains the information needed about the build context, e.g. list of
     modules, what phases each module is in, the various options, etc.
-    
+
     It also records information on which modules encountered errors (and what
     error), where to put log files, persistent options that should be available on
     the next run, and basically anything else that falls into the category of state
     management.
-    
+
     The 'global' module
-    
+
     One interesting thing about this class is that, as a state-managing class, this
-    class implements the role of :class:`ksblib.Module` for the pseudo-module called
+    class implements the role of :class:`Module` for the pseudo-module called
     'global' throughout the source code (and whose options are defined in the
-    'global' section in the rc-file).  It is also a parent to every ksblib.Module in
-    terms of the option hierarchy, serving as a fallback source for ksblib.Module's
-    getOption() calls for most (though not all!) options.
-    
-    SYNOPSIS
+    'global' section in the rc-file). It is also a parent to every :class:`Module` in
+    terms of the option hierarchy, serving as a fallback source for :class:`Module`'s
+    `getOption()` calls for most (though not all!) options.
+
+    Examples:
     ::
-    
-         ctx = ksblib.BuildContext.BuildContext()
-    
+
+         ctx = BuildContext.BuildContext()
+
          ctx.setRcFile('/path/to/kdesrc-buildrc')
          fh = ctx.loadRcFile()
-    
+
          ...
-    
+
          for modName in selectors:
-            ctx.addModule(ksblib.Module.Module(modName, ctx)
-    
+            ctx.addModule(Module.Module(ctx, modName))
+
          ...
          moduleList = ctx.moduleList()
     """
@@ -240,8 +238,8 @@ class BuildContext(Module):
     # @override
     def phases(self, phases=None):
         """
-        Gets the ksb::PhaseList for this context, and optionally sets it first to
-        the ksb::PhaseList passed in.
+        Gets the :class:`PhaseList` for this context, and optionally sets it first to
+        the :class:`PhaseList` passed in.
         """
         if phases:
             if not isinstance(phases, PhaseList):
@@ -268,7 +266,7 @@ class BuildContext(Module):
 
     def moduleList(self) -> list[Module]:
         """
-        Returns a listref of the modules to build
+        Returns a list of the modules to build
         """
         return self.modules
 
@@ -278,8 +276,8 @@ class BuildContext(Module):
         Parameters should simply be a list of KDE project paths to ignore,
         e.g. 'extragear/utils/kdesrc-build'. Partial paths are acceptable, matches
         are determined by comparing the path provided to the suffix of the full path
-        of modules being compared.  See KDEProjectsReader::_projectPathMatchesWildcardSearch
-        
+        of modules being compared.  See :meth:`KDEProjectsReader._projectPathMatchesWildcardSearch`.
+
         Existing items on the ignore list are not removed.
         """
         self.ignore_list.extend(moduleslist)
@@ -313,12 +311,12 @@ class BuildContext(Module):
         """
         Adds an environment variable and value to the list of environment
         variables to apply for the next subprocess execution.
-        
+
         Note that these changes are /not/ reflected in the current environment,
         so if you are doing something that requires that kind of update you
         should do that yourself (but remember to have some way to restore the old
         value if necessary).
-        
+
         In order to keep compatibility with the old 'setenv' sub, no action is
         taken if the value is not equivalent to boolean true.
         """
@@ -349,18 +347,18 @@ class BuildContext(Module):
         that we don't inadvertently re-add a system path to be promoted over the
         custom code we're compiling (for instance, when a system Qt is used and
         installed to /usr).
-        
+
         If the environment variable to be modified has already been queued using
         queueEnvironmentVariable, then that (queued) value will be modified and
         will take effect with the next forked subprocess.
-        
+
         Otherwise, the current environment variable value will be used, and then
         queued. Either way the current environment will be unmodified afterward.
-        
-        First parameter is the name of the environment variable to modify
-        All remaining parameters are prepended to the current environment path, in
-        the order given. (i.e. param1, param2, param3 ->
-        param1:param2:param3:existing)
+
+        Parameters:
+            envName: The name of the environment variable to modify
+            items: Prepended to the current environment path, in
+                the order given. (i.e. param1, param2, param3 -> param1:param2:param3:existing)
         """
 
         if envName in self.env:
@@ -402,12 +400,13 @@ class BuildContext(Module):
         """
         Tries to take the lock for our current base directory, which currently is
         what passes for preventing people from accidentally running kde-builder
-        multiple times at once.  The lock is based on the base directory instead
+        multiple times at once. The lock is based on the base directory instead
         of being global to allow for motivated and/or brave users to properly
         configure kde-builder to run simultaneously with different
         configurations.
-        
-        Return value is a boolean success flag.
+
+        Returns:
+             Boolean success flag.
         """
         Util.assert_isa(self, BuildContext)
         baseDir = self.baseConfigDirectory()
@@ -509,10 +508,10 @@ class BuildContext(Module):
 
     def getLogDirFor(self, module: Module) -> str:
         """
-        This subroutine accepts a Module parameter, and returns the log directory
+        This function accepts a Module parameter, and returns the log directory
         for it. You can also pass a BuildContext (including this one) to get the
         default log directory.
-        
+
         As part of setting up what path to use for the log directory, the
         'latest' symlink will also be setup to point to the returned log
         directory.
@@ -603,11 +602,11 @@ class BuildContext(Module):
 
     def loadRcFile(self) -> fileinput.FileInput:
         """
-        Returns an open filehandle to the user's chosen rc file.  Use setRcFile
+        Returns an open filehandle to the user's chosen rc file. Use setRcFile
         to choose a file to load before calling this function, otherwise
-        loadRcFile will search the default search path.  After this function is
+        loadRcFile will search the default search path. After this function is
         called, rcFile() can be used to determine which file was loaded.
-        
+
         If unable to find or open the rc file an exception is raised. Empty rc
         files are supported, however.
         """
@@ -693,7 +692,7 @@ class BuildContext(Module):
         Returns the base directory that holds the configuration file. This is
         typically used as the directory base for other necessary kde-builder
         execution files, such as the persistent data store and lock file.
-        
+
         The RC file must have been found and loaded first, obviously.
         """
         Util.assert_isa(self, BuildContext)
@@ -725,10 +724,10 @@ class BuildContext(Module):
     def lookupModule(self, moduleName: str):
         """
         Searches for a module with a name that matches the provided parameter,
-        and returns its ksb::Module object. Returns undef if no match was found.
+        and returns its :class:`Module` object. Returns None if no match was found.
         As a special-case, returns the BuildContext itself if the name passed is
         'global', since the BuildContext also is a (in the "is-a" OOP sense)
-        ksb::Module, specifically the 'global' one.
+        :class:`Module`, specifically the 'global' one.
         """
         if moduleName == "global":
             return self
@@ -747,8 +746,7 @@ class BuildContext(Module):
 
     def failedModulesInPhase(self, phase: str) -> list:
         """
-        Returns a list (i.e. not a reference to, but a real list) of Modules that failed to
-        complete the given phase.
+        Returns a list of Modules that failed to complete the given phase.
         """
         failures = [module for module in self.moduleList() if self.errors.get(module.name, "") == phase]
         return failures
@@ -770,8 +768,9 @@ class BuildContext(Module):
         Our immediate parent class Module overrides this, but we actually
         want the OptionsBase version to be used instead, until we break the recursive
         use of Module's own getOption calls on our getOption.
-        
-        Returns the same types that OptionsBase.getOption returns.
+
+        Returns:
+             The same types that OptionsBase.getOption returns.
         """
         return OptionsBase.getOption(self, key)
 
@@ -850,7 +849,7 @@ class BuildContext(Module):
         """
         Reads in all persistent options from the file where they are kept
         (kdesrc-build-data) for use in the program.
-        
+
         The directory used is the same directory that contains the rc file in use.
         """
 
@@ -910,15 +909,16 @@ class BuildContext(Module):
     def getPersistentOption(self, moduleName: str, key=None) -> str | int | None:
         """
         Returns the value of a "persistent" option (normally read in as part of
-        startup), or undef if there is no value stored.
-        
-        First parameter is the module name to get the option for, or 'global' if
-        not for a module.
-            Note that unlike setOption/getOption, no inheritance is done at this
-            point so if an option is present globally but not for a module you
-            must check both if that's what you want.
-        Second parameter is the name of the value to retrieve (i.e. the key)
-        
+        startup), or None if there is no value stored.
+
+        Parameters:
+            moduleName: The module name to get the option for, or 'global' if
+                not for a module.
+                Note that unlike setOption/getOption, no inheritance is done at this
+                point so if an option is present globally but not for a module you
+                must check both if that's what you want.
+            key: The name of the value to retrieve (i.e. the key)
+
         Return type - for example used in
           int - global last-metadata-update
         """
@@ -936,11 +936,14 @@ class BuildContext(Module):
     def unsetPersistentOption(self, moduleName: str, key) -> None:
         """
         Clears a persistent option if set (for a given module and option-name).
-        
-        First parameter is the module name to get the option for, or 'global' for
-        the global options.
-        Second parameter is the name of the value to clear.
-        No return value.
+
+        Parameters:
+            moduleName: The module name to get the option for, or 'global' for
+                the global options.
+            key: The name of the value to clear.
+
+        Returns:
+            None
         """
 
         persistent_opts = self.persistent_options
@@ -953,10 +956,11 @@ class BuildContext(Module):
         """
         Sets a "persistent" option which will be read in for a module when
         kde-builder starts up and written back out at (normal) program exit.
-        
-        First parameter is the module name to set the option for, or 'global'.
-        Second parameter is the name of the value to set (i.e. key)
-        Third parameter is the value to store, which must be a scalar.
+
+        Parameters:
+            moduleName: The module name to set the option for, or 'global'.
+            key: The name of the value to set (i.e. key)
+            value: The value to store.
         """
 
         persistent_opts = self.persistent_options
@@ -969,11 +973,11 @@ class BuildContext(Module):
 
     def getKDEProjectsMetadataModule(self) -> Module:
         """
-        Returns the ksb::Module (which has a 'metadata' scm type) that is used for
+        Returns the :class:`Module` (which has a 'metadata' scm type) that is used for
         kde-project metadata, so that other modules that need it can call into it if
         necessary.
-        
-        Also, may return undef if the metadata is unavailable or has not yet
+
+        Also, may return None if the metadata is unavailable or has not yet
         been set by setKDEProjectsMetadataModule (this method does not
         automatically create the needed module).
         """
@@ -1008,7 +1012,7 @@ class BuildContext(Module):
 
     def moduleBranchGroupResolver(self) -> Module_BranchGroupResolver:
         """
-        Returns a ksb::Module::BranchGroupResolver which can be used to efficiently
+        Returns a :class:`Module.BranchGroupResolver` which can be used to efficiently
         determine a git branch to use for a given kde-projects module (when the
         branch-group option is in use), as specified at
         https://community.kde.org/Infrastructure/Project_Metadata.

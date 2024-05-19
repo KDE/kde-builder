@@ -18,9 +18,9 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     """
     Updater used only to specifically update the "repo-metadata" module
     used for storing dependency information, among other things.
-    
+
     Note: 2020-06-20 the previous "kde-build-metadata" module was combined into
-    the "repo-metadata" module, under the '/dependencies' folder.
+    the "repo-metadata" module, under the "/dependencies" folder.
     """
 
     @staticmethod
@@ -60,7 +60,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     def logicalModuleGroups(self) -> dict:
         """
         If JSON support is present, and the metadata has already been downloaded
-        (e.g. with ->updateInternal), returns a hashref to the logical module group
+        (e.g. with ->updateInternal), returns a dict to the logical module group
         data contained within the kde-build-metadata, decoded from its JSON format.
         See https://community.kde.org/Infrastructure/Project_Metadata
         """
@@ -88,7 +88,6 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     def _mockTestMetadata() -> None:
         """
         Nothing to do currently, mock data is handled directly by
-        ksb::Application (dependencies) or ksb::KDEProjectReader (project
-        metadata).
+        :class:`Application` (dependencies) or :class:`KDEProjectReader` (project metadata).
         """
         pass

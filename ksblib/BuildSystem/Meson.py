@@ -14,12 +14,12 @@ from ..Util.Util import Util
 
 class BuildSystem_Meson(BuildSystem):
     """
-    This is a build system used to support configuring with L<Meson|https://mesonbuild.com/>.
-    
+    This is a build system used to support configuring with Meson (https://mesonbuild.com).
+
     Note that Meson requires Ninja as its underlying build system so anything dealing with Meson
     can assume Ninja support is present.
-    
-    Control the flags passed to Meson's setup step using the C<configure-flags> option.
+
+    Control the flags passed to Meson's setup step using the ``configure-flags`` option.
     """
 
     @staticmethod
