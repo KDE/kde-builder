@@ -210,7 +210,7 @@ class Application:
 
         # Process --help, etc. first.
         c = Cmdline()
-        opts = c.readCommandLineOptionsAndSelectors(argv)
+        opts: dict = c.readCommandLineOptionsAndSelectors(argv)
 
         selectors: list[str] = opts["selectors"]
         cmdlineOptions: dict = opts["opts"]
@@ -267,7 +267,9 @@ class Application:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 BuildException.croak_runtime("Invalid --resume flag")
-            selectors.extend(moduleList.split(", "))
+            if selectors:
+                logger_app.debug("Some selectors were presented alongside with --resume, ignoring them.")
+            selectors = moduleList.split(", ")
 
         if "rebuild-failures" in cmdlineGlobalOptions:
             moduleList = ctx.getPersistentOption("global", "last-failed-module-list")
@@ -275,7 +277,9 @@ class Application:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which modules have previously failed to build.")
                 BuildException.croak_runtime("Invalid --rebuild-failures flag")
-            selectors.extend(re.split(r",\s*", moduleList))
+            if selectors:
+                logger_app.debug("Some selectors were presented alongside with --rebuild-failures, ignoring them.")
+            selectors = re.split(r",\s*", moduleList)
 
         if "list-installed" in cmdlineGlobalOptions:
             for key in ctx.persistent_options.keys():
