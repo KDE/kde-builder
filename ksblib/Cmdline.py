@@ -296,6 +296,12 @@ class Cmdline:
             auxOptions["resume"] = True
             phases.filterOutPhase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
+            # Imply --no-include-dependencies, because when resuming, user wants to continue from exact same modules list
+            # as saved in global persistent option "resume-list". Otherwise, some dependencies that have already passed the build successfully,
+            # (i.e. those that were before the first item of resume list) may appear in modules list again (if some module from the
+            # resume list requires such modules).
+            auxOptions["include-dependencies"] = False
+
         # Hack to set module options
         if args.set_module_option_value:
             for module, option, value in args.set_module_option_value:
