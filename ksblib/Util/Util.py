@@ -209,7 +209,7 @@ class Util:
         # Note that the ONLY SUPPORTED way to pass file names, command-line
         # args, etc. to commands is under the UTF-8 encoding at this point, as
         # that is the only sane way for this en_US-based developer to handle
-        # the task.  Patches (likely using Encode::Locale) are accepted. :P
+        # the task.
 
         os.environ["LC_MESSAGES"] = "C"
         if "LC_ALL" in os.environ:
@@ -235,7 +235,7 @@ class Util:
                 be passed a line at a time and should return true if the line should be
                 returned). If no filtering is desired pass None.
             program: The program to run (either full path or something
-                accessible in $PATH).
+                accessible in PATH).
         All remaining arguments are passed to the program.
         """
 
@@ -626,9 +626,9 @@ class Util:
         failure.
 
         `NOTE`: This function has a special feature. If the command passed into the
-        argument reference is 'kde-builder', then log_command will, when it forks,
+        argument reference is "kde-builder", then log_command will, when it forks,
         execute the function named by the second parameter rather than executing a
-        child process. The subroutine should include the full python module name as well
+        child process. The function should include the full python module name as well
         (otherwise the package containing log_command's implementation is used). The
         remaining arguments in the list are passed to the function that is called.
 
@@ -803,7 +803,7 @@ class Util:
         Parameters:
              path: Path to delete
         Returns:
-             Boolean true on success, boolean false for failure.
+             True on success, False for failure.
         """
         # Pretty user-visible path
         user_path = path
@@ -972,7 +972,7 @@ class Util:
             promise = prune_under_directory_p(module, "/path/to/clean")
 
         Returns:
-            A promise resolving to boolean true on success, boolean false on failure.
+            A promise resolving to True on success, False on failure.
         """
 
         logpath = module.getLogPath("clean-builddir.log")

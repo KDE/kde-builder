@@ -92,7 +92,7 @@ class ModuleResolver:
             del opts["repository"]
             setIndices.append(idx)  # so we can delete this once loop complete
 
-            # Use KDE project database to pull list of matching ksb::Modules
+            # Use KDE project database to pull list of matching `Module`s
             for m in referencedModules.split(" "):
                 mods = proj_db.getModulesForProject(m)
                 for mod in mods:
@@ -244,7 +244,7 @@ class ModuleResolver:
         results = []  # Will default to '$selector' if unset by end of sub
 
         # In the remainder of this code, lookupTableRef is basically handling
-        # case 1, while setEntryLookupTableRef handles case 2. No ksb::Modules
+        # case 1, while setEntryLookupTableRef handles case 2. No `Module`s
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
 
@@ -410,12 +410,12 @@ class ModuleResolver:
         # Basically there are 3 types of selectors at this point:
         # 1. Directly named and defined modules or module-sets.
         # 2. Referenced (but undefined) modules. These are mentioned in a
-        #    use-modules in a module set but not actually available as ksb::Module
+        #    use-modules in a module set but not actually available as `Module`
         #    objects yet. But we know they will exist.
         # 3. Indirect modules. These are modules that do exist in the KDE project
         #    metadata, and will be pulled in once all module-sets are expanded
         #    (whether that's due to implicit wildcarding with use-modules, or due
-        #    to dependency following). However we don't even know the names for
+        #    to dependency following). However, we don't even know the names for
         #    these yet.
 
         # We have to be careful to maintain order of selectors throughout.
@@ -427,10 +427,10 @@ class ModuleResolver:
 
         modules = self.expandModuleSets(outputList)
 
-        # If we have any 'guessed' modules then they had no obvious source in the
+        # If we have any "guessed" modules then they had no obvious source in the
         # rc-file. But they might still be implicitly from one of our module-sets
         # (Case 3).
-        # We want them to use ksb::Modules from the rc-file modules/module-sets
+        # We want them to use `Module`s from the rc-file modules/module-sets
         # instead of our shell Modules, if possible.
         modules = self._resolveGuessedModules(modules)
 
@@ -501,9 +501,9 @@ class ModuleResolver:
 
 
 """
-=head2 IMPLEMENTATION
+IMPLEMENTATION
 
-This module uses a multi-pass option resolving system, in accordance with
+This class uses a multi-pass option resolving system, in accordance with
 the way kde-builder handles options. Consider a simple kdesrc-buildrc:
 
  global
@@ -533,37 +533,34 @@ the way kde-builder handles options. Consider a simple kdesrc-buildrc:
  end options
 
 In this case we'd expect that a module like taglib ends up with its
-C<cmake-options> derived from the global section directly, while all modules
-included from module set C<ms-foo> use the C<cmake-options> defined in the
+``cmake-options`` derived from the global section directly, while all modules
+included from module set ``ms-foo`` use the ``cmake-options`` defined in the
 module-set.
 
 At the same time we'd expect that juk has all the options listed in ms-foo, but
-also the specific C<cxxflags> and C<custom-build-command> options shown,
-I<no matter how> the juk module had been referenced during the build.
+also the specific ``cxxflags`` and ``custom-build-command`` options shown,
+`no matter how` the juk module had been referenced during the build.
 
 There are many ways to convince kde-builder to add a module into its build list:
 
-=over
+1. Mention it directly on the command line.
 
-=item 1. Mention it directly on the command line.
+2. Include it in the kdesrc-buildrc file, either as a new ``module`` block or
+in a ``use-modules`` of a ``module-set``.
 
-=item 2. Include it in the kdesrc-buildrc file, either as a new C<module> block or
-in a C<use-modules> of a C<module-set>.
-
-=item 3. For KDE modules, mention a component of its project path in a
-C<use-modules> declaration within a C<kde-projects>-based module set. E.g. the
+3. For KDE modules, mention a component of its project path in a
+``use-modules`` declaration within a ``kde-projects``-based module set. E.g. the
 "kde/kdemultimedia" entry above, which will pull in the juk module even though
 "juk" is not named directly.
 
-=item 4. For KDE modules, by being a dependency of a module included from a
-C<module-set> where the C<include-dependencies> option is set to C<true>. This
+4. For KDE modules, by being a dependency of a module included from a
+``module-set`` where the ``include-dependencies`` option is set to ``true``. This
 wouldn't apply to juk, but might apply to modules such as phonon. Note that
-"taglib" in this example would B<not> be a dependency of juk according to
+"taglib" in this example would **not** be a dependency of juk according to
 kde-builder (although it is in reality), since taglib is not a KDE module.
 
-=back
 
-This mission of this class is to ensure that, no matter I<how> a module ended
+This mission of this class is to ensure that, no matter `how` a module ended
 up being selected by the user for the build list, that the same options are
 registered into the module, the module uses the same build and scm types, is
 defaulted to the right build phases, etc.
@@ -580,20 +577,20 @@ already present in the known list of modules (or module sets).
 
 Since module sets can cause modules to be defined that are not mentioned
 anywhere within an rc-file, it may be required to completely expand all
-module sets in order to verify that a referenced C<Module> is B<not>
+module sets in order to verify that a referenced :class:`Module` is **not**
 already known.
 
-=head2 OUTPUTS
+OUTPUTS
 
-From the perspective of calling code, the 'outputs' of this module are
-lists of C<Module> objects, in the order they were selected (or mentioned
+From the perspective of calling code, the "outputs" of this module are
+lists of :class:`Module` objects, in the order they were selected (or mentioned
 in the rc-file). See expandModuleSets() and resolveSelectorsIntoModules().
 
 Each object so returned should already have the appropriate options
 included (based on the cmdlineOptions member, which should be constructed
 as the union of rc-file and cmdline options).
 
-Note that dependency resolution is B<not> handled by this module, see
-C<DependencyResolver> for that.
+Note that dependency resolution is **not** handled by this module, see
+:class:`DependencyResolver` for that.
 
 """

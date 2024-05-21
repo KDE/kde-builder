@@ -77,8 +77,8 @@ class Module(OptionsBase):
 
         OptionsBase.__init__(self)
 
-        # If building a BuildContext instead of a ksb::Module, then the context
-        # can't have been setup yet...
+        # If building a BuildContext instead of a `Module`, then the context
+        # can't have been set up yet...
         if self.__class__.__name__ != "BuildContext" and ctx.__class__.__name__ != "BuildContext":
             BuildException.croak_internal(f"Invalid context {ctx}")
 
@@ -201,7 +201,7 @@ class Module(OptionsBase):
         """
         Do note that this returns the *base* path to the source directory,
         without the module name or kde_projects stuff appended. If you want that
-        use subroutine fullpath().
+        use function fullpath().
         """
         return self.getSubdirPath("source-dir")
 
@@ -236,7 +236,7 @@ class Module(OptionsBase):
     def scmType(self) -> str:
         """
         Returns a string describing the scm platform of the given module.
-        Return value: 'git' at this point, as appropriate.
+        Return value: "git" at this point, as appropriate.
         """
         return self.scm().name()
 
@@ -246,7 +246,7 @@ class Module(OptionsBase):
     def buildSystemFromName(self, name: str) -> BuildSystem:
         """
         Returns a new build system object, given the appropriate name.
-        This is a sub-optimal way to fix the problem of allowing users to override
+        This is a suboptimal way to fix the problem of allowing users to override
         the detected build system (we could instead use introspection to figure out
         available build systems at runtime). However, KISS...
         """
@@ -321,22 +321,20 @@ class Module(OptionsBase):
 
     def buildSystemType(self) -> str:
         """
-        Current possible build system types:
-        KDE (i.e. cmake), Qt, autotools (either
-        configure or autogen.sh). A final possibility is 'pendingSource' which
-        simply means that we don't know yet.
-        
-        If the build system type is not set ('pendingSource' counts as being
-        set!) when this function is called then it will be autodetected if
-        possible, but note that not all possible types will be detected this way.
+        Current possible build system types: KDE (i.e. cmake), Qt, autotools (either configure or autogen.sh).
+        A final possibility is "pendingSource" which simply means that we don't know yet.
+
+        If the build system type is not set ("pendingSource" counts as being set!) when this function is called
+        then it will be autodetected if possible, but note that not all possible types will be detected this way.
         If in doubt use setBuildSystemType
         """
         return self.buildSystem().name()
 
     def build(self) -> bool:
         """
-        Subroutine to build this module.
-        Returns boolean false on failure, boolean true on success.
+        Function to build this module.
+        Returns:
+             False on failure, True on success.
         """
         Util.assert_isa(self, Module)
         moduleName = self.name
@@ -381,8 +379,9 @@ class Module(OptionsBase):
 
     def setupBuildSystem(self) -> bool:
         """
-        Subroutine to setup the build system in a directory.
-        Returns boolean true on success, boolean false (0) on failure.
+        Function to set up the build system in a directory.
+        Returns:
+             True on success, False (0) on failure.
         """
         Util.assert_isa(self, Module)
         moduleName = self.name
@@ -443,7 +442,7 @@ class Module(OptionsBase):
 
             # Add undocumented ".refresh-me" file to build directory to flag
             # for --refresh-build for this module on next run. See also the
-            # "needsRefreshed" subroutine.
+            # "needsRefreshed" function.
             if fh := open(".refresh-me", "w"):
                 print("# Build directory will be re-generated next kde-builder run", file=fh)
                 print("# due to failing to complete configuration on the last run", file=fh)
@@ -454,7 +453,8 @@ class Module(OptionsBase):
     def install(self) -> bool:
         """
         Responsible for installing the module (no update, build, etc.)
-        Returns boolean false on failure, boolean true on success.
+        Returns:
+             False on failure, True on success.
         Exceptions may be thrown for abnormal conditions (e.g. no build dir exists)
         """
         Util.assert_isa(self, Module)
@@ -515,8 +515,9 @@ class Module(OptionsBase):
     def uninstall(self) -> bool:
         """
         Handles uninstalling this module
-        
-        Returns boolean false on failure, boolean true on success.
+
+        Returns:
+             False on failure, True on success.
         """
         Util.assert_isa(self, Module)
         builddir = self.fullpath("build")
@@ -549,7 +550,7 @@ class Module(OptionsBase):
 
     def applyUserEnvironment(self) -> None:
         """
-        Integrates 'set-env' option to the build context environment
+        Integrates "set-env" option to the build context environment
         """
         Util.assert_isa(self, Module)
         ctx = self.buildContext()
@@ -617,7 +618,7 @@ class Module(OptionsBase):
     def getLogDir(self) -> str:
         """
         Returns the path to the log directory used during this run for this
-        ksb::Module, based on an autogenerated unique id. The id doesn't change
+        ``Module``, based on an autogenerated unique id. The id doesn't change
         once generated within a single run of the script.
         """
         return self.buildContext().getLogDirFor(self)
@@ -626,7 +627,7 @@ class Module(OptionsBase):
         """
         Returns a full path that can be open()'d to write a log
         file, based on the given basename (with extension).
-        Updates the 'latest' symlink as well, unlike getLogDir
+        Updates the "latest" symlink as well, unlike getLogDir
         Use when you know you're going to create a new log
         """
         return self.buildContext().getLogPathFor(self, path)
@@ -725,7 +726,7 @@ class Module(OptionsBase):
     # @override
     def setOption(self, options: dict) -> None:
         """
-        This calls OptionsBase::setOption and performs any Module-specific
+        This calls :meth:`OptionsBase.setOption` and performs any Module-specific
         handling.
         """
 
@@ -782,28 +783,29 @@ class Module(OptionsBase):
     # @override(check_signature=False)
     def getOption(self, key: str, levelLimit="allow-inherit") -> str | bool | dict | None:
         """
-        This subroutine returns an option value for a given module.  Some globals
+        This function returns an option value for a given module. Some globals
         can't be overridden by a module's choice (but see 2nd parameter below).
         If so, the module's choice will be ignored, and a warning will be issued.
-        
+
         Option names are case-sensitive!
-        
+
         Some options (e.g. cmake-options, configure-flags) have the global value
         and then the module's own value appended together. To get the actual
-        module setting you must use the level limit parameter set to 'module'.
-        
+        module setting you must use the level limit parameter set to "module".
+
         Likewise, some qt module options do not obey the previous proviso since
         Qt options are not likely to agree nicely with generic KDE buildsystem
         options.
-        
-        1st parameter: Name of option
-        2nd parameter: Level limit (optional). If not present, then the value
-        'allow-inherit' is used. Options:
-          - allow-inherit: Module value is used if present (with exceptions),
-            otherwise global is used.
-          - module: Only module value is used (if you want only global then use the
-            buildContext) NOTE: This overrides global "sticky" options as well!
-        
+
+        Parameters:
+            key: Name of option
+            levelLimit: Level limit (optional). If not present, then the value
+                'allow-inherit' is used. Options:
+                  - allow-inherit: Module value is used if present (with exceptions),
+                    otherwise global is used.
+                  - module: Only module value is used (if you want only global then use the
+                    buildContext) NOTE: This overrides global "sticky" options as well!
+
         Returned type - for example used in
           bool - "#guessed-kde-project"
           None - unexisting key in module-only level
@@ -842,23 +844,24 @@ class Module(OptionsBase):
     def getPersistentOption(self, key: str) -> str | int | None:
         """
         Gets persistent options set for this module. First parameter is the name
-        of the option to lookup. Undef is returned if the option is not set,
+        of the option to lookup. None is returned if the option is not set,
         although even if the option is set, the value returned might be empty.
-        Note that ksb::BuildContext also has this function, with a slightly
+        Note that ``BuildContext`` also has this function, with a slightly
         different signature, which OVERRIDEs this function since Perl does not
         have parameter-based method overloading.
-        
-        Return types: the same as BuildContext::getPersistentOption()
+
+        Return types: the same as :meth:`BuildContext.getPersistentOption()`
         """
         return self.buildContext().getPersistentOption(self.name, key)
 
     def setPersistentOption(self, key: str, value) -> None:
         """
         Sets a persistent option (i.e. survives between processes) for this module.
-        First parameter is the name of the persistent option.
-        Second parameter is its actual value.
+        Parameters:
+            key: The name of the persistent option.
+            value: Its actual value.
         See the warning for getPersistentOption above, it also applies for this
-        method vs. ksb::BuildContext::setPersistentOption
+        method vs. :meth:`BuildContext.setPersistentOption`
         """
         return self.buildContext().setPersistentOption(self.name, key, value)
 
@@ -880,9 +883,9 @@ class Module(OptionsBase):
     def fullProjectPath(self) -> str:
         """
         Returns the "full kde-projects path" for the module. As should be obvious by
-        the description, this only works for modules with an scm type that is a
-        Updater::KDEProject (or its subclasses), but modules that don't fall into this
-        hierarchy will just return the module name (with no path components) anyways.
+        the description, this only works for modules with scm type that is a
+        :class:`Updater_KDEProject` (or its subclasses), but modules that don't fall into this
+        hierarchy will just return the module name (with no path components) anyway.
         """
         return self.getOption("#kde-project-path", "module") or self.name
 
@@ -894,9 +897,9 @@ class Module(OptionsBase):
 
     def destDir(self) -> str:
         """
-        Subroutine to return the name of the destination directory for the
-        checkout and build routines.  Based on the dest-dir option.  The return
-        value will be relative to the src/build dir.  The user may use the
+        Function to return the name of the destination directory for the
+        checkout and build routines. Based on the dest-dir option. The return
+        value will be relative to the src/build dir. The user may use the
         '$MODULE' or '${MODULE}' sequences, which will be replaced by the name of
         the module in question.
         """
@@ -925,7 +928,7 @@ class Module(OptionsBase):
 
     def installationPath(self) -> str:
         """
-        Subroutine to return the installation path of a given module (the value
+        Function to return the installation path of a given module (the value
         that is passed to the CMAKE_INSTALL_PREFIX CMake option).
         It is based on the "install-dir" option.
         The user may use '$MODULE' or '${MODULE}' in the "install-dir" option to have
@@ -940,11 +943,11 @@ class Module(OptionsBase):
 
     def getPostBuildMessages(self) -> list:
         """
-        Returns a list of any 'post-build' messages that have been set for the module
+        Returns a list of any "post-build" messages that have been set for the module
         to show after the build has ended. These may be messages such as warning of a
         local source conflict that may have scrolled past or similar things the user
         needs to know about.
-        
+
         Each entry in the list will be a text message that should be shown (perhaps
         with additional formatting).
         """

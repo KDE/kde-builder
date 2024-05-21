@@ -11,7 +11,7 @@ class DebugOrderHints:
     """
     This module is motivated by the desire to help the user debug a kde-builder
     failure more easily. It provides support code to rank build failures on a per
-    module from 'most' to 'least' interesting, as well as to sort the list of
+    module from "most" to "least" interesting, as well as to sort the list of
     (all) failures by their respective rankings. This ranking is determined by
     trying to evaluate whether a given build failure fits a number of
     assumptions/heuristics. E.g.: a module which fails to build is likely to
@@ -23,10 +23,10 @@ class DebugOrderHints:
     def _getPhaseScore(phase: str) -> int:
         """
         Assumption: build & install phases are interesting.
-        Install is particularly interesting because that should 'rarely' fail,
+        Install is particularly interesting because that should "rarely" fail,
         and so if it does there are probably underlying system issues at work.
 
-        Assumption: 'test' is opt in and therefore the user has indicated a
+        Assumption: "test" is opt in and therefore the user has indicated a
         special interest in that particular module?
 
         Assumption: source updates are likely not that interesting due to

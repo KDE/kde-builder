@@ -28,7 +28,7 @@ class PhaseList:
         ::
 
             phases1 = PhaseList() # default phases
-            print("phases are " + phases1.phaselist.join(', '))
+            print("phases are " + phases1.phaselist.join(", "))
 
             phases2 = PhaseList(["update", "test", "install"])
         """

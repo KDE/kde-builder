@@ -94,8 +94,8 @@ class ModuleSet_KDEProjects(ModuleSet):
         to tell that the branch won't be there.  These should be removed later.
 
         Parameters:
-            ctx: The <BuildContext> in use.
-            moduleSearchItem: The search description to expand in ksb::Modules. See
+            ctx: The ``BuildContext`` in use.
+            moduleSearchItem: The search description to expand in ``Module``s. See
                 _projectPathMatchesWildcardSearch for a description of the syntax.
 
         Returns:
@@ -157,7 +157,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        moduleList = []  # module names converted to ksb::Module objects.
+        moduleList = []  # module names converted to `Module` objects.
         foundModules = {}
 
         # Setup default options for each module

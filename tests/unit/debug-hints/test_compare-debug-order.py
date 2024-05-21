@@ -14,7 +14,7 @@ def mock_module(monkeypatch):
         self.count = count
         self.name = name
 
-    # Redefine ksb::Module to stub getPersistentOption() results
+    # Redefine `Module` to stub getPersistentOption() results
     def mock_getPersistentOption(self, option):
         assert option == "failure-count", "only the 'failure-count' should be queried"
         return self.count

@@ -21,8 +21,8 @@ def test_logged_subprocess():
     m = Module(ctx, "test")
 
     assert ctx, "BuildContext setup"
-    assert m, "ksb::Module setup"
-    assert m.name == "test", "ksb::Module has a name"
+    assert m, "Module set up"
+    assert m.name == "test", "Module has a name"
 
     tmp = tempfile.mkdtemp()
     ctx.setOption({"log-dir": f"{tmp}/kde-builder-test"})

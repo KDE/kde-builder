@@ -20,7 +20,7 @@ def mock_module_fullproject(monkeypatch):
     def mock_isKDEProject(self):
         return self.kde
 
-    # Redefine ksb::Module to stub fullProjectPath() results
+    # Redefine `Module` to stub fullProjectPath() results
     def mock_fullProjectPath(self):
         return self.projectPath
 

@@ -16,15 +16,10 @@ from .Util import Util
 logger_logged_cmd = kbLogger.getLogger("logged-command")
 
 """
-=head1 EVENTS
+child_output event is called whenever a line of output is produced in the child.
+Use the ``on`` method to subscribe to the event.
 
-=head2 child_output
-
-This event (see L<Mojo::EventEmitter>, which is a base class of this one) is
-called whenever a line of output is produced in the child.  Use the base
-class's C<on> method to subscribe to the event.
-
-Any subscriptions to this event must be in place before C<start> is called, as
+Any subscriptions to this event must be in place before ``start`` is called, as
 the child will not install a callback for this unless at least one subscriber
 is in place.
 """
@@ -44,13 +39,13 @@ class Util_LoggedSubprocess:
         def announ(mod):
              logger.note(f"g[{mod}] starting update")
 
-        cmd = Util_LoggedSubprocess(
+        cmd = Util_LoggedSubprocess()
          .module(module)           # required
          .log_to(filename)         # required
          .set_command(argRef)      # required
          .chdir_to(builddir)       # optional
          .announcer(announ)  # optional
-        )
+
 
         def child_outp(cmd, line):
             # called in parent!
@@ -285,8 +280,8 @@ class Util_LoggedSubprocess:
     def _sendToParent(queue, data: list):
         """
         Sends the given data to the parent process. Our calling code and this
-        package must share the same single channel (over the 'progress' event
-        supported by Mojolicious). Although we only support handling for the calling
+        package must share the same single channel (over the "progress" event).
+        Although we only support handling for the calling
         code (to send line-by-line output back to the parent), to support future
         expansion we send a dict which we can add different keys to if we need to
         support other use cases.

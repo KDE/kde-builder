@@ -181,7 +181,7 @@ except BuildException as err:
     exit(99)  # if app couldn't be created
 
 except Exception as err:
-    # We encountered some other kind of error that didn't raise a ksb::BuildException
+    # We encountered some other kind of error that didn't raise a `BuildException`
     print(textwrap.dedent(f"""\
     Encountered an error in the execution of the script.
     --> {err}

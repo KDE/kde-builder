@@ -41,7 +41,7 @@ class Module_BranchGroupResolver:
         exist.
         """
 
-        # Using defined-or and still returning undef is on purpose, silences
+        # Using defined-or and still returning None is on purpose, silences
         # warning about use of undefined value.
         return self.groups[module].get(logicalGroup, None)
 

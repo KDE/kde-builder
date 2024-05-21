@@ -49,10 +49,10 @@ class ModuleSet_Qt5(ModuleSet):
     def convertToModules(self, ctx) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
-        available in order to convert this module set to a list of ksb::Module.
-        
-        In our case, we will return ONLY ONE MODULE. That module will handle "sub
-        modules" via the init-repository script so from kde-builder's perspective it
+        available in order to convert this module set to a list of ``Module``.
+
+        In our case, we will return ONLY ONE MODULE. That module will handle
+        "submodules" via the init-repository script so from kde-builder's perspective it
         is handled as a single unit.
         """
         return [self._makeQt5Module(ctx)]

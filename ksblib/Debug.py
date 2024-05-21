@@ -161,7 +161,7 @@ class kbLogger(logging.Logger):
     # from least to most important:
     # debug, info, warning, and error.
     #
-    # You can also use the pretend output subroutine, which is emitted if, and only
+    # You can also use the pretend output function, which is emitted if, and only
     # if pretend mode is enabled.
     #
     # Debug.colorize() is automatically run on the input for all of those

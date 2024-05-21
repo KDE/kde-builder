@@ -167,8 +167,8 @@ class IPC:
 
     def setPersistentOptionHandler(self, handler: Callable) -> None:
         """
-        Used to assign a callback / subroutine to use for updating persistent
-        options based on IPC update messages.  The sub should itself take a
+        Used to assign a callback / function to use for updating persistent
+        options based on IPC update messages. The function should itself take a
         key and value pair.
         """
         self.opt_update_handler = handler

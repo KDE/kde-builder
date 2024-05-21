@@ -10,7 +10,7 @@ from ksblib.Debug import Debug
 
 @pytest.fixture
 def mock_application(monkeypatch):
-    # Redefine ksb::Application::_resolveModuleDependencies to avoid requiring metadata module.
+    # Redefine Application._resolveModuleDependencies to avoid requiring metadata module.
     def mock_resolveModuleDependencyGraph(self, modules: list):
         newModule = self.module_factory("setmod2")
 

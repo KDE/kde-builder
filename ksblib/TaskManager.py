@@ -226,9 +226,9 @@ class TaskManager:
             ctx: Build Context, which is used to determine list of modules to build.
 
         If the packages are not already checked-out and/or updated, this
-        subroutine WILL NOT do so for you.
+        function WILL NOT do so for you.
 
-        This subroutine assumes that the source directory has already been set up.
+        This function assumes that the source directory has already been set up.
         It will create the build directory if it doesn't already exist.
 
         If builddir/module/.refresh-me exists, the function will
@@ -387,7 +387,7 @@ class TaskManager:
 
         Parameters:
             monitorToBuildIPC: IPC Object to use for sending/receiving update/build status. It must be
-                an object type that supports IPC concurrency (e.g. IPC::Pipe).
+                an object type that supports IPC concurrency (e.g. IPC_Pipe).
             ctx: Build Context to use, from which the module lists will be determined.
 
         Returns:

@@ -7,8 +7,8 @@ import os
 from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess  # load early so we can override
 from promise import Promise
 
-# Now we can load ksb::Application, which will load a bunch more modules all
-# using log_command and run_logged_p from ksb::Util
+# Now we can load `Application`, which will load a bunch more modules all
+# using log_command and run_logged_p from `Util`
 from ksblib.Application import Application
 from ksblib.Updater.Git import Updater_Git
 from ksblib.Debug import Debug

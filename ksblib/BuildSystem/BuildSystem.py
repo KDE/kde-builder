@@ -390,10 +390,10 @@ class BuildSystem:
         target and message are required. logbase is required if target is left
         undefined, but otherwise defaults to the same value as target.
 
-        Note that the make command is based on the results of the 'buildCommands'
-        subroutine which should be overridden if necessary by subclasses. Each
+        Note that the make command is based on the results of the "buildCommands"
+        function which should be overridden if necessary by subclasses. Each
         command should be the command name (i.e. no path). The user may override
-        the command used (for build only) by using the 'custom-build-command'
+        the command used (for build only) by using the "custom-build-command"
         option.
 
         The first command name found which resolves to an executable on the

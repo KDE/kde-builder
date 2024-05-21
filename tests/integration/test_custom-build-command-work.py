@@ -14,12 +14,12 @@ from ksblib.Debug import Debug
 def test_build_internal(monkeypatch):
     """
     Ensure that the custom-build-command can at least make it to the
-    $module->buildInternal() portion when no build system can be auto-detected.
+    module.buildInternal() portion when no build system can be auto-detected.
     """
 
     # Mock override
     def mock_update(self, *args, **kwargs):
-        assert str(self) == self.name, "We're a real ksb::Module"
+        assert str(self) == self.name, "We're a real Module"
         assert not self.pretending(), "Test makes no sense if we're pretending"
         return 0  # shell semantics
 

@@ -10,7 +10,7 @@ to implement common functions within :class:`BuildContext`, :class:`Module`, and
 
 There is some internal trickery to ensure that program code can override
 user-selected options in certain situations, which is why we don't simply
-use a dict table directly. These are the so-called 'sticky' options, seen
+use a dict table directly. These are the so-called "sticky" options, seen
 internally as options with a name starting with #.
 
 This class is mostly used to encapsulate common code for handling module and

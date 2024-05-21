@@ -104,7 +104,7 @@ output.
 
 ## Logs and build output
 
-All build commands are logged to a file (see `log_command` in ksb::Util).
+All build commands are logged to a file (see `log_command` in `Util`).
 This is both to declutter the terminal output and to enable troubleshooting
 after a build failure.
 

@@ -60,7 +60,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     def logicalModuleGroups(self) -> dict:
         """
         If JSON support is present, and the metadata has already been downloaded
-        (e.g. with ->updateInternal), returns a dict to the logical module group
+        (e.g. with ``updateInternal``), returns a dict to the logical module group
         data contained within the kde-build-metadata, decoded from its JSON format.
         See https://community.kde.org/Infrastructure/Project_Metadata
         """

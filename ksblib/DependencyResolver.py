@@ -59,7 +59,7 @@ class DependencyResolver:
         # listref of module:branch dependencies.
         self.catchAllDependencies = {}
 
-        # reference to a sub that will properly create a ksb::Module from a
+        # reference to a sub that will properly create a `Module` from a
         # given kde-project module name. Used to support automatically adding
         # dependencies to a build.
         self.moduleFactoryRef = moduleFactoryRef
@@ -67,8 +67,8 @@ class DependencyResolver:
     @staticmethod
     def _shortenModuleName(name) -> str:
         """
-        This method returns the 'short' module name of kde-project full project paths.
-        E.g. 'kde/kdelibs/foo' would be shortened to 'foo'.
+        This method returns the "short" module name of kde-project full project paths.
+        E.g. "kde/kdelibs/foo" would be shortened to "foo".
 
         Parameters:
             name: A string holding the full module virtual path
@@ -196,7 +196,7 @@ class DependencyResolver:
     def readDependencyData_v2(self, fh) -> None:
         """
         Reads in v2-format dependency data from KDE repository database, using the KDE
-        'invent' repository naming convention.
+        "invent" repository naming convention.
 
         Throws exception on read failure.
 

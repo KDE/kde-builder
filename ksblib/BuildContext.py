@@ -49,12 +49,12 @@ class BuildContext(Module):
     the next run, and basically anything else that falls into the category of state
     management.
 
-    The 'global' module
+    The "global" module
 
     One interesting thing about this class is that, as a state-managing class, this
     class implements the role of :class:`Module` for the pseudo-module called
-    'global' throughout the source code (and whose options are defined in the
-    'global' section in the rc-file). It is also a parent to every :class:`Module` in
+    "global" throughout the source code (and whose options are defined in the
+    "global" section in the rc-file). It is also a parent to every :class:`Module` in
     terms of the option hierarchy, serving as a fallback source for :class:`Module`'s
     `getOption()` calls for most (though not all!) options.
 
@@ -120,7 +120,7 @@ class BuildContext(Module):
         }
 
         # These options are exposed as cmdline options, but _not from here_.
-        # Their more complex specifier is made in ksb::Cmdline _supportedOptions().
+        # Their more complex specifier is made in `Cmdline` _supportedOptions().
         self.GlobalOptions_with_extra_specifier = {
             "build-when-unchanged": True,
             "colorful-output": True,
@@ -207,7 +207,7 @@ class BuildContext(Module):
             },
             # Module options are stored under here as well, keyed by module->name()
         }
-        # This one replaces ksb::Module::{phases}
+        # This one replaces `Module` {phases}
         self.phases = PhaseList()
 
         self.errors = {
@@ -274,7 +274,7 @@ class BuildContext(Module):
         """
         Adds a list of modules to ignore processing on completely.
         Parameters should simply be a list of KDE project paths to ignore,
-        e.g. 'extragear/utils/kdesrc-build'. Partial paths are acceptable, matches
+        e.g. "extragear/utils/kdesrc-build". Partial paths are acceptable, matches
         are determined by comparing the path provided to the suffix of the full path
         of modules being compared.  See :meth:`KDEProjectsReader._projectPathMatchesWildcardSearch`.
 
@@ -726,7 +726,7 @@ class BuildContext(Module):
         Searches for a module with a name that matches the provided parameter,
         and returns its :class:`Module` object. Returns None if no match was found.
         As a special-case, returns the BuildContext itself if the name passed is
-        'global', since the BuildContext also is a (in the "is-a" OOP sense)
+        "global", since the BuildContext also is a (in the "is-a" OOP sense)
         :class:`Module`, specifically the 'global' one.
         """
         if moduleName == "global":
@@ -737,7 +737,7 @@ class BuildContext(Module):
             return None
 
         if len(options) > 1:
-            BuildException.croak_internal(f"Detected 2 or more {moduleName} ksb::Module objects")
+            BuildException.croak_internal(f"Detected 2 or more {moduleName} `Module` objects")
         return options[0]
 
     def markModulePhaseFailed(self, phase: str, module: Module) -> None:
@@ -912,7 +912,7 @@ class BuildContext(Module):
         startup), or None if there is no value stored.
 
         Parameters:
-            moduleName: The module name to get the option for, or 'global' if
+            moduleName: The module name to get the option for, or "global" if
                 not for a module.
                 Note that unlike setOption/getOption, no inheritance is done at this
                 point so if an option is present globally but not for a module you
@@ -938,7 +938,7 @@ class BuildContext(Module):
         Clears a persistent option if set (for a given module and option-name).
 
         Parameters:
-            moduleName: The module name to get the option for, or 'global' for
+            moduleName: The module name to get the option for, or "global" for
                 the global options.
             key: The name of the value to clear.
 
@@ -958,7 +958,7 @@ class BuildContext(Module):
         kde-builder starts up and written back out at (normal) program exit.
 
         Parameters:
-            moduleName: The module name to set the option for, or 'global'.
+            moduleName: The module name to set the option for, or "global".
             key: The name of the value to set (i.e. key)
             value: The value to store.
         """

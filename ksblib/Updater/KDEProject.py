@@ -25,7 +25,7 @@ class Updater_KDEProject(Updater_Git):
     def _resolveBranchGroup(self, branchGroup) -> str | None:
         """
         Resolves the requested branch-group for this Updater's module.
-        Returns the required branch name, or undef if none is set.
+        Returns the required branch name, or None if none is set.
         """
 
         module = self.module

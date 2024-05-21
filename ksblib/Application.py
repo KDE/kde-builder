@@ -398,8 +398,8 @@ class Application:
 
     def _downloadKDEProjectMetadata(self) -> None:
         """
-        Causes kde-projects metadata to be downloaded (unless --pretend, --no-src, or
-        --no-metadata is in effect, although we'll download even in --pretend if
+        Causes kde-projects metadata to be downloaded (unless ``--pretend``, ``--no-src``, or
+        ``--no-metadata`` is in effect, although we'll download even in ``--pretend`` if
         nothing is available).
         """
 
@@ -1122,7 +1122,7 @@ class Application:
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
         """
-        Handles the installation process. Simply calls 'make install' in the build
+        Handles the installation process. Simply calls "make install" in the build
         directory, though there is also provision for cleaning the build directory
         afterwards, or stopping immediately if there is a build failure (normally
         every built module is attempted to be installed).
@@ -1151,7 +1151,7 @@ class Application:
     @staticmethod
     def _handle_uninstall(ctx: BuildContext) -> bool:
         """
-        Handles the uninstall process. Simply calls 'make uninstall' in the build
+        Handles the uninstall process. Simply calls "make uninstall" in the build
         directory, while assuming that Qt or CMake actually handles it.
 
         The order of the modules is often significant, and it may work better to
@@ -1404,7 +1404,7 @@ class Application:
 
         Parameters:
             ctx: Build Context
-            message: Message to print (e.g. 'failed to foo')
+            message: Message to print (e.g. "failed to foo")
             fail_list: List of :class:`Module` that had failed to foo
 
         Returns:

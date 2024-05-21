@@ -12,7 +12,7 @@ from ksblib.Debug import Debug
 def mock_app_res_mod_dep_graph(monkeypatch):
     def mock_resolveModuleDependencyGraph(self, modules: list):
         """
-        Redefine ksb::Application::_resolveModuleDependencies to avoid requiring metadata module.
+        Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
         """
         newModule = self.module_factory("setmod2")
 

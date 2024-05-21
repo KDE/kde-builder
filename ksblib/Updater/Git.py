@@ -340,7 +340,7 @@ class Updater_Git(Updater):
     def _setupBestRemote(self) -> Promise:
         """
         Selects a git remote for the user's selected repository (preferring a
-        defined remote if available, using 'origin' otherwise).
+        defined remote if available, using "origin" otherwise).
 
         Assumes the current directory is already set to the source directory.
 
@@ -348,7 +348,7 @@ class Updater_Git(Updater):
             A promise that resolves to the name of the remote (which will be
             setup by kde-builder) to use for updates, or rejects with an error.
 
-        See also the 'repository' module option.
+        See also the "repository" module option.
         """
         Util.assert_isa(self, Updater_Git)
         module = self.module
@@ -515,7 +515,7 @@ class Updater_Git(Updater):
         Parameters:
             commit: The commit to update to. This can be in pretty
                 much any format that git itself will respect (e.g. tag, sha1, etc.).
-                It is recommended to use refs/$foo/$bar syntax for specificity.
+                It is recommended to use refs/foo/bar syntax for specificity.
 
         Returns:
              A promise resolving to a boolean success flag.
@@ -602,7 +602,7 @@ class Updater_Git(Updater):
         """
         Tries to determine the best remote branch name to use as a default if the
         user hasn't selected one, by resolving the remote symbolic ref "HEAD" from
-        its entry in the .git dir.  This can also be found by introspecting the
+        its entry in the .git dir. This can also be found by introspecting the
         output of "git remote show $REMOTE_NAME" or "git branch -r" but these are
         incredibly slow.
         """
@@ -629,7 +629,7 @@ class Updater_Git(Updater):
         Goes through all the various combination of git checkout selection options in
         various orders of priority.
 
-        Returns a *list* containing: (the resultant symbolic ref/or SHA1,'branch' or
+        Returns a *list* containing: (the resultant symbolic ref/or SHA1,"branch" or
         'tag' (to determine if something like git-pull would be suitable or whether
         you have a detached HEAD)). Since the sym-ref is returned first that should
         be what you get in a scalar context, if that's all you want.
@@ -738,7 +738,7 @@ class Updater_Git(Updater):
         Finally, if changes were stashed, they are applied and the stash stack is
         popped.
 
-        It is assumed that the required remote has been setup already, that we
+        It is assumed that the required remote has been set up already, that we
         are on the right branch, and that we are already in the correct
         directory.
 
@@ -852,7 +852,7 @@ class Updater_Git(Updater):
         This function finds an existing remote-tracking branch name for the
         given repository's named remote. For instance if the user was using the
         local remote-tracking branch called "qt-stable" to track kde-qt's master
-        branch, this subroutine would return the branchname "qt-stable" when
+        branch, this function would return the branchname "qt-stable" when
         passed kde-qt and "master".
 
         The current directory must be the source directory of the git module.
@@ -892,7 +892,7 @@ class Updater_Git(Updater):
         """
         Filter for bestRemoteName to determine if a given remote name and url looks
         like a plausible prior existing remote for a given configured repository URL.
-        
+
         Note that the actual repository fetch URL is not necessarily the same as the
         configured (expected) fetch URL: an upstream might have moved, or kde-builder
         configuration might have been updated to the same effect.
@@ -914,7 +914,7 @@ class Updater_Git(Updater):
         99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
         should try to utilize when doing checkouts for instance. To aid in this,
-        this subroutine returns a list of all remote aliased matching the
+        this function returns a list of all remote aliased matching the
         supplied repository (besides the internal alias that is).
 
         Assumes that we are already in the proper source directory.
@@ -972,7 +972,7 @@ class Updater_Git(Updater):
           remote!) based on the repository.git part of the URI.
 
         As with nearly all git support functions, we should be running in the
-        source directory of the git module.  Don't call this function unless
+        source directory of the git module. Don't call this function unless
         you've already checked that a suitable remote-tracking branch doesn't
         exist.
 

@@ -1,14 +1,14 @@
-# ksb::Module
+# Module
 
 ## DESCRIPTION
 
-This is ksb::Module, one of the core classes within kde-builder. It represents
+This is `Module`, one of the core classes within kde-builder. It represents
 any single "buildable" module that kde-builder can manage. It acts as a common
 interface to the multiple types of build systems and source control management
 systems that kde-builder supports.
 
 The many options available to the user are managed using setOption/getOption
-(but see also the ksb::OptionsBase class that this derives from).
+(but see also the `OptionsBase` class that this derives from).
 
 kde-builder manages persistent metadata for each module as well, see
 {set,get}PersistentOption
@@ -23,18 +23,18 @@ the source code itself for more detail.
 These functions are used to integrate into the Perl runtime or for use from
 other Perl modules.
 
-* ``new``, creates a new ksb::Module, and sets any provided options.
+* ``new``, creates a new `Module`, and sets any provided options.
 
 * ``toString``, for "stringifying" a module into a quoted string.
 
-* ``compare``, for sorting ksb::Modules amongst each other based on name.
+* ``compare``, for sorting `Module`s amongst each other based on name.
 
 ### CONFIGURATION
 
-These functions are used to configure what the ksb::Module object should do,
+These functions are used to configure what the `Module` object should do,
 change settings, etc.
 
-* ``setModuleSet``, optional, specifies the ksb::ModuleSet this module was
+* ``setModuleSet``, optional, specifies the `ModuleSet` this module was
   spawned from.
 
 * ``setScmType``, sets the source control plugin (git, kde-projects) based
@@ -45,7 +45,7 @@ change settings, etc.
   build system plugin. This is exposed to the user as *override-build-system*.
 
 * ``setBuildSystem``, like ``buildSystemFromName``, but passes the proper
-  ksb::BuildSystem directly.
+  `BuildSystem` directly.
 
 * ``setOption``, sets a configuration option that can be checked later using
   getOption.  Normally set from user input (cmdline or rc-file) but supports
@@ -68,31 +68,31 @@ object.
 * ``name``, returns the module name. Only one module with a given name can be
   present during a build.
 
-* ``buildContext``, returns the ksb::BuildContext (as set when the object
+* ``buildContext``, returns the `BuildContext` (as set when the object
   was constructed)
 
 * ``phases``, returns the list of execution phases (update, buildsystem, test,
   etc.) that apply to this module in this execution.
 
-* ``moduleSet``, returns the ksb::ModuleSet that was assigned earlier as the
+* ``moduleSet``, returns the `ModuleSet` that was assigned earlier as the
   source set. If no module set was assigned, returns a valid (but null) set.
 
 #### PLUGIN HANDLERS
 
 * ``scm``, **autodetects** the appropriate scm plugin if not already done (or
-  manually set), and then returns the ksb::Updater plugin.
+  manually set), and then returns the `Updater` plugin.
 
 * ``buildSystem``, **autodetects** the appropriate build system plugin if not
   already done (or manually set) and then returns the
-  ksb::BuildSystem|ksb/BuildSystem.pm plugin.
+  `BuildSystem` ksb/BuildSystem.pm plugin.
 
 * ``scmType``, returns the **name** of the scm plugin (as determined by
-  scm(), which can itself cause an autodetection pass.
+  scm(), which can itself cause an autodetection pass).
 
 * ``buildSystemType``, returns the **name** of the build system plugin (as
-  determined by buildSystem(), which can itself cause an autodetection pass.
+  determined by buildSystem(), which can itself cause an autodetection pass).
 
-* ``currentScmRevision``, returns a string with an scm-specific revision ID.
+* ``currentScmRevision``, returns a string with scm-specific revision ID.
   Can be a Git-style SHA or something else entirely.
   Can case an autodetection of the scm plugin.
 
@@ -146,7 +146,7 @@ just from the method name, sadly.
 
   * accepts an option name, normally as set in the rc-file. Can also accept a
     second parameter 'module', to prevent falling back to a global option.
-    However doing this also permits ``undef`` to be returned so you must check
+    However, doing this also permits ``None`` to be returned, so you must check
     whether the result is defined.
 
   * Options starting with '#' can only be set internally (i.e. not from rc-file
@@ -173,8 +173,8 @@ just from the method name, sadly.
 
 * ``isKDEProject``, returns true if the module was sourced from the special
   ``kde-projects`` module set in the user's rc-file. In this case the module's
-  ``moduleSet()`` function should return a ksb::ModuleSet that is-a
-  ksb::ModuleSet::KDEProjects.
+  ``moduleSet()`` function should return a `ModuleSet` that is-a
+  `ModuleSet_KDEProjects`.
 
 ### OPERATIONS
 
@@ -203,7 +203,7 @@ just from the method name, sadly.
 * ``applyUserEnvironment``, this adds ``set-env`` module-specific environment
   variable settings into the module's build context, called by
   ``setupEnvironment``. This is needed since $ENV is not actually updated by
-  ksb::BuildContext until after a new child process is ``fork``'ed.
+  `BuildContext` until after a new child process is ``fork``'ed.
 
 * ``setupEnvironment``, called by the kde-builder build driver, running in a
   subprocess, before calling the appropriate update/build/install etc. method.

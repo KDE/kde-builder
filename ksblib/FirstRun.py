@@ -51,7 +51,7 @@ class FirstRun:
                 Application(["--metadata-only", "--metadata-only"])  # invokes _downloadKDEProjectMetadata internally
                 # We use a hack to catch exactly this command line to make the app not exit. This way we do not influence the normal behavior, and we
                 # do not create a normal instance of Application, because it will create a lockfile.
-                # todo remove this hack after moving takeLock to another place before actual work from the Application::new
+                # todo remove this hack after moving takeLock to another place before actual work from the Application.__init__
 
                 metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
                 self._installSystemPackages(metadata_distro_deps_path)

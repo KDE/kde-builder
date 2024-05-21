@@ -12,8 +12,8 @@ def test_cmdline_selector_not_eaten():
     Checks that we don't inadvertently eat non-option arguments in cmdline
     processing, which happened with some cmdline options that were inadvertently
     handled both directly in _readCommandLineOptionsAndSelectors and indirectly
-    via being in ksb::BuildContext::defaultGlobalFlags)
-    
+    via being in BuildContext default Global Flags
+
     See bug 402509 -- https://bugs.kde.org/show_bug.cgi?id=402509
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --stop-on-failure setmod3".split(" ")

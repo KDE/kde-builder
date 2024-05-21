@@ -11,7 +11,7 @@ from typing import NoReturn
 
 class BuildException(Exception):
     """
-    A class to wrap 'exception' messages for the script, allowing them to be
+    A class to wrap "exception" messages for the script, allowing them to be
     dispatch based on type and automatically stringified.
     """
 
@@ -33,11 +33,11 @@ class BuildException(Exception):
     @staticmethod
     def make_exception(exception_type: str, msg: str, levels=None):
         """
-        Returns an exception object to pass to 'raise' function
+        Returns an exception object to pass to "raise" function
         The returned object will be an instance of :class:`BuildException`.
 
         Parameters:
-            exception_type: Exception type, 'Exception' if not defined.
+            exception_type: Exception type, "Exception" if not defined.
             msg: Message to show to user
             levels: Number of levels to remove from backtrace.
         """

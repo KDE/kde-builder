@@ -36,8 +36,8 @@ class ModuleSet(OptionsBase):
     1. A dict of options to set for each module read into this module set.
     2. A list of module search declarations to be used to construct modules for
     this module set (in the case of kde-projects repository). For other
-    repository types we can still consider it a 'search', but with the
-    understanding that it's a 1:1 mapping to the 'found' module (which may not
+    repository types we can still consider it a "search", but with the
+    understanding that it's a 1:1 mapping to the "found" module (which may not
     exist for real).
     3. A list of module search declarations to *ignore* from this module set,
     using the same syntax as used to search for them in 2. This is only really
@@ -74,7 +74,7 @@ class ModuleSet(OptionsBase):
 
     def phases(self):
         """
-        Just returns a reference to the existing PhaseList, there's no way to
+        Just returns the existing PhaseList, there's no way to
         replace this, though you can alter the underlying phases through the
         PhaseList object itself.
         """
@@ -106,7 +106,7 @@ class ModuleSet(OptionsBase):
 
     def _initializeNewModule(self, newModule: Module) -> None:
         """
-        Should be called for each new ksb::Module created in order to set up common
+        Should be called for each new ``Module`` created in order to set up common
         module options.
         """
         newModule.setModuleSet(self)
@@ -160,7 +160,7 @@ class ModuleSet(OptionsBase):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        moduleList = []  # module names converted to ksb::Module objects.
+        moduleList = []  # module names converted to `Module` objects.
         optionsRef = self.options
 
         # Note: This returns a hashref, not a string.
@@ -169,7 +169,7 @@ class ModuleSet(OptionsBase):
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no 'search' or 'ignore' to
-        # handle, just create ksb::Module and dump options into them.
+        # handle, just create `Module` and dump options into them.
         for moduleItem in self.modulesToFind():
             moduleName = moduleItem
             moduleName = re.sub(r"\.git$", "", moduleName)

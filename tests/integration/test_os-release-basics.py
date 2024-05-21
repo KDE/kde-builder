@@ -8,7 +8,7 @@ from ksblib.OSSupport import OSSupport
 
 def test_ossupport():
     """
-    Test ksb::OSSupport
+    Test OSSupport
     """
     # Unit test of _readOSRelease
     kvPairs = OSSupport._readOSRelease("tests/integration/fixtures/os-release")

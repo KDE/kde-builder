@@ -34,7 +34,7 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
         sourcedir = module.fullpath("source")
         installdir = module.installationPath()
 
-        # 'module'-limited option grabbing can return undef, so use //
+        # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
         bootstrapOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
 

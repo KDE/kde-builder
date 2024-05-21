@@ -52,17 +52,17 @@ class OSSupport:
     def vendorID(self) -> str:
         """
         Returns the vendor ID from the `os-release` specification, or
-        'unknown' if /etc/os-release could not be read.
+        "unknown" if /etc/os-release could not be read.
         ::
 
-            vendor = os.vendorID  # 'gentoo', 'debian', etc.
+            vendor = os.vendorID  # "gentoo", "debian", etc.
         N.B., this is **not the same as the operating system**!
         """
         return self.ID or "unknown"
 
     def vendorVersion(self) -> str:
         """
-            vendor = os.vendorVersion  # 'xenial', '17', etc.
+            vendor = os.vendorVersion  # "xenial", "17", etc.
 
         Returns the vendor Version from the `os-release` specification.
         The first available value from `VERSION_ID` and then

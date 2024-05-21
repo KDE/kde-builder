@@ -28,10 +28,10 @@ class StartProgram:
 
         EXAMPLES
 
-        Launch kate in a new session with '-l 5 file1.txt' arguments.
+        Launch kate in a new session with "-l 5 file1.txt" arguments.
             kde-builder --run -f kate -l 5 file1.txt
 
-        Launch kate-syntax-highlighter of module kate with '--list-themes' argument.
+        Launch kate-syntax-highlighter of module kate with "--list-themes" argument.
             kde-builder-launch -e kate-syntax-highlighter kate --list-themes
         """
 

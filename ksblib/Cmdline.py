@@ -81,22 +81,22 @@ class Cmdline:
                     },
                     ...
                 },
-                "phases": ['update', 'build', ..., 'install'],
-                "run_mode": 'build', # or 'install', 'uninstall', or 'query'
+                "phases": ["update", "build", ..., "install"],
+                "run_mode": "build", # or "install", "uninstall", or "query"
                 "selectors": [
-                    'juk',
-                    'frameworks-set',
+                    "juk",
+                    "frameworks-set",
                     # etc.  MAY BE EMPTY in which case the command should build everything known
                 ],
                 "ignore-modules": [
-                    'plasma-nm',
-                    'plasma-mobile',
+                    "plasma-nm",
+                    "plasma-mobile",
                     # etc.  MAY BE EMPTY in which case no modules should be stripped from a module-set
                 ],
                 "start-program": [
-                    'cmd',
-                    '--opt1',
-                    'value',
+                    "cmd",
+                    "--opt1",
+                    "value",
                     # etc.  USUALLY EMPTY
                 ],
             }
@@ -524,14 +524,14 @@ class Cmdline:
         exit()
 
     phase_changing_options = [
-        'build-only',
-        'install-only',
-        'no-build',
-        'no-install',
-        'no-src|S',
-        'no-tests',
-        'src-only|s',
-        'uninstall',
+        "build-only",
+        "install-only",
+        "no-build",
+        "no-install",
+        "no-src|S",
+        "no-tests",
+        "src-only|s",
+        "uninstall",
     ]
 
     @staticmethod
@@ -572,8 +572,8 @@ class Cmdline:
         ]
 
         options_converted_to_canonical = [
-            "d",  # --include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
-            "D",  # --no-include-dependencies, which is already pulled in via ksb::BuildContext::defaultGlobalFlags
+            "d",  # --include-dependencies, which is already pulled in via `BuildContext` default Global Flags
+            "D",  # --no-include-dependencies, which is already pulled in via `BuildContext` default Global Flags
         ]
 
         # For now, place the options we specified above
