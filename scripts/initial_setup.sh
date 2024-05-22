@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
-# SPDX-FileCopyrightText: 2024 KDE Contributors (see git history) <community@kde.org>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -10,16 +9,16 @@
 set -eE  # exit on error, errtrace to still be able to trap errors
 
 
-Color_Off='\033[0m'       # Text Reset
-Red='\033[0;31m'          # Red
-Yellow='\033[0;33m'       # Yellow
-Green='\033[0;32m'        # Green
+Color_Off="\033[0m"       # Text Reset
+Red="\033[0;31m"          # Red
+Yellow="\033[0;33m"       # Yellow
+Green="\033[0;32m"        # Green
 
 
 err_report() {
   echo -e "${Red}Exited on error at line $(caller).${Color_Off}"
 }
-trap 'err_report' ERR  # When error happens, this function will run automatically before exit.
+trap "err_report" ERR  # When error happens, this function will run automatically before exit.
 
 install_runtime_packages() {
   echo "Installing runtime packages"
@@ -120,7 +119,9 @@ make_symlink_in_bin_path() {
 
 install_icon_and_desktop_file() {
   echo "Installing icon and desktop file"
+  mkdir -p ~/.local/share/icons
   cp -v ~/.local/share/kde-builder/logo.png ~/.local/share/icons/kde-builder.png
+  mkdir -p ~/.local/share/applications
   cp -v ~/.local/share/kde-builder/data/kde-builder.desktop.in ~/.local/share/applications/kde-builder.desktop
 }
 
@@ -158,7 +159,6 @@ install_icon_and_desktop_file
 ensure_kde_builder_launches
 
 # todo:
-# Install rendered documentation for KHelpCenter
 # Install zsh completions
 # Install kate syntax highlighter for kdesrc-buildrc
 
