@@ -244,6 +244,9 @@ class TaskManager:
         if not modules:
             return 0
 
+        if ctx.getOption("refresh-build-first"):
+            modules[0].setOption({"refresh-build": True})
+
         # IPC queue should have a message saying whether or not to bother with the
         # build.
         ipc.waitForStreamStart()

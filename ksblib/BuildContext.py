@@ -191,6 +191,7 @@ class BuildContext(Module):
         self.GlobalOptions_without_parameter = {
             "build-system-only": "",
             "reconfigure": "",
+            "refresh-build-first": "",
             "metadata-only": "",
         }
 

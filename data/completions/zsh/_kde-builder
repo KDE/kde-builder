@@ -72,9 +72,11 @@ _arguments \
   "--rc-file""[Read configuration from filename instead of default]"":::_files" \
   "--rebuild-failures""[Only those modules which failed to build on a previous run.]" \
   "--reconfigure""[Run cmake or configure again, without cleaning the build directory]" \
+  "--refresh-build-first" \
   "(--refresh-build -r)"{--refresh-build,-r}"[Start the build from scratch]" \
   "--remove-after-install""[Delete the source and/or build directory after the module is successfully installed]"":argument:" \
   "--resume""[Resume after a build failure]" \
+  "(--resume-refresh-build-first -R)"{--resume-refresh-build-first,-R} \
   "--revision""[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the modules with support for running their test suite]" \
   "--set-module-option-value""[Override an option in your configuration file for a specific module]"":argument:" \

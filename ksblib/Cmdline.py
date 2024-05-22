@@ -292,7 +292,7 @@ class Cmdline:
             # Set pretend mode but also force the build process to run.
             auxOptions["pretend"] = True
             foundOptions["build-when-unchanged"] = True
-        if args.resume:
+        if args.resume or args.resume_refresh_build_first:
             auxOptions["resume"] = True
             phases.filterOutPhase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
@@ -375,6 +375,9 @@ class Cmdline:
 
         if args.refresh_build:
             foundOptions["refresh-build"] = True
+
+        if args.refresh_build_first or args.resume_refresh_build_first:
+            foundOptions["refresh-build-first"] = True
 
         if args.resume_after is not None:
             foundOptions["resume-after"] = args.resume_after[0]
@@ -560,6 +563,7 @@ class Cmdline:
             "resume",
             "resume-after|after|a=s",
             "resume-from|from|f=s",
+            "resume-refresh-build-first|R",
             "set-module-option-value=s",
             "show-info",
             "show-options-specifiers",

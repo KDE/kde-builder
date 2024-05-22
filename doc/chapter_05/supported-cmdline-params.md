@@ -165,6 +165,13 @@ missing dependency causes the build failure. Once you correct the error
 you can quickly get back into building the modules you were building
 before, without fiddling with `--resume-from` and `--stop-before`.
 
+(cmdline-resume-refresh-build-first)=
+[`--resume-refresh-build-first`](cmdline-resume-refresh-build-first) (or `-R`)  
+This option is an alias for using `--resume` and `--refresh-build-first` at the same time.
+It is convenient to use when some module failed to build, and you want to refresh build it,
+and then continue (re-)building modules after that one, as if it was built successfully in
+the first place.
+
 (cmdline-stop-before)=
 [`--stop-before`](cmdline-stop-before) (or `--until`) \<module\>  
 This option is used to stop the normal build process just *before* a
@@ -377,6 +384,11 @@ existing temporary or intermediate output files. Use this option if you
 have problems getting a module to build but realize it will take longer
 (possibly much longer) for the build to complete as a result. When in
 doubt use this option for the entire `kde-builder` run.
+
+(cmdline-refresh-build-first)=
+[`--refresh-build-first`](cmdline-refresh-build-first)  
+Enables the `refresh-build` option for the first module appeared in final modules list to build.
+Useful in conjunction with `--resume`. See also [`--resume-refresh-build-first`](#cmdline-resume-refresh-build-first).
 
 (cmdline-reconfigure)=
 [`--reconfigure`](cmdline-reconfigure)  
