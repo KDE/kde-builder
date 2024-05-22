@@ -115,20 +115,7 @@ class Cmdline:
             "start-program": [],
         }
 
-        # Perl original comment:
-        # Getopt::Long will store options in %foundOptions, since that is what we
-        # pass in. To allow for custom subroutines to handle an option it is
-        # required that the sub *also* be in %foundOptions... whereupon it will
-        # promptly be overwritten if we're not careful. Instead, we let the custom
-        # subs save to %auxOptions, and read those in back over it later.
-
-        # pl2py: In perl original kdesrc-build, foundOptions is a hash (dict in python terms) that stores {"option_name": func_def_to_run_if_has_that_option_in_cmd, ...}.
-        # But it _also_ stores some {"option_name": value}, i.e. not a function. After the parser (GetOptionsFromArray) worked, they delete entries which values are functions.
-        # Some strange ugly solution in perl. We do not need that, so we only store values for option_names there.
-        # But I (Andrew Shark) keep the variable name similar to perl's, to make transition to python implementation easier.
-        # Todo After we drop perl version, we probably will write only to auxOptions, and drop foundOptions.
         foundOptions = {}
-        auxOptions = {}
 
         parser = argparse.ArgumentParser(add_help=False)
 
@@ -139,9 +126,9 @@ class Cmdline:
             if True:  # if f"--{key}" not in already_added_parser_args:  # keep this for a while, in case I need that again.
 
                 if key == "async":  # as async is reserved word in python, we use such way to access it
-                    flag_handlers += textwrap.dedent(f"""\
+                    flag_handlers += textwrap.dedent("""\
                         if vars(args)["async"] is not None:
-                            auxOptions["async"] = vars(args)["async"]
+                            foundOptions["async"] = vars(args)["async"]
                         """)
                     continue
 
@@ -149,9 +136,8 @@ class Cmdline:
 
                 flag_handlers += textwrap.dedent(f"""\
                 if args.{optName} is not None:
-                    auxOptions[\"{key}\"] = args.{optName}
-                """)  # pl2py: initially in perl, it was added to foundOptions, assigned $flagHandler, and then the items with assigned code
-                # are filtered from foundOptions (to readOptionNames). So we skip all this and do the final result (put to auxOptions) in the first place.
+                    foundOptions[\"{key}\"] = args.{optName}
+                """)
 
         # Similar procedure for global options (they require one argument)
         global_opts_handler = ""
@@ -161,7 +147,7 @@ class Cmdline:
             global_opts_handler += textwrap.dedent(f"""\
             if args.{optName}:
                 foundOptions[\"{key}\"] = args.{optName}[0]
-            """)  # pl2py: in perl original, cmd opts from global opts list are putted to foundOptions by GetOptionsFromArray. But for us in python, there is no difference where to put (foundOptions or auxOptions)
+            """)
 
         # build options for Getopt::Long
         supportedOptions = Cmdline._supportedOptions()
@@ -250,9 +236,9 @@ class Cmdline:
         if args.help:
             self._showHelpAndExit()
         if args.d:
-            auxOptions["include-dependencies"] = True
+            foundOptions["include-dependencies"] = True
         if args.D:
-            auxOptions["include-dependencies"] = False
+            foundOptions["include-dependencies"] = False
         if args.uninstall:
             opts["run_mode"] = "uninstall"
             phases.phases(["uninstall"])
@@ -276,7 +262,7 @@ class Cmdline:
             opts["run_mode"] = "install"
             phases.phases(["install"])
         if args.install_dir:
-            auxOptions["install-dir"] = args.install_dir[0]
+            foundOptions["install-dir"] = args.install_dir[0]
             foundOptions["reconfigure"] = True
         if args.query:
             arg = args.query[0]
@@ -286,21 +272,21 @@ class Cmdline:
                 raise ValueError(f"Invalid query mode {arg}")
 
             opts["run_mode"] = "query"
-            auxOptions["query"] = arg
-            auxOptions["pretend"] = True  # Implied pretend mode
+            foundOptions["query"] = arg
+            foundOptions["pretend"] = True  # Implied pretend mode
         if args.pretend:
             # Set pretend mode but also force the build process to run.
-            auxOptions["pretend"] = True
+            foundOptions["pretend"] = True
             foundOptions["build-when-unchanged"] = True
         if args.resume or args.resume_refresh_build_first:
-            auxOptions["resume"] = True
+            foundOptions["resume"] = True
             phases.filterOutPhase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
             # Imply --no-include-dependencies, because when resuming, user wants to continue from exact same modules list
             # as saved in global persistent option "resume-list". Otherwise, some dependencies that have already passed the build successfully,
             # (i.e. those that were before the first item of resume list) may appear in modules list again (if some module from the
             # resume list requires such modules).
-            auxOptions["include-dependencies"] = False
+            foundOptions["include-dependencies"] = False
 
         # Hack to set module options
         if args.set_module_option_value:
@@ -480,16 +466,7 @@ class Cmdline:
 
         # </editor-fold desc="all other args handlers">
 
-        # pl2py: Original perl comment:
-        # To store the values we found, need to strip out the values that are
-        # subroutines, as those are the ones we created. Alternately, place the
-        # subs inline as an argument to the appropriate option in the
-        # GetOptionsFromArray call above, but that's ugly too.
-        # pl2py: Note: in Python we do not need this ugly perl hacks. We do not store functions there. But still will do for now, to replicate perl original.
-        readOptionNames = [option for option in foundOptions.keys() if not callable(foundOptions[option])]  # todo After the project will replace kdesrc-build, clean this.
-
-        opts["opts"]["global"].update({option: foundOptions[option] for option in readOptionNames})  # In other words, it is the same as update from foundOptions itself.
-        opts["opts"]["global"].update(auxOptions)
+        opts["opts"]["global"].update(foundOptions)
         opts["phases"] = phases.phases()
         return opts
 
