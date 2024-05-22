@@ -3,15 +3,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import os
 import re
 import argparse
 import textwrap
-import __main__
 from typing import NoReturn
 
 from .BuildContext import BuildContext
-from .Debug import Debug, kbLogger
+from .Debug import kbLogger
 from .PhaseList import PhaseList
 from .OSSupport import OSSupport
 from .Version import Version
@@ -47,7 +45,7 @@ class Cmdline:
         # ... let's build
         for module in module_list:
         # override module options from rc-file
-        module.setOption(**opts["opts"][module.name()])
+        module.setOption(**opts["opts"][module.name])
 
     At the command line, the user can specify things like:
         * Modules or module-sets to build (by name)
@@ -105,7 +103,6 @@ class Cmdline:
         program entirely.
         """
         phases = PhaseList()
-        savedOptions = options  # Copied for use in debugging.
         opts = {
             "opts": {"global": {}},
             "phases": [],
@@ -114,30 +111,26 @@ class Cmdline:
             "ignore-modules": [],
             "start-program": [],
         }
-
         foundOptions = {}
 
         parser = argparse.ArgumentParser(add_help=False)
 
-        # Handle any "cmdline-eligible" options not already covered.
-        flag_handlers = ""  # will create a code as a string, containing functions to be run for flag options
-        # already_added_parser_args = list(parser._option_string_actions.keys())  # read from protected attribute from argparse (to replicate the perl kdesrc-build flow) ;( # I add them dynamically in string_of_parser_add_arguments
+        # Create a code as a string, containing functions to be run for flag options
+        flag_handlers = ""
         for key in BuildContext().GlobalOptions_with_negatable_form.keys():
-            if True:  # if f"--{key}" not in already_added_parser_args:  # keep this for a while, in case I need that again.
+            if key == "async":  # as async is reserved word in python, we use such way to access it
+                flag_handlers += textwrap.dedent("""\
+                    if vars(args)["async"] is not None:
+                        foundOptions["async"] = vars(args)["async"]
+                    """)
+                continue
 
-                if key == "async":  # as async is reserved word in python, we use such way to access it
-                    flag_handlers += textwrap.dedent("""\
-                        if vars(args)["async"] is not None:
-                            foundOptions["async"] = vars(args)["async"]
-                        """)
-                    continue
+            optName = key.replace("-", "_")
 
-                optName = key.replace("-", "_")
-
-                flag_handlers += textwrap.dedent(f"""\
-                if args.{optName} is not None:
-                    foundOptions[\"{key}\"] = args.{optName}
-                """)
+            flag_handlers += textwrap.dedent(f"""\
+            if args.{optName} is not None:
+                foundOptions[\"{key}\"] = args.{optName}
+            """)
 
         # Similar procedure for global options (they require one argument)
         global_opts_handler = ""
@@ -149,7 +142,6 @@ class Cmdline:
                 foundOptions[\"{key}\"] = args.{optName}[0]
             """)
 
-        # build options for Getopt::Long
         supportedOptions = Cmdline._supportedOptions()
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
@@ -313,10 +305,6 @@ class Cmdline:
                 del foundOptions[key]
 
         # <editor-fold desc="all other args handlers">
-        # pl2py: The options in perl which do not have some sub assigned to them in %foundOptions, are _added_ to %foundOptions hash
-        # by `GetOptionsFromArray(\@options, \%foundOptions, @supportedOptions, "<>")` when `@options` contain some option that is in `@supportedOptions`.
-        # So we replicate this manually.
-
         if args.build_system_only:
             foundOptions["build-system-only"] = True
 
@@ -478,13 +466,12 @@ class Cmdline:
 
     @staticmethod
     def _showHelpAndExit() -> NoReturn:
-        print(textwrap.dedent(f"""\
-        This script automates the download, build, and install process for KDE software using the latest available source code.
-        
-        Documentation at https://docs.kde.org/?application=kdesrc-build
-            Commonly used command line options:             https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/cmdline.html#cmdline-commonly-used-options
-            Supported command-line parameters:              https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/supported-cmdline-params.html
-            Table of available configuration options:       https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html
+        print(textwrap.dedent("""\
+        KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
+
+        Documentation: https://kde-builder.kde.org
+            Supported command-line parameters:              https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html
+            Table of available configuration options:       https://kde-builder.kde.org/en/chapter_04/conf-options-table.html
         """))
         exit()
 
@@ -501,7 +488,7 @@ class Cmdline:
     def _showOptionsSpecifiersAndExit() -> NoReturn:
         supportedOptions = Cmdline._supportedOptions()
 
-        # The initial setup options are handled outside of Cmdline (in the starting script).
+        # The initial setup options are handled outside the Cmdline (in the starting script).
         initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
 
         for option in [*supportedOptions, *initial_options, "debug"]:
@@ -589,7 +576,7 @@ class Cmdline:
         # Now, place the rest of the options, that have specifier dependent on group
         options.extend([
             *[f"{key}!" for key in BuildContext().GlobalOptions_with_negatable_form],
-            *[f"{key}=s" for key in BuildContext().GlobalOptions_with_parameter],  # https://invent.kde.org/ashark/kdesrc-build/-/commit/86e42d8f5bc9aae4fd6e57682300a495e3f579c4#note_843319
+            *[f"{key}=s" for key in BuildContext().GlobalOptions_with_parameter],
             *[f"{key}" for key in BuildContext().GlobalOptions_without_parameter]
         ])
 
