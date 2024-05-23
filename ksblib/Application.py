@@ -10,6 +10,7 @@ import atexit
 import glob
 import os
 import shutil
+import subprocess
 import sys
 import textwrap
 import re
@@ -639,9 +640,8 @@ class Application:
             # --rebuild-failures
             ctx.setPersistentOption("global", "last-failed-module-list", failedModules)
 
-        # env driver is just the ~/.config/kde-env-*.sh, session driver is that + ~/.xsession
-        if ctx.getOption("install-environment-driver") or ctx.getOption("install-session-driver"):
-            Application._installCustomSessionDriver(ctx)
+        if ctx.getOption("install-login-session") and not Debug().pretending():
+            self.install_login_session()
 
         # Check for post-build messages and list them here
         for m in modules:
@@ -894,6 +894,10 @@ class Application:
             elif option not in all_possible_options:
                 if option == "git-desired-protocol":  # todo This message is temporary. Remove it after 19.07.2024.
                     logger_app.error("y[Please edit your config. Replace \"r[git-desired-protocol]y[\" with \"g[git-push-protocol]y[\".")
+                if option == "install-session-driver":  # todo This message is temporary. Remove it after 24.08.2024.
+                    logger_app.error("y[Please edit your config. Replace \"r[install-session-driver]y[\" with \"g[install-login-session]y[\".")
+                if option == "install-environment-driver":  # todo This message is temporary. Remove it after 24.08.2024.
+                    logger_app.error("y[Please edit your config. Replace \"r[install-environment-driver]y[\" with \"g[install-login-session]y[\".")
                 raise BuildException_Config(option, f"Unrecognized option \"{option}\" found at {current_file}:{fileReader.currentFilehandle().filelineno()}")
 
             # This is addition of python version
@@ -1617,61 +1621,82 @@ class Application:
             Application._installTemplatedFile(sourceFilePath, destFilePath, ctx)
             ctx.setPersistentOption("/digests", md5KeyName, hashlib.md5(open(destFilePath, "rb").read()).hexdigest())
 
-    @staticmethod
-    def _installCustomSessionDriver(ctx: BuildContext) -> None:
+    def install_login_session(self) -> None:
         """
-        This function installs the included sample .xsession and environment variable
-        setup files, and records the md5sum of the installed results.
+        This function makes an entire built-from-source Plasma session accessible from the SDDM login screen.
 
-        If a file already exists, then its md5sum is taken and if the same as what
-        was previously installed, is overwritten. If not the same, the original file
-        is left in place and the .xsession is instead installed to
-        .xsession-kde-builder
+        It copies the needed files to the specific locations. After this, you can log out and select your new
+        Plasma session in SDDM's session chooser menu.
 
-        Error handling: Any errors will result in an exception being thrown.
-
-        Parameters:
-            ctx: Build context to use for looking up template values,
-
-        Returns:
-             None
+        Before invoking the installation script (install-sessions.sh), this function checks if the invocation is
+        actually needed. The check is made for each file that is going to be installed by the script. If at least one
+        file is not presented in the destination location, or its md5 hash sum differs from the file to be installed,
+        then the installation script is invoked. Otherwise, invocation is skipped, so user is not asked to enter sudo
+        password.
         """
+
         RealBinDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
-        Util.assert_isa(ctx, BuildContext)
-        xdgDataDirs = os.environ.get("XDG_DATA_DIRS").split(":") if os.environ.get("XDG_DATA_DIRS") else "/usr/local/share/:/usr/share/".split(":")
-        xdgDataHome = os.environ.get("XDG_DATA_HOME") or f"""{os.environ.get("HOME")}/.local/share"""
+        ctx = self.context
+        pws_builddir = ctx.getOption("build-dir") + "/plasma-workspace"
+        install_sessions_script = pws_builddir + "/login-sessions/install-sessions.sh"
+        startplasma_dev_script = pws_builddir + "/login-sessions/startplasma-dev.sh"
+        libexecdir = f"""{ctx.getOption("install-dir")}/{ctx.getOption("libname")}/libexec"""
 
-        # First we have to find the source
-        searchPaths = [RealBinDir] + [f"{path}/apps/kde-builder" for path in [xdgDataHome] + xdgDataDirs]
-
-        for i in range(len(searchPaths)):  # Remove trailing slashes
-            searchPaths[i] = re.sub(r"/+$", "", searchPaths[i])
-        for i in range(len(searchPaths)):  # Remove duplicate slashes
-            searchPaths[i] = re.sub(r"//+", "/", searchPaths[i])
-        envScript = next((f for f in [f"{path}/data/kde-env-master.sh.in" for path in searchPaths] if os.path.isfile(f)), None)
-        sessionScript = next((f for f in [f"{path}/data/xsession.sh.in" for path in searchPaths] if os.path.isfile(f)), None)
-
-        if not envScript or not sessionScript:
-            logger_app.warning("b[*] Unable to find helper files to setup a login session.")
-            logger_app.warning("b[*] You will have to setup login yourself, or install kde-builder properly.")
+        if not os.path.isfile(install_sessions_script) or not os.path.isfile(startplasma_dev_script):
+            logger_app.debug(" b[*] Unable to find login-sessions scripts in plasma-workspace build directory.\n"
+                             "   You need to build plasma-workspace first. Cancelling login session installation.")
             return
 
-        destDir = os.environ.get("XDG_CONFIG_HOME") or f"""{os.environ.get("HOME")}/.config"""
-        if not os.path.isdir(destDir):
-            Util.super_mkdir(destDir)
+        def get_md5(path: str):
+            return hashlib.md5(open(path, "rb").read()).hexdigest()
 
-        Application._installCustomFile(ctx, envScript, f"{destDir}/kde-env-master.sh", "kde-env-master-digest")
-        if ctx.getOption("install-session-driver"):
-            Application._installCustomFile(ctx, sessionScript, f"""{os.environ.get("HOME")}/.xsession""", "xsession-digest")
+        new_files_map = {}
 
-        if not Debug().pretending():
-            if ctx.getOption("install-session-driver"):
-                try:
-                    os.chmod(f"""{os.environ.get("HOME")}/.xsession""", 0o744)
-                except Exception as e:
-                    logger_app.error(f"\tb[r[*] Error making b[~/.xsession] executable: {e}")
-                    logger_app.error("\tb[r[*] If this file is not executable you may not be able to login!")
+        def check_match(sourcefile, destfile):
+            source_md5 = get_md5(sourcefile)
+            if os.path.exists(destfile):
+                dest_md5 = get_md5(destfile)
+                if source_md5 == dest_md5:
+                    return
+            new_files_map[sourcefile] = destfile
+
+        def gen_new_files_map():
+            plasmaver = ""
+            if "6" in ctx.getOption("branch-group"):
+                plasmaver = "6"
+
+            check_match(pws_builddir + f"/login-sessions/plasmax11-dev{plasmaver}.desktop",
+                        f"/usr/local/share/xsessions/plasmax11-dev{plasmaver}.desktop")
+            check_match(pws_builddir + f"/login-sessions/plasmawayland-dev{plasmaver}.desktop",
+                        f"/usr/local/share/wayland-sessions/plasmawayland-dev{plasmaver}.desktop")
+            check_match(pws_builddir + "/prefix.sh",
+                        libexecdir + "/plasma-dev-prefix.sh")
+            check_match(startplasma_dev_script,
+                        libexecdir + "/startplasma-dev.sh")
+            check_match(RealBinDir + "/data/00-plasma.conf.in",
+                        "/etc/dbus-1/session.d/00-plasma.conf")
+
+            dbus1_files_dir = ctx.getOption("install-dir") + "/share/dbus-1"
+
+            needed_dbus1_files = sorted([item.removeprefix(dbus1_files_dir) for item in glob.glob(dbus1_files_dir + "/**/*", recursive=True) if os.path.isfile(item)])
+
+            for file in needed_dbus1_files:
+                check_match(dbus1_files_dir + file, "/opt/kde-dbus-scripts" + file)
+
+        gen_new_files_map()
+
+        if new_files_map:
+            logger_app.warning(" b[*] Installing login session")
+            msg = "   These files needs to be (re)installed:\n    "
+            for k, v in new_files_map.items():
+                msg += f"\n     {k} -> {new_files_map[k]}"
+            logger_app.info(msg)
+            logger_app.info(f" b[*] Running script: {install_sessions_script}")
+            subprocess.run([install_sessions_script])
+            logger_app.warning(" b[*] Install login sessions script finished.")
+        else:
+            logger_app.debug(" b[*] No need to run install-sessions.sh, all files are already installed and up to date.")
 
     @staticmethod
     def _checkForEssentialBuildPrograms(ctx: BuildContext):

@@ -30,13 +30,8 @@ global
     num-cores %{num_cores}
     num-cores-low-mem %{num_cores_low}
 
-    # kde-builder can install a sample .xsession file for "Custom"
-    # (or "XSession") logins,
-    install-session-driver %{install-session-driver}
-
-    # or add a environment variable-setting script to
-    # ~/.config/kde-env-master.sh
-    install-environment-driver %{install-environment-driver}
+    # Makes the built-from-source Plasma session accessible from the SDDM login screen.
+    install-login-session %{install-login-session}
 
     # Stop the build process on the first failure. If set to false, when kde-builder
     # encounters a build failure, it will attempt to continue building other modules, 

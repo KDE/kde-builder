@@ -8,13 +8,14 @@ Copyright: 2018, 2019, 2021, 2023 Michael Pyne <mpyne@kde.org>
 License: CC0-1.0
 
 Files:  .gitignore
+        data/00-plasma.conf.in
         data/kdesrc-buildrc.in
         data/kde-builder-logging.yaml
         data/kde-builder.desktop.in
         data/vscode/*
         doc/conf.py
         Pipfile
-        doc/_static/gitlab_build_sphinx_app_docs_job_select.png
+        doc/_static/*.png
 Copyright: none
 License: CC0-1.0
 

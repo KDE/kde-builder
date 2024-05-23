@@ -42,11 +42,6 @@
   unneeded directories after your build, just don't be surprised when compile
   times go up.
 
-- Need help setting up environment variables to run your shiny new desktop?
-  kde-builder offers a sample ~/.xsession setup (which is supported by many
-  login managers), which can be used by enabling the `install-session-driver`
-  option.
-
 - For KDE-based modules, kde-builder can install a module and all of its
   dependencies, by using the `--include-dependencies` command line option.
   You can also use `--no-include-dependencies` if you just want to build

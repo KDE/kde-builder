@@ -1,5 +1,8 @@
 # Changelog
 
+2024-05-24
+: Added option `install-login-session`. Removed options `install-session-driver` and `install-environment-driver`.
+
 2024-05-22
 : Added options `refresh-build-first` and `resume-refresh-build-first`.
 

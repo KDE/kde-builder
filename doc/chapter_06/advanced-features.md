@@ -350,3 +350,25 @@ Using a different build directory for the kdeedu module:
 ```
 % kde-builder --kdeedu,build-dir=temp-build
 ```
+
+(installing-login-session)=
+## Installing login session
+
+It is possible to log into the Plasma session built by KDE Builder. This can be used for testing new features.
+
+In your configuration file, enable the [install-login-session](#conf-install-login-session) option. Build the `plasma-workspace`
+module. KDE Builder will install the session at the end of the process.
+
+The installation script requires write access to these locations, so you will be asked to enter a sudo password:
+- `/usr/local/share/xsessions/`
+- `/usr/local/share/wayland-sessions/`
+- `/opt/kde-dbus-scripts/`
+- `/etc/dbus-1/session.d/`
+
+After that, you can log out, and select the Development session in SDDM session chooser:
+
+![Select the development session in SDDM](/_static/sddm_dev_session_select.png)
+
+Kde-builder will keep track of when it needs to rerun the session installation script. This happens when some of the
+files that are handled by installation script are changed. When installation is not needed, it is not run, so it will
+not bother you to enter sudo password.

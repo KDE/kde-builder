@@ -129,65 +129,15 @@ module-set, this option exists to make it easy to use the same
 repository across many different module sets.
 ```
 
-(conf-install-environment-driver)=
-[`install-environment-driver`](conf-install-environment-driver)
+(conf-install-login-session)=
+[`install-login-session`](conf-install-login-session)
 
-Type: Boolean, Default value: True, Available since: 17.08
+Type: Boolean, Default value: True
 
-Install a shell script that can be sourced in a user's profile setup
-scripts to easily establish needed environment variables to run the
-Plasma desktop built by kde-builder.
+If enabled, KDE Builder will invoke session installation script from `plasma-workspace` module. See
+[](#installing-login-session) for details.
 
-This driver will alter the following files:
-
-- `$XDG_CONFIG_HOME/kde-env-master.sh` (normally found at `~/.config/kde-env-master.sh`).
-- `$XDG_CONFIG_HOME/kde-env-user.sh` (normally found at `~/.config/kde-env-user.sh`).
-
-The `kde-env-user.sh` is optional. It is intended for user
-customizations (see the [Troubleshooting and Debugging](https://userbase.kde.org/KDE_System_Administration/Environment_Variables#Troubleshooting_and_Debugging)
-section of the KDE UserBase for examples of
-customizable settings), but these settings can be set elsewhere by the
-user in their existing profile setup scripts.
-
-You can disable this feature by setting this option to \<false\>,
-and ensuring that the [install-session-driver](#conf-install-session-driver) option is
-also disabled.
-
-```{tip}
-kde-builder will not overwrite your existing files (if present)
-unless you also pass the `--delete-my-settings` command-line
-option.
-```
-
-Related command-line option: --install-environment-driver, --no-install-environment-driver
-
-(conf-install-session-driver)=
-[`install-session-driver`](conf-install-session-driver)
-
-Type: Boolean, Default value: True, Available since: 1.16
-
-If enabled, kde-builder will try to install a driver for the
-graphical login manager that allows you to login to your
-kde-builder built KDE desktop.
-
-This driver will alter the following files:
-
-- `~/.xsession`
-- `$XDG_CONFIG_HOME/kde-env-master.sh` (normally found at `~/.config/kde-env-master.sh`).
-- `$XDG_CONFIG_HOME/kde-env-user.sh` (normally found at `~/.config/kde-env-user.sh`).
-
-If you maintain your own login driver then you can disable this
-feature by setting this option to \<false\>. If enabled, this
-feature also enables the [install-environment-driver](#conf-install-environment-driver)
-feature.
-
-```{tip}
-kde-builder will not overwrite your existing files (if present)
-unless you also pass the `--delete-my-settings` command-line
-option.
-```
-
-Related command-line option: --install-session-driver, --no-install-session-driver
+Related command-line option: --install-login-session, --no-install-login-session
 
 (conf-niceness)=
 [`niceness`](conf-niceness)

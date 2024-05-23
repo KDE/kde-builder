@@ -97,10 +97,6 @@ deleted and re-cloned.
 This option is used to let kde-builder overwrite existing files which
 may contain user data.
 
-This is currently only used for xsession setup for the login manager.
-You should not use this option normally, kde-builder will prompt to be
-re-run with it if it is needed.
-
 (cmdline-option-name)=
 [`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration

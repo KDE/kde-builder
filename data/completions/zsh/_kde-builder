@@ -49,8 +49,7 @@ _arguments \
   "(--install-after-build --no-install-after-build)"{--install-after-build,--no-install-after-build}"[Install the package after it successfully builds]" \
   "--install-dir""[Where to install the module after it is built]"":argument:" \
   "--install-distro-packages""[Installs required system pkgs]" \
-  "(--install-environment-driver --no-install-environment-driver)"{--install-environment-driver,--no-install-environment-driver}"[Install script to easily establish needed environment variables to run the built Plasma]" \
-  "(--install-session-driver --no-install-session-driver)"{--install-session-driver,--no-install-session-driver}"[Install a driver for the graphical login manager]" \
+  "(--install-login-session --no-install-login-session)"{--install-login-session,--no-install-login-session} \
   "--libname""[Default name of the installed library directory]"":argument:" \
   "--libpath""[Set the environment variable LD_LIBRARY_PATH while building]"":argument:" \
   "--list-installed""[Print installed modules and exit]" \

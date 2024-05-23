@@ -25,7 +25,6 @@ alternative-installation
 configure-data
 building-and-troubleshooting
 building-specific-modules
-environment
 kde-modules-and-selection
 quick-start-conclusion
 ```

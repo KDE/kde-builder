@@ -141,8 +141,7 @@ class BuildContext(Module):
             "generate-vscode-project-config": False,
             "include-dependencies": True,
             "install-after-build": True,
-            "install-environment-driver": True,  # Setup ~/.config/kde-env-*.sh for login scripts
-            "install-session-driver": False,  # Above, + ~/.xsession
+            "install-login-session": True,
             "purge-old-logs": True,
             "run-tests": False,  # 1 = make test, upload = make Experimental  # todo why boolean option may have "upload" value?
             "stop-on-failure": True,
