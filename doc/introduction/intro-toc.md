@@ -10,7 +10,7 @@ kde-builder operation:
 
 - The [configuration file](../getting-started/configure-data) syntax and options.
 
-- The [command line options](../chapter_05/cmdline).
+- The [command line options](../cmdline/cmdline-usage).
 
 Also documented are the steps which you should perform using other tools
 (i.e. steps that are not automatically performed by kde-builder).

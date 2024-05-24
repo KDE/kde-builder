@@ -26,7 +26,7 @@ kde-builder works by using the tools available to the user at the
 command-line, using the same interfaces available to the user. When
 kde-builder is run, the following sequence is followed:
 
-1.  kde-builder reads in the [command line](../chapter_05/cmdline) and
+1.  kde-builder reads in the [command line](../cmdline/cmdline-usage) and
     [configuration file](../getting-started/configure-data), to determine what to build,
     compile options to use, where to install, etc
 

@@ -80,4 +80,4 @@ See the wiki page [Get_Involved/development](https://community.kde.org/Get_Invol
 For more details, consult the project documentation at https://kde-builder.kde.org/. The most important pages are:
 
 - [List of supported configuration options](https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html)
-- [Supported command line parameters](https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html)
+- [Supported command line parameters](https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html)

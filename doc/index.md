@@ -11,7 +11,7 @@ introduction/index
 getting-started/index
 features/index
 kdesrc-buildrc/index
-chapter_05/index
+cmdline/index
 chapter_06/index
 chapter_07/index
 chapter_08/index

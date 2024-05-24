@@ -91,7 +91,7 @@ give kde-builder a higher priority, reduce the
 priority) to 20 (super nice, lowest priority).
 
 You can also temporarily change the priority for kde-builder by using
-the [--nice](#cmdline-nice) [command line option](../chapter_05/cmdline). The value
+the [--nice](#cmdline-nice) [command line option](../cmdline/cmdline-usage). The value
 to the option is used exactly the same as for
 [niceness](#conf-niceness).
 

@@ -5,7 +5,7 @@ These are the major features and concepts needed to get started with kde-builder
 
 For additional information, you could keep reading through this
 documentation. In particular, the [list of command-line
-options](../chapter_05/supported-cmdline-params) and the [table of configuration file
+options](../cmdline/supported-cmdline-params) and the [table of configuration file
 options](../kdesrc-buildrc/conf-options-table) are useful references.
 
 The KDE Community also maintains [an online Wiki reference for how to
