@@ -13,7 +13,7 @@ features/index
 kdesrc-buildrc/index
 cmdline/index
 using-kde-builder/index
-chapter_07/index
+kde-cmake/index
 chapter_08/index
 chapter_09/index
 ```

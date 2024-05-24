@@ -6,5 +6,5 @@ nosearch:
 # CMake, the KDE build system
 
 ```{toctree}
-kde-cmake
+kde-cmake-intro
 ```
