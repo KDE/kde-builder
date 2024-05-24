@@ -126,7 +126,7 @@ Source](https://community.kde.org/Guidelines_and_HOWTOs/Build_from_source).
 
 On the other hand, assuming everything went well, you should have a new
 KDE install on your computer, and now it is simply a matter of running
-it, described next in the section called [](#environment).
+it, described in the section [](#installing-login-session).
 
 ```{note}
 For more information about kde-builder's logging features, please see
