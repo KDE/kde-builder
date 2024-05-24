@@ -15,5 +15,5 @@ cmdline/index
 using-kde-builder/index
 kde-cmake/index
 developer/index
-chapter_09/index
+misc/index
 ```
