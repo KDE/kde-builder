@@ -471,7 +471,7 @@ class Cmdline:
 
         Documentation: https://kde-builder.kde.org
             Supported command-line parameters:              https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html
-            Table of available configuration options:       https://kde-builder.kde.org/en/chapter_04/conf-options-table.html
+            Table of available configuration options:       https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html
         """))
         exit()
 

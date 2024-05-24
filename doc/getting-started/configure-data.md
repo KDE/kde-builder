@@ -8,7 +8,7 @@ download and build.
 
 ```{note}
 It is possible to use different configuration files for kde-builder,
-which is described in [](../chapter_04/index). If you need to use
+which is described in [](../kdesrc-buildrc/index). If you need to use
 multiple configurations, please see that section. Here, we will assume
 that the configuration is stored in `~/.config/kdesrc-buildrc`.
 ```

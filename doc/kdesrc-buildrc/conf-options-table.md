@@ -1123,7 +1123,7 @@ Scope: module-set
 Type: String, Available since: 1.12.1
 
 This option allows you to easily specify many different modules to
-build at the same point in [the configuration file](./kdesrc-buildrc).
+build at the same point in [the configuration file](./kdesrc-buildrc-overview).
 
 Every identifier passed to this option is internally converted to a
 kde-builder module, with a [repository](#conf-repository) option set to the

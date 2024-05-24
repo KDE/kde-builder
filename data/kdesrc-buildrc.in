@@ -1,5 +1,5 @@
 # This file controls options to apply when configuring/building modules, and controls which modules are built in the first place.
-# List of all options: https://kde-builder.kde.org/en/chapter_04/conf-options-table.html
+# List of all options: https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html
 
 global
     branch-group kf6-qt6

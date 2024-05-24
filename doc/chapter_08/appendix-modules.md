@@ -18,7 +18,7 @@ a grouping of code that can be downloaded, built, tested, and installed.
 
 It is easy to set kde-builder to build a single module. The following
 listing is an example of what a declaration for a Git-based module would
-look like in [the configuration file](../chapter_04/kdesrc-buildrc).
+look like in [the configuration file](../kdesrc-buildrc/kdesrc-buildrc-overview).
 
 ```
 module kdefoo

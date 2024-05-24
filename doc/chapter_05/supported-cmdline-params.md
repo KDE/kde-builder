@@ -252,7 +252,7 @@ following:
   systems.
 
 - Any option name that is valid for modules in the [configuration
-  file](../chapter_04/conf-options-table).
+  file](../kdesrc-buildrc/conf-options-table).
 
 For example, the command
 `kde-builder --query branch kactivities kdepim` might end up with
@@ -455,7 +455,7 @@ The file to read the configuration options from. The default value for
 this parameter is `kdesrc-buildrc` (checked in the current working
 directory). If this file doesn't exist, `~/.config/kdesrc-buildrc`
 (`$XDG_CONFIG_HOME/kdesrc-buildrc`, if `$XDG_CONFIG_HOME` is set) will
-be used instead. See also [](../chapter_04/index).
+be used instead. See also [](../kdesrc-buildrc/index).
 
 ## Setup
 
