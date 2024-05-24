@@ -25,7 +25,7 @@ bash initial_setup.sh
 
 ## Alternative installation methods
 
-See [Alternative Installation](doc/chapter_02/alternative-installation.md)
+See [Alternative Installation](doc/getting-started/alternative-installation.md)
 
 ## Initial setup
 

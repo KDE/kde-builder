@@ -8,7 +8,7 @@ nosearch:
 ```{toctree}
 :numbered:
 introduction/index
-chapter_02/index
+getting-started/index
 chapter_03/index
 chapter_04/index
 chapter_05/index

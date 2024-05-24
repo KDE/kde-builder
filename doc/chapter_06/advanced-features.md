@@ -316,7 +316,7 @@ Ignoring extragear/multimedia and kdereview during a full run:
 ### Changing global options
 
 You can change the setting of options read from the [configuration
-file](../chapter_02/configure-data) directly from the command line. This change will
+file](../getting-started/configure-data) directly from the command line. This change will
 override the configuration file setting, but is only temporary. It only
 takes effect as long as it is still present on the command line.
 
@@ -342,7 +342,7 @@ It is also possible to change options only for a specific module. The
 syntax is similar: --\<module\>,\<option-name\>=\<value\>.
 
 This change overrides any duplicate setting for the module found in the
-[configuration file](../chapter_02/configure-data), and applies only while the option
+[configuration file](../getting-started/configure-data), and applies only while the option
 is passed on the command line.
 
 Using a different build directory for the kdeedu module:

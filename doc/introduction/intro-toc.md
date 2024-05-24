@@ -4,11 +4,11 @@
 This guide is an overview to describe the following aspects of
 kde-builder operation:
 
-- An [overview](../chapter_02/getting-started) of the steps required to get started.
+- An [overview](../getting-started/before-building) of the steps required to get started.
 
 - Notable [features](../chapter_03/features).
 
-- The [configuration file](../chapter_02/configure-data) syntax and options.
+- The [configuration file](../getting-started/configure-data) syntax and options.
 
 - The [command line options](../chapter_05/cmdline).
 

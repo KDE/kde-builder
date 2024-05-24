@@ -15,7 +15,7 @@ The kde-builder script can be configured to maintain a single
 individual module, a full Plasma desktop with KDE application set, or
 somewhere in between.
 
-To get started, see [](../chapter_02/index), or continue reading for
+To get started, see [](../getting-started/index), or continue reading for
 more detail on how kde-builder works and what is covered in this
 documentation.
 
@@ -27,7 +27,7 @@ command-line, using the same interfaces available to the user. When
 kde-builder is run, the following sequence is followed:
 
 1.  kde-builder reads in the [command line](../chapter_05/cmdline) and
-    [configuration file](../chapter_02/configure-data), to determine what to build,
+    [configuration file](../getting-started/configure-data), to determine what to build,
     compile options to use, where to install, etc
 
 2.  kde-builder performs a source update for each

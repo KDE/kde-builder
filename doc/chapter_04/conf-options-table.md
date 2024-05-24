@@ -954,7 +954,7 @@ set-env RONALD McDonald
 
 This option is special in that it can be repeated without overriding
 earlier set-env settings in the same section of the
-[configuration file](../chapter_02/configure-data). This way you can set more
+[configuration file](../getting-started/configure-data). This way you can set more
 than one environment variable per module (or globally).
 
 (conf-source-dir)=
