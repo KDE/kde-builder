@@ -6,7 +6,7 @@ kde-builder operation:
 
 - An [overview](../getting-started/before-building) of the steps required to get started.
 
-- Notable [features](../chapter_03/features).
+- Notable [features](../features/features-overview).
 
 - The [configuration file](../getting-started/configure-data) syntax and options.
 

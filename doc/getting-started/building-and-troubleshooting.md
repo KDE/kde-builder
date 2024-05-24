@@ -130,5 +130,5 @@ it, described in the section [](#installing-login-session).
 
 ```{note}
 For more information about kde-builder's logging features, please see
-the section called [](../chapter_03/kde-builder-logging).
+the section called [](../features/kde-builder-logging).
 ```

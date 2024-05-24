@@ -9,7 +9,7 @@ nosearch:
 :numbered:
 introduction/index
 getting-started/index
-chapter_03/index
+features/index
 chapter_04/index
 chapter_05/index
 chapter_06/index
