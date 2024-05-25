@@ -470,8 +470,8 @@ class Cmdline:
         KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
 
         Documentation: https://kde-builder.kde.org
-            Supported command-line parameters:              https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html
-            Table of available configuration options:       https://kde-builder.kde.org/en/chapter_04/conf-options-table.html
+            Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
+            Table of available configuration options:       https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html
         """))
         exit()
 

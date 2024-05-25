@@ -6,6 +6,6 @@ nosearch:
 # Script Features
 
 ```{toctree}
-features
+features-overview
 kde-builder-logging
 ```

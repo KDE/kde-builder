@@ -6,7 +6,7 @@ nosearch:
 # Command Line Options and Environment Variables
 
 ```{toctree}
-cmdline
+cmdline-usage
 supported-envvars
 supported-cmdline-params
 ```

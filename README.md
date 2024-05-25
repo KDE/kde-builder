@@ -25,7 +25,7 @@ bash initial_setup.sh
 
 ## Alternative installation methods
 
-See [Alternative Installation](doc/chapter_02/alternative-installation.md)
+See [Alternative Installation](doc/getting-started/alternative-installation.md)
 
 ## Initial setup
 
@@ -79,5 +79,5 @@ See the wiki page [Get_Involved/development](https://community.kde.org/Get_Invol
 
 For more details, consult the project documentation at https://kde-builder.kde.org/. The most important pages are:
 
-- [List of supported configuration options](https://kde-builder.kde.org/en/chapter_04/conf-options-table.html)
-- [Supported command line parameters](https://kde-builder.kde.org/en/chapter_05/supported-cmdline-params.html)
+- [List of supported configuration options](https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html)
+- [Supported command line parameters](https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html)

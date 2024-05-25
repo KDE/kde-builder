@@ -6,7 +6,7 @@ nosearch:
 # Using kde-builder
 
 ```{toctree}
-using-kde-builder
+using-kde-builder-preface
 basic-features
 advanced-features
 developer-features

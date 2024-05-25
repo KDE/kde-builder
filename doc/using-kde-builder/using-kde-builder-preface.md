@@ -2,7 +2,7 @@
 # Preface
 
 Normally using kde-builder after you have gone through
-[](../chapter_02/index) is as easy as doing the following from a
+[](../getting-started/index) is as easy as doing the following from a
 terminal prompt:
 
 ```

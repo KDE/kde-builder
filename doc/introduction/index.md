@@ -6,6 +6,6 @@ nosearch:
 # Introduction
 
 ```{toctree}
-introduction
+brief-intro
 intro-toc
 ```

@@ -164,8 +164,8 @@ see fit.
 You can also setup your configuration file manually, by copying the
 included sample configuration file `kdesrc-buildrc-kf5-sample` to
 `~/.config/kdesrc-buildrc` and then editing the file.
-[](../chapter_04/index) will be a useful reference for this, especially
-its [table of configuration options](../chapter_04/conf-options-table).
+[](../kdesrc-buildrc/index) will be a useful reference for this, especially
+its [table of configuration options](../kdesrc-buildrc/conf-options-table).
 
 kde-builder contains many recommended configuration files to support
 KDE Frameworks 5, Plasma 5, and other KDE applications. See the section called
@@ -174,4 +174,4 @@ configuration files from your own `kdesrc-buildrc`.
 
 You can find more information about the syntax of the [configuration
 file](./configure-data) in the section called [](./configure-data) and in
-[](../chapter_04/index).
+[](../kdesrc-buildrc/index).

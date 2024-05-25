@@ -6,6 +6,6 @@ nosearch:
 # Configuring kde-builder
 
 ```{toctree}
-kdesrc-buildrc
+kdesrc-buildrc-overview
 conf-options-table
 ```

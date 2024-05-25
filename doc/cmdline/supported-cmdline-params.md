@@ -32,7 +32,7 @@ required metadata first.
 This option causes kde-builder to automatically include other KDE and
 Qt modules in the build, if required for the modules you have requested
 to build on the command line or in your [configuration
-file](../chapter_02/configure-data).
+file](../getting-started/configure-data).
 
 The modules that are added are as recorded within the KDE source code
 management system. See the section called [](#kde-projects-module-sets).
@@ -46,7 +46,7 @@ This option is enabled by default.
 [`--ignore-modules`](cmdline-ignore-modules) (or `-!`) module \[module ...]  
 Do not include the modules passed on the rest of the command line in the
 update/build process (this is useful if you want to build most of the
-modules in your [configuration file](../chapter_02/configure-data) and just skip a
+modules in your [configuration file](../getting-started/configure-data) and just skip a
 few).
 
 Note that this option does not override
@@ -100,7 +100,7 @@ may contain user data.
 (cmdline-option-name)=
 [`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration
-file](../chapter_02/configure-data) for every module. For instance, to override the
+file](../getting-started/configure-data) for every module. For instance, to override the
 [log-dir](#conf-log-dir) option, you would do: `--log-dir /path/to/dir`.
 
 ```{note}
@@ -114,7 +114,7 @@ command line options that are preferred by kde-builder.
 (cmdline-set-module-option-value)=
 [`--set-module-option-value`](cmdline-set-module-option-value) \<module-name\>,\<option-name\>,\<option-value\>  
 You can use this option to override an option in your [configuration
-file](../chapter_02/configure-data) for a specific module.
+file](../getting-started/configure-data) for a specific module.
 
 ## Resuming and stopping
 
@@ -252,7 +252,7 @@ following:
   systems.
 
 - Any option name that is valid for modules in the [configuration
-  file](../chapter_04/conf-options-table).
+  file](../kdesrc-buildrc/conf-options-table).
 
 For example, the command
 `kde-builder --query branch kactivities kdepim` might end up with
@@ -455,7 +455,7 @@ The file to read the configuration options from. The default value for
 this parameter is `kdesrc-buildrc` (checked in the current working
 directory). If this file doesn't exist, `~/.config/kdesrc-buildrc`
 (`$XDG_CONFIG_HOME/kdesrc-buildrc`, if `$XDG_CONFIG_HOME` is set) will
-be used instead. See also [](../chapter_04/index).
+be used instead. See also [](../kdesrc-buildrc/index).
 
 ## Setup
 

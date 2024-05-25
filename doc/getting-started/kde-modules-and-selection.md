@@ -51,7 +51,7 @@ properly select the software modules that you want built.
 ## Selecting modules to build
 
 Selecting which of the possible modules to build is controlled by [the
-configuration file](../chapter_04/kdesrc-buildrc). After the `global` section is a
+configuration file](../kdesrc-buildrc/kdesrc-buildrc-overview). After the `global` section is a
 list of modules to build, bracketed by module ... end module lines. An
 example entry for a module is shown in
 [Example module entry in the configuration file](#conf-module-example).

@@ -20,7 +20,7 @@ about packaging tools and requirements, common compilation pitfalls and
 strategies and information about running your new KDE installation.
 
 ```{toctree}
-getting-started
+before-building
 alternative-installation
 configure-data
 building-and-troubleshooting

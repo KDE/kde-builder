@@ -954,7 +954,7 @@ set-env RONALD McDonald
 
 This option is special in that it can be repeated without overriding
 earlier set-env settings in the same section of the
-[configuration file](../chapter_02/configure-data). This way you can set more
+[configuration file](../getting-started/configure-data). This way you can set more
 than one environment variable per module (or globally).
 
 (conf-source-dir)=
@@ -1123,7 +1123,7 @@ Scope: module-set
 Type: String, Available since: 1.12.1
 
 This option allows you to easily specify many different modules to
-build at the same point in [the configuration file](./kdesrc-buildrc).
+build at the same point in [the configuration file](./kdesrc-buildrc-overview).
 
 Every identifier passed to this option is internally converted to a
 kde-builder module, with a [repository](#conf-repository) option set to the

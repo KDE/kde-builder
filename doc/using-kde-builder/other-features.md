@@ -47,7 +47,7 @@ normally display with colorized text.
 
 You can disable this by using the `--no-color` on the command line, or
 by setting the [colorful-output](#conf-colorful-output) option in the
-[configuration file](../chapter_02/configure-data) to `false`.
+[configuration file](../getting-started/configure-data) to `false`.
 
 Disabling color output in the configuration file:
 
@@ -74,7 +74,7 @@ major space-using pieces when using kde-builder:
     can reduce this amount by making sure that you are only building as
     many modules as you actually want. kde-builder will not delete
     source code from disk even if you delete the entry from the
-    [configuration file](../chapter_02/configure-data), so make sure that you go and
+    [configuration file](../getting-started/configure-data), so make sure that you go and
     delete unused source checkouts from the source directory. Note that
     the source files are downloaded from the Internet, you *should not*
     delete them if you are actually using them, at least until you are
