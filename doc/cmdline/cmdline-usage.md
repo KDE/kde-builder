@@ -77,7 +77,7 @@ normal. Useful when the previous build failed on specific module, you
 fixed it, and then you want to continue the with building the rest of
 initial set of modules.
 
-`--run` module  
+`--run` executable_name  
 Launch the built application.
 
 The full list of command line options is given in the section called

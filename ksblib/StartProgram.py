@@ -1,4 +1,3 @@
-# SPDX-FileCopyrightText: 2021 Luis Kao <kogiokkafrms@gmail.com>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
@@ -18,90 +17,80 @@ logger_app = kbLogger.getLogger("application")
 
 class StartProgram:
     @staticmethod
-    def executeCommandLineProgram(ctx: BuildContext, args: list) -> NoReturn:
+    def execute_built_binary(ctx: BuildContext, args: list) -> NoReturn:
         """
-        kde-builder --run [options] <module-name> [arguments]
-
-        OPTIONS
-        "-e", "--exec" <program> Specify program of the module. Default to module name.
-        "-f", "--fork" Launch the program in a new session.
-
-        EXAMPLES
-
-        Launch kate in a new session with "-l 5 file1.txt" arguments.
-            kde-builder --run -f kate -l 5 file1.txt
-
-        Launch kate-syntax-highlighter of module kate with "--list-themes" argument.
-            kde-builder-launch -e kate-syntax-highlighter kate --list-themes
+        Executes the binary from install-dir/bin, and sources the environment file before that.
         """
 
-        optExec = None
-        optFork = 0
+        opt_fork = 0
 
-        # We cannot use GetOptionsFromArray here, because -e or -f could be meant to be arguments of module executable. But that would steal them.
-        # We manually care of them, they can only appear in front of module/executable name.
+        # We manually care of options. They can only appear in front of executable name.
         arg = None
-        while arg := args.pop(0):
-            if arg == "-f" or arg == "--fork":
-                optFork = 1
-                continue
-            elif arg == "-e" or arg == "--exec":
-                optExec = args.pop(0)
-                if optExec is None:
-                    logger_app.error("-e option requires a name of executable")
-                    exit(1)
-                continue
-            break
+        while True:
+            try:
+                arg = args.pop(0)
+                if arg == "-f" or arg == "--fork":
+                    opt_fork = 1
+                    continue
+                break
+            except IndexError:
+                arg = None
+                break
 
-        module = arg
-        if module is None:  # the case when user specified -e executable_name and/or -f, but then did not specified the module name
-            logger_app.error("The module name is missing")
+        executable = arg
+        if executable is None:  # the case when user specified -f, but then did not specified the executable name
+            logger_app.error("Executable name is missing")
             exit(1)
 
-        executable = optExec or module
-        buildData = ctx.persistent_options
-        extraRunEnv = ctx.getOption("source-when-start-program")
+        pers_opts = ctx.persistent_options
+        extra_run_env = ctx.getOption("source-when-start-program")
 
-        if module not in buildData:
-            print(f"Module {module} has not been built yet.")
-            exit(1)
+        install_dir = ctx.getOption("install-dir")
+        exec_path = f"{install_dir}/bin/{executable}"
+        prefix_sh_path = f"{install_dir}/prefix.sh"
 
-        buildDir = buildData[module]["build-dir"]
-        installDir = buildData[module]["install-dir"]
-        revision = buildData[module]["last-build-rev"]
-        execPath = f"{installDir}/bin/{executable}"
-
-        if not os.path.exists(execPath):
-            print(f"Program \"{executable}\" does not exist.")
-            print("Try to set executable name with -e option.")
+        if not os.path.exists(exec_path):
+            print(f"Program \"{executable}\" does not exist in {install_dir}/bin directory.")
+            if executable in pers_opts:  # Hint possible reason in case we got executable named as some already built module
+                print(f"Probably the module \"{executable}\" installs its executable under different name. Check its install manifest in its build directory.")
             exit(127)  # Command not found
+
+        if not os.path.exists(prefix_sh_path):
+            # Try to use prefix.sh from build dir if we can guess module (the case when executable is identical to module name, which is not always)
+            msg = (f" r[*] Not found y[{install_dir}/prefix.sh] file. Please copy prefix.sh manually from build directory of any kde module or "
+                   "add the \"-DKDE_INSTALL_PREFIX_SCRIPT=ON\" to cmake-options of any kde module and (re)build it.")
+            if executable in pers_opts:
+                prefix_sh_path = pers_opts[executable].get("build-dir", "/dev/null") + "/prefix.sh"
+                if os.path.exists(prefix_sh_path):
+                    logger_app.debug("Using prefix.sh from build directory")
+                else:
+                    logger_app.warning(msg)
+                    exit(1)
+            else:
+                logger_app.warning(msg)
+                exit(1)
 
         script = textwrap.dedent(f"""\
         #!/bin/sh
-        
-        # Set up environment variables (dot command)
-        . "{buildDir}/prefix.sh";
-        . "{extraRunEnv}"
-        
-        # Launch the program with optional arguments.
-        if [ "{int(optFork)}" = 1 ]; then
-            nohup {execPath} "$@" >/dev/null 2>&1 & 
+        . "{prefix_sh_path}"
+        . "{extra_run_env}"
+
+        if [ "{int(opt_fork)}" = 1 ]; then
+            nohup {exec_path} "$@" >/dev/null 2>&1 & 
             disown
             echo "PID:                $!"
             printf '%.0s#' {{1..80}}; printf "\n\n"
         else
             echo "PID:                $$"
             printf '%.0s#' {{1..80}}; printf "\n\n"
-            exec "{execPath}" $@
+            exec "{exec_path}" $@
         fi
         """)
 
         # Print run information
         logger_app.warning(
             "#" * 80 + "\n" +
-            f"Module:             {module}\n" +
-            f"Executable          {executable}\n" +
-            f"Revision:           {revision}\n" +
+            f"Executable:         {executable}\n" +
             f"""Arguments:          {" ".join(args)}"""
         )
 
@@ -109,14 +98,8 @@ class StartProgram:
             exit(0)
 
         try:
-            # Instead of embedding module_args in shell script with string interpolation, pass
-            # them as arguments of the script. Let the shell handle the list through "$@",
-            # so it will do the quoting on each one of them.
-            #
-            # Run the script with sh options specification:
             #                               sh     -c command_string    command_name       $1 $2 $3...
             os.execv("/bin/sh", ["/bin/sh", "-c", script, "kde-builder run script"] + args)
         except Exception as e:
-            # If we get to here, that sucks, but don't continue.
             logger_app.error(f"Error executing {executable}: {e}")
             exit(1)
