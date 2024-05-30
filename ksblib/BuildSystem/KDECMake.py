@@ -8,6 +8,7 @@ from __future__ import annotations
 import os.path
 import re
 import sys
+import textwrap
 # from overrides import override
 
 from .BuildSystem import BuildSystem
@@ -338,7 +339,7 @@ class BuildSystem_KDECMake(BuildSystem):
         module = self.module
 
         if module.getOption("generate-vscode-project-config"):
-            self.generateVSCodeConfig(module)
+            self.generateVSCodeConfig()
         else:
             logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
 
@@ -346,6 +347,9 @@ class BuildSystem_KDECMake(BuildSystem):
         # semantics).
         if self._safe_run_cmake():
             return False
+
+        if module.getOption("generate-vscode-project-config"):
+            self.convert_prefixsh_to_env()
 
         # handle the linking of compile_commands.json back to source directory if wanted
         # allows stuff like clangd to function out of the box
@@ -357,7 +361,7 @@ class BuildSystem_KDECMake(BuildSystem):
                 Util.remake_symlink(f"{builddir}/compile_commands.json", f"{srcdir}/compile_commands.json")
         return True
 
-    def generateVSCodeConfig(self, module: Module) -> bool:
+    def generateVSCodeConfig(self) -> bool:
         """
         Generate default config files for VSCode.
 
@@ -368,6 +372,7 @@ class BuildSystem_KDECMake(BuildSystem):
             logger_ide_proj.pretend("\tWould have generated .vscode directory")
             return False
 
+        module: Module = self.module
         projectName = module.name
         buildDir = module.fullpath("build")
         srcDir = module.fullpath("source")
@@ -445,6 +450,28 @@ class BuildSystem_KDECMake(BuildSystem):
                 file.write(content)
         except IOError as e:
             logger_buildsystem.warning(f"\tCouldn't write to {file_path}: {e}")
+
+    def convert_prefixsh_to_env(self):
+        """
+        Export a standard environment variables key/value file, for tools that can't make use of the prefix.sh.
+        They are essentially the same, but without the "export" keywords.
+
+        This is needed for things like the VS Code CMake extension.
+        """
+        build_dir = self.module.fullpath("build")
+        if os.path.exists(build_dir + "/prefix.sh"):
+            env_content = textwrap.dedent("""\
+            # This file is .env type, for tools that can't make use of the prefix.sh
+            # kate: syntax bash;
+            """)
+            with open(build_dir + "/prefix.sh", "r") as f:
+                for line in f:
+                    if line.startswith("#") or line == "\n":
+                        continue
+                    line = line.removeprefix("export ")
+                    env_content += line
+            with open(build_dir + "/prefix.env", "w") as f:
+                f.write(env_content)
 
     # @override
     def buildInternal(self, optionsName=None) -> dict:

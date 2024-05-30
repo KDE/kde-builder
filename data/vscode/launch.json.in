@@ -6,6 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
+            "envFile": "${command:cmake.buildDirectory}/prefix.env",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
