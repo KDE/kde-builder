@@ -295,7 +295,7 @@ class Application:
         ignoredSelectors = {**ignored_in_cmdline, **ignored_in_global_section}
 
         if startProgramAndArgs:
-            StartProgram.execute_built_binary(ctx, startProgramAndArgs)  # noreturn
+            StartProgram.executeCommandLineProgram(ctx, startProgramAndArgs)  # noreturn
 
         if not Debug().isTesting():
             # Running in a test harness, avoid downloading metadata which will be

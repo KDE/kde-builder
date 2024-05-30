@@ -54,30 +54,11 @@ Note that this option does not override
 Instead, it appends it.
 
 (cmdline-run)=
-[`--run`](cmdline-run) (or `--start-program`) \[-f\|--fork\] \<program\> \[parameters ...\]  
+[`--run`](cmdline-run) (or `--start-program`) \[-e\|--exec name\] \[-f\|--fork\] program \[parameters ...\]  
 This option interprets the next item on the command line as a program to
 run, and kde-builder will then finish reading the configuration file,
-source the `prefix.sh` to apply environment variables, and then execute
+source the prefix.sh to apply environment variables, and then execute
 the given program.
-
-The "-f", "--fork" option launches the program, and detaches its process from current terminal.
-
-Usage examples:
-
-Launch kate with "-l 5 file1.txt" arguments:
-```bash
-kde-builder --run kate -l 5 file1.txt
-```
-
-Launch kate with "-l 5 file1.txt" arguments, and detach its process from current terminal:
-```bash
-kde-builder --run -f kate -l 5 file1.txt
-```
-
-Launch kate-syntax-highlighter executable (installed by "kate" module) with "--list-themes" argument:
-```bash
-kde-builder --run kate-syntax-highlighter --list-themes
-```
 
 (cmdline-source-when-start-program)=
 [`--source-when-start-program`](cmdline-source-when-start-program) \<file\>  

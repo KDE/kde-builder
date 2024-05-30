@@ -1,8 +1,5 @@
 # Changelog
 
-2024-05-29
-: Launching the built binaries which names are different from their module name no longer require specifying --exec in --run.
-
 2024-05-24
 : Added option `install-login-session`. Removed options `install-session-driver` and `install-environment-driver`.
 
