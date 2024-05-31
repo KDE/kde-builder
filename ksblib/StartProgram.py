@@ -46,13 +46,25 @@ class StartProgram:
         extra_run_env = ctx.getOption("source-when-start-program")
 
         install_dir = ctx.getOption("install-dir")
+        bin_dir = f"{install_dir}/bin/"
         exec_path = f"{install_dir}/bin/{executable}"
         prefix_sh_path = f"{install_dir}/prefix.sh"
 
         if not os.path.exists(exec_path):
-            print(f"Program \"{executable}\" does not exist in {install_dir}/bin directory.")
-            if executable in pers_opts:  # Hint possible reason in case we got executable named as some already built module
-                print(f"Probably the module \"{executable}\" installs its executable under different name. Check its install manifest in its build directory.")
+            logger_app.error(f" r[*] Program r[{executable}] does not exist in {bin_dir} directory.")
+            if executable in pers_opts:  # Hint possible variants in case we got executable named as some already built module
+                install_manifest = ctx.getOption("build-dir") + f"/{executable}/install_manifest.txt"
+                bins_of_module = []
+                if os.path.exists(install_manifest):
+                    with open(install_manifest, "r") as f:
+                        for line in f:
+                            if line.startswith(bin_dir):
+                                line = line.removeprefix(bin_dir).rstrip("\n")
+                                bins_of_module.append(line)
+                if bins_of_module:
+                    logger_app.error("   You probably mean one from this list:")
+                    for binary in bins_of_module:
+                        logger_app.error("\ty[" + binary)
             exit(127)  # Command not found
 
         if not os.path.exists(prefix_sh_path):
