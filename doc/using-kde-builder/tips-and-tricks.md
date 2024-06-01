@@ -34,9 +34,9 @@
   `--no-src` for that module.
 
 - You can refer to option values that have been previously set in your
-  kde-builder configuration file, by using the syntax ${option-name}. There's
-  no need for the option to be recognized by kde-builder, so you can set
-  user-specific variables this way.
+  kde-builder configuration file, by using the syntax ${option-name}. If this is
+  not a standard option, you can name it prefixed with underscore, so kde-builder 
+  recognizes it as a user-specific variable.
 
 - Low on disk space? Use the `remove-after-install` option to clean out
   unneeded directories after your build, just don't be surprised when compile

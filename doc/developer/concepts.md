@@ -6,7 +6,7 @@ Some basic concepts are assumed throughout for brevity.
 
 kde-builder uses the "module" as the most granular level of buildable
 software. Each module has a name, unique in the list of all modules.
-Each module can have a specific source control system plugin (Git,
+Each module can have a specific source control system plugin (git,
 KDE's git, etc.) and a build system plugin (qmake, CMake, KDE's
 CMake, autotools, etc.)
 
@@ -17,12 +17,12 @@ optional.
 
 The normal progression is:
 
-. Update
-. Uninstall (not normally seen)
-. Build system setup and configuration
-. Build
-. Testsuite (if enabled)
-. Install
+- Update
+- Uninstall (not normally seen)
+- Build system setup and configuration
+- Build
+- Testsuite (if enabled)
+- Install
 
 The update phase can happen concurrently with other modules' build/install
 phases, under the theory that the build phase is usually CPU-heavy so it makes
@@ -41,9 +41,9 @@ Each module can refer to the global build context.
 kde-builder uses a configuration file (usually abbreviated the `rc-file`) to
 store:
 
-. The list of modules to build, and
-. The dependency order in which to build modules (the order seen in the rc-file), and
-. The build or configuration options to use by default or on a per-module
+- The list of modules to build, and
+- The dependency order in which to build modules (the order seen in the rc-file), and
+- The build or configuration options to use by default or on a per-module
 basis.
 
 When kde-builder is run, it will use `kdesrc-buildrc` located in the current
@@ -127,21 +127,21 @@ useful for that, but --debug has a significant amount of other changes as well.
 For each script execution, kde-builder generically goes through the following
 steps:
 
-. Read the cmdline to determine global options, list of module *selectors*
+- Read the cmdline to determine global options, list of module *selectors*
 (modules are defined later) and potentially alternate rc-files to use.
-. Opens the selected rc-file (chosen on cmdline or based on `$PWD`) and reads
+- Opens the selected rc-file (chosen on cmdline or based on `$PWD`) and reads
 in the list of modules and module-sets in the rc-file along with the options
 chosen for each.
-. Ensures that the KDE git repository metadata is available (containing
+- Ensures that the KDE git repository metadata is available (containing
 dependency information and the virtual project path hierarchy)
-. If module selectors are available from the cmdline, creates the build list by
+- If module selectors are available from the cmdline, creates the build list by
 expanding those selectors into the appropriate modules from the rc-file. If no
 selectors, uses all module sets and modules from the rc-file.
   * Either mode can involve resolving dependencies for KDE-based modules.
-. Forks additional children to serve as a way to perform updates and build in
+- Forks additional children to serve as a way to perform updates and build in
 separate processes so that they may proceed concurrently. Once ready, performs
 these two steps concurrently:
-.. Updates each module in order, and
-.. Performs remaining module build steps in order (waiting for the update if
+  - Updates each module in order, and
+  - Performs remaining module build steps in order (waiting for the update if
   needed).
-. When all update/build processes are done, displays the results to the user.
+- When all update/build processes are done, displays the results to the user.

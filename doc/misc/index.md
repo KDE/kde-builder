@@ -2,7 +2,7 @@
 nosearch:
 ---
 
-# Changelog and License
+# Miscellaneous
 
 ```{toctree}
 changelog

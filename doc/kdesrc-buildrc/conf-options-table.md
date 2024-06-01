@@ -1,7 +1,7 @@
-(conf-options-table)=
-# Table of available configuration options
+(conf-options-list)=
+# List of available configuration options
 
-Here are tables of various options, containing the following
+Here are the lists of various options, containing the following
 information:
 
 - The option name
@@ -18,7 +18,7 @@ information:
 (conf-async)=
 [`async`](conf-async)
 
-Type: Boolean, Default value: True, Available since: 1.6
+Type: Boolean, Default value: True
 
 This option enables the asynchronous mode of operation, where the
 source code update and the build process will be performed in parallel,
@@ -44,10 +44,10 @@ Related command-line option: [--color](#cmdline-color)
 
 Type: Boolean, Default value: False
 
-If you are using SSH to download the Git sources (such as if you are
+If you are using ssh to download the sources (such as if you are
 using the git+ssh protocol), this option controls if kde-builder will
 try and make sure that if you are using ssh-agent, it is actually
-managing some SSH identities. This is to try and prevent SSH from asking
+managing some ssh identities. This is to try and prevent ssh from asking
 for your pass phrase for every module.
 
 Related command-line option: --disable-agent-check, --no-disable-agent-check
@@ -77,20 +77,20 @@ The protocol for fetching KDE projects is always `https`.
 (conf-git-repository-base)=
 [`git-repository-base`](conf-git-repository-base)
 
-Type: String, Available since: 1.12.1
+Type: String
 
 This option is used to create a short name to reference a specific
-Git repository base URL in later [module set](#module-sets)
-declarations, which is useful for quickly declaring many Git modules to
+repository base URL in later [module set](#module-sets)
+declarations, which is useful for quickly declaring many modules to
 build.
 
-You must specify two things (separated by a space): The name to
+You must specify two things (separated by a space): the name to
 assign to the base URL, and the actual base URL itself. For example:
 
-```{code-block} shell
+```{code-block} text
 global
     # other options
-    # This is the common path to all anonymous Git server modules.
+    # This is the common path to all kde repositories
     git-repository-base kde-git kde:
 end global
 
@@ -116,10 +116,8 @@ module module2
 end module
 ```
 
-The `kde:` Git repository prefix used above is a shortcut
-which will be setup by kde-builder automatically. See the TechBase
-[URL Renaming](https://techbase.kde.org/Development/Git/Configuration#URL_Renaming)
-article for more information. Note that unlike most other
+The `kde:` git repository prefix used above is a shortcut
+which will be set up by kde-builder automatically. Note that unlike most other
 options, this option can be specified multiple times in order to create
 as many aliases as necessary.
 
@@ -139,6 +137,20 @@ If enabled, KDE Builder will invoke session installation script from `plasma-wor
 
 Related command-line option: --install-login-session, --no-install-login-session
 
+(conf-libpath)=
+[`libpath`](conf-libpath)
+
+Type: String
+
+Set this option to set the environment variable
+`LD_LIBRARY_PATH` while building. You cannot override this
+setting in a module option. The default value is blank, but the paths
+`${install-dir}/$LIBNAME` and
+`${qt-install-dir}/$LIBNAME` are automatically added. You may
+use the tilde (~) for any paths you add using this option.
+
+Related command-line option: --libpath \<path\>
+
 (conf-niceness)=
 [`niceness`](conf-niceness)
 
@@ -153,7 +165,7 @@ Related command-line option: [--nice](#cmdline-nice)
 (conf-num-cores)=
 [`num-cores`](conf-num-cores)
 
-Type: Integer, Default value: Depends on system, Available since: 20.07
+Type: Integer, Default value: Depends on system
 
 This option is defined by kde-builder (when using
 `kde-builder --generate-config`), set to be the number of
@@ -168,7 +180,7 @@ Related command-line option: --num-cores \<value\>
 (conf-num-cores-low-mem)=
 [`num-cores-low-mem`](conf-num-cores-low-mem)
 
-Type: Integer, Default value: Depends on system, Available since: 20.07
+Type: Integer, Default value: Depends on system
 
 This option is defined by kde-builder (when using
 `kde-builder --generate-config`), set to be the number of
@@ -190,7 +202,7 @@ Related command-line option: --num-cores-low-mem \<value\>
 (conf-persistent-data-file)=
 [`persistent-data-file`](conf-persistent-data-file)
 
-Type: String, Available since: 1.15
+Type: String
 
 Use this option to change where kde-builder stores its persistent
 data. The default is to store this data in a file called
@@ -217,7 +229,7 @@ Related command line option: [--source-when-start-program](cmdline-source-when-s
 (conf-ssh-identity-file)=
 [`ssh-identity-file`](conf-ssh-identity-file)
 
-Type: String, Available since: 1.14.2
+Type: String
 
 Set this option to control which private SSH key file is passed to
 the `ssh-add` command when kde-builder is downloading source
@@ -228,7 +240,7 @@ See also: the section called [](#ssh-agent-reminder).
 (conf-use-idle-io-priority)=
 [`use-idle-io-priority`](conf-use-idle-io-priority)
 
-Type: Boolean, Default value: False, Available since: 1.12
+Type: Boolean, Default value: False
 
 Use lower priority for disk and other I/O, which can significantly
 improve the responsiveness of the rest of the system at the expense of
@@ -280,15 +292,14 @@ Related command-line option: --branch \<value\>
 (conf-branch-group)=
 [`branch-group`](conf-branch-group)
 
-Type: String, Available since: 1.16-pre2
+Type: String
 
 Set this option to a general group from which you want modules to be chosen.
 
-For supported Git module types, kde-builder will determine the
+For modules that are kde-projects, kde-builder will determine the
 actual branch to use automatically based on rules encoded by the KDE
 developers (these rules may be viewed in the
-`kde-build-metadata` source repository in your source
-directory). After a branch is determined that branch is used as if you
+`sysadmin/repo-metadata` repository. After a branch is determined that branch is used as if you
 had specified it yourself using the [branch](#conf-branch)
 option.
 
@@ -301,8 +312,7 @@ that it will override this setting. The same is true of other specific
 branch selection options such as [tag](#conf-tag).
 
 ```{note}
-This option only applies to `kde-projects` Git modules
-(the common case). See also the section called [](#kde-projects-module-sets).
+This option only applies to `kde-projects` modules. See also the section called [](#kde-projects-module-sets).
 ```
 
 Related command-line option: --branch-group \<value\>
@@ -315,8 +325,8 @@ Type: String, Default value: `~/kde/build`
 Use this option to change the directory to contain the built sources.
 There are three different ways to use it:
 
-1. Relative to the KDE Git source directory (see [the source-dir option](#conf-source-dir)). This is the default,
-and is selected if you type a directory name that does not start with a
+1. Relative to the source directory (see the [source-dir](#conf-source-dir) option).
+This is selected if you type a directory name that does not start with a
 tilde (~) or a slash (/).
 
 2. Absolute path. If you specify a path that begins with a /, then
@@ -329,7 +339,7 @@ analogous to the shell's tilde-expansion. For example,
 `~/builddir` would set the build directory to
 `/home/user-name/builddir`.
 
-Perhaps surprisingly, this option can be changed per module.
+This option can be changed per module.
 
 Related command-line option: --build-dir \<path\>
 
@@ -354,7 +364,7 @@ or more frequently.
 ```{important}
 This feature is provided as an optimization only. Like many other
 optimizations, there are trade-offs for the correctness of your
-installation. For instance, changes to the qt or kdelibs modules may
+installation. For instance, changes to the qt modules may
 cause a rebuild of other modules to be necessary, even if the source
 code doesn't change at all.
 ```
@@ -406,11 +416,9 @@ global for other buildsystems.
 
 Use this option to specify what flags to pass to CMake when creating
 the build system for the module. When this is used as a global option,
-it is applied to all modules that this script builds. When used as a
+it is applied to all modules that KDE Builder builds. When used as a
 module option, it is added to the end of the global options. This allows
 you to specify common CMake options in the global section.
-
-This option does not apply to qt (which does not use CMake). Use [configure-flags](#conf-configure-flags) instead.
 
 If a valid generator is specified among the listed options it will
 override the value of [cmake-generator](#conf-cmake-generator). Invalid (unsupported)
@@ -423,7 +431,7 @@ ignored and will not be passed to CMake.
 Since these options are passed directly to the CMake command line,
 they should be given as they would be typed into CMake. For example:
 
-```
+```text
 cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo
 ```
 
@@ -466,7 +474,6 @@ global for other buildsystems.
 Use this option to specify what flags to pass to ./configure when
 creating the build system for the module. When this is used as a
 global-option, it is applied to all modules that this script builds.
-_This option only works for qt._
 
 To change configuration settings for KDE modules, see [cmake-options](#conf-cmake-options).
 
@@ -502,6 +509,10 @@ This option is specified here instead of with [configure-flags](#conf-configure-
 or [cmake-options](#conf-cmake-options) because this option will
 also set the environment variable `CXXFLAGS` during the build
 process.
+
+```{note}
+Possibly outdated info about KDE 4.
+```
 
 Note that for KDE 4 and any other modules that use CMake, it is
 necessary to set the CMAKE_BUILD_TYPE option to `none` when
@@ -547,28 +558,22 @@ Related command-line option: --do-not-compile \<value\>
 (conf-git-user)=
 [`git-user`](conf-git-user)
 
-Type: String, Available since: 15.09
+Type: String
 
 This option is intended for KDE developers. If set, it will be used
-to automatically setup identity information for the Git source control
-software for _newly downloaded_ Git modules (including the vast
-majority of KDE modules).
+to automatically setup identity information for the git config
+for _newly downloaded_ modules.
 
-Specifically, the user's name and email fields for each new Git
+Specifically, the user's name and email fields for each new
 repository are filled in to the values set by this option.
 
 The value must be specified in the form
 `User Name <email@example.com>`.
 
-For instance, a developer named “Foo Barbaz” with the email address
-“foo@abc.xyz” would use:
-
-`git-user Foo Barbaz <foo@abc.xyz>`
-
 (conf-http-proxy)=
 [`http-proxy`](conf-http-proxy)
 
-Type: String, Available since: 1.16
+Type: String
 
 This option, if set, uses the specified URL as a proxy server to use
 for any HTTP network communications (for example, when downloading the
@@ -699,27 +704,13 @@ changed with this setting.
 
 Related command-line option: --libname \<value\>
 
-(conf-libpath)=
-[`libpath`](conf-libpath)
-
-Type: String
-
-Set this option to set the environment variable
-`LD_LIBRARY_PATH` while building. You cannot override this
-setting in a module option. The default value is blank, but the paths
-`${install-dir}/$LIBNAME` and
-`${qt-install-dir}/$LIBNAME` are automatically added. You may
-use the tilde (~) for any paths you add using this option.
-
-Related command-line option: --libpath \<path\>
-
 (conf-log-dir)=
 [`log-dir`](conf-log-dir)
 
 Type: String
 
 Use this option to change the directory used to hold the log files
-generated by the script.
+generated by KDE Builder.
 
 Related command-line option: --log-dir \<path\>
 
@@ -731,7 +722,7 @@ Type: String
 Set this variable to a space-separated list, which is interpreted as
 a command and its options to precede the `make install`
 command used to install modules. This is useful for installing packages
-with Sudo for example, but please be careful while dealing with root
+with sudo for example, but please be careful while dealing with root
 privileges.
 
 Related command-line option: --make-install-prefix \<value\>
@@ -759,7 +750,7 @@ Type: Boolean, Default value: False
 
 Set the option value to `true` to keep the build process
 from attempting to build this module. It will still be kept up-to-date
-when updating from Git. This option is exactly equivalent to the [--no-build](#cmdline-no-build) command line
+when updating from git. This option is exactly equivalent to the [--no-build](#cmdline-no-build) command line
 option.
 
 (conf-manual-update)=
@@ -778,34 +769,17 @@ commented it out.
 Type: String
 
 Set this variable in order to pass command line options to the
-`ninja` build command. This can be useful to enable “verbose”
+`ninja` build command. This can be useful to enable "verbose"
 output or to manually reduce the number of parallel build jobs that
 `ninja` would use.
-
-````{note}
-Note that this setting only controls ninja when used by kde-builder.
-The Qt “webengine” module uses `ninja` indirectly, but only
-officially supports being built by `make`. In this situation,
-you can set `NINJAFLAGS` as a way to have `make`
-pass the appropriate flags when it later calls `ninja`, by
-using [make-options](#conf-make-options).
-
-```
-options qtwebengine
-    # Restrict make and ninja to using no more than 6 separate compile jobs even
-    # when more CPU is available, to avoid running out of memory
-    make-options -j6 NINJAFLAGS=-j6
-end options
-```
-````
 
 Related command-line option: --ninja-options \<value\>
 
 (conf-override-build-system)=
 [`override-build-system`](conf-override-build-system)
 
-Type: String, Default value: Auto detected, Valid values, KDE, Qt,
-qmake, generic, autotools, meson, Available since: 1.16
+Type: String, Default value: Auto detected, Valid values: KDE, Qt,
+qmake, generic, autotools, meson
 
 Normally kde-builder will detect the appropriate build system to use
 for a module after it is downloaded. This is done by checking for the
@@ -857,7 +831,7 @@ Related command-line option: --purge-old-logs, --no-purge-old-logs
 (conf-qmake-options)=
 [`qmake-options`](conf-qmake-options)
 
-Type: String, Available since: 1.16
+Type: String
 
 Any options specified here are passed to the `qmake`
 command, for modules that use the `qmake` build system. For
@@ -880,7 +854,7 @@ Related command-line option: --qt-install-dir \<path\>
 (conf-remove-after-install)=
 [`remove-after-install`](conf-remove-after-install)
 
-Type: String, Valid values, none, builddir, all, Default value: none
+Type: String, Valid values: none, builddir, all, Default value: none
 
 If you are low on hard disk space, you may want to use this option in
 order to automatically delete the build directory (or both the source
@@ -903,17 +877,15 @@ Related command-line option: --remove-after-install \<value\>
 (conf-repository)=
 [`repository`](conf-repository)
 
-Type: String, Available since: 1.10
+Type: String
 
-This option is used to specify the Git repository to download the
-source code for the module. Qt (and therefore qt) would need this
-option, as well as various KDE modules that are in the process of
-conversion to use Git.
+This option is used to specify the git repository to download the
+source code for the module.
 
 (conf-revision)=
 [`revision`](conf-revision)
 
-Type: String, Available since: 1.16
+Type: String
 
 If this option is set to a value other than 0 (zero), kde-builder
 will force the source update to bring the module to the exact revision
@@ -945,11 +917,11 @@ Type: String
 This option accepts a space-separated set of values, where the first
 value is the environment variable to set, and the rest of the values is
 what you want the variable set to. For example, to set the variable
-`RONALD` to McDonald, you would put in the appropriate
-section this command:
+`MYTEXT` to "helloworld", you would put in the appropriate
+section this line:
 
 ```
-set-env RONALD McDonald
+set-env MYTEXT helloworld
 ```
 
 This option is special in that it can be repeated without overriding
@@ -963,7 +935,7 @@ than one environment variable per module (or globally).
 Type: String, Default value: `~/kde/src`
 
 This option is used to set the directory on your computer to store
-the KDE Git sources at. You may use the tilde (~) to represent the home
+the sources at. You may use the tilde (~) to represent the home
 directory if using this option.
 
 Related command-line option: --source-dir \<path\>
@@ -982,7 +954,7 @@ Related command-line option: [--stop-on-failure](#cmdline-stop-on-failure)
 (conf-tag)=
 [`tag`](conf-tag)
 
-Type: String, Available since: 1.16
+Type: String
 
 Use this option to download a specific release of a module.
 
@@ -995,7 +967,7 @@ Related command-line option: --tag \<value\>
 (conf-use-clean-install)=
 [`use-clean-install`](conf-use-clean-install)
 
-Type: Boolean, Default value: False, Available since: 1.12
+Type: Boolean, Default value: False
 
 Set this option to `true` in order to have kde-builder
 run `make uninstall` directly before running
@@ -1086,7 +1058,7 @@ processed.
 
 Scope: global, module-set
 
-Type: String, Available since: 1.16
+Type: String
 
 Note that when specified in global section,
 [--ignore-modules](#cmdline-ignore-modules) cmdline option does
@@ -1120,7 +1092,7 @@ Related command-line option: [--ignore-modules](#cmdline-ignore-modules)
 
 Scope: module-set
 
-Type: String, Available since: 1.12.1
+Type: String
 
 This option allows you to easily specify many different modules to
 build at the same point in [the configuration file](./kdesrc-buildrc-overview).

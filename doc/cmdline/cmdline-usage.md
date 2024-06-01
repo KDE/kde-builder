@@ -1,7 +1,7 @@
 (cmdline-usage)=
 # Command Line Usage
 
-kde-builder is designed to be run as follows:
+KDE Builder is designed to be run as follows:
 
 kde-builder \[--options\] \[modules to build...\]
 
@@ -22,18 +22,18 @@ itself, if you have given it a name.
 In the specific case of module sets based against the [KDE project
 database](#kde-projects-module-sets), kde-builder will expand module
 name components to determine the exact module you want. For example,
-kdesrc-build's KDE project entry locates the project in
-`extragear/utils/kdesrc-build`. You could specify any of the following
-to build kdesrc-build:
+repo-metadata's KDE project entry locates the project in
+`extragear/utils/kcalc`. You could specify any of the following
+to build kcalc:
 
-```
-% kdesrc-build +extragear/utils/kdesrc-build
-% kdesrc-build +utils/kdesrc-build
-% kdesrc-build +kdesrc-build
+```bash
+kde-builder +kde/kdeutils/kcalc
+kde-builder +kdeutils/kcalc
+kde-builder +kcalc
 ```
 
 ```{note}
-The commands in the previous example preceded the module-name with a
+The commands in the example above preceded the module-name with a
 `+`. This forces the module name to be interpreted as a module from the
 KDE project database, even if that module hasn't been defined in your
 configuration file.
@@ -49,8 +49,8 @@ want.
 ## Commonly used command line options
 
 `--pretend` (or `-p`)  
-This option causes kde-builder to indicate what actions it would take,
-without actually really implementing them. This can be useful to make
+This option causes KDE Builder to indicate what actions it would take,
+without actually executing them. This can be useful to make
 sure that the modules you think you are building will actually get
 built.
 
@@ -74,7 +74,7 @@ libraries change.
 `--resume-from` module  
 Skips modules until just before the given module, then operates as
 normal. Useful when the previous build failed on specific module, you
-fixed it, and then you want to continue the with building the rest of
+fixed it, and then you want to continue the building with the rest of
 initial set of modules.
 
 `--run` executable_name  

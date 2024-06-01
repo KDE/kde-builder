@@ -2,32 +2,32 @@
 # KDE modules and source code organization
 
 (module-concept)=
-## The “Module”
+## The Module
 
-KDE groups its software into “modules” of various size. This was
+KDE groups its software into "modules" of various size. This was
 initially a loose grouping of a few large modules, but with the
-introduction of the [Git](https://git-scm.com/)-based [source code
+introduction of the [git](https://git-scm.com/)-based [source code
 repositories](https://commits.kde.org/), these large modules were
 further split into many smaller modules.
 
-kde-builder uses this module concept as well. In essence, a “module” is
+kde-builder uses this module concept as well. In essence, a "module" is
 a grouping of code that can be downloaded, built, tested, and installed.
 
 (single-modules)=
 ### Individual modules
 
 It is easy to set kde-builder to build a single module. The following
-listing is an example of what a declaration for a Git-based module would
+listing is an example of what a declaration for a module would
 look like in [the configuration file](../kdesrc-buildrc/kdesrc-buildrc-overview).
 
-```
+```text
 module kdefoo
     cmake-options -DCMAKE_BUILD_TYPE=Debug
 end module
 ```
 
 ```{tip}
-This is a Git-based module since it doesn't use a
+This is a git-based module since it doesn't use a
 [repository](#conf-repository) option. Also, the `cmake-options` option
 is listed as an example only, it is not required.
 ```
@@ -35,13 +35,13 @@ is listed as an example only, it is not required.
 (module-groups)=
 ### Groups of related modules
 
-Now most KDE source modules are Git-based KDE, and are normally combined
+Now most KDE source modules are git-based KDE, and are normally combined
 into groups of modules.
 
 kde-builder therefore supports groups of modules as well, using [module
 sets](#module-sets). An example:
 
-```
+```text
 module-set base-modules
     repository kde-projects
     use-modules kde-runtime kde-workspace kde-baseapps
@@ -54,28 +54,25 @@ if you like. This `repository` setting tells kde-builder where to
 download the source from, but you can also use a `git://` URL.
 ```
 
-One special feature of the “`repository` `kde-projects`” is that
-kde-builder will automatically include any Git modules that are grouped
+One special feature of the "repository kde-projects" is that
+kde-builder will automatically include any modules that are grouped
 under the modules you list (in the KDE Project database).
 
 (module-branch-groups)=
-### Module “branch groups”
+### Module "branch groups"
 
 Taking the concept of a [group of modules](#module-groups) further, the
-KDE developers eventually found that synchronizing the names of the Git
+KDE developers eventually found that synchronizing the names of the git
 branches across a large number of repositories was getting difficult,
 especially during the development push for the new KDE Frameworks for Qt 5.
 
-So the concept of “branch groups” was developed, to allow users and
+So the concept of "branch groups" was developed, to allow users and
 developers to select one of only a few groups, and allow the script to
-automatically select the appropriate Git branch.
-
-kde-builder supports this feature as of version 1.16-pre2, via the
-[branch-group](#conf-branch-group) option.
+automatically select the appropriate git branch.
 
 branch-group can be used in the configuration file as follows:
 
-```{code-block}
+```{code-block} text
 :name: ex-branch-group
 :caption: Example of using branch-group
 
@@ -101,10 +98,10 @@ end module-set
 ```
 
 In this case the same `branch-group` gives different branch names for
-each Git module.
+each module.
 
 This feature requires some data maintained by the KDE developers in a
-Git repository named `kde-build-metadata`, however this module will be
+git repository named `kde-build-metadata`, however this module will be
 included automatically by kde-builder (though you may see it appear in
 the script output).
 

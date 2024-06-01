@@ -6,7 +6,7 @@ Normally using kde-builder after you have gone through
 terminal prompt:
 
 ```
-% kde-builder
+kde-builder
 ```
 
 kde-builder will then download the sources for KDE, try to configure

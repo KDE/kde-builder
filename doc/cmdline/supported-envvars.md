@@ -14,7 +14,7 @@ to this variable (e.g. for running from `cron`(8)).
 Environment variables starting with LC\_ control the locale used by
 `kde-builder`. Although `kde-builder` is still not localizable at this
 point, many of the commands it uses are. `kde-builder` normally sets
-`LC_ALL`=C for commands that its must examine the output of but you can
+`LC_ALL`=C for commands that it must examine the output of but you can
 manually do this as well. If setting `LC_ALL`=C fixes a `kde-builder`
 problem please submit a bug report.
 
@@ -29,11 +29,6 @@ If set, this variable forces `kde-builder` not to close its input while
 executing system processes. Normally `kde-builder` closes `stdin` since
 the `stdout` and `stderr` for its child processes are redirected and
 therefore the user would never see an input prompt anyways.
-
-`KDESRC_BUILD_DUMP_CONTEXT`  
-If set, this variable prints out a description of its "build context"
-just after reading options and command line arguments and determining
-which modules to build. You pretty much never want to set this.
 
 others  
 Many programs are used by `kde-builder` in the course of its execution,

@@ -4,7 +4,7 @@
 (logging-overview)=
 ## Logging overview
 
-Logging is a kde-builder feature whereby the output from every command
+Logging is a KDE Builder feature whereby the output from every command
 that kde-builder runs is saved to a file for examination later, if
 necessary. This is done because it is often necessary to have the output
 of these programs when there is a build failure, because there are so
@@ -17,7 +17,7 @@ The logs are always stored under the log directory. The destination of
 the log directory is controlled by the [log-dir](#conf-log-dir) option,
 which defaults to `~/kde/log`. In the rest of this section, this value will be referred to as `${log-dir}`.
 
-Under `${log-dir}`, is a set of directories, one for every time that
+Under `${log-dir}`, there is a set of directories, one for every time that
 kde-builder was run. Each directory is named with the date, and the run
 number. For instance, the second time that kde-builder is run on May
 26, 2004, it would create a directory called `2004-05-26-02`, where the
@@ -34,10 +34,10 @@ which will allow you to determine which modules built and which failed.
 
 ```{note}
 If a module itself has a submodule (such as extragear/multimedia,
-playground/utils, or KDE/kdelibs), then there would actually be a
+playground/utils), then there would actually be a
 matching layout in the log directory. For example, the logs for
-KDE/kdelibs after the last kde-builder run would be found in
-`${log-dir}/latest/KDE/kdelibs`, and not under `${log-dir}/latest/kdelibs`.
+playground/utils after the last kde-builder run would be found in
+`${log-dir}/latest/playground/utils`, and not under `${log-dir}/latest/utils`.
 ```
 
 In each module log directory, you will find a set of files for each
@@ -53,7 +53,7 @@ kde-builder will create a link from the file containing the error (such
 as `build-1.log` to a file called `error.log`).
 
 The upshot to all of this is that to see why a module failed to build
-after your last kde-builder, the file you should look at first is
+after your last kde-builder invocation, the file you should look at first is
 `${log-dir}/latest/module-name/error.log`.
 
 ```{tip}
@@ -63,7 +63,7 @@ system will sometimes mistakenly report an error when there was none.
 
 Also, some commands will evade kde-builder's output redirection and
 bypass the log file in certain circumstances (normally when performing
-the first Git checkout), and the error output in that case is not in the
+the first git checkout), and the error output in that case is not in the
 log file but is instead at the Konsole or terminal where you ran
 kde-builder.
 ```

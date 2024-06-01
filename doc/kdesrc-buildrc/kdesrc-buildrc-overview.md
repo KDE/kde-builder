@@ -1,7 +1,7 @@
 (kdesrc-buildrc-overview)=
 # Overview of kde-builder configuration
 
-To use the script, you must have a file in your home directory called
+To use the KDE Builder, you must have a file in your home directory called
 `.kdesrc-buildrc`, which describes the modules you would like to
 download and build, and any options or configuration parameters to use
 for these modules.
@@ -15,7 +15,7 @@ for these modules.
 The configuration file starts with the global options, specified like
 the following:
 
-```
+```text
 global
     option-name option-value
     [...]
@@ -28,15 +28,15 @@ end global
 It is then followed by one or more module sections, specified in one of
 the following two forms:
 
-- 
-```
+
+```text
 module module-name
   option-name option-value
   [...]
 end module
 ```
--
-```
+
+```text
 module-set module-set-name
   repository kde-projects or git://host.org/path/to/repo.git
   use-modules module-names
@@ -47,22 +47,16 @@ module-set module-set-name
 end module-set
 ```
 
-```{important}
-Note that the second form, module sets, *only works for Git-based
-modules*.
-```
-
-For Git modules, \<module-name\> must be a module from the KDE Git
+For *module*, \<module-name\> must be a module from the KDE git
 repository (for example, kdeartwork or kde-wallpapers).
-
-For Git modules, the module name can be essentially whatever you'd like,
+The \<module-name\> can be essentially whatever you'd like,
 as long as it does not duplicate any other module name in the
 configuration. Keep in mind the source and build directory layout will
 be based on the module name if you do not use the
 [dest-dir](#conf-dest-dir) option.
 
-However, for Git *module sets* the \<module-names\> must correspond with
-actual git modules in the chosen `repository`. See
+For *module-set*, the \<module-names\> must correspond with
+actual modules in the chosen `repository`. See
 [git-repository-base](#conf-git-repository-base) or
 [use-modules](#conf-use-modules) for more information.
 
@@ -83,7 +77,7 @@ You can also introduce your own non-standard global variables for
 referencing them further in the config. To do this, your option name
 should be prepended with underscore symbol. Example:
 
-```{code-block}
+```{code-block} text
 :name: custom-global-option-example
 :caption: Introducing your own global option for referencing later in config
 
@@ -99,12 +93,12 @@ end options
 ```
 
 (kdesrc-buildrc-options-groups)=
-### “options” modules
+### "options" modules
 
 There is a final type of configuration file entry, `options` groups,
-which may be given wherever a `module` or `module-set` may be used.
+which may be given wherever in `module` or `module-set` may be used.
 
-```
+```text
 options module-name
   option-name option-value
   [...]
@@ -135,7 +129,7 @@ In this example we choose to build all modules from the KDE multimedia
 software grouping. However we want to use a different version of the
 KMix application (perhaps for testing a bug fix). It works as follows:
 
-```{code-block}
+```{code-block} text
 :name: ex-options-group
 :caption: Example of using options
 
@@ -153,15 +147,10 @@ end options
 ```
 
 Now when you run kde-builder, all of the KDE multimedia programs will
-be built from the “master” branch of the source repository, but KMix
+be built from the "master" branch of the source repository, but KMix
 will be built from the older “KDE/4.12” branch. By using `options` you
 didn't have to individually list all the *other* KDE multimedia programs
 to give them the right branch option.
-
-```{note}
-Note that this feature is only available in kde-builder from version
-1.16, or using the development version of kde-builder after 2014-01-12.
-```
 
 (kdesrc-buildrc-including)=
 ## Including other configuration files
@@ -172,7 +161,7 @@ referenced had been inserted into the configuration file at that point.
 
 For example, you could have something like this:
 
-```
+```text
 global
     include ~/common-kde-builder-options
 
@@ -189,7 +178,7 @@ file. This works recursively as well.
 
 You can use variables in the value of include instruction:
 
-```
+```text
 global
   _ver 6
   source-dir ~/kde${_ver}/src
@@ -197,7 +186,7 @@ global
   persistent-data-file ~/kde${_ver}/persistent-options.json
 end global
 
-include ~/kde6/src/kde-builder/data/build-include/kf${_ver}-qt${_ver}.ksb
+include ${module-definitions-dir}/kf${_ver}-qt${_ver}.ksb
 ```
 
 (kdesrc-buildrc-common)=
@@ -218,7 +207,7 @@ find out more about it. To see the full list of options, see the section called
 - [install-dir](#conf-install-dir), to set the directory to install KDE
   to.
 
-- [make-options](#conf-make-options), to pass options to the Make
+- [make-options](#conf-make-options), to pass options to the `make`
   program (such as number of CPUs to use).
 
 - [qt-install-dir](#conf-qt-install-dir), to set the directory to

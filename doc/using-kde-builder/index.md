@@ -11,5 +11,6 @@ basic-features
 advanced-features
 developer-features
 other-features
+kde-builder-logging
 tips-and-tricks
 ```

@@ -2,20 +2,19 @@
 # Using the kde-builder script
 
 With the configuration data established, now you are ready to run the
-script. Even if you still have some tweaking or other reading you wish
-to do, it is a good idea to at least load the KDE project metadata.
+tool.
 
 (loading-kde-builder-metadata)=
 ## Loading project metadata
 
-From a terminal window, log in to the user you are using to compile KDE
-software and execute the script:
+The metadata downloading is handled automatically when needed. But in case
+you want to download it manually, run the command:
 
-```
-% kde-builder --metadata-only
+```bash
+kde-builder --metadata-only
 ```
 
-This command will setup the source directory and connect to the KDE Git
+This command will setup the source directory and connect to the KDE git
 repositories to download the database of KDE git repositories, and the
 database of dependency metadata, without making any further changes. It
 is useful to run this separately as this metadata is useful for other
@@ -28,8 +27,8 @@ With the project metadata installed, it is possible to preview what
 kde-builder will do when launched. This can be done with the
 `--pretend` command line option.
 
-```
-% ./kde-builder --pretend
+```bash
+kde-builder kcalc --pretend
 ```
 
 You should see a message saying that some packages were successfully
@@ -37,8 +36,8 @@ built (although nothing was actually built). If there were no
 significant problems shown, you can proceed to actually running the
 script.
 
-```
-% kde-builder
+```bash
+kde-builder kcalc
 ```
 
 This command will download the appropriate source code, build and
@@ -49,7 +48,7 @@ to that in [example_title](#example-build-sequence):
 :name: example-build-sequence
 :caption: Example output of a kde-builder run
 
-% kde-builder
+$ kde-builder kcalc
 Updating kde-build-metadata (to branch master)
 Updating sysadmin-repo-metadata (to branch master)
 
@@ -81,7 +80,7 @@ Building kdevelop from kdev (200/200)
 <<<  PACKAGES SUCCESSFULLY BUILT  >>>
 Built 200 modules
 
-Your logs are saved in /home/kde-src/kdesrc/log/2018-01-20-07
+Your logs are saved in /home/username/kde/log/2018-01-20-07
 ```
 
 (fixing-build-failures)=
@@ -91,10 +90,10 @@ Depending on how many modules you are downloading, it is possible that
 kde-builder will not succeed the first time you compile KDE software.
 Do not despair!
 
-kde-builder logs the output of every command it runs. By default, the
-log files are kept in `~/kdesrc/log`. To see what the caused an error
+KDE Builder logs the output of every command it runs. By default, the
+log files are kept in `~/kde/log`. To see what caused an error
 for a module in the last kde-builder command, usually it is sufficient
-to look at `~/kdesrc/log/latest/module-name/error.log`.
+to look at `~/kde/log/latest/module-name/error.log`.
 
 ```{tip}
 Perhaps the easiest way to find out what error caused a module to fail
@@ -113,22 +112,17 @@ you run kde-builder again to pass the
 the module to check for the missing packages again.
 
 Or, if the error appears to be a build error (such as a syntax error,
-“incorrect prototype”, “unknown type”, or similar) then it is probably
+"incorrect prototype", "unknown type", or similar) then it is probably
 an error with the KDE source, which will hopefully be resolved within a
 few days. If it is not resolved within that time, feel free to mail the
 <kde-devel@kde.org> mailing list (subscription may be required first) in
 order to report the build failure.
-
-You can find more common examples of things that can go wrong and their
-solutions, as well as general tips and strategies to build KDE software
-in the [Build from
-Source](https://community.kde.org/Guidelines_and_HOWTOs/Build_from_source).
 
 On the other hand, assuming everything went well, you should have a new
 KDE install on your computer, and now it is simply a matter of running
 it, described in the section [](#installing-login-session).
 
 ```{note}
-For more information about kde-builder's logging features, please see
-the section called [](../features/kde-builder-logging).
+For more information about KDE Builder's logging features, please see
+the section called [](#kde-builder-logging).
 ```

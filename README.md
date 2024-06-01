@@ -15,7 +15,9 @@ to your local system.
 The predecessor project was written in Perl, and this was a significant barrier for new contributions.  
 The successor project is written in Python - a much more acknowledged language. This means that newly wanted features can be implemented with ease.  
 
-## Generic installation
+## Basic Usage
+
+Installation:
 
 ```bash
 cd ~
@@ -23,25 +25,12 @@ curl 'https://invent.kde.org/sdk/kde-builder/-/raw/master/scripts/initial_setup.
 bash initial_setup.sh
 ```
 
-## Alternative installation methods
-
-See [Alternative Installation](doc/getting-started/alternative-installation.md)
-
-## Initial setup
-
-Run this command to install needed dependencies:
-
-```bash
-kde-builder --install-distro-packages
-```
-
-Run this command to generate configuration file:
+Initial setup:
 
 ```bash
 kde-builder --generate-config
+kde-builder --install-distro-packages
 ```
-
-## Usage
 
 Observe the build plan:
 
@@ -67,7 +56,7 @@ Launch the binary for a project using the development environment:
 kde-builder --run kcalc
 ```
 
-To build a specific project while skipping certain modules:
+Build a specific project while skipping certain modules:
 
 ```bash
 kde-builder kcalc --ignore-modules kxmlgui
@@ -75,9 +64,10 @@ kde-builder kcalc --ignore-modules kxmlgui
 
 ## Documentation
 
-See the wiki page [Get_Involved/development](https://community.kde.org/Get_Involved/development).
+For more details, consult the project documentation at https://kde-builder.kde.org/.
 
-For more details, consult the project documentation at https://kde-builder.kde.org/. The most important pages are:
+Shortcuts to some pages:
 
+- [Installation and initial setup steps](https://kde-builder.kde.org/en//getting-started/before-building.html#initial-setup-of-kde-builder)
 - [List of supported configuration options](https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html)
 - [Supported command line parameters](https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html)

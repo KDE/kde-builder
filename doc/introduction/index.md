@@ -7,5 +7,5 @@ nosearch:
 
 ```{toctree}
 brief-intro
-intro-toc
+features-overview
 ```

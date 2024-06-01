@@ -51,7 +51,7 @@ by setting the [colorful-output](#conf-colorful-output) option in the
 
 Disabling color output in the configuration file:
 
-```
+```text
 global
   colorful-output false
 end global
@@ -62,7 +62,7 @@ end global
 
 Are you short on disk space but still want to run a bleeding-edge KDE
 checkout? kde-builder can help reduce your disk usage when building KDE
-from Git.
+from git.
 
 ```{note}
 Be aware that building KDE does take a lot of space. There are several
@@ -82,8 +82,12 @@ major space-using pieces when using kde-builder:
 
     Also, if you already have a Qt installed by your distribution (and
     the odds are good that you do), you probably do not need to install
-    the qt module. That will shave about 200 megabytes off of the
+    the qt6-set module set. That will shave about 200 megabytes off of the
     on-disk source size.
+
+```{note}
+Outdated info. Mentions the size for the kdebase module.
+```
 
 2.  kde-builder will create a separate build directory to build the
     source code in. Sometimes kde-builder will have to copy a source
@@ -125,7 +129,7 @@ fix the crash. So, remove debugging information at your own risk!
 Removing the build directory after installation of a module. The source
 directory is still kept, and debugging is enabled:
 
-```
+```text
 global
   configure-flags      --enable-debug
   remove-after-install builddir        # Remove build directory after install
@@ -135,7 +139,7 @@ end global
 Removing the build directory after installation, without debugging
 information, with size optimization.
 
-```
+```text
 global
   cxxflags             -Os             # Optimize for size
   configure-flags      --disable-debug

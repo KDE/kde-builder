@@ -8,34 +8,24 @@
 Operate in a "dry run" mode. No network accesses are made, no log files
 are created, no modules are built, and no other permanent changes to
 disk are made. One *important exception* is that if you try to build a
-module that comes from the KDE project database, and the database hasn't
-been downloaded yet, the database will be downloaded since the
-pretend-mode output may change significantly based on the database
+module that comes from the KDE projects, and the repo-metadata hasn't
+been downloaded yet, the repo-metadata will be downloaded since the
+pretend-mode output may change significantly based on the repo-metadata
 results.
 
-```{note}
 Simple read-only commands (such as reading file information) may still
 be run to make the output more relevant (such as correctly simulating
 whether source code would be checked out or updated).
-```
-
-```{important}
-This option requires that some needed metadata is available, which is
-normally automatically downloaded, but downloads are disabled in pretend
-mode. If you've never run kde-builder (and therefore, don't have this
-metadata), you should run `kde-builder --metadata-only` to download the
-required metadata first.
-```
 
 (cmdline-include-dependencies)=
 [`--include-dependencies`](cmdline-include-dependencies) (or `-d`), `--no-include-dependencies` (or `-D`)  
 This option causes kde-builder to automatically include other KDE and
-Qt modules in the build, if required for the modules you have requested
+Qt modules in the build, if required, for the modules you have requested
 to build on the command line or in your [configuration
 file](../getting-started/configure-data).
 
-The modules that are added are as recorded within the KDE source code
-management system. See the section called [](#kde-projects-module-sets).
+The modules that are added are as recorded within the KDE repo-metadata
+dependencies. See the section called [](#kde-projects-module-sets).
 
 The corresponding configuration file option is
 [include-dependencies](#conf-include-dependencies).
@@ -87,7 +77,7 @@ For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` v
 (cmdline-revision)=
 [`--revision`](cmdline-revision) \<id\>  
 This option causes kde-builder to checkout a specific numbered revision
-for each Git module, overriding any [branch](#conf-branch),
+for each module, overriding any [branch](#conf-branch),
 [tag](#conf-tag), or [revision](#conf-revision) options already set for
 these modules.
 
@@ -106,7 +96,7 @@ re-run with it if it is needed.
 
 This option must be passed to allow `kde-builder` to remove conflicting
 source directories. Currently even this only happens when trying to
-clone a git-based module if an existing source directory is present.
+git clone a module if an existing source directory is present.
 Never specify this option unless it is suggested by `kde-builder`, and
 only if you don't mind the source directories that are referenced being
 deleted and re-cloned.
@@ -209,7 +199,7 @@ and `moduleB`.
 [`--stop-on-failure`](cmdline-stop-on-failure), `--no-stop-on-failure`  
 This option controls if the build will be aborted as soon as a failure
 occurs. Default behavior is --stop-on-failure. You may override it if
-you wish to press on with the rest of the modules in the build, to avoid
+you wish to still process the rest of the modules in the build, to avoid
 wasting time in case the problem is with a single module.
 
 See also the [stop-on-failure](#conf-stop-on-failure) configuration file
@@ -224,7 +214,7 @@ causing the build failures you can then easily build only the modules
 that failed previously.
 
 ```{note}
-Note that the list of “previously-failed modules” is reset every time a
+Note that the list of "previously-failed modules" is reset every time a
 kde-builder run finishes with some module failures. However, it is not
 reset by a completely successful build, so you can successfully rebuild
 a module or two and this flag will still work.
@@ -239,36 +229,28 @@ the build list (either passed on the command line or read in from the
 configuration file), outputting the result to screen (one module per
 line).
 
-This option must be provided with a “mode”, which may be one of the
+This option must be provided with a "mode", which may be one of the
 following:
 
-- `source-dir`, which causes kde-builder to output the full path to
-  where the module's source code is stored.
+- `source-dir` - the full path to where the module's source code is stored.
 
-- `build-dir`, which causes kde-builder to output the full path to
-  where the module build process occurs.
+- `build-dir` - the full path to where the module build process occurs.
 
-- `install-dir`, which causes kde-builder to output the full path to
-  where the module will be installed.
+- `install-dir` - the full path to where the module will be installed.
 
-- `project-path`, which causes kde-builder to output the location of
-  the module within the hierarchy of KDE source code repositories. See
-  the section called [](#kde-projects-module-sets) for more information on this
-  hierarchy.
+- `project-path` - the location of the module within the hierarchy of KDE
+   source code repositories. See the section called [](#kde-projects-module-sets) for more information
+   on this hierarchy.
 
-- `branch`, which causes kde-builder to output the resolved git branch
-  that will be used for each module, based on the [tag](#conf-tag),
-  [branch](#conf-branch) and [branch-group](#conf-branch-group) settings
-  in effect.
+- `branch` - the resolved git branch that will be used for each module, based
+   on the [tag](#conf-tag), [branch](#conf-branch) and [branch-group](#conf-branch-group) settings in effect.
 
-- `module-set`, which causes kde-builder to output the name of
-  module-set which contains the module. This can be used to generate zsh
-  autocompletion cache.
+- `module-set` - the name of module-set which contains the module. This can be used
+   to generate zsh autocompletion cache.
 
-- `build-system`, which causes kde-builder to output the name of build
-  system detected for the module. This can be used to debug build system
-  auto-detection problems, or when developing tests for specific build
-  systems.
+- `build-system` - the name of build system detected for the module. This can be used
+   to debug build system auto-detection problems, or when developing tests for specific
+   build systems.
 
 - Any option name that is valid for modules in the [configuration
   file](../kdesrc-buildrc/conf-options-table).
@@ -327,7 +309,7 @@ to `--src-only`, but the semantics may change in the future (e.g. when
 test suites are moved into their own phase).
 
 (cmdline-no-tests)=
-[`--no-tests`](cmdline-no-tests)=
+[`--no-tests`](cmdline-no-tests)  
 Disables running the test suite for CMake-based modules. To be fully
 effective this requires re-running CMake, which can be forced by using
 the `--reconfigure` or `--refresh-build` options.
@@ -368,7 +350,7 @@ that supports the `make uninstall` command (e.g. KDE CMake-based).
 
 (cmdline-build-system-only)=
 [`--build-system-only`](cmdline-build-system-only)  
-Interrupts the build process for each module built: The build process
+Interrupts the build process for each module built. The build process
 consists of normal setup up to and including running `cmake` or
 `configure` (as appropriate), but `make` is not run and no installation
 is attempted. This is mostly only useful to get things like
@@ -407,7 +389,7 @@ Useful in conjunction with `--resume`. See also [`--resume-refresh-build-first`]
 
 (cmdline-reconfigure)=
 [`--reconfigure`](cmdline-reconfigure)  
-Run `cmake` (for KDE modules) or `configure` (for Qt) again, without
+Run `cmake` (for KDE modules) or `configure` (for non-cmake modules) again, without
 cleaning the build directory.
 Usually you actually want `--refresh-build`, but if you are 100% sure
 your change to `cmake-options` will not invalidate your current
@@ -418,7 +400,7 @@ and automatically re-run the build setup. This option is implied if
 `--refresh-build` is used.
 
 (cmdline-install-dir)=
-[`--install-dir path`](cmdline-install-dir)  
+[`--install-dir`](cmdline-install-dir) path  
 This allows you to change the directory where modules will be installed
 to. This option implies [`--reconfigure`](#cmdline-reconfigure), but
 using [`--refresh-build`](#cmdline-refresh-build) may still be required.
@@ -453,7 +435,7 @@ Enables `DEBUG` level for every logger of the kde-builder. See [](#changing-verb
 [`--nice`](cmdline-nice) (or `--niceness`) \<value\>  
 This value adjusts the computer CPU priority requested by kde-builder,
 and should be in the range of 0-20. 0 is highest priority (because it is
-the least “nice”), 20 is the lowest priority. This option defaults to 10.  
+the least "nice"), 20 is the lowest priority. This option defaults to 10.  
 
 Changes the CPU priority given to `kde-builder` (and all processes used
 by `kde-builder` e.g. `make`(1)). \<foo\> should be an integer number
@@ -487,7 +469,7 @@ software to run.
 This includes:
 
 - Installing known dependencies (on supported Linux distributions)
-- Adding required environment variables to `~/.bashrc`
+- Generating kdesrc-buildrc config
 
 This option is exactly equivalent to using `--install-distro-packages`
 and `--generate-config` at the same time.
