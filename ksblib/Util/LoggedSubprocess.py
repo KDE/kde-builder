@@ -6,7 +6,11 @@
 from __future__ import annotations
 
 from promise import Promise
-import multiprocessing
+import sys
+if sys.platform == "darwin":
+    import multiprocess as multiprocessing
+else:
+    import multiprocessing
 import asyncio
 
 from ..BuildException import BuildException

@@ -19,7 +19,10 @@ import subprocess
 import shlex
 import signal
 from promise import Promise
-import multiprocessing
+if sys.platform == "darwin":
+    import multiprocess as multiprocessing
+else:
+    import multiprocessing
 import traceback
 import codecs
 import setproctitle

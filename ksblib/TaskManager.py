@@ -73,6 +73,12 @@ class TaskManager:
         def updateOptsSub(modName, k, v):
             ctx.setPersistentOption(modName, k, v)
 
+        if sys.platform == "darwin":
+            # There were reports that macOS does not play well with async mode. See https://invent.kde.org/sdk/kde-builder/-/issues/79
+            if ctx.getOption("async"):
+                logger_ipc.warning("Disabling async mode due to macOS detected.")
+                ctx.setOption({"async": False})
+
         if ctx.usesConcurrentPhases() and ctx.getOption("async"):
             ipc = IPC_Pipe()
         else:
