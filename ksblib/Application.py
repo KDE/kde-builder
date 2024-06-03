@@ -604,13 +604,8 @@ class Application:
             # processes performing update and build at the same time by default.
 
             # Check for absolutely essential programs now.
-            if not Application._checkForEssentialBuildPrograms(ctx) and not os.environ.get("KDESRC_BUILD_IGNORE_MISSING_PROGRAMS"):
-                logger_app.error(textwrap.dedent("""\
-                 r[b[*] Aborting now to save a lot of wasted time.
-                 y[b[*] export b[KDESRC_BUILD_IGNORE_MISSING_PROGRAMS=1] and re-run (perhaps with --no-src)
-                 r[b[*] to continue anyways. If this check was in error please report a bug against
-                 y[b[*] kde-builder at https://bugs.kde.org/
-                """))
+            if not self._check_for_essential_build_programs() and not os.environ.get("KDE_BUILDER_IGNORE_MISSING_PROGRAMS"):
+                logger_app.error(" r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.")
                 result = 1
             else:
                 runner = TaskManager(self)
@@ -1698,27 +1693,21 @@ class Application:
         else:
             logger_app.debug(" b[*] No need to run install-sessions.sh, all files are already installed and up to date.")
 
-    @staticmethod
-    def _checkForEssentialBuildPrograms(ctx: BuildContext):
+    def _check_for_essential_build_programs(self) -> bool:
         """
-        This function checks for programs which are absolutely essential to the
-        *build* process and returns false if they are not all present. Right now this
-        just means qmake and cmake (although this depends on what modules are
-        actually present in the build context).
-
-        Parameters:
-            ctx: Build context
+        Checks if programs which are absolutely essential to the *build* process are available.
+        The check is made for modules that are actually present in the build context.
 
         Returns:
-            None
+            False if not all required programs are present. True otherwise.
         """
-        Util.assert_isa(ctx, BuildContext)
+        ctx = self.context
         installdir = ctx.getOption("install-dir")
         qt_installdir = ctx.getOption("qt-install-dir")
         preferred_paths = [f"{installdir}/bin", f"{qt_installdir}/bin"]
 
         if Debug().pretending():
-            return 1
+            return True
 
         buildModules = ctx.modulesInPhase("build")
         requiredPrograms = {}
@@ -1734,7 +1723,7 @@ class Application:
                     modulesRequiringProgram[prog] = {}
                 modulesRequiringProgram[prog][module.name] = 1
 
-        wasError = 0
+        wasError = False
         for prog in requiredPrograms.keys():
             requiredPackages = {
                 "qmake": "Qt",
@@ -1746,7 +1735,7 @@ class Application:
             preferredPath = Util.locate_exe(prog, preferred_paths)
             programPath = preferredPath or Util.locate_exe(prog)
 
-            # qmake is not necessarily named 'qmake'
+            # qmake is not necessarily named "qmake"
             if not programPath and prog == "qmake":
                 programPath = BuildSystem_QMake.absPathToQMake()
 
@@ -1755,16 +1744,16 @@ class Application:
                 if prog == "qmake" and [x for x in buildModules if x.buildSystemType() == "Qt" or x.buildSystemType() == "Qt5"] or Debug().pretending():
                     continue
 
-                wasError = 1
+                wasError = True
                 reqPackage = requiredPackages.get(prog) or prog
 
                 modulesNeeding = modulesRequiringProgram[prog].keys()
 
                 logger_app.error(textwrap.dedent(f"""\
-                
+
                 Unable to find r[b[{prog}]. This program is absolutely essential for building
                 the modules: y[{", ".join(modulesNeeding)}].
-                
+
                 Please ensure the development packages for
                 {reqPackage} are installed by using your distribution's package manager.
                 """))

@@ -34,13 +34,13 @@ class BuildSystem_KDECMake(BuildSystem):
         "Ninja": {
             "optionsName": "ninja-options",
             "installTarget": "install",
-            "requiredPrograms": ["ninja", "cmake", "qmake"],
+            "requiredPrograms": ["ninja", "cmake"],
             "buildCommands": ["ninja"]
         },
         "Unix Makefiles": {
             "optionsName": "make-options",
             "installTarget": "install/fast",
-            "requiredPrograms": ["cmake", "qmake"],
+            "requiredPrograms": ["cmake"],
             # Non Linux systems can sometimes fail to build when GNU Make would work,
             # so prefer GNU Make if present, otherwise try regular make.
             "buildCommands": ["gmake", "make"]
