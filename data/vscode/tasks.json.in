@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // Have `kde-builder` rebuild the project.
+            "label": "Rebuild",
+            "type": "shell",
+            "options": {
+                "shell": {
+                    "args": [
+                        "-c",
+                        "-i" // Needed for the shell to use kde-builder
+                    ]
+                }
+            },
+            "command": "kde-builder --no-src --no-include-dependencies ${workspaceRootFolderName}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

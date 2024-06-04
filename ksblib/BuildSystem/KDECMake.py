@@ -408,11 +408,16 @@ class BuildSystem_KDECMake(BuildSystem):
 
         # launch.json configures the run with debugger functionality.
         launchJson = self._readFile(f"{dataDir}/launch.json.in")
+        launchJson = launchJson.replace("$installDir", installDir)
+
+        # tasks.json contains tasks to be easily / automatically run.
+        tasksJson = self._readFile(f"{dataDir}/tasks.json.in")
 
         self._writeToFile(f"{configDir}/c_cpp_properties.json", cCppPropertiesJson)
         self._writeToFile(f"{configDir}/settings.json", settingsJson)
         self._writeToFile(f"{configDir}/extensions.json", extensionsJson)
         self._writeToFile(f"{configDir}/launch.json", launchJson)
+        self._writeToFile(f"{configDir}/tasks.json", tasksJson)
 
         return True
 

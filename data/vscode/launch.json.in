@@ -18,6 +18,30 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            // Debug a KCM.
+            "name": "kcm",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "Rebuild",
+            "envFile": "${command:cmake.buildDirectory}/prefix.env",
+            "program": "$installDir/bin/kcmshell6",
+            "args": [
+                // Set build target to the target KCM. Example: "kcm_kwinrules".
+                // This argument will be passed to `kcmshell6` automatically.
+                "${command:cmake.buildTargetName}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }
