@@ -318,16 +318,14 @@ class Updater:
             BuildException.croak_runtime(f"Unable to remove preconfigured push URL for {module}!")
         return 1  # overall success
 
-    def _setupBestRemote(self) -> Promise:
+    def _setupBestRemote(self) -> str:
         """
         Selects a git remote for the user's selected repository (preferring a
         defined remote if available, using "origin" otherwise).
 
         Assumes the current directory is already set to the source directory.
 
-        Returns:
-            A promise that resolves to the name of the remote (which will be
-            setup by kde-builder) to use for updates, or rejects with an error.
+        Returns the name of the remote (which will be setup by kde-builder) to use for updates, or raises exception on an error.
 
         See also the "repository" module option.
         """
@@ -340,22 +338,19 @@ class Updater:
         remoteNames = self.bestRemoteName()
         chosenRemote = remoteNames[0] if remoteNames else Updater.DEFAULT_GIT_REMOTE
 
-        def _then(_):
-            # Make a notice if the repository we're using has moved.
-            old_repo = module.getPersistentOption("git-cloned-repository")
-            if old_repo and (cur_repo != old_repo):
-                logger_updater.warning(f" y[b[*]\ty[{module}]'s selected repository has changed")
-                logger_updater.warning(f" y[b[*]\tfrom y[{old_repo}]")
-                logger_updater.warning(f" y[b[*]\tto   b[{cur_repo}]")
-                logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater.DEFAULT_GIT_REMOTE + "] has been updated")
+        self._setupRemote(chosenRemote)
 
-                # Update what we think is the current repository on-disk.
-                ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
-            return chosenRemote
+        # Make a notice if the repository we're using has moved.
+        old_repo = module.getPersistentOption("git-cloned-repository")
+        if old_repo and (cur_repo != old_repo):
+            logger_updater.warning(f" y[b[*]\ty[{module}]'s selected repository has changed")
+            logger_updater.warning(f" y[b[*]\tfrom y[{old_repo}]")
+            logger_updater.warning(f" y[b[*]\tto   b[{cur_repo}]")
+            logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater.DEFAULT_GIT_REMOTE + "] has been updated")
 
-        a = Promise.resolve(self._setupRemote(chosenRemote))
-        b = a.then(_then)
-        return b
+            # Update what we think is the current repository on-disk.
+            ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
+        return chosenRemote
 
     def _warnIfStashedFromWrongBranch(self, remoteName: str, branch: str, branchName: str) -> bool:
         """
@@ -533,7 +528,7 @@ class Updater:
             BuildException.croak_runtime(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
         remoteName = None
-        remoteNamePromise = self._setupBestRemote()
+        remoteNamePromise = Promise.resolve(self._setupBestRemote())
 
         def uec_fetch(_remoteName):
             nonlocal remoteName
