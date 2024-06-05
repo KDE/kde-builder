@@ -25,7 +25,6 @@ from ..Util.Util import Util
 # use List::Util qw(first);
 from ..Debug import Debug, kbLogger
 
-from .Updater import Updater
 from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
     from ..Module.Module import Module
@@ -34,9 +33,9 @@ if TYPE_CHECKING:
 logger_updater = kbLogger.getLogger("updater")
 
 
-class Updater_Git(Updater):
+class Updater_Git:
     """
-    Module which is responsible for updating git-based source code modules. Can
+    Class that is responsible for updating git-based source code modules. Can
     have some features overridden by subclassing (see Updater_KDEProject
     for an example).
     """
@@ -44,7 +43,7 @@ class Updater_Git(Updater):
     DEFAULT_GIT_REMOTE = "origin"
 
     def __init__(self, module):
-        Updater.__init__(self, module)
+        self.module = module
         self.ipc = None
 
     def updateInternal(self, ipc=IPC_Null()) -> int:
