@@ -269,7 +269,7 @@ class Updater:
         """
         return False
 
-    def _setupRemote(self, remote: str) -> Promise:
+    def _setupRemote(self, remote: str) -> int:
         """
         Ensures the given remote is pre-configured for the module's git repository.
         The remote is either set up from scratch or its URLs are updated.
@@ -277,64 +277,46 @@ class Updater:
         Parameters:
             remote: name (alias) of the remote to configure
 
-        Returns:
-             A promise that resolves to 1, or rejects with an error.
+        Returns 1 or raises exception on an error.
         """
         module = self.module
         repo = module.getOption("repository")
         hasOldRemote = self.hasRemote(remote)
 
-        def first_fn(resolve, reject):
-            if hasOldRemote:
-                logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
+        if hasOldRemote:
+            logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
+            exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])
+            if not exitcode == 0:
+                BuildException.croak_runtime(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
+        else:
+            logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
+            exitcode = Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])
+            if not exitcode == 0:
+                BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
 
-                def ec_1(exitcode):
-                    if not exitcode == 0:
-                        BuildException.croak_runtime(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
+        # If we make it here, no exceptions were thrown
+        if not self.isPushUrlManaged():
+            return 1
 
-                resolve(Promise.resolve(Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])).then(ec_1))
-            else:
-                logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
+        # pushInsteadOf does not work nicely with git remote set-url --push
+        # The result would be that the pushInsteadOf kde: prefix gets ignored.
+        #
+        # The next best thing is to remove any preconfigured pushurl and
+        # restore the kde: prefix mapping that way.  This is effectively the
+        # same as updating the push URL directly because of the remote set-url
+        # executed previously by this function for the fetch URL.
 
-                def ec_2(exitcode):
-                    if not exitcode == 0:
-                        BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
+        existingPushUrl = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
 
-                resolve(Promise.resolve(Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])).then(ec_2))
+        if not existingPushUrl:
+            return 1
 
-        p = Promise(first_fn)
+        logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
 
-        def second_fn(_):
-            # If we make it here, no exceptions were thrown
-            if not self.isPushUrlManaged():
-                return 1
-
-            # pushInsteadOf does not work nicely with git remote set-url --push
-            # The result would be that the pushInsteadOf kde: prefix gets ignored.
-            #
-            # The next best thing is to remove any preconfigured pushurl and
-            # restore the kde: prefix mapping that way.  This is effectively the
-            # same as updating the push URL directly because of the remote set-url
-            # executed previously by this function for the fetch URL.
-
-            existingPushUrl = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
-
-            if not existingPushUrl:
-                return 1
-
-            logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
-
-            Promise.resolve(Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"]))
-
-            def then(exitcode):
-                if not exitcode == 0:
-                    BuildException.croak_runtime(f"Unable to remove preconfigured push URL for {module}!")
-                return 1  # overall success
-
-            return then
-
-        p = p.then(second_fn)
-        return p
+        exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
+        if not exitcode == 0:
+            BuildException.croak_runtime(f"Unable to remove preconfigured push URL for {module}!")
+        return 1  # overall success
 
     def _setupBestRemote(self) -> Promise:
         """
@@ -371,7 +353,7 @@ class Updater:
                 ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
             return chosenRemote
 
-        a = self._setupRemote(chosenRemote)
+        a = Promise.resolve(self._setupRemote(chosenRemote))
         b = a.then(_then)
         return b
 
