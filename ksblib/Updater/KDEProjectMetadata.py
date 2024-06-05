@@ -80,14 +80,6 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     # @override(check_signature=False)
     def updateInternal(self, ipc=IPC_Null()) -> None:
         if Debug().isTesting():
-            return self._mockTestMetadata()
+            return
 
         super().updateInternal(ipc)
-
-    @staticmethod
-    def _mockTestMetadata() -> None:
-        """
-        Nothing to do currently, mock data is handled directly by
-        :class:`Application` (dependencies) or :class:`KDEProjectReader` (project metadata).
-        """
-        pass
