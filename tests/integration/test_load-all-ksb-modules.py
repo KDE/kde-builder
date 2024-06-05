@@ -43,7 +43,7 @@ def test_import_all():
     import ksblib.StatusView
     import ksblib.TaskManager
     import ksblib.Updater
-    import ksblib.Updater.Git
+    import ksblib.Updater.Updater
     import ksblib.Updater.KDEProject
     import ksblib.Updater.KDEProjectMetadata
     import ksblib.Updater.Qt5

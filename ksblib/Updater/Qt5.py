@@ -11,13 +11,13 @@ from promise import Promise
 
 from ..BuildException import BuildException
 from ..Util.Util import Util
-from .Git import Updater_Git
+from .Updater import Updater
 from ..Debug import Debug, kbLogger
 
 logger_updater = kbLogger.getLogger("updater")
 
 
-class Updater_Qt5(Updater_Git):
+class Updater_Qt5(Updater):
     """
     Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated
     "init-repository" script to keep the source up to date and coherent.

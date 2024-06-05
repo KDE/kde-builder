@@ -13,7 +13,7 @@ from types import FunctionType
 
 from .BuildException import BuildException
 from .Util.Util import Util
-from .Updater.Git import Updater_Git
+from .Updater.Updater import Updater
 from .Module.Module import Module
 from .Debug import Debug, kbLogger
 
@@ -749,7 +749,7 @@ class DependencyResolver:
         # when the module's SCM is not git,
         # assume the default "no particular" branch wildcard
 
-        if not isinstance(scm, Updater_Git):
+        if not isinstance(scm, Updater):
             return None
 
         branch, sourcetype = scm._determinePreferredCheckoutSource(module)

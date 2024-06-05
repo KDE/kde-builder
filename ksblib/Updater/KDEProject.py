@@ -8,10 +8,10 @@ from __future__ import annotations
 # from overrides import override
 
 from ..Debug import Debug
-from .Git import Updater_Git
+from .Updater import Updater
 
 
-class Updater_KDEProject(Updater_Git):
+class Updater_KDEProject(Updater):
     """
     An update class for KDE Project modules (i.e. those that use "repository
     kde-projects" in the configuration file).

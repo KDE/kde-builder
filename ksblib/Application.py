@@ -37,7 +37,7 @@ from .ModuleSet.Qt5 import ModuleSet_Qt5
 from .RecursiveFH import RecursiveFH
 from .StartProgram import StartProgram
 from .TaskManager import TaskManager
-from .Updater.Git import Updater_Git
+from .Updater.Updater import Updater
 from .Util.Util import Util
 from .OptionsBase import OptionsBase
 from typing import TYPE_CHECKING, Callable, Optional
@@ -300,7 +300,7 @@ class Application:
         if not Debug().isTesting():
             # Running in a test harness, avoid downloading metadata which will be
             # ignored in the test or making changes to git config
-            Updater_Git.verifyGitConfig(ctx)
+            Updater.verifyGitConfig(ctx)
 
         # At this point we have our list of candidate modules / module-sets (as read in
         # from rc-file). The module sets have not been expanded into modules.
@@ -428,7 +428,7 @@ class Application:
             updateNeeded = (not os.path.exists(moduleSource)) or (not os.listdir(moduleSource))
 
             if updateNeeded:
-                Updater_Git.verifyGitConfig(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status
+                Updater.verifyGitConfig(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status
 
             if not updateDesired and not updateNeeded:
                 ctx.setOption({"metadata-update-skipped": 1})

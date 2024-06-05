@@ -21,7 +21,7 @@ from ..IPC.IPC import IPC
 from ..Util.Util import Util
 from ..Debug import Debug, kbLogger
 
-from ..Updater.Git import Updater_Git
+from ..Updater.Updater import Updater
 from ..Updater.KDEProject import Updater_KDEProject
 from ..Updater.KDEProjectMetadata import Updater_KDEProjectMetadata
 from ..Updater.Qt5 import Updater_Qt5
@@ -215,13 +215,13 @@ class Module(OptionsBase):
             return self.scm_obj
 
         if not self.scm_obj:
-            self.scm_obj = Updater_Git(self)
+            self.scm_obj = Updater(self)
         return self.scm_obj
 
     def setScmType(self, scmType: str) -> None:
         newType = None
         if scmType == "git":
-            newType = Updater_Git(self)
+            newType = Updater(self)
         elif scmType == "proj":
             newType = Updater_KDEProject(self)
         elif scmType == "metadata":

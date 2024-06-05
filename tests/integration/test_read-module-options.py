@@ -10,7 +10,7 @@ from promise import Promise
 # Now we can load `Application`, which will load a bunch more modules all
 # using log_command and run_logged_p from `Util`
 from ksblib.Application import Application
-from ksblib.Updater.Git import Updater_Git
+from ksblib.Updater.Updater import Updater
 from ksblib.Debug import Debug
 
 
@@ -48,7 +48,7 @@ def test_option_reading(monkeypatch):
     assert moduleList[3].name == "module2", "Right module name"
 
     scm = moduleList[3].scm()
-    assert isinstance(scm, Updater_Git)
+    assert isinstance(scm, Updater)
 
     branch, sourcetype = scm._determinePreferredCheckoutSource()
 

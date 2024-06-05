@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from ksblib.Application import Application
-from ksblib.Updater.Git import Updater_Git
+from ksblib.Updater.Updater import Updater
 from ksblib.Debug import Debug
 
 
@@ -18,7 +18,7 @@ def test_tag_names_based_on_time():
 
     for mod in moduleList:
         scm = mod.scm()
-        assert isinstance(scm, Updater_Git)
+        assert isinstance(scm, Updater)
 
         branch, sourcetype = scm._determinePreferredCheckoutSource()
         assert branch == "master@{3 weeks ago}", "Right tag name"

@@ -33,7 +33,7 @@ if TYPE_CHECKING:
 logger_updater = kbLogger.getLogger("updater")
 
 
-class Updater_Git:
+class Updater:
     """
     Class that is responsible for updating git-based source code modules. Can
     have some features overridden by subclassing (see Updater_KDEProject
@@ -75,14 +75,14 @@ class Updater_Git:
         return "git"
 
     def currentRevisionInternal(self) -> str:
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         return self.commit_id("HEAD")
 
     def commit_id(self, commit: str) -> str:
         """
         Returns the current sha1 of the given git "commit-ish".
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         if commit is None:
             BuildException.croak_internal("Must specify git-commit to retrieve id for")
         module = self.module
@@ -132,7 +132,7 @@ class Updater_Git:
         Returns:
              A promise that resolves to 1, or rejects if an error occurs.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         srcdir = module.fullpath("source")
         args = ["--", git_repo, srcdir]
@@ -219,7 +219,7 @@ class Updater_Git:
         Returns a promise that resolves to the number of *commits* affected, or
         rejects with an update error.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         srcdir = module.fullpath("source")
 
@@ -245,7 +245,7 @@ class Updater_Git:
                 def func2(result):
                     if Debug().pretending():
                         return Promise.resolve(1)
-                    return Updater_Git.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
+                    return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
 
                 resolve(self._clone(git_repo).then(func2))
 
@@ -349,14 +349,14 @@ class Updater_Git:
 
         See also the "repository" module option.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         cur_repo = module.getOption("repository")
         ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
 
         # Search for an existing remote name first. If none, add our alias.
         remoteNames = self.bestRemoteName()
-        chosenRemote = remoteNames[0] if remoteNames else Updater_Git.DEFAULT_GIT_REMOTE
+        chosenRemote = remoteNames[0] if remoteNames else Updater.DEFAULT_GIT_REMOTE
 
         def _then(_):
             # Make a notice if the repository we're using has moved.
@@ -365,7 +365,7 @@ class Updater_Git:
                 logger_updater.warning(f" y[b[*]\ty[{module}]'s selected repository has changed")
                 logger_updater.warning(f" y[b[*]\tfrom y[{old_repo}]")
                 logger_updater.warning(f" y[b[*]\tto   b[{cur_repo}]")
-                logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater_Git.DEFAULT_GIT_REMOTE + "] has been updated")
+                logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater.DEFAULT_GIT_REMOTE + "] has been updated")
 
                 # Update what we think is the current repository on-disk.
                 ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
@@ -539,7 +539,7 @@ class Updater_Git:
         Throws an exception on error.
         Return parameter is a promise resolving to the number of affected *commits*.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         cur_repo = module.getOption("repository")
         result = None
@@ -587,7 +587,7 @@ class Updater_Git:
             updateSub = condition()
 
             def uec_count(isOk):
-                ret = Updater_Git.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
+                ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
                 return Promise.resolve(ret)
 
             c = self.stashAndUpdate(updateSub).then(uec_count)
@@ -706,7 +706,7 @@ class Updater_Git:
         return scheme, authority, path, query, fragment
 
     def countStash(self, description=None) -> int:
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
 
         if os.path.exists(".git/refs/stash"):
@@ -726,7 +726,7 @@ class Updater_Git:
         Wrapper to send a post-build (warning) message via the IPC object.
         This just takes care of the boilerplate to forward its arguments as message.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         self.ipc.notifyNewPostBuildMessage(module.name, *args)
 
@@ -864,7 +864,7 @@ class Updater_Git:
             Empty string if no match is found, or the name of the local
             remote-tracking branch if one exists.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
 
         # We'll parse git config output to search for branches that have a
         # remote of $remoteName and a 'merge' of refs/heads/$branchName.
@@ -904,7 +904,7 @@ class Updater_Git:
         Returns:
              Whether the remote will be considered for bestRemoteName
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         # name - not used, subclasses might want to filter on remote name
         return url == configuredUrl
 
@@ -923,7 +923,7 @@ class Updater_Git:
             and has aliased more than one remote to the same repo). Obviously the list
             will be empty if no remote names were found.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         module = self.module
         configuredUrl = module.getOption("repository")
         outputs = []
@@ -982,7 +982,7 @@ class Updater_Git:
              A useful branch name that doesn't already exist, or "" if no
             name can be generated.
         """
-        Util.assert_isa(self, Updater_Git)
+        Util.assert_isa(self, Updater)
         if not remoteName:
             remoteName = "origin"
         module = self.module
