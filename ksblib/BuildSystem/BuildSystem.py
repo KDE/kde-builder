@@ -364,7 +364,7 @@ class BuildSystem:
                     logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
                 return result
 
-            promise = Util.safe_lndir_p(srcdir, builddir).then(func)
+            promise = Promise.resolve(Util.safe_lndir(srcdir, builddir)).then(func)
             return promise
 
         return Promise.resolve(1)

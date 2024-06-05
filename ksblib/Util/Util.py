@@ -799,45 +799,41 @@ class Util:
         return True
 
     @staticmethod
-    def safe_lndir_p(from_path: str, to_path: str) -> Promise:
+    def safe_lndir(from_path: str, to_path: str) -> int:
         """
-        function to recursively symlink a directory into another location, in a
+        Recursively symlink a directory into another location, in a
         similar fashion to how the XFree/X.org lndir() program does it. This is
         reimplemented here since some systems lndir doesn't seem to work right.
-
-        As a special exception to the GNU GPL, you may use and redistribute this
-        function however you would like (i.e. consider it public domain).
 
         Use by passing two `absolute` paths, the first being where to symlink files
         from, and the second being what directory to symlink them into.
         ::
 
-            promise = safe_lndir_p("/path/to/symlink", "/where/to/put/symlinks")
+            result = safe_lndir("/path/to/symlink", "/where/to/put/symlinks")
             def func(result):
                 if result:
                     print("success")
 
-            promise.then(func)
+            func(result)
 
         All intervening directories will be created as needed. In addition, you may
         safely run this function again if you only want to catch additional files in
         the source directory.
 
         Returns:
-            A promise that resolves to a Boolean true (non-zero) if successful,
-            Boolean false if unsuccessful.
+            1 if successful, 0 if unsuccessful.
         """
 
         if Debug().pretending():
-            return Promise.resolve(1)
+            return 1
 
         if not os.path.isabs(from_path) or not os.path.isabs(to_path):
-            BuildException.croak_internal("Both paths to safe_lndir_p must be absolute paths!")
+            BuildException.croak_internal("Both paths to safe_lndir must be absolute paths!")
 
         # Create destination directory.
         if not Util.super_mkdir(to_path):
             logger_util.error(f"Couldn't create directory r[{to_path}]")
-            return Promise.resolve(0)
+            return 0
 
         # # Create closure callback subroutine.
         # def wanted(root, dirs, files):
@@ -858,17 +854,13 @@ class Util:
         #         if not os.symlink(file, f"{dir}/$_"):
         #             BuildException.croak_runtime(f"Couldn't create file {dir}/$_: $!")
 
-        def subprocess_run_p(target: callable) -> Promise:
-            def subprocess_run():
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                subproc.join()
-                return retval.value
-
-            p = Promise.promisify(subprocess_run)()
-            return p
+        def subprocess_run(target: Callable):
+            retval = multiprocessing.Value("i", -1)
+            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc.start()
+            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+            subproc.join()
+            return retval.value
 
         def func(retval):
             # Happens in child process
@@ -889,8 +881,8 @@ class Util:
                 retval.value = 0
             retval.value = 1
 
-        promise = subprocess_run_p(func)
-        return promise
+        result = subprocess_run(func)
+        return result
 
     @staticmethod
     def prune_under_directory_p(module, target_dir) -> Promise:
