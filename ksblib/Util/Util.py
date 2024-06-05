@@ -220,104 +220,56 @@ class Util:
             del os.environ["LC_ALL"]
 
     @staticmethod
-    def filter_program_output(filterRef, program, *args) -> list[str]:
+    def filter_program_output(filter_func: Callable | None, program: str, *args) -> list[str]:
         """
-        Returns an array of lines output from a program. Use this only if you expect
+        Returns a list of output lines from a program. Use this only if you expect
         that the output after filtering will be short.
 
             def filter(arg):
                 if arg.upper():
-                    return 1
+                    return True
             output = filter_program_output(filter, "git", "describe", "HEAD")
 
-        Since there is no way to disambiguate no output from an error, this function
-        will call ``raise`` on error, wrap in try-catch if this bugs you.
-
         Parameters:
-            filterRef: function to use as a filter (this function  will
-                be passed a line at a time and should return true if the line should be
+            filter_func: function to use as a filter (this function  will
+                be passed a line at a time and should return True if the line should be
                 returned). If no filtering is desired pass None.
             program: The program to run (either full path or something
                 accessible in PATH).
-        All remaining arguments are passed to the program.
+            *args: All remaining arguments are passed to the program.
         """
 
-        if filterRef is None:
-            def filterRef(_):
+        if filter_func is None:
+            def filter_func(_):
                 return True  # Default to all lines
 
         logger_util.debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
 
-        # Check early for whether an executable exists since otherwise
-        # it is possible for our fork-open below to "succeed" (i.e. fork()
-        # happens OK) and then fail when it gets to the exec(2) syscall.
+        # Check early for whether an executable exists.
         if not Util.locate_exe(program):
             BuildException.croak_runtime(f"Can't find {program} in PATH!")
 
-        execFailedError = "\t - kde-builder - exec failed!\n"
-        try:
-            pipe_read, pipe_write = os.pipe()
-            pid = os.fork()
-        except OSError as e:
-            raise BuildException.croak_internal(f"Can't fork: {e}")
+        # todo Originally, the Util.disable_locale_message_translation() was applied to the subprocess, check if it is needed
+        p = subprocess.run([program, *args], shell=False, capture_output=True)
+        exitCode = p.returncode
+        childOutput = p.stdout.decode()
 
-        if pid:
-            # parent
-            os.close(pipe_write)
-
-            if not pipe_read:
-                BuildException.croak_internal(f"Unable to open pipe to read {program} output")
-
-            childOutput = b""
-            while True:
-                chunk = os.read(pipe_read, 4096)
-                if not chunk:
-                    break
-                childOutput += chunk
-
-            _, exitCode = os.waitpid(pid, 0)  # we do it after we have read the pipe, because otherwise we could be deadlocked if pipe overflowed (for example for "git ls-files" command long output)
-            childOutput = childOutput.decode()
-
-            if "\0" in childOutput:
-                childOutputs = [item + "\0" for item in childOutput.split("\0") if item]  # pl2py: for our git command terminated with --null
-            else:
-                childOutputs = childOutput.split("\n")
-                childOutputs = childOutputs[:-1] if childOutputs[-1] == "" else childOutputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
-                childOutputs = list(map(lambda x: x + "\n", childOutputs))
-
-            lines = [line for line in childOutputs if filterRef(line)]
-
-            os.close(pipe_read)
-
-            # we can pass serious errors back to ourselves too.
-            if exitCode == 99 and len(lines) >= 1 and lines[0] == execFailedError:
-                BuildException.croak_runtime(f"Failed to exec {program}, is it installed?")
-
-            if exitCode:
-                # other errors might still be serious but don't need a backtrace
-                if Debug().pretending():
-                    logger_util.debug(f"{program} gave error exit code {exitCode}")
-                else:
-                    logger_util.warning(f"{program} gave error exit code {exitCode}")
-            return lines
+        if "\0" in childOutput:
+            childOutputs = [item + "\0" for item in childOutput.split("\0") if item]  # pl2py: for our git command terminated with --null
         else:
-            os.close(pipe_read)
-            Util.disable_locale_message_translation()
+            childOutputs = childOutput.split("\n")
+            childOutputs = childOutputs[:-1] if childOutputs[-1] == "" else childOutputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
+            childOutputs = list(map(lambda x: x + "\n", childOutputs))
 
-            # We don't want stderr output on tty.
-            devnull = open(os.devnull, "w")
-            os.dup2(devnull.fileno(), 2)
+        lines = [line for line in childOutputs if filter_func(line)]
 
-            os.dup2(pipe_write, 1)
-
-            try:
-                os.execvp(program, [program, *args])
-            except OSError:
-                # Send a message back to parent
-                print(execFailedError)
-                exit(99)  # Helper proc, so don't use finish(), just die
-            finally:
-                os.close(pipe_write)
+        if exitCode:
+            # other errors might still be serious but don't need a backtrace
+            if Debug().pretending():
+                logger_util.debug(f"{program} gave error exit code {exitCode}")
+            else:
+                logger_util.warning(f"{program} gave error exit code {exitCode}")
+        return lines
 
     @staticmethod
     def prettify_seconds(elapsed):
