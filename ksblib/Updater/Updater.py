@@ -150,7 +150,7 @@ class Updater:
             args.insert(0, commitId)  # Checkout branch right away
             args.insert(0, "-b")
 
-        promise = Util.run_logged_p(module, "git-clone", module.getSourceDir(), ["git", "clone", "--recursive", *args])
+        promise = Promise.resolve(Util.run_logged(module, "git-clone", module.getSourceDir(), ["git", "clone", "--recursive", *args]))
 
         def _then(exitcode):
             if not exitcode == 0:
@@ -292,7 +292,7 @@ class Updater:
                     if not exitcode == 0:
                         BuildException.croak_runtime(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
 
-                resolve(Util.run_logged_p(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo]).then(ec_1))
+                resolve(Promise.resolve(Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])).then(ec_1))
             else:
                 logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
 
@@ -300,7 +300,7 @@ class Updater:
                     if not exitcode == 0:
                         BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
 
-                resolve(Util.run_logged_p(module, "git-add-remote", None, ["git", "remote", "add", remote, repo]).then(ec_2))
+                resolve(Promise.resolve(Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])).then(ec_2))
 
         p = Promise(first_fn)
 
@@ -324,7 +324,7 @@ class Updater:
 
             logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
 
-            Util.run_logged_p(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
+            Promise.resolve(Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"]))
 
             def then(exitcode):
                 if not exitcode == 0:
@@ -483,7 +483,7 @@ class Updater:
 
                     # Given that we're starting with a 'clean' checkout, it's now simply a fast-forward
                     # to the remote HEAD (previously we pulled, incurring additional network I/O).
-                    a = Util.run_logged_p(module, "git-rebase", None, ["git", "reset", "--hard", f"{remoteName}/{branch}"])
+                    a = Promise.resolve(Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remoteName}/{branch}"]))
                     return a
 
                 promise = pr.then(utrh_checkout_exitcode)
@@ -528,7 +528,7 @@ class Updater:
             def func_2(exitcode):  # need to adapt to boolean success flag
                 return exitcode == 0
 
-            promise = Util.run_logged_p(module, "git-checkout-commit", srcdir, ["git", "checkout", commit]).then(func_2)
+            promise = Promise.resolve(Util.run_logged(module, "git-checkout-commit", srcdir, ["git", "checkout", commit])).then(func_2)
             resolve(promise)
 
         return Promise(func)
@@ -558,7 +558,7 @@ class Updater:
             remoteName = _remoteName  # save for later
 
             logger_updater.info(f"Fetching remote changes to g[{module}]")
-            return Util.run_logged_p(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName])
+            return Promise.resolve(Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName]))
 
         # Download updated objects. This also updates remote heads so do this
         # before we start comparing branches and such.
@@ -753,7 +753,7 @@ class Updater:
         stashName = f"kde-builder auto-stash at {date}"
 
         # first, log the git status prior to kde-builder taking over the reins in the repo
-        promise = Util.run_logged_p(module, "git-status-before-update", None, ["git", "status"])
+        promise = Promise.resolve(Util.run_logged(module, "git-status-before-update", None, ["git", "status"]))
 
         oldStashCount, newStashCount = None, None  # Used in promises below
 
@@ -771,7 +771,7 @@ class Updater:
             if Debug().pretending():  # probably best not to do anything if pretending
                 return Promise.resolve(0)
 
-            return Util.run_logged_p(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stashName])
+            return Promise.resolve(Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stashName]))
 
         promise = promise.then(sau_stash_push)
         Promise.wait(promise, None)
@@ -787,7 +787,7 @@ class Updater:
             # out what the original merge conflicts were afterwards.
             self._notifyPostBuildMessage(f"b[{module}] may have local changes that we couldn't handle, so the module was left alone.")
 
-            return Util.run_logged_p(module, "git-status-after-error", None, ["git", "status"]) \
+            return Promise.resolve(Util.run_logged(module, "git-status-after-error", None, ["git", "status"])) \
                 .then(lambda _: BuildException.croak_runtime(f"Unable to stash local changes (if any) for {module}, aborting update."))
 
         promise = promise.then(sau_notify_stashed)
@@ -815,7 +815,7 @@ class Updater:
             if updateOk:
                 return 1
 
-            return Util.run_logged_p(module, "git-status-after-error", None, ["git", "status"]) \
+            return Promise.resolve(Util.run_logged(module, "git-status-after-error", None, ["git", "status"])) \
                 .then(lambda _: BuildException.croak_runtime(f"Unable to update source code for {module}"))
 
         promise = promise.then(sau_check_updateok)
@@ -839,7 +839,7 @@ class Updater:
 
             # If the stash had been needed then try to re-apply it before we build, so
             # that KDE developers working on changes do not have to manually re-apply.
-            a = Util.run_logged_p(module, "git-stash-pop", None, ["git", "stash", "pop"])
+            a = Promise.resolve(Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"]))
             b = a.then(sau_stash_count_differs)
             return b
 

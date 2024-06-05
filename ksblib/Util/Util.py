@@ -612,37 +612,21 @@ class Util:
         return Util.run_logged_command(module, filename, callbackRef, argRef)
 
     @staticmethod
-    def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> Promise:
+    def run_logged(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> int:
         """
         This is similar to ``log_command`` in that this runs the given command and
-        arguments in a separate process. The difference is that this command
-        `does not wait` for the process to finish, and instead returns a
-        Promise that resolves to the exit status of the sub-process.
+        arguments in a separate process. Returns the exit status of the sub-process.
 
-        Another important difference is that fewer options are currently supported.
-        In particular there is no built-in way to filter the program output or to
-        force off locale translations.
-
-        This is useful in permitting concurrent code without needing to resolve
-        significant changes from a separate thread of execution over time.
-
-        Note that concurrent code should be careful about accessing global state
-        simultaneously. This includes things like the current working directory, which
-        is shared across the entire process. run_logged_p allows you to pass a param
-        to set the working directory to use in the *subprocess* it creates so that
-        there is no contention over the main process's current working directory.
-        If the ``directory`` param is None then the directory is not changed.
+        ``directory`` parameter allows you to set the working directory to use in the *subprocess* it creates.
+        If the ``directory`` parameter is None then the directory is not changed.
         ::
 
             builddir = module.fullpath("build")  # need to pass dir to use
-            promise = run_logged_p(module, "build", builddir, ["make", "-j8"])
+            result = run_logged(module, "build", builddir, ["make", "-j8"])
             def func(result):
                 print(f"Process result: {result}")
 
-            promise.then(func).wait()
-
-        TODO: For really concurrent code we need to have run_logged_p change to a
-         specific directory in the subprocess, add to this interface.
+            func(result)
         """
 
         if not directory:
@@ -650,23 +634,19 @@ class Util:
         if Debug().pretending():
             args_str = "', '".join(argRef)
             logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
-            return Promise.resolve(0)
+            return 0
 
         # Do this before we fork so the path is finalized to prevent auto-detection
         # in the child
         logpath = module.getLogPath(f"{filename}.log")
 
-        def subprocess_run_p(target: callable) -> Promise:
-            def subprocess_run():
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                subproc.join()
-                return retval.value
-
-            p = Promise.promisify(subprocess_run)()
-            return p
+        def subprocess_run(target: Callable) -> int:
+            retval = multiprocessing.Value("i", -1)
+            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc.start()
+            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+            subproc.join()
+            return retval.value
 
         def func(retval):
             # This happens in a CHILD PROCESS, not in the main process!
@@ -677,19 +657,12 @@ class Util:
             if directory:
                 Util.p_chdir(directory)
             retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
-        promise = subprocess_run_p(func)
 
-        def then_(exitcode):
-            # This happens back in the main process, so we can reintegrate the
-            # changes into our data structures if needed.
-
-            logger_logged_cmd.info(f"run_logged_p() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
-            if not exitcode == 0:
-                Util._setErrorLogfile(module, f"{filename}.log")
-            return exitcode
-
-        promise = promise.then(then_)
-        return promise
+        exitcode = subprocess_run(func)
+        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
+        if not exitcode == 0:
+            Util._setErrorLogfile(module, f"{filename}.log")
+        return exitcode
 
     @staticmethod
     def split_quoted_on_whitespace(line):

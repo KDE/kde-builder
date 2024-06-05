@@ -229,7 +229,7 @@ class Util_LoggedSubprocess:
             if announceSub:
                 announceSub(module)
 
-            pr = Util.run_logged_p(module, filename, None, command, callback)
+            pr = Promise.resolve(Util.run_logged(module, filename, None, command, callback))
             Promise.wait(pr)
             result = pr.value
             retval.value = result

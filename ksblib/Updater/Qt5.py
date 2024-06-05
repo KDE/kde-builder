@@ -54,7 +54,7 @@ class Updater_Qt5(Updater):
         command = [f"{srcdir}/init-repository", "-f", f"--module-subset={subset_arg}"]
         logger_updater.warning("\tUsing Qt 5 modules: " + ", ".join(modules))
 
-        result = Util.await_exitcode(Util.run_logged_p(module, "init-repository", srcdir, command))
+        result = Util.good_exitcode(Util.run_logged(module, "init-repository", srcdir, command))
 
         if not result:
             BuildException.croak_runtime("Couldn't update Qt 5 repository submodules!")

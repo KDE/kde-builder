@@ -8,7 +8,6 @@ import os.path
 import sys
 import re
 import time
-from promise import Promise
 import logging
 
 from ..BuildException import BuildException
@@ -488,16 +487,14 @@ class BuildSystem:
         if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
             logger_buildsystem.warning(f"\t{message}")
 
-            promise = Util.run_logged_p(module, filename, builddir, argRef)
-            resultRef["was_successful"] = Util.await_exitcode(promise)
+            resultRef["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, argRef))
 
             # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
             # When the module was built successfully, and you were using --debug, then you will get the message:
             #  "No changes from build, skipping install"
             # from Module.build() method. This is due to "work_done" key was missing in returned dict when debugging.
             # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
-            if not promise.is_rejected:
-                resultRef["work_done"] = 1
+            resultRef["work_done"] = 1
 
             return resultRef
 

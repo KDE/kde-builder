@@ -46,7 +46,7 @@ class BuildSystem_Autotools(BuildSystem):
         # So we run autogen.sh first to create the configure command and
         # recheck for that.
         if configureInFile and configureCommand == "autogen.sh":
-            promise = Util.run_logged_p(module, "autogen", sourcedir, [f"{sourcedir}/{configureCommand}"])
+            promise = Promise.resolve(Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/{configureCommand}"]))
 
             def _then1(exitcode):
                 if exitcode != 0:
@@ -58,7 +58,7 @@ class BuildSystem_Autotools(BuildSystem):
             def _then2(_):
                 # Cleanup any stray Makefiles that may be present, if generated
                 if os.path.exists(f"{sourcedir}/Makefile"):
-                    return Util.run_logged_p(module, "distclean", sourcedir, ["make", "distclean"])
+                    return Promise.resolve(Util.run_logged(module, "distclean", sourcedir, ["make", "distclean"]))
 
                 # nothing to do, return successful exit code
                 return 0
@@ -106,7 +106,7 @@ class BuildSystem_Autotools(BuildSystem):
         def _then1(configureCommand):
             Util.p_chdir(module.fullpath("build"))
 
-            return Util.run_logged_p(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
+            return Promise.resolve(Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions]))
 
         promise = promise.then(_then1)
 

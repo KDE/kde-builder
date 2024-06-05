@@ -85,4 +85,4 @@ class BuildSystem_QMake(BuildSystem):
 
         logger_buildsystem.info("\tRunning g[qmake]...")
 
-        return Util.await_exitcode(Util.run_logged_p(module, "qmake", builddir, [qmake, *qmakeOpts, projectFiles[0]]))
+        return Util.good_exitcode(Util.run_logged(module, "qmake", builddir, [qmake, *qmakeOpts, projectFiles[0]]))
