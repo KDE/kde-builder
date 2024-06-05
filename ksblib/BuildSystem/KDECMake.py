@@ -303,7 +303,7 @@ class BuildSystem_KDECMake(BuildSystem):
 
         cmd.on({"child_output": on_child_output})  # pl2py: this is in testsuite
 
-        result = Util.await_exitcode(cmd.start())
+        result = Util.good_exitcode(cmd.start())
 
         if not result:
             logDir = module.getLogDir()
@@ -612,8 +612,8 @@ class BuildSystem_KDECMake(BuildSystem):
 
             cmd.on({"child_output": on_child_output})
 
-            # await_result, not await_exitcode, to match return semantic
-            result = Util.await_result(cmd.start())
+            # just a result, not good_exitcode, to match return semantic
+            result = cmd.start()
 
             if optional_packages_not_found:
                 logger_buildsystem.warning("\t  Some optional dependencies were not found:")

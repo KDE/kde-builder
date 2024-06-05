@@ -460,7 +460,7 @@ class Updater:
                     .announcer(announcer_sub)
 
                 croak_reason = f"Unable to perform a git checkout of {remoteName}/{branch} to a local branch of {newName}"
-                promise = cmd.start()
+                promise = Promise.resolve(cmd.start())
             else:
                 def announcer_sub(_):
                     # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
@@ -472,7 +472,7 @@ class Updater:
 
                 croak_reason = f"Unable to perform a git checkout to existing branch {branchName}"
 
-                pr = cmd.start()
+                pr = Promise.resolve(cmd.start())
 
                 def utrh_checkout_exitcode(exitcode):
                     if not exitcode == 0:

@@ -6,7 +6,6 @@
 from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess
 from ksblib.Application import Application
 from ksblib.BuildSystem.KDECMake import BuildSystem_KDECMake
-from promise import Promise
 from ksblib.Debug import Debug
 
 
@@ -31,8 +30,8 @@ def test_cmake_prefix(monkeypatch):
     monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
 
     # Redefine start.
-    def mock_start(self) -> Promise:
-        return Promise.resolve(0)  # success
+    def mock_start(self) -> int:
+        return 0  # success
 
     monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
 

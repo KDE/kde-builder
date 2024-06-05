@@ -555,21 +555,16 @@ class BuildSystem:
 
         cmd.on({"child_output": on_child_output})
 
-        def _then(exitcode):
-            nonlocal resultRef
+        try:
+            exitcode = cmd.start()
             resultRef = {
                 "was_successful": exitcode == 0,
                 "warnings": warnings,
                 "work_done": workDoneFlag,
             }
-
-        def _catch(err):
+        except Exception as err:
             logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
             resultRef["was_successful"] = 0
-
-        promise = cmd.start().then(_then).catch(_catch)
-
-        Promise.wait(promise)
 
         # Cleanup TTY output.
         a_time = Util.prettify_seconds(int(time.time()) - a_time)

@@ -66,11 +66,11 @@ def test_logged_subprocess():
             nonlocal prog2Exit
             prog2Exit = exit2
 
-        promise2 = cmd2.start().then(func4)
+        promise2 = Promise.resolve(cmd2.start()).then(func4)
 
         return promise2  # Resolve to another promise that requires resolution
 
-    promise = cmd.start().then(func3)
+    promise = Promise.resolve(cmd.start()).then(func3)
 
     assert isinstance(promise, Promise), "A promise should be a promise!"
     Promise.wait(promise)

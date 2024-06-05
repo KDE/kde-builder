@@ -5,13 +5,13 @@
 
 from __future__ import annotations
 
-from promise import Promise
 import sys
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
     import multiprocessing
 import asyncio
+from typing import Callable
 
 from ..BuildException import BuildException
 from ..Debug import Debug, kbLogger
@@ -34,8 +34,7 @@ class Util_LoggedSubprocess:
     This integrates the functionality subprocess into kde-builder's logging and module tracking functions.
 
     Unlike most of the rest of kde-builder, this is a "fluent" interface due to the number of adjustables vars that must be set,
-    including which module is being built, the log file to use, what directory to
-    build from, etc.
+    including which module is being built, the log file to use, what directory to build from, etc.
 
     Examples:
     ::
@@ -65,10 +64,10 @@ class Util_LoggedSubprocess:
              "work_done"     : workDoneFlag,
             }
 
-        # once ready, call .start() to obtain a Promise that
-        # can be waited on or chained from, pending the result of
+        # once ready, call .start() to obtain a result of
         # computation in a separate child process.
-        promise = cmd.start().then(func)
+        result = cmd.start()
+        func(result)
     """
 
     def __init__(self):
@@ -143,15 +142,13 @@ class Util_LoggedSubprocess:
         self._announcer = announcer
         return self
 
-    def start(self) -> Promise:
+    def start(self) -> int:
         """
-        Begins the execution, if possible. Returns a Promise that resolves to
-        the exit code of the command being run. 0 indicates success, non-zero
+        Begins the execution, if possible.
+        Returns the exit code of the command being run. 0 indicates success, non-zero
         indicates failure.
 
-        Exceptions may be thrown, which Promise will catch and convert into
-        a rejected promise. You must install Promise "catch" handler
-        on the promise to handle this condition.
+        Exceptions may be thrown.
         """
         from ..Module.Module import Module
         module = self._module
@@ -169,8 +166,7 @@ class Util_LoggedSubprocess:
 
         if Debug().pretending():
             logger_logged_cmd.pretend(f"\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
-            a = Promise.resolve(0)
-            return a
+            return 0
 
         # Install callback handler to feed child output to parent if the parent has
         # a callback to filter through it.
@@ -193,18 +189,14 @@ class Util_LoggedSubprocess:
 
         succeeded = 0
 
-        def subprocess_run_p(target: callable) -> Promise:
-            async def subprocess_run():
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                while subproc.is_alive():
-                    await asyncio.sleep(1)
-                subproc.join()
-                return retval.value
-
-            p = Promise.promisify(subprocess_run)()
-            return p
+        async def subprocess_run(target: Callable) -> int:
+            retval = multiprocessing.Value("i", -1)
+            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc.start()
+            while subproc.is_alive():
+                await asyncio.sleep(1)
+            subproc.join()
+            return retval.value
 
         lines_queue = multiprocessing.Queue()
 
@@ -229,12 +221,10 @@ class Util_LoggedSubprocess:
             if announceSub:
                 announceSub(module)
 
-            pr = Promise.resolve(Util.run_logged(module, filename, None, command, callback))
-            Promise.wait(pr)
-            result = pr.value
+            result = Util.run_logged(module, filename, None, command, callback)
             retval.value = result
 
-        promise = Promise()  # Just use Promise() here, to let PyCharm's inspector understand the type of "promise" variable.
+        exitcode = -1
 
         async def on_progress_handler(subp_finished: multiprocessing.Event):
             if needsCallback:
@@ -247,11 +237,9 @@ class Util_LoggedSubprocess:
             else:
                 return
 
-        async def promise_waiter(event):
-            nonlocal promise
-            promise = subprocess_run_p(_begin)
-            while promise.is_pending:  # because Promise.wait(promise) is not awaitable itself, we wait it in such way.
-                await asyncio.sleep(1)
+        async def subprocess_waiter(event):
+            nonlocal exitcode
+            exitcode = await subprocess_run(_begin)
             event.set()
 
         # pl2py: Now we need to run the on_progress_handler and the subprocess at the same time.
@@ -259,26 +247,18 @@ class Util_LoggedSubprocess:
         loop = asyncio.get_event_loop()
         subproc_finished_event = asyncio.Event()
         task1 = loop.create_task(on_progress_handler(subproc_finished_event))
-        task2 = loop.create_task(promise_waiter(subproc_finished_event))
+        task2 = loop.create_task(subprocess_waiter(subproc_finished_event))
         loop.run_until_complete(asyncio.gather(task1, task2))
 
-        # Now we have our promise finished, and we can continue
+        # Now we have our subprocess finished, and we can continue
 
-        def _set_succeeded(exitcode):
-            nonlocal succeeded
-            succeeded = exitcode == 0
-            return exitcode  # Don't change result, just pass it on
+        succeeded = exitcode == 0
 
-        promise = promise.then(_set_succeeded)
+        # If an exception was thrown or we didn't succeed, set error log
+        if not succeeded:
+            Util._setErrorLogfile(module, f"{filename}.log")
 
-        def _finally():
-            # If an exception was thrown or we didn't succeed, set error log
-            if not succeeded:
-                Util._setErrorLogfile(module, f"{filename}.log")
-
-        Promise.wait(promise)
-        _finally()
-        return promise
+        return exitcode
 
     @staticmethod
     def _sendToParent(queue, data: list):
