@@ -5,7 +5,6 @@
 
 import os
 # from overrides import override
-from promise import Promise
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
@@ -86,28 +85,13 @@ class BuildSystem_Autotools(BuildSystem):
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
         bootstrapOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
-
-        result = None
-        promise = Promise.resolve(self._findConfigureCommands())
-
-        def _then1(configureCommand):
+        try:
+            configureCommand = self._findConfigureCommands()
             Util.p_chdir(module.fullpath("build"))
-
-            return Promise.resolve(Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions]))
-
-        promise = promise.then(_then1)
-
-        def _then2(exitcode):
-            nonlocal result
+            exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
             result = exitcode
-
-        promise = promise.then(_then2)
-
-        def _catch(err):
+        except BuildException as err:
             logger_buildsystem.error(f"\tError configuring {module}: r[b[{err}]")
-            return 0
-
-        promise = promise.catch(_catch)
-        Promise.wait(promise)
+            return False
 
         return result == 0
