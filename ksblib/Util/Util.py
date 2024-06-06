@@ -18,7 +18,6 @@ from pathlib import Path
 import subprocess
 import shlex
 import signal
-from promise import Promise
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
@@ -485,70 +484,11 @@ class Util:
                 sys.exit(1)
 
     @staticmethod
-    def await_promise(promise: Promise):
+    def good_exitcode(exitcode: int) -> bool:
         """
-        Takes a promise on input and calls .wait() on it, blocking until the promise
-        resolves. Returns the promise passed in.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
+        Returns True if exitcode is 0, False otherwise.
         """
-        # if promise.ioloop.is_running:
-        #     BuildException.croak_internal("Tried to await a promise when I/O loop active!")
-        promise = promise.get()
-        return promise
-
-    @staticmethod
-    def await_exitcode(promise: Promise):
-        """
-        Takes a promise on input, adds a handler to extract the final result (treating
-        it as a shell-style exit code), and calls .wait() on it, blocking until the
-        promise resolves or rejects.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Returns a boolean value (true if the promise exitcode resolved to 0, false
-        otherwise).
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
-        """
-        result = None
-
-        def func(exitcode):
-            nonlocal result
-            result = exitcode == 0
-
-        Util.await_promise(promise.then(func))
-        return result
-
-    @staticmethod
-    def await_result(promise: Promise):
-        """
-        Takes a promise on input, adds a handler to extract the final result,
-        and calls .wait() on it, blocking until the promise resolves or
-        rejects.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Returns the result.
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
-        """
-        result = None
-
-        def func(result_from_p):
-            nonlocal result
-            result = result_from_p
-
-        Util.await_promise(promise.then(func))
-        return result
+        return exitcode == 0
 
     @staticmethod
     def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
@@ -605,37 +545,21 @@ class Util:
         return Util.run_logged_command(module, filename, callbackRef, argRef)
 
     @staticmethod
-    def run_logged_p(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> Promise:
+    def run_logged(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> int:
         """
         This is similar to ``log_command`` in that this runs the given command and
-        arguments in a separate process. The difference is that this command
-        `does not wait` for the process to finish, and instead returns a
-        Promise that resolves to the exit status of the sub-process.
+        arguments in a separate process. Returns the exit status of the sub-process.
 
-        Another important difference is that fewer options are currently supported.
-        In particular there is no built-in way to filter the program output or to
-        force off locale translations.
-
-        This is useful in permitting concurrent code without needing to resolve
-        significant changes from a separate thread of execution over time.
-
-        Note that concurrent code should be careful about accessing global state
-        simultaneously. This includes things like the current working directory, which
-        is shared across the entire process. run_logged_p allows you to pass a param
-        to set the working directory to use in the *subprocess* it creates so that
-        there is no contention over the main process's current working directory.
-        If the ``directory`` param is None then the directory is not changed.
+        ``directory`` parameter allows you to set the working directory to use in the *subprocess* it creates.
+        If the ``directory`` parameter is None then the directory is not changed.
         ::
 
             builddir = module.fullpath("build")  # need to pass dir to use
-            promise = run_logged_p(module, "build", builddir, ["make", "-j8"])
+            result = run_logged(module, "build", builddir, ["make", "-j8"])
             def func(result):
                 print(f"Process result: {result}")
 
-            promise.then(func).wait()
-
-        TODO: For really concurrent code we need to have run_logged_p change to a
-         specific directory in the subprocess, add to this interface.
+            func(result)
         """
 
         if not directory:
@@ -643,23 +567,19 @@ class Util:
         if Debug().pretending():
             args_str = "', '".join(argRef)
             logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
-            return Promise.resolve(0)
+            return 0
 
         # Do this before we fork so the path is finalized to prevent auto-detection
         # in the child
         logpath = module.getLogPath(f"{filename}.log")
 
-        def subprocess_run_p(target: callable) -> Promise:
-            def subprocess_run():
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                subproc.join()
-                return retval.value
-
-            p = Promise.promisify(subprocess_run)()
-            return p
+        def subprocess_run(target: Callable) -> int:
+            retval = multiprocessing.Value("i", -1)
+            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc.start()
+            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+            subproc.join()
+            return retval.value
 
         def func(retval):
             # This happens in a CHILD PROCESS, not in the main process!
@@ -670,19 +590,12 @@ class Util:
             if directory:
                 Util.p_chdir(directory)
             retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
-        promise = subprocess_run_p(func)
 
-        def then_(exitcode):
-            # This happens back in the main process, so we can reintegrate the
-            # changes into our data structures if needed.
-
-            logger_logged_cmd.info(f"run_logged_p() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
-            if not exitcode == 0:
-                Util._setErrorLogfile(module, f"{filename}.log")
-            return exitcode
-
-        promise = promise.then(then_)
-        return promise
+        exitcode = subprocess_run(func)
+        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
+        if not exitcode == 0:
+            Util._setErrorLogfile(module, f"{filename}.log")
+        return exitcode
 
     @staticmethod
     def split_quoted_on_whitespace(line):
@@ -819,45 +732,41 @@ class Util:
         return True
 
     @staticmethod
-    def safe_lndir_p(from_path: str, to_path: str) -> Promise:
+    def safe_lndir(from_path: str, to_path: str) -> int:
         """
-        function to recursively symlink a directory into another location, in a
+        Recursively symlink a directory into another location, in a
         similar fashion to how the XFree/X.org lndir() program does it. This is
         reimplemented here since some systems lndir doesn't seem to work right.
-
-        As a special exception to the GNU GPL, you may use and redistribute this
-        function however you would like (i.e. consider it public domain).
 
         Use by passing two `absolute` paths, the first being where to symlink files
         from, and the second being what directory to symlink them into.
         ::
 
-            promise = safe_lndir_p("/path/to/symlink", "/where/to/put/symlinks")
+            result = safe_lndir("/path/to/symlink", "/where/to/put/symlinks")
             def func(result):
                 if result:
                     print("success")
 
-            promise.then(func)
+            func(result)
 
         All intervening directories will be created as needed. In addition, you may
         safely run this function again if you only want to catch additional files in
         the source directory.
 
         Returns:
-            A promise that resolves to a Boolean true (non-zero) if successful,
-            Boolean false if unsuccessful.
+            1 if successful, 0 if unsuccessful.
         """
 
         if Debug().pretending():
-            return Promise.resolve(1)
+            return 1
 
         if not os.path.isabs(from_path) or not os.path.isabs(to_path):
-            BuildException.croak_internal("Both paths to safe_lndir_p must be absolute paths!")
+            BuildException.croak_internal("Both paths to safe_lndir must be absolute paths!")
 
         # Create destination directory.
         if not Util.super_mkdir(to_path):
             logger_util.error(f"Couldn't create directory r[{to_path}]")
-            return Promise.resolve(0)
+            return 0
 
         # # Create closure callback subroutine.
         # def wanted(root, dirs, files):
@@ -878,17 +787,13 @@ class Util:
         #         if not os.symlink(file, f"{dir}/$_"):
         #             BuildException.croak_runtime(f"Couldn't create file {dir}/$_: $!")
 
-        def subprocess_run_p(target: callable) -> Promise:
-            def subprocess_run():
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                subproc.join()
-                return retval.value
-
-            p = Promise.promisify(subprocess_run)()
-            return p
+        def subprocess_run(target: Callable):
+            retval = multiprocessing.Value("i", -1)
+            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc.start()
+            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+            subproc.join()
+            return retval.value
 
         def func(retval):
             # Happens in child process
@@ -909,25 +814,24 @@ class Util:
                 retval.value = 0
             retval.value = 1
 
-        promise = subprocess_run_p(func)
-        return promise
+        result = subprocess_run(func)
+        return result
 
     @staticmethod
-    def prune_under_directory_p(module, target_dir) -> Promise:
+    def prune_under_directory(module: Module, target_dir: str) -> int:
         """
-        Function to delete recursively, everything under the given directory, unless
+        Delete recursively everything under the given directory, unless
         we're in pretend mode.
 
         Used from :class:`BuildSystem` to handle cleaning a build directory.
 
-        i.e. the effect is similar to `rm -r arg/* arg/.*`.
+        I.e. the effect is similar to `rm -r arg/* arg/.*`.
         ::
 
-            # promise resolves to a boolean success flag
-            promise = prune_under_directory_p(module, "/path/to/clean")
+            result = prune_under_directory_p(module, "/path/to/clean")
 
         Returns:
-            A promise resolving to True on success, False on failure.
+            1 on success, 0 on failure.
         """
 
         logpath = module.getLogPath("clean-builddir.log")
@@ -938,22 +842,18 @@ class Util:
             logger_util.error(f"\tError opening logfile {logpath}: r[b[{e}]")
             logger_util.error("\tContinuing without logging")
 
-        print(f"starting delete o {target_dir}", file=log)
+        print(f"starting delete of {target_dir}", file=log)
 
         try:
-            def subprocess_run_p(target: callable) -> Promise:
-                def subprocess_run():
-                    retval = multiprocessing.Value("i", -1)
-                    subproc = multiprocessing.Process(target=target, args=(retval,))
-                    subproc.start()
-                    # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                    subproc.join()
-                    if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
-                        raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
-                    return retval.value
-
-                p = Promise.promisify(subprocess_run)()
-                return p
+            def subprocess_run(target: Callable):
+                retval = multiprocessing.Value("i", -1)
+                subproc = multiprocessing.Process(target=target, args=(retval,))
+                subproc.start()
+                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+                subproc.join()
+                if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
+                    raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
+                return retval.value
 
             def func(retval):
                 errorRef = {}
@@ -985,12 +885,12 @@ class Util:
                 # pl2py: As we are in subprocess, we have "returned" the value via a shared variable.
                 # The actual (normal) return value cannot be read by the parent process.
 
-            promise = subprocess_run_p(func)
-            return promise
+            result = subprocess_run(func)
+            return result
 
         except Exception as e:
             logger_util.error(f"\tUnable to clean r[{target_dir}]:\n\ty[b[{e}]")
-            return Promise.resolve(0)  # resolve, but to an error
+            return 0  # an error
 
     @staticmethod
     def remake_symlink(src, dst):

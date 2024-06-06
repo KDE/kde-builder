@@ -6,7 +6,6 @@
 import os.path
 from ksblib.Util.Util import Util
 import tempfile
-from promise import Promise
 
 
 def test_safe_lndir():
@@ -29,12 +28,7 @@ def test_safe_lndir():
     assert os.path.exists(f"{tmpdir}/b/c/file2"), "second file created"
 
     to = tempfile.mkdtemp(prefix="kde-builder-test2")
-    promise = Util.safe_lndir_p(os.path.abspath(tmpdir), os.path.abspath(to))
-
-    # These shouldn't exist until we let the promise start!
-    # assert not os.path.exists(f"{to}/b/c/file2"), "safe_lndir does not start until we let promise run"  # pl2py: the promises we use start right after we create them
-
-    Promise.wait(promise)
+    Util.safe_lndir(os.path.abspath(tmpdir), os.path.abspath(to))
 
     assert os.path.isdir(f"{to}/b/c"), "directory symlinked over"
     assert os.path.islink(f"{to}/a"), "file under directory is a symlink"

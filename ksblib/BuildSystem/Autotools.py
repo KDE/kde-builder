@@ -5,11 +5,11 @@
 
 import os
 # from overrides import override
-from promise import Promise
 
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
 from ..Debug import Debug, kbLogger
+from ..BuildException import BuildException
 
 logger_buildsystem = kbLogger.getLogger("build-system")
 
@@ -24,13 +24,13 @@ class BuildSystem_Autotools(BuildSystem):
     def name() -> str:
         return "autotools"
 
-    def _findConfigureCommands(self) -> Promise:
+    def _findConfigureCommands(self) -> str:
         """
-        Returns a promise that resolves to the specific configure command to use.
+        Returns the specific configure command to use.
 
         This may execute commands to re-run autoconf to generate the script.
 
-        If these commands fail the promise will reject.
+        If these commands fail will raise exception.
         """
         module = self.module
         sourcedir = module.fullpath("source")
@@ -39,52 +39,38 @@ class BuildSystem_Autotools(BuildSystem):
         configureInFile = next((item for item in ["configure.in", "configure.ac"] if os.path.exists(f"{sourcedir}/{item}")), None)
 
         if configureCommand != "autogen.sh" and configureInFile:
-            return Promise.resolve(configureCommand)
+            return configureCommand
 
         # If we have a configure.in or configure.ac but configureCommand is autogen.sh
         # we assume that configure is created by autogen.sh as usual in some GNU Projects.
         # So we run autogen.sh first to create the configure command and
         # recheck for that.
         if configureInFile and configureCommand == "autogen.sh":
-            promise = Util.run_logged_p(module, "autogen", sourcedir, [f"{sourcedir}/{configureCommand}"])
+            exitcode = Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/{configureCommand}"])
 
-            def _then1(exitcode):
-                if exitcode != 0:
-                    print(f"Autogen failed with exit code {exitcode}")
-                    exit(1)
+            if exitcode != 0:
+                print(f"Autogen failed with exit code {exitcode}")
+                exit(1)
 
-            promise = promise.then(_then1)
+            # Cleanup any stray Makefiles that may be present, if generated
+            if os.path.exists(f"{sourcedir}/Makefile"):
+                exitcode = Util.run_logged(module, "distclean", sourcedir, ["make", "distclean"])
+            else:
+                # nothing to do, use successful exit code
+                exitcode = 0
 
-            def _then2(_):
-                # Cleanup any stray Makefiles that may be present, if generated
-                if os.path.exists(f"{sourcedir}/Makefile"):
-                    return Util.run_logged_p(module, "distclean", sourcedir, ["make", "distclean"])
+            if exitcode != 0:
+                print(f"Failed to run make distclean, exit code {exitcode}")
+                exit(1)
 
-                # nothing to do, return successful exit code
-                return 0
-
-            promise = promise.then(_then2)
-
-            def _then3(exitcode):
-                if exitcode != 0:
-                    print(f"Failed to run make distclean, exit code {exitcode}")
-                    exit(1)
-
-            promise = promise.then(_then3)
-
-            def _then4(_):
-                # Now recheck
-                configureCommand = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
-                return configureCommand
-
-            promise = promise.then(_then4)
-
-            return promise
+            # Now recheck
+            configureCommand = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
+            return configureCommand
 
         if not configureCommand:
-            return Promise.reject('No configure command available')
+            BuildException.croak_runtime("No configure command available")
 
-        return Promise.resolve(configureCommand)
+        return configureCommand
 
     # @override
     def configureInternal(self) -> bool:
@@ -99,28 +85,13 @@ class BuildSystem_Autotools(BuildSystem):
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
         bootstrapOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
-
-        result = None
-        promise = self._findConfigureCommands()
-
-        def _then1(configureCommand):
+        try:
+            configureCommand = self._findConfigureCommands()
             Util.p_chdir(module.fullpath("build"))
-
-            return Util.run_logged_p(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
-
-        promise = promise.then(_then1)
-
-        def _then2(exitcode):
-            nonlocal result
+            exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
             result = exitcode
-
-        promise = promise.then(_then2)
-
-        def _catch(err):
+        except BuildException as err:
             logger_buildsystem.error(f"\tError configuring {module}: r[b[{err}]")
-            return 0
-
-        promise = promise.catch(_catch)
-        Promise.wait(promise)
+            return False
 
         return result == 0

@@ -42,7 +42,8 @@ class BuildSystem_Meson(BuildSystem):
         # to convert to empty string in that case.
         setupOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
 
-        return Util.await_exitcode(Util.run_logged_p(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions]))
+        exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions])
+        return Util.good_exitcode(exitcode)
 
     @staticmethod
     # @override

@@ -427,7 +427,7 @@ class Module(OptionsBase):
                 logger_module.warning(f"\tUnable to clean r[{self}]!")
                 return False
 
-        result = Util.await_result(buildSystem.createBuildSystem())
+        result = buildSystem.createBuildSystem()
         if not result:
             logger_module.error(f"\tError creating r[{self}]'s build system!")
             return False

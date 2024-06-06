@@ -8,7 +8,6 @@ import os.path
 import sys
 import re
 import time
-from promise import Promise
 import logging
 
 from ..BuildException import BuildException
@@ -317,8 +316,7 @@ class BuildSystem:
         if os.path.exists(builddir) and builddir != srcdir:
             logger_buildsystem.info(f"\tRemoving files in build directory for g[{module}]")
 
-            clean_promise = Util.prune_under_directory_p(module, builddir)
-            result = Util.await_result(clean_promise)
+            result = Util.prune_under_directory(module, builddir)
 
             # This variant of log_command runs the sub prune_under_directory($builddir)
             # in a forked child, so that we can log its output.
@@ -341,14 +339,14 @@ class BuildSystem:
     def needsBuilddirHack() -> bool:
         return False  # By default all build systems are assumed to be sane
 
-    def createBuildSystem(self) -> Promise:
+    def createBuildSystem(self) -> int:
         """
         Creates the build directory for the associated module, and handles
         pre-configure setup that might be necessary to permit the build to complete
         from the build directory.
 
         Returns:
-             A promise that resolves to a boolean result value (true == success)
+             1 on success, 0 on failure.
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -357,18 +355,15 @@ class BuildSystem:
 
         if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
             logger_buildsystem.error(f"\tUnable to create build directory for r[{module}]!!")
-            return Promise.resolve(0)
+            return 0
 
         if builddir != srcdir and self.needsBuilddirHack():
-            def func(result):
-                if not result:
-                    logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
-                return result
+            result = Util.safe_lndir(srcdir, builddir)
+            if not result:
+                logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
+            return result
 
-            promise = Util.safe_lndir_p(srcdir, builddir).then(func)
-            return promise
-
-        return Promise.resolve(1)
+        return 1
 
     def safe_make(self, optsRef: dict) -> dict:
         """
@@ -488,16 +483,14 @@ class BuildSystem:
         if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
             logger_buildsystem.warning(f"\t{message}")
 
-            promise = Util.run_logged_p(module, filename, builddir, argRef)
-            resultRef["was_successful"] = Util.await_exitcode(promise)
+            resultRef["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, argRef))
 
             # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
             # When the module was built successfully, and you were using --debug, then you will get the message:
             #  "No changes from build, skipping install"
             # from Module.build() method. This is due to "work_done" key was missing in returned dict when debugging.
             # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
-            if not promise.is_rejected:
-                resultRef["work_done"] = 1
+            resultRef["work_done"] = 1
 
             return resultRef
 
@@ -559,21 +552,16 @@ class BuildSystem:
 
         cmd.on({"child_output": on_child_output})
 
-        def _then(exitcode):
-            nonlocal resultRef
+        try:
+            exitcode = cmd.start()
             resultRef = {
                 "was_successful": exitcode == 0,
                 "warnings": warnings,
                 "work_done": workDoneFlag,
             }
-
-        def _catch(err):
+        except Exception as err:
             logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
             resultRef["was_successful"] = 0
-
-        promise = cmd.start().then(_then).catch(_catch)
-
-        Promise.wait(promise)
 
         # Cleanup TTY output.
         a_time = Util.prettify_seconds(int(time.time()) - a_time)

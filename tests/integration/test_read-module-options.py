@@ -5,7 +5,6 @@
 
 import os
 from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess  # load early so we can override
-from promise import Promise
 
 # Now we can load `Application`, which will load a bunch more modules all
 # using log_command and run_logged_p from `Util`
@@ -34,8 +33,8 @@ def test_option_reading(monkeypatch):
     monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
 
     # Override start.
-    def mock_start(self) -> Promise:
-        return Promise.resolve(0)
+    def mock_start(self) -> int:
+        return 0
 
     monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
 

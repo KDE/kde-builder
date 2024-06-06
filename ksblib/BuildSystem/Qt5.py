@@ -102,4 +102,4 @@ class BuildSystem_Qt5(BuildSystem):
 
         module.setPersistentOption("last-configure-flags", cur_flags)
 
-        return Util.await_exitcode(Util.run_logged_p(module, "configure", builddir, commands))
+        return Util.good_exitcode(Util.run_logged(module, "configure", builddir, commands))

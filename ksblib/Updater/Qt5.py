@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os.path
 # from overrides import override
-from promise import Promise
 
 from ..BuildException import BuildException
 from ..Util.Util import Util
@@ -54,7 +53,7 @@ class Updater_Qt5(Updater):
         command = [f"{srcdir}/init-repository", "-f", f"--module-subset={subset_arg}"]
         logger_updater.warning("\tUsing Qt 5 modules: " + ", ".join(modules))
 
-        result = Util.await_exitcode(Util.run_logged_p(module, "init-repository", srcdir, command))
+        result = Util.good_exitcode(Util.run_logged(module, "init-repository", srcdir, command))
 
         if not result:
             BuildException.croak_runtime("Couldn't update Qt 5 repository submodules!")
@@ -62,7 +61,7 @@ class Updater_Qt5(Updater):
         return 1  # TODO: Count commits
 
     # @override
-    def updateExistingClone(self) -> Promise:
+    def updateExistingClone(self) -> int:
         """
         Updates an existing Qt5 super module checkout.
         Throws exceptions on failure, otherwise returns number of commits updated
@@ -70,16 +69,15 @@ class Updater_Qt5(Updater):
         Util.assert_isa(self, Updater_Qt5)
 
         # Update init-repository and the shell of the super module itself.
-        promise = super().updateExistingClone()
-        Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
+        result = super().updateExistingClone()
 
         # updateRepository has init-repository work to update the source
         self._updateRepository()
 
-        return promise
+        return result
 
     # @override(check_signature=False)
-    def updateCheckout(self) -> Promise | int:
+    def updateCheckout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
@@ -99,8 +97,7 @@ class Updater_Qt5(Updater):
         else:
             self._verifySafeToCloneIntoSourceDir(module, srcdir)
 
-            promise = self._clone(module.getOption("repository"))
-            Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
+            self._clone(module.getOption("repository"))
 
             logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
             logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")

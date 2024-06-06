@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-from promise import Promise
 from ksblib.Application import Application
 from ksblib.Module.Module import Module
 from ksblib.BuildSystem.BuildSystem import BuildSystem
@@ -45,7 +44,7 @@ def test_build_internal(monkeypatch):
 
     # Mock override
     def mock_createBuildSystem(self):
-        return Promise.resolve(1)
+        return 1
 
     # Mock override
     def mock_configureInternal(self):

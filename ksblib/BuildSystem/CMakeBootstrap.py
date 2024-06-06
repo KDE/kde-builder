@@ -40,6 +40,5 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
 
         builddir = module.fullpath("build")
 
-        promise = Util.run_logged_p(module, "cmake-bootstrap", builddir, [f"{sourcedir}/bootstrap", f"--prefix={installdir}", *bootstrapOptions])
-
-        return Util.await_exitcode(promise)
+        exitcode = Util.run_logged(module, "cmake-bootstrap", builddir, [f"{sourcedir}/bootstrap", f"--prefix={installdir}", *bootstrapOptions])
+        return Util.good_exitcode(exitcode)

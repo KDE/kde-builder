@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import shutil
-from promise import Promise
 import os
 import tempfile
 from ksblib.Module.Module import Module
@@ -40,8 +39,6 @@ def test_logged_subprocess():
     assert isinstance(cmd, Util_LoggedSubprocess), "got the right type of cmd"
 
     output = None
-    prog1Exit = None
-    prog2Exit = None
 
     def func2(line):
         nonlocal output
@@ -50,30 +47,17 @@ def test_logged_subprocess():
 
     cmd.on({"child_output": func2})
 
-    def func3(exitcode):
-        nonlocal prog1Exit
-        prog1Exit = exitcode
+    prog1Exit = cmd.start()
 
-        # Create a second LoggedSubprocess while the first one is still alive, even
-        # though it is finished.
-        cmd2 = Util_LoggedSubprocess() \
-            .module(m) \
-            .log_to("test-suite-2") \
-            .set_command(["perl", "-E", "my $x = 4 + 4; say qq(here for stdout); die qq(hello);"]) \
-            .chdir_to(tmp)
+    # Create a second LoggedSubprocess while the first one is still alive, even
+    # though it is finished.
+    cmd2 = Util_LoggedSubprocess() \
+        .module(m) \
+        .log_to("test-suite-2") \
+        .set_command(["perl", "-E", "my $x = 4 + 4; say qq(here for stdout); die qq(hello);"]) \
+        .chdir_to(tmp)
 
-        def func4(exit2):
-            nonlocal prog2Exit
-            prog2Exit = exit2
-
-        promise2 = cmd2.start().then(func4)
-
-        return promise2  # Resolve to another promise that requires resolution
-
-    promise = cmd.start().then(func3)
-
-    assert isinstance(promise, Promise), "A promise should be a promise!"
-    Promise.wait(promise)
+    prog2Exit = cmd2.start()
 
     assert output == "4", "Interior child command successfully completed"
     assert prog1Exit == 0, "Program 1 exited correctly"
