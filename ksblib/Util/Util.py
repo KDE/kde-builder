@@ -885,21 +885,20 @@ class Util:
         return result
 
     @staticmethod
-    def prune_under_directory_p(module, target_dir) -> Promise:
+    def prune_under_directory(module: Module, target_dir: str) -> int:
         """
-        Function to delete recursively, everything under the given directory, unless
+        Delete recursively everything under the given directory, unless
         we're in pretend mode.
 
         Used from :class:`BuildSystem` to handle cleaning a build directory.
 
-        i.e. the effect is similar to `rm -r arg/* arg/.*`.
+        I.e. the effect is similar to `rm -r arg/* arg/.*`.
         ::
 
-            # promise resolves to a boolean success flag
-            promise = prune_under_directory_p(module, "/path/to/clean")
+            result = prune_under_directory_p(module, "/path/to/clean")
 
         Returns:
-            A promise resolving to True on success, False on failure.
+            1 on success, 0 on failure.
         """
 
         logpath = module.getLogPath("clean-builddir.log")
@@ -910,22 +909,18 @@ class Util:
             logger_util.error(f"\tError opening logfile {logpath}: r[b[{e}]")
             logger_util.error("\tContinuing without logging")
 
-        print(f"starting delete o {target_dir}", file=log)
+        print(f"starting delete of {target_dir}", file=log)
 
         try:
-            def subprocess_run_p(target: callable) -> Promise:
-                def subprocess_run():
-                    retval = multiprocessing.Value("i", -1)
-                    subproc = multiprocessing.Process(target=target, args=(retval,))
-                    subproc.start()
-                    # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                    subproc.join()
-                    if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
-                        raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
-                    return retval.value
-
-                p = Promise.promisify(subprocess_run)()
-                return p
+            def subprocess_run(target: Callable):
+                retval = multiprocessing.Value("i", -1)
+                subproc = multiprocessing.Process(target=target, args=(retval,))
+                subproc.start()
+                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
+                subproc.join()
+                if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
+                    raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
+                return retval.value
 
             def func(retval):
                 errorRef = {}
@@ -957,12 +952,12 @@ class Util:
                 # pl2py: As we are in subprocess, we have "returned" the value via a shared variable.
                 # The actual (normal) return value cannot be read by the parent process.
 
-            promise = subprocess_run_p(func)
-            return promise
+            result = subprocess_run(func)
+            return result
 
         except Exception as e:
             logger_util.error(f"\tUnable to clean r[{target_dir}]:\n\ty[b[{e}]")
-            return Promise.resolve(0)  # resolve, but to an error
+            return 0  # an error
 
     @staticmethod
     def remake_symlink(src, dst):

@@ -7,7 +7,6 @@ import os
 import tempfile
 from ksblib.Util.Util import Util
 from ksblib.BuildContext import BuildContext
-from promise import Promise
 from pathlib import Path
 
 
@@ -28,12 +27,7 @@ def test_prune_under_dir():
 
     ctx = BuildContext()
     ctx.setOption({"log-dir": os.path.abspath(tmpdir)})
-    promise = Util.prune_under_directory_p(ctx, os.path.abspath(tmpdir))
-
-    # This shouldn't disappear until we let the promise start!
-    # assert os.path.exists(file), "prune_under_directory_p does not start until we let promise run"  # pl2py: we use promise that starts as we make it
-
-    Promise.wait(promise)
+    Util.prune_under_directory(ctx, os.path.abspath(tmpdir))
 
     assert not os.path.exists(file), "Known read-only file removed"
 

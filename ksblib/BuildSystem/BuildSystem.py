@@ -316,8 +316,7 @@ class BuildSystem:
         if os.path.exists(builddir) and builddir != srcdir:
             logger_buildsystem.info(f"\tRemoving files in build directory for g[{module}]")
 
-            clean_promise = Util.prune_under_directory_p(module, builddir)
-            result = Util.await_result(clean_promise)
+            result = Util.prune_under_directory(module, builddir)
 
             # This variant of log_command runs the sub prune_under_directory($builddir)
             # in a forked child, so that we can log its output.
