@@ -62,7 +62,7 @@ class Updater_Qt5(Updater):
         return 1  # TODO: Count commits
 
     # @override
-    def updateExistingClone(self) -> Promise:
+    def updateExistingClone(self) -> int:
         """
         Updates an existing Qt5 super module checkout.
         Throws exceptions on failure, otherwise returns number of commits updated
@@ -70,13 +70,12 @@ class Updater_Qt5(Updater):
         Util.assert_isa(self, Updater_Qt5)
 
         # Update init-repository and the shell of the super module itself.
-        promise = super().updateExistingClone()
-        Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
+        result = super().updateExistingClone()
 
         # updateRepository has init-repository work to update the source
         self._updateRepository()
 
-        return promise
+        return result
 
     # @override(check_signature=False)
     def updateCheckout(self) -> Promise | int:
@@ -95,7 +94,7 @@ class Updater_Qt5(Updater):
 
         if os.path.isdir(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            return self.updateExistingClone()
+            return Promise.resolve(self.updateExistingClone())
         else:
             self._verifySafeToCloneIntoSourceDir(module, srcdir)
 

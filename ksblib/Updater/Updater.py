@@ -222,7 +222,7 @@ class Updater:
         # worktree checkout (https://git-scm.com/docs/gitrepository-layout)
         if os.path.exists(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            promise = self.updateExistingClone()
+            promise = Promise.resolve(self.updateExistingClone())
         else:
             def func(resolve, reject):
                 self._verifySafeToCloneIntoSourceDir(module, srcdir)
@@ -486,11 +486,11 @@ class Updater:
         result = result == 0  # need to adapt to boolean success flag
         return result
 
-    def updateExistingClone(self) -> Promise:
+    def updateExistingClone(self) -> int:
         """
         Updates an already existing git checkout by running git pull.
         Throws an exception on error.
-        Return parameter is a promise resolving to the number of affected *commits*.
+        Returns the number of affected *commits*.
         """
         Util.assert_isa(self, Updater)
         module = self.module
@@ -503,51 +503,37 @@ class Updater:
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
             BuildException.croak_runtime(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
-        remoteName = None
-        remoteNamePromise = Promise.resolve(self._setupBestRemote())
-
-        def uec_fetch(_remoteName):
-            nonlocal remoteName
-            remoteName = _remoteName  # save for later
-
-            logger_updater.info(f"Fetching remote changes to g[{module}]")
-            return Promise.resolve(Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName]))
+        remoteName = self._setupBestRemote()
+        logger_updater.info(f"Fetching remote changes to g[{module}]")
+        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName])
 
         # Download updated objects. This also updates remote heads so do this
         # before we start comparing branches and such.
-        a = remoteNamePromise.then(uec_fetch)
 
-        def uec_set_updatesub_and_run_sau(exitcode):
-            if not exitcode == 0:
-                BuildException.croak_runtime(f"Unable to perform git fetch for {remoteName} ({cur_repo})")
+        if not exitcode == 0:
+            BuildException.croak_runtime(f"Unable to perform git fetch for {remoteName} ({cur_repo})")
 
-            # Now we need to figure out if we should update a branch, or simply
-            # checkout a specific tag/SHA1/etc.
-            commitId, commitType = self._determinePreferredCheckoutSource(module)
-            if commitType == "none":
-                commitType = "branch"
-                commitId = self._detectDefaultRemoteHead(remoteName)
+        # Now we need to figure out if we should update a branch, or simply
+        # checkout a specific tag/SHA1/etc.
+        commitId, commitType = self._determinePreferredCheckoutSource(module)
+        if commitType == "none":
+            commitType = "branch"
+            commitId = self._detectDefaultRemoteHead(remoteName)
 
-            logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
-            start_commit = self.commit_id("HEAD")
+        logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
+        start_commit = self.commit_id("HEAD")
 
-            def condition():
-                if commitType == "branch":
-                    return lambda: self._updateToRemoteHead(remoteName, commitId)
-                else:
-                    return lambda: self._updateToDetachedHead(commitId)
+        def condition():
+            if commitType == "branch":
+                return lambda: self._updateToRemoteHead(remoteName, commitId)
+            else:
+                return lambda: self._updateToDetachedHead(commitId)
 
-            updateSub = condition()
+        updateSub = condition()
 
-            def uec_count(isOk):
-                ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
-                return Promise.resolve(ret)
-
-            c = Promise.resolve(self.stashAndUpdate(updateSub)).then(uec_count)
-            return c
-
-        b = a.then(uec_set_updatesub_and_run_sau)
-        return b
+        self.stashAndUpdate(updateSub)
+        ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
+        return ret
 
     @staticmethod
     def _detectDefaultRemoteHead(remoteName: str) -> str:
