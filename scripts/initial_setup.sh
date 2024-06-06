@@ -25,37 +25,32 @@ install_runtime_packages() {
 
   if [ "$ID" = "alpine" ]; then
     (set -x; sudo apk update)
-    # Have packages: py3-yaml py3-setproctitle
-    # Does not have packages: py3-promise
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
-    pip install promise --break-system-packages
   elif [ "$ID" = "arch" ] || [ "$ID" = "manjaro" ]; then
-    (set -x; sudo pacman -S git dbus-python python-promise python-yaml python-setproctitle --needed)
+    (set -x; sudo pacman -S git dbus-python python-yaml python-setproctitle --needed)
   elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ] || [ "$ID" = "neon" ]; then
     (set -x; sudo apt update)
-    (set -x; sudo apt install git python3-dbus python3-promise python3-yaml python3-setproctitle)
+    (set -x; sudo apt install git python3-dbus python3-yaml python3-setproctitle)
   elif [ "$ID" = "fedora" ]; then
-    (set -x; sudo dnf install git python3-dbus python3-promise python3-pyyaml python3-setproctitle)
+    (set -x; sudo dnf install git python3-dbus python3-pyyaml python3-setproctitle)
   elif [ "$ID" = "gentoo" ]; then
     (set -x; sudo emerge -q dev-python/dbus-python dev-python/pyyaml dev-python/setproctitle)
-    # Does not have package dev-python/promise in official repos
   elif [ "$ID" = "opensuse-leap" ]; then
     (set -x; sudo zypper install python311 python311-PyYAML)
-    # Does not have packages: dbus-python, promise, setproctitle
+    # Does not have packages: dbus-python, setproctitle
     pip install pipenv
     # For building from source code the Python module dbus-python.
     (set -x; sudo zypper install cmake gcc libdbus-c++-devel libglib-testing-devel python311-devel)
   elif [ "$ID" = "opensuse-tumbleweed" ]; then
     (set -x; sudo zypper refresh)
-    (set -x; sudo zypper install git python311-pyaml python311-setproctitle python311-promise)
+    (set -x; sudo zypper install git python311-pyaml python311-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
-    (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus py39-promise)
+    (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus)
   else
     echo -e "${Yellow}Warning: Unsupported OS: $ID, skipping installation of runtime packages.${Color_Off}" 1>&2
     cat << EOF
 The following python modules are required (please install manually):
     yaml
-    promise
     setproctitle
 EOF
 

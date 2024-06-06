@@ -20,7 +20,6 @@ RealBinDir = os.path.dirname(os.path.realpath(__file__))
 def findMissingModules() -> list:
     requiredModules = [
         "yaml",
-        "promise",
         "setproctitle",
     ]
     missingModules = []
