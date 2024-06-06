@@ -18,7 +18,6 @@ from pathlib import Path
 import subprocess
 import shlex
 import signal
-from promise import Promise
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
@@ -483,72 +482,6 @@ class Util:
                     """))
                 # Don't use return, this is the child still!
                 sys.exit(1)
-
-    @staticmethod
-    def await_promise(promise: Promise):
-        """
-        Takes a promise on input and calls .wait() on it, blocking until the promise
-        resolves. Returns the promise passed in.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
-        """
-        # if promise.ioloop.is_running:
-        #     BuildException.croak_internal("Tried to await a promise when I/O loop active!")
-        promise = promise.get()
-        return promise
-
-    @staticmethod
-    def await_exitcode(promise: Promise):
-        """
-        Takes a promise on input, adds a handler to extract the final result (treating
-        it as a shell-style exit code), and calls .wait() on it, blocking until the
-        promise resolves or rejects.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Returns a boolean value (true if the promise exitcode resolved to 0, false
-        otherwise).
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
-        """
-        result = None
-
-        def func(exitcode):
-            nonlocal result
-            result = exitcode == 0
-
-        Util.await_promise(promise.then(func))
-        return result
-
-    @staticmethod
-    def await_result(promise: Promise):
-        """
-        Takes a promise on input, adds a handler to extract the final result,
-        and calls .wait() on it, blocking until the promise resolves or
-        rejects.
-
-        You should not use this function except as a porting aid to convert
-        log_command()-based async code to use promises.
-
-        Returns the result.
-
-        Throws an exception if the I/O loop is already in operation, as this indicates
-        serious bugs.
-        """
-        result = None
-
-        def func(result_from_p):
-            nonlocal result
-            result = result_from_p
-
-        Util.await_promise(promise.then(func))
-        return result
 
     @staticmethod
     def good_exitcode(exitcode: int) -> bool:
