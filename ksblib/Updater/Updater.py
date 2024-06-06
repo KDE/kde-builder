@@ -548,7 +548,7 @@ class Updater:
                 ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
                 return Promise.resolve(ret)
 
-            c = self.stashAndUpdate(updateSub).then(uec_count)
+            c = Promise.resolve(self.stashAndUpdate(updateSub)).then(uec_count)
             return c
 
         b = a.then(uec_set_updatesub_and_run_sau)
@@ -688,7 +688,7 @@ class Updater:
         module = self.module
         self.ipc.notifyNewPostBuildMessage(module.name, *args)
 
-    def stashAndUpdate(self, updateSub: Callable) -> Promise:
+    def stashAndUpdate(self, updateSub: Callable) -> int:
         """
         This stashes existing changes if necessary, and then runs a provided
         update routine in order to advance the given module to the desired head.
@@ -704,105 +704,80 @@ class Updater:
                 a boolean success indicator. It may throw exceptions.
 
         Returns:
-             A promise that resolves to 1, or rejects with an exception.
+             1 or raises exception on error.
         """
         module = self.module
         date = time.strftime("%F-%R", time.gmtime())  # ISO Date, hh:mm time
         stashName = f"kde-builder auto-stash at {date}"
 
         # first, log the git status prior to kde-builder taking over the reins in the repo
-        promise = Promise.resolve(Util.run_logged(module, "git-status-before-update", None, ["git", "status"]))
+        result = Util.run_logged(module, "git-status-before-update", None, ["git", "status"])
 
-        oldStashCount, newStashCount = None, None  # Used in promises below
+        oldStashCount = self.countStash()
 
-        def sau_stash_push(exitcode):
-            nonlocal oldStashCount
-            oldStashCount = self.countStash()
+        # always stash:
+        # - also stash untracked files because what if upstream started to track them
+        # - we do not stash .gitignore'd files because they may be needed for builds?
+        #   on the other hand that leaves a slight risk if upstream altered those
+        #   (i.e. no longer truly .gitignore'd)
+        logger_updater.debug("\tStashing local changes if any...")
 
-            # always stash:
-            # - also stash untracked files because what if upstream started to track them
-            # - we do not stash .gitignore'd files because they may be needed for builds?
-            #   on the other hand that leaves a slight risk if upstream altered those
-            #   (i.e. no longer truly .gitignore'd)
-            logger_updater.debug("\tStashing local changes if any...")
+        if Debug().pretending():  # probably best not to do anything if pretending
+            result = 0
+        else:
+            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stashName])
 
-            if Debug().pretending():  # probably best not to do anything if pretending
-                return Promise.resolve(0)
-
-            return Promise.resolve(Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stashName]))
-
-        promise = promise.then(sau_stash_push)
-        Promise.wait(promise, None)
-        pass
-
-        def sau_notify_stashed(exitcode):
-            if exitcode == 0:
-                return exitcode
-
+        if result == 0:
+            pass
+        else:
             # Might happen if the repo is already in merge conflict state.
             # We could mark everything as resolved using git add . before stashing,
             # but that might not always be appreciated by people having to figure
             # out what the original merge conflicts were afterwards.
             self._notifyPostBuildMessage(f"b[{module}] may have local changes that we couldn't handle, so the module was left alone.")
 
-            return Promise.resolve(Util.run_logged(module, "git-status-after-error", None, ["git", "status"])) \
-                .then(lambda _: BuildException.croak_runtime(f"Unable to stash local changes (if any) for {module}, aborting update."))
+            result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
+            BuildException.croak_runtime(f"Unable to stash local changes (if any) for {module}, aborting update.")
 
-        promise = promise.then(sau_notify_stashed)
+        # next: check if the stash was truly necessary.
+        # compare counts (not just testing if there is *any* stash) because there
+        # might have been a genuine user's stash already prior to kde-builder
+        # taking over the reins in the repo.
+        newStashCount = self.countStash()
 
-        def sau_call_updatesub(exitcode):
-            nonlocal newStashCount
-            # next: check if the stash was truly necessary.
-            # compare counts (not just testing if there is *any* stash) because there
-            # might have been a genuine user's stash already prior to kde-builder
-            # taking over the reins in the repo.
-            newStashCount = self.countStash()
+        # mark that we applied a stash so that $updateSub (_updateToRemoteHead or
+        # _updateToDetachedHead) can know not to do dumb things
+        if newStashCount != oldStashCount:
+            module.setOption({"#git-was-stashed": True})
 
-            # mark that we applied a stash so that $updateSub (_updateToRemoteHead or
-            # _updateToDetachedHead) can know not to do dumb things
-            if newStashCount != oldStashCount:
-                module.setOption({"#git-was-stashed": True})
+        # finally, update to remote head
+        result = updateSub()
 
-            # finally, update to remote head
-            ret = Promise.resolve(updateSub())
-            return ret
+        if result:
+            result = 1
+        else:
+            result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
+            BuildException.croak_runtime(f"Unable to update source code for {module}")
 
-        promise = promise.then(sau_call_updatesub)
+        # we ignore git-status exit code deliberately, it's a debugging aid
 
-        def sau_check_updateok(updateOk):
-            if updateOk:
-                return 1
-
-            return Promise.resolve(Util.run_logged(module, "git-status-after-error", None, ["git", "status"])) \
-                .then(lambda _: BuildException.croak_runtime(f"Unable to update source code for {module}"))
-
-        promise = promise.then(sau_check_updateok)
-
-        def sau_check_stash_count(exitcode):
-            # we ignore git-status exit code deliberately, it's a debugging aid
-
-            if newStashCount == oldStashCount:
-                return 1  # success
-
-            def sau_stash_count_differs(exitcode):
-                if exitcode != 0:
-                    message = f"r[b[*] Unable to restore local changes for b[{module}]! " + \
-                              f"You should manually inspect the new stash: b[{stashName}]"
-                    logger_updater.warning(f"\t{message}")
-                    self._notifyPostBuildMessage(message)
-                else:
-                    logger_updater.info(f"\tb[*] You had local changes to b[{module}], which have been re-applied.")
-
-                return 1  # success
-
+        if newStashCount == oldStashCount:
+            result = 1  # success
+        else:
             # If the stash had been needed then try to re-apply it before we build, so
             # that KDE developers working on changes do not have to manually re-apply.
-            a = Promise.resolve(Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"]))
-            b = a.then(sau_stash_count_differs)
-            return b
+            exitcode = Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"])
+            if exitcode != 0:
+                message = f"r[b[*] Unable to restore local changes for b[{module}]! " + \
+                          f"You should manually inspect the new stash: b[{stashName}]"
+                logger_updater.warning(f"\t{message}")
+                self._notifyPostBuildMessage(message)
+            else:
+                logger_updater.info(f"\tb[*] You had local changes to b[{module}], which have been re-applied.")
 
-        promise = promise.then(sau_check_stash_count)
-        return promise
+            result = 1  # success
+
+        return result
 
     def getRemoteBranchName(self, remoteName: str, branchName: str) -> str:
         """
