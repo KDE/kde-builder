@@ -123,14 +123,14 @@ class Updater:
 
         BuildException.croak_runtime(f"git had error exit {result} when verifying {ref} present in repository at {repo}")
 
-    def _clone(self, git_repo: str) -> Promise:
+    def _clone(self, git_repo: str) -> int:
         """
         Perform a git clone to checkout the latest branch of a given git module
 
         First parameter is the repository (typically URL) to use.
 
         Returns:
-             A promise that resolves to 1, or rejects if an error occurs.
+             1, or raises exception if an error occurs.
         """
         Util.assert_isa(self, Updater)
         module = self.module
@@ -150,35 +150,30 @@ class Updater:
             args.insert(0, commitId)  # Checkout branch right away
             args.insert(0, "-b")
 
-        promise = Promise.resolve(Util.run_logged(module, "git-clone", module.getSourceDir(), ["git", "clone", "--recursive", *args]))
+        exitcode = Util.run_logged(module, "git-clone", module.getSourceDir(), ["git", "clone", "--recursive", *args])
 
-        def _then(exitcode):
-            if not exitcode == 0:
-                BuildException.croak_runtime("Failed to make initial clone of $module")
+        if not exitcode == 0:
+            BuildException.croak_runtime("Failed to make initial clone of $module")
 
-            ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", git_repo)
+        ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", git_repo)
 
-            Util.p_chdir(srcdir)
+        Util.p_chdir(srcdir)
 
-            # Setup user configuration
-            if name := module.getOption("git-user"):
-                username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
-                if not username or not email:
-                    BuildException.croak_runtime(f"Invalid username or email for git-user option: {name}" +
-                                                 " (should be in format 'User Name <username@example.net>'")
+        # Setup user configuration
+        if name := module.getOption("git-user"):
+            username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
+            if not username or not email:
+                BuildException.croak_runtime(f"Invalid username or email for git-user option: {name}" +
+                                             " (should be in format 'User Name <username@example.net>'")
 
-                logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
-                result = Util.safe_system(["git", "config", "--local", "user.name", username]) == 0
+            logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
+            result = Util.safe_system(["git", "config", "--local", "user.name", username]) == 0
 
-                result = Util.safe_system(["git", "config", "--local", "user.email", email]) == 0 or result
+            result = Util.safe_system(["git", "config", "--local", "user.email", email]) == 0 or result
 
-                if not result:
-                    logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
-            return 1  # success
-
-        promise = promise.then(_then)
-
-        return promise
+            if not result:
+                logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
+        return 1  # success
 
     def _verifySafeToCloneIntoSourceDir(self, module: Module, srcdir: str) -> None:
         """
@@ -247,7 +242,7 @@ class Updater:
                         return Promise.resolve(1)
                     return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
 
-                resolve(self._clone(git_repo).then(func2))
+                resolve(Promise.resolve(self._clone(git_repo)).then(func2))
 
             promise = Promise(func)
         return promise

@@ -99,8 +99,7 @@ class Updater_Qt5(Updater):
         else:
             self._verifySafeToCloneIntoSourceDir(module, srcdir)
 
-            promise = self._clone(module.getOption("repository"))
-            Promise.wait(promise)  # Ensure we have finished cloning, because the _updateRepository() expects it
+            self._clone(module.getOption("repository"))
 
             logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
             logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")
