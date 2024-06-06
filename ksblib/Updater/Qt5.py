@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os.path
 # from overrides import override
-from promise import Promise
 
 from ..BuildException import BuildException
 from ..Util.Util import Util
@@ -78,7 +77,7 @@ class Updater_Qt5(Updater):
         return result
 
     # @override(check_signature=False)
-    def updateCheckout(self) -> Promise | int:
+    def updateCheckout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
@@ -94,7 +93,7 @@ class Updater_Qt5(Updater):
 
         if os.path.isdir(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            return Promise.resolve(self.updateExistingClone())
+            return self.updateExistingClone()
         else:
             self._verifySafeToCloneIntoSourceDir(module, srcdir)
 

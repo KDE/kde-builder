@@ -13,8 +13,6 @@ import inspect
 import time
 # from overrides import override
 
-from promise import Promise
-
 from ..BuildException import BuildException
 from ..IPC.Null import IPC_Null
 # use ksb::Util qw(:DEFAULT :await run_logged_p);
@@ -53,17 +51,14 @@ class Updater:
         """
         self.ipc = ipc
         err = None
+        numCommits = None
 
-        def handle_error(_err):
-            nonlocal err
+        try:
+            numCommits = self.updateCheckout()
+        except Exception as _err:
             err = _err
 
-        promise = self.updateCheckout()
-        promise = promise.catch(handle_error)
-
-        numCommits = Util.await_result(promise)
-
-        self.ipc = None  # pl2py: this was in promise.finally()
+        self.ipc = None
 
         if err:
             raise err
@@ -206,13 +201,13 @@ class Updater:
                     print(subprocess.check_output(["git", "status", srcdir]))
                 BuildException.croak_runtime("Conflicting source-dir present")
 
-    def updateCheckout(self) -> Promise:
+    def updateCheckout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
 
-        Returns a promise that resolves to the number of *commits* affected, or
-        rejects with an update error.
+        Returns the number of *commits* affected, or
+        throws exception on an update error.
         """
         Util.assert_isa(self, Updater)
         module = self.module
@@ -222,30 +217,25 @@ class Updater:
         # worktree checkout (https://git-scm.com/docs/gitrepository-layout)
         if os.path.exists(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            promise = Promise.resolve(self.updateExistingClone())
+            return self.updateExistingClone()
         else:
-            def func(resolve, reject):
-                self._verifySafeToCloneIntoSourceDir(module, srcdir)
+            self._verifySafeToCloneIntoSourceDir(module, srcdir)
 
-                git_repo = module.getOption("repository")
-                if not git_repo:
-                    BuildException.croak_internal(f"Unable to checkout {module}, you must specify a repository to use.")
+            git_repo = module.getOption("repository")
+            if not git_repo:
+                BuildException.croak_internal(f"Unable to checkout {module}, you must specify a repository to use.")
 
-                if not self._verifyRefPresent(module, git_repo):
-                    if self._moduleIsNeeded():
-                        BuildException.croak_runtime(f"{module} build was requested, but it has no source code at the requested git branch")
-                    else:
-                        BuildException.croak_runtime("The required git branch does not exist at the source repository")
+            if not self._verifyRefPresent(module, git_repo):
+                if self._moduleIsNeeded():
+                    BuildException.croak_runtime(f"{module} build was requested, but it has no source code at the requested git branch")
+                else:
+                    BuildException.croak_runtime("The required git branch does not exist at the source repository")
 
-                def func2(result):
-                    if Debug().pretending():
-                        return Promise.resolve(1)
-                    return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
-
-                resolve(Promise.resolve(self._clone(git_repo)).then(func2))
-
-            promise = Promise(func)
-        return promise
+            self._clone(git_repo)
+            if Debug().pretending():
+                return 1
+            else:
+                return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
 
     @staticmethod
     def _moduleIsNeeded() -> bool:
