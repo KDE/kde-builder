@@ -390,7 +390,7 @@ class Updater:
             return True
         return False
 
-    def _updateToRemoteHead(self, remoteName: str, branch: str) -> Promise:
+    def _updateToRemoteHead(self, remoteName: str, branch: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to
         a given remote-tracking branch. Any existing local branch with the given
@@ -406,77 +406,63 @@ class Updater:
             branch: The branch to update to.
 
         Returns:
-             A promise resolving to a boolean success flag.
+             boolean success flag.
         Exception may be thrown if unable to create a local branch.
         """
         module = self.module
 
-        def utrh_checkout(resolve, reject) -> None:
-            # 'branch' option requests a given remote head in the user's selected
-            # repository. The local branch with 'branch' as upstream might have a
-            # different name. If there's no local branch this method creates one.
-            branchName = self.getRemoteBranchName(remoteName, branch)
+        # "branch" option requests a given remote head in the user's selected
+        # repository. The local branch with "branch" as upstream might have a
+        # different name. If there's no local branch this method creates one.
+        branchName = self.getRemoteBranchName(remoteName, branch)
 
-            if self._warnIfStashedFromWrongBranch(remoteName, branch, branchName):
-                resolve(0)
-                return
+        if self._warnIfStashedFromWrongBranch(remoteName, branch, branchName):
+            return 0
 
-            croak_reason = None
-            promise = None
-            cmd = Util_LoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
+        croak_reason = None
+        result = None
+        cmd = Util_LoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
 
-            if not branchName:
-                newName = self.makeBranchname(remoteName, branch)
+        if not branchName:
+            newName = self.makeBranchname(remoteName, branch)
 
-                def announcer_sub(_):
-                    # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                    logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{newName}]")
+            def announcer_sub(_):
+                # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
+                logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{newName}]")
 
-                cmd.log_to("git-checkout-branch") \
-                    .set_command(["git", "checkout", "-b", newName, f"{remoteName}/{branch}"]) \
-                    .announcer(announcer_sub)
+            cmd.log_to("git-checkout-branch") \
+                .set_command(["git", "checkout", "-b", newName, f"{remoteName}/{branch}"]) \
+                .announcer(announcer_sub)
 
-                croak_reason = f"Unable to perform a git checkout of {remoteName}/{branch} to a local branch of {newName}"
-                promise = Promise.resolve(cmd.start())
+            croak_reason = f"Unable to perform a git checkout of {remoteName}/{branch} to a local branch of {newName}"
+            result = cmd.start()
+        else:
+            def announcer_sub(_):
+                # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
+                logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branchName}]")
+
+            cmd.log_to("git-checkout-update") \
+                .set_command(["git", "checkout", branchName]) \
+                .announcer(announcer_sub)
+
+            croak_reason = f"Unable to perform a git checkout to existing branch {branchName}"
+
+            result = cmd.start()
+
+            if not result == 0:
+                pass
             else:
-                def announcer_sub(_):
-                    # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                    logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branchName}]")
+                croak_reason = f"{module}: Unable to reset to remote development branch {branch}"
 
-                cmd.log_to("git-checkout-update") \
-                    .set_command(["git", "checkout", branchName]) \
-                    .announcer(announcer_sub)
+                # Given that we're starting with a "clean" checkout, it's now simply a fast-forward
+                # to the remote HEAD (previously we pulled, incurring additional network I/O).
+                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remoteName}/{branch}"])
 
-                croak_reason = f"Unable to perform a git checkout to existing branch {branchName}"
+        if not result == 0:
+            BuildException.croak_runtime(croak_reason)
+        return 1  # success
 
-                pr = Promise.resolve(cmd.start())
-
-                def utrh_checkout_exitcode(exitcode):
-                    if not exitcode == 0:
-                        return Promise.resolve(exitcode)
-
-                    nonlocal croak_reason
-                    croak_reason = f"{module}: Unable to reset to remote development branch {branch}"
-
-                    # Given that we're starting with a 'clean' checkout, it's now simply a fast-forward
-                    # to the remote HEAD (previously we pulled, incurring additional network I/O).
-                    a = Promise.resolve(Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remoteName}/{branch}"]))
-                    return a
-
-                promise = pr.then(utrh_checkout_exitcode)
-
-            def utrh_check_exitcode(exitcode):
-                if not exitcode == 0:
-                    BuildException.croak_runtime(croak_reason)
-                return Promise.resolve(1)  # success
-
-            promise = promise.then(utrh_check_exitcode)
-            resolve(promise.get())
-
-        p = Promise(utrh_checkout)
-        return p
-
-    def _updateToDetachedHead(self, commit: str) -> Promise:
+    def _updateToDetachedHead(self, commit: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to
         a given commit. The local checkout is left in a detached HEAD state,
@@ -494,21 +480,16 @@ class Updater:
                 It is recommended to use refs/foo/bar syntax for specificity.
 
         Returns:
-             A promise resolving to a boolean success flag.
+             boolean success flag.
         """
         module = self.module
         srcdir = module.fullpath("source")
 
-        def func(resolve, reject):
-            logger_updater.info(f"\tDetaching head to b[{commit}]")
+        logger_updater.info(f"\tDetaching head to b[{commit}]")
 
-            def func_2(exitcode):  # need to adapt to boolean success flag
-                return exitcode == 0
-
-            promise = Promise.resolve(Util.run_logged(module, "git-checkout-commit", srcdir, ["git", "checkout", commit])).then(func_2)
-            resolve(promise)
-
-        return Promise(func)
+        result = Util.run_logged(module, "git-checkout-commit", srcdir, ["git", "checkout", commit])
+        result = result == 0  # need to adapt to boolean success flag
+        return result
 
     def updateExistingClone(self) -> Promise:
         """
@@ -783,7 +764,7 @@ class Updater:
                 module.setOption({"#git-was-stashed": True})
 
             # finally, update to remote head
-            ret = updateSub()
+            ret = Promise.resolve(updateSub())
             return ret
 
         promise = promise.then(sau_call_updatesub)
