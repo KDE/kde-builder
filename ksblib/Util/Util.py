@@ -551,6 +551,13 @@ class Util:
         return result
 
     @staticmethod
+    def good_exitcode(exitcode: int) -> bool:
+        """
+        Returns True if exitcode is 0, False otherwise.
+        """
+        return exitcode == 0
+
+    @staticmethod
     def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
         """
         Function to run a command, optionally filtering on the output of the child
