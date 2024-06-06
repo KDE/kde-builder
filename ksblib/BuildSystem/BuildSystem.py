@@ -339,14 +339,14 @@ class BuildSystem:
     def needsBuilddirHack() -> bool:
         return False  # By default all build systems are assumed to be sane
 
-    def createBuildSystem(self) -> Promise:
+    def createBuildSystem(self) -> int:
         """
         Creates the build directory for the associated module, and handles
         pre-configure setup that might be necessary to permit the build to complete
         from the build directory.
 
         Returns:
-             A promise that resolves to a boolean result value (true == success)
+             1 on success, 0 on failure.
         """
         Util.assert_isa(self, BuildSystem)
         module = self.module
@@ -355,18 +355,15 @@ class BuildSystem:
 
         if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
             logger_buildsystem.error(f"\tUnable to create build directory for r[{module}]!!")
-            return Promise.resolve(0)
+            return 0
 
         if builddir != srcdir and self.needsBuilddirHack():
-            def func(result):
-                if not result:
-                    logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
-                return result
+            result = Util.safe_lndir(srcdir, builddir)
+            if not result:
+                logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
+            return result
 
-            promise = Promise.resolve(Util.safe_lndir(srcdir, builddir)).then(func)
-            return promise
-
-        return Promise.resolve(1)
+        return 1
 
     def safe_make(self, optsRef: dict) -> dict:
         """
