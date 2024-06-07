@@ -20,6 +20,8 @@ class BuildSystem_QMake6(BuildSystem):
     A build system used to build modules that use qmake
     """
 
+    possible_qmake_names = ["qmake-qt6", "qmake6", "qmake-mac", "qmake"]
+
     @staticmethod
     # @override
     def name() -> str:
@@ -42,24 +44,21 @@ class BuildSystem_QMake6(BuildSystem):
         # Assume code.qt.io modules all need hack for now
         return bool(re.search(r"qt\.io", module.getOption("repository")))
 
-    @staticmethod
-    def absPathToQMake() -> str:
+    @classmethod
+    def absPathToQMake(cls) -> str:
         """
         Returns the absolute path to "qmake". Note the actual executable name may
         not necessarily be "qmake" as some distributions rename it to allow for
-        co-installability with Qt 5
+        co-installability with previous Qt versions.
         If no suitable qmake can be found, None is returned.
-        This is a "static class method" i.e. use :meth:`BuildSystem.QMake6.absPathToQMake()`
         """
-        possibilities = ["qmake-qt6", "qmake6", "qmake-mac", "qmake"]
-        return next((p for p in possibilities if Util.locate_exe(p)), None)
+        return next((p for p in cls.possible_qmake_names if Util.locate_exe(p)), None)
 
     # @override
     def configureInternal(self) -> bool:
         """
         Return value style: boolean
         """
-        Util.assert_isa(self, BuildSystem_QMake6)
         module = self.module
         builddir = module.fullpath("build")
         sourcedir = builddir if self.needsBuilddirHack() else module.fullpath("source")
@@ -85,4 +84,4 @@ class BuildSystem_QMake6(BuildSystem):
 
         logger_buildsystem.info("\tRunning g[qmake]...")
 
-        return Util.good_exitcode(Util.run_logged(module, "qmake6", builddir, [qmake, *qmakeOpts, projectFiles[0]]))
+        return Util.good_exitcode(Util.run_logged(module, "qmake", builddir, [qmake, *qmakeOpts, projectFiles[0]]))

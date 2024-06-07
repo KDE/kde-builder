@@ -30,7 +30,7 @@ from ksblib.BuildException import BuildException, BuildException_Config
 
 from ..BuildSystem.BuildSystem import BuildSystem
 from ..BuildSystem.Autotools import BuildSystem_Autotools
-from ..BuildSystem.QMake import BuildSystem_QMake
+from ..BuildSystem.QMake5 import BuildSystem_QMake5
 from ..BuildSystem.QMake6 import BuildSystem_QMake6
 from ..BuildSystem.Qt4 import BuildSystem_Qt4
 from ..BuildSystem.Qt5 import BuildSystem_Qt5
@@ -252,7 +252,7 @@ class Module(OptionsBase):
         """
         buildSystemClasses = {
             "generic": BuildSystem,
-            "qmake": BuildSystem_QMake,
+            "qmake": BuildSystem_QMake5,
             "qmake6": BuildSystem_QMake6,
             "cmake-bootstrap": BuildSystem_CMakeBootstrap,
             "kde": BuildSystem_KDECMake,
@@ -292,7 +292,7 @@ class Module(OptionsBase):
         # otherwise it acts like a non-reentrant generator whose output depends on
         # how many times it's been called...
         if not buildType and (files := glob.glob(f"{sourceDir}/*.pro")):
-            buildType = BuildSystem_QMake(self)
+            buildType = BuildSystem_QMake5(self)
 
         # 'configure' is a popular fall-back option even for other build
         # systems so ensure we check last for autotools.

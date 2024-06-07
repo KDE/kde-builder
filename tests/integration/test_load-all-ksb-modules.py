@@ -15,7 +15,7 @@ def test_import_all():
     import ksblib.BuildSystem.CMakeBootstrap
     import ksblib.BuildSystem.KDECMake
     import ksblib.BuildSystem.Meson
-    import ksblib.BuildSystem.QMake
+    import ksblib.BuildSystem.QMake5
     import ksblib.BuildSystem.QMake6
     import ksblib.BuildSystem.Qt4
     import ksblib.BuildSystem.Qt5

@@ -24,7 +24,7 @@ from typing import NoReturn, Union
 
 from .BuildContext import BuildContext
 from ksblib.BuildException import BuildException, BuildException_Config
-from .BuildSystem.QMake import BuildSystem_QMake
+from .BuildSystem.QMake5 import BuildSystem_QMake5
 from .Cmdline import Cmdline
 from .Debug import Debug, kbLogger
 from .DebugOrderHints import DebugOrderHints
@@ -1737,7 +1737,7 @@ class Application:
 
             # qmake is not necessarily named "qmake"
             if not programPath and prog == "qmake":
-                programPath = BuildSystem_QMake.absPathToQMake()
+                programPath = BuildSystem_QMake5.absPathToQMake()
 
             if not programPath:
                 # Don't complain about Qt if we're building it...
