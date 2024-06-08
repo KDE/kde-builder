@@ -69,7 +69,7 @@ class BuildContext(Module):
             ctx.addModule(Module.Module(ctx, modName))
 
          ...
-         moduleList = ctx.moduleList()
+         moduleList = ctx.modules
     """
 
     # According to XDG spec, if XDG_STATE_HOME is not set, then we should
@@ -192,7 +192,7 @@ class BuildContext(Module):
         }
 
         # newOpts
-        self.modules = []
+        self.modules: list[Module] = []  # list of modules to build
         self.context = self  # Fix link to buildContext (i.e. self)
         self.build_options = {
             "global": {
@@ -260,12 +260,6 @@ class BuildContext(Module):
         else:
             logger_buildcontext.debug(f"Adding {module} to module list")
             self.modules.append(module)
-
-    def moduleList(self) -> list[Module]:
-        """
-        Returns a list of the modules to build
-        """
-        return self.modules
 
     def addToIgnoreList(self, moduleslist: list) -> None:
         """
@@ -699,7 +693,7 @@ class BuildContext(Module):
         return os.path.dirname(rcfile)
 
     def modulesInPhase(self, phase: str) -> list:
-        modules_list = [module for module in self.moduleList() if module.phases.has(phase)]
+        modules_list = [module for module in self.modules if module.phases.has(phase)]
         return modules_list
 
     def usesConcurrentPhases(self) -> bool:
@@ -708,7 +702,7 @@ class BuildContext(Module):
         has_update = False
         has_other = False
 
-        for mod in self.moduleList():
+        for mod in self.modules:
             for phase in mod.phases.phases():
                 if phase == "update":
                     has_update = True
@@ -729,7 +723,7 @@ class BuildContext(Module):
         if moduleName == "global":
             return self
 
-        options = [module for module in self.moduleList() if module.name == moduleName]
+        options = [module for module in self.modules if module.name == moduleName]
         if not options:
             return None
 
@@ -745,7 +739,7 @@ class BuildContext(Module):
         """
         Returns a list of Modules that failed to complete the given phase.
         """
-        failures = [module for module in self.moduleList() if self.errors.get(module.name, "") == phase]
+        failures = [module for module in self.modules if self.errors.get(module.name, "") == phase]
         return failures
 
     def listFailedModules(self) -> list[Module]:
@@ -753,7 +747,7 @@ class BuildContext(Module):
         Returns a list of modules that had a failure of some sort, in the order the modules
         are listed in our current module list.
         """
-        modules = self.moduleList()
+        modules = self.modules
 
         # grepping for failures instead of returning error list directly maintains ordering
         modules = [module for module in modules if module.name in self.errors]

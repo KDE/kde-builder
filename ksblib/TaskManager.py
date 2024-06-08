@@ -417,7 +417,7 @@ class TaskManager:
         # Before we fork we should pre-calculate where the logs will go so that the
         # children do not try to do the same calculation independently because they
         # didn't know it's already been figured out.
-        for module in ctx.moduleList():
+        for module in ctx.modules:
             module.getLogDir()
 
         result = 0

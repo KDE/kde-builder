@@ -1482,7 +1482,7 @@ class Application:
             Application._output_failed_module_list(ctx, f"failed to {phase}", failures)
 
         # See if any modules fail continuously and warn specifically for them.
-        super_fail = [module for module in ctx.moduleList() if (module.getPersistentOption("failure-count") or 0) > 3]
+        super_fail = [module for module in ctx.modules if (module.getPersistentOption("failure-count") or 0) > 3]
 
         for m in super_fail:
             # These messages will print immediately after this function completes.
