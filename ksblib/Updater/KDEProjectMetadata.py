@@ -39,7 +39,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
 
         fh = Util.pretend_open(path) or BuildException.croak_internal(f"Unable to read ignore data from {path}")
 
-        ctx = self.module.buildContext()
+        ctx = self.module.context
         ignoreModules = []
         for line in fh:
             # 1 Remove comments

@@ -62,7 +62,7 @@ class BuildSystem:
         Module-specific options are left intact.
         """
         module = self.module
-        ctx = module.buildContext()
+        ctx = module.context
         buildSystemOptions = ["cmake-options", "cmake-generator", "configure-flags", "custom-build-command", "cxxflags", "make-options", "run-tests", "use-clean-install"]
 
         for opt in buildSystemOptions:
@@ -477,7 +477,7 @@ class BuildSystem:
         module = self.module
         builddir = module.fullpath("build")
         resultRef = {"was_successful": 0}
-        ctx = module.buildContext()
+        ctx = module.context
 
         # There are situations when we don't want progress output:
         # 1. If we're not printing to a terminal.
