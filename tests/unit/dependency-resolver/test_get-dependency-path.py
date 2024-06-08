@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import pytest
+
 from ksblib.DependencyResolver import DependencyResolver
 from ksblib.Module.Module import Module
 

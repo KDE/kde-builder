@@ -9,10 +9,9 @@
 import copy
 
 from .BuildException import BuildException
-from .Util import Util
+from .Module.Module import Module
 from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
 from .ModuleSet.ModuleSet import ModuleSet
-from .Module.Module import Module
 
 
 class ModuleResolver:

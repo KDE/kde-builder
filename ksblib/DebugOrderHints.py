@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from functools import cmp_to_key
-from typing import Callable
 
 
 class DebugOrderHints:

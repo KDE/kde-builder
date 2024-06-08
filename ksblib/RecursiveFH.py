@@ -6,14 +6,13 @@
 
 from __future__ import annotations
 
-import textwrap
+import fileinput
 import os
 import re
-import fileinput
+import textwrap
 
 from .BuildException import BuildException
-# from .Util import Util
-from .Debug import Debug, kbLogger
+from .Debug import kbLogger
 
 logger_var_subst = kbLogger.getLogger("variables_substitution")
 logger_app = kbLogger.getLogger("application")

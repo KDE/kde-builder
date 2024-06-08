@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from typing import NoReturn
-# from overrides import override
 
 from .ModuleSet import ModuleSet
 from ..BuildException import BuildException

@@ -7,42 +7,42 @@
 from __future__ import annotations
 
 import atexit
+import fileinput
 import glob
+import hashlib
 import os
+import re
 import shutil
+import signal
 import subprocess
 import sys
 import textwrap
-import re
+from time import sleep
+from time import time
 import traceback
-from time import time, sleep
-import fileinput
-import asyncio
-import hashlib
-import signal
-from typing import NoReturn, Union
+from typing import Callable
+from typing import NoReturn
 
+from ksblib.BuildException import BuildException
+from ksblib.BuildException import BuildException_Config
 from .BuildContext import BuildContext
-from ksblib.BuildException import BuildException, BuildException_Config
 from .BuildSystem.QMake5 import BuildSystem_QMake5
 from .Cmdline import Cmdline
-from .Debug import Debug, kbLogger
+from .Debug import Debug
+from .Debug import kbLogger
 from .DebugOrderHints import DebugOrderHints
 from .DependencyResolver import DependencyResolver
 from .Module.Module import Module
 from .ModuleResolver import ModuleResolver
-from .ModuleSet.ModuleSet import ModuleSet
 from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
+from .ModuleSet.ModuleSet import ModuleSet
 from .ModuleSet.Qt5 import ModuleSet_Qt5
+from .OptionsBase import OptionsBase
 from .RecursiveFH import RecursiveFH
 from .StartProgram import StartProgram
 from .TaskManager import TaskManager
 from .Updater.Updater import Updater
 from .Util.Util import Util
-from .OptionsBase import OptionsBase
-from typing import TYPE_CHECKING, Callable, Optional
-if TYPE_CHECKING:
-    import fileinput
 
 logger_var_subst = kbLogger.getLogger("variables_substitution")
 logger_app = kbLogger.getLogger("application")
@@ -98,7 +98,7 @@ class Application:
             print(f"{sys.argv[0]} is already running!\n")
             exit(1)  # Don't finish(), it's not our lockfile!!
 
-        os.setpgrp()  # Create our own process group, its id will be equal to self._base_pid. Needed to send signal to the whole group when exiting.
+        # os.setpgrp()  # Create our own process group, its id will be equal to self._base_pid. Needed to send signal to the whole group when exiting.
         self._already_got_signal = False  # Used to prevent secondary invocation of signal handler
 
         # Install signal handlers to ensure that the lockfile gets closed.

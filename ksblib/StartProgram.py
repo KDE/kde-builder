@@ -3,12 +3,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
 import os
 import textwrap
 from typing import NoReturn
-from .Debug import Debug, kbLogger
-
 from typing import TYPE_CHECKING
+
+from .Debug import Debug
+from .Debug import kbLogger
+
 if TYPE_CHECKING:
     from .BuildContext import BuildContext
 

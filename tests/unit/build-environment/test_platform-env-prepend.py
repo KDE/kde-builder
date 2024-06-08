@@ -5,6 +5,7 @@
 
 import os
 import re
+
 from ksblib.BuildContext import BuildContext
 from ksblib.Module.Module import Module
 

@@ -5,33 +5,30 @@
 
 from __future__ import annotations
 
+import datetime
+import errno
+import fileinput
+import json
 import os
+from pathlib import Path
+import re
 import sys
 import tempfile
 import textwrap
 import traceback
-from io import StringIO
-from pathlib import Path
-import json
-import re
-import fileinput
-import datetime
-import errno
-# from overrides import override
 
-from .Debug import Debug, kbLogger
-from .PhaseList import PhaseList
-from .Module.Module import Module
-from .Module.BranchGroupResolver import Module_BranchGroupResolver
-# from . import Updater::KDEProjectMetadata
-from .Version import Version
-from .StatusView import StatusView
-from .KDEProjectsReader import KDEProjectsReader
-
-from .OptionsBase import OptionsBase
-from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
 from .BuildException import BuildException
+from .Debug import Debug
+from .Debug import kbLogger
+from .KDEProjectsReader import KDEProjectsReader
+from .Module.BranchGroupResolver import Module_BranchGroupResolver
+from .Module.Module import Module
+from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
+from .OptionsBase import OptionsBase
+from .PhaseList import PhaseList
+from .StatusView import StatusView
 from .Util.Util import Util
+from .Version import Version
 
 logger_buildcontext = kbLogger.getLogger("build-context")
 

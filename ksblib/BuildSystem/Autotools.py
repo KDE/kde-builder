@@ -4,12 +4,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-# from overrides import override
 
 from .BuildSystem import BuildSystem
-from ..Util.Util import Util
-from ..Debug import Debug, kbLogger
 from ..BuildException import BuildException
+from ..Debug import kbLogger
+from ..Util.Util import Util
 
 logger_buildsystem = kbLogger.getLogger("build-system")
 

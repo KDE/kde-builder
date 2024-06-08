@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import shutil
 import os
+import shutil
 import tempfile
-from ksblib.Module.Module import Module
+
 from ksblib.BuildContext import BuildContext
+from ksblib.Module.Module import Module
 from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess
 
 

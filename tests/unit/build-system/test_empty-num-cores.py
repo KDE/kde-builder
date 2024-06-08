@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+
 import pytest
-import subprocess
-from ksblib.Module.Module import Module
-from ksblib.BuildSystem.BuildSystem import BuildSystem
+
 from ksblib.BuildContext import BuildContext
+from ksblib.BuildSystem.BuildSystem import BuildSystem
+from ksblib.Module.Module import Module
 
 
 @pytest.fixture

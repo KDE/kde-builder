@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os.path
-from ksblib.Util.Util import Util
 import tempfile
+
+from ksblib.Util.Util import Util
 
 
 def test_safe_lndir():

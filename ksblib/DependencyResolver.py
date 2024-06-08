@@ -6,16 +6,17 @@
 
 from __future__ import annotations
 
-import re
-import json
 from functools import cmp_to_key
+import json
+import re
 from types import FunctionType
 
 from .BuildException import BuildException
-from .Util.Util import Util
-from .Updater.Updater import Updater
+from .Debug import Debug
+from .Debug import kbLogger
 from .Module.Module import Module
-from .Debug import Debug, kbLogger
+from .Updater.Updater import Updater
+from .Util.Util import Util
 
 logger_depres = kbLogger.getLogger("dependency-resolver")
 

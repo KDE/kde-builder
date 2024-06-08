@@ -4,18 +4,16 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
 import re
-# from overrides import override
-
-from ..OptionsBase import OptionsBase
-
-# use ksb::Util;
-from ..PhaseList import PhaseList
-from ..Module.Module import Module
+from typing import TYPE_CHECKING
 
 from ..BuildException import BuildException_Config
-from ..Debug import Debug, kbLogger
-from typing import TYPE_CHECKING
+from ..Debug import kbLogger
+from ..Module.Module import Module
+from ..OptionsBase import OptionsBase
+from ..PhaseList import PhaseList
+
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 

@@ -5,12 +5,12 @@
 
 import glob
 import re
-# from overrides import override
 
-from ..Util.Util import Util
-from ..BuildException import BuildException
 from .BuildSystem import BuildSystem
-from ..Debug import Debug, kbLogger
+from ..BuildException import BuildException
+from ..Debug import Debug
+from ..Debug import kbLogger
+from ..Util.Util import Util
 
 logger_buildsystem = kbLogger.getLogger("build-system")
 

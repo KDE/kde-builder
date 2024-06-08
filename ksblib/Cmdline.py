@@ -3,15 +3,15 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import re
 import argparse
+import re
 import textwrap
 from typing import NoReturn
 
 from .BuildContext import BuildContext
 from .Debug import kbLogger
-from .PhaseList import PhaseList
 from .OSSupport import OSSupport
+from .PhaseList import PhaseList
 from .Version import Version
 
 logger_app = kbLogger.getLogger("application")

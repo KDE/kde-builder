@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from ksblib.Application import Application
-from ksblib.Updater.Updater import Updater
 from ksblib.Debug import Debug
+from ksblib.Updater.Updater import Updater
 
 
 def test_tag_names_based_on_time():

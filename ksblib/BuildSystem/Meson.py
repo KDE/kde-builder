@@ -3,12 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-# from overrides import override
-
 from .BuildSystem import BuildSystem
-# use ksb::BuildException;
-# use ksb::Debug;
-# use ksb::Util qw(:DEFAULT :await run_logged_p);
 from ..Util.Util import Util
 
 

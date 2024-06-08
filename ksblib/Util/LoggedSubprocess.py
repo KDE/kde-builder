@@ -5,17 +5,19 @@
 
 from __future__ import annotations
 
+import asyncio
 import sys
+from typing import Callable
+
+from .Util import Util
+from ..BuildException import BuildException
+from ..Debug import Debug
+from ..Debug import kbLogger
+
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
     import multiprocessing
-import asyncio
-from typing import Callable
-
-from ..BuildException import BuildException
-from ..Debug import Debug, kbLogger
-from .Util import Util
 
 logger_logged_cmd = kbLogger.getLogger("logged-command")
 

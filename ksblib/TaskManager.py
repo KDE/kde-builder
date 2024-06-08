@@ -4,22 +4,27 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
+import logging
 import os.path
+import selectors
+import signal
 import sys
-from urllib.parse import urlparse
 import textwrap
 import time
-import signal
-import setproctitle
-import selectors
-from .Debug import Debug, kbLogger
-from .IPC.IPC import IPC
-from .IPC.Pipe import IPC_Pipe
-from .IPC.Null import IPC_Null
-from .Util.Util import Util
-from .BuildException import BuildException
-import logging
 from typing import TYPE_CHECKING
+from urllib.parse import urlparse
+
+import setproctitle
+
+from .BuildException import BuildException
+from .Debug import Debug
+from .Debug import kbLogger
+from .IPC.IPC import IPC
+from .IPC.Null import IPC_Null
+from .IPC.Pipe import IPC_Pipe
+from .Util.Util import Util
+
 if TYPE_CHECKING:
     from BuildContext import BuildContext
     from .Application import Application

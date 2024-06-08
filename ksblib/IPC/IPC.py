@@ -5,12 +5,15 @@
 
 from __future__ import annotations
 
+from enum import IntEnum
 import re
 import struct
-from typing import NoReturn, Callable, TYPE_CHECKING
-from enum import IntEnum
+from typing import Callable
+from typing import NoReturn
+from typing import TYPE_CHECKING
+
 from ..BuildException import BuildException
-from ..Debug import Debug, kbLogger
+from ..Debug import kbLogger
 
 if TYPE_CHECKING:
     from ..Module.Module import Module

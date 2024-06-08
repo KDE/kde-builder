@@ -8,9 +8,11 @@
 #
 # Currently, supports TTY output only, but it's not impossible to visualize
 # extending this to a GUI or even web server as options.
+
 from __future__ import annotations
 
 import sys
+
 from .Debug import Debug
 
 

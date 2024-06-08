@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os.path
-import re
 from pathlib import Path
+import re
+
 import yaml
 
 from .BuildException import BuildException

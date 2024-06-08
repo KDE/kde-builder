@@ -7,8 +7,7 @@
 
 import os
 import subprocess
-# import tempfile
-# import re
+
 from ksblib.Debug import Debug
 
 

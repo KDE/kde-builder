@@ -6,11 +6,11 @@
 import os.path
 import re
 import textwrap
-# from overrides import override
 
 from .BuildSystem import BuildSystem
+from ..Debug import Debug
+from ..Debug import kbLogger
 from ..Util.Util import Util
-from ..Debug import Debug, kbLogger
 
 logger_buildsystem = kbLogger.getLogger("build-system")
 

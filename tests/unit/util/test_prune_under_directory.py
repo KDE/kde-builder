@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-import tempfile
-from ksblib.Util.Util import Util
-from ksblib.BuildContext import BuildContext
 from pathlib import Path
+import tempfile
+
+from ksblib.BuildContext import BuildContext
+from ksblib.Util.Util import Util
 
 
 def test_prune_under_dir():

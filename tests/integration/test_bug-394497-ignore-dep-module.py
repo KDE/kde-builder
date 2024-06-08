@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import pytest
+
 from ksblib.Application import Application
 from ksblib.Debug import Debug
 

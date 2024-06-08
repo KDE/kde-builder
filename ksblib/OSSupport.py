@@ -6,11 +6,11 @@
 from __future__ import annotations
 
 import os
-from .BuildException import BuildException
-# import platform
-import sys
-import subprocess
 import re
+import subprocess
+import sys
+
+from .BuildException import BuildException
 
 
 class OSSupport:

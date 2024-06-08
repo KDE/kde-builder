@@ -5,21 +5,23 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
 import os.path
 import re
 import sys
 import textwrap
-# from overrides import override
+from typing import TYPE_CHECKING
 
 from .BuildSystem import BuildSystem
 from ..BuildException import BuildException
-from ..Util.Util import Util
+from ..Debug import Debug
+from ..Debug import kbLogger
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug, kbLogger
-from typing import TYPE_CHECKING
+from ..Util.Util import Util
+
 if TYPE_CHECKING:
-    from ..Module.Module import Module
     from ..BuildContext import BuildContext
+    from ..Module.Module import Module
 
 logger_ide_proj = kbLogger.getLogger("ide_project_configs")
 logger_buildsystem = kbLogger.getLogger("build-system")

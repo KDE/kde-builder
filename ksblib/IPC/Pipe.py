@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-# from overrides import override
 import struct
+
 from .IPC import IPC
 from ..BuildException import BuildException
 

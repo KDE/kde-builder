@@ -6,12 +6,12 @@
 from __future__ import annotations
 
 import os.path
-# from overrides import override
 
-from ..BuildException import BuildException
-from ..Util.Util import Util
 from .Updater import Updater
-from ..Debug import Debug, kbLogger
+from ..BuildException import BuildException
+from ..Debug import Debug
+from ..Debug import kbLogger
+from ..Util.Util import Util
 
 logger_updater = kbLogger.getLogger("updater")
 

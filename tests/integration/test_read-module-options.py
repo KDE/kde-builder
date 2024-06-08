@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess  # load early so we can override
 
 # Now we can load `Application`, which will load a bunch more modules all
 # using log_command and run_logged_p from `Util`
 from ksblib.Application import Application
-from ksblib.Updater.Updater import Updater
 from ksblib.Debug import Debug
+from ksblib.Updater.Updater import Updater
+from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess  # load early so we can override
 
 
 def test_option_reading(monkeypatch):

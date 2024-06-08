@@ -6,39 +6,37 @@
 
 from __future__ import annotations
 
+import copy
 import glob
 import os
 import re
 import shutil
-import sys
 import textwrap
 import traceback
-# from overrides import override
-import copy
+from typing import TYPE_CHECKING
 
-from ..OptionsBase import OptionsBase
-from ..IPC.IPC import IPC
-from ..Util.Util import Util
-from ..Debug import Debug, kbLogger
-
-from ..Updater.Updater import Updater
-from ..Updater.KDEProject import Updater_KDEProject
-from ..Updater.KDEProjectMetadata import Updater_KDEProjectMetadata
-from ..Updater.Qt5 import Updater_Qt5
-
-from ksblib.BuildException import BuildException, BuildException_Config
-
-from ..BuildSystem.BuildSystem import BuildSystem
+from ksblib.BuildException import BuildException
+from ksblib.BuildException import BuildException_Config
 from ..BuildSystem.Autotools import BuildSystem_Autotools
+from ..BuildSystem.BuildSystem import BuildSystem
+from ..BuildSystem.CMakeBootstrap import BuildSystem_CMakeBootstrap
+from ..BuildSystem.KDECMake import BuildSystem_KDECMake
+from ..BuildSystem.Meson import BuildSystem_Meson
 from ..BuildSystem.QMake5 import BuildSystem_QMake5
 from ..BuildSystem.QMake6 import BuildSystem_QMake6
 from ..BuildSystem.Qt4 import BuildSystem_Qt4
 from ..BuildSystem.Qt5 import BuildSystem_Qt5
 from ..BuildSystem.Qt6 import BuildSystem_Qt6
-from ..BuildSystem.KDECMake import BuildSystem_KDECMake
-from ..BuildSystem.CMakeBootstrap import BuildSystem_CMakeBootstrap
-from ..BuildSystem.Meson import BuildSystem_Meson
-from typing import TYPE_CHECKING
+from ..Debug import Debug
+from ..Debug import kbLogger
+from ..IPC.IPC import IPC
+from ..OptionsBase import OptionsBase
+from ..Updater.KDEProject import Updater_KDEProject
+from ..Updater.KDEProjectMetadata import Updater_KDEProjectMetadata
+from ..Updater.Qt5 import Updater_Qt5
+from ..Updater.Updater import Updater
+from ..Util.Util import Util
+
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
     from ..ModuleSet.ModuleSet import ModuleSet

@@ -7,31 +7,36 @@
 from __future__ import annotations
 
 import base64
+import codecs
 import hashlib
+from io import StringIO
+import logging
 import os.path
+from pathlib import Path
 import re
+import shlex
 import shutil
+import signal
+import subprocess
 import sys
 import textwrap
-from io import StringIO
-from pathlib import Path
-import subprocess
-import shlex
-import signal
+from typing import Callable
+from typing import Optional
+from typing import TYPE_CHECKING
+
+import setproctitle
+
+from ksblib.BuildException import BuildException
+from ksblib.Debug import Debug
+from ksblib.Debug import kbLogger
+
+if TYPE_CHECKING:
+    from ..Module.Module import Module
+
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
     import multiprocessing
-import traceback
-import codecs
-import setproctitle
-
-from ksblib.Debug import Debug, kbLogger
-from ksblib.BuildException import BuildException
-from typing import TYPE_CHECKING, Callable, Optional
-import logging
-if TYPE_CHECKING:
-    from ..Module.Module import Module
 
 logger_logged_cmd = kbLogger.getLogger("logged-command")
 logger_util = kbLogger.getLogger("util")

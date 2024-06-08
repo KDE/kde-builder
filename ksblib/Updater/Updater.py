@@ -5,28 +5,26 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
+import inspect
 import os.path
 import re
 import subprocess
 import textwrap
-import inspect
 import time
-# from overrides import override
+from typing import Callable
+from typing import TYPE_CHECKING
 
 from ..BuildException import BuildException
+from ..Debug import Debug
+from ..Debug import kbLogger
 from ..IPC.Null import IPC_Null
-# use ksb::Util qw(:DEFAULT :await run_logged_p);
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
 from ..Util.Util import Util
-# use File::Basename; # basename
-# use File::Spec;     # tmpdir
-# use List::Util qw(first);
-from ..Debug import Debug, kbLogger
 
-from typing import TYPE_CHECKING, Callable
 if TYPE_CHECKING:
-    from ..Module.Module import Module
     from ..BuildContext import BuildContext
+    from ..Module.Module import Module
 
 logger_updater = kbLogger.getLogger("updater")
 

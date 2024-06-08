@@ -4,17 +4,17 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
 import os
 import re
 import subprocess
-import textwrap
 import time
 from typing import NoReturn
 
-from .OSSupport import OSSupport
-from .BuildException import BuildException
 from .BuildContext import BuildContext
-from .Debug import Debug, kbLogger
+from .BuildException import BuildException
+from .Debug import kbLogger
+from .OSSupport import OSSupport
 
 logger_fr = kbLogger.getLogger("first-run")
 

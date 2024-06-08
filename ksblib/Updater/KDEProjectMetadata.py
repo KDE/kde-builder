@@ -3,15 +3,14 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import re
 import json
-# from overrides import override
+import re
 
+from .KDEProject import Updater_KDEProject
 from ..BuildException import BuildException
 from ..Debug import Debug
 from ..IPC.Null import IPC_Null
 from ..Util.Util import Util
-from .KDEProject import Updater_KDEProject
 
 
 class Updater_KDEProjectMetadata(Updater_KDEProject):

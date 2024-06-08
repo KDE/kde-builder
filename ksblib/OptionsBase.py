@@ -19,13 +19,13 @@ module-set options, for use by major subclasses.
 The code in this class simply gets/sets options. To parse options and determine
 what options to set, see :class:`Application` and its friends.
 """
+
 from __future__ import annotations
 
 import copy
 import re
+
 from .BuildException import BuildException_Config
-# use ksb::BuildException;
-# use ksb::Debug;
 from .Util.Util import Util
 
 

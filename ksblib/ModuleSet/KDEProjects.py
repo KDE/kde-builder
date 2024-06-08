@@ -4,18 +4,18 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
+
 import os
 import re
-# from overrides import override
+from typing import TYPE_CHECKING
 
+from .ModuleSet import ModuleSet
 from ..BuildException import BuildException
+from ..Debug import kbLogger
 from ..KDEProjectsReader import KDEProjectsReader
 from ..Module.Module import Module
 from ..Util.Util import Util
 
-from .ModuleSet import ModuleSet
-from ..Debug import Debug, kbLogger
-from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
 

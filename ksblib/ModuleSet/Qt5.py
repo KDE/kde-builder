@@ -3,13 +3,11 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-# from overrides import override
-
+from .ModuleSet import ModuleSet
 from ..BuildContext import BuildContext
 from ..BuildSystem.Qt5 import BuildSystem_Qt5
 from ..Module.Module import Module
 from ..Util.Util import Util
-from .ModuleSet import ModuleSet
 
 
 class ModuleSet_Qt5(ModuleSet):

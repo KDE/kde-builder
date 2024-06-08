@@ -4,22 +4,24 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
-import os.path
-import sys
-import re
-import time
+
 import logging
+import os.path
+import re
+import sys
+import time
+from typing import TYPE_CHECKING
 
 from ..BuildException import BuildException
-from ..Util.Util import Util
+from ..Debug import Debug
+from ..Debug import kbLogger
 from ..Util.LoggedSubprocess import Util_LoggedSubprocess
-from ..Debug import Debug, kbLogger
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from ..Module.Module import Module
-    from ..BuildContext import BuildContext
+from ..Util.Util import Util
 
-# use ksb::StatusView;
+if TYPE_CHECKING:
+    from ..BuildContext import BuildContext
+    from ..Module.Module import Module
+
 
 logger_logged_cmd = kbLogger.getLogger("logged-command")
 logger_buildsystem = kbLogger.getLogger("build-system")

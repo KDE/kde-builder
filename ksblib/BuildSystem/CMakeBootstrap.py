@@ -3,8 +3,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-# from overrides import override
-
 from .BuildSystem import BuildSystem
 from ..Util.Util import Util
 

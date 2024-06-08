@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+
 from ksblib.Application import Application
-from ksblib.Module.Module import Module
 from ksblib.BuildSystem.BuildSystem import BuildSystem
 from ksblib.Debug import Debug
+from ksblib.Module.Module import Module
 
 
 def test_build_internal(monkeypatch):

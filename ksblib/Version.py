@@ -3,8 +3,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import subprocess
 import os
+import subprocess
 
 
 class Version:

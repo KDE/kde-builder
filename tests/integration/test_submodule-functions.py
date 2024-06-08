@@ -3,10 +3,11 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import tempfile
 import os
-import subprocess
 import shutil
+import subprocess
+import tempfile
+
 from ksblib.Updater.Updater import Updater
 
 

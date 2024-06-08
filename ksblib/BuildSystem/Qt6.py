@@ -4,13 +4,14 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from __future__ import annotations
-# from overrides import override
+
+from typing import TYPE_CHECKING
 
 from .KDECMake import BuildSystem_KDECMake
-from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
-    from ..Module.Module import Module
     from ..BuildContext import BuildContext
+    from ..Module.Module import Module
 
 
 class BuildSystem_Qt6(BuildSystem_KDECMake):
