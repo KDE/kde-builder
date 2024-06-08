@@ -1843,20 +1843,3 @@ class Application:
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
             logger_app.warning("Could not import dbus module. Skipping dbus calls.")
             return
-
-    # Accessors
-
-    def context(self):
-        return self.context
-
-    def metadataModule(self):
-        return self.metadata_module
-
-    def runMode(self):
-        return self.run_mode
-
-    def modules(self):
-        return self.modules
-
-    def workLoad(self):
-        return self.workLoad
