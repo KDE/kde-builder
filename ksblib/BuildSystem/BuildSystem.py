@@ -46,7 +46,7 @@ class BuildSystem:
             buildsys.installInternal()
     """
 
-    def __init__(self, module):
+    def __init__(self, module: Module):
         self.module = module
 
         # This is simply the 'default' build system at this point, so options
@@ -82,9 +82,6 @@ class BuildSystem:
         give the custom configuration maximum "power" (including foot shooting power).
         """
         return False
-
-    def module(self):
-        return self.module
 
     def buildConstraints(self) -> dict:
         """
