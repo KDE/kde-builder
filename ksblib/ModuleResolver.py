@@ -214,7 +214,7 @@ class ModuleResolver:
         # expandModuleSets applies pending/cmdline options already.
         moduleResults = self.expandModuleSets([neededModuleSet])
         if not moduleResults:
-            BuildException.croak_runtime(f"{neededModuleSet.name()} expanded to an empty list of modules!")
+            BuildException.croak_runtime(f"{neededModuleSet.name} expanded to an empty list of modules!")
 
         for moduleResult in moduleResults:
             moduleResult.setOption({"#selected-by": selectedReason})
@@ -382,7 +382,7 @@ class ModuleResolver:
         modules/module-sets.
 
         Selectors always choose an available :class:`Module` or :class:`ModuleSet` if
-        present (based on the name() of each Module or ModuleSet, including any
+        present (based on the .name of each Module or ModuleSet, including any
         use-modules entries for ModuleSet objects). If a selector cannot be
         directly found then ModuleSet objects may be expanded into their
         constituent Module objects and the search performed again. If a selector

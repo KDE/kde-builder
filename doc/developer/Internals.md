@@ -54,7 +54,7 @@ to modules from the command line.
 
 Following this we run a filter pass to remove whole module-sets that we don't
 care about (as the applyModuleFilters function cares only about
-$module->name(). In this example nameA happened to match a module-set name
+`module.name`. In this example nameA happened to match a module-set name
 only.
 
 > nameB/git, nameC/proj, nameD/??

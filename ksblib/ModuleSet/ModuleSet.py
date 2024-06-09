@@ -64,12 +64,6 @@ class ModuleSet(OptionsBase):
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
 
-    def name(self) -> str:
-        return self.name
-
-    def setName(self, name) -> None:
-        self.name = name
-
     def modulesToFind(self) -> list:
         return self.module_search_decls
 

@@ -18,11 +18,7 @@ class ModuleSet_Null(ModuleSet):
     def __init__(self):
         # No need to call parent __init__.
         pass
-        self.name = ""  # pl2py: support returning name by not invoking the function. Needed for `wayland` module for example.
-
-    # @override
-    def name(self) -> str:
-        return ""
+        self.name = ""
 
     @staticmethod
     # @override(check_signature=False)

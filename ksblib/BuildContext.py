@@ -202,7 +202,7 @@ class BuildContext(Module):
                 **self.GlobalOptions_with_negatable_form,
                 **self.GlobalOptions_with_parameter,
             },
-            # Module options are stored under here as well, keyed by module->name()
+            # Module options are stored under here as well, keyed by module.name
         }
         # This one replaces `Module` {phases}
         self.phases = PhaseList()

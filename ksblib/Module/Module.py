@@ -102,7 +102,7 @@ class Module(OptionsBase):
         self.scm_obj = None
 
     def __str__(self) -> str:  # Add stringify operator.
-        return self.toString()
+        return self.name
 
     def moduleSet(self):
         from ..ModuleSet.Null import ModuleSet_Null
@@ -200,10 +200,6 @@ class Module(OptionsBase):
         use function fullpath().
         """
         return self.getSubdirPath("source-dir")
-
-    # pl2py: perl specific
-    # def name(self):
-    #     return self.name
 
     def scm(self):
 
@@ -624,9 +620,6 @@ class Module(OptionsBase):
         Use when you know you're going to create a new log
         """
         return self.context.getLogPathFor(self, path)
-
-    def toString(self) -> str:
-        return self.name
 
     # This is left here only for reference. todo After dropping perl version, we can delete this comment.
     # def compare(self, other):

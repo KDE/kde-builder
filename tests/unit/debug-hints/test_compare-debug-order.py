@@ -20,12 +20,8 @@ def mock_module(monkeypatch):
         assert option == "failure-count", "only the 'failure-count' should be queried"
         return self.count
 
-    # def mock_name(self):
-    #     return self.name
-
     monkeypatch.setattr(Module, "__init__", mock__init__)
     monkeypatch.setattr(Module, "getPersistentOption", mock_getPersistentOption)
-    # monkeypatch.setattr(Module, "name", mock_name)
 
 
 def test_debug_order(mock_module):
