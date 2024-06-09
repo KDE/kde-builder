@@ -313,7 +313,7 @@ class ModuleResolver:
         else:
             # Case 3?
             selector = Module(ctx, selectorName)
-            selector.phases.phases(ctx.phases.phases())
+            selector.phases.reset_to(ctx.phases.phaselist)
 
             selector.setScmType("proj")
             selector.setOption({"#guessed-kde-project": True})

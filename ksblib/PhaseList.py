@@ -29,7 +29,7 @@ class PhaseList:
         ::
 
             phases1 = PhaseList() # default phases
-            print("phases are " + phases1.phaselist.join(", "))
+            print("phases are " + ", ".join(phases1.phaselist))
 
             phases2 = PhaseList(["update", "test", "install"])
         """
@@ -59,17 +59,12 @@ class PhaseList:
         """
         return any(element == phase for element in self.phaselist)
 
-    def phases(self, args: list | None = None) -> list:
+    def reset_to(self, args: list[str]) -> None:
         """
-        If provided a list, clears the existing list of phases and
-        resets them to the provided list.
-        If not provided a list, returns the list of
-        phases without modifying the instance.
+        Clears the existing list of phases and resets it to the provided list.
+        Basically, it is same as __init__, but with mandatory list argument
         """
-        assert args is None or isinstance(args, list)
-        if args:
-            self.phaselist = args
-        return self.phaselist
+        self.phaselist = args
 
     def clear(self) -> None:
         """

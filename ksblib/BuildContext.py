@@ -703,7 +703,7 @@ class BuildContext(Module):
         has_other = False
 
         for mod in self.modules:
-            for phase in mod.phases.phases():
+            for phase in mod.phases.phaselist:
                 if phase == "update":
                     has_update = True
                 else:

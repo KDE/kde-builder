@@ -216,7 +216,7 @@ class Application:
         selectors: list[str] = opts["selectors"]
         cmdlineOptions: dict = opts["opts"]
         cmdlineGlobalOptions: dict = cmdlineOptions["global"]
-        ctx.phases.phases(opts["phases"])
+        ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
         # Convert list to hash for lookup
@@ -231,7 +231,7 @@ class Application:
 
         # pl2py: this was commented there in perl.
         # disable async if only running a single phase.
-        #   if len(ctx.phases().phases()) == 1:
+        #   if len(ctx.phases.phaselist) == 1:
         #     cmdlineGlobalOptions["async"] = 0
 
         ctx.setOption(cmdlineGlobalOptions)
@@ -1469,7 +1469,7 @@ class Application:
 
         # This list should correspond to the possible phase names (although
         # it doesn't yet since the old code didn't, TODO)
-        for phase in ctx.phases.phases():
+        for phase in ctx.phases.phaselist:
             failures = ctx.failedModulesInPhase(phase)
             for failure in failures:
                 # we already tagged the failure before, should not happen but

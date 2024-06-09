@@ -59,7 +59,7 @@ class ModuleSet(OptionsBase):
         self.module_search_decls = []
         self.module_ignore_decls = []
         self.module_order = {}  # maps module names to position in list
-        self.phase_list = PhaseList(ctx.phases.phases())
+        self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
@@ -109,7 +109,7 @@ class ModuleSet(OptionsBase):
         """
         newModule.setModuleSet(self)
         newModule.setScmType("git")
-        newModule.phases.phases(self.phases().phases())
+        newModule.phases.reset_to(self.phases().phaselist)
         newModule.mergeOptionsFrom(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based

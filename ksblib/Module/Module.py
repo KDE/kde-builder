@@ -755,20 +755,20 @@ class Module(OptionsBase):
         if "uninstall" in options:
             # Not useful yet. Currently only may be useful to disable uninstallation when uninstalling with cmdline ("uninstall" run_mode)
             if self.phases.has("uninstall"):
-                self.phases.phases("uninstall")
+                self.phases.reset_to(["uninstall"])
             else:
                 self.phases.clear()
             del options["uninstall"]
         if "build-only" in options:
             if self.phases.has("build"):
-                self.phases.phases("build")
+                self.phases.reset_to(["build"])
             else:
                 self.phases.clear()
             del options["build-only"]
         if "install-only" in options:
             # Not useful yet, because install is invoked by run_mode or in the end of building function. See a todo with text "Likewise this should be a phase to run."
             if self.phases.has("install"):
-                self.phases.phases("install")
+                self.phases.reset_to(["install"])
             else:
                 self.phases.clear()
             del options["install-only"]

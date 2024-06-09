@@ -233,7 +233,7 @@ class Cmdline:
             foundOptions["include-dependencies"] = False
         if args.uninstall:
             opts["run_mode"] = "uninstall"
-            phases.phases(["uninstall"])
+            phases.reset_to(["uninstall"])
         if args.no_src:
             phases.filterOutPhase("update")
         if args.no_install:
@@ -247,12 +247,12 @@ class Cmdline:
             phases.filterOutPhase("build")
         # Mostly equivalent to the above
         if args.src_only:
-            phases.phases(["update"])
+            phases.reset_to(["update"])
         if args.build_only:
-            phases.phases(["build"])
+            phases.reset_to(["build"])
         if args.install_only:
             opts["run_mode"] = "install"
-            phases.phases(["install"])
+            phases.reset_to(["install"])
         if args.install_dir:
             foundOptions["install-dir"] = args.install_dir[0]
             foundOptions["reconfigure"] = True
@@ -455,7 +455,7 @@ class Cmdline:
         # </editor-fold desc="all other args handlers">
 
         opts["opts"]["global"].update(foundOptions)
-        opts["phases"] = phases.phases()
+        opts["phases"] = phases.phaselist
         return opts
 
     @staticmethod

@@ -59,7 +59,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         metadataModule.setModuleSet(moduleSet)
 
         # Ensure we only ever try to update source, not build.
-        metadataModule.phases.phases(["update"])
+        metadataModule.phases.reset_to(["update"])
 
         return metadataModule
 
