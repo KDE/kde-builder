@@ -498,11 +498,11 @@ class BuildSystem:
 
         a_time = int(time.time())
 
-        statusViewer = ctx.statusViewer()
+        statusViewer = ctx.status_view
         statusViewer.setStatus(f"\t{message}")
         statusViewer.update()
 
-        if logger_logged_cmd.level == logging.INFO and ctx.statusViewer().cur_progress == -1:
+        if logger_logged_cmd.level == logging.INFO and ctx.status_view.cur_progress == -1:
             # When user configured logged-command logger to not print the output of the command to console (i.e. logged-command level is higher than DEBUG), but still print the info of started and finished logged command,
             # (i.e. logged-command level is lower than WARNING), in other words, when logged-command level is INFO, the user will want to see the initial status message.
             # statusViewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".

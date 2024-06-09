@@ -224,7 +224,7 @@ class BuildContext(Module):
         self.ignore_list = []  # List of KDE project paths to ignore completely
         self.kde_projects_metadata = None  # Enumeration of kde-projects
         self.logical_module_resolver = None  # For branch-group option
-        self.status_view = StatusView()
+        self.status_view: StatusView = StatusView()
         self.projects_db = None  # See getProjectDataReader
 
         self.options = self.build_options["global"]
@@ -1007,6 +1007,3 @@ class BuildContext(Module):
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver
-
-    def statusViewer(self) -> StatusView:
-        return self.status_view

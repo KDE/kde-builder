@@ -283,7 +283,7 @@ class TaskManager:
         cur_module = 1
         num_modules = len(modules)
 
-        statusViewer = ctx.statusViewer()
+        statusViewer = ctx.status_view
         statusViewer.numberModulesTotal(num_modules)
 
         while modules:
