@@ -232,18 +232,6 @@ class BuildContext(Module):
         Util.assert_isa(self, Module)
         Util.assert_isa(self, BuildContext)
 
-    # @override
-    def phases(self, phases=None):
-        """
-        Gets the :class:`PhaseList` for this context, and optionally sets it first to
-        the :class:`PhaseList` passed in.
-        """
-        if phases:
-            if not isinstance(phases, PhaseList):
-                raise AssertionError("Invalid type, expected PhaseList")
-            self.phases = phases
-        return self.phases
-
     def addModule(self, module: Module) -> None:
         if not module:
             traceback.print_exc()

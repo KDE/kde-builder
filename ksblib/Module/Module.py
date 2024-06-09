@@ -40,6 +40,7 @@ from ..Util.Util import Util
 if TYPE_CHECKING:
     from ..BuildContext import BuildContext
     from ..ModuleSet.ModuleSet import ModuleSet
+    from ..PhaseList import PhaseList
 
 logger_module = kbLogger.getLogger("module")
 
@@ -89,7 +90,7 @@ class Module(OptionsBase):
         self.name = name
         self.scm_obj = None
         self.build_obj = None
-        self.phases = phases
+        self.phases: PhaseList = phases
         self.context = ctx
         self.module_set = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs = []
@@ -102,9 +103,6 @@ class Module(OptionsBase):
 
     def __str__(self) -> str:  # Add stringify operator.
         return self.toString()
-
-    def phases(self):
-        return self.phases
 
     def moduleSet(self):
         from ..ModuleSet.Null import ModuleSet_Null

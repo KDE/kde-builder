@@ -70,14 +70,6 @@ class ModuleSet(OptionsBase):
     def setName(self, name) -> None:
         self.name = name
 
-    def phases(self):
-        """
-        Just returns the existing PhaseList, there's no way to
-        replace this, though you can alter the underlying phases through the
-        PhaseList object itself.
-        """
-        return self.phase_list
-
     def modulesToFind(self) -> list:
         return self.module_search_decls
 
@@ -109,7 +101,7 @@ class ModuleSet(OptionsBase):
         """
         newModule.setModuleSet(self)
         newModule.setScmType("git")
-        newModule.phases.reset_to(self.phases().phaselist)
+        newModule.phases.reset_to(self.phase_list.phaselist)
         newModule.mergeOptionsFrom(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based
