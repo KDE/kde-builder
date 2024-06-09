@@ -22,12 +22,6 @@ class BuildException(Exception):
     def __str__(self) -> str:
         return self.exception_type + " Error: " + self.message
 
-    def message(self):
-        return self.message
-
-    def setMessage(self, newMessage) -> None:
-        self.message = newMessage
-
     # Exported utility functions
 
     @staticmethod

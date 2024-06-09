@@ -905,11 +905,11 @@ class Application:
                 module.setOption({option: value})
             except Exception as err:
                 if isinstance(err, BuildException_Config):
-                    msg = f"{current_file}:{fileReader.currentFilehandle().filelineno()}: " + err.message()
+                    msg = f"{current_file}:{fileReader.currentFilehandle().filelineno()}: " + err.message
                     explanation = err.optionUsageExplanation()
                     if explanation:
                         msg = msg + "\n" + explanation
-                    err.setMessage(msg)
+                    err.message = msg
                 raise  # re-throw
 
             line = self._readNextLogicalLine(fileReader)
