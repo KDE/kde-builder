@@ -511,15 +511,7 @@ class Updater:
         logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
         start_commit = self.commit_id("HEAD")
 
-        def condition():
-            if commitType == "branch":
-                return lambda: self._updateToRemoteHead(remoteName, commitId)
-            else:
-                return lambda: self._updateToDetachedHead(commitId)
-
-        updateSub = condition()
-
-        self.stashAndUpdate(updateSub)
+        self.stash_and_update(commitType, remoteName, commitId)
         ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
         return ret
 
@@ -657,20 +649,16 @@ class Updater:
         module = self.module
         self.ipc.notifyNewPostBuildMessage(module.name, *args)
 
-    def stashAndUpdate(self, updateSub: Callable) -> int:
+    def stash_and_update(self, commit_type: str, remote_name: str, commit_id: str) -> int:
         """
-        This stashes existing changes if necessary, and then runs a provided
-        update routine in order to advance the given module to the desired head.
+        Stashes existing changes if necessary, and then runs appropriate update function
+        (_updateToRemoteHead or _updateToDetachedHead) in order to advance the given module to the desired head.
         Finally, if changes were stashed, they are applied and the stash stack is
         popped.
 
         It is assumed that the required remote has been set up already, that we
         are on the right branch, and that we are already in the correct
         directory.
-
-        Parameters:
-            updateSub: The function to run. This function should need no parameters and return
-                a boolean success indicator. It may throw exceptions.
 
         Returns:
              1 or raises exception on error.
@@ -720,7 +708,10 @@ class Updater:
             module.setOption({"#git-was-stashed": True})
 
         # finally, update to remote head
-        result = updateSub()
+        if commit_type == "branch":
+            result = self._updateToRemoteHead(remote_name, commit_id)
+        else:
+            result = self._updateToDetachedHead(commit_id)
 
         if result:
             result = 1
