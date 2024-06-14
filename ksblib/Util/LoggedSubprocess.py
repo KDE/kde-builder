@@ -263,7 +263,7 @@ class Util_LoggedSubprocess:
         return exitcode
 
     @staticmethod
-    def _sendToParent(queue, data: list):
+    def _sendToParent(queue, data: list[str]):
         """
         Sends the given data to the parent process. Our calling code and this
         package must share the same single channel (over the "progress" event).

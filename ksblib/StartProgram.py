@@ -20,7 +20,7 @@ logger_app = kbLogger.getLogger("application")
 
 class StartProgram:
     @staticmethod
-    def execute_built_binary(ctx: BuildContext, args: list) -> NoReturn:
+    def execute_built_binary(ctx: BuildContext, args: list[str]) -> NoReturn:
         """
         Executes the binary from install-dir/bin, and sources the environment file before that.
         """

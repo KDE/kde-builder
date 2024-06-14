@@ -791,7 +791,7 @@ class Updater:
         # name - not used, subclasses might want to filter on remote name
         return url == configuredUrl
 
-    def bestRemoteName(self) -> list:
+    def bestRemoteName(self) -> list[str]:
         """
         99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
@@ -902,7 +902,7 @@ class Updater:
         return count
 
     @staticmethod
-    def slurp_git_config_output(args: list) -> list:
+    def slurp_git_config_output(args: list[str]) -> list[str]:
         """
         A simple wrapper that is used to split the output of "git config --null"
         correctly. All parameters are then passed to filter_program_output (so look

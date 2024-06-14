@@ -78,7 +78,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         ctx = Util.assert_isa(ctx_obj, BuildContext)
         return ModuleSet_KDEProjects._createMetadataModule(ctx, "sysadmin/repo-metadata")
 
-    def _expandModuleCandidates(self, ctx: BuildContext, moduleSearchItem: str) -> list:
+    def _expandModuleCandidates(self, ctx: BuildContext, moduleSearchItem: str) -> list[Module]:
         """
         A class method which goes through the modules in our search list (assumed to
         be found in kde-projects), expands them into their equivalent git modules,

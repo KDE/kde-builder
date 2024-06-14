@@ -108,7 +108,7 @@ class KDEProjectsReader:
 
         self.repositories[repoName] = curRepository
 
-    def getModulesForProject(self, proj: str) -> list:
+    def getModulesForProject(self, proj: str) -> list[dict]:
         """
         Note on ``proj``: A "/"-separated path is fine, in which case we look
         for the right-most part of the full path which matches all of searchProject.
@@ -151,11 +151,11 @@ class KDEProjectsReader:
 
         # As we run findResults twice (for example, when proj is "workspace"), remove duplicates
         results = list(set(results))
-
-        return [repositoryRef[result] for result in results]
+        ret = [repositoryRef[result] for result in results]
+        return ret
 
     @staticmethod
-    def _projectPathMatchesWildcardSearch(projectPath, searchItem) -> bool:
+    def _projectPathMatchesWildcardSearch(projectPath: str, searchItem: str) -> bool:
         """
         Returns true if the given kde-project full path (e.g.
         kde/kdelibs/nepomuk-core) matches the given search item.

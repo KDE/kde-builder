@@ -246,7 +246,7 @@ class BuildContext(Module):
             logger_buildcontext.debug(f"Adding {module} to module list")
             self.modules.append(module)
 
-    def addToIgnoreList(self, moduleslist: list) -> None:
+    def addToIgnoreList(self, moduleslist: list[str]) -> None:
         """
         Adds a list of modules to ignore processing on completely.
         Parameters should simply be a list of KDE project paths to ignore,
@@ -542,7 +542,7 @@ class BuildContext(Module):
 
         return f"{logDir}/{path}"
 
-    def rcFile(self):
+    def rcFile(self) -> None:
         """
         Returns rc file in use. Call loadRcFile first.
         """
@@ -669,7 +669,7 @@ class BuildContext(Module):
             BuildException.croak_internal("Call to baseConfigDirectory before loadRcFile")
         return os.path.dirname(rcfile)
 
-    def modulesInPhase(self, phase: str) -> list:
+    def modulesInPhase(self, phase: str) -> list[Module]:
         modules_list = [module for module in self.modules if module.phases.has(phase)]
         return modules_list
 
@@ -712,7 +712,7 @@ class BuildContext(Module):
         Util.assert_isa(module, Module)
         self.errors[module.name] = phase
 
-    def failedModulesInPhase(self, phase: str) -> list:
+    def failedModulesInPhase(self, phase: str) -> list[Module]:
         """
         Returns a list of Modules that failed to complete the given phase.
         """

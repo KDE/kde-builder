@@ -68,7 +68,7 @@ class Application:
     KDE_PROJECT_ID = "kde-projects"  # git-repository-base for sysadmin/repo-metadata. The value is determined as "kde:$repoPath.git", where $repoParh is read from yaml metadata file for each module.
     QT_PROJECT_ID = "qt-projects"  # git-repository-base for qt.io Git repo. The value is set as "https://invent.kde.org/qt/qt/qt5.git" when the module set transforms to qt5 super module.
 
-    def __init__(self, options: list):
+    def __init__(self, options: list[str]):
         self.context = BuildContext()
 
         self.metadata_module = None
@@ -88,7 +88,7 @@ class Application:
             print("No modules to build, exiting.\n")
             exit(0)  # todo When --metadata-only was used and $self->context->{rcFile} is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
-        self.modules = workLoad["selectedModules"]
+        self.modules: list[Module] = workLoad["selectedModules"]
         self.workLoad = workLoad
         self.context.setupOperatingEnvironment()  # i.e. niceness, ulimits, etc.
 
@@ -185,7 +185,7 @@ class Application:
         context["depth"] = depth + 1
         context["report"](connector + currentItem)
 
-    def generateModuleList(self, options: list) -> dict:
+    def generateModuleList(self, options: list[str]) -> dict:
         """
         Generates the build context and module list based on the command line options
         and module selectors provided, resolves dependencies on those modules if needed,
@@ -243,7 +243,7 @@ class Application:
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         fh = ctx.loadRcFile()
-        optionModulesAndSets = self._readConfigurationOptions(ctx, fh, cmdlineGlobalOptions, deferredOptions)
+        optionModulesAndSets: list[Module | ModuleSet] = self._readConfigurationOptions(ctx, fh, cmdlineGlobalOptions, deferredOptions)
         fh.close()
 
         ctx.loadPersistentOptions()
@@ -341,7 +341,7 @@ class Application:
         resolver = ctx.moduleBranchGroupResolver()
         branchGroup = ctx.effectiveBranchGroup()
 
-        filtered_modules = []
+        filtered_modules: list[Module] = []
         for module in modules:
             branch = resolver.findModuleBranch(module.fullProjectPath(), branchGroup) if module.isKDEProject() else True  # Just a placeholder truthy value
             if branch is not None and not branch:
@@ -1186,7 +1186,7 @@ class Application:
         return failed
 
     @staticmethod
-    def _applyModuleFilters(ctx: BuildContext, moduleList: list) -> list:
+    def _applyModuleFilters(ctx: BuildContext, moduleList: list[Module]) -> list[Module]:
         """
         Applies any module-specific filtering that is necessary after reading command
         line and rc-file options. (This is as opposed to phase filters, which leave
@@ -1229,7 +1229,7 @@ class Application:
             BuildException.croak_runtime("Both --stop-before and --stop-from specified.")
 
         if not moduleList:  # Empty input?
-            return
+            return []
 
         resumePoint = ctx.getOption("resume-from") or ctx.getOption("resume-after")
         startIndex = len(moduleList)
@@ -1293,7 +1293,7 @@ class Application:
         # handles that fine as well.
 
     @staticmethod
-    def _updateModulePhases(modules: list[Module]):
+    def _updateModulePhases(modules: list[Module]) -> list[Module]:
         """
         Updates the built-in phase list for all Modules passed into this function in
         accordance with the options set by the user.
@@ -1354,7 +1354,7 @@ class Application:
                 Util.safe_rmtree(d)
 
     @staticmethod
-    def _output_possible_solution(ctx: BuildContext, fail_list: list) -> None:
+    def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:
         """
         Print out a "possible solution" message.
         It will display a list of command lines to run.
@@ -1394,7 +1394,7 @@ class Application:
             See https://community.kde.org/Get_Involved/development/Install_the_dependencies"""))
 
     @staticmethod
-    def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list) -> None:
+    def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list[Module]) -> None:
         """
         Print out an error message, and a list of modules that match that error
         message. It will also display the log file name if one can be determined.
@@ -1465,12 +1465,12 @@ class Application:
             "phases": {},
             "failCount": {}
         }
-        actualFailures = []
+        actualFailures: list[Module] = []
 
         # This list should correspond to the possible phase names (although
         # it doesn't yet since the old code didn't, TODO)
         for phase in ctx.phases.phaselist:
-            failures = ctx.failedModulesInPhase(phase)
+            failures: list[Module] = ctx.failedModulesInPhase(phase)
             for failure in failures:
                 # we already tagged the failure before, should not happen but
                 # make sure to check to avoid spurious duplicate output
@@ -1759,7 +1759,7 @@ class Application:
                 """))
         return not wasError
 
-    def _reachableModuleLogs(self, logdir: str) -> list:
+    def _reachableModuleLogs(self, logdir: str) -> list[str]:
         """
         Returns a list of module directories IDs (based on YYYY-MM-DD-XX format) that must be kept due to being
         referenced from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.

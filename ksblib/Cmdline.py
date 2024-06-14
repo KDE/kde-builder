@@ -58,7 +58,7 @@ class Cmdline:
     def __init__(self):
         pass
 
-    def readCommandLineOptionsAndSelectors(self, options: list) -> dict:
+    def readCommandLineOptionsAndSelectors(self, options: list[str]) -> dict:
         """
         This function decodes the command line options passed into it and returns a
         dictionary describing what actions to take.
@@ -508,7 +508,7 @@ class Cmdline:
     ]
 
     @staticmethod
-    def _supportedOptions() -> list:
+    def _supportedOptions() -> list[str]:
         """
         Return option names ready to be fed into GetOptionsFromArray
         """

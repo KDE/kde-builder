@@ -77,7 +77,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return generator in BuildSystem_KDECMake.GENERATOR_MAP
 
     @staticmethod
-    def _stripGeneratorFromCMakeOptions(args: list) -> list:
+    def _stripGeneratorFromCMakeOptions(args: list[str]) -> list[str]:
         nextShouldBeGenerator = 0
         filtered = []
         for i in args:
@@ -98,7 +98,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return filtered
 
     @staticmethod
-    def _findGeneratorInCMakeOptions(args: list) -> str:
+    def _findGeneratorInCMakeOptions(args: list[str]) -> str:
         nextShouldBeGenerator = 0
         filtered = []
         for i in args:
@@ -131,7 +131,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return toolchain != "" and os.path.isfile(toolchain) and os.access(toolchain, os.R_OK)
 
     @staticmethod
-    def _stripToolchainFromCMakeOptions(args: list) -> list:
+    def _stripToolchainFromCMakeOptions(args: list[str]) -> list[str]:
         filtered = []
 
         for maybeToolchain in args:
@@ -143,7 +143,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return filtered
 
     @staticmethod
-    def _findToolchainInCMakeOptions(args: list) -> str:
+    def _findToolchainInCMakeOptions(args: list[str]) -> str:
         found = None
         for maybeToolchain in args:
             match = re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybeToolchain)

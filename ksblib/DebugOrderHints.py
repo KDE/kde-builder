@@ -3,7 +3,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from __future__ import annotations
+
 from functools import cmp_to_key
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Module.Module import Module
 
 
 class DebugOrderHints:
@@ -146,7 +152,7 @@ class DebugOrderHints:
         return _compareDebugOrder
 
     @staticmethod
-    def sortFailuresInDebugOrder(moduleGraph, extraDebugInfo, failuresRef: list) -> list:
+    def sortFailuresInDebugOrder(moduleGraph, extraDebugInfo, failuresRef: list[Module]) -> list[Module]:
         failures = failuresRef
         prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(moduleGraph, extraDebugInfo)))
         return prioritised

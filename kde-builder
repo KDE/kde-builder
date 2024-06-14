@@ -18,7 +18,7 @@ RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 
 # <editor-fold desc="Check missing python modules">
-def findMissingModules() -> list:
+def findMissingModules() -> list[str]:
     requiredModules = [
         "yaml",
         "setproctitle",

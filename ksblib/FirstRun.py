@@ -37,7 +37,7 @@ class FirstRun:
         self.supportedOtherOS = ["freebsd"]
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
-    def setupUserSystem(self, baseDir, setup_steps: list) -> NoReturn:
+    def setupUserSystem(self, baseDir, setup_steps: list[str]) -> NoReturn:
         self.baseDir = baseDir
 
         try:

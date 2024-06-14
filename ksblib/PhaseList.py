@@ -22,7 +22,7 @@ from __future__ import annotations
 
 
 class PhaseList:
-    def __init__(self, phases: list | None = None):
+    def __init__(self, phases: list[str] | None = None):
         """
         Constructs a new phase list, with the provided list of phases or
         a default set if none are provided.

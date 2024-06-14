@@ -25,7 +25,7 @@ class Module_BranchGroupResolver:
         # defined in the spec to be a comment of some sort.
         self.layers = [layer for layer in self.layers if not layer.startswith("_")]
 
-        # Deleting a hash slice. Sorry about the syntax.
+        # Deleting keys that starts with underscore.
         self.groups = {key: self.groups[key] for key in self.groups if not key.startswith("_")}
 
         # Extract wildcarded groups separately as they are handled separately
@@ -34,7 +34,7 @@ class Module_BranchGroupResolver:
 
         self.wildcardedGroups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
 
-    def _findLogicalGroup(self, module, logicalGroup) -> str | None:
+    def _findLogicalGroup(self, module: str, logicalGroup: str) -> str | None:
         """
         Returns the branch for the given logical group and module specifier. This
         function should not be called if the module specifier does not actually
@@ -45,7 +45,7 @@ class Module_BranchGroupResolver:
         # warning about use of undefined value.
         return self.groups[module].get(logicalGroup, None)
 
-    def findModuleBranch(self, module, logicalGroup) -> str | None:
+    def findModuleBranch(self, module: str, logicalGroup: str) -> str | None:
         if module in self.groups:
             return self._findLogicalGroup(module, logicalGroup)
 

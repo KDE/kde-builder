@@ -920,7 +920,7 @@ class Module(OptionsBase):
 
         return path
 
-    def getPostBuildMessages(self) -> list:
+    def getPostBuildMessages(self) -> list[str]:
         """
         Returns a list of any "post-build" messages that have been set for the module
         to show after the build has ended. These may be messages such as warning of a
@@ -932,7 +932,7 @@ class Module(OptionsBase):
         """
         return self.post_build_msgs
 
-    def addPostBuildMessage(self, new_msg) -> None:
+    def addPostBuildMessage(self, new_msg: str) -> None:
         """
         Adds the given message to the list of post-build messages to show to the user
         """

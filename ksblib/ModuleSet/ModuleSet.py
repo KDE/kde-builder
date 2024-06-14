@@ -64,25 +64,26 @@ class ModuleSet(OptionsBase):
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
 
-    def modulesToFind(self) -> list:
+    def modulesToFind(self) -> list[str]:
         return self.module_search_decls
 
-    def setModulesToFind(self, moduleDecls: list) -> None:
+    def setModulesToFind(self, moduleDecls: list[str]) -> None:
         declOrder = {moduleDecls[i]: i for i in range(len(moduleDecls))}
 
         self.module_search_decls = moduleDecls
         self.module_order = declOrder
 
-    def moduleNamesToFind(self) -> list:
+    def moduleNamesToFind(self) -> list[str]:
         """
         Same as modulesToFind, but strips away any path components to leave just
         module names.
         E.g. a "use-modules kde/kdelibs juk.git" would give (kdelibs, juk) as the
         result list.
         """
-        return [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modulesToFind()]
+        ret = [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modulesToFind()]
+        return ret
 
-    def modulesToIgnore(self) -> list:
+    def modulesToIgnore(self) -> list[str]:
         return self.module_ignore_decls
 
     def addModulesToIgnore(self, moduleDecls: list[str]) -> None:

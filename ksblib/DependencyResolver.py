@@ -719,7 +719,7 @@ class DependencyResolver:
         return _compareBuildOrder_depends
 
     @staticmethod
-    def sortModulesIntoBuildOrder(moduleGraph) -> list:
+    def sortModulesIntoBuildOrder(moduleGraph) -> list[Module]:
         resolved = list(moduleGraph.keys())
         built = [el for el in resolved if moduleGraph[el]["build"] and moduleGraph[el]["module"]]
         prioritised = sorted(built, key=cmp_to_key(DependencyResolver.make_comparison_func(moduleGraph)))

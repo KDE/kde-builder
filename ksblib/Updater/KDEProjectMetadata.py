@@ -27,7 +27,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     def name() -> str:
         return "metadata"
 
-    def ignoredModules(self) -> list:
+    def ignoredModules(self) -> list[str]:
         """
         Returns a list of the full kde-project paths for each module to ignore.
         """

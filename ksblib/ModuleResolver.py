@@ -7,11 +7,15 @@
 # handling.
 
 import copy
+from typing import TYPE_CHECKING
 
 from .BuildException import BuildException
 from .Module.Module import Module
 from .ModuleSet.KDEProjects import ModuleSet_KDEProjects
 from .ModuleSet.ModuleSet import ModuleSet
+
+if TYPE_CHECKING:
+    from KDEProjectsReader import KDEProjectsReader
 
 
 class ModuleResolver:
@@ -74,7 +78,7 @@ class ModuleResolver:
         we assume single "options" blocks should still be able to override these.
         """
 
-        proj_db = self.context.getProjectDataReader()
+        proj_db: KDEProjectsReader = self.context.getProjectDataReader()
         setIndices = []
         finalOpts = {}
 
@@ -130,7 +134,7 @@ class ModuleResolver:
         """
         self.ignoredSelectors = ignoredSelectorsRef if ignoredSelectorsRef else []
 
-    def setInputModulesAndOptions(self, modOptsRef: list) -> None:
+    def setInputModulesAndOptions(self, modOptsRef: list[Module | ModuleSet]) -> None:
         """
         Declares the list of all modules and module-sets known to the program,
         along with their base options. Modules should be :class:`Module` objects,
@@ -145,7 +149,7 @@ class ModuleResolver:
         self.definedModules = {mod.name: mod for mod in modOptsRef}
         self.referencedModules = self._listReferencedModules(modOptsRef)
 
-    def _applyOptions(self, modules: list) -> None:
+    def _applyOptions(self, modules: list[Module | ModuleSet]) -> None:
         """
         Applies cmdline and deferred options to the given modules or module-sets.
         """
@@ -240,7 +244,7 @@ class ModuleResolver:
         """
         ctx = self.context
         selectorName = selector
-        results = []  # Will default to '$selector' if unset by end of sub
+        results: list = []  # Will default to '$selector' if unset by end of sub
 
         # In the remainder of this code, lookupTableRef is basically handling
         # case 1, while setEntryLookupTableRef handles case 2. No `Module`s
@@ -331,7 +335,7 @@ class ModuleResolver:
         for unexpandedModuleSet in unexpandedModuleSets:
             self._expandSingleModuleSet(unexpandedModuleSet)
 
-    def _resolveGuessedModules(self, modules: list) -> list:
+    def _resolveGuessedModules(self, modules: list[Module]) -> list[Module]:
         ctx = self.context
 
         # We didn't necessarily fully expand all module-sets available in the
@@ -454,7 +458,7 @@ class ModuleResolver:
 
         return self.definedModules.get(moduleName, None)
 
-    def expandModuleSets(self, buildModuleList: list) -> list:
+    def expandModuleSets(self, buildModuleList: list[Module | ModuleSet]) -> list[Module]:
         """
         Replaces ModuleSets in the given list with their component Modules, and
         returns the new list.
@@ -495,8 +499,6 @@ class ModuleResolver:
             returnList.extend(results)
 
         return returnList
-
-    # Internal API
 
 
 """

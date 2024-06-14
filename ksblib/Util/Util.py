@@ -61,7 +61,7 @@ class Util:
         return value in listRef
 
     @staticmethod
-    def locate_exe(prog: str, preferred: list | None = None):
+    def locate_exe(prog: str, preferred: list[str] | None = None):
         """
         Function to return the path to the given executable based on
         either the given paths or the current PATH.
@@ -701,7 +701,7 @@ class Util:
         return True
 
     @staticmethod
-    def get_list_digest(args: list):
+    def get_list_digest(args: list[str]):
         """
         Returns a hash digest of the given options in the list. The return value is
         base64-encoded at this time.
