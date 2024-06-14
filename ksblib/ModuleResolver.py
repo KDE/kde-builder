@@ -6,6 +6,8 @@
 # Handle proper resolution of module selectors, including option
 # handling.
 
+from __future__ import annotations
+
 import copy
 from typing import TYPE_CHECKING
 
