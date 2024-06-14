@@ -35,7 +35,6 @@ class BuildSystem_Qt5(BuildSystem):
         """
         Return value style: boolean
         """
-        Util.assert_isa(self, BuildSystem_Qt5)
         module = self.module
         srcdir = module.fullpath("source")
         script = f"{srcdir}/configure"

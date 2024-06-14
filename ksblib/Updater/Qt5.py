@@ -66,7 +66,6 @@ class Updater_Qt5(Updater):
         Updates an existing Qt5 super module checkout.
         Throws exceptions on failure, otherwise returns number of commits updated
         """
-        Util.assert_isa(self, Updater_Qt5)
 
         # Update init-repository and the shell of the super module itself.
         result = super().updateExistingClone()
@@ -87,7 +86,6 @@ class Updater_Qt5(Updater):
         Returns:
              The number of *commits* affected.
         """
-        Util.assert_isa(self, Updater_Qt5)
         module = self.module
         srcdir = module.fullpath("source")
 

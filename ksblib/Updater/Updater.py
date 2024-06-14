@@ -68,14 +68,12 @@ class Updater:
         return "git"
 
     def currentRevisionInternal(self) -> str:
-        Util.assert_isa(self, Updater)
         return self.commit_id("HEAD")
 
     def commit_id(self, commit: str) -> str:
         """
         Returns the current sha1 of the given git "commit-ish".
         """
-        Util.assert_isa(self, Updater)
         if commit is None:
             BuildException.croak_internal("Must specify git-commit to retrieve id for")
         module = self.module
@@ -125,7 +123,6 @@ class Updater:
         Returns:
              1, or raises exception if an error occurs.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         srcdir = module.fullpath("source")
         args = ["--", git_repo, srcdir]
@@ -207,7 +204,6 @@ class Updater:
         Returns the number of *commits* affected, or
         throws exception on an update error.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         srcdir = module.fullpath("source")
 
@@ -312,7 +308,6 @@ class Updater:
 
         See also the "repository" module option.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         cur_repo = module.getOption("repository")
         ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
@@ -480,7 +475,6 @@ class Updater:
         Throws an exception on error.
         Returns the number of affected *commits*.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         cur_repo = module.getOption("repository")
         result = None
@@ -625,7 +619,6 @@ class Updater:
         return scheme, authority, path, query, fragment
 
     def countStash(self, description=None) -> int:
-        Util.assert_isa(self, Updater)
         module = self.module
 
         if os.path.exists(".git/refs/stash"):
@@ -645,7 +638,6 @@ class Updater:
         Wrapper to send a post-build (warning) message via the IPC object.
         This just takes care of the boilerplate to forward its arguments as message.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         self.ipc.notifyNewPostBuildMessage(module.name, *args)
 
@@ -757,7 +749,6 @@ class Updater:
             Empty string if no match is found, or the name of the local
             remote-tracking branch if one exists.
         """
-        Util.assert_isa(self, Updater)
 
         # We'll parse git config output to search for branches that have a
         # remote of $remoteName and a 'merge' of refs/heads/$branchName.
@@ -797,7 +788,6 @@ class Updater:
         Returns:
              Whether the remote will be considered for bestRemoteName
         """
-        Util.assert_isa(self, Updater)
         # name - not used, subclasses might want to filter on remote name
         return url == configuredUrl
 
@@ -816,7 +806,6 @@ class Updater:
             and has aliased more than one remote to the same repo). Obviously the list
             will be empty if no remote names were found.
         """
-        Util.assert_isa(self, Updater)
         module = self.module
         configuredUrl = module.getOption("repository")
         outputs = []
@@ -875,7 +864,6 @@ class Updater:
              A useful branch name that doesn't already exist, or "" if no
             name can be generated.
         """
-        Util.assert_isa(self, Updater)
         if not remoteName:
             remoteName = "origin"
         module = self.module

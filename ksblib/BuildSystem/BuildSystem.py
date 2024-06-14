@@ -124,7 +124,6 @@ class BuildSystem:
         recreated from scratch.
         If so, it returns a non-empty string
         """
-        Util.assert_isa(self, BuildSystem)
         module = self.module
         builddir = module.fullpath("build")
         confFileKey = self.configuredModuleFileName()
@@ -302,7 +301,6 @@ class BuildSystem:
         Returns:
              0 for failure, non-zero for success.
         """
-        Util.assert_isa(self, BuildSystem)
         module = self.module
         srcdir = module.fullpath("source")
         builddir = module.fullpath("build")
@@ -347,7 +345,6 @@ class BuildSystem:
         Returns:
              1 on success, 0 on failure.
         """
-        Util.assert_isa(self, BuildSystem)
         module = self.module
         builddir = module.fullpath("build")
         srcdir = module.fullpath("source")
@@ -402,7 +399,6 @@ class BuildSystem:
               work_done      : $bool, (true if the make command had work to do, may be needlessly set)
             }
         """
-        Util.assert_isa(self, BuildSystem)
         module = self.module
 
         commandToUse = module.getOption("custom-build-command")

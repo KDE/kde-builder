@@ -23,7 +23,6 @@ class BuildSystem_Qt4(BuildSystem):
 
     # @override(check_signature=False)
     def needsInstalled(self) -> bool:
-        Util.assert_isa(self, BuildSystem_Qt4)
         module = self.module
         return module.getOption("qt-install-dir") != module.fullpath("build")
 
@@ -42,7 +41,6 @@ class BuildSystem_Qt4(BuildSystem):
         """
         Return value style: boolean
         """
-        Util.assert_isa(self, BuildSystem_Qt4)
         module = self.module
         srcdir = module.fullpath("source")
         script = f"{srcdir}/configure"

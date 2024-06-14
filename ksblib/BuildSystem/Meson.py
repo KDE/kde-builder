@@ -27,7 +27,6 @@ class BuildSystem_Meson(BuildSystem):
         """
         Return value style: boolean
         """
-        Util.assert_isa(self, BuildSystem_Meson)
         module = self.module
         sourcedir = module.fullpath("source")
         buildDir = module.fullpath("build")

@@ -172,7 +172,6 @@ class Module(OptionsBase):
             dict
         """
         module = self
-        Util.assert_isa(module, Module)
 
         destdir = module.destDir()
         srcbase = module.getSourceDir()
@@ -328,7 +327,6 @@ class Module(OptionsBase):
         Returns:
              False on failure, True on success.
         """
-        Util.assert_isa(self, Module)
         moduleName = self.name
         pathinfo = self.getInstallPathComponents("build")
         builddir = pathinfo["fullpath"]
@@ -375,7 +373,6 @@ class Module(OptionsBase):
         Returns:
              True on success, False (0) on failure.
         """
-        Util.assert_isa(self, Module)
         moduleName = self.name
 
         buildSystem = self.buildSystem()
@@ -449,7 +446,6 @@ class Module(OptionsBase):
              False on failure, True on success.
         Exceptions may be thrown for abnormal conditions (e.g. no build dir exists)
         """
-        Util.assert_isa(self, Module)
         builddir = self.fullpath("build")
         buildSysFile = self.buildSystem().configuredModuleFileName()
 
@@ -511,7 +507,6 @@ class Module(OptionsBase):
         Returns:
              False on failure, True on success.
         """
-        Util.assert_isa(self, Module)
         builddir = self.fullpath("build")
         buildSysFile = self.buildSystem().configuredModuleFileName()
 
@@ -541,7 +536,6 @@ class Module(OptionsBase):
         """
         Integrates "set-env" option to the build context environment
         """
-        Util.assert_isa(self, Module)
         ctx = self.context
 
         # Let's see if the user has set env vars to be set.
@@ -920,7 +914,6 @@ class Module(OptionsBase):
         The user may use '$MODULE' or '${MODULE}' in the "install-dir" option to have
         them replaced by the name of the module in question.
         """
-        Util.assert_isa(self, Module)
         path = self.getOption("install-dir")
         moduleName = self.name
         path = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", moduleName, path)
@@ -937,7 +930,6 @@ class Module(OptionsBase):
         Each entry in the list will be a text message that should be shown (perhaps
         with additional formatting).
         """
-        Util.assert_isa(self, Module)
         return self.post_build_msgs
 
     def addPostBuildMessage(self, new_msg) -> None:

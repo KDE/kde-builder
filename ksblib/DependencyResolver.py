@@ -125,8 +125,6 @@ class DependencyResolver:
         Raises:
             Exception: Can throw an exception on I/O errors or malformed dependencies.
         """
-        Util.assert_isa(self, DependencyResolver)
-
         dependenciesOfRef = self.dependenciesOf
         dependencyAtom = re.compile(
             r"^\s*"  # Clear leading whitespace
@@ -245,8 +243,6 @@ class DependencyResolver:
             dependenciesRef["+"] = sorted(dependenciesRef["+"])
 
     def _lookupDirectDependencies(self, path, branch) -> dict:
-        Util.assert_isa(self, DependencyResolver)
-
         dependenciesOfRef = self.dependenciesOf
 
         directDeps = []
@@ -421,8 +417,6 @@ class DependencyResolver:
         return path
 
     def _resolveDependenciesForModuleDescription(self, moduleGraph, moduleDesc) -> dict:
-
-        Util.assert_isa(self, DependencyResolver)
         module = moduleDesc["module"]
         if module:
             Util.assert_isa(module, Module)
@@ -509,9 +503,6 @@ class DependencyResolver:
         return errors
 
     def resolveToModuleGraph(self, modules: list[Module]) -> dict:
-
-        Util.assert_isa(self, DependencyResolver)
-
         graph = {}
         moduleGraph = graph
 

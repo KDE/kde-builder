@@ -22,7 +22,6 @@ class ModuleSet_Qt5(ModuleSet):
     """
 
     def _makeQt5Module(self, ctx: BuildContext) -> Module:
-        Util.assert_isa(self, __class__)
         Util.assert_isa(ctx, BuildContext)
 
         newModule = Module(ctx, "Qt5")

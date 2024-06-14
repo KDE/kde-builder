@@ -276,7 +276,6 @@ class BuildSystem_KDECMake(BuildSystem):
 
     # @override
     def runTestsuite(self) -> bool:
-        Util.assert_isa(self, BuildSystem_KDECMake)
         module = self.module
 
         # Note that we do not run safe_make, which should really be called
@@ -336,8 +335,6 @@ class BuildSystem_KDECMake(BuildSystem):
 
     # @override
     def configureInternal(self) -> bool:
-
-        Util.assert_isa(self, BuildSystem_KDECMake)
         module = self.module
 
         if module.getOption("generate-vscode-project-config"):

@@ -31,7 +31,6 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
         """
         Returns a list of the full kde-project paths for each module to ignore.
         """
-        Util.assert_isa(self, Updater_KDEProjectMetadata)
         path = self.module.fullpath("source") + "/dependencies/build-script-ignore"
 
         # Now that we in theory have up-to-date source code, read in the

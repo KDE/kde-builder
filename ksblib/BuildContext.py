@@ -229,9 +229,6 @@ class BuildContext(Module):
 
         self.options = self.build_options["global"]
 
-        Util.assert_isa(self, Module)
-        Util.assert_isa(self, BuildContext)
-
     def addModule(self, module: Module) -> None:
         if not module:
             traceback.print_exc()
@@ -283,7 +280,6 @@ class BuildContext(Module):
         """
         Clears the list of environment variables to set for log_command runs.
         """
-        Util.assert_isa(self, BuildContext)
         self.env = {}
 
     def queueEnvironmentVariable(self, key: str, value: str) -> None:
@@ -299,8 +295,6 @@ class BuildContext(Module):
         In order to keep compatibility with the old 'setenv' sub, no action is
         taken if the value is not equivalent to boolean true.
         """
-        Util.assert_isa(self, BuildContext)
-
         if not value:
             return
 
@@ -313,8 +307,6 @@ class BuildContext(Module):
         environment irretrievably. Use this before exec()'ing another child, for
         instance.
         """
-        Util.assert_isa(self, BuildContext)
-
         for key, value in self.env.items():
             os.environ[key] = value
             logger_buildcontext.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
@@ -387,7 +379,6 @@ class BuildContext(Module):
         Returns:
              Boolean success flag.
         """
-        Util.assert_isa(self, BuildContext)
         baseDir = self.baseConfigDirectory()
         lockfile = f"{baseDir}/{BuildContext.LOCKFILE_NAME}"
 
@@ -476,7 +467,6 @@ class BuildContext(Module):
         """
         Releases the lock obtained by takeLock.
         """
-        Util.assert_isa(self, BuildContext)
         baseDir = self.baseConfigDirectory()
         lockFile = f"{baseDir}/{BuildContext.LOCKFILE_NAME}"
 
@@ -674,7 +664,6 @@ class BuildContext(Module):
 
         The RC file must have been found and loaded first, obviously.
         """
-        Util.assert_isa(self, BuildContext)
         rcfile = self.rcFile
         if not rcfile:
             BuildException.croak_internal("Call to baseConfigDirectory before loadRcFile")
