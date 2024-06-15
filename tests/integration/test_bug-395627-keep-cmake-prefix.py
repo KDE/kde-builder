@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from ksblib.Application import Application
-from ksblib.BuildSystem.KDECMake import BuildSystem_KDECMake
-from ksblib.Debug import Debug
-from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess
+from kde_builder_lib.application import Application
+from kde_builder_lib.build_system.kde_cmake import BuildSystem_KDECMake
+from kde_builder_lib.debug import Debug
+from kde_builder_lib.util.logged_subprocess import Util_LoggedSubprocess
 
 
 def test_cmake_prefix(monkeypatch):

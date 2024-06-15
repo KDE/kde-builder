@@ -5,8 +5,8 @@
 
 import pytest
 
-from ksblib.DebugOrderHints import DebugOrderHints
-from ksblib.Module.Module import Module
+from kde_builder_lib.debug_order_hints import DebugOrderHints
+from kde_builder_lib.module.module import Module
 
 
 @pytest.fixture

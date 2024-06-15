@@ -7,9 +7,9 @@ import os
 import shutil
 import tempfile
 
-from ksblib.BuildContext import BuildContext
-from ksblib.Module.Module import Module
-from ksblib.Util.LoggedSubprocess import Util_LoggedSubprocess
+from kde_builder_lib.build_context import BuildContext
+from kde_builder_lib.module.module import Module
+from kde_builder_lib.util.logged_subprocess import Util_LoggedSubprocess
 
 
 def test_logged_subprocess():

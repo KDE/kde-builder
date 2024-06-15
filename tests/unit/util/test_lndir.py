@@ -6,7 +6,7 @@
 import os.path
 import tempfile
 
-from ksblib.Util.Util import Util
+from kde_builder_lib.util.util import Util
 
 
 def test_safe_lndir():

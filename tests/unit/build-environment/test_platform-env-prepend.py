@@ -6,8 +6,8 @@
 import os
 import re
 
-from ksblib.BuildContext import BuildContext
-from ksblib.Module.Module import Module
+from kde_builder_lib.build_context import BuildContext
+from kde_builder_lib.module.module import Module
 
 
 def test_environment_prepend():

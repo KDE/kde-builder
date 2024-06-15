@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from ksblib.Application import Application
-from ksblib.Debug import Debug
-from ksblib.Updater.Updater import Updater
+from kde_builder_lib.application import Application
+from kde_builder_lib.debug import Debug
+from kde_builder_lib.updater.updater import Updater
 
 
 def test_tag_names_based_on_time():

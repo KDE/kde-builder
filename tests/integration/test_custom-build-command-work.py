@@ -5,10 +5,10 @@
 
 import os
 
-from ksblib.Application import Application
-from ksblib.BuildSystem.BuildSystem import BuildSystem
-from ksblib.Debug import Debug
-from ksblib.Module.Module import Module
+from kde_builder_lib.application import Application
+from kde_builder_lib.build_system.build_system import BuildSystem
+from kde_builder_lib.debug import Debug
+from kde_builder_lib.module.module import Module
 
 
 def test_build_internal(monkeypatch):
@@ -67,7 +67,7 @@ def test_build_internal(monkeypatch):
     assert module.getOption("custom-build-command") == "echo", "Custom build command setup"
     assert module.getOption("override-build-system") == "generic", "Custom build system required"
 
-    assert module.buildSystem() is not None, "module has a buildsystem"
+    assert module.buildSystem() is not None, "module has a build_system"
 
     # Don't use ->isa because we want this exact class
     assert isinstance(module.buildSystem(), BuildSystem)

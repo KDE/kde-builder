@@ -5,8 +5,8 @@
 
 import pytest
 
-from ksblib.DependencyResolver import DependencyResolver
-from ksblib.Module.Module import Module
+from kde_builder_lib.dependency_resolver import DependencyResolver
+from kde_builder_lib.module.module import Module
 
 
 @pytest.fixture

@@ -12,7 +12,7 @@ import sys
 import textwrap
 import traceback
 
-from ksblib.Debug import kbLogger
+from kde_builder_lib.debug import kbLogger
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -138,8 +138,8 @@ else:
         setup_steps.append("generate-config")
 
 if setup_steps:
-    from ksblib.FirstRun import FirstRun
-    from ksblib.Debug import Debug
+    from kde_builder_lib.first_run import FirstRun
+    from kde_builder_lib.debug import Debug
 
     d = Debug()
     d.setColorfulOutput(True)
@@ -147,9 +147,9 @@ if setup_steps:
     fr = FirstRun(prompt_answer)
     exit(fr.setupUserSystem(RealBinDir, setup_steps))
 
-from ksblib.Version import Version  # noqa: E402
-from ksblib.Application import Application  # noqa: E402
-from ksblib.BuildException import BuildException  # noqa: E402
+from kde_builder_lib.version import Version  # noqa: E402
+from kde_builder_lib.application import Application  # noqa: E402
+from kde_builder_lib.build_exception import BuildException  # noqa: E402
 
 Version.setBasePath(RealBinDir)
 

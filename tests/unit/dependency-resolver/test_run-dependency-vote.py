@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from ksblib.DependencyResolver import DependencyResolver
+from kde_builder_lib.dependency_resolver import DependencyResolver
 
 
 def test_vote_dependencies():

@@ -8,7 +8,7 @@
 import os
 import subprocess
 
-from ksblib.Debug import Debug
+from kde_builder_lib.debug import Debug
 
 
 def test_install_and_run():
@@ -21,7 +21,7 @@ def test_install_and_run():
     # This test can't pass from an installed kde-builder, unless user goes out of
     # their way to move files around or establish a broken module layout. If this
     # passes, we should be able to assume we're running from a git source dir
-    assert os.path.isfile("ksblib/Version.py"), "kde-builder modules found in git-src"
+    assert os.path.isfile("kde_builder_lib/version.py"), "kde-builder modules found in git-src"
 
     # Make sure kde-builder can still at least start when run directly
     result = subprocess.run(["./kde-builder", "--version", "--pretend"])

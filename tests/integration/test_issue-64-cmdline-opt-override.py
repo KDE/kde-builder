@@ -12,8 +12,8 @@
 #
 # See issue #64
 
-from ksblib.Application import Application
-from ksblib.Debug import Debug
+from kde_builder_lib.application import Application
+from kde_builder_lib.debug import Debug
 
 
 def test_no_cmdline_override():

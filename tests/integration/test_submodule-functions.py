@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import tempfile
 
-from ksblib.Updater.Updater import Updater
+from kde_builder_lib.updater.updater import Updater
 
 
 def run_command(command):

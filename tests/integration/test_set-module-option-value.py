@@ -3,8 +3,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from ksblib.Application import Application
-from ksblib.Debug import Debug
+from kde_builder_lib.application import Application
+from kde_builder_lib.debug import Debug
 
 
 def test_set_module_option():

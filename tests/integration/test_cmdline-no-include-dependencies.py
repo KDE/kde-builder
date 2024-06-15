@@ -5,8 +5,8 @@
 
 import pytest
 
-from ksblib.Application import Application
-from ksblib.Debug import Debug
+from kde_builder_lib.application import Application
+from kde_builder_lib.debug import Debug
 
 
 @pytest.fixture
