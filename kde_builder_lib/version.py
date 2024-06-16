@@ -20,23 +20,23 @@ class Version:
     SCRIPT_VERSION = VERSION
 
     @staticmethod
-    def setBasePath(newPath: str) -> None:
+    def set_base_path(newPath: str) -> None:
         """
-        Should be called before using ``scriptVersion`` to set the base path for the
+        Should be called before using ``script_version`` to set the base path for the
         script. This is needed to auto-detect the version in git for kde-builder
         instances running from a git repo.
         """
         Version.SCRIPT_PATH = newPath if newPath else Version.SCRIPT_PATH
 
     @staticmethod
-    def scriptVersion() -> str:
+    def script_version() -> str:
         """
         Call this function to return the kde-builder version.
         ::
 
-            version = kde_builder_lib.Version.scriptVersion()  # "22.07"
+            version = kde_builder_lib.Version.script_version()  # "22.07"
 
-        If the script is running from within its git repository (and ``setBasePath`` has
+        If the script is running from within its git repository (and ``set_base_path`` has
         been called), this function will try to auto-detect the git SHA1 ID of the
         current checkout and append the ID (in ``git-describe`` format) to the output
         string as well.

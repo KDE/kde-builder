@@ -70,15 +70,15 @@ class Debug:
         """
         return self.isPretending
 
-    def setPretending(self, val: bool) -> None:
+    def set_pretending(self, val: bool) -> None:
         self.isPretending = val
 
     @staticmethod
-    def isTesting() -> bool:
+    def is_testing() -> bool:
         # return "HARNESS_ACTIVE" in os.environ
         return "unittest" in sys.modules
 
-    def setColorfulOutput(self, useColor: bool) -> None:
+    def set_colorful_output(self, useColor: bool) -> None:
         # No colors unless output to a tty.
         if not sys.stdout.isatty():
             return
@@ -97,7 +97,7 @@ class Debug:
         else:
             self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD, self.DIM = [""] * 6
 
-    def setLogFile(self, fileName) -> None:
+    def set_log_file(self, fileName) -> None:
         if self.pretending():
             return
         try:
@@ -106,7 +106,7 @@ class Debug:
             logger_root = logging.getLogger()
             logger_root.error(f"Unable to open log file {fileName}!")
 
-    def setIPC(self, ipc) -> None:
+    def set_ipc(self, ipc) -> None:
         """
         Sets an IPC object to use to proxy logged messages over, to avoid having
         multiple procs fighting over the same TTY. Needless to say, you should only
@@ -122,6 +122,7 @@ class kbLogger(logging.Logger):
     _loggers = {}
     levelNamesMapping = logging._nameToLevel
 
+    # noinspection PyPep8Naming
     @classmethod
     def getLogger(cls, name, level=logging.NOTSET):
         if name not in cls._loggers:
@@ -140,7 +141,7 @@ class kbLogger(logging.Logger):
         # share the same TTY. Just forward messages to the one proc that should be
         # managing the TTY.
         if d.ipc:
-            d.ipc.sendLogMessage(logger_name, message_level, msg)
+            d.ipc.send_log_message(logger_name, message_level, msg)
             return
 
         kblogger = kbLogger.getLogger(logger_name)

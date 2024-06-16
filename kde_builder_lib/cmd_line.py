@@ -32,9 +32,9 @@ class Cmdline:
     ::
 
         # may exit! for things like --help, --version
-        opts = Cmdline.readCommandLineOptionsAndSelectors()
+        opts = Cmdline.read_command_line_options_and_selectors()
 
-        ctx.setOption(**opts["opts"]["global"])
+        ctx.set_option(**opts["opts"]["global"])
 
         module_list = lookForModSelectors(*opts["selectors"])
 
@@ -45,7 +45,7 @@ class Cmdline:
         # ... let's build
         for module in module_list:
         # override module options from rc-file
-        module.setOption(**opts["opts"][module.name])
+        module.set_option(**opts["opts"][module.name])
 
     At the command line, the user can specify things like:
         * Modules or module-sets to build (by name)
@@ -58,7 +58,7 @@ class Cmdline:
     def __init__(self):
         pass
 
-    def readCommandLineOptionsAndSelectors(self, options: list[str]) -> dict:
+    def read_command_line_options_and_selectors(self, options: list[str]) -> dict:
         """
         This function decodes the command line options passed into it and returns a
         dictionary describing what actions to take.
@@ -142,7 +142,7 @@ class Cmdline:
                 foundOptions[\"{key}\"] = args.{optName}[0]
             """)
 
-        supportedOptions = Cmdline._supportedOptions()
+        supportedOptions = Cmdline._supported_options()
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
@@ -168,7 +168,7 @@ class Cmdline:
         # This is done by parsing supportedOptions and extracting option variants (long, alias, short ...), parameter numbers and default values.
         string_of_parser_add_arguments = ""
         for key in supportedOptions:
-            # global flags and global options are not duplicating options defined in options in _supportedOptions(). That function ensures that.
+            # global flags and global options are not duplicating options defined in options in _supported_options(). That function ensures that.
 
             line = key
             nargs = None
@@ -220,13 +220,13 @@ class Cmdline:
 
         # <editor-fold desc="arg functions">
         if args.show_info:
-            self._showInfoAndExit()
+            self._show_info_and_exit()
         if args.version:
-            self._showVersionAndExit()
+            self._show_version_and_exit()
         if args.show_options_specifiers:
-            self._showOptionsSpecifiersAndExit()
+            self._show_options_specifiers_and_exit()
         if args.help:
-            self._showHelpAndExit()
+            self._show_help_and_exit()
         if args.d:
             foundOptions["include-dependencies"] = True
         if args.D:
@@ -235,16 +235,16 @@ class Cmdline:
             opts["run_mode"] = "uninstall"
             phases.reset_to(["uninstall"])
         if args.no_src:
-            phases.filterOutPhase("update")
+            phases.filter_out_phase("update")
         if args.no_install:
-            phases.filterOutPhase("install")
+            phases.filter_out_phase("install")
         if args.no_tests:
             # The "right thing" to do
-            phases.filterOutPhase("test")
+            phases.filter_out_phase("test")
             # What actually works at this point.
             foundOptions["run-tests"] = False
         if args.no_build:
-            phases.filterOutPhase("build")
+            phases.filter_out_phase("build")
         # Mostly equivalent to the above
         if args.src_only:
             phases.reset_to(["update"])
@@ -272,7 +272,7 @@ class Cmdline:
             foundOptions["build-when-unchanged"] = True
         if args.resume or args.resume_refresh_build_first:
             foundOptions["resume"] = True
-            phases.filterOutPhase("update")  # Implied --no-src
+            phases.filter_out_phase("update")  # Implied --no-src
             foundOptions["no-metadata"] = True  # Implied --no-metadata
             # Imply --no-include-dependencies, because when resuming, user wants to continue from exact same modules list
             # as saved in global persistent option "resume-list". Otherwise, some dependencies that have already passed the build successfully,
@@ -459,13 +459,13 @@ class Cmdline:
         return opts
 
     @staticmethod
-    def _showVersionAndExit() -> NoReturn:
-        version = "kde-builder " + Version.scriptVersion()
+    def _show_version_and_exit() -> NoReturn:
+        version = "kde-builder " + Version.script_version()
         print(version)
         exit()
 
     @staticmethod
-    def _showHelpAndExit() -> NoReturn:
+    def _show_help_and_exit() -> NoReturn:
         print(textwrap.dedent("""\
         KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
 
@@ -476,17 +476,17 @@ class Cmdline:
         exit()
 
     @staticmethod
-    def _showInfoAndExit() -> NoReturn:
-        os_vendor = OSSupport().vendorID()
-        version = "kde-builder " + Version.scriptVersion()
+    def _show_info_and_exit() -> NoReturn:
+        os_vendor = OSSupport().vendor_id()
+        version = "kde-builder " + Version.script_version()
         print(textwrap.dedent(f"""\
             {version}
             OS: {os_vendor}"""))
         exit()
 
     @staticmethod
-    def _showOptionsSpecifiersAndExit() -> NoReturn:
-        supportedOptions = Cmdline._supportedOptions()
+    def _show_options_specifiers_and_exit() -> NoReturn:
+        supportedOptions = Cmdline._supported_options()
 
         # The initial setup options are handled outside the Cmdline (in the starting script).
         initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
@@ -508,7 +508,7 @@ class Cmdline:
     ]
 
     @staticmethod
-    def _supportedOptions() -> list[str]:
+    def _supported_options() -> list[str]:
         """
         Return option names ready to be fed into GetOptionsFromArray
         """

@@ -22,29 +22,29 @@ class IPC_Pipe(IPC):
         self.pipe_read, self.pipe_write = os.pipe()
         self.fh = None
 
-    def setSender(self):
+    def set_sender(self):
         """
         Call this to let the object know it will be the update process.
         """
         os.close(self.pipe_read)
         self.fh = os.fdopen(self.pipe_write, "wb", 0)  # Disable buffering and any possibility of IO 'interpretation' of the bytes
 
-    def setReceiver(self):
+    def set_receiver(self):
         os.close(self.pipe_write)
         self.fh = os.fdopen(self.pipe_read, "rb", 0)  # Disable buffering and any possibility of IO 'interpretation' of the bytes
 
     @staticmethod
     # @override
-    def supportsConcurrency() -> bool:
+    def supports_concurrency() -> bool:
         """
-        Reimplementation of :meth:`IPC.supportsConcurrency`.
+        Reimplementation of :meth:`IPC.supports_concurrency`.
         """
         return True
 
     # @override(check_signature=False)
-    def sendMessage(self, msg: bytes) -> bool:
+    def send_message(self, msg: bytes) -> bool:
         """
-        Required reimplementation of :meth:`IPC.sendMessage`.
+        Required reimplementation of :meth:`IPC.send_message`.
 
         Parameters:
              msg: The (encoded) message to send.
@@ -60,18 +60,18 @@ class IPC_Pipe(IPC):
 
         return True
 
-    def _readNumberOfBytes(self, length: int) -> bytes:
+    def _read_number_of_bytes(self, length: int) -> bytes:
         fh = self.fh
         result = fh.read(length)
         return result
 
     # @override(check_signature=False)
-    def receiveMessage(self) -> bytes:
+    def receive_message(self) -> bytes:
         """
-        Required reimplementation of :meth:`IPC.receiveMessage`.
+        Required reimplementation of :meth:`IPC.receive_message`.
         """
         # Read unsigned short with msg length, then the message
-        msgLength = self._readNumberOfBytes(2)
+        msgLength = self._read_number_of_bytes(2)
         if not msgLength:
             return b""
 
@@ -79,7 +79,7 @@ class IPC_Pipe(IPC):
         if not msgLength:
             BuildException.croak_internal(f"Failed to read {msgLength} bytes as needed by earlier message!")
 
-        return self._readNumberOfBytes(msgLength)
+        return self._read_number_of_bytes(msgLength)
 
     # @override
     def close(self):

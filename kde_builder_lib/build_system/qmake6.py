@@ -29,11 +29,11 @@ class BuildSystem_QMake6(BuildSystem):
 
     @staticmethod
     # @override
-    def requiredPrograms() -> list[str]:
+    def required_programs() -> list[str]:
         return ["qmake"]
 
     # @override(check_signature=False)
-    def needsBuilddirHack(self) -> bool:
+    def needs_builddir_hack(self) -> bool:
         """
         I've never had problems with modern QMake-using modules being built in a
         specific build directory, until I tried using QMake to build Qt5 modules
@@ -42,10 +42,10 @@ class BuildSystem_QMake6(BuildSystem):
         module = self.module
 
         # Assume code.qt.io modules all need hack for now
-        return bool(re.search(r"qt\.io", module.getOption("repository")))
+        return bool(re.search(r"qt\.io", module.get_option("repository")))
 
     @classmethod
-    def absPathToQMake(cls) -> str:
+    def abs_path_to_qmake(cls) -> str:
         """
         Returns the absolute path to "qmake". Note the actual executable name may
         not necessarily be "qmake" as some distributions rename it to allow for
@@ -55,15 +55,15 @@ class BuildSystem_QMake6(BuildSystem):
         return next((p for p in cls.possible_qmake_names if Util.locate_exe(p)), None)
 
     # @override
-    def configureInternal(self) -> bool:
+    def configure_internal(self) -> bool:
         """
         Return value style: boolean
         """
         module = self.module
         builddir = module.fullpath("build")
-        sourcedir = builddir if self.needsBuilddirHack() else module.fullpath("source")
+        sourcedir = builddir if self.needs_builddir_hack() else module.fullpath("source")
 
-        qmakeOpts = module.getOption("qmake-options").split(" ")
+        qmakeOpts = module.get_option("qmake-options").split(" ")
         qmakeOpts = [el for el in qmakeOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         projectFiles = glob.glob(f"{sourcedir}/*.pro")
 
@@ -77,7 +77,7 @@ class BuildSystem_QMake6(BuildSystem):
             logger_buildsystem.error(f" b[r[*] Too many possible *.pro files for {module}")
             return False
 
-        qmake = self.absPathToQMake()
+        qmake = self.abs_path_to_qmake()
 
         if not qmake:
             return False

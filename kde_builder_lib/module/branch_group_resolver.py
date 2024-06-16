@@ -30,11 +30,11 @@ class Module_BranchGroupResolver:
 
         # Extract wildcarded groups separately as they are handled separately
         # later. Note that the specific catch-all group '*' is itself handled
-        # as a special case in findModuleBranch.
+        # as a special case in find_module_branch.
 
         self.wildcardedGroups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
 
-    def _findLogicalGroup(self, module: str, logicalGroup: str) -> str | None:
+    def _find_logical_group(self, module: str, logicalGroup: str) -> str | None:
         """
         Returns the branch for the given logical group and module specifier. This
         function should not be called if the module specifier does not actually
@@ -45,9 +45,9 @@ class Module_BranchGroupResolver:
         # warning about use of undefined value.
         return self.groups[module].get(logicalGroup, None)
 
-    def findModuleBranch(self, module: str, logicalGroup: str) -> str | None:
+    def find_module_branch(self, module: str, logicalGroup: str) -> str | None:
         if module in self.groups:
-            return self._findLogicalGroup(module, logicalGroup)
+            return self._find_logical_group(module, logicalGroup)
 
         # Map module search spec to prefix string that is required for a match
         catchAllGroupStats = {key: key[:-1] for key in self.wildcardedGroups.keys()}
@@ -59,9 +59,9 @@ class Module_BranchGroupResolver:
         match = next((candidate for candidate in orderedCandidates if module[:len(catchAllGroupStats[candidate])] == catchAllGroupStats[candidate]), None)
 
         if match:
-            return self._findLogicalGroup(match, logicalGroup)
+            return self._find_logical_group(match, logicalGroup)
 
         if "*" in self.groups:
-            return self._findLogicalGroup("*", logicalGroup)
+            return self._find_logical_group("*", logicalGroup)
 
         return

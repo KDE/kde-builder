@@ -36,10 +36,10 @@ class OptionsBase:
         # 'options', of course.
         self.options = {"set-env": {}}
 
-    def hasStickyOption(self, key: str) -> bool:
+    def has_sticky_option(self, key: str) -> bool:
         """
         Returns true if the given option has been overridden by a "sticky" option.
-        Use `getOption` to return the actual value in this case.
+        Use `get_option` to return the actual value in this case.
         """
         key = key.removeprefix("#")  # Remove sticky marker.
 
@@ -47,14 +47,14 @@ class OptionsBase:
             return True
         return True if f"#{key}" in self.options.keys() else False
 
-    def hasOption(self, key: str) -> bool:
+    def has_option(self, key: str) -> bool:
         """
         Returns true if the given option has been set for this module.
-        Use `getOption` to return the actual value in this case.
+        Use `get_option` to return the actual value in this case.
         """
         return key in self.options.keys()
 
-    def getOption(self, key: str) -> str | dict | list | bool:
+    def get_option(self, key: str) -> str | dict | list | bool:
         """
         Returns the value of the given option. "Sticky" options are returned in
         preference to this object's own option (this allows you to temporarily
@@ -74,29 +74,29 @@ class OptionsBase:
         """
 
         for el in [f"#{key}", key]:
-            if self.hasOption(el):
+            if self.has_option(el):
                 return self.options[el]
         return ""
 
-    def setOption(self, options: dict) -> None:
+    def set_option(self, options: dict) -> None:
         """        
         Sets the given option(s) to the given values.
-            self.setOption(options)
+            self.set_option(options)
         Normally seen as simply:
-            self.setOption(option, value)
+            self.set_option(option, value)
 
         For the vast majority of possible options, setting the same option again
         overwrites any previous value. However, for `set-env` options, additional
         option sets instead will **append** to previously-set values.
 
         If you need to perform special handling based on option values, subclass
-        this function, but be sure to call **this** setOption() with the resulting
+        this function, but be sure to call **this** set_option() with the resulting
         set of options (if any are left to set).
         """
 
         # Special case handling.
         if "set-env" in options.keys():
-            self._processSetEnvOption(options["set-env"])
+            self._process_set_env_option(options["set-env"])
             del options["set-env"]
 
         # Special-case handling
@@ -116,7 +116,7 @@ class OptionsBase:
                 if not repo or not url:
                     raise BuildException_Config(repoOption, f"Invalid git-repository-base setting: {value}")
 
-                dictref = self.getOption(repoOption)
+                dictref = self.get_option(repoOption)
                 if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash is empty itself).
                     dictref = {}
                 dictref[repo] = url
@@ -127,14 +127,14 @@ class OptionsBase:
         for option in options:
             self.options[option] = options[option]
 
-    def deleteOption(self, key: str) -> None:
+    def delete_option(self, key: str) -> None:
         """
         Removes the given option (and its value), if present.
         """
         if key in self.options.keys():
             del self.options[key]
 
-    def mergeOptionsFrom(self, other) -> None:
+    def merge_options_from(self, other) -> None:
         """
         Merges options from the given :class:`OptionsBase`, replacing any options already
         present (but keeping other existing options). Nice to quickly set up an options
@@ -143,9 +143,9 @@ class OptionsBase:
         """
         Util.assert_isa(other, OptionsBase)
         newOpts = copy.deepcopy(other.options)
-        self.setOption(newOpts)
+        self.set_option(newOpts)
 
-    def _processSetEnvOption(self, value) -> None:
+    def _process_set_env_option(self, value) -> None:
         """
         Handles setting set-env options.
 

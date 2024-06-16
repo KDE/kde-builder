@@ -85,11 +85,11 @@ class BuildException_Config(BuildException):
         BuildException.__init__(self, "Config", msg)
         self.config_invalid_option_name = bad_option_name
 
-    def problematicOptionName(self):
+    def problematic_option_name(self):
         return self.config_invalid_option_name
 
     @staticmethod
-    def optionUsageExplanation(optionName) -> str | None:
+    def option_usage_explanation(optionName) -> str | None:
         """
         Should return a lengthy explanation of how to use a given option for use in
         error messages, or None if no explanation is unavailable.
@@ -98,7 +98,7 @@ class BuildException_Config(BuildException):
 
         if isinstance(optionName, BuildException_Config):
             # Should only happen if called as method: i.e. $optionName == $self
-            optionName = optionName.problematicOptionName()
+            optionName = optionName.problematic_option_name()
 
         if optionName == "git-repository-base":
             result = textwrap.dedent("""\

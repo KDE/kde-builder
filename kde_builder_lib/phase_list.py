@@ -13,9 +13,9 @@ Example:
 
     phases = PhaseList()
     if phases.has("build_system"):
-        mod.createBuildSystem()
-    if ctx.getOption("build-only"):
-        phases.filterOutPhase("update")
+        mod.create_build_system()
+    if ctx.get_option("build-only"):
+        phases.filter_out_phase("update")
 """
 
 from __future__ import annotations
@@ -37,13 +37,13 @@ class PhaseList:
             phases = ["update", "build", "install"]
         self.phaselist = phases
 
-    def filterOutPhase(self, phase: str) -> None:
+    def filter_out_phase(self, phase: str) -> None:
         """
         Removes the given phase from the list, if present.
         """
         self.phaselist = [item for item in self.phaselist if item != phase]
 
-    def addPhase(self, phase: str) -> None:
+    def add_phase(self, phase: str) -> None:
         """
         Adds the given phase to the phase list at the end.
 

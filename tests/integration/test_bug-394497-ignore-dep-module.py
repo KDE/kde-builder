@@ -11,7 +11,7 @@ from kde_builder_lib.debug import Debug
 
 @pytest.fixture
 def mock_app_res_mod_dep_graph(monkeypatch):
-    def mock_resolveModuleDependencyGraph(self, modules: list):
+    def mock_resolve_module_dependency_graph(self, modules: list):
         """
         Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
         """
@@ -46,7 +46,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
 
         return {"graph": graph}
 
-    monkeypatch.setattr(Application, "_resolveModuleDependencyGraph", mock_resolveModuleDependencyGraph)
+    monkeypatch.setattr(Application, "_resolve_module_dependency_graph", mock_resolve_module_dependency_graph)
 
 
 def test_include_deps(mock_app_res_mod_dep_graph):
@@ -58,7 +58,7 @@ def test_include_deps(mock_app_res_mod_dep_graph):
     assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
     assert moduleList[1].name == "setmod2", "mod list[1] == setmod2"
     assert moduleList[2].name == "setmod3", "mod list[2] == setmod3"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
@@ -73,7 +73,7 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     assert len(moduleList) == 2, "Right number of modules (include-dependencies+ignore-modules)"
     assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
     assert moduleList[1].name == "setmod3", "mod list[1] == setmod3"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
@@ -87,4 +87,4 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
 
     assert len(moduleList) == 1, "Right number of modules (ignore module-set)"
     assert moduleList[0].name == "module2", "mod list[0] == module2"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

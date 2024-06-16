@@ -29,13 +29,13 @@ class StatusView:
         self.mod_failed = 0
         self.mod_success = 0
 
-    def setStatus(self, newStatus) -> None:
+    def set_status(self, newStatus) -> None:
         """
         Sets the "base" message to show as part of the update. E.g. "Compiling..."
         """
         self.status = Debug().colorize(newStatus)
 
-    def setProgress(self, newProgress) -> None:
+    def set_progress(self, newProgress) -> None:
         """
         Sets the amount of progress made vs. the total progress possible.
         """
@@ -45,13 +45,13 @@ class StatusView:
         if oldProgress != newProgress:
             self.update()
 
-    def setProgressTotal(self, newProgressTotal) -> None:
+    def set_progress_total(self, newProgressTotal) -> None:
         """
         Sets the total amount of progress deemed possible.
         """
         self.progress_total = newProgressTotal
 
-    def numberModulesTotal(self, newTotal: int = None) -> int:
+    def number_modules_total(self, newTotal: int = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules to be built.
         """
@@ -59,7 +59,7 @@ class StatusView:
             self.mod_total = newTotal
         return self.mod_total
 
-    def numberModulesSucceeded(self, newTotal: int | None = None) -> int:
+    def number_modules_succeeded(self, newTotal: int | None = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules built successfully.
         """
@@ -67,7 +67,7 @@ class StatusView:
             self.mod_success = newTotal
         return self.mod_success
 
-    def numberModulesFailed(self, newTotal: int | None = None) -> int:
+    def number_modules_failed(self, newTotal: int | None = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules not built successfully.
         """
@@ -111,18 +111,18 @@ class StatusView:
             spinner = "-\\|/"
             msg = spinner[self.cur_progress % len(spinner)] + status_line
 
-        StatusView._clearLineAndUpdate(msg)
+        StatusView._clear_line_and_update(msg)
 
     @staticmethod
-    def releaseTTY(msg: str = "") -> None:
+    def release_tty(msg: str = "") -> None:
         """
         For TTY outputs, this clears the line (if we actually had dirtied it) so
         the rest of the program can resume output from where it'd been left off.
         """
-        StatusView._clearLineAndUpdate(Debug().colorize(msg))
+        StatusView._clear_line_and_update(Debug().colorize(msg))
 
     @staticmethod
-    def _clearLineAndUpdate(msg: str) -> None:
+    def _clear_line_and_update(msg: str) -> None:
         """
         Give escape sequence to return to column 1 and clear the entire line
         Then print message and return to column 1 again in case somewhere else

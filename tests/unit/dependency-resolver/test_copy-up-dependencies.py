@@ -97,4 +97,4 @@ def test_vote_for_dependencies():
         }
     }
 
-    assert DependencyResolver._copyUpDependencies(graph1) == expected1, "should copy up dependencies correctly"
+    assert DependencyResolver._copy_up_dependencies(graph1) == expected1, "should copy up dependencies correctly"

@@ -23,7 +23,7 @@ class BuildSystem_Autotools(BuildSystem):
     def name() -> str:
         return "autotools"
 
-    def _findConfigureCommands(self) -> str:
+    def _find_configure_commands(self) -> str:
         """
         Returns the specific configure command to use.
 
@@ -72,20 +72,20 @@ class BuildSystem_Autotools(BuildSystem):
         return configureCommand
 
     # @override
-    def configureInternal(self) -> bool:
+    def configure_internal(self) -> bool:
         """
         Return value style: boolean
         """
         module = self.module
         sourcedir = module.fullpath("source")
         builddir = module.fullpath("build")
-        installdir = module.installationPath()
+        installdir = module.installation_path()
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        bootstrapOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
+        bootstrapOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
         try:
-            configureCommand = self._findConfigureCommands()
+            configureCommand = self._find_configure_commands()
             Util.p_chdir(module.fullpath("build"))
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
             result = exitcode

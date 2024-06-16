@@ -61,7 +61,7 @@ def test_proper_order(graph1):
     Test sorting modules into build order
     """
     expected1 = [graph1[item]["module"] for item in ["a", "c", "b", "d", "e"]]
-    actual1 = DependencyResolver.sortModulesIntoBuildOrder(graph1)
+    actual1 = DependencyResolver.sort_modules_into_build_order(graph1)
 
     assert actual1 == expected1, "should sort modules into the proper build order"
 
@@ -79,7 +79,7 @@ def test_key_order_does_not_matter(graph1):
 
     # corresponds to same order as the test above
     expected2 = [graph2[item]["module"] for item in ["nllfmvrb", "avdnrvrl", "lexical1", "lexical2", "lexicla3"]]
-    actual2 = DependencyResolver.sortModulesIntoBuildOrder(graph2)
+    actual2 = DependencyResolver.sort_modules_into_build_order(graph2)
 
     assert actual2 == expected2, "key order should not matter for build order"
 
@@ -96,6 +96,6 @@ def test_not_built_omitted(graph1):
     graph3["b"]["module"] = None  # Empty module blocks should be treated as build == 0
 
     expected3 = [graph3[item]["module"] for item in ("c", "d", "e")]
-    actual3 = DependencyResolver.sortModulesIntoBuildOrder(graph3)
+    actual3 = DependencyResolver.sort_modules_into_build_order(graph3)
 
     assert actual3 == expected3, "modules that are not to be built should be omitted"

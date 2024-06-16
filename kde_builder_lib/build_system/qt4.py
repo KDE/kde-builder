@@ -22,9 +22,9 @@ class BuildSystem_Qt4(BuildSystem):
     """
 
     # @override(check_signature=False)
-    def needsInstalled(self) -> bool:
+    def needs_installed(self) -> bool:
         module = self.module
-        return module.getOption("qt-install-dir") != module.fullpath("build")
+        return module.get_option("qt-install-dir") != module.fullpath("build")
 
     @staticmethod
     # @override
@@ -33,11 +33,11 @@ class BuildSystem_Qt4(BuildSystem):
 
     @staticmethod
     # @override
-    def needsBuilddirHack() -> bool:
+    def needs_builddir_hack() -> bool:
         return True
 
     # @override
-    def configureInternal(self) -> bool:
+    def configure_internal(self) -> bool:
         """
         Return value style: boolean
         """
@@ -49,15 +49,15 @@ class BuildSystem_Qt4(BuildSystem):
             logger_buildsystem.error(f"\tMissing configure script for r[b[{module}]")
             return False
 
-        commands = re.split(r"\s+", module.getOption("configure-flags"))
+        commands = re.split(r"\s+", module.get_option("configure-flags"))
         commands.append("-confirm-license")
         commands.append("-opensource")
 
         # Get the user's CXXFLAGS
-        cxxflags = module.getOption("cxxflags")
-        module.context.queueEnvironmentVariable("CXXFLAGS", cxxflags)
+        cxxflags = module.get_option("cxxflags")
+        module.context.queue_environment_variable("CXXFLAGS", cxxflags)
 
-        prefix = module.getOption("qt-install-dir")
+        prefix = module.get_option("qt-install-dir")
 
         if not prefix:
             logger_buildsystem.error(f"\tThe b[qt-install-dir] option must be set to determine where to install r[b[{module}]")
@@ -80,14 +80,14 @@ class BuildSystem_Qt4(BuildSystem):
         commands.insert(0, script)
 
         builddir = module.fullpath("build")
-        old_flags = module.getPersistentOption("last-configure-flags") or ""
+        old_flags = module.get_persistent_option("last-configure-flags") or ""
         cur_flags = Util.get_list_digest(commands)
 
-        if cur_flags != old_flags or module.getOption("reconfigure") or not os.path.exists(f"{builddir}/Makefile"):
+        if cur_flags != old_flags or module.get_option("reconfigure") or not os.path.exists(f"{builddir}/Makefile"):
             logger_buildsystem.warning(f"\tb[r[LGPL license selected for Qt].  See {srcdir}/LICENSE.LGPL")
             logger_buildsystem.info("\tRunning g[configure]...")
 
-            module.setPersistentOption("last-configure-flags", cur_flags)
+            module.set_persistent_option("last-configure-flags", cur_flags)
 
             return Util.good_exitcode(Util.run_logged(module, "configure", builddir, commands))
 

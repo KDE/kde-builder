@@ -18,14 +18,14 @@ RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 
 # <editor-fold desc="Check missing python modules">
-def findMissingModules() -> list[str]:
+def find_missing_modules() -> list[str]:
     requiredModules = [
         "yaml",
         "setproctitle",
     ]
     missingModules = []
 
-    def validateMod(mod_name):
+    def validate_mod(mod_name):
         import importlib
 
         try:
@@ -35,7 +35,7 @@ def findMissingModules() -> list[str]:
             return False
 
     for neededModule in requiredModules:
-        if validateMod(neededModule):
+        if validate_mod(neededModule):
             continue
         missingModules.append(neededModule)
 
@@ -43,7 +43,7 @@ def findMissingModules() -> list[str]:
 
 
 # Ensure that required Python modules are available so that the user isn't surprised later with an exception
-missingModuleDescriptions = findMissingModules()
+missingModuleDescriptions = find_missing_modules()
 if missingModuleDescriptions:
     print(textwrap.dedent("""\
         Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:"""))
@@ -142,16 +142,16 @@ if setup_steps:
     from kde_builder_lib.debug import Debug
 
     d = Debug()
-    d.setColorfulOutput(True)
+    d.set_colorful_output(True)
     prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
     fr = FirstRun(prompt_answer)
-    exit(fr.setupUserSystem(RealBinDir, setup_steps))
+    exit(fr.setup_user_system(RealBinDir, setup_steps))
 
 from kde_builder_lib.version import Version  # noqa: E402
 from kde_builder_lib.application import Application  # noqa: E402
 from kde_builder_lib.build_exception import BuildException  # noqa: E402
 
-Version.setBasePath(RealBinDir)
+Version.set_base_path(RealBinDir)
 
 # Script starts.
 
@@ -160,7 +160,7 @@ Version.setBasePath(RealBinDir)
 app = None
 try:
     app = Application(sys.argv[1:])  # the 0 element is script name
-    result = app.runAllModulePhases()
+    result = app.run_all_module_phases()
     app.finish(result)
 except BuildException as err:
     print(textwrap.dedent(f"""

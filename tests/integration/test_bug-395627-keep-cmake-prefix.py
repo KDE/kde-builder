@@ -40,10 +40,10 @@ def test_cmake_prefix(monkeypatch):
     moduleList = app.modules
 
     assert len(moduleList) == 6, "Right number of modules"
-    assert isinstance(moduleList[0].buildSystem(), BuildSystem_KDECMake)
+    assert isinstance(moduleList[0].build_system(), BuildSystem_KDECMake)
 
     # This requires log_command to be overridden above
-    result = moduleList[0].setupBuildSystem()
+    result = moduleList[0].setup_build_system()
     assert set_command_called == 1, "Overridden set_command was called"
     assert result, "Setup build system for auto-set prefix path"
 
@@ -51,7 +51,7 @@ def test_cmake_prefix(monkeypatch):
     prefix = next((x for x in savedCommand if "-DCMAKE_PREFIX_PATH" in x), None)
     assert prefix == "-DCMAKE_PREFIX_PATH=/tmp/qt5", "Prefix path set to custom Qt prefix"
 
-    result = moduleList[2].setupBuildSystem()
+    result = moduleList[2].setup_build_system()
     assert result, "Setup build system for manual-set prefix path"
 
     prefixes = [el for el in savedCommand if "-DCMAKE_PREFIX_PATH" in el]
@@ -59,11 +59,11 @@ def test_cmake_prefix(monkeypatch):
     if prefixes:
         assert prefixes[0] == "-DCMAKE_PREFIX_PATH=FOO", "Manual-set prefix path is as set by user"
 
-    result = moduleList[4].setupBuildSystem()
+    result = moduleList[4].setup_build_system()
     assert result, "Setup build system for manual-set prefix path"
 
     prefixes = [el for el in savedCommand if "-DCMAKE_PREFIX_PATH" in el]
     assert len(prefixes) == 1, "Only one set prefix path in manual mode"
     if prefixes:
         assert prefixes[0] == "-DCMAKE_PREFIX_PATH:PATH=BAR", "Manual-set prefix path is as set by user"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -17,17 +17,17 @@ def test_set_module_option():
 
     module = [m for m in moduleList if f"{m}" == "module2"][0]
     scm = module.scm()
-    branch, sourcetype = scm._determinePreferredCheckoutSource()
+    branch, sourcetype = scm._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/fake-tag10", "Right tag name"
     assert sourcetype == "tag", "Result came back as a tag"
 
     module = [m for m in moduleList if f"{m}" == "setmod2"][0]
-    branch, sourcetype = module.scm()._determinePreferredCheckoutSource()
+    branch, sourcetype = module.scm()._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/tag-setmod10", "Right tag name (options block from cmdline)"
     assert sourcetype == "tag", "cmdline options block came back as tag"
 
-    assert not module.isKDEProject(), "setmod2 is *not* a \"KDE\" project"
-    assert module.fullProjectPath() == "setmod2", "fullProjectPath on non-KDE modules returns name"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    assert not module.is_kde_project(), "setmod2 is *not* a \"KDE\" project"
+    assert module.full_project_path() == "setmod2", "full_project_path on non-KDE modules returns name"
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -27,17 +27,17 @@ def test_environment_prepend():
     newPath = re.sub(r":/bin:", "", newPath)
     os.environ["PATH"] = newPath
 
-    ctx.setOption({"install-dir": ""})  # must be set but empty
-    ctx.setOption({"qt-install-dir": "/dev/null"})
+    ctx.set_option({"install-dir": ""})  # must be set but empty
+    ctx.set_option({"qt-install-dir": "/dev/null"})
 
-    mod.setupEnvironment()
+    mod.setup_environment()
 
     assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
     assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
 
     # --
 
-    ctx.resetEnvironment()
+    ctx.reset_environment()
 
     mod = Module(ctx, "test")
     newPath = os.environ.get("PATH")
@@ -46,17 +46,17 @@ def test_environment_prepend():
     newPath = re.sub(r":/bin:", "", newPath)
     os.environ["PATH"] = newPath
 
-    ctx.setOption({"qt-install-dir": ""})  # must be set but empty
-    ctx.setOption({"install-dir": "/dev/null"})
+    ctx.set_option({"qt-install-dir": ""})  # must be set but empty
+    ctx.set_option({"install-dir": "/dev/null"})
 
-    mod.setupEnvironment()
+    mod.setup_environment()
 
     assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
     assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
 
     # --
 
-    ctx.resetEnvironment()
+    ctx.reset_environment()
 
     mod = Module(ctx, "test")
     newPath = os.environ.get("PATH")
@@ -65,10 +65,10 @@ def test_environment_prepend():
     newPath = re.sub(r":/bin:", "", newPath)
     os.environ["PATH"] = newPath
 
-    ctx.setOption({"qt-install-dir": "/dev/null"})
-    ctx.setOption({"install-dir": "/dev/null"})
+    ctx.set_option({"qt-install-dir": "/dev/null"})
+    ctx.set_option({"install-dir": "/dev/null"})
 
-    mod.setupEnvironment()
+    mod.setup_environment()
 
     assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
     assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
@@ -77,15 +77,15 @@ def test_environment_prepend():
 
     # Ensure binpath and libpath options work
 
-    ctx.resetEnvironment()
+    ctx.reset_environment()
 
     mod = Module(ctx, "test")
     os.environ["PATH"] = "/bin:/usr/bin"
 
-    ctx.setOption({"binpath": "/tmp/fake/bin"})
-    ctx.setOption({"libpath": "/tmp/fake/lib:/tmp/fake/lib64"})
+    ctx.set_option({"binpath": "/tmp/fake/bin"})
+    ctx.set_option({"libpath": "/tmp/fake/lib:/tmp/fake/lib64"})
 
-    mod.setupEnvironment()
+    mod.setup_environment()
 
     assert re.search("/tmp/fake/bin", ctx.env["PATH"]), "Ensure `binpath` present in generated PATH"
     assert re.search("/tmp/fake/lib", ctx.env["LD_LIBRARY_PATH"]), "Ensure `libpath` present in generated LD_LIBRARY_PATH"

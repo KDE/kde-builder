@@ -84,7 +84,7 @@ def test_submodule():
 
     # Submodule checks
 
-    assert not Updater._hasSubmodules(), "No submodules detected when none present"
+    assert not Updater._has_submodules(), "No submodules detected when none present"
 
     # git now prevents use of local clones of other git repos on the file system
     # unless specifically enabled, due to security risks from symlinks. See
@@ -92,7 +92,7 @@ def test_submodule():
     result = run_command("git -c protocol.file.allow=always submodule add ../submodule".split(" "))
     assert result, 'git submodule add worked'
 
-    assert Updater._hasSubmodules(), "Submodules detected when they are present"
+    assert Updater._has_submodules(), "Submodules detected when they are present"
 
     os.chdir(origdir)  # Allow auto-cleanup
     shutil.rmtree(tmpdir)

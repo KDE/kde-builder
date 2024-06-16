@@ -46,9 +46,9 @@ class StartProgram:
             exit(1)
 
         pers_opts = ctx.persistent_options
-        extra_run_env = ctx.getOption("source-when-start-program")
+        extra_run_env = ctx.get_option("source-when-start-program")
 
-        install_dir = ctx.getOption("install-dir")
+        install_dir = ctx.get_option("install-dir")
         bin_dir = f"{install_dir}/bin/"
         exec_path = f"{install_dir}/bin/{executable}"
         prefix_sh_path = f"{install_dir}/prefix.sh"
@@ -56,7 +56,7 @@ class StartProgram:
         if not os.path.exists(exec_path):
             logger_app.error(f" r[*] Program r[{executable}] does not exist in {bin_dir} directory.")
             if executable in pers_opts:  # Hint possible variants in case we got executable named as some already built module
-                install_manifest = ctx.getOption("build-dir") + f"/{executable}/install_manifest.txt"
+                install_manifest = ctx.get_option("build-dir") + f"/{executable}/install_manifest.txt"
                 bins_of_module = []
                 if os.path.exists(install_manifest):
                     with open(install_manifest, "r") as f:

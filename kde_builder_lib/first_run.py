@@ -26,7 +26,7 @@ class FirstRun:
     Examples:
     ::
 
-        exitcode = FirstRun.setupUserSystem()
+        exitcode = FirstRun.setup_user_system()
         exit(exitcode)
     """
 
@@ -37,7 +37,7 @@ class FirstRun:
         self.supportedOtherOS = ["freebsd"]
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
-    def setupUserSystem(self, baseDir, setup_steps: list[str]) -> NoReturn:
+    def setup_user_system(self, baseDir, setup_steps: list[str]) -> NoReturn:
         self.baseDir = baseDir
 
         try:
@@ -48,16 +48,16 @@ class FirstRun:
                 # First, we need to download metadata with Application.
 
                 from .application import Application
-                Application(["--metadata-only", "--metadata-only"])  # invokes _downloadKDEProjectMetadata internally
+                Application(["--metadata-only", "--metadata-only"])  # invokes _download_kde_project_metadata internally
                 # We use a hack to catch exactly this command line to make the app not exit. This way we do not influence the normal behavior, and we
                 # do not create a normal instance of Application, because it will create a lockfile.
-                # todo remove this hack after moving takeLock to another place before actual work from the Application.__init__
+                # todo remove this hack after moving take_lock to another place before actual work from the Application.__init__
 
                 metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
-                self._installSystemPackages(metadata_distro_deps_path)
+                self._install_system_packages(metadata_distro_deps_path)
             if "generate-config" in setup_steps:
                 logger_fr.warning("=== generate-config ===")
-                self._setupBaseConfiguration()
+                self._setup_base_configuration()
         except BuildException as e:
             msg = e.message
             logger_fr.error(f"  b[r[*] r[{msg}]")
@@ -68,7 +68,7 @@ class FirstRun:
     # Internal functions
 
     @staticmethod
-    def _readPackages(vendor, version, deps_data_path) -> dict:
+    def _read_packages(vendor, version, deps_data_path) -> dict:
         """
         Reads from the files from data/pkg and dumps the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
         """
@@ -102,23 +102,23 @@ class FirstRun:
         else:
             return False
 
-    def _installSystemPackages(self, deps_data_path) -> None:
+    def _install_system_packages(self, deps_data_path) -> None:
 
-        vendor = self.oss.vendorID()
-        osVersion = self.oss.vendorVersion()
+        vendor = self.oss.vendor_id()
+        osVersion = self.oss.vendor_version()
 
         logger_fr.info(f" b[-] Installing b[system packages] for b[{vendor}]...")
 
-        packages = self._findBestVendorPackageList(deps_data_path)
+        packages = self._find_best_vendor_package_list(deps_data_path)
         if not packages:
             logger_fr.error(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})")
             return
 
-        installCmd = self._findBestInstallCmd()
+        installCmd = self._find_best_install_cmd()
         not_found_in_repo_packages = []
 
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
-        if self.oss.vendorID() == "arch":
+        if self.oss.vendor_id() == "arch":
             required_packages_and_required_groups = packages
             missing_packages_and_required_groups = subprocess.run("pacman -T " + " ".join(required_packages_and_required_groups), shell=True, capture_output=True, check=False).stdout.decode("utf-8").removesuffix("\n").split("\n")
             all_possible_groups = subprocess.run("pacman -Sg", shell=True, capture_output=True, check=False).stdout.decode("utf-8").removesuffix("\n").split("\n")
@@ -132,7 +132,7 @@ class FirstRun:
                     missing_packages_from_required_groups += missing_packages_from_required_group
             packages = missing_packages_not_grouped + missing_packages_from_required_groups
 
-        if self.oss.isDebianBased():
+        if self.oss.is_debian_based():
             all_available_packages = subprocess.run("apt list", shell=True, capture_output=True).stdout.decode("utf-8").removesuffix("\n").split("\n")
             all_available_packages.pop(0)  # The 0 element is "Listing..."
             all_available_packages = [pkg.split("/")[0] for pkg in all_available_packages]
@@ -188,19 +188,19 @@ class FirstRun:
                 logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
             logger_fr.info(" b[*] b[g[Packages were successfully installed!]")
 
-    def suggestedNumCoresForLowMemory(self) -> int:
+    def suggested_num_cores_for_low_memory(self) -> int:
         """
         Returns the suggested number of cores to use for make jobs for build jobs where
         memory is a bottleneck, such as qtwebengine.
 
-            num_cores = FirstRun.suggestedNumCoresForLowMemory()
+            num_cores = FirstRun.suggested_num_cores_for_low_memory()
         """
 
         # Try to detect the amount of total memory for a corresponding option for
         # heavyweight modules
         mem_total = None
         try:
-            mem_total = self.oss.detectTotalMemory()
+            mem_total = self.oss.detect_total_memory()
         except BuildException as e:
             logger_fr.warning(str(e))
 
@@ -212,14 +212,14 @@ class FirstRun:
         rounded_mem = int(mem_total / 1024000.0)
         return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
 
-    def _getNumCoresForLowMemory(self, num_cores: int) -> int:
+    def _get_num_cores_for_low_memory(self, num_cores: int) -> int:
         """
         Return the highest number of cores we can use based on available memory, but
         without exceeding the base number of cores available.
         """
-        return min(self.suggestedNumCoresForLowMemory(), num_cores)
+        return min(self.suggested_num_cores_for_low_memory(), num_cores)
 
-    def _setupBaseConfiguration(self) -> None:
+    def _setup_base_configuration(self) -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
         xdgConfigHome = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
@@ -247,7 +247,7 @@ class FirstRun:
         if not numCores:
             numCores = 4
 
-        numCoresLow = self._getNumCoresForLowMemory(numCores)
+        numCoresLow = self._get_num_cores_for_low_memory(numCores)
 
         sampleRc = sampleRc.replace("%{num_cores}", str(numCores))
         sampleRc = sampleRc.replace("%{num_cores_low}", str(numCoresLow))
@@ -282,7 +282,7 @@ class FirstRun:
             sampleFh.write(sampleRc)
         print()
 
-    def _findBestInstallCmd(self) -> list[str]:
+    def _find_best_install_cmd(self) -> list[str]:
         cmdsRef = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
@@ -295,10 +295,10 @@ class FirstRun:
 
         supportedDistros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmdsRef.keys()]
 
-        bestVendor = self.oss.bestDistroMatch(supportedDistros)
+        bestVendor = self.oss.best_distro_match(supportedDistros)
         logger_fr.info(f"    Using installer for b[{bestVendor}]")
 
-        version = self.oss.vendorVersion()
+        version = self.oss.vendor_version()
         cmd = []
 
         for opt in [f"{bestVendor}/{version}", f"{bestVendor}/unknown"]:
@@ -320,14 +320,14 @@ class FirstRun:
                 exit(1)
         return cmd
 
-    def _findBestVendorPackageList(self, deps_data_path) -> list[str]:
-        bestVendor = self.oss.bestDistroMatch(self.supportedDistros + self.supportedOtherOS)
-        version = self.oss.vendorVersion()
+    def _find_best_vendor_package_list(self, deps_data_path) -> list[str]:
+        bestVendor = self.oss.best_distro_match(self.supportedDistros + self.supportedOtherOS)
+        version = self.oss.vendor_version()
         logger_fr.info(f"    Installing packages for b[{bestVendor}]/b[{version}]")
-        return self._packagesForVendor(bestVendor, version, deps_data_path)
+        return self._packages_for_vendor(bestVendor, version, deps_data_path)
 
-    def _packagesForVendor(self, vendor, version, deps_data_path) -> list[str]:
-        packages = self._readPackages(vendor, version, deps_data_path)
+    def _packages_for_vendor(self, vendor, version, deps_data_path) -> list[str]:
+        packages = self._read_packages(vendor, version, deps_data_path)
         for opt in [f"pkg/{vendor}/{version}", f"pkg/{vendor}/unknown"]:
             if opt in packages.keys():
                 return packages[opt]

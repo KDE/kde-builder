@@ -27,7 +27,7 @@ class Updater_Qt5(Updater):
     def name() -> str:
         return "qt5"
 
-    def _updateRepository(self) -> int:
+    def _update_repository(self) -> int:
         """
         Handles calling init-repository to clone or update the appropriate Qt 5
         submodules.
@@ -43,7 +43,7 @@ class Updater_Qt5(Updater):
         # See https://wiki.qt.io/Building_Qt_5_from_Git#Getting_the_source_code for
         # why we skip web engine by default. As of 2019-01-12 it is only used for
         # PIM or optionally within Plasma
-        modules = module.getOption("use-qt5-modules").split(" ")
+        modules = module.get_option("use-qt5-modules").split(" ")
         if not modules:
             modules.extend(["default", "-qtwebengine"])
 
@@ -61,22 +61,22 @@ class Updater_Qt5(Updater):
         return 1  # TODO: Count commits
 
     # @override
-    def updateExistingClone(self) -> int:
+    def update_existing_clone(self) -> int:
         """
         Updates an existing Qt5 super module checkout.
         Throws exceptions on failure, otherwise returns number of commits updated
         """
 
         # Update init-repository and the shell of the super module itself.
-        result = super().updateExistingClone()
+        result = super().update_existing_clone()
 
         # updateRepository has init-repository work to update the source
-        self._updateRepository()
+        self._update_repository()
 
         return result
 
     # @override(check_signature=False)
-    def updateCheckout(self) -> int:
+    def update_checkout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
@@ -91,15 +91,15 @@ class Updater_Qt5(Updater):
 
         if os.path.isdir(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            return self.updateExistingClone()
+            return self.update_existing_clone()
         else:
-            self._verifySafeToCloneIntoSourceDir(module, srcdir)
+            self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
-            self._clone(module.getOption("repository"))
+            self._clone(module.get_option("repository"))
 
             logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
             logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")
 
             # With the supermodule cloned, we then need to call into
             # init-repository to have it complete the checkout.
-            return self._updateRepository()  # num commits
+            return self._update_repository()  # num commits

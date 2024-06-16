@@ -26,7 +26,7 @@ class OSSupport:
     ::
 
         os = OSSupport()  # Autodetects info on running system
-        print("Current OS is: " + os.vendorID)
+        print("Current OS is: " + os.vendor_id)
     """
 
     def __init__(self, file: str | None = None):
@@ -45,24 +45,24 @@ class OSSupport:
         self.VERSION_ID = None
 
         # file might be None
-        kvListRef = self._readOSRelease(file)
+        kvListRef = self._read_os_release(file)
         for key in kvListRef.keys():
             setattr(self, key, kvListRef[key])
 
-    def vendorID(self) -> str:
+    def vendor_id(self) -> str:
         """
         Returns the vendor ID from the `os-release` specification, or
         "unknown" if /etc/os-release could not be read.
         ::
 
-            vendor = os.vendorID  # "gentoo", "debian", etc.
+            vendor = os.vendor_id  # "gentoo", "debian", etc.
         N.B., this is **not the same as the operating system**!
         """
         return self.ID or "unknown"
 
-    def vendorVersion(self) -> str:
+    def vendor_version(self) -> str:
         """
-            vendor = os.vendorVersion  # "xenial", "17", etc.
+            vendor = os.vendor_version  # "xenial", "17", etc.
 
         Returns the vendor Version from the `os-release` specification.
         The first available value from `VERSION_ID` and then
@@ -76,7 +76,7 @@ class OSSupport:
         else:
             return "unknown"
 
-    def isDebianBased(self) -> bool:
+    def is_debian_based(self) -> bool:
         """
         Returns boolean. 1 (true) if this is a Linux distribution based on Debian, 0 (false) otherwise.
         """
@@ -91,12 +91,12 @@ class OSSupport:
                 return True
         return False
 
-    def detectTotalMemory(self) -> int:
+    def detect_total_memory(self) -> int:
         """
         Returns the amount of installed memory, in kilobytes. Linux and FreeBSD are
         supported.
         Throws a runtime exception if unable to autodetect memory capacity.
-            mem_total_KiB = os.detectTotalMemory()
+            mem_total_KiB = os.detect_total_memory()
         """
         mem_total = None
         if sys.platform == "freebsd":
@@ -113,14 +113,14 @@ class OSSupport:
                 mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
                 mem_total = int(mem_total)
         else:
-            BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendorID()}")
+            BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendor_id()}")
 
         return mem_total
 
-    def bestDistroMatch(self, distros: list[str]) -> str:
+    def best_distro_match(self, distros: list[str]) -> str:
         """
             # Might return "fedora" if running on Scientific Linux
-            distro = os.bestDistroMatch(["ubuntu", "fedora", "arch", "debian"]);
+            distro = os.best_distro_match(["ubuntu", "fedora", "arch", "debian"]);
 
         This uses the ID (and if needed, ID_LIKE) parameter in
         /etc/os-release to find the best possible match amongst the
@@ -131,7 +131,7 @@ class OSSupport:
         similar): "linux" or "freebsd" as the case may be.
         """
 
-        ids = [self.vendorID()]
+        ids = [self.vendor_id()]
         likeDistros = self.ID_LIKE or ""
         if likeDistros:
             for likeDistro in likeDistros.split(" "):
@@ -148,7 +148,7 @@ class OSSupport:
         return "linux"
 
     @staticmethod
-    def _readOSRelease(fileName: str | None) -> dict:
+    def _read_os_release(fileName: str | None) -> dict:
         files = [fileName] if fileName else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
         file = None
         error = None

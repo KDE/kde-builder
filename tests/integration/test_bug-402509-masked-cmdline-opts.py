@@ -23,4 +23,4 @@ def test_cmdline_selector_not_eaten():
 
     assert len(moduleList) == 1, "Right number of modules (just one)"
     assert moduleList[0].name == "setmod3", "mod list[2] == setmod3"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -56,26 +56,26 @@ def test_empty_numcores(mock_buildsystem):
 
     for item in testMatrix:
         testString, resultRef, testName = item
-        module.setOption({testOption: testString})
-        buildSystem.buildInternal(testOption)
+        module.set_option({testOption: testString})
+        buildSystem.build_internal(testOption)
         assert BuildSystem.madeArguments == resultRef, testName
 
-        module.setOption({"num-cores": str(max_cores - 1)})
-        buildSystem.buildInternal(testOption)
+        module.set_option({"num-cores": str(max_cores - 1)})
+        buildSystem.build_internal(testOption)
         assert BuildSystem.madeArguments == ["-j", str(max_cores - 1), *resultRef], f"{testName} with num-cores set"
-        module.setOption({"num-cores": ""})
+        module.set_option({"num-cores": ""})
 
     testOption = "ninja-options"
-    module.setOption({"make-options": "not used"})
-    module.setOption({"cmake-generator": "Kate - Ninja"})
+    module.set_option({"make-options": "not used"})
+    module.set_option({"cmake-generator": "Kate - Ninja"})
 
     for item in testMatrix:
         testString, resultRef, testName = item
-        module.setOption({testOption: testString})
-        buildSystem.buildInternal(testOption)
+        module.set_option({testOption: testString})
+        buildSystem.build_internal(testOption)
         assert BuildSystem.madeArguments == resultRef, testName
 
-        module.setOption({"num-cores": str(max_cores - 1)})
-        buildSystem.buildInternal(testOption)
+        module.set_option({"num-cores": str(max_cores - 1)})
+        buildSystem.build_internal(testOption)
         assert BuildSystem.madeArguments == ['-j', str(max_cores - 1), *resultRef], f"{testName} with num-cores set"
-        module.setOption({"num-cores": ""})
+        module.set_option({"num-cores": ""})

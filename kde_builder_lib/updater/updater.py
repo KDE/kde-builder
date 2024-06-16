@@ -42,7 +42,7 @@ class Updater:
         self.module = module
         self.ipc = None
 
-    def updateInternal(self, ipc=IPC_Null()) -> int:
+    def update_internal(self, ipc=IPC_Null()) -> int:
         """
         scm-specific update procedure.
         May change the current directory as necessary.
@@ -52,7 +52,7 @@ class Updater:
         numCommits = None
 
         try:
-            numCommits = self.updateCheckout()
+            numCommits = self.update_checkout()
         except Exception as _err:
             err = _err
 
@@ -67,7 +67,7 @@ class Updater:
     def name() -> str:
         return "git"
 
-    def currentRevisionInternal(self) -> str:
+    def current_revision_internal(self) -> str:
         return self.commit_id("HEAD")
 
     def commit_id(self, commit: str) -> str:
@@ -89,8 +89,8 @@ class Updater:
 
         return an_id
 
-    def _verifyRefPresent(self, module: Module, repo: str) -> bool:
-        ref, commitType = self._determinePreferredCheckoutSource(module)
+    def _verify_ref_present(self, module: Module, repo: str) -> bool:
+        ref, commitType = self._determine_preferred_checkout_source(module)
 
         if Debug().pretending():
             return True
@@ -131,26 +131,26 @@ class Updater:
 
         logger_updater.warning(f"Cloning g[{module}]")
 
-        Util.p_chdir(module.getSourceDir())
+        Util.p_chdir(module.get_source_dir())
 
-        commitId, commitType = self._determinePreferredCheckoutSource(module)
+        commitId, commitType = self._determine_preferred_checkout_source(module)
 
         if commitType != "none":
             commitId = re.sub(r"^refs/tags/", "", commitId)  # git-clone -b doesn't like refs/tags/
             args.insert(0, commitId)  # Checkout branch right away
             args.insert(0, "-b")
 
-        exitcode = Util.run_logged(module, "git-clone", module.getSourceDir(), ["git", "clone", "--recursive", *args])
+        exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
         if not exitcode == 0:
             BuildException.croak_runtime("Failed to make initial clone of $module")
 
-        ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", git_repo)
+        ipc.notify_persistent_option_change(module.name, "git-cloned-repository", git_repo)
 
         Util.p_chdir(srcdir)
 
         # Setup user configuration
-        if name := module.getOption("git-user"):
+        if name := module.get_option("git-user"):
             username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
             if not username or not email:
                 BuildException.croak_runtime(f"Invalid username or email for git-user option: {name}" +
@@ -165,13 +165,13 @@ class Updater:
                 logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
         return 1  # success
 
-    def _verifySafeToCloneIntoSourceDir(self, module: Module, srcdir: str) -> None:
+    def _verify_safe_to_clone_into_source_dir(self, module: Module, srcdir: str) -> None:
         """
         Checks that the required source dir is either not already present or is empty.
         Throws an exception if that's not true.
         """
         if os.path.exists(f"{srcdir}") and not os.listdir(srcdir):
-            if module.getOption("#delete-my-patches"):
+            if module.get_option("#delete-my-patches"):
                 logger_updater.warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
                 logger_updater.warning(f"\tRemoving b[{srcdir}]")
                 Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
@@ -196,7 +196,7 @@ class Updater:
                     print(subprocess.check_output(["git", "status", srcdir]))
                 BuildException.croak_runtime("Conflicting source-dir present")
 
-    def updateCheckout(self) -> int:
+    def update_checkout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout
         for git-using modules, as appropriate.
@@ -211,16 +211,16 @@ class Updater:
         # worktree checkout (https://git-scm.com/docs/gitrepository-layout)
         if os.path.exists(f"{srcdir}/.git"):
             # Note that this function will throw an exception on failure.
-            return self.updateExistingClone()
+            return self.update_existing_clone()
         else:
-            self._verifySafeToCloneIntoSourceDir(module, srcdir)
+            self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
-            git_repo = module.getOption("repository")
+            git_repo = module.get_option("repository")
             if not git_repo:
                 BuildException.croak_internal(f"Unable to checkout {module}, you must specify a repository to use.")
 
-            if not self._verifyRefPresent(module, git_repo):
-                if self._moduleIsNeeded():
+            if not self._verify_ref_present(module, git_repo):
+                if self._module_is_needed():
                     BuildException.croak_runtime(f"{module} build was requested, but it has no source code at the requested git branch")
                 else:
                     BuildException.croak_runtime("The required git branch does not exist at the source repository")
@@ -232,23 +232,23 @@ class Updater:
                 return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
 
     @staticmethod
-    def _moduleIsNeeded() -> bool:
+    def _module_is_needed() -> bool:
         """
         Intended to be reimplemented
         """
         return True
 
     @staticmethod
-    def isPushUrlManaged() -> bool:
+    def is_push_url_managed() -> bool:
         """
-        Determine whether _setupRemote should manage the configuration of the git push URL for the repo.
+        Determine whether _setup_remote should manage the configuration of the git push URL for the repo.
 
         Returns:
-             Boolean indicating whether _setupRemote should assume control over the push URL.
+             Boolean indicating whether _setup_remote should assume control over the push URL.
         """
         return False
 
-    def _setupRemote(self, remote: str) -> int:
+    def _setup_remote(self, remote: str) -> int:
         """
         Ensures the given remote is pre-configured for the module's git repository.
         The remote is either set up from scratch or its URLs are updated.
@@ -259,8 +259,8 @@ class Updater:
         Returns 1 or raises exception on an error.
         """
         module = self.module
-        repo = module.getOption("repository")
-        hasOldRemote = self.hasRemote(remote)
+        repo = module.get_option("repository")
+        hasOldRemote = self.has_remote(remote)
 
         if hasOldRemote:
             logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
@@ -274,7 +274,7 @@ class Updater:
                 BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
 
         # If we make it here, no exceptions were thrown
-        if not self.isPushUrlManaged():
+        if not self.is_push_url_managed():
             return 1
 
         # pushInsteadOf does not work nicely with git remote set-url --push
@@ -297,7 +297,7 @@ class Updater:
             BuildException.croak_runtime(f"Unable to remove preconfigured push URL for {module}!")
         return 1  # overall success
 
-    def _setupBestRemote(self) -> str:
+    def _setup_best_remote(self) -> str:
         """
         Selects a git remote for the user's selected repository (preferring a
         defined remote if available, using "origin" otherwise).
@@ -309,17 +309,17 @@ class Updater:
         See also the "repository" module option.
         """
         module = self.module
-        cur_repo = module.getOption("repository")
+        cur_repo = module.get_option("repository")
         ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
 
         # Search for an existing remote name first. If none, add our alias.
-        remoteNames = self.bestRemoteName()
+        remoteNames = self.best_remote_name()
         chosenRemote = remoteNames[0] if remoteNames else Updater.DEFAULT_GIT_REMOTE
 
-        self._setupRemote(chosenRemote)
+        self._setup_remote(chosenRemote)
 
         # Make a notice if the repository we're using has moved.
-        old_repo = module.getPersistentOption("git-cloned-repository")
+        old_repo = module.get_persistent_option("git-cloned-repository")
         if old_repo and (cur_repo != old_repo):
             logger_updater.warning(f" y[b[*]\ty[{module}]'s selected repository has changed")
             logger_updater.warning(f" y[b[*]\tfrom y[{old_repo}]")
@@ -327,10 +327,10 @@ class Updater:
             logger_updater.warning(" y[b[*]\tThe git remote named b[" + Updater.DEFAULT_GIT_REMOTE + "] has been updated")
 
             # Update what we think is the current repository on-disk.
-            ipc.notifyPersistentOptionChange(module.name, "git-cloned-repository", cur_repo)
+            ipc.notify_persistent_option_change(module.name, "git-cloned-repository", cur_repo)
         return chosenRemote
 
-    def _warnIfStashedFromWrongBranch(self, remoteName: str, branch: str, branchName: str) -> bool:
+    def _warn_if_stashed_from_wrong_branch(self, remoteName: str, branch: str, branchName: str) -> bool:
         """
         Returns true if there is a git stash active from the wrong branch, so we
         don't mistakenly try to apply the stash after we switch branch.
@@ -347,7 +347,7 @@ class Updater:
 
         # The result is empty if in 'detached HEAD' state where we should also
         # clearly not switch branches if there are local changes.
-        if module.getOption("#git-was-stashed") and (not existingBranch or (existingBranch != branchName)):
+        if module.get_option("#git-was-stashed") and (not existingBranch or (existingBranch != branchName)):
 
             # Make error message make more sense
             if not existingBranch:
@@ -364,11 +364,11 @@ class Updater:
                 y[b[*] branch will remain unchanged, so it may be out of date from upstream.
                 """))
 
-            self._notifyPostBuildMessage(f" y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")
+            self._notify_post_build_message(f" y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")
             return True
         return False
 
-    def _updateToRemoteHead(self, remoteName: str, branch: str) -> int:
+    def _update_to_remote_head(self, remoteName: str, branch: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to
         a given remote-tracking branch. Any existing local branch with the given
@@ -392,9 +392,9 @@ class Updater:
         # "branch" option requests a given remote head in the user's selected
         # repository. The local branch with "branch" as upstream might have a
         # different name. If there's no local branch this method creates one.
-        branchName = self.getRemoteBranchName(remoteName, branch)
+        branchName = self.get_remote_branch_name(remoteName, branch)
 
-        if self._warnIfStashedFromWrongBranch(remoteName, branch, branchName):
+        if self._warn_if_stashed_from_wrong_branch(remoteName, branch, branchName):
             return 0
 
         croak_reason = None
@@ -402,7 +402,7 @@ class Updater:
         cmd = Util_LoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
 
         if not branchName:
-            newName = self.makeBranchname(remoteName, branch)
+            newName = self.make_branchname(remoteName, branch)
 
             def announcer_sub(_):
                 # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
@@ -440,7 +440,7 @@ class Updater:
             BuildException.croak_runtime(croak_reason)
         return 1  # success
 
-    def _updateToDetachedHead(self, commit: str) -> int:
+    def _update_to_detached_head(self, commit: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to
         a given commit. The local checkout is left in a detached HEAD state,
@@ -469,14 +469,14 @@ class Updater:
         result = result == 0  # need to adapt to boolean success flag
         return result
 
-    def updateExistingClone(self) -> int:
+    def update_existing_clone(self) -> int:
         """
         Updates an already existing git checkout by running git pull.
         Throws an exception on error.
         Returns the number of affected *commits*.
         """
         module = self.module
-        cur_repo = module.getOption("repository")
+        cur_repo = module.get_option("repository")
         result = None
 
         Util.p_chdir((module.fullpath("source")))
@@ -485,7 +485,7 @@ class Updater:
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
             BuildException.croak_runtime(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
-        remoteName = self._setupBestRemote()
+        remoteName = self._setup_best_remote()
         logger_updater.info(f"Fetching remote changes to g[{module}]")
         exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName])
 
@@ -497,10 +497,10 @@ class Updater:
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
-        commitId, commitType = self._determinePreferredCheckoutSource(module)
+        commitId, commitType = self._determine_preferred_checkout_source(module)
         if commitType == "none":
             commitType = "branch"
-            commitId = self._detectDefaultRemoteHead(remoteName)
+            commitId = self._detect_default_remote_head(remoteName)
 
         logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
         start_commit = self.commit_id("HEAD")
@@ -510,7 +510,7 @@ class Updater:
         return ret
 
     @staticmethod
-    def _detectDefaultRemoteHead(remoteName: str) -> str:
+    def _detect_default_remote_head(remoteName: str) -> str:
         """
         Tries to determine the best remote branch name to use as a default if the
         user hasn't selected one, by resolving the remote symbolic ref "HEAD" from
@@ -536,7 +536,7 @@ class Updater:
         head = head.removesuffix("\n")
         return head
 
-    def _determinePreferredCheckoutSource(self, module: Module | None = None) -> tuple:
+    def _determine_preferred_checkout_source(self, module: Module | None = None) -> tuple:
         """
         Goes through all the various combination of git checkout selection options in
         various orders of priority.
@@ -551,7 +551,7 @@ class Updater:
             module = self.module
 
         priorityOrderedSources = [
-            #   option-name    type   getOption-inheritance-flag
+            #   option-name    type   get_option-inheritance-flag
             ["commit", "tag", "module"],
             ["revision", "tag", "module"],
             ["tag", "tag", "module"],
@@ -572,7 +572,7 @@ class Updater:
         checkoutSource = None
         # easiest way to be clear that bool context is intended
 
-        sourceTypeRef = next((x for x in priorityOrderedSources if (checkoutSource := module.getOption(x[0], x[2]))), None)  # Note that we check for truth of getOption, not if it is None, because we want to treat empty string also as false
+        sourceTypeRef = next((x for x in priorityOrderedSources if (checkoutSource := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
 
         # The user has no clear desire here (either set for the module or globally.
         # Note that the default config doesn't generate a global 'branch' setting).
@@ -586,10 +586,10 @@ class Updater:
         # currently the branch-group to be resolved.
         if sourceTypeRef[0] == "branch-group":
             Util.assert_isa(self, Updater_KDEProject)
-            checkoutSource = self._resolveBranchGroup(checkoutSource)
+            checkoutSource = self._resolve_branch_group(checkoutSource)
 
             if not checkoutSource:
-                branchGroup = module.getOption("branch-group")
+                branchGroup = module.get_option("branch-group")
                 logger_updater.debug(f"No specific branch set for {module} and {branchGroup}, using master!")
                 checkoutSource = "master"
 
@@ -599,7 +599,7 @@ class Updater:
         return checkoutSource, sourceTypeRef[1]
 
     @staticmethod
-    def _hasSubmodules() -> bool:
+    def _has_submodules() -> bool:
         """
         Tries to check whether the git module is using submodules or not. Currently,
         we just check the .git/config file (using git-config) to determine whether
@@ -613,12 +613,12 @@ class Updater:
         return len(configLines) > 0
 
     @staticmethod
-    def _splitUri(uri) -> tuple:
+    def _split_uri(uri) -> tuple:
         match = re.match(r"(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?", uri)
         scheme, authority, path, query, fragment = match.groups()
         return scheme, authority, path, query, fragment
 
-    def countStash(self, description=None) -> int:
+    def count_stash(self, description=None) -> int:
         module = self.module
 
         if os.path.exists(".git/refs/stash"):
@@ -633,18 +633,18 @@ class Updater:
             logger_updater.debug(f"\tIt appears there is no stash for b[{module}]")
             return 0
 
-    def _notifyPostBuildMessage(self, *args: str) -> None:
+    def _notify_post_build_message(self, *args: str) -> None:
         """
         Wrapper to send a post-build (warning) message via the IPC object.
         This just takes care of the boilerplate to forward its arguments as message.
         """
         module = self.module
-        self.ipc.notifyNewPostBuildMessage(module.name, *args)
+        self.ipc.notify_new_post_build_message(module.name, *args)
 
     def stash_and_update(self, commit_type: str, remote_name: str, commit_id: str) -> int:
         """
         Stashes existing changes if necessary, and then runs appropriate update function
-        (_updateToRemoteHead or _updateToDetachedHead) in order to advance the given module to the desired head.
+        (_update_to_remote_head or _update_to_detached_head) in order to advance the given module to the desired head.
         Finally, if changes were stashed, they are applied and the stash stack is
         popped.
 
@@ -662,7 +662,7 @@ class Updater:
         # first, log the git status prior to kde-builder taking over the reins in the repo
         result = Util.run_logged(module, "git-status-before-update", None, ["git", "status"])
 
-        oldStashCount = self.countStash()
+        oldStashCount = self.count_stash()
 
         # always stash:
         # - also stash untracked files because what if upstream started to track them
@@ -683,7 +683,7 @@ class Updater:
             # We could mark everything as resolved using git add . before stashing,
             # but that might not always be appreciated by people having to figure
             # out what the original merge conflicts were afterwards.
-            self._notifyPostBuildMessage(f"b[{module}] may have local changes that we couldn't handle, so the module was left alone.")
+            self._notify_post_build_message(f"b[{module}] may have local changes that we couldn't handle, so the module was left alone.")
 
             result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
             BuildException.croak_runtime(f"Unable to stash local changes (if any) for {module}, aborting update.")
@@ -692,18 +692,18 @@ class Updater:
         # compare counts (not just testing if there is *any* stash) because there
         # might have been a genuine user's stash already prior to kde-builder
         # taking over the reins in the repo.
-        newStashCount = self.countStash()
+        newStashCount = self.count_stash()
 
-        # mark that we applied a stash so that $updateSub (_updateToRemoteHead or
-        # _updateToDetachedHead) can know not to do dumb things
+        # mark that we applied a stash so that $updateSub (_update_to_remote_head or
+        # _update_to_detached_head) can know not to do dumb things
         if newStashCount != oldStashCount:
-            module.setOption({"#git-was-stashed": True})
+            module.set_option({"#git-was-stashed": True})
 
         # finally, update to remote head
         if commit_type == "branch":
-            result = self._updateToRemoteHead(remote_name, commit_id)
+            result = self._update_to_remote_head(remote_name, commit_id)
         else:
-            result = self._updateToDetachedHead(commit_id)
+            result = self._update_to_detached_head(commit_id)
 
         if result:
             result = 1
@@ -723,7 +723,7 @@ class Updater:
                 message = f"r[b[*] Unable to restore local changes for b[{module}]! " + \
                           f"You should manually inspect the new stash: b[{stashName}]"
                 logger_updater.warning(f"\t{message}")
-                self._notifyPostBuildMessage(message)
+                self._notify_post_build_message(message)
             else:
                 logger_updater.info(f"\tb[*] You had local changes to b[{module}], which have been re-applied.")
 
@@ -731,7 +731,7 @@ class Updater:
 
         return result
 
-    def getRemoteBranchName(self, remoteName: str, branchName: str) -> str:
+    def get_remote_branch_name(self, remoteName: str, branchName: str) -> str:
         """
         This function finds an existing remote-tracking branch name for the
         given repository's named remote. For instance if the user was using the
@@ -771,9 +771,9 @@ class Updater:
                 return thisBranch
         return ""
 
-    def _isPlausibleExistingRemote(self, name: str, url: str, configuredUrl: str) -> bool:
+    def _is_plausible_existing_remote(self, name: str, url: str, configuredUrl: str) -> bool:
         """
-        Filter for bestRemoteName to determine if a given remote name and url looks
+        Filter for best_remote_name to determine if a given remote name and url looks
         like a plausible prior existing remote for a given configured repository URL.
 
         Note that the actual repository fetch URL is not necessarily the same as the
@@ -786,12 +786,12 @@ class Updater:
             configuredUrl: the configured URL for the module (the expected fetch URL).
 
         Returns:
-             Whether the remote will be considered for bestRemoteName
+             Whether the remote will be considered for best_remote_name
         """
         # name - not used, subclasses might want to filter on remote name
         return url == configuredUrl
 
-    def bestRemoteName(self) -> list[str]:
+    def best_remote_name(self) -> list[str]:
         """
         99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
@@ -807,7 +807,7 @@ class Updater:
             will be empty if no remote names were found.
         """
         module = self.module
-        configuredUrl = module.getOption("repository")
+        configuredUrl = module.get_option("repository")
         outputs = []
 
         # The Repo URL isn't much good, let's find a remote name to use it with.
@@ -829,7 +829,7 @@ class Updater:
             remoteName = re.sub(r"\.url$", "", remoteName)  # remove the cruft
 
             # Skip other remotes
-            if not self._isPlausibleExistingRemote(remoteName, url, configuredUrl):
+            if not self._is_plausible_existing_remote(remoteName, url, configuredUrl):
                 continue
 
             # Try to avoid "weird" remote names.
@@ -840,7 +840,7 @@ class Updater:
             results.append(remoteName)
         return results
 
-    def makeBranchname(self, remoteName: str, branch: str) -> str:
+    def make_branchname(self, remoteName: str, branch: str) -> str:
         """
         Generates a potential new branch name for the case where we have to set up
         a new remote-tracking branch for a repository/branch. There are several
@@ -917,7 +917,7 @@ class Updater:
         return output
 
     @staticmethod
-    def hasRemote(remote: str) -> bool:
+    def has_remote(remote: str) -> bool:
         """
         Returns true if the git module in the current directory has a remote of the
         name given by the first parameter.
@@ -936,18 +936,18 @@ class Updater:
         return hasRemote
 
     @staticmethod
-    def verifyGitConfig(contextOptions: BuildContext) -> bool:
+    def verify_git_config(contextOptions: BuildContext) -> bool:
         """
         Function to add the "kde:" alias to the user's git config if it's not
         already set.
 
         Call this as a static class function, not as an object method
-        (i.e. Updater_Git.verifyGitConfig, not foo.verifyGitConfig)
+        (i.e. Updater_Git.verify_git_config, not foo.verify_git_config)
 
         Returns:
              False on failure of any sort, True otherwise.
         """
-        protocol = contextOptions.getOption("git-push-protocol") or "git"
+        protocol = contextOptions.get_option("git-push-protocol") or "git"
 
         pushUrlPrefix = ""
         otherPushUrlPrefix = ""

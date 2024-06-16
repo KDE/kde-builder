@@ -27,7 +27,7 @@ def test_prune_under_dir():
     assert os.stat(file).st_mode & new_permissions == new_permissions, "Changed mode to readonly"
 
     ctx = BuildContext()
-    ctx.setOption({"log-dir": os.path.abspath(tmpdir)})
+    ctx.set_option({"log-dir": os.path.abspath(tmpdir)})
     Util.prune_under_directory(ctx, os.path.abspath(tmpdir))
 
     assert not os.path.exists(file), "Known read-only file removed"

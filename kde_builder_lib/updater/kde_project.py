@@ -19,7 +19,7 @@ class Updater_KDEProject(Updater):
     def name() -> str:
         return "proj"
 
-    def _resolveBranchGroup(self, branchGroup) -> str | None:
+    def _resolve_branch_group(self, branchGroup) -> str | None:
         """
         Resolves the requested branch-group for this Updater's module.
         Returns the required branch name, or None if none is set.
@@ -30,12 +30,12 @@ class Updater_KDEProject(Updater):
         # If we're using a logical group we need to query the global build context
         # to resolve it.
         ctx = module.context
-        resolver = ctx.moduleBranchGroupResolver()
-        modulePath = module.fullProjectPath()
-        return resolver.findModuleBranch(modulePath, branchGroup)
+        resolver = ctx.module_branch_group_resolver()
+        modulePath = module.full_project_path()
+        return resolver.find_module_branch(modulePath, branchGroup)
 
     # @override(check_signature=False)
-    def _moduleIsNeeded(self) -> bool:
+    def _module_is_needed(self) -> bool:
         """
         Reimplementation
         """
@@ -45,14 +45,14 @@ class Updater_KDEProject(Updater):
         # module info from rc-file in first place to select it from cmdline.
         # Basically if user asks for it on cmdline directly or in rc-file directly
         # then we need to try to grab it...
-        if (module.getOption("#selected-by", "module") or "") != "name" and (module.getOption("#found-by", "module") or "") == "wildcard":
+        if (module.get_option("#selected-by", "module") or "") != "name" and (module.get_option("#found-by", "module") or "") == "wildcard":
             return False
 
         return True
 
     @staticmethod
     # @override(check_signature=False)
-    def _isPlausibleExistingRemote(name: str, url: str, configuredUrl: str) -> bool:
+    def _is_plausible_existing_remote(name: str, url: str, configuredUrl: str) -> bool:
         """
         Reimplementation
         """
@@ -61,7 +61,7 @@ class Updater_KDEProject(Updater):
 
     @staticmethod
     # @override
-    def isPushUrlManaged() -> bool:
+    def is_push_url_managed() -> bool:
         """
         Reimplementation
         """

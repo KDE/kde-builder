@@ -10,8 +10,8 @@ def test_ossupport():
     """
     Test OSSupport
     """
-    # Unit test of _readOSRelease
-    kvPairs = OSSupport._readOSRelease("tests/integration/fixtures/os-release")
+    # Unit test of _read_os_release
+    kvPairs = OSSupport._read_os_release("tests/integration/fixtures/os-release")
     assert len(kvPairs) == 4, "Right number of key/value pairs"
     opts = {kvPair[0]: kvPair[1] for kvPair in kvPairs.items()}
     assert opts["NAME"] == "Totally Valid Name", "Right NAME"
@@ -22,7 +22,7 @@ def test_ossupport():
     # Use tests
     os = OSSupport("tests/integration/fixtures/os-release")
     assert isinstance(os, OSSupport)
-    assert os.bestDistroMatch(["arch", "kde-builder", "sabayon"]) == "kde-builder", "ID preferred"
-    assert os.bestDistroMatch(["ubuntu", "fedora", "gentoo"]) == "gentoo", "ID_LIKE respected"
-    assert os.bestDistroMatch(["fedora", "gentoo", "gentoo-hardened", "sabayon"]) == "sabayon", "ID_LIKE preference order proper"
-    assert os.vendorID() == "kde-builder", "Right ID"
+    assert os.best_distro_match(["arch", "kde-builder", "sabayon"]) == "kde-builder", "ID preferred"
+    assert os.best_distro_match(["ubuntu", "fedora", "gentoo"]) == "gentoo", "ID_LIKE respected"
+    assert os.best_distro_match(["fedora", "gentoo", "gentoo-hardened", "sabayon"]) == "sabayon", "ID_LIKE preference order proper"
+    assert os.vendor_id() == "kde-builder", "Right ID"

@@ -20,21 +20,21 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
 
     @staticmethod
     # @override
-    def requiredPrograms() -> list[str]:
+    def required_programs() -> list[str]:
         return ["c++", "make"]
 
     # @override
-    def configureInternal(self) -> bool:
+    def configure_internal(self) -> bool:
         """
         Return value style: boolean
         """
         module = self.module
         sourcedir = module.fullpath("source")
-        installdir = module.installationPath()
+        installdir = module.installation_path()
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        bootstrapOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
+        bootstrapOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
 
         builddir = module.fullpath("build")
 

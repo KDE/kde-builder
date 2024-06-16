@@ -49,14 +49,14 @@ def test_option_reading(monkeypatch):
     scm = moduleList[3].scm()
     assert isinstance(scm, Updater)
 
-    branch, sourcetype = scm._determinePreferredCheckoutSource()
+    branch, sourcetype = scm._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/fake-tag5", "Right tag name"
     assert sourcetype == "tag", "Result came back as a tag"
 
     # setmod2 is second module in set of 3 at start, should be second overall
     assert moduleList[1].name == "setmod2", "Right module name from module-set"
-    branch, sourcetype = moduleList[1].scm()._determinePreferredCheckoutSource()
+    branch, sourcetype = moduleList[1].scm()._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/tag-setmod2", "Right tag name (options block)"
     assert sourcetype == "tag", "options block came back as tag"
@@ -65,10 +65,10 @@ def test_option_reading(monkeypatch):
     # into build system.
 
     # Override auto-detection since no source is downloaded
-    moduleList[1].setOption({"override-build-system": "kde"})
+    moduleList[1].set_option({"override-build-system": "kde"})
 
     # Should do nothing in --pretend
-    assert moduleList[1].setupBuildSystem(), "setup fake build system"
+    assert moduleList[1].setup_build_system(), "setup fake build system"
 
     assert CMD, "run_logged_p cmake was called"
     assert len(CMD) == 12
@@ -87,5 +87,5 @@ def test_option_reading(monkeypatch):
     assert CMD[11] == f"""-DCMAKE_INSTALL_PREFIX={os.environ.get("HOME")}/kde/usr""", "Prefix is passed to cmake"
 
     # See https://phabricator.kde.org/D18165
-    assert moduleList[0].getOption("cxxflags") == "", "empty cxxflags renders with no whitespace in module"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    assert moduleList[0].get_option("cxxflags") == "", "empty cxxflags renders with no whitespace in module"
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

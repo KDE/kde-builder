@@ -64,40 +64,40 @@ class ModuleSet(OptionsBase):
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
 
-    def modulesToFind(self) -> list[str]:
+    def modules_to_find(self) -> list[str]:
         return self.module_search_decls
 
-    def setModulesToFind(self, moduleDecls: list[str]) -> None:
+    def set_modules_to_find(self, moduleDecls: list[str]) -> None:
         declOrder = {moduleDecls[i]: i for i in range(len(moduleDecls))}
 
         self.module_search_decls = moduleDecls
         self.module_order = declOrder
 
-    def moduleNamesToFind(self) -> list[str]:
+    def module_names_to_find(self) -> list[str]:
         """
-        Same as modulesToFind, but strips away any path components to leave just
+        Same as modules_to_find, but strips away any path components to leave just
         module names.
         E.g. a "use-modules kde/kdelibs juk.git" would give (kdelibs, juk) as the
         result list.
         """
-        ret = [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modulesToFind()]
+        ret = [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modules_to_find()]
         return ret
 
-    def modulesToIgnore(self) -> list[str]:
+    def modules_to_ignore(self) -> list[str]:
         return self.module_ignore_decls
 
-    def addModulesToIgnore(self, moduleDecls: list[str]) -> None:
+    def add_modules_to_ignore(self, moduleDecls: list[str]) -> None:
         self.module_ignore_decls.extend(moduleDecls)
 
-    def _initializeNewModule(self, newModule: Module) -> None:
+    def _initialize_new_module(self, newModule: Module) -> None:
         """
         Should be called for each new ``Module`` created in order to set up common
         module options.
         """
-        newModule.setModuleSet(self)
-        newModule.setScmType("git")
+        newModule.set_module_set(self)
+        newModule.set_scm_type("git")
         newModule.phases.reset_to(self.phase_list.phaselist)
-        newModule.mergeOptionsFrom(self)
+        newModule.merge_options_from(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based
         # on order the user declared modules in use-modules, especially for third
@@ -109,9 +109,9 @@ class ModuleSet(OptionsBase):
         newModule.create_id = startOrder + orderInList
 
     # @override
-    def setOption(self, options: dict) -> None:
+    def set_option(self, options: dict) -> None:
         """
-        Handles module-set specific options for OptionsBase's setOption
+        Handles module-set specific options for OptionsBase's set_option
         """
 
         # Special-case handling
@@ -122,7 +122,7 @@ class ModuleSet(OptionsBase):
                 logger_moduleset.error("in the y[use-modules] entry.")
                 raise BuildException_Config("use-modules", "Invalid use-modules")
 
-            self.setModulesToFind(modules)
+            self.set_modules_to_find(modules)
             del options["use-modules"]
 
         if "ignore-modules" in options:
@@ -132,13 +132,13 @@ class ModuleSet(OptionsBase):
                 logger_moduleset.error("in the y[ignore-modules] entry.")
                 raise BuildException_Config("ignore-modules", "Invalid ignore-modules")
 
-            self.addModulesToIgnore(modules)
+            self.add_modules_to_ignore(modules)
             del options["ignore-modules"]
 
         # Actually set options.
-        OptionsBase.setOption(self, options)
+        OptionsBase.set_option(self, options)
 
-    def convertToModules(self, ctx: BuildContext) -> list[Module]:
+    def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
         available in order to convert this module set to a list of Module.
@@ -149,28 +149,28 @@ class ModuleSet(OptionsBase):
         optionsRef = self.options
 
         # Note: This returns a hashref, not a string.
-        repoSet = ctx.getOption("git-repository-base")
+        repoSet = ctx.get_option("git-repository-base")
 
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no 'search' or 'ignore' to
         # handle, just create `Module` and dump options into them.
-        for moduleItem in self.modulesToFind():
+        for moduleItem in self.modules_to_find():
             moduleName = moduleItem
             moduleName = re.sub(r"\.git$", "", moduleName)
 
             newModule = Module(ctx, moduleName)
 
-            self._initializeNewModule(newModule)
+            self._initialize_new_module(newModule)
 
             moduleList.append(newModule)
 
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
             selectedRepo = repoSet[optionsRef["repository"]]
-            newModule.setOption({"repository": selectedRepo + moduleItem})
+            newModule.set_option({"repository": selectedRepo + moduleItem})
 
-        if not self.modulesToFind():
+        if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
             logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 

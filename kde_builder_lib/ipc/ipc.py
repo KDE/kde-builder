@@ -59,39 +59,39 @@ class IPC:
         self.updates_done = 0
         self.opt_update_handler = None  # Callback for persistent option changes
 
-    def notifyPersistentOptionChange(self, moduleName: str, optName: str, optValue: str) -> None:
+    def notify_persistent_option_change(self, moduleName: str, optName: str, optValue: str) -> None:
         """
         Sends a message to the main/build process that a persistent option for the
         given module name must be changed. For use by processes that do not control
         the persistent option store upon shutdown.
         """
-        self.sendIPCMessage(IPC.MODULE_PERSIST_OPT, f"{moduleName},{optName},{optValue}")
+        self.send_ipc_message(IPC.MODULE_PERSIST_OPT, f"{moduleName},{optName},{optValue}")
 
-    def notifyNewPostBuildMessage(self, moduleName: str, msg) -> None:
+    def notify_new_post_build_message(self, moduleName: str, msg) -> None:
         """
         Sends a message to the main/build process that a given message should be
         shown to the user at the end of the build.
         """
-        self.sendIPCMessage(IPC.MODULE_POSTBUILD_MSG, f"{moduleName},{msg}")
+        self.send_ipc_message(IPC.MODULE_POSTBUILD_MSG, f"{moduleName},{msg}")
 
-    def notifyUpdateSuccess(self, module: str, msg: str) -> None:
-        self.sendIPCMessage(IPC.MODULE_SUCCESS, f"{module},{msg}")
+    def notify_update_success(self, module: str, msg: str) -> None:
+        self.send_ipc_message(IPC.MODULE_SUCCESS, f"{module},{msg}")
 
-    def setLoggedModule(self, moduleName: str) -> None:
-        # Sets which module messages stored by sendLogMessage are supposed to be
+    def set_logged_module(self, moduleName: str) -> None:
+        # Sets which module messages stored by send_log_message are supposed to be
         # associated with.
         self.logged_module = moduleName
 
-    def sendLogMessage(self, logger_name: str, message_level: str, msg: str) -> None:
+    def send_log_message(self, logger_name: str, message_level: str, msg: str) -> None:
         """
         Sends a message to be logged by the process holding the TTY.
-        The logged message is associated with the module set by setLoggedModule.
+        The logged message is associated with the module set by set_logged_module.
         """
         loggedModule = self.logged_module
-        self.sendIPCMessage(IPC.MODULE_LOGMSG, f"{loggedModule},{logger_name},{message_level},{msg}")
+        self.send_ipc_message(IPC.MODULE_LOGMSG, f"{loggedModule},{logger_name},{message_level},{msg}")
 
     @staticmethod
-    def _printLoggedMessage(combined_msg: str) -> None:
+    def _print_logged_message(combined_msg: str) -> None:
         """
         Prints the given message out (adjusting to have proper whitespace
         if needed). For use with the log-message forwarding facility.
@@ -101,7 +101,7 @@ class IPC:
             msg = f"\t{msg}"
         kbLogger.print_clr(logger_name, message_level, msg)
 
-    def _updateSeenModulesFromMessage(self, ipcType, buffer) -> str | None:
+    def _update_seen_modules_from_message(self, ipcType, buffer) -> str | None:
         """
         Called any time we're waiting for an IPC message from a sub process. This can
         occur during a module build (waiting for messages from update process) or
@@ -168,7 +168,7 @@ class IPC:
             BuildException.croak_internal(f"Unhandled IPC type: {ipcType}")
         return message
 
-    def setPersistentOptionHandler(self, handler: Callable) -> None:
+    def set_persistent_option_handler(self, handler: Callable) -> None:
         """
         Used to assign a callback / function to use for updating persistent
         options based on IPC update messages. The function should itself take a
@@ -176,22 +176,22 @@ class IPC:
         """
         self.opt_update_handler = handler
 
-    def refreshReasonFor(self, module: str) -> str:
+    def refresh_reason_for(self, module: str) -> str:
         """
         Returns a text reason to refresh a non-updated module, or an empty string if
         the module has been updated or has not yet been seen.
         """
         return self.why_refresh.get(module, "")
 
-    def waitForEnd(self) -> None:
-        self.waitForStreamStart()
+    def wait_for_end(self) -> None:
+        self.wait_for_stream_start()
         while not self.no_update and not self.updates_done:
-            ipcType, buffer = self.receiveIPCMessage()
+            ipcType, buffer = self.receive_ipc_message()
             ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
             # We ignore the return value in favor of ->{updates_done}
-            self._updateSeenModulesFromMessage(ipcType, buffer)
+            self._update_seen_modules_from_message(ipcType, buffer)
 
-    def waitForModule(self, module: Module) -> tuple:
+    def wait_for_module(self, module: Module) -> tuple:
         """
         Waits for an update for a module with the given name.
         Returns a list containing whether the module was successfully updated,
@@ -204,7 +204,7 @@ class IPC:
         updated = self.updated
 
         # Wait for the initial phase to complete, if it hasn't.
-        self.waitForStreamStart()
+        self.wait_for_stream_start()
 
         # No update? Just mark as successful
         if self.no_update or not module.phases.has("update"):
@@ -213,9 +213,9 @@ class IPC:
 
         message = None
         while updated.get(moduleName) is None and not self.updates_done:
-            ipcType, buffer = self.receiveIPCMessage()
+            ipcType, buffer = self.receive_ipc_message()
             ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
-            message = self._updateSeenModulesFromMessage(ipcType, buffer)
+            message = self._update_seen_modules_from_message(ipcType, buffer)
 
             # If we have 'global' messages they are probably for the first module and
             # include standard setup messages, etc. Print first and then print module's
@@ -224,18 +224,18 @@ class IPC:
             for item in ["global", moduleName]:
                 if item in messagesRef:  # pl2py: we specifically check if there is such a key
                     for msg in messagesRef[item]:
-                        self._printLoggedMessage(msg)
+                        self._print_logged_message(msg)
                     del messagesRef[item]
 
         # We won't print post-build messages now but we need to save them for when
         # they can be printed.
         if moduleName in self.postbuild_msg:
             for msg in self.postbuild_msg[moduleName]:
-                module.addPostBuildMessage(msg)
+                module.add_post_build_message(msg)
             del self.postbuild_msg[moduleName]
         return updated[moduleName], message
 
-    def outputPendingLoggedMessages(self) -> None:
+    def output_pending_logged_messages(self) -> None:
         """
         Just in case we somehow have messages to display after all modules are
         processed, we have this function to show any available messages near the end
@@ -254,7 +254,7 @@ class IPC:
                     kbLogger.print_clr(logger_name, message_level, msg)
         self.messages = {}
 
-    def forgetModule(self, module: Module) -> None:
+    def forget_module(self, module: Module) -> None:
         """
         Flags the given module as something that can be ignored from now on. For use
         after the module has been waited on
@@ -262,14 +262,14 @@ class IPC:
         modulename = module.name
         del self.updated[modulename]
 
-    def unacknowledgedModules(self) -> dict:
+    def unacknowledged_modules(self) -> dict:
         """
         Returns a dict mapping module *names* to update statuses, for modules that
-        have not already been marked as ignorable using forgetModule()
+        have not already been marked as ignorable using forget_module()
         """
         return self.updated
 
-    def waitForStreamStart(self) -> None:
+    def wait_for_stream_start(self) -> None:
         """
         Waits on the IPC connection until one of the ALL_* IPC codes is returned.
         If IPC.ALL_SKIPPED is returned then the 'no_update' entry will be set in
@@ -291,7 +291,7 @@ class IPC:
         IPC.waited = 1
 
         while ipcType != IPC.ALL_UPDATING:
-            ipcType, buffer = self.receiveIPCMessage()
+            ipcType, buffer = self.receive_ipc_message()
             ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
 
             if not ipcType:
@@ -309,21 +309,21 @@ class IPC:
             elif ipcType != IPC.ALL_UPDATING:
                 BuildException.croak_runtime(f"IPC failure while expecting an update status: Incorrect type: {ipcType}")
 
-    def sendIPCMessage(self, ipcType, msg: str) -> bool:
+    def send_ipc_message(self, ipcType, msg: str) -> bool:
         """
         Sends an IPC message along with some IPC type information.
 
         Parameters:
             ipcType: The IPC type to send.
             msg: The actual message.
-        All remaining parameters are sent to the object's sendMessage()
+        All remaining parameters are sent to the object's send_message()
          procedure.
         """
         encodedMsg = struct.pack("!l", ipcType) + msg.encode("utf-8")
-        return self.sendMessage(encodedMsg)
+        return self.send_message(encodedMsg)
 
     @staticmethod
-    def unpackMsg(msg: bytes) -> tuple:
+    def unpack_msg(msg: bytes) -> tuple:
         """
         Static class function to unpack a message.
 
@@ -336,7 +336,7 @@ class IPC:
         returnType, outBuffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
         return returnType, outBuffer
 
-    def receiveIPCMessage(self) -> tuple:
+    def receive_ipc_message(self) -> tuple:
         """
         Receives an IPC message and decodes it into the message and its
         associated type information.
@@ -346,27 +346,27 @@ class IPC:
         """
         if self.updates_done:
             BuildException.croak_internal("Trying to pull message from closed IPC channel!")
-        msg = self.receiveMessage()
-        return self.unpackMsg(msg) if msg else (None, None)
+        msg = self.receive_message()
+        return self.unpack_msg(msg) if msg else (None, None)
 
     # These must be reimplemented.  They must be able to handle scalars without
     # any extra frills.
 
-    def sendMessage(self, msg: bytes) -> NoReturn:
-        # sendMessage should accept one parameter (the message to send) and return
+    def send_message(self, msg: bytes) -> NoReturn:
+        # send_message should accept one parameter (the message to send) and return
         # true on success, or false on failure.  $! should hold the error information
         # if false is returned.
         BuildException.croak_internal("Unimplemented.")
 
-    def receiveMessage(self) -> NoReturn:
+    def receive_message(self) -> NoReturn:
         """
-        receiveMessage should return a message received from the other side, or
+        receive_message should return a message received from the other side, or
         None for EOF or error.
         """
         BuildException.croak_internal("Unimplemented.")
 
     @staticmethod
-    def supportsConcurrency() -> bool:
+    def supports_concurrency() -> bool:
         """
         Should be reimplemented if default does not apply.
         """

@@ -28,61 +28,61 @@ class RecursiveFH:
         self.current_fn = None  # Current filename
         self.ctx = ctx
 
-        self.pushBasePath(os.path.dirname(rcfile))  # rcfile should already be absolute
+        self.push_base_path(os.path.dirname(rcfile))  # rcfile should already be absolute
 
-    def addFile(self, fh, fn) -> None:
+    def add_file(self, fh, fn) -> None:
         """
         Adds a new filehandle to read config data from.
 
-        This should be called in conjunction with pushBasePath to allow for recursive
+        This should be called in conjunction with push_base_path to allow for recursive
         includes from different folders to maintain the correct notion of the current
         cwd at each recursion level.
         """
         self.filehandles.append(fh)
         self.filenames.append(fn)
-        self.setCurrentFile(fh, fn)
+        self.set_current_file(fh, fn)
 
-    def popFilehandle(self) -> None:
+    def pop_filehandle(self) -> None:
         self.filehandles.pop()
         self.filenames.pop()
         newFh = self.filehandles[-1] if self.filehandles else None
         newFilename = self.filenames[-1] if self.filenames else None
-        self.setCurrentFile(newFh, newFilename)
+        self.set_current_file(newFh, newFilename)
 
-    def currentFilehandle(self):
+    def current_filehandle(self):
         return self.current
 
-    def currentFilename(self):
+    def current_filename(self):
         return self.current_fn
 
-    def setCurrentFile(self, fh, fn) -> None:
+    def set_current_file(self, fh, fn) -> None:
         self.current = fh
         self.current_fn = fn
 
-    def pushBasePath(self, base_path) -> None:
+    def push_base_path(self, base_path) -> None:
         """
         Sets the base directory to use for any future encountered include entries
         that use relative notation, and saves the existing base path (as on a stack).
-        Use in conjunction with addFile, and use popFilehandle and popBasePath
+        Use in conjunction with add_file, and use pop_filehandle and pop_base_path
         when done with the filehandle.
         """
         self.base_path.append(base_path)
 
-    def popBasePath(self):
+    def pop_base_path(self):
         """
         See above
         """
         return self.base_path.pop()
 
-    def currentBasePath(self):
+    def current_base_path(self):
         """
         Returns the current base path to use for relative include declarations.
         """
-        curBase = self.popBasePath()
-        self.pushBasePath(curBase)
+        curBase = self.pop_base_path()
+        self.push_base_path(curBase)
         return curBase
 
-    def readLine(self) -> str | None:
+    def read_line(self) -> str | None:
         """
         Reads the next line of input and returns it.
         If a line of the form "include foo" is read, this function automatically
@@ -98,17 +98,17 @@ class RecursiveFH:
 
         while True:  # READLINE
             line = None
-            fh = self.currentFilehandle()
+            fh = self.current_filehandle()
 
             # Sanity check since different methods might try to read same file reader
             if fh is None:
                 return None
 
             if not (line := fh.readline()):
-                self.popFilehandle()
-                self.popBasePath()
+                self.pop_filehandle()
+                self.pop_base_path()
 
-                fh = self.currentFilehandle()
+                fh = self.current_filehandle()
                 if not fh:
                     return None
 
@@ -159,8 +159,8 @@ class RecursiveFH:
                     sub_var_name = None
 
                 while sub_var_name:
-                    sub_var_value = ctx.getOption(sub_var_name) or ""
-                    if not ctx.hasOption(sub_var_name):
+                    sub_var_value = ctx.get_option(sub_var_name) or ""
+                    if not ctx.has_option(sub_var_name):
                         logger_var_subst.warning(f" *\n * WARNING: {sub_var_name} used in {self.current_fn}:{fh.filelineno()} is not set in global context.\n *")
 
                     logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
@@ -172,7 +172,7 @@ class RecursiveFH:
                     sub_var_name = re.findall(optionRE, filename)[0] if re.findall(optionRE, filename) else None
 
                 newFh = None
-                prefix = self.currentBasePath()
+                prefix = self.current_base_path()
 
                 if filename.startswith("~/"):
                     filename = re.sub(r"^~", os.getenv("HOME"), filename)  # Tilde-expand
@@ -189,8 +189,8 @@ class RecursiveFH:
                     raise BuildException.make_exception("Config", f"Unable to open file '{filename}' which was included from {self.current_fn}:{fh.filelineno()}")
 
                 prefix = os.path.dirname(filename)  # Recalculate base path
-                self.addFile(newFh, filename)
-                self.pushBasePath(prefix)
+                self.add_file(newFh, filename)
+                self.push_base_path(prefix)
 
                 continue
             else:

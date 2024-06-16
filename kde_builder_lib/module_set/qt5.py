@@ -21,29 +21,29 @@ class ModuleSet_Qt5(ModuleSet):
     the magic value "qt-projects", just as "kde-projects" is used for KDE.
     """
 
-    def _makeQt5Module(self, ctx: BuildContext) -> Module:
+    def _make_qt5_module(self, ctx: BuildContext) -> Module:
         Util.assert_isa(ctx, BuildContext)
 
         newModule = Module(ctx, "Qt5")
 
-        self._initializeNewModule(newModule)
+        self._initialize_new_module(newModule)
 
         # Repo URL to the Qt5 "supermodule" that contains the documented
         # init-repository script.
         # See https://wiki.qt.io/Building_Qt_5_from_Git
-        newModule.setOption({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
-        newModule.setScmType("qt5")
-        newModule.setBuildSystem(BuildSystem_Qt5(newModule))
+        newModule.set_option({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
+        newModule.set_scm_type("qt5")
+        newModule.set_build_system(BuildSystem_Qt5(newModule))
 
         # Convert the use-modules/ignore-modules entries into a form appropriate
         # for init-repository's module-subset option.
-        modEntries = list(self.modulesToFind()) + ["-" + i for i in self.modulesToIgnore()]
-        newModule.setOption({"use-qt5-modules": " ".join(modEntries)})
+        modEntries = list(self.modules_to_find()) + ["-" + i for i in self.modules_to_ignore()]
+        newModule.set_option({"use-qt5-modules": " ".join(modEntries)})
 
         return newModule
 
     # @override
-    def convertToModules(self, ctx) -> list[Module]:
+    def convert_to_modules(self, ctx) -> list[Module]:
         """
         This function should be called after options are read and build metadata is
         available in order to convert this module set to a list of ``Module``.
@@ -52,4 +52,4 @@ class ModuleSet_Qt5(ModuleSet):
         "submodules" via the init-repository script so from kde-builder's perspective it
         is handled as a single unit.
         """
-        return [self._makeQt5Module(ctx)]
+        return [self._make_qt5_module(ctx)]

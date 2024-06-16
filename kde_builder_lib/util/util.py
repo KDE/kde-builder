@@ -323,7 +323,7 @@ class Util:
         return return_str
 
     @staticmethod
-    def _setErrorLogfile(module, logfile) -> None:
+    def _set_error_logfile(module, logfile) -> None:
         """
         Function to mark a file as being the error log for a module. This also
         creates a symlink in the module log directory for easy viewing.
@@ -334,13 +334,13 @@ class Util:
         if not logfile:
             return
 
-        logdir = module.getLogDir()
+        logdir = module.get_log_dir()
 
-        if module.hasStickyOption("error-log-file"):
+        if module.has_sticky_option("error-log-file"):
             logger_util.error(f"{module} already has error log set, tried to set to r[b[{logfile}]")
             return
 
-        module.setOption({"#error-log-file": f"{logdir}/{logfile}"})
+        module.set_option({"#error-log-file": f"{logdir}/{logfile}"})
         logger_util.debug(f"Logfile for {module} is {logfile}")
 
         # Setup symlink in the module log directory pointing to the appropriate
@@ -365,7 +365,7 @@ class Util:
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             BuildException.croak_internal(f"Pass only base filename for {module}/{filename}")
-        logpath = module.getLogPath(f"{filename}.log")
+        logpath = module.get_log_path(f"{filename}.log")
 
         # Fork a child, with its stdout connected to CHILD.
         pipe_read, pipe_write = os.pipe()
@@ -415,7 +415,7 @@ class Util:
             setproctitle.setproctitle("kde-builder run_logged_command: " + " ".join(command))
 
             # Apply altered environment variables.
-            module.context.commitEnvironmentChanges()
+            module.context.commit_environment_changes()
 
             signal.signal(signal.SIGPIPE, signal.SIG_IGN)
 
@@ -450,7 +450,7 @@ class Util:
             # Call internal function, name given by $command[1]
             if command[0] == "kde-builder":
                 # No colors!
-                Debug().setColorfulOutput(False)
+                Debug().set_colorful_output(False)
                 logger_util.debug(f"Calling {command[1]}")
 
                 cmd = command[1]
@@ -576,7 +576,7 @@ class Util:
 
         # Do this before we fork so the path is finalized to prevent auto-detection
         # in the child
-        logpath = module.getLogPath(f"{filename}.log")
+        logpath = module.get_log_path(f"{filename}.log")
 
         def subprocess_run(target: Callable) -> int:
             retval = multiprocessing.Value("i", -1)
@@ -597,9 +597,9 @@ class Util:
             retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
 
         exitcode = subprocess_run(func)
-        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.getLogPath(filename + '.log')}\n")
+        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + '.log')}\n")
         if not exitcode == 0:
-            Util._setErrorLogfile(module, f"{filename}.log")
+            Util._set_error_logfile(module, f"{filename}.log")
         return exitcode
 
     @staticmethod
@@ -839,7 +839,7 @@ class Util:
             1 on success, 0 on failure.
         """
 
-        logpath = module.getLogPath("clean-builddir.log")
+        logpath = module.get_log_path("clean-builddir.log")
         log = None
         try:
             log = open(logpath, "w")

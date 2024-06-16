@@ -23,15 +23,15 @@ def test_no_cmdline_override():
     app = Application(args)
     moduleList = app.modules
 
-    assert app.context.getOption("num-cores") == "8", "No cmdline option leaves num-cores value alone"
+    assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
 
     assert len(moduleList) == 4, "Right number of modules"
     assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].getOption("make-options") == "-j4", "make-options base value proper pre-override"
+    assert moduleList[0].get_option("make-options") == "-j4", "make-options base value proper pre-override"
 
     assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].getOption("make-options") == "-j 8", "module-override make-options proper pre-override"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    assert moduleList[3].get_option("make-options") == "-j 8", "module-override make-options proper pre-override"
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_cmdline_makeoption():
@@ -41,18 +41,18 @@ def test_cmdline_makeoption():
     app = Application(args)
     moduleList = app.modules
 
-    assert app.context.getOption("num-cores") == "8", "No cmdline option leaves num-cores value alone"
+    assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
 
     assert len(moduleList) == 4, "Right number of modules"
     assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].getOption("make-options") == "j3", "make-options base value proper post-override"
+    assert moduleList[0].get_option("make-options") == "j3", "make-options base value proper post-override"
 
     # Policy discussion: Should command line options override *all* instances
     # of an option in kdesrc-buildrc? Historically the answer has deliberately
     # been yes, so that's the behavior we enforce.
     assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].getOption("make-options") == "j3", "module-override make-options proper post-override"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    assert moduleList[3].get_option("make-options") == "j3", "module-override make-options proper post-override"
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_cmdline_numcores():
@@ -62,12 +62,12 @@ def test_cmdline_numcores():
     app = Application(args)
     moduleList = app.modules
 
-    assert app.context.getOption("num-cores") == "5", "Updated cmdline option changes global value"
+    assert app.context.get_option("num-cores") == "5", "Updated cmdline option changes global value"
 
     assert len(moduleList) == 4, "Right number of modules"
     assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].getOption("make-options") == "-j4", "make-options base value proper post-override (indirect value)"
+    assert moduleList[0].get_option("make-options") == "-j4", "make-options base value proper post-override (indirect value)"
 
     assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].getOption("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    assert moduleList[3].get_option("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -215,8 +215,7 @@ class Util_LoggedSubprocess:
                 def clbk(line):
                     if line is None:
                         return
-                    # self._sendToParent(subp, line)
-                    self._sendToParent(lines_queue, line.split("\n"))
+                    self._send_to_parent(lines_queue, line.split("\n"))
 
                 callback = clbk
 
@@ -258,12 +257,12 @@ class Util_LoggedSubprocess:
 
         # If an exception was thrown or we didn't succeed, set error log
         if not succeeded:
-            Util._setErrorLogfile(module, f"{filename}.log")
+            Util._set_error_logfile(module, f"{filename}.log")
 
         return exitcode
 
     @staticmethod
-    def _sendToParent(queue, data: list[str]):
+    def _send_to_parent(queue, data: list[str]):
         """
         Sends the given data to the parent process. Our calling code and this
         package must share the same single channel (over the "progress" event).

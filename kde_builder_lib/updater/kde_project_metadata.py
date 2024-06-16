@@ -27,7 +27,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
     def name() -> str:
         return "metadata"
 
-    def ignoredModules(self) -> list[str]:
+    def ignored_modules(self) -> list[str]:
         """
         Returns a list of the full kde-project paths for each module to ignore.
         """
@@ -55,10 +55,10 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
         fh.close()
         return ignoreModules
 
-    def logicalModuleGroups(self) -> dict:
+    def logical_module_groups(self) -> dict:
         """
         If JSON support is present, and the metadata has already been downloaded
-        (e.g. with ``updateInternal``), returns a dict to the logical module group
+        (e.g. with ``update_internal``), returns a dict to the logical module group
         data contained within the kde-build-metadata, decoded from its JSON format.
         See https://community.kde.org/Infrastructure/Project_Metadata
         """
@@ -76,8 +76,8 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
         return json_hashref
 
     # @override(check_signature=False)
-    def updateInternal(self, ipc=IPC_Null()) -> None:
-        if Debug().isTesting():
+    def update_internal(self, ipc=IPC_Null()) -> None:
+        if Debug().is_testing():
             return
 
-        super().updateInternal(ipc)
+        super().update_internal(ipc)

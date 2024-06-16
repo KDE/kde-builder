@@ -82,4 +82,4 @@ def test_install_and_run():
     #     output = subprocess.run("kde-builder --version --pretend").stdout.decode()
     #     assert re.match(r"^kde-builder \d\d\.\d\d\n?$", output), "--version for installed version is appropriate"
     #     os.chdir(curdir)
-    Debug().setPretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
+    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

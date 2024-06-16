@@ -15,13 +15,13 @@ def mock_module(monkeypatch):
         self.count = count
         self.name = name
 
-    # Redefine `Module` to stub getPersistentOption() results
-    def mock_getPersistentOption(self, option):
+    # Redefine `Module` to stub get_persistent_option() results
+    def mock_get_persistent_option(self, option):
         assert option == "failure-count", "only the 'failure-count' should be queried"
         return self.count
 
     monkeypatch.setattr(Module, "__init__", mock__init__)
-    monkeypatch.setattr(Module, "getPersistentOption", mock_getPersistentOption)
+    monkeypatch.setattr(Module, "get_persistent_option", mock_get_persistent_option)
 
 
 def test_debug_order(mock_module):

@@ -25,7 +25,7 @@ class DebugOrderHints:
     """
 
     @staticmethod
-    def _getPhaseScore(phase: str) -> int:
+    def _get_phase_score(phase: str) -> int:
         """
         Assumption: build & install phases are interesting.
         Install is particularly interesting because that should "rarely" fail,
@@ -52,7 +52,7 @@ class DebugOrderHints:
 
     @staticmethod
     def _make_comparison_func(moduleGraph, extraDebugInfo):
-        def _compareDebugOrder(a, b):
+        def _compare_debug_order(a, b):
             # comparison results uses:
             # -1 if a < b
             # 0 if a == b
@@ -117,8 +117,8 @@ class DebugOrderHints:
             # Try and see if there is something 'interesting' that might e.g. indicate
             # issues with the system itself, preventing a successful build.
 
-            phaseA = DebugOrderHints._getPhaseScore(extraDebugInfo["phases"].get(nameA, ""))
-            phaseB = DebugOrderHints._getPhaseScore(extraDebugInfo["phases"].get(nameB, ""))
+            phaseA = DebugOrderHints._get_phase_score(extraDebugInfo["phases"].get(nameA, ""))
+            phaseB = DebugOrderHints._get_phase_score(extraDebugInfo["phases"].get(nameB, ""))
             phase = (phaseB > phaseA) - (phaseB < phaseA)
 
             if phase:
@@ -132,8 +132,8 @@ class DebugOrderHints:
             # someone does not need prodding if they have been working on it
             # for the past X builds or so already.
 
-            failCountA = a.getPersistentOption("failure-count")
-            failCountB = b.getPersistentOption("failure-count")
+            failCountA = a.get_persistent_option("failure-count")
+            failCountB = b.get_persistent_option("failure-count")
             failCount = (failCountA or 0) - (failCountB or 0)
 
             if failCount:
@@ -149,10 +149,10 @@ class DebugOrderHints:
 
             return name
 
-        return _compareDebugOrder
+        return _compare_debug_order
 
     @staticmethod
-    def sortFailuresInDebugOrder(moduleGraph, extraDebugInfo, failuresRef: list[Module]) -> list[Module]:
+    def sort_failures_in_debug_order(moduleGraph, extraDebugInfo, failuresRef: list[Module]) -> list[Module]:
         failures = failuresRef
         prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(moduleGraph, extraDebugInfo)))
         return prioritised

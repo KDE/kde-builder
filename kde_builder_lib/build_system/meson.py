@@ -23,42 +23,42 @@ class BuildSystem_Meson(BuildSystem):
         return "meson"
 
     # @override
-    def configureInternal(self) -> bool:
+    def configure_internal(self) -> bool:
         """
         Return value style: boolean
         """
         module = self.module
         sourcedir = module.fullpath("source")
         buildDir = module.fullpath("build")
-        installdir = module.installationPath()
+        installdir = module.installation_path()
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        setupOptions = Util.split_quoted_on_whitespace(module.getOption("configure-flags", "module") or "")
+        setupOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
 
         exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions])
         return Util.good_exitcode(exitcode)
 
     @staticmethod
     # @override
-    def supportsAutoParallelism() -> bool:
+    def supports_auto_parallelism() -> bool:
         return True  # meson requires ninja so supports this by default
 
     # @override(check_signature=False)
-    def buildInternal(self) -> dict:
-        return super().buildInternal("ninja-options")
+    def build_internal(self) -> dict:
+        return super().build_internal("ninja-options")
 
     @staticmethod
     # @override
-    def buildCommands() -> list[str]:
+    def build_commands() -> list[str]:
         return ["ninja"]
 
     @staticmethod
     # @override
-    def requiredPrograms() -> list[str]:
+    def required_programs() -> list[str]:
         return ["meson", "ninja"]
 
     @staticmethod
     # @override
-    def configuredModuleFileName() -> str:
+    def configured_module_file_name() -> str:
         return "build.ninja"

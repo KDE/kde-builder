@@ -16,12 +16,12 @@ class IPC_Null(IPC):
         self.msgList = []  # List of messages.
 
     # @override(check_signature=False)
-    def sendMessage(self, msg: bytes) -> bool:
+    def send_message(self, msg: bytes) -> bool:
         self.msgList.append(msg)
         return True
 
     # @override(check_signature=False)
-    def receiveMessage(self) -> bytes:
+    def receive_message(self) -> bytes:
         if not len(self.msgList) > 0:
             return b""
         return self.msgList.pop(0)
