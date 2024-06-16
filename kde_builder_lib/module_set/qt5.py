@@ -24,23 +24,23 @@ class ModuleSet_Qt5(ModuleSet):
     def _make_qt5_module(self, ctx: BuildContext) -> Module:
         Util.assert_isa(ctx, BuildContext)
 
-        newModule = Module(ctx, "Qt5")
+        new_module = Module(ctx, "Qt5")
 
-        self._initialize_new_module(newModule)
+        self._initialize_new_module(new_module)
 
         # Repo URL to the Qt5 "supermodule" that contains the documented
         # init-repository script.
         # See https://wiki.qt.io/Building_Qt_5_from_Git
-        newModule.set_option({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
-        newModule.set_scm_type("qt5")
-        newModule.set_build_system(BuildSystem_Qt5(newModule))
+        new_module.set_option({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
+        new_module.set_scm_type("qt5")
+        new_module.set_build_system(BuildSystem_Qt5(new_module))
 
         # Convert the use-modules/ignore-modules entries into a form appropriate
         # for init-repository's module-subset option.
-        modEntries = list(self.modules_to_find()) + ["-" + i for i in self.modules_to_ignore()]
-        newModule.set_option({"use-qt5-modules": " ".join(modEntries)})
+        mod_entries = list(self.modules_to_find()) + ["-" + i for i in self.modules_to_ignore()]
+        new_module.set_option({"use-qt5-modules": " ".join(mod_entries)})
 
-        return newModule
+        return new_module
 
     # @override
     def convert_to_modules(self, ctx) -> list[Module]:

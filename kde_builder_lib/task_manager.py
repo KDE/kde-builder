@@ -75,8 +75,8 @@ class TaskManager:
         result = 0
         ipc = None
 
-        def update_opts_sub(modName, k, v):
-            ctx.set_persistent_option(modName, k, v)
+        def update_opts_sub(mod_name, k, v):
+            ctx.set_persistent_option(mod_name, k, v)
 
         if sys.platform == "darwin":
             # There were reports that macOS does not play well with async mode. See https://invent.kde.org/sdk/kde-builder/-/issues/79
@@ -156,7 +156,7 @@ class TaskManager:
         # which means we can tell the build thread to start.
         ipc.send_ipc_message(IPC.ALL_UPDATING, "starting-updates")
 
-        hadError = 0
+        had_error = 0
         for module in update_list:
             if self.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
@@ -166,7 +166,7 @@ class TaskManager:
 
             # Note that this must be in this order to avoid accidentally not
             # running ->update() from short-circuiting if an error is noted.
-            hadError = not module.update(ipc, ctx) or hadError
+            had_error = not module.update(ipc, ctx) or had_error
 
             # Cache module directories, e.g. to be consumed in kde-builder --run
             # This is needed for --no-async mode where the buildSingleModule won't run
@@ -174,11 +174,11 @@ class TaskManager:
             # only work from within the build process
             module.set_persistent_option("source-dir", module.fullpath("source"))
 
-        ipc.send_ipc_message(IPC.ALL_DONE, f"had_errors: {hadError}")
-        return hadError
+        ipc.send_ipc_message(IPC.ALL_DONE, f"had_errors: {had_error}")
+        return had_error
 
     @staticmethod
-    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, startTimeRef: int) -> str | int:
+    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time_ref: int) -> str | int:
         """
         Builds the given module.
 
@@ -194,27 +194,27 @@ class TaskManager:
         module.set_persistent_option("install-dir", module.installation_path())
 
         fail_count = module.get_persistent_option("failure-count") or 0
-        resultStatus, message = ipc.wait_for_module(module)
+        result_status, message = ipc.wait_for_module(module)
         ipc.forget_module(module)
 
-        if resultStatus == "failed":
+        if result_status == "failed":
             logger_taskmanager.error(f"\tUnable to update r[{module}], build canceled.")
             fail_count += 1
             module.set_persistent_option("failure-count", fail_count)
             return "update"
-        elif resultStatus == "success":
+        elif result_status == "success":
             logger_taskmanager.warning(f"\tSource update complete for g[{module}]: {message}")
-            whyRefresh = ipc.refresh_reason_for(module.name)
-            if whyRefresh:
-                logger_taskmanager.info(f"\t  Rebuilding because {whyRefresh}")
+            why_refresh = ipc.refresh_reason_for(module.name)
+            if why_refresh:
+                logger_taskmanager.info(f"\t  Rebuilding because {why_refresh}")
 
         # Skip actually building a module if the user has selected to skip
         # builds when the source code was not actually updated. But, don't skip
         # if we didn't successfully build last time.
-        elif resultStatus == "skipped" and not module.get_option("build-when-unchanged") and fail_count == 0:
+        elif result_status == "skipped" and not module.get_option("build-when-unchanged") and fail_count == 0:
             logger_taskmanager.warning(f"\tSkipping g[{module}] because its source code has not changed.")
             return 0
-        elif resultStatus == "skipped":
+        elif result_status == "skipped":
             logger_taskmanager.warning(f"\tNo changes to g[{module}] source code, but proceeding to build anyway.")
 
         # If the build gets interrupted, ensure the persistent options that are
@@ -222,7 +222,7 @@ class TaskManager:
         # value to write. If the build succeeds we'll reset to 0 then.
         module.set_persistent_option("failure-count", fail_count + 1)
 
-        startTimeRef = time.time()
+        start_time_ref = time.time()
         if module.build():
             module.set_persistent_option("failure-count", 0)
             return 0
@@ -283,8 +283,8 @@ class TaskManager:
         cur_module = 1
         num_modules = len(modules)
 
-        statusViewer = ctx.status_view
-        statusViewer.number_modules_total(num_modules)
+        status_viewer = ctx.status_view
+        status_viewer.number_modules_total(num_modules)
 
         while modules:
             module = modules.pop(0)
@@ -292,32 +292,32 @@ class TaskManager:
                 logger_taskmanager.warning(f" y[b[* * *] Early exit requested, cancelling build of further modules.")
                 break
 
-            moduleName = module.name
-            moduleSet = module.get_module_set().name
-            modOutput = moduleName
+            module_name = module.name
+            module_set = module.get_module_set().name
+            mod_output = module_name
 
             if logger_buildsystem.isEnabledFor(logging.DEBUG):
-                sysType = module.build_system_type()
-                modOutput += f" (build system {sysType})"
+                sys_type = module.build_system_type()
+                mod_output += f" (build system {sys_type})"
 
-            if moduleSet:
-                moduleSet = f" from g[{moduleSet}]"
+            if module_set:
+                module_set = f" from g[{module_set}]"
 
-            logger_taskmanager.warning(f"Building g[{modOutput}]{moduleSet} ({cur_module}/{num_modules})")
+            logger_taskmanager.warning(f"Building g[{mod_output}]{module_set} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
-            failedPhase = TaskManager._build_single_module(ipc, ctx, module, start_time)
+            failed_phase = TaskManager._build_single_module(ipc, ctx, module, start_time)
             elapsed = Util.prettify_seconds(int(time.time()) - start_time)
 
-            if failedPhase:
+            if failed_phase:
                 # FAILURE
-                ctx.mark_module_phase_failed(failedPhase, module)
-                print(f"{module}: Failed on {failedPhase} after {elapsed}.", file=status_fh)
+                ctx.mark_module_phase_failed(failed_phase, module)
+                print(f"{module}: Failed on {failed_phase} after {elapsed}.", file=status_fh)
 
                 if result == 0:
                     # No failures yet, mark this as resume point
-                    moduleList = ", ".join([f"{elem}" for elem in [module] + modules])
-                    ctx.set_persistent_option("global", "resume-list", moduleList)
+                    module_list = ", ".join([f"{elem}" for elem in [module] + modules])
+                    ctx.set_persistent_option("global", "resume-list", module_list)
                 result = 1
 
                 if module.get_option("stop-on-failure"):
@@ -326,12 +326,12 @@ class TaskManager:
 
                 logfile = module.get_option("#error-log-file")
                 logger_taskmanager.info("\tError log: r[" + logfile)
-                statusViewer.number_modules_failed(1 + statusViewer.number_modules_failed())
+                status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
             else:
                 # Success
                 print(f"{module}: Succeeded after {elapsed}.", file=status_fh)
-                build_done.append(moduleName)  # Make it show up as a success
-                statusViewer.number_modules_succeeded(1 + statusViewer.number_modules_succeeded())
+                build_done.append(module_name)  # Make it show up as a success
+                status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
             cur_module += 1
             print()  # Space things out
 
@@ -340,13 +340,13 @@ class TaskManager:
 
             # Update the symlink in latest to point to this file.
             logdir = ctx.get_subdir_path("log-dir")
-            statusFileLoc = f"{logdir}/latest/build-status"
-            if os.path.islink(statusFileLoc):
-                Util.safe_unlink(statusFileLoc)
+            status_file_loc = f"{logdir}/latest/build-status"
+            if os.path.islink(status_file_loc):
+                Util.safe_unlink(status_file_loc)
 
-            if not os.path.exists(statusFileLoc):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
+            if not os.path.exists(status_file_loc):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
                 try:
-                    os.symlink(outfile, statusFileLoc)
+                    os.symlink(outfile, status_file_loc)
                 except FileNotFoundError:
                     # pl2py: In perl they just ignore the case when the symlink was not successfully created.
                     # This case may happen when you do not have a source directory (the log directory that will contain a symlink),
@@ -386,7 +386,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, monitorToBuildIPC: IPC_Pipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, monitor_to_build_ipc: IPC_Pipe, ctx: BuildContext) -> int:
         """
         This function special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
@@ -400,7 +400,7 @@ class TaskManager:
         other.
 
         Parameters:
-            monitorToBuildIPC: IPC Object to use for sending/receiving update/build status. It must be
+            monitor_to_build_ipc: IPC Object to use for sending/receiving update/build status. It must be
                 an object type that supports IPC concurrency (e.g. IPC_Pipe).
             ctx: Build Context to use, from which the module lists will be determined.
 
@@ -421,15 +421,15 @@ class TaskManager:
             module.get_log_dir()
 
         result = 0
-        monitorPid = os.fork()
-        updaterPid = None
+        monitor_pid = os.fork()
+        updater_pid = None
 
-        if monitorPid == 0:
+        if monitor_pid == 0:
             # child of build (i.e. monitor and updater)
-            updaterToMonitorIPC = IPC_Pipe()
-            updaterPid = os.fork()
+            updater_to_monitor_ipc = IPC_Pipe()
+            updater_pid = os.fork()
 
-            if updaterPid == 0:
+            if updater_pid == 0:
                 # child of monitor (i.e. updater)
 
                 def sigint_handler(sig, frame):
@@ -445,16 +445,16 @@ class TaskManager:
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print(f"[updater process] recv SIGHUP, will end after updating {updaterToMonitorIPC.logged_module} module.")
+                    print(f"[updater process] recv SIGHUP, will end after updating {updater_to_monitor_ipc.logged_module} module.")
                     self.DO_STOP = 1
 
                 signal.signal(signal.SIGHUP, sighup_handler)
 
                 setproctitle.setproctitle("kde-builder-updater")
-                updaterToMonitorIPC.set_sender()
-                Debug().set_ipc(updaterToMonitorIPC)
+                updater_to_monitor_ipc.set_sender()
+                Debug().set_ipc(updater_to_monitor_ipc)
 
-                exitcode = self._handle_updates(updaterToMonitorIPC, ctx)
+                exitcode = self._handle_updates(updater_to_monitor_ipc, ctx)
                 # print("Updater process exiting with code", exitcode)
                 sys.exit(exitcode)
             else:
@@ -479,20 +479,20 @@ class TaskManager:
                     # If we haven't recv'd yet, forward to monitor in case user didn't
                     # send to process group
                     if not self.DO_STOP:
-                        os.kill(updaterPid, signal.SIGHUP)
+                        os.kill(updater_pid, signal.SIGHUP)
                     self.DO_STOP = 1
 
                 signal.signal(signal.SIGHUP, sighup_handler)
 
                 setproctitle.setproctitle("kde-builder-monitor")
-                monitorToBuildIPC.set_sender()
-                updaterToMonitorIPC.set_receiver()
+                monitor_to_build_ipc.set_sender()
+                updater_to_monitor_ipc.set_receiver()
 
-                monitorToBuildIPC.set_logged_module("#monitor#")  # This /should/ never be used...
-                Debug().set_ipc(monitorToBuildIPC)
+                monitor_to_build_ipc.set_logged_module("#monitor#")  # This /should/ never be used...
+                Debug().set_ipc(monitor_to_build_ipc)
 
-                exitcode = self._handle_monitoring(monitorToBuildIPC, updaterToMonitorIPC)
-                os.waitpid(updaterPid, 0)
+                exitcode = self._handle_monitoring(monitor_to_build_ipc, updater_to_monitor_ipc)
+                os.waitpid(updater_pid, 0)
                 # print("Monitor process exiting with code", exitcode)
                 sys.exit(exitcode)
         else:
@@ -506,14 +506,14 @@ class TaskManager:
                 # If we haven't recv'd yet, forward to monitor in case user didn't
                 # send to process group
                 if not self.DO_STOP:
-                    os.kill(monitorPid, signal.SIGHUP)
+                    os.kill(monitor_pid, signal.SIGHUP)
                 self.DO_STOP = 1
 
             signal.signal(signal.SIGHUP, signal_handler)
 
             setproctitle.setproctitle("kde-builder-build")
-            monitorToBuildIPC.set_receiver()
-            result = self._handle_build(monitorToBuildIPC, ctx)
+            monitor_to_build_ipc.set_receiver()
+            result = self._handle_build(monitor_to_build_ipc, ctx)
 
             if result and ctx.get_option("stop-on-failure"):
                 # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
@@ -521,14 +521,14 @@ class TaskManager:
                 # If the monitor process already finished (in Zombie state), sending signal is not harmful (i.e. obviously has no effect, but will not raise exception).
 
                 # print("Asking to stop updates gracefully")
-                os.kill(monitorPid, signal.SIGHUP)
+                os.kill(monitor_pid, signal.SIGHUP)
 
-        monitorToBuildIPC.wait_for_end()
+        monitor_to_build_ipc.wait_for_end()
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseenModulesRef = monitorToBuildIPC.unacknowledged_modules()
-        if unseenModulesRef:
+        unseen_modules_ref = monitor_to_build_ipc.unacknowledged_modules()
+        if unseen_modules_ref:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
             # should only happen under --stop-on-failure if an early build fails.
@@ -538,11 +538,11 @@ class TaskManager:
             # one-by-one the modules that successfully updated.
             logger_taskmanager.debug("Some modules were updated but not built")
 
-        pid, status = os.waitpid(monitorPid, 0)
+        pid, status = os.waitpid(monitor_pid, 0)
         if os.WEXITSTATUS(status) != 0:
             result = 1
 
-        monitorToBuildIPC.close()
+        monitor_to_build_ipc.close()
         return result
 
     @staticmethod
@@ -562,15 +562,15 @@ class TaskManager:
         if ctx.get_option("disable-agent-check"):
             return True
 
-        gitServers = [module for module in ctx.modules_in_phase("update") if module.scm_type() == "git"]
+        git_servers = [module for module in ctx.modules_in_phase("update") if module.scm_type() == "git"]
 
-        sshServers = []
-        for gitserver in gitServers:
+        ssh_servers = []
+        for gitserver in git_servers:
             if url := urlparse(gitserver.get_option("repository")):  # Check for git+ssh:// or git@git.kde.org:/path/etc.
                 if url.scheme == "git+ssh" or url.username == "git" and url.hostname == "git.kde.org":
-                    sshServers.append(gitserver)
+                    ssh_servers.append(gitserver)
 
-        if not sshServers:
+        if not ssh_servers:
             return True
         logger_taskmanager.debug("\tChecking for SSH Agent")
 
@@ -588,23 +588,23 @@ class TaskManager:
             logger_taskmanager.warning(textwrap.dedent(f"""\
                 y[b[ *] SSH Agent is enabled, but y[doesn't seem to be running].
                 y[b[ *] The agent is needed for these modules:
-                y[b[ *]   b[{sshServers}]
+                y[b[ *]   b[{ssh_servers}]
                 y[b[ *] Please check that the agent is running and its environment variables defined
                 """))
             return False
 
         # The agent is running, but does it have any keys?  We can't be more specific
         # with this check because we don't know what key is required.
-        noKeys = 0
+        no_keys = 0
 
         def no_keys_filter(_):
-            nonlocal noKeys
-            if not noKeys:
-                noKeys = "no identities"
+            nonlocal no_keys
+            if not no_keys:
+                no_keys = "no identities"
 
         Util.filter_program_output(no_keys_filter, "ssh-add", "-l")
 
-        if not noKeys:
+        if not no_keys:
             return True
 
         print(Debug().colorize(textwrap.dedent("""\
@@ -613,27 +613,27 @@ class TaskManager:
             running g[ssh-add] for you.  Please type your passphrase at the prompt when
             requested, (or simply Ctrl-C to abort the script).
             """)))
-        commandLine = ["ssh-add"]
-        identFile = ctx.get_option("ssh-identity-file")
-        if identFile:
-            commandLine.append(identFile)
-        result = os.system(commandLine)
+        command_line = ["ssh-add"]
+        ident_file = ctx.get_option("ssh-identity-file")
+        if ident_file:
+            command_line.append(ident_file)
+        result = os.system(command_line)
 
         # Run this code for both death-by-signal and nonzero return
         if result:
-            rcfile = ctx.rcFile()
+            rcfile = ctx.rc_file()
             print(Debug().colorize(textwrap.dedent(f"""
 
                 y[b[*] Unable to add SSH identity, aborting.
                 y[b[*] If you don't want kde-builder to check in the future,
                 y[b[*] Set the g[disable-agent-check] option to g[true] in your {rcfile}.
-            
+
                 """)))
             return False
         return True
 
     @staticmethod
-    def _handle_monitoring(ipcToBuild: IPC_Pipe, ipcFromUpdater: IPC_Pipe) -> int:
+    def _handle_monitoring(ipc_to_build: IPC_Pipe, ipc_from_updater: IPC_Pipe) -> int:
         """
         This is the main function for the monitoring process when using :class:`IPC_Pipe`.
         It reads in all status reports from the source update process and then holds
@@ -645,8 +645,8 @@ class TaskManager:
         to write out its status to the build process (which is usually busy).
 
         Parameters:
-            ipcToBuild: the IPC object to use to send to build process.
-            ipcFromUpdater: the IPC object to use to receive from update process.
+            ipc_to_build: the IPC object to use to send to build process.
+            ipc_from_updater: the IPC object to use to receive from update process.
 
         Returns:
              0 on success, non-zero on failure.
@@ -655,12 +655,12 @@ class TaskManager:
 
         # We will write to the build process and read from the update process.
 
-        sendFH = ipcToBuild.fh or BuildException.croak_runtime('??? missing pipe to build proc')
-        recvFH = ipcFromUpdater.fh or BuildException.croak_runtime('??? missing pipe from monitor')
+        send_fh = ipc_to_build.fh or BuildException.croak_runtime('??? missing pipe to build proc')
+        recv_fh = ipc_from_updater.fh or BuildException.croak_runtime('??? missing pipe from monitor')
 
         sel = selectors.DefaultSelector()
-        sel.register(recvFH, selectors.EVENT_READ)
-        sel.register(sendFH, selectors.EVENT_WRITE)
+        sel.register(recv_fh, selectors.EVENT_READ)
+        sel.register(send_fh, selectors.EVENT_WRITE)
 
         # Start the loop.  We will be waiting on either read or write ends.
         # Whenever select() returns we must check both sets.
@@ -669,20 +669,20 @@ class TaskManager:
 
             for key, _ in events:  # events is a list of tuples
                 # Check for source updates first.
-                if key.fileobj == recvFH:
+                if key.fileobj == recv_fh:
                     try:
-                        msg = ipcFromUpdater.receive_message()
+                        msg = ipc_from_updater.receive_message()
                     except Exception as e:
                         raise e
 
                     if msg == b"":  # means the other side is presumably done
-                        sel.unregister(recvFH)  # Select no longer needed, just output to build.
+                        sel.unregister(recv_fh)  # Select no longer needed, just output to build.
                         break
                     else:
                         msgs.append(msg)
 
                 # Now check for build updates.
-                if key.fileobj == sendFH:
+                if key.fileobj == send_fh:
                     # If we're here the update is still going.  If we have no messages
                     # to send wait for that first.
                     if not msgs:
@@ -690,14 +690,14 @@ class TaskManager:
                     else:
                         # Send the message (if we got one).
                         while msgs:
-                            if not ipcToBuild.send_message(msgs.pop(0)):
+                            if not ipc_to_build.send_message(msgs.pop(0)):
                                 logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                                 return 1
 
-        sel.unregister(sendFH)  # stop watching the write pipe
+        sel.unregister(send_fh)  # stop watching the write pipe
         # Send all remaining messages.
         for msg in msgs:
-            if not ipcToBuild.send_message(msg):
+            if not ipc_to_build.send_message(msg):
                 logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                 return 1
         return 0

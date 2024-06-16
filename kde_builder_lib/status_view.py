@@ -29,50 +29,50 @@ class StatusView:
         self.mod_failed = 0
         self.mod_success = 0
 
-    def set_status(self, newStatus) -> None:
+    def set_status(self, new_status) -> None:
         """
         Sets the "base" message to show as part of the update. E.g. "Compiling..."
         """
-        self.status = Debug().colorize(newStatus)
+        self.status = Debug().colorize(new_status)
 
-    def set_progress(self, newProgress) -> None:
+    def set_progress(self, new_progress) -> None:
         """
         Sets the amount of progress made vs. the total progress possible.
         """
-        oldProgress = self.cur_progress
-        self.cur_progress = newProgress
+        old_progress = self.cur_progress
+        self.cur_progress = new_progress
 
-        if oldProgress != newProgress:
+        if old_progress != new_progress:
             self.update()
 
-    def set_progress_total(self, newProgressTotal) -> None:
+    def set_progress_total(self, new_progress_total) -> None:
         """
         Sets the total amount of progress deemed possible.
         """
-        self.progress_total = newProgressTotal
+        self.progress_total = new_progress_total
 
-    def number_modules_total(self, newTotal: int = None) -> int:
+    def number_modules_total(self, new_total: int = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules to be built.
         """
-        if newTotal:
-            self.mod_total = newTotal
+        if new_total:
+            self.mod_total = new_total
         return self.mod_total
 
-    def number_modules_succeeded(self, newTotal: int | None = None) -> int:
+    def number_modules_succeeded(self, new_total: int | None = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules built successfully.
         """
-        if newTotal:
-            self.mod_success = newTotal
+        if new_total:
+            self.mod_success = new_total
         return self.mod_success
 
-    def number_modules_failed(self, newTotal: int | None = None) -> int:
+    def number_modules_failed(self, new_total: int | None = None) -> int:
         """
         Gets (or sets, if arg provided) number of modules not built successfully.
         """
-        if newTotal:
-            self.mod_failed = newTotal
+        if new_total:
+            self.mod_failed = new_total
         return self.mod_failed
 
     def update(self) -> None:

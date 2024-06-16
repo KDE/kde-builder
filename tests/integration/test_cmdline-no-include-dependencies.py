@@ -13,7 +13,7 @@ from kde_builder_lib.debug import Debug
 def mock_application(monkeypatch):
     # Redefine Application._resolveModuleDependencies to avoid requiring metadata module.
     def mock_resolve_module_dependency_graph(self, modules: list):
-        newModule = self.module_factory("setmod2")
+        new_module = self.module_factory("setmod2")
 
         graph = {
             "setmod1": {
@@ -29,7 +29,7 @@ def mock_application(monkeypatch):
                     "setmod3": 1
                 },
                 "build": bool(self.context.get_option("include-dependencies")),
-                "module": newModule
+                "module": new_module
             },
             "setmod3": {
                 "votes": {},
@@ -53,20 +53,20 @@ def test_no_include_deps(mock_application):
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc-with-deps --no-include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 2, "Right number of modules (include-dependencies)"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[1].name == "setmod3", "mod list[2] == setmod3"
+    assert len(module_list) == 2, "Right number of modules (include-dependencies)"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[1].name == "setmod3", "mod list[2] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_no_include_deps_ignore_modules(mock_application):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc-with-deps --no-include-dependencies setmod1 setmod3 --ignore-modules setmod2".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 2, "Right number of modules (include-dependencies+ignore-modules)"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[1].name == "setmod3", "mod list[1] == setmod3"
+    assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-modules)"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[1].name == "setmod3", "mod list[1] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -67,11 +67,11 @@ class ModuleSet(OptionsBase):
     def modules_to_find(self) -> list[str]:
         return self.module_search_decls
 
-    def set_modules_to_find(self, moduleDecls: list[str]) -> None:
-        declOrder = {moduleDecls[i]: i for i in range(len(moduleDecls))}
+    def set_modules_to_find(self, module_decls: list[str]) -> None:
+        decl_order = {module_decls[i]: i for i in range(len(module_decls))}
 
-        self.module_search_decls = moduleDecls
-        self.module_order = declOrder
+        self.module_search_decls = module_decls
+        self.module_order = decl_order
 
     def module_names_to_find(self) -> list[str]:
         """
@@ -86,27 +86,27 @@ class ModuleSet(OptionsBase):
     def modules_to_ignore(self) -> list[str]:
         return self.module_ignore_decls
 
-    def add_modules_to_ignore(self, moduleDecls: list[str]) -> None:
-        self.module_ignore_decls.extend(moduleDecls)
+    def add_modules_to_ignore(self, module_decls: list[str]) -> None:
+        self.module_ignore_decls.extend(module_decls)
 
-    def _initialize_new_module(self, newModule: Module) -> None:
+    def _initialize_new_module(self, new_module: Module) -> None:
         """
         Should be called for each new ``Module`` created in order to set up common
         module options.
         """
-        newModule.set_module_set(self)
-        newModule.set_scm_type("git")
-        newModule.phases.reset_to(self.phase_list.phaselist)
-        newModule.merge_options_from(self)
+        new_module.set_module_set(self)
+        new_module.set_scm_type("git")
+        new_module.phases.reset_to(self.phase_list.phaselist)
+        new_module.merge_options_from(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based
         # on order the user declared modules in use-modules, especially for third
         # party modules. Indirect deps won't have an entry and are given the max value
         # to sort at the end within the module-set.
-        startOrder = self.create_id if self.create_id else 0
+        start_order = self.create_id if self.create_id else 0
 
-        orderInList = self.module_order.get(f"{newModule}", len(self.module_search_decls))
-        newModule.create_id = startOrder + orderInList
+        order_in_list = self.module_order.get(f"{new_module}", len(self.module_search_decls))
+        new_module.create_id = start_order + order_in_list
 
     # @override
     def set_option(self, options: dict) -> None:
@@ -145,33 +145,33 @@ class ModuleSet(OptionsBase):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        moduleList = []  # module names converted to `Module` objects.
-        optionsRef = self.options
+        module_list = []  # module names converted to `Module` objects.
+        options_ref = self.options
 
         # Note: This returns a hashref, not a string.
-        repoSet = ctx.get_option("git-repository-base")
+        repo_set = ctx.get_option("git-repository-base")
 
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no 'search' or 'ignore' to
         # handle, just create `Module` and dump options into them.
-        for moduleItem in self.modules_to_find():
-            moduleName = moduleItem
-            moduleName = re.sub(r"\.git$", "", moduleName)
+        for module_item in self.modules_to_find():
+            module_name = module_item
+            module_name = re.sub(r"\.git$", "", module_name)
 
-            newModule = Module(ctx, moduleName)
+            new_module = Module(ctx, module_name)
 
-            self._initialize_new_module(newModule)
+            self._initialize_new_module(new_module)
 
-            moduleList.append(newModule)
+            module_list.append(new_module)
 
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
-            selectedRepo = repoSet[optionsRef["repository"]]
-            newModule.set_option({"repository": selectedRepo + moduleItem})
+            selected_repo = repo_set[options_ref["repository"]]
+            new_module.set_option({"repository": selected_repo + module_item})
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
             logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 
-        return moduleList
+        return module_list

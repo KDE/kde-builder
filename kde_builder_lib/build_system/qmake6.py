@@ -63,17 +63,17 @@ class BuildSystem_QMake6(BuildSystem):
         builddir = module.fullpath("build")
         sourcedir = builddir if self.needs_builddir_hack() else module.fullpath("source")
 
-        qmakeOpts = module.get_option("qmake-options").split(" ")
-        qmakeOpts = [el for el in qmakeOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
-        projectFiles = glob.glob(f"{sourcedir}/*.pro")
+        qmake_opts = module.get_option("qmake-options").split(" ")
+        qmake_opts = [el for el in qmake_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
+        project_files = glob.glob(f"{sourcedir}/*.pro")
 
-        if not projectFiles and Debug().pretending():
-            projectFiles = [f"{module}.pro"]
+        if not project_files and Debug().pretending():
+            project_files = [f"{module}.pro"]
 
-        if not projectFiles or not projectFiles[0]:
+        if not project_files or not project_files[0]:
             BuildException.croak_internal(f"No *.pro files could be found for {module}")
 
-        if len(projectFiles) > 1:
+        if len(project_files) > 1:
             logger_buildsystem.error(f" b[r[*] Too many possible *.pro files for {module}")
             return False
 
@@ -84,4 +84,4 @@ class BuildSystem_QMake6(BuildSystem):
 
         logger_buildsystem.info("\tRunning g[qmake]...")
 
-        return Util.good_exitcode(Util.run_logged(module, "qmake", builddir, [qmake, *qmakeOpts, projectFiles[0]]))
+        return Util.good_exitcode(Util.run_logged(module, "qmake", builddir, [qmake, *qmake_opts, project_files[0]]))

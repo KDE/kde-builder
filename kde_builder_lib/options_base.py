@@ -100,27 +100,27 @@ class OptionsBase:
             del options["set-env"]
 
         # Special-case handling
-        repoOption = "git-repository-base"
-        if repoOption in options:
-            value = options[repoOption]
+        repo_option = "git-repository-base"
+        if repo_option in options:
+            value = options[repo_option]
 
             if isinstance(value, dict):
                 # The case when we merge the constructed OptionBase module (from the config) into the BuildContext. The type of $value is a hash (dict).
                 for key in value.keys():
-                    self.options[repoOption][key] = value[key]
-                del options[repoOption]
+                    self.options[repo_option][key] = value[key]
+                del options[repo_option]
             else:
                 match = re.match(r"^([a-zA-Z0-9_-]+)\s+(.+)$", value)
                 repo, url = match.group(1), match.group(2)
 
                 if not repo or not url:
-                    raise BuildException_Config(repoOption, f"Invalid git-repository-base setting: {value}")
+                    raise BuildException_Config(repo_option, f"Invalid git-repository-base setting: {value}")
 
-                dictref = self.get_option(repoOption)
+                dictref = self.get_option(repo_option)
                 if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash is empty itself).
                     dictref = {}
                 dictref[repo] = url
-                self.options[repoOption] = dictref
+                self.options[repo_option] = dictref
                 return
 
         # Everything else can be dumped straight into our hash.
@@ -142,8 +142,8 @@ class OptionsBase:
         aliasing the other module's option set.
         """
         Util.assert_isa(other, OptionsBase)
-        newOpts = copy.deepcopy(other.options)
-        self.set_option(newOpts)
+        new_opts = copy.deepcopy(other.options)
+        self.set_option(new_opts)
 
     def _process_set_env_option(self, value) -> None:
         """
@@ -160,5 +160,5 @@ class OptionsBase:
             for key in value:
                 self.options["set-env"][key] = value[key]
         else:
-            var, envValue = value.split(" ", maxsplit=1)
-            self.options["set-env"][var] = envValue
+            var, env_value = value.split(" ", maxsplit=1)
+            self.options["set-env"][var] = env_value

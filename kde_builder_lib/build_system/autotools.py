@@ -34,18 +34,18 @@ class BuildSystem_Autotools(BuildSystem):
         module = self.module
         sourcedir = module.fullpath("source")
 
-        configureCommand = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
-        configureInFile = next((item for item in ["configure.in", "configure.ac"] if os.path.exists(f"{sourcedir}/{item}")), None)
+        configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
+        configure_in_file = next((item for item in ["configure.in", "configure.ac"] if os.path.exists(f"{sourcedir}/{item}")), None)
 
-        if configureCommand != "autogen.sh" and configureInFile:
-            return configureCommand
+        if configure_command != "autogen.sh" and configure_in_file:
+            return configure_command
 
-        # If we have a configure.in or configure.ac but configureCommand is autogen.sh
+        # If we have a configure.in or configure.ac but configure_command is autogen.sh
         # we assume that configure is created by autogen.sh as usual in some GNU Projects.
         # So we run autogen.sh first to create the configure command and
         # recheck for that.
-        if configureInFile and configureCommand == "autogen.sh":
-            exitcode = Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/{configureCommand}"])
+        if configure_in_file and configure_command == "autogen.sh":
+            exitcode = Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/{configure_command}"])
 
             if exitcode != 0:
                 print(f"Autogen failed with exit code {exitcode}")
@@ -63,13 +63,13 @@ class BuildSystem_Autotools(BuildSystem):
                 exit(1)
 
             # Now recheck
-            configureCommand = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
-            return configureCommand
+            configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
+            return configure_command
 
-        if not configureCommand:
+        if not configure_command:
             BuildException.croak_runtime("No configure command available")
 
-        return configureCommand
+        return configure_command
 
     # @override
     def configure_internal(self) -> bool:
@@ -83,11 +83,11 @@ class BuildSystem_Autotools(BuildSystem):
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        bootstrapOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
+        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
         try:
-            configureCommand = self._find_configure_commands()
+            configure_command = self._find_configure_commands()
             Util.p_chdir(module.fullpath("build"))
-            exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configureCommand}", f"--prefix={installdir}", *bootstrapOptions])
+            exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])
             result = exitcode
         except BuildException as err:
             logger_buildsystem.error(f"\tError configuring {module}: r[b[{err}]")

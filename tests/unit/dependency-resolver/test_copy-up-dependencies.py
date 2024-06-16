@@ -15,17 +15,17 @@ def test_vote_for_dependencies():
             "deps": {
                 "b": 1
             },
-            "allDeps": {}
+            "all_deps": {}
         },
         "b": {
             "deps": {
                 "c": 1
             },
-            "allDeps": {}
+            "all_deps": {}
         },
         "c": {
             "deps": {},
-            "allDeps": {}
+            "all_deps": {}
         },
         #
         # an item might depend through multiple (transitive) paths on the same
@@ -36,11 +36,11 @@ def test_vote_for_dependencies():
                 "b": 1,
                 "c": 1
             },
-            "allDeps": {}
+            "all_deps": {}
         },
         "e": {
             "deps": {},
-            "allDeps": {}
+            "all_deps": {}
         }
     }
 
@@ -49,7 +49,7 @@ def test_vote_for_dependencies():
             "deps": {
                 "b": 1
             },
-            "allDeps": {
+            "all_deps": {
                 "done": 1,
                 "items": {
                     "b": 1,
@@ -61,7 +61,7 @@ def test_vote_for_dependencies():
             "deps": {
                 "c": 1
             },
-            "allDeps": {
+            "all_deps": {
                 "done": 1,
                 "items": {
                     "c": 1
@@ -70,7 +70,7 @@ def test_vote_for_dependencies():
         },
         "c": {
             "deps": {},
-            "allDeps": {
+            "all_deps": {
                 "done": 1,
                 "items": {}
             }
@@ -80,7 +80,7 @@ def test_vote_for_dependencies():
                 "b": 1,
                 "c": 1
             },
-            "allDeps": {
+            "all_deps": {
                 "done": 1,
                 "items": {
                     "b": 1,
@@ -90,7 +90,7 @@ def test_vote_for_dependencies():
         },
         "e": {
             "deps": {},
-            "allDeps": {
+            "all_deps": {
                 "done": 1,
                 "items": {}
             }

@@ -58,12 +58,12 @@ def test_build_internal(monkeypatch):
 
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --no-metadata --custom-build-command echo --override-build-system generic".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 4, "Right number of modules"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
+    assert len(module_list) == 4, "Right number of modules"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
 
-    module = moduleList[0]
+    module = module_list[0]
     assert module.get_option("custom-build-command") == "echo", "Custom build command setup"
     assert module.get_option("override-build-system") == "generic", "Custom build system required"
 

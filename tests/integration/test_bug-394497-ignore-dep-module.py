@@ -15,7 +15,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
         """
         Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
         """
-        newModule = self.module_factory("setmod2")
+        new_module = self.module_factory("setmod2")
 
         graph = {}
 
@@ -41,7 +41,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
                         "setmod3": 1
                     },
                     "build": 1,
-                    "module": newModule,
+                    "module": new_module,
                 }
 
         return {"graph": graph}
@@ -52,12 +52,12 @@ def mock_app_res_mod_dep_graph(monkeypatch):
 def test_include_deps(mock_app_res_mod_dep_graph):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 3, "Right number of modules (include-dependencies)"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[1].name == "setmod2", "mod list[1] == setmod2"
-    assert moduleList[2].name == "setmod3", "mod list[2] == setmod3"
+    assert len(module_list) == 3, "Right number of modules (include-dependencies)"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[1].name == "setmod2", "mod list[1] == setmod2"
+    assert module_list[2].name == "setmod3", "mod list[2] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
@@ -68,11 +68,11 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --include-dependencies setmod1 setmod3 --ignore-modules setmod2".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 2, "Right number of modules (include-dependencies+ignore-modules)"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[1].name == "setmod3", "mod list[1] == setmod3"
+    assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-modules)"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[1].name == "setmod3", "mod list[1] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
@@ -83,8 +83,8 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --ignore-modules set1".split(" ")
 
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 1, "Right number of modules (ignore module-set)"
-    assert moduleList[0].name == "module2", "mod list[0] == module2"
+    assert len(module_list) == 1, "Right number of modules (ignore module-set)"
+    assert module_list[0].name == "module2", "mod list[0] == module2"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

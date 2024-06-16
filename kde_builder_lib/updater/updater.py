@@ -49,10 +49,10 @@ class Updater:
         """
         self.ipc = ipc
         err = None
-        numCommits = None
+        num_commits = None
 
         try:
-            numCommits = self.update_checkout()
+            num_commits = self.update_checkout()
         except Exception as _err:
             err = _err
 
@@ -60,7 +60,7 @@ class Updater:
 
         if err:
             raise err
-        return numCommits
+        return num_commits
 
     @staticmethod
     # @override(check_signature=False)
@@ -90,12 +90,12 @@ class Updater:
         return an_id
 
     def _verify_ref_present(self, module: Module, repo: str) -> bool:
-        ref, commitType = self._determine_preferred_checkout_source(module)
+        ref, commit_type = self._determine_preferred_checkout_source(module)
 
         if Debug().pretending():
             return True
 
-        if commitType == "none":
+        if commit_type == "none":
             ref = "HEAD"
 
         process = subprocess.Popen(f"git ls-remote --exit-code {repo} {ref}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -133,11 +133,11 @@ class Updater:
 
         Util.p_chdir(module.get_source_dir())
 
-        commitId, commitType = self._determine_preferred_checkout_source(module)
+        commit_id, commit_type = self._determine_preferred_checkout_source(module)
 
-        if commitType != "none":
-            commitId = re.sub(r"^refs/tags/", "", commitId)  # git-clone -b doesn't like refs/tags/
-            args.insert(0, commitId)  # Checkout branch right away
+        if commit_type != "none":
+            commit_id = re.sub(r"^refs/tags/", "", commit_id)  # git-clone -b doesn't like refs/tags/
+            args.insert(0, commit_id)  # Checkout branch right away
             args.insert(0, "-b")
 
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
@@ -260,9 +260,9 @@ class Updater:
         """
         module = self.module
         repo = module.get_option("repository")
-        hasOldRemote = self.has_remote(remote)
+        has_old_remote = self.has_remote(remote)
 
-        if hasOldRemote:
+        if has_old_remote:
             logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
             exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])
             if not exitcode == 0:
@@ -285,12 +285,12 @@ class Updater:
         # same as updating the push URL directly because of the remote set-url
         # executed previously by this function for the fetch URL.
 
-        existingPushUrl = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
+        existing_push_url = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
 
-        if not existingPushUrl:
+        if not existing_push_url:
             return 1
 
-        logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existingPushUrl}")
+        logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existing_push_url}")
 
         exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
         if not exitcode == 0:
@@ -313,10 +313,10 @@ class Updater:
         ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
 
         # Search for an existing remote name first. If none, add our alias.
-        remoteNames = self.best_remote_name()
-        chosenRemote = remoteNames[0] if remoteNames else Updater.DEFAULT_GIT_REMOTE
+        remote_names = self.best_remote_name()
+        chosen_remote = remote_names[0] if remote_names else Updater.DEFAULT_GIT_REMOTE
 
-        self._setup_remote(chosenRemote)
+        self._setup_remote(chosen_remote)
 
         # Make a notice if the repository we're using has moved.
         old_repo = module.get_persistent_option("git-cloned-repository")
@@ -328,37 +328,37 @@ class Updater:
 
             # Update what we think is the current repository on-disk.
             ipc.notify_persistent_option_change(module.name, "git-cloned-repository", cur_repo)
-        return chosenRemote
+        return chosen_remote
 
-    def _warn_if_stashed_from_wrong_branch(self, remoteName: str, branch: str, branchName: str) -> bool:
+    def _warn_if_stashed_from_wrong_branch(self, remote_name: str, branch: str, branch_name: str) -> bool:
         """
         Returns true if there is a git stash active from the wrong branch, so we
         don't mistakenly try to apply the stash after we switch branch.
         """
         module = self.module
 
-        # Check if this branchName we want was already the branch we were on. If
+        # Check if this branch_name we want was already the branch we were on. If
         # not, and if we stashed local changes, then we might dump a bunch of
         # conflicts in the repo if we un-stash those changes after a branch switch.
         # See issue #67.
-        existingBranch = next(iter(Util.filter_program_output(None, "git", "branch", "--show-current")), None)
-        if existingBranch is not None:
-            existingBranch = existingBranch.removesuffix("\n")
+        existing_branch = next(iter(Util.filter_program_output(None, "git", "branch", "--show-current")), None)
+        if existing_branch is not None:
+            existing_branch = existing_branch.removesuffix("\n")
 
         # The result is empty if in 'detached HEAD' state where we should also
         # clearly not switch branches if there are local changes.
-        if module.get_option("#git-was-stashed") and (not existingBranch or (existingBranch != branchName)):
+        if module.get_option("#git-was-stashed") and (not existing_branch or (existing_branch != branch_name)):
 
             # Make error message make more sense
-            if not existingBranch:
-                existingBranch = "Detached HEAD"
-            if not branchName:
-                branchName = f"New branch to point to {remoteName}/{branch}"
+            if not existing_branch:
+                existing_branch = "Detached HEAD"
+            if not branch_name:
+                branch_name = f"New branch to point to {remote_name}/{branch}"
 
             logger_updater.info(textwrap.dedent(f"""\
                 y[b[*] The module y[b[{module}] had local changes from a different branch than expected:
-                y[b[*]   Expected branch: b[{branchName}]
-                y[b[*]   Actual branch:   b[{existingBranch}]
+                y[b[*]   Expected branch: b[{branch_name}]
+                y[b[*]   Actual branch:   b[{existing_branch}]
                 y[b[*]
                 y[b[*] To avoid conflict with your local changes, b[{module}] will not be updated, and the
                 y[b[*] branch will remain unchanged, so it may be out of date from upstream.
@@ -368,7 +368,7 @@ class Updater:
             return True
         return False
 
-    def _update_to_remote_head(self, remoteName: str, branch: str) -> int:
+    def _update_to_remote_head(self, remote_name: str, branch: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to
         a given remote-tracking branch. Any existing local branch with the given
@@ -380,7 +380,7 @@ class Updater:
         Assumes we're in a clean working directory (use git-stash to achieve if necessary).
 
         Parameters:
-            remoteName: The remote to use.
+            remote_name: The remote to use.
             branch: The branch to update to.
 
         Returns:
@@ -392,38 +392,38 @@ class Updater:
         # "branch" option requests a given remote head in the user's selected
         # repository. The local branch with "branch" as upstream might have a
         # different name. If there's no local branch this method creates one.
-        branchName = self.get_remote_branch_name(remoteName, branch)
+        branch_name = self.get_remote_branch_name(remote_name, branch)
 
-        if self._warn_if_stashed_from_wrong_branch(remoteName, branch, branchName):
+        if self._warn_if_stashed_from_wrong_branch(remote_name, branch, branch_name):
             return 0
 
         croak_reason = None
         result = None
         cmd = Util_LoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
 
-        if not branchName:
-            newName = self.make_branchname(remoteName, branch)
+        if not branch_name:
+            new_name = self.make_branchname(remote_name, branch)
 
             def announcer_sub(_):
                 # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{newName}]")
+                logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{new_name}]")
 
             cmd.log_to("git-checkout-branch") \
-                .set_command(["git", "checkout", "-b", newName, f"{remoteName}/{branch}"]) \
+                .set_command(["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"]) \
                 .announcer(announcer_sub)
 
-            croak_reason = f"Unable to perform a git checkout of {remoteName}/{branch} to a local branch of {newName}"
+            croak_reason = f"Unable to perform a git checkout of {remote_name}/{branch} to a local branch of {new_name}"
             result = cmd.start()
         else:
             def announcer_sub(_):
                 # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branchName}]")
+                logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branch_name}]")
 
             cmd.log_to("git-checkout-update") \
-                .set_command(["git", "checkout", branchName]) \
+                .set_command(["git", "checkout", branch_name]) \
                 .announcer(announcer_sub)
 
-            croak_reason = f"Unable to perform a git checkout to existing branch {branchName}"
+            croak_reason = f"Unable to perform a git checkout to existing branch {branch_name}"
 
             result = cmd.start()
 
@@ -434,7 +434,7 @@ class Updater:
 
                 # Given that we're starting with a "clean" checkout, it's now simply a fast-forward
                 # to the remote HEAD (previously we pulled, incurring additional network I/O).
-                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remoteName}/{branch}"])
+                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remote_name}/{branch}"])
 
         if not result == 0:
             BuildException.croak_runtime(croak_reason)
@@ -485,32 +485,32 @@ class Updater:
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
             BuildException.croak_runtime(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
-        remoteName = self._setup_best_remote()
+        remote_name = self._setup_best_remote()
         logger_updater.info(f"Fetching remote changes to g[{module}]")
-        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remoteName])
+        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remote_name])
 
         # Download updated objects. This also updates remote heads so do this
         # before we start comparing branches and such.
 
         if not exitcode == 0:
-            BuildException.croak_runtime(f"Unable to perform git fetch for {remoteName} ({cur_repo})")
+            BuildException.croak_runtime(f"Unable to perform git fetch for {remote_name} ({cur_repo})")
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
-        commitId, commitType = self._determine_preferred_checkout_source(module)
-        if commitType == "none":
-            commitType = "branch"
-            commitId = self._detect_default_remote_head(remoteName)
+        commit_id, commit_type = self._determine_preferred_checkout_source(module)
+        if commit_type == "none":
+            commit_type = "branch"
+            commit_id = self._detect_default_remote_head(remote_name)
 
-        logger_updater.warning(f"Merging g[{module}] changes from {commitType} b[{commitId}]")
+        logger_updater.warning(f"Merging g[{module}] changes from {commit_type} b[{commit_id}]")
         start_commit = self.commit_id("HEAD")
 
-        self.stash_and_update(commitType, remoteName, commitId)
+        self.stash_and_update(commit_type, remote_name, commit_id)
         ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
         return ret
 
     @staticmethod
-    def _detect_default_remote_head(remoteName: str) -> str:
+    def _detect_default_remote_head(remote_name: str) -> str:
         """
         Tries to determine the best remote branch name to use as a default if the
         user hasn't selected one, by resolving the remote symbolic ref "HEAD" from
@@ -522,7 +522,7 @@ class Updater:
             caller_name = inspect.currentframe().f_back.f_code.co_name
             BuildException.croak_internal("Run " + caller_name + " from git repo!")
 
-        with open(f".git/refs/remotes/{remoteName}/HEAD", "r") as file:
+        with open(f".git/refs/remotes/{remote_name}/HEAD", "r") as file:
             data = file.read()
 
         if not data:
@@ -531,7 +531,7 @@ class Updater:
         match = re.search(r"^ref: *refs/remotes/[^/]+/([^/]+)$", data)
         head = match.group(1) if match else None
         if not head:
-            BuildException.croak_runtime(f"Can't find HEAD for remote {remoteName}")
+            BuildException.croak_runtime(f"Can't find HEAD for remote {remote_name}")
 
         head = head.removesuffix("\n")
         return head
@@ -550,7 +550,7 @@ class Updater:
         if not module:
             module = self.module
 
-        priorityOrderedSources = [
+        priority_ordered_sources = [
             #   option-name    type   get_option-inheritance-flag
             ["commit", "tag", "module"],
             ["revision", "tag", "module"],
@@ -567,36 +567,36 @@ class Updater:
         # options to be selected... kind of complicated, but more DWIMy
         from .kde_project import Updater_KDEProject
         if not isinstance(module.scm(), Updater_KDEProject):
-            priorityOrderedSources = [priorityOrderedSource for priorityOrderedSource in priorityOrderedSources if priorityOrderedSource[0] != "branch-group"]
+            priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
 
-        checkoutSource = None
+        checkout_source = None
         # easiest way to be clear that bool context is intended
 
-        sourceTypeRef = next((x for x in priorityOrderedSources if (checkoutSource := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
+        source_type_ref = next((x for x in priority_ordered_sources if (checkout_source := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
 
         # The user has no clear desire here (either set for the module or globally.
         # Note that the default config doesn't generate a global 'branch' setting).
         # In this case it's unclear which convention source modules will use between
         # 'master', 'main', or something entirely different.  So just don't guess...
-        if not sourceTypeRef:
+        if not source_type_ref:
             logger_updater.debug(f"No branch specified for {module}, will use whatever git gives us")
             return "none", "none"
 
-        # Likewise branch-group requires special handling. checkoutSource is
+        # Likewise branch-group requires special handling. checkout_source is
         # currently the branch-group to be resolved.
-        if sourceTypeRef[0] == "branch-group":
+        if source_type_ref[0] == "branch-group":
             Util.assert_isa(self, Updater_KDEProject)
-            checkoutSource = self._resolve_branch_group(checkoutSource)
+            checkout_source = self._resolve_branch_group(checkout_source)
 
-            if not checkoutSource:
-                branchGroup = module.get_option("branch-group")
-                logger_updater.debug(f"No specific branch set for {module} and {branchGroup}, using master!")
-                checkoutSource = "master"
+            if not checkout_source:
+                branch_group = module.get_option("branch-group")
+                logger_updater.debug(f"No specific branch set for {module} and {branch_group}, using master!")
+                checkout_source = "master"
 
-        if sourceTypeRef[0] == "tag" and not checkoutSource.startswith("^refs/tags/"):
-            checkoutSource = f"refs/tags/{checkoutSource}"
+        if source_type_ref[0] == "tag" and not checkout_source.startswith("^refs/tags/"):
+            checkout_source = f"refs/tags/{checkout_source}"
 
-        return checkoutSource, sourceTypeRef[1]
+        return checkout_source, source_type_ref[1]
 
     @staticmethod
     def _has_submodules() -> bool:
@@ -609,8 +609,8 @@ class Updater:
         """
         # The git-config line shows all option names of the form submodule.foo.active,
         # filtering down to options for which the option is set to 'true'
-        configLines = Util.filter_program_output(None, "git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
-        return len(configLines) > 0
+        config_lines = Util.filter_program_output(None, "git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
+        return len(config_lines) > 0
 
     @staticmethod
     def _split_uri(uri) -> tuple:
@@ -657,12 +657,12 @@ class Updater:
         """
         module = self.module
         date = time.strftime("%F-%R", time.gmtime())  # ISO Date, hh:mm time
-        stashName = f"kde-builder auto-stash at {date}"
+        stash_name = f"kde-builder auto-stash at {date}"
 
         # first, log the git status prior to kde-builder taking over the reins in the repo
         result = Util.run_logged(module, "git-status-before-update", None, ["git", "status"])
 
-        oldStashCount = self.count_stash()
+        old_stash_count = self.count_stash()
 
         # always stash:
         # - also stash untracked files because what if upstream started to track them
@@ -674,7 +674,7 @@ class Updater:
         if Debug().pretending():  # probably best not to do anything if pretending
             result = 0
         else:
-            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stashName])
+            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stash_name])
 
         if result == 0:
             pass
@@ -692,11 +692,11 @@ class Updater:
         # compare counts (not just testing if there is *any* stash) because there
         # might have been a genuine user's stash already prior to kde-builder
         # taking over the reins in the repo.
-        newStashCount = self.count_stash()
+        new_stash_count = self.count_stash()
 
         # mark that we applied a stash so that $updateSub (_update_to_remote_head or
         # _update_to_detached_head) can know not to do dumb things
-        if newStashCount != oldStashCount:
+        if new_stash_count != old_stash_count:
             module.set_option({"#git-was-stashed": True})
 
         # finally, update to remote head
@@ -713,7 +713,7 @@ class Updater:
 
         # we ignore git-status exit code deliberately, it's a debugging aid
 
-        if newStashCount == oldStashCount:
+        if new_stash_count == old_stash_count:
             result = 1  # success
         else:
             # If the stash had been needed then try to re-apply it before we build, so
@@ -721,7 +721,7 @@ class Updater:
             exitcode = Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"])
             if exitcode != 0:
                 message = f"r[b[*] Unable to restore local changes for b[{module}]! " + \
-                          f"You should manually inspect the new stash: b[{stashName}]"
+                          f"You should manually inspect the new stash: b[{stash_name}]"
                 logger_updater.warning(f"\t{message}")
                 self._notify_post_build_message(message)
             else:
@@ -731,7 +731,7 @@ class Updater:
 
         return result
 
-    def get_remote_branch_name(self, remoteName: str, branchName: str) -> str:
+    def get_remote_branch_name(self, remote_name: str, branch_name: str) -> str:
         """
         This function finds an existing remote-tracking branch name for the
         given repository's named remote. For instance if the user was using the
@@ -742,8 +742,8 @@ class Updater:
         The current directory must be the source directory of the git module.
 
         Parameters:
-            remoteName: The git remote to use (normally origin).
-            branchName: The remote head name to find a local branch for.
+            remote_name: The git remote to use (normally origin).
+            branch_name: The remote head name to find a local branch for.
 
         Returns:
             Empty string if no match is found, or the name of the local
@@ -751,27 +751,27 @@ class Updater:
         """
 
         # We'll parse git config output to search for branches that have a
-        # remote of $remoteName and a 'merge' of refs/heads/$branchName.
+        # remote of $remote_name and a 'merge' of refs/heads/$branch_name.
 
         # TODO: Replace with git for-each-ref refs/heads and the %(upstream)
         # format.
-        branches = self.slurp_git_config_output(["git", "config", "--null", "--get-regexp", r"branch\..*\.remote", remoteName])
+        branches = self.slurp_git_config_output(["git", "config", "--null", "--get-regexp", r"branch\..*\.remote", remote_name])
 
         for gitBranch in branches:
             # The key/value is \n separated, we just want the key.
-            keyName = gitBranch.split("\n")[0]
-            thisBranch = re.match(r"^branch\.(.*)\.remote$", keyName).group(1)
+            key_name = gitBranch.split("\n")[0]
+            this_branch = re.match(r"^branch\.(.*)\.remote$", key_name).group(1)
 
             # We have the local branch name, see if it points to the remote
             # branch we want.
-            configOutput = self.slurp_git_config_output(["git", "config", "--null", f"branch.{thisBranch}.merge"])
+            config_output = self.slurp_git_config_output(["git", "config", "--null", f"branch.{this_branch}.merge"])
 
-            if configOutput and configOutput[0] == f"refs/heads/{branchName}":
+            if config_output and config_output[0] == f"refs/heads/{branch_name}":
                 # We have a winner
-                return thisBranch
+                return this_branch
         return ""
 
-    def _is_plausible_existing_remote(self, name: str, url: str, configuredUrl: str) -> bool:
+    def _is_plausible_existing_remote(self, name: str, url: str, configured_url: str) -> bool:
         """
         Filter for best_remote_name to determine if a given remote name and url looks
         like a plausible prior existing remote for a given configured repository URL.
@@ -783,13 +783,13 @@ class Updater:
         Parameters:
             name: name of the remote found
             url: the configured (fetch) URL
-            configuredUrl: the configured URL for the module (the expected fetch URL).
+            configured_url: the configured URL for the module (the expected fetch URL).
 
         Returns:
              Whether the remote will be considered for best_remote_name
         """
         # name - not used, subclasses might want to filter on remote name
-        return url == configuredUrl
+        return url == configured_url
 
     def best_remote_name(self) -> list[str]:
         """
@@ -807,7 +807,7 @@ class Updater:
             will be empty if no remote names were found.
         """
         module = self.module
-        configuredUrl = module.get_option("repository")
+        configured_url = module.get_option("repository")
         outputs = []
 
         # The Repo URL isn't much good, let's find a remote name to use it with.
@@ -823,24 +823,24 @@ class Updater:
         results = []
         for output in outputs:
             # git config output between key/val is divided by newline.
-            remoteName, url = output.split("\n")
+            remote_name, url = output.split("\n")
 
-            remoteName = re.sub(r"^remote\.", "", remoteName)
-            remoteName = re.sub(r"\.url$", "", remoteName)  # remove the cruft
+            remote_name = re.sub(r"^remote\.", "", remote_name)
+            remote_name = re.sub(r"\.url$", "", remote_name)  # remove the cruft
 
             # Skip other remotes
-            if not self._is_plausible_existing_remote(remoteName, url, configuredUrl):
+            if not self._is_plausible_existing_remote(remote_name, url, configured_url):
                 continue
 
             # Try to avoid "weird" remote names.
-            if not re.match(r"^[\w-]*$", remoteName):
+            if not re.match(r"^[\w-]*$", remote_name):
                 continue
 
             # A winner is this one.
-            results.append(remoteName)
+            results.append(remote_name)
         return results
 
-    def make_branchname(self, remoteName: str, branch: str) -> str:
+    def make_branchname(self, remote_name: str, branch: str) -> str:
         """
         Generates a potential new branch name for the case where we have to set up
         a new remote-tracking branch for a repository/branch. There are several
@@ -858,20 +858,20 @@ class Updater:
         exist.
 
         Parameters:
-            remoteName: The name of a git remote to use.
+            remote_name: The name of a git remote to use.
             branch: The name of the remote head we need to make a branch name of.
         Returns:
              A useful branch name that doesn't already exist, or "" if no
             name can be generated.
         """
-        if not remoteName:
-            remoteName = "origin"
+        if not remote_name:
+            remote_name = "origin"
         module = self.module
-        chosenName = None
+        chosen_name = None
 
         # Use "$branch" directly if not already used, otherwise try to prefix
         # with the remote name.
-        for possibleBranch in [branch, f"{remoteName}-{branch}", f"ksdc-{remoteName}-{branch}"]:
+        for possibleBranch in [branch, f"{remote_name}-{branch}", f"ksdc-{remote_name}-{branch}"]:
             result = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{possibleBranch}"])
 
             if result == 1:
@@ -922,21 +922,21 @@ class Updater:
         Returns true if the git module in the current directory has a remote of the
         name given by the first parameter.
         """
-        hasRemote = False
+        has_remote = False
 
         try:
             def filter_fn(x):
-                nonlocal hasRemote
-                if not hasRemote:
-                    hasRemote = x and x.startswith(remote)
+                nonlocal has_remote
+                if not has_remote:
+                    has_remote = x and x.startswith(remote)
 
             Util.filter_program_output(filter_fn, "git", "remote")
         except Exception:
             pass
-        return hasRemote
+        return has_remote
 
     @staticmethod
-    def verify_git_config(contextOptions: BuildContext) -> bool:
+    def verify_git_config(context_options: BuildContext) -> bool:
         """
         Function to add the "kde:" alias to the user's git config if it's not
         already set.
@@ -947,26 +947,26 @@ class Updater:
         Returns:
              False on failure of any sort, True otherwise.
         """
-        protocol = contextOptions.get_option("git-push-protocol") or "git"
+        protocol = context_options.get_option("git-push-protocol") or "git"
 
-        pushUrlPrefix = ""
-        otherPushUrlPrefix = ""
+        push_url_prefix = ""
+        other_push_url_prefix = ""
 
         if protocol == "git" or protocol == "https":
-            pushUrlPrefix = "ssh://git@invent.kde.org/" if protocol == "git" else "https://invent.kde.org/"
-            otherPushUrlPrefix = "https://invent.kde.org/" if protocol == "git" else "ssh://git@invent.kde.org/"
+            push_url_prefix = "ssh://git@invent.kde.org/" if protocol == "git" else "https://invent.kde.org/"
+            other_push_url_prefix = "https://invent.kde.org/" if protocol == "git" else "ssh://git@invent.kde.org/"
         else:
             logger_updater.error(f" b[y[*] Invalid b[git-push-protocol] {protocol}")
             logger_updater.error(" b[y[*] Try setting this option to 'git' if you're not using a proxy")
             BuildException.croak_runtime(f"Invalid git-push-protocol: {protocol}")
 
         p = subprocess.run("git config --global --includes --get url.https://invent.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True)
-        configOutput = p.stdout.removesuffix("\n")
-        errNum = p.returncode
+        config_output = p.stdout.removesuffix("\n")
+        err_num = p.returncode
 
         # 0 means no error, 1 means no such section exists -- which is OK
-        if errNum >= 2:
-            error = f"Code {errNum}"
+        if err_num >= 2:
+            error = f"Code {err_num}"
             errors = {
                 1: "Invalid section or key",
                 2: "No section was provided to git-config",
@@ -977,53 +977,53 @@ class Updater:
                 128: "HOME environment variable is not set (?)",
             }
 
-            if errNum in errors:
-                error = errors[errNum]
+            if err_num in errors:
+                error = errors[err_num]
             logger_updater.error(f" r[*] Unable to run b[git] command:\n\t{error}")
             return False
 
         # If we make it here, I'm just going to assume git works from here on out
         # on this simple task.
-        if not re.search(r"^kde:\s*$", configOutput):
+        if not re.search(r"^kde:\s*$", config_output):
             logger_updater.debug("\tAdding git download kde: alias (fetch: https://invent.kde.org/)")
             result = Util.safe_system("git config --global --add url.https://invent.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
-        configOutput = subprocess.run(f"git config --global --includes --get url.{pushUrlPrefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
-        if not re.search(r"^kde:\s*$", configOutput):
-            logger_updater.debug(f"\tAdding git upload kde: alias (push: {pushUrlPrefix})")
-            result = Util.safe_system(["git", "config", "--global", "--add", f"url.{pushUrlPrefix}.pushInsteadOf", "kde:"])
+        config_output = subprocess.run(f"git config --global --includes --get url.{push_url_prefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
+        if not re.search(r"^kde:\s*$", config_output):
+            logger_updater.debug(f"\tAdding git upload kde: alias (push: {push_url_prefix})")
+            result = Util.safe_system(["git", "config", "--global", "--add", f"url.{push_url_prefix}.pushInsteadOf", "kde:"])
             if result != 0:
                 return False
 
         # Remove old kde-builder installed aliases (kde: -> git://anongit.kde.org/)
-        configOutput = subprocess.run("git config --global --get url.git://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
-        if re.search(r"^kde:\s*$", configOutput):
+        config_output = subprocess.run("git config --global --get url.git://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
+        if re.search(r"^kde:\s*$", config_output):
             logger_updater.debug("\tRemoving outdated kde: alias (fetch: git://anongit.kde.org/)")
             result = Util.safe_system("git config --global --unset-all url.git://anongit.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
-        configOutput = subprocess.run("git config --global --get url.https://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
-        if re.search(r"^kde:\s*$", configOutput):
+        config_output = subprocess.run("git config --global --get url.https://anongit.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
+        if re.search(r"^kde:\s*$", config_output):
             logger_updater.debug("\tRemoving outdated kde: alias (fetch: https://anongit.kde.org/)")
             result = Util.safe_system("git config --global --unset-all url.https://anongit.kde.org/.insteadOf kde:".split(" "))
             if result != 0:
                 return False
 
-        configOutput = subprocess.run("git config --global --get url.git@git.kde.org:.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
-        if re.search(r"^kde:\s*$", configOutput):
+        config_output = subprocess.run("git config --global --get url.git@git.kde.org:.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
+        if re.search(r"^kde:\s*$", config_output):
             logger_updater.debug("\tRemoving outdated kde: alias (push: git@git.kde.org)")
             result = Util.safe_system("git config --global --unset-all url.git@git.kde.org:.pushInsteadOf kde:".split(" "))
             if result != 0:
                 return False
 
         # remove outdated alias if git-push-protocol gets flipped
-        configOutput = subprocess.run(f"git config --global --get url.{otherPushUrlPrefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
-        if re.search(r"^kde:\s*$", configOutput):
-            logger_updater.debug(f"\tRemoving outdated kde: alias (push: {otherPushUrlPrefix})")
-            result = Util.safe_system(["git", "config", "--global", "--unset-all", f"url.{otherPushUrlPrefix}.pushInsteadOf", "kde:"])
+        config_output = subprocess.run(f"git config --global --get url.{other_push_url_prefix}.pushInsteadOf kde:", shell=True, capture_output=True, text=True).stdout.removesuffix("\n")
+        if re.search(r"^kde:\s*$", config_output):
+            logger_updater.debug(f"\tRemoving outdated kde: alias (push: {other_push_url_prefix})")
+            result = Util.safe_system(["git", "config", "--global", "--unset-all", f"url.{other_push_url_prefix}.pushInsteadOf", "kde:"])
             if result != 0:
                 return False
         return True

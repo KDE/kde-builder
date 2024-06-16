@@ -22,8 +22,6 @@ class BuildException(Exception):
     def __str__(self) -> str:
         return self.exception_type + " Error: " + self.message
 
-    # Exported utility functions
-
     @staticmethod
     def make_exception(exception_type: str, msg: str, levels=None):
         """
@@ -89,18 +87,18 @@ class BuildException_Config(BuildException):
         return self.config_invalid_option_name
 
     @staticmethod
-    def option_usage_explanation(optionName) -> str | None:
+    def option_usage_explanation(option_name) -> str | None:
         """
         Should return a lengthy explanation of how to use a given option for use in
         error messages, or None if no explanation is unavailable.
         """
         result = None
 
-        if isinstance(optionName, BuildException_Config):
-            # Should only happen if called as method: i.e. $optionName == $self
-            optionName = optionName.problematic_option_name()
+        if isinstance(option_name, BuildException_Config):
+            # Should only happen if called as method: i.e. option_name == self
+            option_name = option_name.problematic_option_name()
 
-        if optionName == "git-repository-base":
+        if option_name == "git-repository-base":
             result = textwrap.dedent("""\
             The y[git-repository-base] option requires a repository name and URL.
             

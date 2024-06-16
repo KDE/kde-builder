@@ -21,11 +21,11 @@ def test_environment_prepend():
         return not any(x == "/bin" for x in elem)
 
     mod = Module(ctx, "test")
-    newPath = os.environ.get("PATH")
-    newPath = re.sub(r"^/bin:", "", newPath)  # Remove existing bare /bin entries if present
-    newPath = re.sub(r":/bin$", "", newPath)
-    newPath = re.sub(r":/bin:", "", newPath)
-    os.environ["PATH"] = newPath
+    new_path = os.environ.get("PATH")
+    new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
+    new_path = re.sub(r":/bin$", "", new_path)
+    new_path = re.sub(r":/bin:", "", new_path)
+    os.environ["PATH"] = new_path
 
     ctx.set_option({"install-dir": ""})  # must be set but empty
     ctx.set_option({"qt-install-dir": "/dev/null"})
@@ -40,11 +40,11 @@ def test_environment_prepend():
     ctx.reset_environment()
 
     mod = Module(ctx, "test")
-    newPath = os.environ.get("PATH")
-    newPath = re.sub(r"^/bin:", "", newPath)  # Remove existing bare /bin entries if present
-    newPath = re.sub(r":/bin$", "", newPath)
-    newPath = re.sub(r":/bin:", "", newPath)
-    os.environ["PATH"] = newPath
+    new_path = os.environ.get("PATH")
+    new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
+    new_path = re.sub(r":/bin$", "", new_path)
+    new_path = re.sub(r":/bin:", "", new_path)
+    os.environ["PATH"] = new_path
 
     ctx.set_option({"qt-install-dir": ""})  # must be set but empty
     ctx.set_option({"install-dir": "/dev/null"})
@@ -59,11 +59,11 @@ def test_environment_prepend():
     ctx.reset_environment()
 
     mod = Module(ctx, "test")
-    newPath = os.environ.get("PATH")
-    newPath = re.sub(r"^/bin:", "", newPath)  # Remove existing bare /bin entries if present
-    newPath = re.sub(r":/bin$", "", newPath)
-    newPath = re.sub(r":/bin:", "", newPath)
-    os.environ["PATH"] = newPath
+    new_path = os.environ.get("PATH")
+    new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
+    new_path = re.sub(r":/bin$", "", new_path)
+    new_path = re.sub(r":/bin:", "", new_path)
+    os.environ["PATH"] = new_path
 
     ctx.set_option({"qt-install-dir": "/dev/null"})
     ctx.set_option({"install-dir": "/dev/null"})

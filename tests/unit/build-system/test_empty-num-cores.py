@@ -14,11 +14,11 @@ from kde_builder_lib.module.module import Module
 
 @pytest.fixture
 def mock_buildsystem(monkeypatch):
-    BuildSystem.madeArguments = []
+    BuildSystem.made_arguments = []
 
     # Defang the build command and just record the args passed to it
-    def mock_safe_make(self, optsRef):
-        BuildSystem.madeArguments = optsRef["make-options"]
+    def mock_safe_make(self, opts_ref):
+        BuildSystem.made_arguments = opts_ref["make-options"]
         return {"was_successful": 1}
 
     monkeypatch.setattr(BuildSystem, "safe_make", mock_safe_make)
@@ -32,7 +32,7 @@ def test_empty_numcores(mock_buildsystem):
     # Set up a shell build system
     ctx = BuildContext()
     module = Module(ctx, "test")
-    buildSystem = BuildSystem(module)
+    build_system = BuildSystem(module)
 
     # The -j logic will take off one CPU if you ask for too many so try to ensure
     # test cases don't ask for too many.
@@ -43,9 +43,9 @@ def test_empty_numcores(mock_buildsystem):
     if max_cores < 2:
         max_cores = 2
 
-    testOption = "make-options"
+    test_option = "make-options"
 
-    testMatrix = [
+    test_matrix = [
         ["a b -j", ["a", "b"], "Empty -j removed at end"],
         ["-j a b", ["a", "b"], "Empty -j removed at beginning"],
         ["a b", ["a", "b"], "Opts without -j left alone"],
@@ -54,28 +54,28 @@ def test_empty_numcores(mock_buildsystem):
         ["a -j17 b", ["a", "-j17", "b"], "Numeric -j left alone"],
     ]
 
-    for item in testMatrix:
-        testString, resultRef, testName = item
-        module.set_option({testOption: testString})
-        buildSystem.build_internal(testOption)
-        assert BuildSystem.madeArguments == resultRef, testName
+    for item in test_matrix:
+        test_string, result_ref, test_name = item
+        module.set_option({test_option: test_string})
+        build_system.build_internal(test_option)
+        assert BuildSystem.made_arguments == result_ref, test_name
 
         module.set_option({"num-cores": str(max_cores - 1)})
-        buildSystem.build_internal(testOption)
-        assert BuildSystem.madeArguments == ["-j", str(max_cores - 1), *resultRef], f"{testName} with num-cores set"
+        build_system.build_internal(test_option)
+        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
         module.set_option({"num-cores": ""})
 
-    testOption = "ninja-options"
+    test_option = "ninja-options"
     module.set_option({"make-options": "not used"})
     module.set_option({"cmake-generator": "Kate - Ninja"})
 
-    for item in testMatrix:
-        testString, resultRef, testName = item
-        module.set_option({testOption: testString})
-        buildSystem.build_internal(testOption)
-        assert BuildSystem.madeArguments == resultRef, testName
+    for item in test_matrix:
+        test_string, result_ref, test_name = item
+        module.set_option({test_option: test_string})
+        build_system.build_internal(test_option)
+        assert BuildSystem.made_arguments == result_ref, test_name
 
         module.set_option({"num-cores": str(max_cores - 1)})
-        buildSystem.build_internal(testOption)
-        assert BuildSystem.madeArguments == ['-j', str(max_cores - 1), *resultRef], f"{testName} with num-cores set"
+        build_system.build_internal(test_option)
+        assert BuildSystem.made_arguments == ['-j', str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
         module.set_option({"num-cores": ""})

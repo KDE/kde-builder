@@ -63,9 +63,9 @@ class BuildSystem:
         """
         module = self.module
         ctx = module.context
-        buildSystemOptions = ["cmake-options", "cmake-generator", "configure-flags", "custom-build-command", "cxxflags", "make-options", "run-tests", "use-clean-install"]
+        build_system_options = ["cmake-options", "cmake-generator", "configure-flags", "custom-build-command", "cxxflags", "make-options", "run-tests", "use-clean-install"]
 
-        for opt in buildSystemOptions:
+        for opt in build_system_options:
             # If an option is present, and not set at module-level, it must be
             # global. Can't use get_option() method due to recursion.
             if ctx.options[opt] and not module.options.get(opt, None):
@@ -126,7 +126,7 @@ class BuildSystem:
         """
         module = self.module
         builddir = module.fullpath("build")
-        confFileKey = self.configured_module_file_name()
+        conf_file_key = self.configured_module_file_name()
 
         if not os.path.exists(f"{builddir}"):
             return "the build directory doesn't exist"
@@ -134,8 +134,8 @@ class BuildSystem:
             return "the last configure failed"  # see Module.pm
         if module.get_option("refresh-build"):
             return "the option refresh-build was set"
-        if not os.path.exists(f"{builddir}/{confFileKey}"):
-            return f"{builddir}/{confFileKey} is missing"
+        if not os.path.exists(f"{builddir}/{conf_file_key}"):
+            return f"{builddir}/{conf_file_key} is missing"
         return ""
 
     def prepare_module_build_environment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
@@ -181,10 +181,10 @@ class BuildSystem:
         # Convert the path to an absolute path since I've encountered a sudo
         # that is apparently unable to guess.  Maybe it's better that it
         # doesn't guess anyways from a security point-of-view.
-        buildCommand = next((bc for bc in self.build_commands() if Util.locate_exe(bc)), None)
-        if buildCommand is None:
-            logger_buildsystem.warning(" y[*] Not found any of these executables: '" + "' '".join(self.build_commands()) + "'. buildCommand will be undefined.")
-        return buildCommand
+        build_command = next((bc for bc in self.build_commands() if Util.locate_exe(bc)), None)
+        if build_command is None:
+            logger_buildsystem.warning(" y[*] Not found any of these executables: '" + "' '".join(self.build_commands()) + "'. build_command will be undefined.")
+        return build_command
 
     @staticmethod
     def supports_auto_parallelism() -> bool:
@@ -201,7 +201,7 @@ class BuildSystem:
         """
         return False
 
-    def build_internal(self, optionsName: str = "make-options") -> dict:
+    def build_internal(self, options_name: str = "make-options") -> dict:
         """
         Return value style: dict to build results object (see safe_make)
         """
@@ -211,30 +211,30 @@ class BuildSystem:
         # automatically below. So filter out the naked -j for configs where what
         # previously might have been "-j 4" is now only "-j". See
         # https://invent.kde.org/sdk/kdesrc-build/-/issues/78
-        optionVal = self.module.get_option(optionsName)
+        option_val = self.module.get_option(options_name)
 
         # Look for -j being present but not being followed by digits
-        if re.search(r"(^|[^a-zA-Z0-9_])-j$", optionVal) or re.search(r"(^|[^a-zA-Z_])-j(?! *[0-9]+)", optionVal):
+        if re.search(r"(^|[^a-zA-Z0-9_])-j$", option_val) or re.search(r"(^|[^a-zA-Z_])-j(?! *[0-9]+)", option_val):
             logger_buildsystem.warning(" y[b[*] Removing empty -j setting during build for y[b[" + str(self.module) + "]")
-            optionVal = re.sub(r"(^|[^a-zA-Z_])-j *", r"\1", optionVal)  # Remove the -j entirely for now
+            option_val = re.sub(r"(^|[^a-zA-Z_])-j *", r"\1", option_val)  # Remove the -j entirely for now
 
-        makeOptions = optionVal.split(" ")
-        makeOptions = [el for el in makeOptions if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
+        make_options = option_val.split(" ")
+        make_options = [el for el in make_options if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         # Look for CPU core limits to enforce. This handles core limits for all
         # current build systems.
-        buildConstraints = self.build_constraints()
-        numCores = buildConstraints.get("compute", None)
+        build_constraints = self.build_constraints()
+        num_cores = build_constraints.get("compute", None)
 
-        if numCores:
+        if num_cores:
             # Prepend parallelism arg to allow user settings to override
-            makeOptions.insert(0, str(numCores))
-            makeOptions.insert(0, "-j")
+            make_options.insert(0, str(num_cores))
+            make_options.insert(0, "-j")
 
         return self.safe_make({
             "target": None,
             "message": "Compiling...",
-            "make-options": makeOptions,
+            "make-options": make_options,
             "logbase": "build",
         })
 
@@ -266,7 +266,7 @@ class BuildSystem:
         logger_buildsystem.info(f"\ty[{module}] does not support the b[run-tests] option")
         return False
 
-    def install_internal(self, cmdPrefix: list[str]) -> bool:
+    def install_internal(self, cmd_prefix: list[str]) -> bool:
         """
         Used to install a module (that has already been built, tested, etc.)
         All options passed are prefixed to the eventual command to be run.
@@ -277,10 +277,10 @@ class BuildSystem:
         return self.safe_make({
             "target": "install",
             "message": f"Installing g[{module}]",
-            "prefix-options": cmdPrefix,
+            "prefix-options": cmd_prefix,
         })["was_successful"]
 
-    def uninstall_internal(self, cmdPrefix: list[str]) -> bool:
+    def uninstall_internal(self, cmd_prefix: list[str]) -> bool:
         """
         Used to uninstall a previously installed module.
         All options passed are prefixed to the eventual command to be run.
@@ -291,7 +291,7 @@ class BuildSystem:
         return self.safe_make({
             "target": "uninstall",
             "message": f"Uninstalling g[{module}]",
-            "prefix-options": cmdPrefix,
+            "prefix-options": cmd_prefix,
         })["was_successful"]
 
     def clean_build_system(self) -> int:
@@ -361,7 +361,7 @@ class BuildSystem:
 
         return 1
 
-    def safe_make(self, optsRef: dict) -> dict:
+    def safe_make(self, opts_ref: dict) -> dict:
         """
         Function to run the build command with the arguments given by the
         passed dict, laid out as:
@@ -401,57 +401,57 @@ class BuildSystem:
         """
         module = self.module
 
-        commandToUse = module.get_option("custom-build-command")
-        buildCommand = None
-        buildCommandLine = []
+        command_to_use = module.get_option("custom-build-command")
+        build_command = None
+        build_command_line = []
 
         # Check for custom user command. We support command line options being
         # passed to the command as well.
-        if commandToUse:
-            buildCommand, *buildCommandLine = Util.split_quoted_on_whitespace(commandToUse)
-            commandToUse = buildCommand  # Don't need whole cmdline in any errors.
-            buildCommand = Util.locate_exe(buildCommand)
+        if command_to_use:
+            build_command, *build_command_line = Util.split_quoted_on_whitespace(command_to_use)
+            command_to_use = build_command  # Don't need whole cmdline in any errors.
+            build_command = Util.locate_exe(build_command)
         else:
-            # command line options passed in optsRef
-            commandToUse = buildCommand = self.default_build_command()
+            # command line options passed in opts_ref
+            command_to_use = build_command = self.default_build_command()
 
-        if not buildCommand:
-            logger_buildsystem.error(f" r[b[*] Unable to find the g[{commandToUse}] executable!")
+        if not build_command:
+            logger_buildsystem.error(f" r[b[*] Unable to find the g[{command_to_use}] executable!")
             return {"was_successful": 0}
 
         # Make it prettier if pretending (Remove leading directories).
         if Debug().pretending():
-            buildCommand = re.sub(r"^/.*/", "", buildCommand)
+            build_command = re.sub(r"^/.*/", "", build_command)
 
         # Simplify code by forcing lists to exist.
-        if "prefix-options" not in optsRef:
-            optsRef["prefix-options"] = []
-        if "make-options" not in optsRef:
-            optsRef["make-options"] = []
+        if "prefix-options" not in opts_ref:
+            opts_ref["prefix-options"] = []
+        if "make-options" not in opts_ref:
+            opts_ref["make-options"] = []
 
-        prefixOpts = optsRef["prefix-options"]
+        prefix_opts = opts_ref["prefix-options"]
 
         # If using sudo ensure that it doesn't wait on tty, but tries to read from
         # stdin (which should fail as we redirect that from /dev/null)
-        if prefixOpts and prefixOpts[0] == "sudo" and [opt for opt in prefixOpts if opt != "-S"]:
-            prefixOpts.insert(1, "-S")  # Add -S right after 'sudo'
+        if prefix_opts and prefix_opts[0] == "sudo" and [opt for opt in prefix_opts if opt != "-S"]:
+            prefix_opts.insert(1, "-S")  # Add -S right after 'sudo'
 
         # Assemble arguments
-        args = [*prefixOpts, buildCommand, *buildCommandLine]
-        if optsRef["target"]:
-            args.append(optsRef["target"])
-        args.extend(optsRef["make-options"])
+        args = [*prefix_opts, build_command, *build_command_line]
+        if opts_ref["target"]:
+            args.append(opts_ref["target"])
+        args.extend(opts_ref["make-options"])
 
-        logname = optsRef.get("logbase", optsRef.get("logfile", optsRef.get("target", "")))  # pl2py: if all of these are undefined, logname remains undef in perl. But undef in perl becomes empty string when stringified.
+        logname = opts_ref.get("logbase", opts_ref.get("logfile", opts_ref.get("target", "")))  # pl2py: if all of these are undefined, logname remains undef in perl. But undef in perl becomes empty string when stringified.
 
         builddir = module.fullpath("build")
         builddir = re.sub(r"/*$", "", builddir)  # Remove trailing /
 
         Util.p_chdir(builddir)
 
-        return self._run_build_command(optsRef["message"], logname, args)
+        return self._run_build_command(opts_ref["message"], logname, args)
 
-    def _run_build_command(self, message: str, filename: str, argRef: list[str]) -> dict:
+    def _run_build_command(self, message: str, filename: str, arg_ref: list[str]) -> dict:
         """
         Function to run make and process the build process output in order to
         provide completion updates. This procedure takes the same arguments as
@@ -461,7 +461,7 @@ class BuildSystem:
         Parameters:
             message: The message to display to the user while the build happens.
             filename: The name of the log file to use (relative to the log directory).
-            argRef: An array with the command and its arguments. i.e. ['command', 'arg1', 'arg2']
+            arg_ref: An array with the command and its arguments. i.e. ['command', 'arg1', 'arg2']
 
         Returns:
              Dict as defined by safe_make
@@ -469,7 +469,7 @@ class BuildSystem:
 
         module = self.module
         builddir = module.fullpath("build")
-        resultRef = {"was_successful": 0}
+        result_ref = {"was_successful": 0}
         ctx = module.context
 
         # There are situations when we don't want progress output:
@@ -478,34 +478,34 @@ class BuildSystem:
         if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
             logger_buildsystem.warning(f"\t{message}")
 
-            resultRef["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, argRef))
+            result_ref["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, arg_ref))
 
             # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
             # When the module was built successfully, and you were using --debug, then you will get the message:
             #  "No changes from build, skipping install"
             # from Module.build() method. This is due to "work_done" key was missing in returned dict when debugging.
             # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
-            resultRef["work_done"] = 1
+            result_ref["work_done"] = 1
 
-            return resultRef
+            return result_ref
 
         a_time = int(time.time())
 
-        statusViewer = ctx.status_view
-        statusViewer.set_status(f"\t{message}")
-        statusViewer.update()
+        status_viewer = ctx.status_view
+        status_viewer.set_status(f"\t{message}")
+        status_viewer.update()
 
         if logger_logged_cmd.level == logging.INFO and ctx.status_view.cur_progress == -1:
             # When user configured logged-command logger to not print the output of the command to console (i.e. logged-command level is higher than DEBUG), but still print the info of started and finished logged command,
             # (i.e. logged-command level is lower than WARNING), in other words, when logged-command level is INFO, the user will want to see the initial status message.
-            # statusViewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".
+            # status_viewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".
             # And then finally is replaced with "        Installing ark succeeded (after 3 seconds)".
             # So to keep that initial line "        Installing ark", we need to add a new line after statusView prints its line and moves cursor to the beginning of line.
             print("\n", end="")
 
         # TODO More details
         warnings = 0
-        workDoneFlag = 1
+        work_done_flag = 1
 
         def log_command_callback(input_line):
             if input_line is None:
@@ -517,8 +517,8 @@ class BuildSystem:
                 percentage = int(match.group(1))
 
             if percentage:
-                statusViewer.set_progress_total(100)
-                statusViewer.set_progress(percentage)
+                status_viewer.set_progress_total(100)
+                status_viewer.set_progress(percentage)
             else:
                 x, y = None, None
                 match = re.search(r"^\[([0-9]+)/([0-9]+)] ", input_line)
@@ -527,19 +527,19 @@ class BuildSystem:
 
                 if x and y:
                     # ninja-syntax
-                    statusViewer.set_progress_total(y)
-                    statusViewer.set_progress(x)
+                    status_viewer.set_progress_total(y)
+                    status_viewer.set_progress(x)
 
             # pl2py: was commented there
             # see sdk/kdesrc-build#107
             # breaks compile if there is nothing to build but just stuff to install after changes
-            # $workDoneFlag = 0 if $input =~ /^ninja: no work to do/;
+            # $work_done_flag = 0 if $input =~ /^ninja: no work to do/;
 
             if "warning: " in input_line:
                 nonlocal warnings
                 warnings += 1
 
-        cmd = Util_LoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(argRef)
+        cmd = Util_LoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(arg_ref)
 
         def on_child_output(line):
             # called in parent!
@@ -549,19 +549,19 @@ class BuildSystem:
 
         try:
             exitcode = cmd.start()
-            resultRef = {
+            result_ref = {
                 "was_successful": exitcode == 0,
                 "warnings": warnings,
-                "work_done": workDoneFlag,
+                "work_done": work_done_flag,
             }
         except Exception as err:
             logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
-            resultRef["was_successful"] = 0
+            result_ref["was_successful"] = 0
 
         # Cleanup TTY output.
         a_time = Util.prettify_seconds(int(time.time()) - a_time)
-        status = "g[b[succeeded]" if resultRef["was_successful"] else "r[b[failed]"
-        statusViewer.release_tty(f"\t{message} {status} (after {a_time})\n")
+        status = "g[b[succeeded]" if result_ref["was_successful"] else "r[b[failed]"
+        status_viewer.release_tty(f"\t{message} {status} (after {a_time})\n")
 
         if warnings:
             if warnings < 3:
@@ -577,4 +577,4 @@ class BuildSystem:
             logger_buildsystem.warning(f"\tNote: {msg} compile warnings")
             self.module.set_persistent_option("last-compile-warnings", warnings)
 
-        return resultRef
+        return result_ref

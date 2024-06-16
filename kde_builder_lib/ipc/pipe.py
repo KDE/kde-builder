@@ -52,10 +52,10 @@ class IPC_Pipe(IPC):
 
         # Since streaming does not provide message boundaries, we will insert
         # ourselves, by sending a 2-byte unsigned length, then the message.
-        encodedMsg = struct.pack("H", len(msg)) + msg
-        written_length = self.fh.write(encodedMsg)
+        encoded_msg = struct.pack("H", len(msg)) + msg
+        written_length = self.fh.write(encoded_msg)
 
-        if not written_length or len(encodedMsg) != written_length:
+        if not written_length or len(encoded_msg) != written_length:
             BuildException.croak_runtime(f"Unable to write full msg to pipe")
 
         return True
@@ -71,15 +71,15 @@ class IPC_Pipe(IPC):
         Required reimplementation of :meth:`IPC.receive_message`.
         """
         # Read unsigned short with msg length, then the message
-        msgLength = self._read_number_of_bytes(2)
-        if not msgLength:
+        msg_length = self._read_number_of_bytes(2)
+        if not msg_length:
             return b""
 
-        msgLength = struct.unpack("H", msgLength)[0]  # Decode to Perl type
-        if not msgLength:
-            BuildException.croak_internal(f"Failed to read {msgLength} bytes as needed by earlier message!")
+        msg_length = struct.unpack("H", msg_length)[0]  # Decode to Perl type
+        if not msg_length:
+            BuildException.croak_internal(f"Failed to read {msg_length} bytes as needed by earlier message!")
 
-        return self._read_number_of_bytes(msgLength)
+        return self._read_number_of_bytes(msg_length)
 
     # @override
     def close(self):

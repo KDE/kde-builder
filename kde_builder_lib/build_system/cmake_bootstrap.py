@@ -34,9 +34,9 @@ class BuildSystem_CMakeBootstrap(BuildSystem):
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        bootstrapOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
+        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
 
         builddir = module.fullpath("build")
 
-        exitcode = Util.run_logged(module, "cmake-bootstrap", builddir, [f"{sourcedir}/bootstrap", f"--prefix={installdir}", *bootstrapOptions])
+        exitcode = Util.run_logged(module, "cmake-bootstrap", builddir, [f"{sourcedir}/bootstrap", f"--prefix={installdir}", *bootstrap_options])
         return Util.good_exitcode(exitcode)

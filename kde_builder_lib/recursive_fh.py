@@ -45,9 +45,9 @@ class RecursiveFH:
     def pop_filehandle(self) -> None:
         self.filehandles.pop()
         self.filenames.pop()
-        newFh = self.filehandles[-1] if self.filehandles else None
-        newFilename = self.filenames[-1] if self.filenames else None
-        self.set_current_file(newFh, newFilename)
+        new_fh = self.filehandles[-1] if self.filehandles else None
+        new_filename = self.filenames[-1] if self.filenames else None
+        self.set_current_file(new_fh, new_filename)
 
     def current_filehandle(self):
         return self.current
@@ -78,9 +78,9 @@ class RecursiveFH:
         """
         Returns the current base path to use for relative include declarations.
         """
-        curBase = self.pop_base_path()
-        self.push_base_path(curBase)
-        return curBase
+        cur_base = self.pop_base_path()
+        self.push_base_path(cur_base)
+        return cur_base
 
     def read_line(self) -> str | None:
         """
@@ -149,12 +149,12 @@ class RecursiveFH:
                     Mapping this line to "include {filename}"
                     """))
 
-                optionRE = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+                option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
                 ctx = self.ctx
 
                 # Replace reference to global option with their value.
-                if re.findall(optionRE, filename):
-                    sub_var_name = re.findall(optionRE, filename)[0]
+                if re.findall(option_re, filename):
+                    sub_var_name = re.findall(option_re, filename)[0]
                 else:
                     sub_var_name = None
 
@@ -169,9 +169,9 @@ class RecursiveFH:
 
                     # Replace other references as well.  Keep this RE up to date with
                     # the other one.
-                    sub_var_name = re.findall(optionRE, filename)[0] if re.findall(optionRE, filename) else None
+                    sub_var_name = re.findall(option_re, filename)[0] if re.findall(option_re, filename) else None
 
-                newFh = None
+                new_fh = None
                 prefix = self.current_base_path()
 
                 if filename.startswith("~/"):
@@ -180,16 +180,16 @@ class RecursiveFH:
                     filename = f"{prefix}/{filename}"
 
                 try:
-                    # newFh = open(filename, "r")  # cannot count line numbers
-                    # newFh = fileinput.input(files=filename, mode="r")  # can count line numbers, but cannot open multiple instances. Supports throwing exceptions.
-                    newFh = fileinput.FileInput(files=filename, mode="r")  # can count line numbers, can open multiple instances. Does not support throwing exceptions.
+                    # new_fh = open(filename, "r")  # cannot count line numbers
+                    # new_fh = fileinput.input(files=filename, mode="r")  # can count line numbers, but cannot open multiple instances. Supports throwing exceptions.
+                    new_fh = fileinput.FileInput(files=filename, mode="r")  # can count line numbers, can open multiple instances. Does not support throwing exceptions.
                     if not os.path.exists(filename):  # so we throw exception manually
                         raise FileNotFoundError
                 except IOError:
                     raise BuildException.make_exception("Config", f"Unable to open file '{filename}' which was included from {self.current_fn}:{fh.filelineno()}")
 
                 prefix = os.path.dirname(filename)  # Recalculate base path
-                self.add_file(newFh, filename)
+                self.add_file(new_fh, filename)
                 self.push_base_path(prefix)
 
                 continue

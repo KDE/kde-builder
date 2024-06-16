@@ -34,18 +34,18 @@ class BuildSystem_KDECMake(BuildSystem):
 
     BASE_GENERATOR_MAP = {
         "Ninja": {
-            "optionsName": "ninja-options",
-            "installTarget": "install",
-            "requiredPrograms": ["ninja", "cmake"],
-            "buildCommands": ["ninja"]
+            "options_name": "ninja-options",
+            "install_target": "install",
+            "required_programs": ["ninja", "cmake"],
+            "build_commands": ["ninja"]
         },
         "Unix Makefiles": {
-            "optionsName": "make-options",
-            "installTarget": "install/fast",
-            "requiredPrograms": ["cmake"],
+            "options_name": "make-options",
+            "install_target": "install/fast",
+            "required_programs": ["cmake"],
             # Non Linux systems can sometimes fail to build when GNU Make would work,
             # so prefer GNU Make if present, otherwise try regular make.
-            "buildCommands": ["gmake", "make"]
+            "build_commands": ["gmake", "make"]
         }
     }
 
@@ -78,20 +78,20 @@ class BuildSystem_KDECMake(BuildSystem):
 
     @staticmethod
     def _strip_generator_from_cmake_options(args: list[str]) -> list[str]:
-        nextShouldBeGenerator = 0
+        next_should_be_generator = 0
         filtered = []
         for i in args:
             accept = 1
-            if nextShouldBeGenerator:
-                nextShouldBeGenerator = 0
+            if next_should_be_generator:
+                next_should_be_generator = 0
                 accept = 0
             else:
-                maybeGenerator = i
-                match = re.match(r"^-G(\S*(\s*\S)*)\s*", maybeGenerator)
+                maybe_generator = i
+                match = re.match(r"^-G(\S*(\s*\S)*)\s*", maybe_generator)
                 if match:
                     generator = match.group(1) or ""
                     if generator == "":
-                        nextShouldBeGenerator = 1
+                        next_should_be_generator = 1
                     accept = 0
             if accept == 1:
                 filtered.append(i)
@@ -99,22 +99,22 @@ class BuildSystem_KDECMake(BuildSystem):
 
     @staticmethod
     def _find_generator_in_c_make_options(args: list[str]) -> str:
-        nextShouldBeGenerator = 0
+        next_should_be_generator = 0
         filtered = []
         for i in args:
             accept = 0
-            if nextShouldBeGenerator:
-                nextShouldBeGenerator = 0
+            if next_should_be_generator:
+                next_should_be_generator = 0
                 accept = 1
             else:
-                maybeGenerator = i
-                match = re.match(r"^-G(\S*(\s*\S)*)\s*", maybeGenerator)
+                maybe_generator = i
+                match = re.match(r"^-G(\S*(\s*\S)*)\s*", maybe_generator)
                 if match:
                     generator = match.group(1) or ""
                     if generator != "":
                         accept = 1
                     else:
-                        nextShouldBeGenerator = 1
+                        next_should_be_generator = 1
             if accept == 1:
                 filtered.append(i)
 
@@ -166,9 +166,9 @@ class BuildSystem_KDECMake(BuildSystem):
 
     def _determine_cmake_toolchain(self) -> str:
         module = self.module
-        cmakeOptions = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
+        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
 
-        toolchain = next((toolchain for toolchain in (self._find_toolchain_in_cmake_options(cmakeOptions), module.get_option("cmake-toolchain")) if self._check_toolchain_ok(toolchain)), None)
+        toolchain = next((toolchain for toolchain in (self._find_toolchain_in_cmake_options(cmake_options), module.get_option("cmake-toolchain")) if self._check_toolchain_ok(toolchain)), None)
         return toolchain or ""
 
     def get_cmake_toolchain(self) -> str:
@@ -187,18 +187,18 @@ class BuildSystem_KDECMake(BuildSystem):
         automatically.
         """
         generator = self.get_cmake_generator()
-        generatorOpts = BuildSystem_KDECMake.GENERATOR_MAP[generator]["optionsName"]
+        generator_opts = BuildSystem_KDECMake.GENERATOR_MAP[generator]["options_name"]
 
-        if not generatorOpts:
+        if not generator_opts:
             return False
-        if generatorOpts == "ninja-options":
+        if generator_opts == "ninja-options":
             return True
         return False
 
     def _determine_cmake_generator(self) -> str:
         module = self.module
-        cmakeOptions = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
-        generator = next((gen for gen in (self._find_generator_in_c_make_options(cmakeOptions), module.get_option("cmake-generator"), "Unix Makefiles") if self._check_generator_is_whitelisted(gen)), None)
+        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
+        generator = next((gen for gen in (self._find_generator_in_c_make_options(cmake_options), module.get_option("cmake-generator"), "Unix Makefiles") if self._check_generator_is_whitelisted(gen)), None)
 
         if not generator:
             BuildException.croak_internal(f"Unable to determine CMake generator for: {module}")
@@ -256,7 +256,7 @@ class BuildSystem_KDECMake(BuildSystem):
         returned if there's no required programs.
         """
         generator = self.get_cmake_generator()
-        required = BuildSystem_KDECMake.GENERATOR_MAP[generator]["requiredPrograms"]
+        required = BuildSystem_KDECMake.GENERATOR_MAP[generator]["required_programs"]
         return required
 
     # @override(check_signature=False)
@@ -266,7 +266,7 @@ class BuildSystem_KDECMake(BuildSystem):
         be supported by the build system.
         """
         generator = self.get_cmake_generator()
-        progs = BuildSystem_KDECMake.GENERATOR_MAP[generator]["buildCommands"]
+        progs = BuildSystem_KDECMake.GENERATOR_MAP[generator]["build_commands"]
         return progs
 
     @staticmethod
@@ -291,37 +291,37 @@ class BuildSystem_KDECMake(BuildSystem):
         logger_buildsystem.info("\tRunning test suite...")
 
         # Step 2: Run the tests.
-        buildCommand = self.default_build_command()
-        numTests = "Some"  # overwritten by a specific number, hopefully
+        build_command = self.default_build_command()
+        num_tests = "Some"  # overwritten by a specific number, hopefully
 
-        cmd = Util_LoggedSubprocess().module(module).log_to("test-results").set_command([buildCommand, make_target])
+        cmd = Util_LoggedSubprocess().module(module).log_to("test-results").set_command([build_command, make_target])
 
         def on_child_output(line):
             match = re.match(r"([0-9]+) tests failed out of", line)
             if match:
-                nonlocal numTests
-                numTests = match.group(1)
+                nonlocal num_tests
+                num_tests = match.group(1)
 
         cmd.on({"child_output": on_child_output})  # pl2py: this is in testsuite
 
         result = Util.good_exitcode(cmd.start())
 
         if not result:
-            logDir = module.get_log_dir()
-            logger_buildsystem.warning(f"\t{numTests} tests failed for y[{module}], consult {logDir}/test-results.log for info")
+            log_dir = module.get_log_dir()
+            logger_buildsystem.warning(f"\t{num_tests} tests failed for y[{module}], consult {log_dir}/test-results.log for info")
         else:
             logger_buildsystem.info("\tAll tests ran successfully.")
         return result
 
     # @override
-    def install_internal(self, cmdPrefix: list[str]) -> bool:
+    def install_internal(self, cmd_prefix: list[str]) -> bool:
         """
         Re-implementing the one in BuildSystem since in CMake we want to call
         make install/fast, so it only installs rather than building + installing
         """
         module = self.module
         generator = self.get_cmake_generator()
-        target = BuildSystem_KDECMake.GENERATOR_MAP[generator]["installTarget"]
+        target = BuildSystem_KDECMake.GENERATOR_MAP[generator]["install_target"]
 
         if module.get_option("custom-build-command"):
             target = "install"
@@ -329,7 +329,7 @@ class BuildSystem_KDECMake(BuildSystem):
         return self.safe_make({
             "target": target,
             "message": f"Installing g[{module}]",
-            "prefix-options": cmdPrefix,
+            "prefix-options": cmd_prefix,
             "logfile": "install",
         })["was_successful"]
 
@@ -372,51 +372,51 @@ class BuildSystem_KDECMake(BuildSystem):
             return False
 
         module: Module = self.module
-        projectName = module.name
-        buildDir = module.fullpath("build")
-        srcDir = module.fullpath("source")
-        installDir = module.installation_path()
-        libDir = module.get_option("libname")
-        configDir = f"{srcDir}/.vscode"
+        project_name = module.name
+        build_dir = module.fullpath("build")
+        src_dir = module.fullpath("source")
+        install_dir = module.installation_path()
+        lib_dir = module.get_option("libname")
+        config_dir = f"{src_dir}/.vscode"
 
-        if os.path.exists(configDir):
-            if os.path.isdir(configDir):
+        if os.path.exists(config_dir):
+            if os.path.isdir(config_dir):
                 logger_ide_proj.debug("\tGenerating .vscode directory - skipping as it already exists")
-            elif os.path.isfile(configDir):
+            elif os.path.isfile(config_dir):
                 logger_ide_proj.error("\tGenerating .vscode directory - cannot proceed, file .vscode exists")
             return False
         else:
-            logger_ide_proj.debug(f"\tGenerating .vscode directory for {projectName}: {configDir}")
+            logger_ide_proj.debug(f"\tGenerating .vscode directory for {project_name}: {config_dir}")
 
-        os.mkdir(configDir)
+        os.mkdir(config_dir)
 
-        baseDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        dataDir = f"{baseDir}/data/vscode"
+        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
+        data_dir = f"{base_dir}/data/vscode"
 
         # c_cpp_properties.json configures C++, CMake & IntelliSense.
-        cCppPropertiesJson = self._read_file(f"{dataDir}/c_cpp_properties.json.in")
+        c_cpp_properties_json = self._read_file(f"{data_dir}/c_cpp_properties.json.in")
 
         # settings.json configures the paths for CMake, QML, Qt, etc.
-        settingsJson = self._read_file(f"{dataDir}/settings.json.in")
-        settingsJson = settingsJson.replace("$buildDir", buildDir)
-        settingsJson = settingsJson.replace("$installDir", installDir)
-        settingsJson = settingsJson.replace("$libDir", libDir)
+        settings_json = self._read_file(f"{data_dir}/settings.json.in")
+        settings_json = settings_json.replace("$build_dir", build_dir)
+        settings_json = settings_json.replace("$install_dir", install_dir)
+        settings_json = settings_json.replace("$lib_dir", lib_dir)
 
         # extensions.json recommends extensions to install/enable.
-        extensionsJson = self._read_file(f"{dataDir}/extensions.json.in")
+        extensions_json = self._read_file(f"{data_dir}/extensions.json.in")
 
         # launch.json configures the run with debugger functionality.
-        launchJson = self._read_file(f"{dataDir}/launch.json.in")
-        launchJson = launchJson.replace("$installDir", installDir)
+        launch_json = self._read_file(f"{data_dir}/launch.json.in")
+        launch_json = launch_json.replace("$install_dir", install_dir)
 
         # tasks.json contains tasks to be easily / automatically run.
-        tasksJson = self._read_file(f"{dataDir}/tasks.json.in")
+        tasks_json = self._read_file(f"{data_dir}/tasks.json.in")
 
-        self._write_to_file(f"{configDir}/c_cpp_properties.json", cCppPropertiesJson)
-        self._write_to_file(f"{configDir}/settings.json", settingsJson)
-        self._write_to_file(f"{configDir}/extensions.json", extensionsJson)
-        self._write_to_file(f"{configDir}/launch.json", launchJson)
-        self._write_to_file(f"{configDir}/tasks.json", tasksJson)
+        self._write_to_file(f"{config_dir}/c_cpp_properties.json", c_cpp_properties_json)
+        self._write_to_file(f"{config_dir}/settings.json", settings_json)
+        self._write_to_file(f"{config_dir}/extensions.json", extensions_json)
+        self._write_to_file(f"{config_dir}/launch.json", launch_json)
+        self._write_to_file(f"{config_dir}/tasks.json", tasks_json)
 
         return True
 
@@ -478,17 +478,15 @@ class BuildSystem_KDECMake(BuildSystem):
                 f.write(env_content)
 
     # @override
-    def build_internal(self, optionsName=None) -> dict:
+    def build_internal(self, options_name=None) -> dict:
         """
         Return value style: dict to build results object (see :meth:`BuildSystem.safe_make`)
         """
         generator = self.get_cmake_generator()
-        defaultOptionsName = BuildSystem_KDECMake.GENERATOR_MAP[generator]["optionsName"]
-        if optionsName is None:
-            optionsName = f"{defaultOptionsName}"
-        return super().build_internal(optionsName)
-
-    ### Internal package functions.
+        default_options_name = BuildSystem_KDECMake.GENERATOR_MAP[generator]["options_name"]
+        if options_name is None:
+            options_name = f"{default_options_name}"
+        return super().build_internal(options_name)
 
     def _safe_run_cmake(self) -> int:
         """

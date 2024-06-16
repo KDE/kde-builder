@@ -21,16 +21,16 @@ def test_no_cmdline_override():
 
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
     assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
 
-    assert len(moduleList) == 4, "Right number of modules"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].get_option("make-options") == "-j4", "make-options base value proper pre-override"
+    assert len(module_list) == 4, "Right number of modules"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[0].get_option("make-options") == "-j4", "make-options base value proper pre-override"
 
-    assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].get_option("make-options") == "-j 8", "module-override make-options proper pre-override"
+    assert module_list[3].name == "module2", "mod list[3] == module2"
+    assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper pre-override"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
@@ -39,19 +39,19 @@ def test_cmdline_makeoption():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --make-options j3".split(" ")
 
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
     assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
 
-    assert len(moduleList) == 4, "Right number of modules"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].get_option("make-options") == "j3", "make-options base value proper post-override"
+    assert len(module_list) == 4, "Right number of modules"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[0].get_option("make-options") == "j3", "make-options base value proper post-override"
 
     # Policy discussion: Should command line options override *all* instances
     # of an option in kdesrc-buildrc? Historically the answer has deliberately
     # been yes, so that's the behavior we enforce.
-    assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].get_option("make-options") == "j3", "module-override make-options proper post-override"
+    assert module_list[3].name == "module2", "mod list[3] == module2"
+    assert module_list[3].get_option("make-options") == "j3", "module-override make-options proper post-override"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
@@ -60,14 +60,14 @@ def test_cmdline_numcores():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --num-cores=5".split(" ")  # 4 is default, 8 is in rc-file, use something different
 
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
     assert app.context.get_option("num-cores") == "5", "Updated cmdline option changes global value"
 
-    assert len(moduleList) == 4, "Right number of modules"
-    assert moduleList[0].name == "setmod1", "mod list[0] == setmod1"
-    assert moduleList[0].get_option("make-options") == "-j4", "make-options base value proper post-override (indirect value)"
+    assert len(module_list) == 4, "Right number of modules"
+    assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
+    assert module_list[0].get_option("make-options") == "-j4", "make-options base value proper post-override (indirect value)"
 
-    assert moduleList[3].name == "module2", "mod list[3] == module2"
-    assert moduleList[3].get_option("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
+    assert module_list[3].name == "module2", "mod list[3] == module2"
+    assert module_list[3].get_option("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

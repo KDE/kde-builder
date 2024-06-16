@@ -62,7 +62,7 @@ class Module(OptionsBase):
         module.update() or raise "no update!"
         module.build() or raise "no build/install!"
 
-        modulesFromSet = moduleSet.convert_to_modules(ctx)
+        modulesFromSet = module_set.convert_to_modules(ctx)
         for module in modulesFromSet:
             print(f"module name: {module}")
     """
@@ -110,17 +110,17 @@ class Module(OptionsBase):
             self.module_set = ModuleSet_Null()
         return self.module_set
 
-    def set_module_set(self, moduleSet: ModuleSet) -> None:
+    def set_module_set(self, module_set: ModuleSet) -> None:
         from ..module_set.module_set import ModuleSet
-        Util.assert_isa(moduleSet, ModuleSet)
-        self.module_set = moduleSet
+        Util.assert_isa(module_set, ModuleSet)
+        self.module_set = module_set
 
-    def get_subdir_path(self, subdirOption: str) -> str:
+    def get_subdir_path(self, subdir_option: str) -> str:
         """
         Function to retrieve a subdirectory path with tilde-expansion and relative path handling.
         The parameter is the option key (e.g. build-dir or log-dir) to read and interpret.
         """
-        directory = self.get_option(subdirOption)
+        directory = self.get_option(subdir_option)
 
         # If build-dir starts with a slash, it is an absolute path.
         if directory.startswith("/"):
@@ -128,7 +128,7 @@ class Module(OptionsBase):
 
         # Make sure we got a valid option result.
         if not directory:
-            raise ValueError(f"Reading option for {subdirOption} gave empty directory!")
+            raise ValueError(f"Reading option for {subdir_option} gave empty directory!")
 
         # If it starts with a tilde, expand it out.
         if directory.startswith("~"):
@@ -209,20 +209,20 @@ class Module(OptionsBase):
             self.scm_obj = Updater(self)
         return self.scm_obj
 
-    def set_scm_type(self, scmType: str) -> None:
-        newType = None
-        if scmType == "git":
-            newType = Updater(self)
-        elif scmType == "proj":
-            newType = Updater_KDEProject(self)
-        elif scmType == "metadata":
-            newType = Updater_KDEProjectMetadata(self)
-        elif scmType == "qt5":
-            newType = Updater_Qt5(self)
+    def set_scm_type(self, scm_type: str) -> None:
+        new_type = None
+        if scm_type == "git":
+            new_type = Updater(self)
+        elif scm_type == "proj":
+            new_type = Updater_KDEProject(self)
+        elif scm_type == "metadata":
+            new_type = Updater_KDEProjectMetadata(self)
+        elif scm_type == "qt5":
+            new_type = Updater_Qt5(self)
         else:
-            newType = None
+            new_type = None
 
-        self.scm_obj = newType
+        self.scm_obj = new_type
 
     def scm_type(self) -> str:
         """
@@ -241,7 +241,7 @@ class Module(OptionsBase):
         the detected build system (we could instead use introspection to figure out
         available build systems at runtime). However, KISS...
         """
-        buildSystemClasses = {
+        build_system_classes = {
             "generic": BuildSystem,
             "qmake": BuildSystem_QMake5,
             "qmake6": BuildSystem_QMake6,
@@ -254,7 +254,7 @@ class Module(OptionsBase):
             "meson": BuildSystem_Meson,
         }
 
-        class_name = buildSystemClasses[name.lower()] or None
+        class_name = build_system_classes[name.lower()] or None
         if not class_name:
             BuildException.croak_runtime(f"Invalid build system {name} requested")
         return class_name(self)
@@ -263,43 +263,43 @@ class Module(OptionsBase):
         if self.build_obj and self.build_obj.name() != "generic":
             return self.build_obj
 
-        if userBuildSystem := self.get_option("override-build-system"):
-            self.build_obj = self.build_system_from_name(userBuildSystem)
+        if user_build_system := self.get_option("override-build-system"):
+            self.build_obj = self.build_system_from_name(user_build_system)
             return self.build_obj
 
         # If not set, let's guess.
-        buildType = None
-        sourceDir = self.fullpath("source")
+        build_type = None
+        source_dir = self.fullpath("source")
 
         # This test must come before the KDE build_system's as cmake's own
         # bootstrap system also has CMakeLists.txt
-        if not buildType and os.path.exists(f"{sourceDir}/CMakeLists.txt") and os.path.exists(f"{sourceDir}/bootstrap"):
-            buildType = BuildSystem_CMakeBootstrap(self)
+        if not build_type and os.path.exists(f"{source_dir}/CMakeLists.txt") and os.path.exists(f"{source_dir}/bootstrap"):
+            build_type = BuildSystem_CMakeBootstrap(self)
 
-        if not buildType and (os.path.exists(f"{sourceDir}/CMakeLists.txt") or self.is_kde_project()):
-            buildType = BuildSystem_KDECMake(self)
+        if not build_type and (os.path.exists(f"{source_dir}/CMakeLists.txt") or self.is_kde_project()):
+            build_type = BuildSystem_KDECMake(self)
 
         # We have to assign to an array to force glob to return all results,
         # otherwise it acts like a non-reentrant generator whose output depends on
         # how many times it's been called...
-        if not buildType and (files := glob.glob(f"{sourceDir}/*.pro")):
-            buildType = BuildSystem_QMake5(self)
+        if not build_type and (files := glob.glob(f"{source_dir}/*.pro")):
+            build_type = BuildSystem_QMake5(self)
 
         # 'configure' is a popular fall-back option even for other build
         # systems so ensure we check last for autotools.
-        if not buildType and (os.path.exists(f"{sourceDir}/configure") or os.path.exists(f"{sourceDir}/autogen.sh")):
-            buildType = BuildSystem_Autotools(self)
+        if not build_type and (os.path.exists(f"{source_dir}/configure") or os.path.exists(f"{source_dir}/autogen.sh")):
+            build_type = BuildSystem_Autotools(self)
 
         # Someday move this up, but for now ensure that Meson happens after
         # configure/autotools support is checked for.
-        if not buildType and os.path.exists(f"{sourceDir}/meson.build"):
-            buildType = BuildSystem_Meson(self)
+        if not build_type and os.path.exists(f"{source_dir}/meson.build"):
+            build_type = BuildSystem_Meson(self)
 
         # Don't just assume the build system is KDE-based...
-        if not buildType:
-            buildType = BuildSystem(self)
+        if not build_type:
+            build_type = BuildSystem(self)
 
-        self.build_obj = buildType
+        self.build_obj = build_type
         return self.build_obj
 
     def set_build_system(self, obj: BuildSystem) -> None:
@@ -327,12 +327,12 @@ class Module(OptionsBase):
         Returns:
              False on failure, True on success.
         """
-        moduleName = self.name
+        module_name = self.name
         pathinfo = self.get_install_path_components("build")
         builddir = pathinfo["fullpath"]
-        buildSystem = self.build_system()
+        build_system = self.build_system()
 
-        if buildSystem.name() == "generic" and not Debug().pretending() and not self.has_option("custom-build-command"):
+        if build_system.name() == "generic" and not Debug().pretending() and not self.has_option("custom-build-command"):
             logger_module.error(f"\tr[b[{self}] does not seem to have a build system to use.")
             return False
 
@@ -346,8 +346,8 @@ class Module(OptionsBase):
         if self.get_option("build-system-only"):
             return True
 
-        buildResults = buildSystem.build_internal()
-        if not buildResults["was_successful"]:
+        build_results = build_system.build_internal()
+        if not build_results["was_successful"]:
             return False
 
         self.set_persistent_option("last-build-rev", self.current_scm_revision())
@@ -356,7 +356,7 @@ class Module(OptionsBase):
         if self.get_option("run-tests"):
             self.build_system().run_testsuite()
 
-        if not buildResults.get("work_done", None) and not self.get_option("refresh-build") and self.get_persistent_option("last-install-rev") is not None:
+        if not build_results.get("work_done", None) and not self.get_option("refresh-build") and self.get_persistent_option("last-install-rev") is not None:
             logger_module.info("\tNo changes from build, skipping install (--refresh-build this module to force install)")
             return True
         elif not self.get_option("install-after-build"):
@@ -373,50 +373,50 @@ class Module(OptionsBase):
         Returns:
              True on success, False (0) on failure.
         """
-        moduleName = self.name
+        module_name = self.name
 
-        buildSystem = self.build_system()
+        build_system = self.build_system()
 
-        if buildSystem.name() == "generic" and self.has_option("custom-build-command"):
+        if build_system.name() == "generic" and self.has_option("custom-build-command"):
             logger_module.info(f" b[*] No build system detected for b[y[{self}], assuming custom build command will handle")
             return True
 
-        if buildSystem.name() == "generic" and not Debug().pretending():
+        if build_system.name() == "generic" and not Debug().pretending():
             BuildException.croak_internal("Build system determination still pending when build attempted.")
 
         # Check if a previous build has happened in a different directory (which
         # can happen due to name changes on KDE.org side or flat-layout option
         # toggled)
         builddir = self.fullpath("build")
-        oldBuildDir = self.get_option("#last-build-dir")
-        if not Debug().pretending() and builddir != oldBuildDir and os.path.isdir(oldBuildDir) and not os.path.exists(builddir):
+        old_build_dir = self.get_option("#last-build-dir")
+        if not Debug().pretending() and builddir != old_build_dir and os.path.isdir(old_build_dir) and not os.path.exists(builddir):
             logger_module.warning(f" y[b[*] Build directory setting has changed to {builddir}.")
-            logger_module.warning(f" y[b[*] Moving old build directory at {oldBuildDir} to the new location.")
+            logger_module.warning(f" y[b[*] Moving old build directory at {old_build_dir} to the new location.")
 
             try:
-                shutil.move(oldBuildDir, builddir)
+                shutil.move(old_build_dir, builddir)
             except Exception as e:
                 logger_module.warning(textwrap.dedent(f"""\
-                    r[b[*] Unable to move {oldBuildDir}
+                    r[b[*] Unable to move {old_build_dir}
                     r[b[*] to {builddir}
                     r[b[*] Error: {e}
                     y[b[*]
                     y[b[*] Will proceed, generating a new build dir.
                     """))
 
-        refreshReason = buildSystem.needs_refreshed()
-        if refreshReason != "":
+        refresh_reason = build_system.needs_refreshed()
+        if refresh_reason != "":
             # The build system needs created, either because it doesn't exist, or
             # because the user has asked that it be completely rebuilt.
             logger_module.info(f"\tPreparing build system for y[{self}].")
 
             # Check to see if we're actually supposed to go through the
             # cleaning process.
-            if not self.get_option("#cancel-clean") and not buildSystem.clean_build_system():
+            if not self.get_option("#cancel-clean") and not build_system.clean_build_system():
                 logger_module.warning(f"\tUnable to clean r[{self}]!")
                 return False
 
-        result = buildSystem.create_build_system()
+        result = build_system.create_build_system()
         if not result:
             logger_module.error(f"\tError creating r[{self}]'s build system!")
             return False
@@ -426,7 +426,7 @@ class Module(OptionsBase):
         # builddir is automatically set to the right value for qt
         Util.p_chdir(builddir)
 
-        if not buildSystem.configure_internal():
+        if not build_system.configure_internal():
             logger_module.error(f"\tUnable to configure r[{self}] with " + self.build_system_type())
 
             # Add undocumented ".refresh-me" file to build directory to flag
@@ -447,28 +447,28 @@ class Module(OptionsBase):
         Exceptions may be thrown for abnormal conditions (e.g. no build dir exists)
         """
         builddir = self.fullpath("build")
-        buildSysFile = self.build_system().configured_module_file_name()
+        build_sys_file = self.build_system().configured_module_file_name()
 
-        if not Debug().pretending() and not os.path.exists(f"{builddir}/{buildSysFile}"):
+        if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
             logger_module.warning("\tTherefore, we can't install it. y[:-(].")
             return False
 
         self.setup_environment()
 
-        makeInstallOpts = self.get_option("make-install-prefix").split(" ")
-        makeInstallOpts = [el for el in makeInstallOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
+        make_install_opts = self.get_option("make-install-prefix").split(" ")
+        make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         # We can optionally uninstall prior to installing
         # to weed out old unused files.
         if self.get_option("use-clean-install") and self.get_persistent_option("last-install-rev"):
-            if not self.build_system().uninstall_internal(makeInstallOpts):
+            if not self.build_system().uninstall_internal(make_install_opts):
                 logger_module.warning(f"\tUnable to uninstall r[{self}] before installing the new build.")
                 logger_module.warning("\tContinuing anyways...")
             else:
                 self.unset_persistent_option("last-install-rev")
 
-        if not self.build_system().install_internal(makeInstallOpts):
+        if not self.build_system().install_internal(make_install_opts):
             logger_module.error(f"\tUnable to install r[{self}]!")
             self.context.mark_module_phase_failed("install", self)
             return False
@@ -508,19 +508,19 @@ class Module(OptionsBase):
              False on failure, True on success.
         """
         builddir = self.fullpath("build")
-        buildSysFile = self.build_system().configured_module_file_name()
+        build_sys_file = self.build_system().configured_module_file_name()
 
-        if not Debug().pretending() and not os.path.exists(f"{builddir}/{buildSysFile}"):
+        if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
             logger_module.warning("\tTherefore, we can't uninstall it.")
             return False
 
         self.setup_environment()
 
-        makeInstallOpts = self.get_option("make-install-prefix").split(" ")
-        makeInstallOpts = [el for el in makeInstallOpts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
+        make_install_opts = self.get_option("make-install-prefix").split(" ")
+        make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
-        if not self.build_system().uninstall_internal(makeInstallOpts):
+        if not self.build_system().uninstall_internal(make_install_opts):
             logger_module.error(f"\tUnable to uninstall r[{self}]!")
             self.context.mark_module_phase_failed("install", self)
             return False
@@ -561,11 +561,11 @@ class Module(OptionsBase):
         self.context.apply_user_environment()
 
         # Build system's environment injection
-        buildSystem = self.build_system()
+        build_system = self.build_system()
 
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
         # Let the toolchain files/definitions take care of themselves.
-        if buildSystem.has_toolchain():
+        if build_system.has_toolchain():
             logger_module.debug(f"\tNot setting environment variables for b[{self}]: a custom toolchain is used")
         else:
             installdir = self.get_option("install-dir")
@@ -592,7 +592,7 @@ class Module(OptionsBase):
             if libpath:
                 ctx.prepend_environment_value("LD_LIBRARY_PATH", libpath)
 
-        buildSystem.prepare_module_build_environment(ctx, self, prefix)
+        build_system.prepare_module_build_environment(ctx, self, prefix)
 
         # Read in user environment defines
         if self.name != ctx.name:  # pl2py: in perl the compare function was called here. See comment there. We just compare here without that function.
@@ -627,7 +627,7 @@ class Module(OptionsBase):
     #     return self.name == other.name
 
     def update(self, ipc, ctx) -> bool:
-        moduleName = self.name
+        module_name = self.name
         module_src_dir = self.get_source_dir()
         kdesrc = ctx.get_source_dir()
 
@@ -635,28 +635,28 @@ class Module(OptionsBase):
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
                 logger_module.error(f"Unable to create separate source directory for r[{self}]: {module_src_dir}")
-                ipc.send_ipc_message(IPC.MODULE_FAILURE, moduleName)
+                ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
 
         # Check for whether path to source dir has changed due to directory-layout
         # option or changes to metadata.
         fullpath = self.fullpath("source")
-        oldSourceDir = self.get_option("#last-source-dir")
-        if not Debug().pretending() and fullpath != oldSourceDir and os.path.isdir(oldSourceDir) and not os.path.exists(fullpath):
+        old_source_dir = self.get_option("#last-source-dir")
+        if not Debug().pretending() and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
             logger_module.warning(f" y[b[*] Source directory setting has changed to {fullpath}.")
-            logger_module.warning(f" y[b[*] Moving old source directory at {oldSourceDir} to the new location.")
+            logger_module.warning(f" y[b[*] Moving old source directory at {old_source_dir} to the new location.")
 
             try:
-                shutil.move(oldSourceDir, fullpath)
+                shutil.move(old_source_dir, fullpath)
             except Exception as e:
                 logger_module.warning(textwrap.dedent(f"""
-                    r[b[*] Unable to move {oldSourceDir}
+                    r[b[*] Unable to move {old_source_dir}
                     r[b[*] to {fullpath}
                     r[b[*] Error: {e}
                     y[b[*]
                     y[b[*] Will proceed, generating a new source dir.
                     """))
         count = None
-        returnValue = None
+        return_value = None
 
         try:
             count = self.scm().update_internal(ipc)
@@ -674,24 +674,24 @@ class Module(OptionsBase):
             logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
             logger_module.error(f" > y[{e}]")
 
-            ipc.send_ipc_message(reason, moduleName)
+            ipc.send_ipc_message(reason, module_name)
             self.phases.filter_out_phase("build")
-            returnValue = False
+            return_value = False
         else:
             message = ""
             if count is None:
                 message = Debug().colorize("b[y[Unknown changes].")
-                ipc.notify_update_success(moduleName, message)
+                ipc.notify_update_success(module_name, message)
             elif count:
                 if count == 1:
                     message = "1 file affected."
                 if count != 1:
                     message = f"{count} files affected."
-                ipc.notify_update_success(moduleName, message)
+                ipc.notify_update_success(module_name, message)
             else:
                 message = "0 files affected."
-                refreshReason = self.build_system().needs_refreshed()
-                ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{moduleName},{refreshReason}")
+                refresh_reason = self.build_system().needs_refreshed()
+                ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{module_name},{refresh_reason}")
 
             # We doing e.g. --src-only, the build phase that normally outputs
             # number of files updated doesn't get run, so manually mention it
@@ -699,9 +699,9 @@ class Module(OptionsBase):
             if not ipc.supports_concurrency():
                 logger_module.info(f"\t{self} update complete, {message}")
 
-            returnValue = True
+            return_value = True
         logger_module.info("")  # Print empty line.
-        return returnValue
+        return return_value
 
     # @override
     def set_option(self, options: dict) -> None:
@@ -761,7 +761,7 @@ class Module(OptionsBase):
         OptionsBase.set_option(self, options)
 
     # @override(check_signature=False)
-    def get_option(self, key: str, levelLimit="allow-inherit") -> str | bool | dict | None:
+    def get_option(self, key: str, level_limit="allow-inherit") -> str | bool | dict | None:
         """
         This function returns an option value for a given module. Some globals
         can't be overridden by a module's choice (but see 2nd parameter below).
@@ -779,7 +779,7 @@ class Module(OptionsBase):
 
         Parameters:
             key: Name of option
-            levelLimit: Level limit (optional). If not present, then the value
+            level_limit: Level limit (optional). If not present, then the value
                 'allow-inherit' is used. Options:
                   - allow-inherit: Module value is used if present (with exceptions),
                     otherwise global is used.
@@ -796,30 +796,30 @@ class Module(OptionsBase):
         ctx = self.context
 
         # Some global options would probably make no sense applied to Qt.
-        qtCopyOverrides = ["branch", "configure-flags", "tag", "cxxflags"]
-        if key in qtCopyOverrides and self.build_system_type() == "Qt":
-            levelLimit = "module"
+        qt_copy_overrides = ["branch", "configure-flags", "tag", "cxxflags"]
+        if key in qt_copy_overrides and self.build_system_type() == "Qt":
+            level_limit = "module"
 
-        Util.assert_in(levelLimit, ["allow-inherit", "module"])
+        Util.assert_in(level_limit, ["allow-inherit", "module"])
 
         # If module-only, check that first.
-        if levelLimit == "module":
+        if level_limit == "module":
             return self.options[key] if key in self.options else None
 
-        ctxValue = ctx.get_option(key)  # we'll use this a lot from here
+        ctx_value = ctx.get_option(key)  # we'll use this a lot from here
 
         # Some global options always override module options.
         if ctx.has_sticky_option(key):
-            return ctxValue
+            return ctx_value
 
         # Some options append to the global (e.g. conf flags)
-        confFlags = ["cmake-options", "configure-flags", "cxxflags"]
-        if key in confFlags and ctxValue:
-            return (f"{ctxValue} " + self.options.get(key, "")).strip()
+        conf_flags = ["cmake-options", "configure-flags", "cxxflags"]
+        if key in conf_flags and ctx_value:
+            return (f"{ctx_value} " + self.options.get(key, "")).strip()
 
         # Everything else overrides the global option, unless it's simply not
         # set at all.
-        return self.options.get(key, ctxValue)
+        return self.options.get(key, ctx_value)
 
     def get_persistent_option(self, key: str) -> str | int | None:
         """
@@ -883,28 +883,28 @@ class Module(OptionsBase):
         '$MODULE' or '${MODULE}' sequences, which will be replaced by the name of
         the module in question.
         """
-        destDir = self.get_option("dest-dir")
-        basePath = None
+        dest_dir = self.get_option("dest-dir")
+        base_path = None
 
         layout = self.get_option("directory-layout")
         if layout == "flat":
-            basePath = self.name
+            base_path = self.name
         elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
-            basePath = self.get_option("#kde-repo-path", "module")
-            basePath = basePath or self.name  # Default if not provided in repo-metadata
+            base_path = self.get_option("#kde-repo-path", "module")
+            base_path = base_path or self.name  # Default if not provided in repo-metadata
         elif layout == "metadata":
-            basePath = self.get_option("#kde-project-path", "module")
-            basePath = basePath or self.name  # Default if not provided in repo-metadata
+            base_path = self.get_option("#kde-project-path", "module")
+            base_path = base_path or self.name  # Default if not provided in repo-metadata
         else:
             if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
                 logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
                 self.set_option({"#warned-invalid-directory-layout": True})
-            basePath = self.name
+            base_path = self.name
 
         # Note the default dest-dir option is '${MODULE}' so this normally is used
-        destDir = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", basePath, destDir)
+        dest_dir = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", base_path, dest_dir)
 
-        return destDir
+        return dest_dir
 
     def installation_path(self) -> str:
         """
@@ -915,8 +915,8 @@ class Module(OptionsBase):
         them replaced by the name of the module in question.
         """
         path = self.get_option("install-dir")
-        moduleName = self.name
-        path = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", moduleName, path)
+        module_name = self.name
+        path = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", module_name, path)
 
         return path
 

@@ -11,8 +11,8 @@ from kde_builder_lib.module.module import Module
 
 @pytest.fixture
 def mock_module_fullproject(monkeypatch):
-    def mock__init__(self, projectPath, kde):
-        self.projectPath = projectPath
+    def mock__init__(self, project_path, kde):
+        self.projectPath = project_path
         self.kde = kde
 
     def mock__str__(self):  # need to redefine, because debugger wants to use this

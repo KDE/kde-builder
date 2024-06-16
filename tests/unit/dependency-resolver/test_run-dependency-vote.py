@@ -13,7 +13,7 @@ def test_vote_dependencies():
     graph1 = {
         "a": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "b": 1,
                     "c": 1
@@ -22,7 +22,7 @@ def test_vote_dependencies():
         },
         "b": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "c": 1
                 }
@@ -30,7 +30,7 @@ def test_vote_dependencies():
         },
         "c": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {}
             }
         },
@@ -40,7 +40,7 @@ def test_vote_dependencies():
         #
         "d": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "b": 1,
                     "c": 1
@@ -49,7 +49,7 @@ def test_vote_dependencies():
         },
         "e": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {}
             }
         }
@@ -58,7 +58,7 @@ def test_vote_dependencies():
     expected1 = {
         "a": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "b": 1,
                     "c": 1
@@ -70,7 +70,7 @@ def test_vote_dependencies():
                 "a": 1,
                 "d": 1
             },
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "c": 1
                 }
@@ -82,13 +82,13 @@ def test_vote_dependencies():
                 "b": 1,
                 "d": 1
             },
-            "allDeps": {
+            "all_deps": {
                 "items": {}
             }
         },
         "d": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {
                     "b": 1,
                     "c": 1
@@ -97,7 +97,7 @@ def test_vote_dependencies():
         },
         "e": {
             "votes": {},
-            "allDeps": {
+            "all_deps": {
                 "items": {}
             }
         }

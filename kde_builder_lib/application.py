@@ -80,16 +80,16 @@ class Application:
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
-        workLoad = self.generate_module_list(options)
-        if not workLoad.get("build", None):
+        work_load = self.generate_module_list(options)
+        if not work_load.get("build", None):
             if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
                 return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
                 # Todo: Currently we still need to exit when normal use like `kde-builder --metadata-only`, because otherwise script tries to proceed with "result = app.run_all_module_phases()". Fix it.
             print("No modules to build, exiting.\n")
-            exit(0)  # todo When --metadata-only was used and self.context.rcFile is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
+            exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
-        self.modules: list[Module] = workLoad["selectedModules"]
-        self.workLoad = workLoad
+        self.modules: list[Module] = work_load["selectedModules"]
+        self.work_load = work_load
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
         # After this call, we must run the finish() method
@@ -131,59 +131,59 @@ class Application:
         self._install_signal_handlers(signal_handler)
 
     @staticmethod
-    def _yield_module_dependency_tree_entry(nodeInfo: dict, module: Module, context: dict) -> None:
-        depth = nodeInfo["depth"]
-        index = nodeInfo["idx"]
-        count = nodeInfo["count"]
-        build = nodeInfo["build"]
-        currentItem = nodeInfo["currentItem"]
-        currentBranch = nodeInfo["currentBranch"]
-        parentItem = nodeInfo["parentItem"]
-        parentBranch = nodeInfo["parentBranch"]
+    def _yield_module_dependency_tree_entry(node_info: dict, module: Module, context: dict) -> None:
+        depth = node_info["depth"]
+        index = node_info["idx"]
+        count = node_info["count"]
+        build = node_info["build"]
+        current_item = node_info["currentItem"]
+        current_branch = node_info["currentBranch"]
+        parent_item = node_info["parentItem"]
+        parent_branch = node_info["parentBranch"]
 
-        buildStatus = "built" if build else "not built"
-        statusInfo = f"({buildStatus}: {currentBranch})" if currentBranch else f"({buildStatus})"
+        build_status = "built" if build else "not built"
+        status_info = f"({build_status}: {current_branch})" if current_branch else f"({build_status})"
 
-        connectorStack = context["stack"]
+        connector_stack = context["stack"]
 
-        prefix = connectorStack.pop()
+        prefix = connector_stack.pop()
 
         while context["depth"] > depth:
-            prefix = connectorStack.pop()
+            prefix = connector_stack.pop()
             context["depth"] -= 1
 
-        connectorStack.append(prefix)
+        connector_stack.append(prefix)
 
         if depth == 0:
             connector = prefix + " ── "
-            connectorStack.append(prefix + (' ' * 4))
+            connector_stack.append(prefix + (' ' * 4))
         else:
             connector = prefix + ("└── " if index == count else "├── ")
-            connectorStack.append(prefix + (" " * 4 if index == count else "│   "))
+            connector_stack.append(prefix + (" " * 4 if index == count else "│   "))
 
         context["depth"] = depth + 1
-        context["report"](connector + currentItem + " " + statusInfo)
+        context["report"](connector + current_item + " " + status_info)
 
     @staticmethod
-    def _yield_module_dependency_tree_entry_full_path(nodeInfo: dict, module: Module, context: dict) -> None:
-        depth = nodeInfo["depth"]
-        currentItem = nodeInfo["currentItem"]
+    def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
+        depth = node_info["depth"]
+        current_item = node_info["currentItem"]
 
-        connectorStack = context["stack"]
+        connector_stack = context["stack"]
 
-        prefix = connectorStack.pop()
+        prefix = connector_stack.pop()
 
         while context["depth"] > depth:
-            prefix = connectorStack.pop()
+            prefix = connector_stack.pop()
             context["depth"] -= 1
 
-        connectorStack.append(prefix)
+        connector_stack.append(prefix)
 
         connector = prefix
-        connectorStack.append(prefix + currentItem + "/")
+        connector_stack.append(prefix + current_item + "/")
 
         context["depth"] = depth + 1
-        context["report"](connector + currentItem)
+        context["report"](connector + current_item)
 
     def generate_module_list(self, options: list[str]) -> dict:
         """
@@ -207,34 +207,34 @@ class Application:
         # doing.
 
         ctx = self.context
-        deferredOptions = []  # 'options' blocks
+        deferred_options = []  # 'options' blocks
 
         # Process --help, etc. first.
         c = Cmdline()
         opts: dict = c.read_command_line_options_and_selectors(argv)
 
         selectors: list[str] = opts["selectors"]
-        cmdlineOptions: dict = opts["opts"]
-        cmdlineGlobalOptions: dict = cmdlineOptions["global"]
+        cmdline_options: dict = opts["opts"]
+        cmdline_global_options: dict = cmdline_options["global"]
         ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
         # Convert list to hash for lookup
         ignored_in_cmdline = {selector: True for selector in opts["ignore-modules"]}
-        startProgramAndArgs: list[str] = opts["start-program"]
+        start_program_and_args: list[str] = opts["start-program"]
 
         # rc-file needs special handling.
-        rcFile = cmdlineGlobalOptions["rc-file"] if "rc-file" in cmdlineGlobalOptions.keys() else ""
-        rcFile = re.sub(r"^~", os.environ.get("HOME"), rcFile)
-        if rcFile:
-            ctx.set_rc_file(rcFile)
+        rc_file = cmdline_global_options["rc-file"] if "rc-file" in cmdline_global_options.keys() else ""
+        rc_file = re.sub(r"^~", os.environ.get("HOME"), rc_file)
+        if rc_file:
+            ctx.set_rc_file(rc_file)
 
         # pl2py: this was commented there in perl.
         # disable async if only running a single phase.
         #   if len(ctx.phases.phaselist) == 1:
-        #     cmdlineGlobalOptions["async"] = 0
+        #     cmdline_global_options["async"] = 0
 
-        ctx.set_option(cmdlineGlobalOptions)
+        ctx.set_option(cmdline_global_options)
 
         # We download repo-metadata before reading config, because config already includes the module-definitions from it.
         self._download_kde_project_metadata()  # Uses test data automatically
@@ -243,15 +243,15 @@ class Application:
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         fh = ctx.load_rc_file()
-        optionModulesAndSets: list[Module | ModuleSet] = self._read_configuration_options(ctx, fh, cmdlineGlobalOptions, deferredOptions)
+        option_modules_and_sets: list[Module | ModuleSet] = self._read_configuration_options(ctx, fh, cmdline_global_options, deferred_options)
         fh.close()
 
         ctx.load_persistent_options()
 
         # After we have read config, we know owr persistent options, and can read/overwrite them.
         if ctx.get_option("metadata-update-skipped"):
-            lastUpdate = ctx.get_persistent_option("global", "last-metadata-update") or 0
-            if (int(time()) - lastUpdate) >= 7200:
+            last_update = ctx.get_persistent_option("global", "last-metadata-update") or 0
+            if (int(time()) - last_update) >= 7200:
                 logger_app.warning(" r[b[*] Skipped metadata update, but it hasn't been updated recently!")
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
@@ -259,30 +259,30 @@ class Application:
 
         # The user might only want metadata to update to allow for a later
         # --pretend run, check for that here.
-        if "metadata-only" in cmdlineGlobalOptions:
+        if "metadata-only" in cmdline_global_options:
             return {}
 
-        if "resume" in cmdlineGlobalOptions:
-            moduleList = ctx.get_persistent_option("global", "resume-list")
-            if not moduleList:
+        if "resume" in cmdline_global_options:
+            module_list = ctx.get_persistent_option("global", "resume-list")
+            if not module_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 BuildException.croak_runtime("Invalid --resume flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --resume, ignoring them.")
-            selectors = moduleList.split(", ")
+            selectors = module_list.split(", ")
 
-        if "rebuild-failures" in cmdlineGlobalOptions:
-            moduleList = ctx.get_persistent_option("global", "last-failed-module-list")
-            if not moduleList:
+        if "rebuild-failures" in cmdline_global_options:
+            module_list = ctx.get_persistent_option("global", "last-failed-module-list")
+            if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which modules have previously failed to build.")
                 BuildException.croak_runtime("Invalid --rebuild-failures flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --rebuild-failures, ignoring them.")
-            selectors = re.split(r",\s*", moduleList)
+            selectors = re.split(r",\s*", module_list)
 
-        if "list-installed" in cmdlineGlobalOptions:
+        if "list-installed" in cmdline_global_options:
             for key in ctx.persistent_options.keys():
                 if "install-dir" in ctx.persistent_options[key]:
                     print(key)
@@ -292,10 +292,10 @@ class Application:
         ctx.options["ignore-modules"] = ""
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
-        ignoredSelectors = {**ignored_in_cmdline, **ignored_in_global_section}
+        ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
 
-        if startProgramAndArgs:
-            StartProgram.execute_built_binary(ctx, startProgramAndArgs)  # noreturn
+        if start_program_and_args:
+            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
 
         if not Debug().is_testing():
             # Running in a test harness, avoid downloading metadata which will be
@@ -307,81 +307,81 @@ class Application:
         # We also might have cmdline "selectors" to determine which modules or
         # module-sets to choose. First let's select module sets, and expand them.
 
-        globalCmdlineArgs = list(cmdlineGlobalOptions.keys())
-        commandLineModules = len(selectors)
+        global_cmdline_args = list(cmdline_global_options.keys())
+        command_line_modules = len(selectors)
 
-        moduleResolver = ModuleResolver(ctx)
-        moduleResolver.set_cmdline_options(cmdlineOptions)
-        moduleResolver.set_deferred_options(deferredOptions)
-        moduleResolver.set_input_modules_and_options(optionModulesAndSets)
-        moduleResolver.set_ignored_selectors(list(ignoredSelectors.keys()))
+        module_resolver = ModuleResolver(ctx)
+        module_resolver.set_cmdline_options(cmdline_options)
+        module_resolver.set_deferred_options(deferred_options)
+        module_resolver.set_input_modules_and_options(option_modules_and_sets)
+        module_resolver.set_ignored_selectors(list(ignored_selectors.keys()))
 
-        self._define_new_module_factory(moduleResolver)
+        self._define_new_module_factory(module_resolver)
 
-        if commandLineModules:
-            modules = moduleResolver.resolve_selectors_into_modules(selectors)
+        if command_line_modules:
+            modules = module_resolver.resolve_selectors_into_modules(selectors)
         else:
             # Build everything in the rc-file, in the order specified.
-            modules = moduleResolver.expand_module_sets(optionModulesAndSets)
+            modules = module_resolver.expand_module_sets(option_modules_and_sets)
 
         # If modules were on the command line then they are effectively forced to
         # process unless overridden by command line options as well. If phases
         # *were* overridden on the command line, then no update pass is required
         # (all modules already have correct phases)
-        if not commandLineModules:
+        if not command_line_modules:
             modules = Application._update_module_phases(modules)
 
         # TODO: Verify this does anything still
-        metadataModule = ctx.get_kde_projects_metadata_module()
-        ctx.add_to_ignore_list(metadataModule.scm().ignored_modules())
+        metadata_module = ctx.get_kde_projects_metadata_module()
+        ctx.add_to_ignore_list(metadata_module.scm().ignored_modules())
 
         # Remove modules that are explicitly blanked out in their branch-group
         # i.e. those modules where they *have* a branch-group, and it's set to
         # be empty ("").
         resolver = ctx.module_branch_group_resolver()
-        branchGroup = ctx.effective_branch_group()
+        branch_group = ctx.effective_branch_group()
 
         filtered_modules: list[Module] = []
         for module in modules:
-            branch = resolver.find_module_branch(module.full_project_path(), branchGroup) if module.is_kde_project() else True  # Just a placeholder truthy value
+            branch = resolver.find_module_branch(module.full_project_path(), branch_group) if module.is_kde_project() else True  # Just a placeholder truthy value
             if branch is not None and not branch:
                 logger_app.debug(f"Removing {module.full_project_path()} due to branch-group")
             if branch is None or branch:  # This is the actual test
                 filtered_modules.append(module)
         modules = filtered_modules
 
-        moduleGraph = self._resolve_module_dependency_graph(modules)
+        module_graph = self._resolve_module_dependency_graph(modules)
 
-        if not moduleGraph or "graph" not in moduleGraph:
+        if not module_graph or "graph" not in module_graph:
             BuildException.croak_runtime("Failed to resolve dependency graph")
 
-        if "dependency-tree" in cmdlineGlobalOptions or "dependency-tree-fullpath" in cmdlineGlobalOptions:
-            depTreeCtx = {
+        if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
+            dep_tree_ctx = {
                 "stack": [""],
                 "depth": 0,
                 "report": lambda *args: print(*args, sep="", end="\n")
             }
 
-            if "dependency-tree" in cmdlineGlobalOptions:
+            if "dependency-tree" in cmdline_global_options:
                 callback = self._yield_module_dependency_tree_entry
             else:
                 callback = self._yield_module_dependency_tree_entry_full_path
 
             DependencyResolver.walk_module_dependency_trees(
-                moduleGraph["graph"],
+                module_graph["graph"],
                 callback,
-                depTreeCtx,
+                dep_tree_ctx,
                 modules
             )
 
             result = {
-                "dependencyInfo": moduleGraph,
+                "dependencyInfo": module_graph,
                 "selectedModules": [],
                 "build": False
             }
             return result
 
-        modules = DependencyResolver.sort_modules_into_build_order(moduleGraph["graph"])
+        modules = DependencyResolver.sort_modules_into_build_order(module_graph["graph"])
 
         # Filter --resume-foo options. This might be a second pass, but that should
         # be OK since there's nothing different going on from the first pass (in
@@ -390,12 +390,12 @@ class Application:
 
         # Check for ignored modules (post-expansion)
         modules = [module for module in modules if
-                   module.name not in ignoredSelectors and
-                   (module.get_module_set().name if module.get_module_set().name else '') not in ignoredSelectors
+                   module.name not in ignored_selectors and
+                   (module.get_module_set().name if module.get_module_set().name else '') not in ignored_selectors
                    ]
 
         result = {
-            "dependencyInfo": moduleGraph,
+            "dependencyInfo": module_graph,
             "selectedModules": modules,
             "build": True
         }
@@ -409,48 +409,48 @@ class Application:
         """
 
         ctx = self.context
-        updateNeeded = False
+        update_needed = False
 
-        wasPretending = Debug().pretending()
+        was_pretending = Debug().pretending()
 
         try:
-            metadataModule = ctx.get_kde_projects_metadata_module()
+            metadata_module = ctx.get_kde_projects_metadata_module()
 
-            sourceDir = metadataModule.get_source_dir()
+            source_dir = metadata_module.get_source_dir()
             Debug().set_pretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
-            if not Util.super_mkdir(sourceDir):
-                updateNeeded = True
-                BuildException.croak_runtime(f"Could not create {sourceDir} directory!")
-            Debug().set_pretending(wasPretending)
+            if not Util.super_mkdir(source_dir):
+                update_needed = True
+                BuildException.croak_runtime(f"Could not create {source_dir} directory!")
+            Debug().set_pretending(was_pretending)
 
-            moduleSource = metadataModule.fullpath("source")
-            updateDesired = not ctx.get_option("no-metadata") and ctx.phases.has("update")
-            updateNeeded = (not os.path.exists(moduleSource)) or (not os.listdir(moduleSource))
+            module_source = metadata_module.fullpath("source")
+            update_desired = not ctx.get_option("no-metadata") and ctx.phases.has("update")
+            update_needed = (not os.path.exists(module_source)) or (not os.listdir(module_source))
 
-            if updateNeeded:
+            if update_needed:
                 Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status
 
-            if not updateDesired and not updateNeeded:
+            if not update_desired and not update_needed:
                 ctx.set_option({"metadata-update-skipped": 1})
 
-            if updateNeeded and Debug().pretending():
+            if update_needed and Debug().pretending():
                 logger_app.warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
                                    " y[b[*] --pretend mode will resume after metadata is available.")
                 Debug().set_pretending(False)
 
-            if (updateDesired and not Debug().pretending()) or updateNeeded:
+            if (update_desired and not Debug().pretending()) or update_needed:
                 orig_wd = os.getcwd()
-                metadataModule.scm().update_internal()
+                metadata_module.scm().update_internal()
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
                 Util.p_chdir(orig_wd)
                 # "last-metadata-update" will be set after config is read, so value will be overriden
 
-            Debug().set_pretending(wasPretending)
+            Debug().set_pretending(was_pretending)
 
         except Exception as err:
-            Debug().set_pretending(wasPretending)
+            Debug().set_pretending(was_pretending)
 
-            if updateNeeded:
+            if update_needed:
                 raise err
 
             # Assume previously-updated metadata will work if not updating
@@ -470,56 +470,56 @@ class Application:
         must be passed in as arguments
         """
         ctx = self.context
-        metadataModule = ctx.get_kde_projects_metadata_module()
+        metadata_module = ctx.get_kde_projects_metadata_module()
 
         try:
-            dependencyResolver = DependencyResolver(self.module_factory)
-            branchGroup = ctx.effective_branch_group()
+            dependency_resolver = DependencyResolver(self.module_factory)
+            branch_group = ctx.effective_branch_group()
 
             if Debug().is_testing():
-                testDeps = textwrap.dedent("""\
+                test_deps = textwrap.dedent("""\
                                            juk: kcalc
                                            dolphin: konsole
                                            kde-builder: juk
                                            """)
                 import tempfile
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
-                    temp_file.write(testDeps)
+                    temp_file.write(test_deps)
                     temp_file_path = temp_file.name
 
                 dependencies = fileinput.FileInput(files=temp_file_path, mode="r")
                 logger_app.debug(" -- Reading dependencies from test data")
-                dependencyResolver.read_dependency_data(dependencies)
+                dependency_resolver.read_dependency_data(dependencies)
                 dependencies.close()
 
                 os.remove(temp_file_path)  # the file was in /tmp, no subfolders needs to be deleted
             else:
-                srcdir = metadataModule.fullpath("source")
+                srcdir = metadata_module.fullpath("source")
                 dependencies = None
 
-                dependencyFile = f"{srcdir}/dependencies/dependencies_v2-{branchGroup}.json"
-                if os.path.exists(dependencyFile) and "KDESRC_BUILD_BETA" in os.environ:
+                dependency_file = f"{srcdir}/dependencies/dependencies_v2-{branch_group}.json"
+                if os.path.exists(dependency_file) and "KDESRC_BUILD_BETA" in os.environ:
                     try:
-                        dependencies = Util.pretend_open(dependencyFile)
+                        dependencies = Util.pretend_open(dependency_file)
                     except Exception as e:
-                        print(f"Unable to open {dependencyFile}: {e}")
+                        print(f"Unable to open {dependency_file}: {e}")
                         exit(1)
 
-                    logger_app.debug(f" -- Reading dependencies from {dependencyFile}")
-                    dependencyResolver.read_dependency_data_v2(dependencies)
+                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                    dependency_resolver.read_dependency_data_v2(dependencies)
                 else:
-                    dependencyFile = f"{srcdir}/dependencies/dependency-data-{branchGroup}"
+                    dependency_file = f"{srcdir}/dependencies/dependency-data-{branch_group}"
                     try:
-                        dependencies = Util.pretend_open(dependencyFile)
+                        dependencies = Util.pretend_open(dependency_file)
                     except Exception as e:
-                        print(f"Unable to open {dependencyFile}: {e}")
+                        print(f"Unable to open {dependency_file}: {e}")
 
-                    logger_app.debug(f" -- Reading dependencies from {dependencyFile}")
-                    dependencyResolver.read_dependency_data(dependencies)
+                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                    dependency_resolver.read_dependency_data(dependencies)
 
                 dependencies.close()
 
-            graph = dependencyResolver.resolve_to_module_graph(modules)
+            graph = dependency_resolver.resolve_to_module_graph(modules)
 
         except Exception as e:
             logger_app.warning(" r[b[*] Problems encountered trying to determing correct module graph:")
@@ -530,11 +530,11 @@ class Application:
 
             graph = {
                 "graph": None,
-                "syntaxErrors": 0,
+                "syntax_errors": 0,
                 "cycles": 0,
-                "trivialCycles": 0,
-                "pathErrors": 0,
-                "branchErrors": 0,
+                "trivial_cycles": 0,
+                "path_errors": 0,
+                "branch_errors": 0,
                 "exception": e
             }
 
@@ -559,35 +559,35 @@ class Application:
         for module in modules:
             ctx.add_module(module)
 
-        runMode = self.run_mode
+        run_mode = self.run_mode
 
-        if runMode == "query":
-            queryMode = ctx.get_option("query")
+        if run_mode == "query":
+            query_mode = ctx.get_option("query")
 
-            if queryMode == "source-dir":
+            if query_mode == "source-dir":
                 def query(x):
                     return x.fullpath("source")
-            elif queryMode == "build-dir":
+            elif query_mode == "build-dir":
                 def query(x):
                     return x.fullpath("build")
-            elif queryMode == "install-dir":
+            elif query_mode == "install-dir":
                 def query(x):
                     return x.installation_path()
-            elif queryMode == "project-path":
+            elif query_mode == "project-path":
                 def query(x):
                     return x.full_project_path()
-            elif queryMode == "branch":
+            elif query_mode == "branch":
                 def query(x):
                     return x.scm()._determine_preferred_checkout_source()[0] or ""
-            elif queryMode == "module-set":
+            elif query_mode == "module-set":
                 def query(x):
                     return x.module_set.name or "undefined_module-set"
-            elif queryMode == "build-system":
+            elif query_mode == "build-system":
                 def query(x):
                     return x.build_system().name()
             else:  # Default to .get_option() as query method.
                 def query(x):
-                    return x.get_option(queryMode)
+                    return x.get_option(query_mode)
 
             for m in modules:
                 print(f"{m}: ", query(m))
@@ -599,7 +599,7 @@ class Application:
         # If power-profiles-daemon is in use, request switching to performance mode.
         self._hold_performance_power_profile_if_possible()
 
-        if runMode == "build":
+        if run_mode == "build":
             # build and (by default) install.  This will involve two simultaneous
             # processes performing update and build at the same time by default.
 
@@ -610,30 +610,30 @@ class Application:
             else:
                 runner = TaskManager(self)
                 result = runner.run_all_tasks()
-        elif runMode == "install":
+        elif run_mode == "install":
             # install but do not build (... unless the build_system does that but
             # hey, we tried)
             result = Application._handle_install(ctx)
-        elif runMode == "uninstall":
+        elif run_mode == "uninstall":
             result = Application._handle_uninstall(ctx)
 
         if ctx.get_option("purge-old-logs"):
             self._cleanup_log_directory(ctx)
 
-        workLoad = self.workLoad
-        dependencyGraph = workLoad["dependencyInfo"]["graph"]
+        work_load = self.work_load
+        dependency_graph = work_load["dependencyInfo"]["graph"]
         ctx = self.context
 
-        Application._output_failed_module_lists(ctx, dependencyGraph)
+        Application._output_failed_module_lists(ctx, dependency_graph)
 
         # Record all failed modules. Unlike the 'resume-list' option this doesn't
         # include any successfully-built modules in between failures.
-        failedModules = ",".join(map(str, ctx.list_failed_modules()))
-        if failedModules:
+        failed_modules = ",".join(map(str, ctx.list_failed_modules()))
+        if failed_modules:
             # We don't clear the list of failed modules on success so that
             # someone can build one or two modules and still use
             # --rebuild-failures
-            ctx.set_persistent_option("global", "last-failed-module-list", failedModules)
+            ctx.set_persistent_option("global", "last-failed-module-list", failed_modules)
 
         if ctx.get_option("install-login-session") and not Debug().pretending():
             self.install_login_session()
@@ -676,13 +676,13 @@ class Application:
         # modules in different source dirs may have different log dirs. If there
         # are multiple, show them all.
 
-        globalLogBase = ctx.get_subdir_path("log-dir")
-        globalLogDir = ctx.get_log_dir()
+        global_log_base = ctx.get_subdir_path("log-dir")
+        global_log_dir = ctx.get_log_dir()
         # global first
-        logger_app.warning(f"Your logs are saved in y[{globalLogDir}]")
+        logger_app.warning(f"Your logs are saved in y[{global_log_dir}]")
 
-        for base, log in ctx.logPaths.items():
-            if base != globalLogBase:
+        for base, log in ctx.log_paths.items():
+            if base != global_log_base:
                 logger_app.warning(f"  (additional logs are saved in y[{log}])")
 
         exit(exitcode)
@@ -690,18 +690,18 @@ class Application:
     # internal helper functions
 
     @staticmethod
-    def _read_next_logical_line(fileReader: RecursiveFH) -> str | None:
+    def _read_next_logical_line(file_reader: RecursiveFH) -> str | None:
         """
         Reads a "line" from a file. This line is stripped of comments and extraneous
         whitespace. Also, backslash-continued multiple lines are merged into a single
         line.
 
         Parameters:
-            fileReader: The reference to the filehandle to read from.
+            file_reader: The reference to the filehandle to read from.
         Returns:
              The text of the line.
         """
-        line = fileReader.read_line()
+        line = file_reader.read_line()
         while line:
             # Remove trailing newline
             line = line.rstrip("\n")
@@ -709,20 +709,20 @@ class Application:
             # Replace \ followed by optional space at EOL and try again.
             if re.search(r"\\\s*$", line):
                 line = re.sub(r"\\\s*$", "", line)
-                line += fileReader.read_line()
+                line += file_reader.read_line()
                 continue
 
             if re.search(r"#.*$", line):
                 line = re.sub(r"#.*$", "", line)  # Remove comments
             if re.match(r"^\s*$", line):
-                line = fileReader.read_line()
+                line = file_reader.read_line()
                 continue  # Skip blank lines
 
             return line
         return None
 
     @staticmethod
-    def _split_option_and_value_and_substitute_value(ctx: BuildContext, input_line: str, fileReader: RecursiveFH) -> tuple:
+    def _split_option_and_value_and_substitute_value(ctx: BuildContext, input_line: str, file_reader: RecursiveFH) -> tuple:
         """
         Takes an input line, and extracts it into an option name, and simplified
         value. The value has "false" converted to False, white space simplified (like in
@@ -736,8 +736,8 @@ class Application:
              Tuple (option-name, option-value)
         """
         Util.assert_isa(ctx, BuildContext)
-        fileName = fileReader.current_filename()
-        optionRE = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+        file_name = file_reader.current_filename()
+        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
 
         # The option is the first word, followed by the
         # flags on the rest of the line.  The interpretation
@@ -760,15 +760,15 @@ class Application:
         value = re.sub(r"\s+", " ", value)
 
         # Replace reference to global option with their value.
-        if re.findall(optionRE, value):
-            sub_var_name = re.findall(optionRE, value)[0]
+        if re.findall(option_re, value):
+            sub_var_name = re.findall(option_re, value)[0]
         else:
             sub_var_name = None
 
         while sub_var_name:
             sub_var_value = ctx.get_option(sub_var_name) or ""
             if not ctx.has_option(sub_var_name):
-                logger_app.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{fileName}:{fileReader.current_filehandle().filelineno()}]\n *")
+                logger_app.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{file_name}:{file_reader.current_filehandle().filelineno()}]\n *")
 
             logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
 
@@ -776,7 +776,7 @@ class Application:
 
             # Replace other references as well.  Keep this RE up to date with
             # the other one.
-            sub_var_name = re.findall(optionRE, value)[0] if re.findall(optionRE, value) else None
+            sub_var_name = re.findall(option_re, value)[0] if re.findall(option_re, value) else None
 
         # Replace tildes with home directory.
         while re.search(r"(^|:|=)~/", value):
@@ -791,21 +791,21 @@ class Application:
         return option, value
 
     @staticmethod
-    def _validate_module_set(ctx: BuildContext, moduleSet: ModuleSet) -> None:
+    def _validate_module_set(ctx: BuildContext, module_set: ModuleSet) -> None:
         """
         Ensures that the given :class:`ModuleSet` has at least a valid repository and
         use-modules setting based on the given BuildContext.
         """
-        name = moduleSet.name if moduleSet.name else "unnamed"
-        rcSources = Application._get_module_sources(moduleSet)
+        name = module_set.name if module_set.name else "unnamed"
+        rc_sources = Application._get_module_sources(module_set)
 
         # re-read option from module set since it may be pre-set
-        selectedRepo = moduleSet.get_option("repository")
-        if not selectedRepo:
+        selected_repo = module_set.get_option("repository")
+        if not selected_repo:
             logger_app.error(textwrap.dedent(f"""\
             
             There was no repository selected for the y[b[{name}] module-set declared at
-                {rcSources}
+                {rc_sources}
             
             A repository is needed to determine where to download the source code from.
             
@@ -814,34 +814,34 @@ class Application:
             """))
             raise BuildException.make_exception("Config", "Missing repository option")
 
-        repoSet = ctx.get_option("git-repository-base")
-        if selectedRepo != Application.KDE_PROJECT_ID and selectedRepo != Application.QT_PROJECT_ID and selectedRepo not in repoSet:
-            projectID = Application.KDE_PROJECT_ID
-            moduleSetName = moduleSet.name
-            moduleSetId = f"module-set ({moduleSetName})" if moduleSetName else "module-set"
+        repo_set = ctx.get_option("git-repository-base")
+        if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
+            project_id = Application.KDE_PROJECT_ID
+            module_set_name = module_set.name
+            module_set_id = f"module-set ({module_set_name})" if module_set_name else "module-set"
 
             logger_app.error(textwrap.dedent(f"""\
-            There is no repository assigned to y[b[{selectedRepo}] when assigning a
-            {moduleSetId} at {rcSources}.
+            There is no repository assigned to y[b[{selected_repo}] when assigning a
+            {module_set_id} at {rc_sources}.
             
             These repositories are defined by g[b[git-repository-base] in the global
             section of your configuration.
             
             Make sure you spelled your repository name right, but you probably meant
-            to use the magic b[{projectID}] repository for your module-set instead.
+            to use the magic b[{project_id}] repository for your module-set instead.
             """))
 
             raise BuildException.make_exception("Config", "Unknown repository base")
 
-    def _parse_module_options(self, ctx: BuildContext, fileReader: RecursiveFH, module: OptionsBase, endRE=None):
+    def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBase, end_re=None):
         """
         Reads in the options from the config file and adds them to the option store.
 
         Parameters:
             ctx: A BuildContext object to use for creating the returned :class:`Module` under.
-            fileReader: A reference to the file handle to read from.
+            file_reader: A reference to the file handle to read from.
             module: The :class:`OptionsBase` to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.
-            endRE: Optional, if provided it should be a regexp for the terminator to use for the block being parsed in the rc file.
+            end_re: Optional, if provided it should be a regexp for the terminator to use for the block being parsed in the rc file.
 
         Returns:
             The provided :class:`OptionsBase`, with options set as given in the configuration file section being processed.
@@ -852,10 +852,10 @@ class Application:
             Application.moduleID = 0
 
         # Just look for an end marker if terminator not provided.
-        if not endRE:
-            endRE = re.compile(r"^\s*end[\w\s]*$")
+        if not end_re:
+            end_re = re.compile(r"^\s*end[\w\s]*$")
 
-        self._mark_module_source(module, fileReader.current_filename() + ":" + str(fileReader.current_filehandle().filelineno()))
+        self._mark_module_source(module, file_reader.current_filename() + ":" + str(file_reader.current_filehandle().filelineno()))
         module.set_option({"#entry_num": Application.moduleID})
         Application.moduleID += 1
 
@@ -863,26 +863,26 @@ class Application:
         all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
 
         # Read in each option
-        line = self._read_next_logical_line(fileReader)
-        while line and not re.search(endRE, line):
-            current_file = fileReader.current_filename()
+        line = self._read_next_logical_line(file_reader)
+        while line and not re.search(end_re, line):
+            current_file = file_reader.current_filename()
 
             # Sanity check, make sure the section is correctly terminated
             if re.match(r"^(module\b|options\b)", line):
 
                 if isinstance(module, BuildContext):
-                    endWord = "global"
+                    end_word = "global"
                 elif isinstance(module, ModuleSet):
-                    endWord = "module-set"
+                    end_word = "module-set"
                 elif isinstance(module, Module):
-                    endWord = "module"
+                    end_word = "module"
                 else:
-                    endWord = "options"
+                    end_word = "options"
 
-                logger_app.error(f"Invalid configuration file {current_file} at line {fileReader.current_filehandle().filelineno()}\nAdd an 'end {endWord}' before " + "starting a new module.\n")
+                logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an 'end {end_word}' before " + "starting a new module.\n")
                 raise BuildException.make_exception("Config", f"Invalid file {current_file}")
 
-            option, value = Application._split_option_and_value_and_substitute_value(ctx, line, fileReader)
+            option, value = Application._split_option_and_value_and_substitute_value(ctx, line, file_reader)
 
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
                 ctx.set_option({option: value})  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
@@ -893,7 +893,7 @@ class Application:
                     logger_app.error("y[Please edit your config. Replace \"r[install-session-driver]y[\" with \"g[install-login-session]y[\".")
                 if option == "install-environment-driver":  # todo This message is temporary. Remove it after 24.08.2024.
                     logger_app.error("y[Please edit your config. Replace \"r[install-environment-driver]y[\" with \"g[install-login-session]y[\".")
-                raise BuildException_Config(option, f"Unrecognized option \"{option}\" found at {current_file}:{fileReader.current_filehandle().filelineno()}")
+                raise BuildException_Config(option, f"Unrecognized option \"{option}\" found at {current_file}:{file_reader.current_filehandle().filelineno()}")
 
             # This is addition of python version
             if value == "true":
@@ -905,64 +905,64 @@ class Application:
                 module.set_option({option: value})
             except Exception as err:
                 if isinstance(err, BuildException_Config):
-                    msg = f"{current_file}:{fileReader.current_filehandle().filelineno()}: " + err.message
+                    msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
                     explanation = err.option_usage_explanation()
                     if explanation:
                         msg = msg + "\n" + explanation
                     err.message = msg
                 raise  # re-throw
 
-            line = self._read_next_logical_line(fileReader)
+            line = self._read_next_logical_line(file_reader)
 
         return module
 
     @staticmethod
-    def _mark_module_source(optionsBase: OptionsBase, configSource: str) -> None:
+    def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
         """
         Marks the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being
         read in from the given string (filename:line). An OptionsBase can be tagged under multiple files.
         """
         key = "#defined-at"
-        sourcesRef = optionsBase.get_option(key) if optionsBase.has_option(key) else []
+        sources_ref = options_base.get_option(key) if options_base.has_option(key) else []
 
-        sourcesRef.append(configSource)
-        optionsBase.set_option({key: sourcesRef})
+        sources_ref.append(config_source)
+        options_base.set_option({key: sources_ref})
 
     @staticmethod
-    def _get_module_sources(optionsBase: ModuleSet) -> str:
+    def _get_module_sources(options_base: ModuleSet) -> str:
         """
         Returns:
              rcfile sources for given OptionsBase (comma-separated).
         """
         key = "#defined-at"
-        sourcesRef = optionsBase.get_option(key) or []
-        return ", ".join(sourcesRef)
+        sources_ref = options_base.get_option(key) or []
+        return ", ".join(sources_ref)
 
-    def _parse_module_set_options(self, ctx: BuildContext, fileReader: RecursiveFH, moduleSet: ModuleSet) -> ModuleSet:
+    def _parse_module_set_options(self, ctx: BuildContext, file_reader: RecursiveFH, module_set: ModuleSet) -> ModuleSet:
         """
         Reads in a "module_set".
 
         Parameters:
             ctx: The build context.
-            fileReader: The filehandle to the config file to read from.
-            moduleSet: The :class:`ModuleSet` to use.
+            file_reader: The filehandle to the config file to read from.
+            module_set: The :class:`ModuleSet` to use.
 
         Returns:
             The :class:`ModuleSet` passed in with read-in options set, which may need
             to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
         """
-        moduleSet = self._parse_module_options(ctx, fileReader, moduleSet, re.compile(r"^end\s+module(-?set)?$"))
+        module_set = self._parse_module_options(ctx, file_reader, module_set, re.compile(r"^end\s+module(-?set)?$"))
 
         # Perl-specific note! re-blessing the module set into the right 'class'
         # You'd probably have to construct an entirely new object and copy the
         # members over in other languages.
-        if moduleSet.get_option("repository") == Application.KDE_PROJECT_ID:
-            moduleSet.__class__ = ModuleSet_KDEProjects
-        elif moduleSet.get_option("repository") == Application.QT_PROJECT_ID:
-            moduleSet.__class__ = ModuleSet_Qt5
-        return moduleSet
+        if module_set.get_option("repository") == Application.KDE_PROJECT_ID:
+            module_set.__class__ = ModuleSet_KDEProjects
+        elif module_set.get_option("repository") == Application.QT_PROJECT_ID:
+            module_set.__class__ = ModuleSet_Qt5
+        return module_set
 
-    def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdlineGlobalOptions: dict, deferredOptionsRef: list) -> list[Module | ModuleSet]:
+    def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options_ref: list) -> list[Module | ModuleSet]:
         """
         Reads in the settings from the configuration, passed in as an open filehandle.
 
@@ -970,9 +970,9 @@ class Application:
             ctx: The :class:`BuildContext` to update based on the configuration read and
                 any pending command-line options (see global options in BuildContext).
             fh: The I/O filehandle object to read from.
-            cmdlineGlobalOptions: An input dict mapping command line options to their
+            cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
-            deferredOptionsRef: A list containing dicts mapping module names to options
+            deferred_options_ref: A list containing dicts mapping module names to options
                 set by any 'options' blocks read in by this function.
                 Each key (identified by the name of the 'options' block) will point to a
                 dict value holding the options to apply.
@@ -986,14 +986,14 @@ class Application:
             BuildException_Config
         """
         module_list = []
-        rcfile = ctx.rcFile
-        option, readModules = None, None
+        rcfile = ctx.rc_file
+        option, read_modules = None, None
 
-        fileReader = RecursiveFH(rcfile, ctx)
-        fileReader.add_file(fh, rcfile)
+        file_reader = RecursiveFH(rcfile, ctx)
+        file_reader.add_file(fh, rcfile)
 
         # Read in global settings
-        while line := fileReader.read_line():
+        while line := file_reader.read_line():
             line = re.sub(r"#.*$", "", line)  # Remove comments
             line = re.sub(r"^\s+", "", line)  # Remove leading whitespace
             if not line:
@@ -1007,22 +1007,22 @@ class Application:
                 raise BuildException.make_exception("Config", "Missing global section")
 
             # Now read in each global option.
-            globalOpts = self._parse_module_options(ctx, fileReader, OptionsBase())
+            global_opts = self._parse_module_options(ctx, file_reader, OptionsBase())
 
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
-            for key in cmdlineGlobalOptions.keys():
-                globalOpts.options.pop(key, None)
-            ctx.merge_options_from(globalOpts)
+            for key in cmdline_global_options.keys():
+                global_opts.options.pop(key, None)
+            ctx.merge_options_from(global_opts)
             break
 
         using_default = True
         creation_order = False
-        seenModules = {}  # NOTE! *not* module-sets, *just* modules.
-        seenModuleSets = {}  # and vice versa -- named sets only though!
-        seenModuleSetItems = {}  # To track option override modules.
+        seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
+        seen_module_sets = {}  # and vice versa -- named sets only though!
+        seen_module_set_items = {}  # To track option override modules.
 
         # Now read in module settings
-        while line := fileReader.read_line():
+        while line := file_reader.read_line():
             line = re.sub(r"#.*$", "", line)  # Remove comments
             line = re.sub(r"^\s*", "", line)  # Remove leading whitespace
             if line.strip() == "":
@@ -1034,58 +1034,58 @@ class Application:
             if match:
                 option_type, modulename = match.group(1), match.group(2)
 
-            newModule = None
+            new_module = None
 
             # 'include' directives can change the current file, so check where we're at
-            rcfile = fileReader.current_filename()
+            rcfile = file_reader.current_filename()
 
             # Module-set?
             if not modulename:
-                moduleSetRE = re.compile(r"^module-set\s*([-/.\w]+)?\s*$")
-                match = moduleSetRE.match(line)
+                module_set_re = re.compile(r"^module-set\s*([-/.\w]+)?\s*$")
+                match = module_set_re.match(line)
                 if match:
                     modulename = match.group(1)
 
                 # modulename may be blank -- use the regex directly to match
-                if not moduleSetRE.match(line):
+                if not module_set_re.match(line):
                     logger_app.error(f"Invalid configuration file {rcfile}!")
-                    logger_app.error(f"Expecting a start of module section at r[b[line {fileReader.current_filehandle().filelineno()}].")
+                    logger_app.error(f"Expecting a start of module section at r[b[line {file_reader.current_filehandle().filelineno()}].")
                     raise BuildException.make_exception("Config", "Ungrouped/Unknown option")
 
-                if modulename and modulename in seenModuleSets.keys():
-                    logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{fileReader.current_filehandle().filelineno()}")
-                    raise BuildException.make_exception("Config", f"Duplicate module-set {modulename} defined at {rcfile}:{fileReader.current_filehandle().filelineno()}")
+                if modulename and modulename in seen_module_sets.keys():
+                    logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise BuildException.make_exception("Config", f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
-                if modulename and modulename in seenModules.keys():
-                    logger_app.error(f"Name {modulename} for module-set at {rcfile}:{fileReader.current_filehandle().filelineno()} is already in use on a module")
-                    raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module-set defined at {rcfile}:{fileReader.current_filehandle().filelineno()}")
+                if modulename and modulename in seen_modules.keys():
+                    logger_app.error(f"Name {modulename} for module-set at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module")
+                    raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 # A module_set can give us more than one module to add.
-                newModule = self._parse_module_set_options(ctx, fileReader, ModuleSet(ctx, modulename or f"Unnamed module-set at {rcfile}:{fileReader.current_filehandle().filelineno()}"))
+                new_module = self._parse_module_set_options(ctx, file_reader, ModuleSet(ctx, modulename or f"Unnamed module-set at {rcfile}:{file_reader.current_filehandle().filelineno()}"))
                 creation_order += 1
-                newModule.create_id = creation_order
+                new_module.create_id = creation_order
 
                 # Save 'use-modules' entries, so we can see if later module decls
                 # are overriding/overlaying their options.
-                moduleSetItems = newModule.module_names_to_find()
-                seenModuleSetItems = {item: newModule for item in moduleSetItems}
+                module_set_items = new_module.module_names_to_find()
+                seen_module_set_items = {item: new_module for item in module_set_items}
 
                 # Reserve enough 'create IDs' for all named modules to use
-                creation_order += len(moduleSetItems)
+                creation_order += len(module_set_items)
                 if modulename:
-                    seenModuleSets[modulename] = newModule
+                    seen_module_sets[modulename] = new_module
 
             # Duplicate module entry? (Note, this must be checked before the check
             # below for 'options' sets)
-            elif modulename in seenModules and option_type != "options":
-                logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {fileReader.current_filehandle().filelineno()} of {rcfile}")
-                raise BuildException.make_exception("Config", f"Duplicate module {modulename} declared at {rcfile}:{fileReader.current_filehandle().filelineno()}")
+            elif modulename in seen_modules and option_type != "options":
+                logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {file_reader.current_filehandle().filelineno()} of {rcfile}")
+                raise BuildException.make_exception("Config", f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
             # Module/module-set options overrides
             elif option_type == "options":
-                options = self._parse_module_options(ctx, fileReader, OptionsBase())
+                options = self._parse_module_options(ctx, file_reader, OptionsBase())
 
-                deferredOptionsRef.append({
+                deferred_options_ref.append({
                     "name": modulename,
                     "opts": options.options
                 })
@@ -1098,20 +1098,20 @@ class Application:
                 continue  # Don't add to module list
 
             # Must follow 'options' handling
-            elif modulename in seenModuleSets:
-                logger_app.error(f"Name {modulename} for module at {rcfile}:{fileReader.current_filehandle().filelineno()} is already in use on a module-set")
-                raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{fileReader.current_filehandle().filelineno()}")
+            elif modulename in seen_module_sets:
+                logger_app.error(f"Name {modulename} for module at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module-set")
+                raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
             else:
-                newModule = self._parse_module_options(ctx, fileReader, Module(ctx, modulename))
-                newModule.create_id = creation_order + 1
+                new_module = self._parse_module_options(ctx, file_reader, Module(ctx, modulename))
+                new_module.create_id = creation_order + 1
                 creation_order += 1
-                seenModules[modulename] = newModule
+                seen_modules[modulename] = new_module
 
-            module_list.append(newModule)
+            module_list.append(new_module)
 
             using_default = False
 
-        for name, moduleSet in seenModuleSets.items():
+        for name, moduleSet in seen_module_sets.items():
             Application._validate_module_set(ctx, moduleSet)
 
         # If the user doesn't ask to build any modules, build a default set.
@@ -1186,7 +1186,7 @@ class Application:
         return failed
 
     @staticmethod
-    def _apply_module_filters(ctx: BuildContext, moduleList: list[Module]) -> list[Module]:
+    def _apply_module_filters(ctx: BuildContext, module_list: list[Module]) -> list[Module]:
         """
         Applies any module-specific filtering that is necessary after reading command
         line and rc-file options. (This is as opposed to phase filters, which leave
@@ -1199,7 +1199,7 @@ class Application:
 
         Parameters:
             ctx: :class:`BuildContext` in use.
-            moduleList: List of :class:`Module` or :class:`ModuleSet` to apply filters on.
+            module_list: List of :class:`Module` or :class:`ModuleSet` to apply filters on.
 
         Returns:
             List of :class:`Modules` or :class:`ModuleSet` with any inclusion/exclusion filters
@@ -1210,7 +1210,7 @@ class Application:
 
         if not ctx.get_option("resume-from") and not ctx.get_option("resume-after") and not ctx.get_option("stop-before") and not ctx.get_option("stop-after"):
             logger_app.debug("No command-line filter seems to be present.")
-            return moduleList
+            return module_list
 
         if ctx.get_option("resume-from") and ctx.get_option("resume-after"):
             # This one's an error.
@@ -1228,55 +1228,53 @@ class Application:
             """))
             BuildException.croak_runtime("Both --stop-before and --stop-from specified.")
 
-        if not moduleList:  # Empty input?
+        if not module_list:  # Empty input?
             return []
 
-        resumePoint = ctx.get_option("resume-from") or ctx.get_option("resume-after")
-        startIndex = len(moduleList)
+        resume_point = ctx.get_option("resume-from") or ctx.get_option("resume-after")
+        start_index = len(module_list)
 
-        if resumePoint:
-            logger_app.debug(f"Looking for {resumePoint} for --resume-* option")
+        if resume_point:
+            logger_app.debug(f"Looking for {resume_point} for --resume-* option")
 
-            # || 0 is a hack to force Boolean context.
-            filterInclusive = ctx.get_option("resume-from") or 0
+            filter_inclusive = ctx.get_option("resume-from") or 0
             found = 0
 
-            for i in range(len(moduleList)):
-                module = moduleList[i]
+            for i in range(len(module_list)):
+                module = module_list[i]
 
-                found = module.name == resumePoint
+                found = module.name == resume_point
                 if found:
-                    startIndex = i if filterInclusive else i + 1
-                    startIndex = min(startIndex, len(moduleList) - 1)
+                    start_index = i if filter_inclusive else i + 1
+                    start_index = min(start_index, len(module_list) - 1)
                     break
         else:
-            startIndex = 0
+            start_index = 0
 
-        stopPoint = ctx.get_option("stop-before") or ctx.get_option("stop-after")
-        stopIndex = 0
+        stop_point = ctx.get_option("stop-before") or ctx.get_option("stop-after")
+        stop_index = 0
 
-        if stopPoint:
-            logger_app.debug(f"Looking for {stopPoint} for --stop-* option")
+        if stop_point:
+            logger_app.debug(f"Looking for {stop_point} for --stop-* option")
 
-            # || 0 is a hack to force Boolean context.
-            filterInclusive = ctx.get_option("stop-before") or 0
+            filter_inclusive = ctx.get_option("stop-before") or 0
             found = 0
 
-            for i in range(startIndex, len(moduleList)):
-                module = moduleList[i]
+            for i in range(start_index, len(module_list)):
+                module = module_list[i]
 
-                found = module.name == stopPoint
+                found = module.name == stop_point
                 if found:
-                    stopIndex = i - (1 if filterInclusive else 0)
+                    stop_index = i - (1 if filter_inclusive else 0)
                     break
         else:
-            stopIndex = len(moduleList) - 1
+            stop_index = len(module_list) - 1
 
-        if startIndex > stopIndex or len(moduleList) == 0:
+        if start_index > stop_index or len(module_list) == 0:
             # Lost all modules somehow.
-            BuildException.croak_runtime(f"Unknown resume -> stop point {resumePoint} -> {stopPoint}.")
+            BuildException.croak_runtime(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
 
-        return moduleList[startIndex:stopIndex + 1]  # pl2py: in python the stop index is not included, so we add +1
+        return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
     def _define_new_module_factory(self, resolver: ModuleResolver) -> None:
         """
@@ -1377,15 +1375,15 @@ class Application:
         if Debug().pretending():
             return
 
-        moduleNames = []
+        module_names = []
 
         for module in fail_list:
             logfile = module.get_option("#error-log-file")
 
             if re.match(r"/cmake\.log$", logfile) or re.match(r"/meson-setup\.log$", logfile):
-                moduleNames.append(module.name)
+                module_names.append(module.name)
 
-        if len(moduleNames) > 0:
+        if len(module_names) > 0:
             names = ", ".join(fail_list)
             logger_app.warning(textwrap.dedent(f"""
             Possible solution: Install the build dependencies for the modules:
@@ -1447,25 +1445,25 @@ class Application:
                 logger_app.warning(f"r[{module}] - g[{logfile}]")
 
     @staticmethod
-    def _output_failed_module_lists(ctx: BuildContext, moduleGraph: dict) -> None:
+    def _output_failed_module_lists(ctx: BuildContext, module_graph: dict) -> None:
         """
         This function reads the list of failed modules for each phase in the build
         context and calls _output_failed_module_list for all the module failures.
 
         Parameters:
             ctx: Build context
-            moduleGraph:
+            module_graph:
 
         Return value:
             None
         """
         Util.assert_isa(ctx, BuildContext)
 
-        extraDebugInfo = {
+        extra_debug_info = {
             "phases": {},
             "failCount": {}
         }
-        actualFailures: list[Module] = []
+        actual_failures: list[Module] = []
 
         # This list should correspond to the possible phase names (although
         # it doesn't yet since the old code didn't, TODO)
@@ -1474,11 +1472,11 @@ class Application:
             for failure in failures:
                 # we already tagged the failure before, should not happen but
                 # make sure to check to avoid spurious duplicate output
-                if extraDebugInfo["phases"].get(failure, None):
+                if extra_debug_info["phases"].get(failure, None):
                     continue
 
-                extraDebugInfo["phases"][failure] = phase
-                actualFailures.append(failure)
+                extra_debug_info["phases"][failure] = phase
+                actual_failures.append(failure)
             Application._output_failed_module_list(ctx, f"failed to {phase}", failures)
 
         # See if any modules fail continuously and warn specifically for them.
@@ -1490,25 +1488,25 @@ class Application:
             m.add_post_build_message(f"y[{m}] has failed to build b[{num_failures}] times.")
 
         top = 5
-        numSuggestedModules = len(actualFailures)
+        num_suggested_modules = len(actual_failures)
 
         # Omit listing $top modules if there are that many or fewer anyway.
         # Not much point ranking 4 out of 4 failures,
         # this feature is meant for 5 out of 65
 
-        if numSuggestedModules > top:
-            sortedForDebug = DebugOrderHints.sort_failures_in_debug_order(moduleGraph, extraDebugInfo, actualFailures)
+        if num_suggested_modules > top:
+            sorted_for_debug = DebugOrderHints.sort_failures_in_debug_order(module_graph, extra_debug_info, actual_failures)
 
             logger_app.info(f"\nThe following top {top} may be the most important to fix to " +
                             "get the build to work, listed in order of 'probably most " +
                             "interesting' to 'probably least interesting' failure:\n")
-            for item in sortedForDebug[:top]:  # pl2py: in python the stop point is not included, so we add +1
+            for item in sorted_for_debug[:top]:  # pl2py: in python the stop point is not included, so we add +1
                 logger_app.info(f"\tr[b[{item}]")
 
-        Application._output_possible_solution(ctx, actualFailures)
+        Application._output_possible_solution(ctx, actual_failures)
 
     @staticmethod
-    def _install_templated_file(sourcePath: str, destinationPath: str, ctx: BuildContext) -> None:
+    def _install_templated_file(source_path: str, destination_path: str, ctx: BuildContext) -> None:
         """
         This function takes a given file and a build context, and installs it to a
         given location while expanding out template entries within the source file.
@@ -1527,8 +1525,8 @@ class Application:
         Error handling: Any errors will result in an exception being thrown.
 
         Parameters:
-            sourcePath: Pathname to the source file (use absolute paths)
-            destinationPath: Pathname to the destination file (use absolute paths)
+            source_path: Pathname to the source file (use absolute paths)
+            destination_path: Pathname to the destination file (use absolute paths)
             ctx: Build context to use for looking up template values
 
         Returns:
@@ -1538,19 +1536,19 @@ class Application:
         Util.assert_isa(ctx, BuildContext)
 
         try:
-            input_file = fileinput.FileInput(files=sourcePath, mode="r")
+            input_file = fileinput.FileInput(files=source_path, mode="r")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template source $sourcePath: {e}")
+            BuildException.croak_runtime(f"Unable to open template source {source_path}: {e}")
 
         try:
-            output_file = open(destinationPath, "w")
+            output_file = open(destination_path, "w")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template output $destinationPath: {e}")
+            BuildException.croak_runtime(f"Unable to open template output {destination_path}: {e}")
 
         for line in input_file:
             if line is None:
-                os.unlink(destinationPath)
-                BuildException.croak_runtime(f"Failed to read from {sourcePath} at line {input_file.filelineno()}")
+                os.unlink(destination_path)
+                BuildException.croak_runtime(f"Failed to read from {source_path} at line {input_file.filelineno()}")
 
             # Some lines should only be present in the source as they aid with testing.
             if "kde-builder: filter" in line:
@@ -1574,10 +1572,10 @@ class Application:
             try:
                 output_file.write(line)
             except Exception as e:
-                BuildException.croak_runtime(f"Unable to write line to {destinationPath}: {e}")
+                BuildException.croak_runtime(f"Unable to write line to {destination_path}: {e}")
 
     @staticmethod
-    def _install_custom_file(ctx: BuildContext, sourceFilePath: str, destFilePath: str, md5KeyName: str) -> None:
+    def _install_custom_file(ctx: BuildContext, source_file_path: str, dest_file_path: str, md5_key_name: str) -> None:
         """
         This function installs a source file to a destination path, assuming the
         source file is a "templated" source file (see also _install_templated_file), and
@@ -1588,33 +1586,33 @@ class Application:
 
         Parameters:
             ctx: Build context to use for looking up template values.
-            sourceFilePath: The full path to the source file.
-            destFilePath: The full path to the destination file (incl. name).
-            md5KeyName: The key name to use for searching/recording installed MD5 digest.
-        
+            source_file_path: The full path to the source file.
+            dest_file_path: The full path to the destination file (incl. name).
+            md5_key_name: The key name to use for searching/recording installed MD5 digest.
+
         Returns:
              None
         """
         Util.assert_isa(ctx, BuildContext)
-        baseName = os.path.basename(sourceFilePath)
+        base_name = os.path.basename(source_file_path)
 
-        if os.path.exists(destFilePath):
-            existingMD5 = ctx.get_persistent_option("/digests", md5KeyName) or ""
+        if os.path.exists(dest_file_path):
+            existing_md5 = ctx.get_persistent_option("/digests", md5_key_name) or ""
 
-            if hashlib.md5(open(destFilePath, "rb").read()).hexdigest() != existingMD5:
+            if hashlib.md5(open(dest_file_path, "rb").read()).hexdigest() != existing_md5:
                 if not ctx.get_option("#delete-my-settings"):
-                    logger_app.error(f"\tr[*] Installing \"b[{baseName}]\" would overwrite an existing file:")
-                    logger_app.error(f"\tr[*]  y[b[{destFilePath}]")
+                    logger_app.error(f"\tr[*] Installing \"b[{base_name}]\" would overwrite an existing file:")
+                    logger_app.error(f"\tr[*]  y[b[{dest_file_path}]")
                     logger_app.error(f"\tr[*] If this is acceptable, please delete the existing file and re-run,")
                     logger_app.error(f"\tr[*] or pass b[--delete-my-settings] and re-run.")
 
                     return
                 elif not Debug().pretending():
-                    shutil.copy(destFilePath, f"{destFilePath}.kde-builder-backup")
+                    shutil.copy(dest_file_path, f"{dest_file_path}.kde-builder-backup")
 
         if not Debug().pretending():
-            Application._install_templated_file(sourceFilePath, destFilePath, ctx)
-            ctx.set_persistent_option("/digests", md5KeyName, hashlib.md5(open(destFilePath, "rb").read()).hexdigest())
+            Application._install_templated_file(source_file_path, dest_file_path, ctx)
+            ctx.set_persistent_option("/digests", md5_key_name, hashlib.md5(open(dest_file_path, "rb").read()).hexdigest())
 
     def install_login_session(self) -> None:
         """
@@ -1630,7 +1628,7 @@ class Application:
         password.
         """
 
-        RealBinDir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
+        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
         ctx = self.context
         pws_builddir = ctx.get_option("build-dir") + "/plasma-workspace"
@@ -1669,7 +1667,7 @@ class Application:
                         libexecdir + "/plasma-dev-prefix.sh")
             check_match(startplasma_dev_script,
                         libexecdir + "/startplasma-dev.sh")
-            check_match(RealBinDir + "/data/00-plasma.conf.in",
+            check_match(real_bin_dir + "/data/00-plasma.conf.in",
                         "/etc/dbus-1/session.d/00-plasma.conf")
 
             dbus1_files_dir = ctx.get_option("install-dir") + "/share/dbus-1"
@@ -1709,55 +1707,55 @@ class Application:
         if Debug().pretending():
             return True
 
-        buildModules = ctx.modules_in_phase("build")
-        requiredPrograms = {}
-        modulesRequiringProgram = {}
+        build_modules = ctx.modules_in_phase("build")
+        required_programs = {}
+        modules_requiring_program = {}
 
         for module in ctx.modules_in_phase("build"):
             progs = module.build_system().required_programs()
 
-            requiredPrograms = {prog: 1 for prog in progs}
+            required_programs = {prog: 1 for prog in progs}
 
             for prog in progs:
-                if not modulesRequiringProgram.get(prog, None):
-                    modulesRequiringProgram[prog] = {}
-                modulesRequiringProgram[prog][module.name] = 1
+                if not modules_requiring_program.get(prog, None):
+                    modules_requiring_program[prog] = {}
+                modules_requiring_program[prog][module.name] = 1
 
-        wasError = False
-        for prog in requiredPrograms.keys():
-            requiredPackages = {
+        was_error = False
+        for prog in required_programs.keys():
+            required_packages = {
                 "qmake": "Qt",
                 "cmake": "CMake",
                 "meson": "Meson",
                 "ninja": "Ninja",
             }
 
-            preferredPath = Util.locate_exe(prog, preferred_paths)
-            programPath = preferredPath or Util.locate_exe(prog)
+            preferred_path = Util.locate_exe(prog, preferred_paths)
+            program_path = preferred_path or Util.locate_exe(prog)
 
             # qmake is not necessarily named "qmake"
-            if not programPath and prog == "qmake":
-                programPath = BuildSystem_QMake5.abs_path_to_qmake()
+            if not program_path and prog == "qmake":
+                program_path = BuildSystem_QMake5.abs_path_to_qmake()
 
-            if not programPath:
+            if not program_path:
                 # Don't complain about Qt if we're building it...
-                if prog == "qmake" and [x for x in buildModules if x.build_system_type() == "Qt" or x.build_system_type() == "Qt5"] or Debug().pretending():
+                if prog == "qmake" and [x for x in build_modules if x.build_system_type() == "Qt" or x.build_system_type() == "Qt5"] or Debug().pretending():
                     continue
 
-                wasError = True
-                reqPackage = requiredPackages.get(prog) or prog
+                was_error = True
+                req_package = required_packages.get(prog) or prog
 
-                modulesNeeding = modulesRequiringProgram[prog].keys()
+                modules_needing = modules_requiring_program[prog].keys()
 
                 logger_app.error(textwrap.dedent(f"""\
 
                 Unable to find r[b[{prog}]. This program is absolutely essential for building
-                the modules: y[{", ".join(modulesNeeding)}].
+                the modules: y[{", ".join(modules_needing)}].
 
                 Please ensure the development packages for
-                {reqPackage} are installed by using your distribution's package manager.
+                {req_package} are installed by using your distribution's package manager.
                 """))
-        return not wasError
+        return not was_error
 
     def _reachable_module_logs(self, logdir: str) -> list[str]:
         """
@@ -1788,23 +1786,23 @@ class Application:
         # Extract numeric directories IDs from directories/files paths in links list.
         dirs = [re.search(r"(\d{4}-\d\d-\d\d-\d\d)", d).group(1) for d in links if re.search(r"(\d{4}-\d\d-\d\d-\d\d)", d)]  # if we use pretending, then symlink will point to /dev/null, so check if found matching group first
 
-        # Convert to unique list by abusing hash keys.
-        tempHash = {a_dir: None for a_dir in dirs}
+        # Convert to unique list by abusing dict keys.
+        temp_dict = {a_dir: None for a_dir in dirs}
 
-        return list(tempHash.keys())
+        return list(temp_dict.keys())
 
     @staticmethod
-    def _install_signal_handlers(handlerRef: Callable) -> None:
+    def _install_signal_handlers(handler_ref: Callable) -> None:
         """
         Installs the given function as a signal handler for a set of signals which
         could kill the program.
 
         Parameters:
-            handlerRef: A function to act as the handler.
+            handler_ref: A function to act as the handler.
         """
         signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGABRT, signal.SIGTERM, signal.SIGPIPE]
         for sig in signals:
-            signal.signal(sig, handlerRef)
+            signal.signal(sig, handler_ref)
 
     def _hold_performance_power_profile_if_possible(self):
         try:

@@ -70,7 +70,7 @@ def test_debug_order(mock_module):
         }
     }
 
-    extraDebugInfo1 = {
+    extra_debug_info1 = {
         "phases": {
             a1.name: "install",
             b1.name: "install",
@@ -80,35 +80,35 @@ def test_debug_order(mock_module):
         }
     }
 
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(c1, c1) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(c1, d1) == -1, "No dependency relation ship, root causes, same popularity: the 'newest' failure (lower count) should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(c1, e1) == 1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(c1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(c1, a1) == -1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(c1, c1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(c1, d1) == -1, "No dependency relation ship, root causes, same popularity: the 'newest' failure (lower count) should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(c1, e1) == 1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(c1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(c1, a1) == -1, "No dependency relation ship: the root cause should be sorted first"
 
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(d1, c1) == 1, "No dependency relation ship, root causes, same popularity: the 'newest' failure (lower count) should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(d1, d1) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(d1, e1) == 1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(d1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(d1, a1) == -1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(d1, c1) == 1, "No dependency relation ship, root causes, same popularity: the 'newest' failure (lower count) should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(d1, d1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(d1, e1) == 1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(d1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(d1, a1) == -1, "No dependency relation ship: the root cause should be sorted first"
 
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(e1, c1) == -1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(e1, d1) == -1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(e1, e1) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(e1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(e1, a1) == -1, "Dependencies should be sorted before dependent modules"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(e1, c1) == -1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(e1, d1) == -1, "No dependency relation ship, root causes: the higher popularity should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(e1, e1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(e1, b1) == -1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(e1, a1) == -1, "Dependencies should be sorted before dependent modules"
 
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(b1, c1) == 1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(b1, d1) == 1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(b1, e1) == 1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(b1, b1) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(b1, a1) == -1, "Dependencies should be sorted before dependent modules"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(b1, c1) == 1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(b1, d1) == 1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(b1, e1) == 1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(b1, b1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(b1, a1) == -1, "Dependencies should be sorted before dependent modules"
 
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(a1, c1) == 1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(a1, d1) == 1, "No dependency relation ship: the root cause should be sorted first"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(a1, e1) == 1, "Dependencies should be sorted before dependent modules"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(a1, b1) == 1, "Dependencies should be sorted before dependent modules"
-    assert DebugOrderHints._make_comparison_func(graph1, extraDebugInfo1)(a1, a1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(a1, c1) == 1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(a1, d1) == 1, "No dependency relation ship: the root cause should be sorted first"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(a1, e1) == 1, "Dependencies should be sorted before dependent modules"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(a1, b1) == 1, "Dependencies should be sorted before dependent modules"
+    assert DebugOrderHints._make_comparison_func(graph1, extra_debug_info1)(a1, a1) == 0, "Comparing the same modules should always yield the same relative position"
 
     # test: ordering of modules that fail in different phases
     p_b1 = Module("build1", 0)
@@ -151,7 +151,7 @@ def test_debug_order(mock_module):
         }
     }
 
-    extraDebugInfo2 = {
+    extra_debug_info2 = {
         "phases": {
             p_b1.name: "build",
             p_b2.name: "build",
@@ -162,44 +162,44 @@ def test_debug_order(mock_module):
         }
     }
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_b1) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_b2) == -1, "Same phase: sort by name for reproducibility"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_i) == 1, "Phase ordering: 'build' should be sorted after 'install'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_t) == 1, "Phase ordering: 'build' should be sorted after 'test'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_u) == -1, "Phase ordering: 'build' should be sorted before 'update'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b1, p_x) == -1, "Phase ordering: 'build' should be sorted before unsupported phases"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_b1) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_b2) == -1, "Same phase: sort by name for reproducibility"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_i) == 1, "Phase ordering: 'build' should be sorted after 'install'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_t) == 1, "Phase ordering: 'build' should be sorted after 'test'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_u) == -1, "Phase ordering: 'build' should be sorted before 'update'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b1, p_x) == -1, "Phase ordering: 'build' should be sorted before unsupported phases"
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_b1) == 1, "Same phase: sort by name for reproducibility"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_b2) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_i) == 1, "Phase ordering: 'build' should be sorted after 'install'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_t) == 1, "Phase ordering: 'build' should be sorted after 'test'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_u) == -1, "Phase ordering: 'build' should be sorted before 'update'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_b2, p_x) == -1, "Phase ordering: 'build' should be sorted before unsupported phases"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_b1) == 1, "Same phase: sort by name for reproducibility"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_b2) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_i) == 1, "Phase ordering: 'build' should be sorted after 'install'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_t) == 1, "Phase ordering: 'build' should be sorted after 'test'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_u) == -1, "Phase ordering: 'build' should be sorted before 'update'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_b2, p_x) == -1, "Phase ordering: 'build' should be sorted before unsupported phases"
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_b1) == -1, "Phase ordering: 'install' should be sorted before 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_b2) == -1, "Phase ordering: 'install' should be sorted before 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_i) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_t) == -1, "Phase ordering: 'install' should be sorted before 'test'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_u) == -1, "Phase ordering: 'install' should be sorted before 'update'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_i, p_x) == -1, "Phase ordering: 'install' should be sorted before unsupported phases"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_b1) == -1, "Phase ordering: 'install' should be sorted before 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_b2) == -1, "Phase ordering: 'install' should be sorted before 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_i) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_t) == -1, "Phase ordering: 'install' should be sorted before 'test'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_u) == -1, "Phase ordering: 'install' should be sorted before 'update'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_i, p_x) == -1, "Phase ordering: 'install' should be sorted before unsupported phases"
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_b1) == -1, "Phase ordering: 'test' should be sorted before 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_b2) == -1, "Phase ordering: 'test' should be sorted before 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_i) == 1, "Phase ordering: 'test' should be sorted after 'install'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_t) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_u) == -1, "Phase ordering: 'test' should be sorted before 'update'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_t, p_x) == -1, "Phase ordering: 'test' should be sorted before unsupported phases"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_b1) == -1, "Phase ordering: 'test' should be sorted before 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_b2) == -1, "Phase ordering: 'test' should be sorted before 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_i) == 1, "Phase ordering: 'test' should be sorted after 'install'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_t) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_u) == -1, "Phase ordering: 'test' should be sorted before 'update'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_t, p_x) == -1, "Phase ordering: 'test' should be sorted before unsupported phases"
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_b1) == 1, "Phase ordering: 'update' should be sorted after 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_b2) == 1, "Phase ordering: 'update' should be sorted after 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_i) == 1, "Phase ordering: 'update' should be sorted after 'install'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_t) == 1, "Phase ordering: 'update' should be sorted after 'test'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_u) == 0, "Comparing the same modules should always yield the same relative position"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_u, p_x) == -1, "Phase ordering: 'update' should be sorted before unsupported phases"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_b1) == 1, "Phase ordering: 'update' should be sorted after 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_b2) == 1, "Phase ordering: 'update' should be sorted after 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_i) == 1, "Phase ordering: 'update' should be sorted after 'install'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_t) == 1, "Phase ordering: 'update' should be sorted after 'test'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_u) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_u, p_x) == -1, "Phase ordering: 'update' should be sorted before unsupported phases"
 
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_b1) == 1, "Phase ordering: unknown phases should be sorted after 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_b2) == 1, "Phase ordering: unknown phases should be sorted after 'build'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_i) == 1, "Phase ordering: unknown phases should be sorted after 'install'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_t) == 1, "Phase ordering: unknown phases should be sorted after 'test'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_u) == 1, "Phase ordering: unknown phases should be sorted after 'update'"
-    assert DebugOrderHints._make_comparison_func(graph2, extraDebugInfo2)(p_x, p_x) == 0, "Comparing the same modules should always yield the same relative position"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_b1) == 1, "Phase ordering: unknown phases should be sorted after 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_b2) == 1, "Phase ordering: unknown phases should be sorted after 'build'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_i) == 1, "Phase ordering: unknown phases should be sorted after 'install'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_t) == 1, "Phase ordering: unknown phases should be sorted after 'test'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_u) == 1, "Phase ordering: unknown phases should be sorted after 'update'"
+    assert DebugOrderHints._make_comparison_func(graph2, extra_debug_info2)(p_x, p_x) == 0, "Comparing the same modules should always yield the same relative position"

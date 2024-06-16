@@ -19,11 +19,11 @@ RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 # <editor-fold desc="Check missing python modules">
 def find_missing_modules() -> list[str]:
-    requiredModules = [
+    required_modules = [
         "yaml",
         "setproctitle",
     ]
-    missingModules = []
+    missing_modules = []
 
     def validate_mod(mod_name):
         import importlib
@@ -34,12 +34,12 @@ def find_missing_modules() -> list[str]:
         except ImportError:
             return False
 
-    for neededModule in requiredModules:
+    for neededModule in required_modules:
         if validate_mod(neededModule):
             continue
-        missingModules.append(neededModule)
+        missing_modules.append(neededModule)
 
-    return missingModules
+    return missing_modules
 
 
 # Ensure that required Python modules are available so that the user isn't surprised later with an exception

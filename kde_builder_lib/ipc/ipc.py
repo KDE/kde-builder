@@ -59,36 +59,36 @@ class IPC:
         self.updates_done = 0
         self.opt_update_handler = None  # Callback for persistent option changes
 
-    def notify_persistent_option_change(self, moduleName: str, optName: str, optValue: str) -> None:
+    def notify_persistent_option_change(self, module_name: str, opt_name: str, opt_value: str) -> None:
         """
         Sends a message to the main/build process that a persistent option for the
         given module name must be changed. For use by processes that do not control
         the persistent option store upon shutdown.
         """
-        self.send_ipc_message(IPC.MODULE_PERSIST_OPT, f"{moduleName},{optName},{optValue}")
+        self.send_ipc_message(IPC.MODULE_PERSIST_OPT, f"{module_name},{opt_name},{opt_value}")
 
-    def notify_new_post_build_message(self, moduleName: str, msg) -> None:
+    def notify_new_post_build_message(self, module_name: str, msg) -> None:
         """
         Sends a message to the main/build process that a given message should be
         shown to the user at the end of the build.
         """
-        self.send_ipc_message(IPC.MODULE_POSTBUILD_MSG, f"{moduleName},{msg}")
+        self.send_ipc_message(IPC.MODULE_POSTBUILD_MSG, f"{module_name},{msg}")
 
     def notify_update_success(self, module: str, msg: str) -> None:
         self.send_ipc_message(IPC.MODULE_SUCCESS, f"{module},{msg}")
 
-    def set_logged_module(self, moduleName: str) -> None:
+    def set_logged_module(self, module_name: str) -> None:
         # Sets which module messages stored by send_log_message are supposed to be
         # associated with.
-        self.logged_module = moduleName
+        self.logged_module = module_name
 
     def send_log_message(self, logger_name: str, message_level: str, msg: str) -> None:
         """
         Sends a message to be logged by the process holding the TTY.
         The logged message is associated with the module set by set_logged_module.
         """
-        loggedModule = self.logged_module
-        self.send_ipc_message(IPC.MODULE_LOGMSG, f"{loggedModule},{logger_name},{message_level},{msg}")
+        logged_module = self.logged_module
+        self.send_ipc_message(IPC.MODULE_LOGMSG, f"{logged_module},{logger_name},{message_level},{msg}")
 
     @staticmethod
     def _print_logged_message(combined_msg: str) -> None:
@@ -101,7 +101,7 @@ class IPC:
             msg = f"\t{msg}"
         kbLogger.print_clr(logger_name, message_level, msg)
 
-    def _update_seen_modules_from_message(self, ipcType, buffer) -> str | None:
+    def _update_seen_modules_from_message(self, ipc_type, buffer) -> str | None:
         """
         Called any time we're waiting for an IPC message from a sub process. This can
         occur during a module build (waiting for messages from update process) or
@@ -109,17 +109,17 @@ class IPC:
         which module we'll be about to receive messages for from the other end.
         """
         updated = self.updated
-        messagesRef = self.messages
+        messages_ref = self.messages
         message = None
 
-        if not ipcType:
+        if not ipc_type:
             BuildException.croak_runtime("IPC failure: no IPC mechanism defined")
 
-        if ipcType == IPC.MODULE_SUCCESS:
-            ipcModuleName, msg = buffer.split(",")
+        if ipc_type == IPC.MODULE_SUCCESS:
+            ipc_module_name, msg = buffer.split(",")
             message = msg
-            updated[ipcModuleName] = "success"
-        elif ipcType == IPC.MODULE_SKIPPED:
+            updated[ipc_module_name] = "success"
+        elif ipc_type == IPC.MODULE_SKIPPED:
             # The difference between success here and 'skipped' below
             # is that success means we should build even though we
             # didn't perform an update, while 'skipped' means the
@@ -127,45 +127,45 @@ class IPC:
             # failure.
             message = "skipped"
             updated[buffer] = "success"
-        elif ipcType == IPC.MODULE_CONFLICT:
+        elif ipc_type == IPC.MODULE_CONFLICT:
             message = "conflicts present"
             updated[buffer] = "failed"
-        elif ipcType == IPC.MODULE_FAILURE:
+        elif ipc_type == IPC.MODULE_FAILURE:
             message = "update failed"
             updated[buffer] = "failed"
-        elif ipcType == IPC.MODULE_UPTODATE:
+        elif ipc_type == IPC.MODULE_UPTODATE:
             # Although the module source hasn't changed, the user might be forcing a
             # rebuild, so our message should reflect what's actually going to happen.
             message = "no files affected"
-            ipcModuleName, refreshReason = buffer.split(",")
+            ipc_module_name, refresh_reason = buffer.split(",")
 
-            if refreshReason:
-                updated[ipcModuleName] = "success"
-                self.why_refresh[ipcModuleName] = refreshReason
+            if refresh_reason:
+                updated[ipc_module_name] = "success"
+                self.why_refresh[ipc_module_name] = refresh_reason
             else:
-                updated[ipcModuleName] = "skipped"
-        elif ipcType == IPC.MODULE_PERSIST_OPT:
-            ipcModuleName, optName, value = buffer.split(",")
+                updated[ipc_module_name] = "skipped"
+        elif ipc_type == IPC.MODULE_PERSIST_OPT:
+            ipc_module_name, opt_name, value = buffer.split(",")
             if self.opt_update_handler:
                 # Call into callback to update persistent options
-                self.opt_update_handler(ipcModuleName, optName, value)
-        elif ipcType == IPC.MODULE_LOGMSG:
-            ipcModuleName, logMessage = buffer.split(",", maxsplit=1)
+                self.opt_update_handler(ipc_module_name, opt_name, value)
+        elif ipc_type == IPC.MODULE_LOGMSG:
+            ipc_module_name, log_message = buffer.split(",", maxsplit=1)
 
             # Save it for later if we can't print it yet.
-            if ipcModuleName not in messagesRef:
-                messagesRef[ipcModuleName] = []
-            messagesRef[ipcModuleName].append(logMessage)
-        elif ipcType == IPC.ALL_DONE:
+            if ipc_module_name not in messages_ref:
+                messages_ref[ipc_module_name] = []
+            messages_ref[ipc_module_name].append(log_message)
+        elif ipc_type == IPC.ALL_DONE:
             self.updates_done = 1
-        elif ipcType == IPC.MODULE_POSTBUILD_MSG:
-            ipcModuleName, postBuildMsg = buffer.split(",", maxsplit=1)
+        elif ipc_type == IPC.MODULE_POSTBUILD_MSG:
+            ipc_module_name, post_build_msg = buffer.split(",", maxsplit=1)
 
-            if ipcModuleName not in self.postbuild_msg:
-                self.postbuild_msg[ipcModuleName] = []
-            self.postbuild_msg[ipcModuleName].append(postBuildMsg)
+            if ipc_module_name not in self.postbuild_msg:
+                self.postbuild_msg[ipc_module_name] = []
+            self.postbuild_msg[ipc_module_name].append(post_build_msg)
         else:
-            BuildException.croak_internal(f"Unhandled IPC type: {ipcType}")
+            BuildException.croak_internal(f"Unhandled IPC type: {ipc_type}")
         return message
 
     def set_persistent_option_handler(self, handler: Callable) -> None:
@@ -186,10 +186,10 @@ class IPC:
     def wait_for_end(self) -> None:
         self.wait_for_stream_start()
         while not self.no_update and not self.updates_done:
-            ipcType, buffer = self.receive_ipc_message()
-            ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
+            ipc_type, buffer = self.receive_ipc_message()
+            ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
             # We ignore the return value in favor of ->{updates_done}
-            self._update_seen_modules_from_message(ipcType, buffer)
+            self._update_seen_modules_from_message(ipc_type, buffer)
 
     def wait_for_module(self, module: Module) -> tuple:
         """
@@ -200,7 +200,7 @@ class IPC:
         Will throw an exception for an IPC failure or if the module should not be
         built.
         """
-        moduleName = module.name
+        module_name = module.name
         updated = self.updated
 
         # Wait for the initial phase to complete, if it hasn't.
@@ -208,32 +208,32 @@ class IPC:
 
         # No update? Just mark as successful
         if self.no_update or not module.phases.has("update"):
-            updated[moduleName] = "success"
+            updated[module_name] = "success"
             return "success", "Skipped"
 
         message = None
-        while updated.get(moduleName) is None and not self.updates_done:
-            ipcType, buffer = self.receive_ipc_message()
-            ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
-            message = self._update_seen_modules_from_message(ipcType, buffer)
+        while updated.get(module_name) is None and not self.updates_done:
+            ipc_type, buffer = self.receive_ipc_message()
+            ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
+            message = self._update_seen_modules_from_message(ipc_type, buffer)
 
             # If we have 'global' messages they are probably for the first module and
             # include standard setup messages, etc. Print first and then print module's
             # messages.
-            messagesRef = self.messages
-            for item in ["global", moduleName]:
-                if item in messagesRef:  # pl2py: we specifically check if there is such a key
-                    for msg in messagesRef[item]:
+            messages_ref = self.messages
+            for item in ["global", module_name]:
+                if item in messages_ref:  # pl2py: we specifically check if there is such a key
+                    for msg in messages_ref[item]:
                         self._print_logged_message(msg)
-                    del messagesRef[item]
+                    del messages_ref[item]
 
         # We won't print post-build messages now but we need to save them for when
         # they can be printed.
-        if moduleName in self.postbuild_msg:
-            for msg in self.postbuild_msg[moduleName]:
+        if module_name in self.postbuild_msg:
+            for msg in self.postbuild_msg[module_name]:
                 module.add_post_build_message(msg)
-            del self.postbuild_msg[moduleName]
-        return updated[moduleName], message
+            del self.postbuild_msg[module_name]
+        return updated[module_name], message
 
     def output_pending_logged_messages(self) -> None:
         """
@@ -244,10 +244,10 @@ class IPC:
         messages = self.messages
 
         for module, logMessages in messages.items():
-            nonEmptyMessages = [logMessage for logMessage in logMessages if logMessage.split(",", maxsplit=2)[2]]
-            if nonEmptyMessages:
+            non_empty_messages = [logMessage for logMessage in logMessages if logMessage.split(",", maxsplit=2)[2]]
+            if non_empty_messages:
                 logger_ipc.debug(f"\nUnhandled messages for module {module}:")
-                for combined_msg in nonEmptyMessages:
+                for combined_msg in non_empty_messages:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
                         msg = f"\t{msg}"
@@ -287,40 +287,40 @@ class IPC:
             return
 
         buffer = ""
-        ipcType = 0
+        ipc_type = 0
         IPC.waited = 1
 
-        while ipcType != IPC.ALL_UPDATING:
-            ipcType, buffer = self.receive_ipc_message()
-            ipcType = MsgType(ipcType)  # pl2py: this was not in kdesrc-build
+        while ipc_type != IPC.ALL_UPDATING:
+            ipc_type, buffer = self.receive_ipc_message()
+            ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
 
-            if not ipcType:
+            if not ipc_type:
                 BuildException.croak_internal("IPC Failure waiting for stream start :(")
-            if ipcType == IPC.ALL_FAILURE:
+            if ipc_type == IPC.ALL_FAILURE:
                 BuildException.croak_runtime(f"Unable to perform source update for any module:\n\t{buffer}")
-            elif ipcType == IPC.ALL_SKIPPED:
+            elif ipc_type == IPC.ALL_SKIPPED:
                 self.no_update = 1
                 self.updates_done = 1
-            elif ipcType == IPC.MODULE_LOGMSG:
-                ipcModuleName, logMessage = buffer.split(",", maxsplit=1)
-                if ipcModuleName not in self.messages:
-                    self.messages[ipcModuleName] = []
-                self.messages[ipcModuleName].append(logMessage)
-            elif ipcType != IPC.ALL_UPDATING:
-                BuildException.croak_runtime(f"IPC failure while expecting an update status: Incorrect type: {ipcType}")
+            elif ipc_type == IPC.MODULE_LOGMSG:
+                ipc_module_name, log_message = buffer.split(",", maxsplit=1)
+                if ipc_module_name not in self.messages:
+                    self.messages[ipc_module_name] = []
+                self.messages[ipc_module_name].append(log_message)
+            elif ipc_type != IPC.ALL_UPDATING:
+                BuildException.croak_runtime(f"IPC failure while expecting an update status: Incorrect type: {ipc_type}")
 
-    def send_ipc_message(self, ipcType, msg: str) -> bool:
+    def send_ipc_message(self, ipc_type, msg: str) -> bool:
         """
         Sends an IPC message along with some IPC type information.
 
         Parameters:
-            ipcType: The IPC type to send.
+            ipc_type: The IPC type to send.
             msg: The actual message.
         All remaining parameters are sent to the object's send_message()
          procedure.
         """
-        encodedMsg = struct.pack("!l", ipcType) + msg.encode("utf-8")
-        return self.send_message(encodedMsg)
+        encoded_msg = struct.pack("!l", ipc_type) + msg.encode("utf-8")
+        return self.send_message(encoded_msg)
 
     @staticmethod
     def unpack_msg(msg: bytes) -> tuple:
@@ -333,8 +333,8 @@ class IPC:
         Returns:
              The IPC message type and message content.
         """
-        returnType, outBuffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
-        return returnType, outBuffer
+        return_type, out_buffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
+        return return_type, out_buffer
 
     def receive_ipc_message(self) -> tuple:
         """

@@ -13,10 +13,10 @@ def test_tag_names_based_on_time():
     Test tag names based on time
     """
     app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/branch-time-based/kdesrc-buildrc"])
-    moduleList = app.modules
-    assert len(moduleList) == 3, "Right number of modules"
+    module_list = app.modules
+    assert len(module_list) == 3, "Right number of modules"
 
-    for mod in moduleList:
+    for mod in module_list:
         scm = mod.scm()
         assert isinstance(scm, Updater)
 

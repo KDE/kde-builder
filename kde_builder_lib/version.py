@@ -20,13 +20,13 @@ class Version:
     SCRIPT_VERSION = VERSION
 
     @staticmethod
-    def set_base_path(newPath: str) -> None:
+    def set_base_path(new_path: str) -> None:
         """
         Should be called before using ``script_version`` to set the base path for the
         script. This is needed to auto-detect the version in git for kde-builder
         instances running from a git repo.
         """
-        Version.SCRIPT_PATH = newPath if newPath else Version.SCRIPT_PATH
+        Version.SCRIPT_PATH = new_path if new_path else Version.SCRIPT_PATH
 
     @staticmethod
     def script_version() -> str:

@@ -48,7 +48,7 @@ def test_logged_subprocess():
 
     cmd.on({"child_output": func2})
 
-    prog1Exit = cmd.start()
+    prog1_exit = cmd.start()
 
     # Create a second LoggedSubprocess while the first one is still alive, even
     # though it is finished.
@@ -58,11 +58,11 @@ def test_logged_subprocess():
         .set_command(["perl", "-E", "my $x = 4 + 4; say qq(here for stdout); die qq(hello);"]) \
         .chdir_to(tmp)
 
-    prog2Exit = cmd2.start()
+    prog2_exit = cmd2.start()
 
     assert output == "4", "Interior child command successfully completed"
-    assert prog1Exit == 0, "Program 1 exited correctly"
-    assert prog2Exit != 0, "Program 2 failed"
+    assert prog1_exit == 0, "Program 1 exited correctly"
+    assert prog2_exit != 0, "Program 2 failed"
 
     assert os.path.isdir(f"{tmp}/kde-builder-test/latest/test"), "Test module had a 'latest' dir setup"
     assert os.path.islink(f"{tmp}/kde-builder-test/latest-by-phase/test/test-suite-1.log"), "Test suite 1 phase log created"

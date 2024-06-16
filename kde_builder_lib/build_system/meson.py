@@ -29,14 +29,14 @@ class BuildSystem_Meson(BuildSystem):
         """
         module = self.module
         sourcedir = module.fullpath("source")
-        buildDir = module.fullpath("build")
+        builddir = module.fullpath("build")
         installdir = module.installation_path()
 
         # "module"-limited option grabbing can return None, so use Logical Defined-Or
         # to convert to empty string in that case.
-        setupOptions = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
+        setup_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
 
-        exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", buildDir, "--prefix", installdir, *setupOptions])
+        exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", builddir, "--prefix", installdir, *setup_options])
         return Util.good_exitcode(exitcode)
 
     @staticmethod

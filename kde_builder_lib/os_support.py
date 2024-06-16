@@ -45,9 +45,9 @@ class OSSupport:
         self.VERSION_ID = None
 
         # file might be None
-        kvListRef = self._read_os_release(file)
-        for key in kvListRef.keys():
-            setattr(self, key, kvListRef[key])
+        kv_list_ref = self._read_os_release(file)
+        for key in kv_list_ref.keys():
+            setattr(self, key, kv_list_ref[key])
 
     def vendor_id(self) -> str:
         """
@@ -84,10 +84,10 @@ class OSSupport:
         if self.ID == "debian":
             return True
 
-        likeDistros = self.ID_LIKE or ""
-        if likeDistros:
-            likeDistrosList = likeDistros.split(" ")
-            if "debian" in likeDistrosList:
+        like_distros = self.ID_LIKE or ""
+        if like_distros:
+            like_distros_list = like_distros.split(" ")
+            if "debian" in like_distros_list:
                 return True
         return False
 
@@ -132,9 +132,9 @@ class OSSupport:
         """
 
         ids = [self.vendor_id()]
-        likeDistros = self.ID_LIKE or ""
-        if likeDistros:
-            for likeDistro in likeDistros.split(" "):
+        like_distros = self.ID_LIKE or ""
+        if like_distros:
+            for likeDistro in like_distros.split(" "):
                 ids.append(likeDistro)
 
         for an_id in ids:
@@ -148,8 +148,8 @@ class OSSupport:
         return "linux"
 
     @staticmethod
-    def _read_os_release(fileName: str | None) -> dict:
-        files = [fileName] if fileName else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
+    def _read_os_release(file_name: str | None) -> dict:
+        files = [file_name] if file_name else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
         file = None
         error = None
 

@@ -19,8 +19,8 @@ def test_cmdline_selector_not_eaten():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --stop-on-failure setmod3".split(" ")
 
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 1, "Right number of modules (just one)"
-    assert moduleList[0].name == "setmod3", "mod list[2] == setmod3"
+    assert len(module_list) == 1, "Right number of modules (just one)"
+    assert module_list[0].name == "setmod3", "mod list[2] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

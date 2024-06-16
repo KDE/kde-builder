@@ -21,7 +21,6 @@ import subprocess
 import sys
 import textwrap
 from typing import Callable
-from typing import Optional
 from typing import TYPE_CHECKING
 
 import setproctitle
@@ -48,17 +47,17 @@ class Util:
     """
 
     @staticmethod
-    def list_has(listRef: list, value):
+    def list_has(list_ref: list, value):
         """
         Function to work around a Perl language limitation.
         Parameters:
-            listRef: The list to search. ALWAYS.
+            list_ref: The list to search. ALWAYS.
             value: The value to search for.
         Returns:
              True if the value is in the list
-        No need to use it in Python. We can just use `if "value" in listRef`.
+        No need to use it in Python. We can just use `if "value" in list_ref`.
         """
-        return value in listRef
+        return value in list_ref
 
     @staticmethod
     def locate_exe(prog: str, preferred: list[str] | None = None):
@@ -101,15 +100,15 @@ class Util:
         return obj
 
     @staticmethod
-    def assert_in(val, listRef):
+    def assert_in(val, list_ref):
         """
         Throws an exception if the first parameter is not included in the
         provided list of possible alternatives.
         Parameters:
             val: The value to check.
-            listRef: List of alternatives.
+            list_ref: List of alternatives.
         """
-        if val not in listRef:
+        if val not in list_ref:
             BuildException.croak_runtime(f"{val} is not a permissible value for its argument")
 
         return val
@@ -141,19 +140,19 @@ class Util:
         return 0  # Return true (success code)
 
     @staticmethod
-    def p_chdir(Dir):
+    def p_chdir(directory):
         """
         Is exactly like "chdir", but it will also print out a message saying that
         we're switching to the directory when debugging.
         """
-        logger_util.debug(f"\tcd g[{Dir}]")
+        logger_util.debug(f"\tcd g[{directory}]")
 
         try:
-            os.chdir(Dir)
+            os.chdir(directory)
         except OSError as e:
             if Debug().pretending():
                 return 1
-            BuildException.croak_runtime(f"Could not change to directory {dir}: {e}")
+            BuildException.croak_runtime(f"Could not change to directory {directory}: {e}")
 
     @staticmethod
     def super_mkdir(pathname):
@@ -178,20 +177,20 @@ class Util:
             return True if os.path.exists(pathname) else False
 
     @staticmethod
-    def file_digest_md5(fileName):
+    def file_digest_md5(file_name):
         """
         Calculates the MD5 digest of a file already on-disk. The digest is
         returned as a hex string digest as from md5.hexdigest
 
         Parameters:
-             fileName: File name to read
+             file_name: File name to read
 
         Returns:
             hex string MD5 digest of file.
         An exception is thrown if an error occurs reading the file.
         """
         md5 = hashlib.md5()
-        with open(fileName, "rb") as file:
+        with open(file_name, "rb") as file:
             while True:
                 chunk = file.read(8192)
                 if not chunk:
@@ -255,24 +254,24 @@ class Util:
 
         # todo Originally, the Util.disable_locale_message_translation() was applied to the subprocess, check if it is needed
         p = subprocess.run([program, *args], shell=False, capture_output=True)
-        exitCode = p.returncode
-        childOutput = p.stdout.decode()
+        exit_code = p.returncode
+        child_output = p.stdout.decode()
 
-        if "\0" in childOutput:
-            childOutputs = [item + "\0" for item in childOutput.split("\0") if item]  # pl2py: for our git command terminated with --null
+        if "\0" in child_output:
+            child_outputs = [item + "\0" for item in child_output.split("\0") if item]  # pl2py: for our git command terminated with --null
         else:
-            childOutputs = childOutput.split("\n")
-            childOutputs = childOutputs[:-1] if childOutputs[-1] == "" else childOutputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
-            childOutputs = list(map(lambda x: x + "\n", childOutputs))
+            child_outputs = child_output.split("\n")
+            child_outputs = child_outputs[:-1] if child_outputs[-1] == "" else child_outputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
+            child_outputs = list(map(lambda x: x + "\n", child_outputs))
 
-        lines = [line for line in childOutputs if filter_func(line)]
+        lines = [line for line in child_outputs if filter_func(line)]
 
-        if exitCode:
+        if exit_code:
             # other errors might still be serious but don't need a backtrace
             if Debug().pretending():
-                logger_util.debug(f"{program} gave error exit code {exitCode}")
+                logger_util.debug(f"{program} gave error exit code {exit_code}")
             else:
-                logger_util.warning(f"{program} gave error exit code {exitCode}")
+                logger_util.warning(f"{program} gave error exit code {exit_code}")
         return lines
 
     @staticmethod
@@ -357,7 +356,7 @@ class Util:
             os.symlink(f"{logfile}", f"{logdir}/error.log")
 
     @staticmethod
-    def run_logged_command(module: Module, filename: str, callbackRef: Optional[Callable], command: list[str]) -> int:
+    def run_logged_command(module: Module, filename: str, callback_ref: Callable | None, command: list[str]) -> int:
         """
         Common code for log_command and Util_LoggedSubprocess
         """
@@ -377,7 +376,7 @@ class Util:
 
             dec = codecs.getincrementaldecoder('utf8')()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
 
-            if not callbackRef and logger_logged_cmd.isEnabledFor(logging.DEBUG):
+            if not callback_ref and logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     # If no other callback given, pass to debug() if debug-mode is on.
                     while True:
@@ -388,13 +387,13 @@ class Util:
                             print(line.strip())
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
 
-            if callbackRef:
+            if callback_ref:
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     while True:
                         line = dec.decode(os.read(pipe_read, 4096))
                         if not line:
                             break
-                        callbackRef(line)  # Note that line may contain several lines (a string containing "\n")
+                        callback_ref(line)  # Note that line may contain several lines (a string containing "\n")
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
 
             _, return_code = os.waitpid(pid, 0)
@@ -434,7 +433,7 @@ class Util:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
 
-            if callbackRef or logger_logged_cmd.isEnabledFor(logging.DEBUG):
+            if callback_ref or logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
                 # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
                 os.close(1)
@@ -496,7 +495,7 @@ class Util:
         return exitcode == 0
 
     @staticmethod
-    def log_command(module: Module, filename: str, argRef: list[str], optionsRef: dict | None = None) -> int:
+    def log_command(module: Module, filename: str, arg_ref: list[str], options_ref: dict | None = None) -> int:
         """
         Function to run a command, optionally filtering on the output of the child
         command. Use like:
@@ -538,19 +537,19 @@ class Util:
         to always be run, use a python IPC mechanism like os.system(), subprocess, or
         a utility like ``filter_program_output``.
         """
-        if optionsRef is None:
-            optionsRef = {}
+        if options_ref is None:
+            options_ref = {}
 
-        command = argRef
-        callbackRef = optionsRef.get("callback", None)
+        command = arg_ref
+        callback_ref = options_ref.get("callback", None)
 
         if Debug().pretending():
             logger_logged_cmd.pretend("\tWould have run g['" + "' '".join(command) + "'")
             return 0
-        return Util.run_logged_command(module, filename, callbackRef, argRef)
+        return Util.run_logged_command(module, filename, callback_ref, arg_ref)
 
     @staticmethod
-    def run_logged(module: Module, filename: str, directory: str | None, argRef: list[str], callbackRef: Optional[Callable] = None) -> int:
+    def run_logged(module: Module, filename: str, directory: str | None, arg_ref: list[str], callback_ref: Callable | None = None) -> int:
         """
         This is similar to ``log_command`` in that this runs the given command and
         arguments in a separate process. Returns the exit status of the sub-process.
@@ -570,7 +569,7 @@ class Util:
         if not directory:
             directory = ""
         if Debug().pretending():
-            args_str = "', '".join(argRef)
+            args_str = "', '".join(arg_ref)
             logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
             return 0
 
@@ -591,10 +590,10 @@ class Util:
             # This means that changes made by log_command or function calls made
             # via log_command will not be saved or noted unless they are made part
             # of the return value, or sent earlier via a 'progress' event.
-            setproctitle.setproctitle("kde-builder " + " ".join(argRef))  # better indicate what is the process
+            setproctitle.setproctitle("kde-builder " + " ".join(arg_ref))  # better indicate what is the process
             if directory:
                 Util.p_chdir(directory)
-            retval.value = Util.log_command(module, filename, argRef, {"callback": callbackRef})
+            retval.value = Util.log_command(module, filename, arg_ref, {"callback": callback_ref})
 
         exitcode = subprocess_run(func)
         logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + '.log')}\n")
@@ -617,14 +616,14 @@ class Util:
         return shlex.split(line.strip())
 
     @staticmethod
-    def pretend_open(path, defaultText: str = ""):
+    def pretend_open(path, default_text: str = ""):
         """
         Opens the given file and returns a filehandle to it if the file actually exists or the script is not in pretend mode.
         If the script is in pretend mode and the file is not already present then an open filehandle to an empty string is returned.
 
         Parameters:
             path: Path to the file to open.
-            defaultText: String to use if the file doesn't exist in pretend mode
+            default_text: String to use if the file doesn't exist in pretend mode
 
         Returns:
             filehandle on success (supports readline() and eof()), can return boolean
@@ -634,7 +633,7 @@ class Util:
 
         if Debug().pretending() and not os.path.exists(path):
             try:
-                fh = StringIO(defaultText)
+                fh = StringIO(default_text)
             except IOError:
                 return False
         else:
@@ -646,11 +645,11 @@ class Util:
         return fh
 
     @staticmethod
-    def any(subRef, listRef):
+    def any(sub_ref, list_ref):
         """
         Returns true if the given function returns true for any item in the given list.
         """
-        return any(subRef(item) for item in listRef)
+        return any(sub_ref(item) for item in list_ref)
 
     # pl2py: perl specific, not needed
     # @staticmethod
@@ -861,7 +860,7 @@ class Util:
                 return retval.value
 
             def func(retval):
-                errorRef = {}
+                error_ref = {}
 
                 with os.scandir(target_dir) as entries:
                     for entry in entries:
@@ -869,16 +868,16 @@ class Util:
                             try:
                                 shutil.rmtree(entry.path)
                             except OSError as ex:
-                                errorRef[entry.path] = ex
+                                error_ref[entry.path] = ex
                         else:
                             try:
                                 os.remove(entry.path)
                             except OSError as ex:
-                                errorRef[entry.path] = ex
+                                error_ref[entry.path] = ex
 
-                if errorRef and len(errorRef):
-                    for file in errorRef:
-                        msg = errorRef[file]
+                if error_ref and len(error_ref):
+                    for file in error_ref:
+                        msg = error_ref[file]
                         if not file:
                             file = "general error"
                         print(f"{file}: error: {msg}", file=log)

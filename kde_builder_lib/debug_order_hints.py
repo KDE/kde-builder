@@ -51,15 +51,15 @@ class DebugOrderHints:
         return 0
 
     @staticmethod
-    def _make_comparison_func(moduleGraph, extraDebugInfo):
+    def _make_comparison_func(module_graph, extra_debug_info):
         def _compare_debug_order(a, b):
             # comparison results uses:
             # -1 if a < b
             # 0 if a == b
             # 1 if a > b
 
-            nameA = a.name
-            nameB = b.name
+            name_a = a.name
+            name_b = b.name
 
             # Enforce a strict dependency ordering.
             # The case where both are true should never happen, since that would
@@ -69,9 +69,9 @@ class DebugOrderHints:
             # Assumption: if A depends on B, and B is broken then a failure to build
             # A is probably due to lacking a working B.
 
-            bDependsOnA = moduleGraph[nameA]["votes"].get(nameB, 0)
-            aDependsOnB = moduleGraph[nameB]["votes"].get(nameA, 0)
-            order = -1 if bDependsOnA else (1 if aDependsOnB else 0)
+            b_depends_on_a = module_graph[name_a]["votes"].get(name_b, 0)
+            a_depends_on_b = module_graph[name_b]["votes"].get(name_a, 0)
+            order = -1 if b_depends_on_a else (1 if a_depends_on_b else 0)
 
             if order:
                 return order
@@ -92,12 +92,12 @@ class DebugOrderHints:
             # essentially a mitigation against noise introduced from raw 'popularity'
             # contests (see below).
 
-            isRootA = len(moduleGraph[nameA]["deps"]) == 0
-            isRootB = len(moduleGraph[nameB]["deps"]) == 0
+            is_root_a = len(module_graph[name_a]["deps"]) == 0
+            is_root_b = len(module_graph[name_b]["deps"]) == 0
 
-            if isRootA and not isRootB:
+            if is_root_a and not is_root_b:
                 return -1
-            if isRootB and not isRootA:
+            if is_root_b and not is_root_a:
                 return 1
 
             # Next sort by 'popularity': the item with the most votes (back edges) is
@@ -107,9 +107,9 @@ class DebugOrderHints:
             # This would point the user to fixing the most heavily used dependencies
             # first before investing time in more 'exotic' modules
 
-            voteA = len(moduleGraph[nameA]["votes"])
-            voteB = len(moduleGraph[nameB]["votes"])
-            votes = voteB - voteA
+            vote_a = len(module_graph[name_a]["votes"])
+            vote_b = len(module_graph[name_b]["votes"])
+            votes = vote_b - vote_a
 
             if votes:
                 return votes
@@ -117,9 +117,9 @@ class DebugOrderHints:
             # Try and see if there is something 'interesting' that might e.g. indicate
             # issues with the system itself, preventing a successful build.
 
-            phaseA = DebugOrderHints._get_phase_score(extraDebugInfo["phases"].get(nameA, ""))
-            phaseB = DebugOrderHints._get_phase_score(extraDebugInfo["phases"].get(nameB, ""))
-            phase = (phaseB > phaseA) - (phaseB < phaseA)
+            phase_a = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_a, ""))
+            phase_b = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_b, ""))
+            phase = (phase_b > phase_a) - (phase_b < phase_a)
 
             if phase:
                 return phase
@@ -132,12 +132,12 @@ class DebugOrderHints:
             # someone does not need prodding if they have been working on it
             # for the past X builds or so already.
 
-            failCountA = a.get_persistent_option("failure-count")
-            failCountB = b.get_persistent_option("failure-count")
-            failCount = (failCountA or 0) - (failCountB or 0)
+            fail_count_a = a.get_persistent_option("failure-count")
+            fail_count_b = b.get_persistent_option("failure-count")
+            fail_count = (fail_count_a or 0) - (fail_count_b or 0)
 
-            if failCount:
-                return failCount
+            if fail_count:
+                return fail_count
 
             # If there is no good reason to perfer one module over another,
             # simply sort by name to get a reproducible order.
@@ -145,14 +145,14 @@ class DebugOrderHints:
             # (The items to sort are supplied as a hash so the order of keys is by
             # definition not guaranteed.)
 
-            name = (nameA > nameB) - (nameA < nameB)
+            name = (name_a > name_b) - (name_a < name_b)
 
             return name
 
         return _compare_debug_order
 
     @staticmethod
-    def sort_failures_in_debug_order(moduleGraph, extraDebugInfo, failuresRef: list[Module]) -> list[Module]:
-        failures = failuresRef
-        prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(moduleGraph, extraDebugInfo)))
+    def sort_failures_in_debug_order(module_graph, extra_debug_info, failures_ref: list[Module]) -> list[Module]:
+        failures = failures_ref
+        prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(module_graph, extra_debug_info)))
         return prioritised

@@ -32,13 +32,13 @@ class FirstRun:
 
     def __init__(self, prefilled_prompt_answer: str | None = None):
         self.oss = OSSupport()
-        self.baseDir = None
-        self.supportedDistros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
-        self.supportedOtherOS = ["freebsd"]
+        self.base_dir = None
+        self.supported_distros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
+        self.supported_other_os = ["freebsd"]
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
-    def setup_user_system(self, baseDir, setup_steps: list[str]) -> NoReturn:
-        self.baseDir = baseDir
+    def setup_user_system(self, base_dir, setup_steps: list[str]) -> NoReturn:
+        self.base_dir = base_dir
 
         try:
             if "install-distro-packages" in setup_steps:
@@ -105,7 +105,7 @@ class FirstRun:
     def _install_system_packages(self, deps_data_path) -> None:
 
         vendor = self.oss.vendor_id()
-        osVersion = self.oss.vendor_version()
+        os_version = self.oss.vendor_version()
 
         logger_fr.info(f" b[-] Installing b[system packages] for b[{vendor}]...")
 
@@ -114,7 +114,7 @@ class FirstRun:
             logger_fr.error(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})")
             return
 
-        installCmd = self._find_best_install_cmd()
+        install_cmd = self._find_best_install_cmd()
         not_found_in_repo_packages = []
 
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
@@ -147,18 +147,18 @@ class FirstRun:
                     packages.remove(package)
 
         if packages:
-            logger_fr.info(f""" b[*] Would run 'b[{" ".join(installCmd + packages)}]'""")
+            logger_fr.info(f""" b[*] Would run 'b[{" ".join(install_cmd + packages)}]'""")
             if not self.confirmed_to_continue():
                 print("Interrupted by user.")
                 return
 
-            result = subprocess.run(installCmd + packages, shell=False)
-            exitStatus = result.returncode
+            result = subprocess.run(install_cmd + packages, shell=False)
+            exit_status = result.returncode
         else:
             logger_fr.info(" b[*] No packages to install, no need to run installer. b[:)]")
-            exitStatus = 0
+            exit_status = 0
 
-        if exitStatus != 0:
+        if exit_status != 0:
             # Install one at a time if we can
             individual_failed_packages = []
 
@@ -168,10 +168,10 @@ class FirstRun:
                 return
 
             for onePackage in packages:
-                logger_fr.info(f"""\n b[*] Running 'b[{" ".join(installCmd + [onePackage])}]'""")
+                logger_fr.info(f"""\n b[*] Running 'b[{" ".join(install_cmd + [onePackage])}]'""")
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
-                result = subprocess.run(installCmd + [onePackage], shell=False)
+                result = subprocess.run(install_cmd + [onePackage], shell=False)
 
                 if result.returncode != 0:
                     individual_failed_packages.append(onePackage)
@@ -182,7 +182,7 @@ class FirstRun:
             if individual_failed_packages:
                 logger_fr.warning("\n y[b[*] Some packages failed to install:\n" + "\n\t".join(individual_failed_packages))
             else:
-                logger_fr.warning(f" r[b[*] Packages were installed individually, but the command to install them at once failed with exit status {exitStatus}. Please report this case.")
+                logger_fr.warning(f" r[b[*] Packages were installed individually, but the command to install them at once failed with exit status {exit_status}. Please report this case.")
         else:
             if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
                 logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
@@ -222,35 +222,35 @@ class FirstRun:
     def _setup_base_configuration(self) -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
-        xdgConfigHome = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
-        xdgConfigHomeShort = xdgConfigHome.replace(os.environ.get("HOME"), "~")  # Replace $HOME with ~
-        knownLocations = [os.getcwd() + "/kdesrc-buildrc",
-                          f"{xdgConfigHome}/kdesrc-buildrc",
-                          os.environ.get("HOME") + "/.kdesrc-buildrc"]
-        locatedFile = None
-        for knownLocation in knownLocations:
+        xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
+        xdg_config_home_short = xdg_config_home.replace(os.environ.get("HOME"), "~")  # Replace $HOME with ~
+        known_locations = [os.getcwd() + "/kdesrc-buildrc",
+                           f"{xdg_config_home}/kdesrc-buildrc",
+                           os.environ.get("HOME") + "/.kdesrc-buildrc"]
+        located_file = None
+        for knownLocation in known_locations:
             if os.path.isfile(knownLocation):
-                locatedFile = knownLocation
+                located_file = knownLocation
                 break
 
-        if locatedFile:
-            printableLocatedFile = locatedFile.replace(os.environ.get("HOME"), "~")
-            logger_fr.warning(f"b[*] You already have a configuration file: b[y[{printableLocatedFile}]")
+        if located_file:
+            printable_located_file = located_file.replace(os.environ.get("HOME"), "~")
+            logger_fr.warning(f"b[*] You already have a configuration file: b[y[{printable_located_file}]")
             return
 
-        logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdgConfigHomeShort}/kdesrc-buildrc\"]...")
+        logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdg_config_home_short}/kdesrc-buildrc\"]...")
 
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kdesrc-buildrc.in", "r") as data_file:
-            sampleRc = data_file.read()
+            sample_rc = data_file.read()
 
-        numCores = os.cpu_count()
-        if not numCores:
-            numCores = 4
+        num_cores = os.cpu_count()
+        if not num_cores:
+            num_cores = 4
 
-        numCoresLow = self._get_num_cores_for_low_memory(numCores)
+        num_cores_low = self._get_num_cores_for_low_memory(num_cores)
 
-        sampleRc = sampleRc.replace("%{num_cores}", str(numCores))
-        sampleRc = sampleRc.replace("%{num_cores_low}", str(numCoresLow))
+        sample_rc = sample_rc.replace("%{num_cores}", str(num_cores))
+        sample_rc = sample_rc.replace("%{num_cores_low}", str(num_cores_low))
 
         gl = BuildContext().build_options["global"]  # real global defaults
 
@@ -262,8 +262,8 @@ class FirstRun:
                 value = "true" if value else "false"
             elif mode == "home_to_tilde":
                 value = re.sub(rf"""^{os.environ.get("HOME")}""", "~", value)
-            nonlocal sampleRc
-            sampleRc = sampleRc.replace(f"%{{{option_name}}}", value)
+            nonlocal sample_rc
+            sample_rc = sample_rc.replace(f"%{{{option_name}}}", value)
 
         fill_placeholder("include-dependencies", "bool_to_str")
         fill_placeholder("source-dir", "home_to_tilde")
@@ -277,13 +277,13 @@ class FirstRun:
         fill_placeholder("compile-commands-export", "bool_to_str")
         fill_placeholder("generate-vscode-project-config", "bool_to_str")
 
-        os.makedirs(xdgConfigHome, exist_ok=True)
-        with open(f"{xdgConfigHome}/kdesrc-buildrc", "w") as sampleFh:
-            sampleFh.write(sampleRc)
+        os.makedirs(xdg_config_home, exist_ok=True)
+        with open(f"{xdg_config_home}/kdesrc-buildrc", "w") as sampleFh:
+            sampleFh.write(sample_rc)
         print()
 
     def _find_best_install_cmd(self) -> list[str]:
-        cmdsRef = {
+        cmds_ref = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
@@ -293,27 +293,27 @@ class FirstRun:
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
         }
 
-        supportedDistros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmdsRef.keys()]
+        supported_distros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmds_ref.keys()]
 
-        bestVendor = self.oss.best_distro_match(supportedDistros)
-        logger_fr.info(f"    Using installer for b[{bestVendor}]")
+        best_vendor = self.oss.best_distro_match(supported_distros)
+        logger_fr.info(f"    Using installer for b[{best_vendor}]")
 
         version = self.oss.vendor_version()
         cmd = []
 
-        for opt in [f"{bestVendor}/{version}", f"{bestVendor}/unknown"]:
+        for opt in [f"{best_vendor}/{version}", f"{best_vendor}/unknown"]:
             key = f"cmd/install/{opt}"
-            if key in cmdsRef.keys():
-                cmd = cmdsRef[key].split(" ")
+            if key in cmds_ref.keys():
+                cmd = cmds_ref[key].split(" ")
                 break
 
         if not cmd:
-            self._throw(f"No installer for {bestVendor}!")
+            self._throw(f"No installer for {best_vendor}!")
 
         # If not running as root already, add sudo
         if os.geteuid() != 0:
-            hasSudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-            if hasSudo:
+            has_sudo = subprocess.call("type " + "sudo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+            if has_sudo:
                 cmd.insert(0, "sudo")
             else:
                 logger_fr.error("r[*] You are missing g[sudo]! Cannot continue.")
@@ -321,10 +321,10 @@ class FirstRun:
         return cmd
 
     def _find_best_vendor_package_list(self, deps_data_path) -> list[str]:
-        bestVendor = self.oss.best_distro_match(self.supportedDistros + self.supportedOtherOS)
+        best_vendor = self.oss.best_distro_match(self.supported_distros + self.supported_other_os)
         version = self.oss.vendor_version()
-        logger_fr.info(f"    Installing packages for b[{bestVendor}]/b[{version}]")
-        return self._packages_for_vendor(bestVendor, version, deps_data_path)
+        logger_fr.info(f"    Installing packages for b[{best_vendor}]/b[{version}]")
+        return self._packages_for_vendor(best_vendor, version, deps_data_path)
 
     def _packages_for_vendor(self, vendor, version, deps_data_path) -> list[str]:
         packages = self._read_packages(vendor, version, deps_data_path)

@@ -11,9 +11,9 @@ def test_ossupport():
     Test OSSupport
     """
     # Unit test of _read_os_release
-    kvPairs = OSSupport._read_os_release("tests/integration/fixtures/os-release")
-    assert len(kvPairs) == 4, "Right number of key/value pairs"
-    opts = {kvPair[0]: kvPair[1] for kvPair in kvPairs.items()}
+    kv_pairs = OSSupport._read_os_release("tests/integration/fixtures/os-release")
+    assert len(kv_pairs) == 4, "Right number of key/value pairs"
+    opts = {kvPair[0]: kvPair[1] for kvPair in kv_pairs.items()}
     assert opts["NAME"] == "Totally Valid Name", "Right NAME"
     assert opts["ID"] == "kde-builder", "Right ID"
     assert opts["ID_LIKE"] == "sabayon gentoo-hardened gentoo", "Right ID_LIKE"

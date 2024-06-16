@@ -19,7 +19,7 @@ class Updater_KDEProject(Updater):
     def name() -> str:
         return "proj"
 
-    def _resolve_branch_group(self, branchGroup) -> str | None:
+    def _resolve_branch_group(self, branch_group) -> str | None:
         """
         Resolves the requested branch-group for this Updater's module.
         Returns the required branch name, or None if none is set.
@@ -31,8 +31,8 @@ class Updater_KDEProject(Updater):
         # to resolve it.
         ctx = module.context
         resolver = ctx.module_branch_group_resolver()
-        modulePath = module.full_project_path()
-        return resolver.find_module_branch(modulePath, branchGroup)
+        module_path = module.full_project_path()
+        return resolver.find_module_branch(module_path, branch_group)
 
     # @override(check_signature=False)
     def _module_is_needed(self) -> bool:
@@ -52,12 +52,12 @@ class Updater_KDEProject(Updater):
 
     @staticmethod
     # @override(check_signature=False)
-    def _is_plausible_existing_remote(name: str, url: str, configuredUrl: str) -> bool:
+    def _is_plausible_existing_remote(name: str, url: str, configured_url: str) -> bool:
         """
         Reimplementation
         """
 
-        return url == configuredUrl or url.startswith("kde:")
+        return url == configured_url or url.startswith("kde:")
 
     @staticmethod
     # @override

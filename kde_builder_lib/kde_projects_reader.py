@@ -19,22 +19,22 @@ class KDEProjectsReader:
     the YAML metadata included in sysadmin/repo-management.
     """
 
-    def __init__(self, projectMetadataModule):
+    def __init__(self, project_metadata_module):
         """
         Constructs a new KDEProjectsReader. This doesn't contradict any part of the class
         documentation which claims this class is a singleton.
 
         Parameters:
-            projectMetadataModule: :class:`Module` that is the repo-metadata module.
+            project_metadata_module: :class:`Module` that is the repo-metadata module.
         """
 
         # pl2py: no need to check _verifyYAMLModuleLoaded()
 
         self.repositories = {}  # Maps short names to repo info blocks
 
-        self._read_project_data(projectMetadataModule)
+        self._read_project_data(project_metadata_module)
 
-    def _read_project_data(self, projectMetadataModule) -> None:
+    def _read_project_data(self, project_metadata_module) -> None:
         # The 'main' method for this class. Reads in *all* KDE projects and notes
         # their details for later queries.
         # Be careful, can throw exceptions.
@@ -43,7 +43,7 @@ class KDEProjectsReader:
             self._load_mock_project_data()
             return
 
-        srcdir = projectMetadataModule.fullpath("source")
+        srcdir = project_metadata_module.fullpath("source")
 
         if not os.path.isdir(srcdir):
             BuildException.croak_runtime(f"No such source directory {srcdir}!")
@@ -52,12 +52,12 @@ class KDEProjectsReader:
         # so that only entries that are used end up being read.
         # The obvious thing of using path info to guess module name doesn't work
         # (e.g. maui-booth has a disk path of maui/booth in repo-metadata, not maui/maui-booth)
-        repoMetaFiles = list(Path(f"{srcdir}/projects").resolve().rglob("metadata.yaml"))  # resolve /projects symlink first, then recurse through dir tree
+        repo_meta_files = list(Path(f"{srcdir}/projects").resolve().rglob("metadata.yaml"))  # resolve /projects symlink first, then recurse through dir tree
 
-        for metadataPath in repoMetaFiles:
-            self._read_yaml(metadataPath)
+        for metadata_path in repo_meta_files:
+            self._read_yaml(metadata_path)
 
-        if not len(repoMetaFiles) > 0:
+        if not len(repo_meta_files) > 0:
             BuildException.croak_runtime(f"Failed to find KDE project entries from {srcdir}!")
 
     def _load_mock_project_data(self) -> None:
@@ -66,15 +66,15 @@ class KDEProjectsReader:
         projects = ["kde-builder", "juk", "kcalc", "konsole", "dolphin"]
 
         for project in projects:
-            repoData = {
-                "fullName": f"test/{project}",
+            repo_data = {
+                "full_name": f"test/{project}",
                 "repo": f"kde:{project}.git",
                 "name": project,
                 "active": True,
                 "found_by": "direct",
             }
 
-            self.repositories[project] = repoData
+            self.repositories[project] = repo_data
 
     def _read_yaml(self, filename) -> None:
         with open(filename, "r") as file:
@@ -84,29 +84,29 @@ class KDEProjectsReader:
         if proj_data["projectpath"] == "repo-management":
             return
 
-        repoPath = proj_data["repopath"]
-        repoName = proj_data["identifier"] if proj_data["identifier"] else repoPath
+        repo_path = proj_data["repopath"]
+        repo_name = proj_data["identifier"] if proj_data["identifier"] else repo_path
 
         # Keep in sync with _load_mock_project_data
-        curRepository = {
-            "fullName": proj_data["projectpath"],
-            "inventName": repoPath,
-            "repo": f"kde:{repoPath}.git",
-            "name": repoName,
+        cur_repository = {
+            "full_name": proj_data["projectpath"],
+            "invent_name": repo_path,
+            "repo": f"kde:{repo_path}.git",
+            "name": repo_name,
             "active": bool(proj_data["repoactive"]),
             "found_by": "direct"  # can be changed in get_modules_for_project
         }
 
         # Find everything after last /
-        inventSuffix = re.search(r"([^/]+$)", proj_data["repopath"]).group(1)
-        legacySuffix = re.search(r"([^/]+$)", proj_data["projectpath"]).group(1)
+        invent_suffix = re.search(r"([^/]+$)", proj_data["repopath"]).group(1)
+        legacy_suffix = re.search(r"([^/]+$)", proj_data["projectpath"]).group(1)
 
         # We can print a message later for modules where the name will change if
         # the module is actually used
-        if inventSuffix != legacySuffix:
-            curRepository["nameChangingTo"] = inventSuffix
+        if invent_suffix != legacy_suffix:
+            cur_repository["nameChangingTo"] = invent_suffix
 
-        self.repositories[repoName] = curRepository
+        self.repositories[repo_name] = cur_repository
 
     def get_modules_for_project(self, proj: str) -> list[dict]:
         """
@@ -115,17 +115,17 @@ class KDEProjectsReader:
         e.g. kde/kdebase/kde-runtime would be matched by a proj of either
         "kdebase/kde-runtime" or simply "kde-runtime".
         """
-        repositoryRef = self.repositories
+        repository_ref = self.repositories
         results = []
 
         def find_results():
-            matchList = [key for key in sorted(repositoryRef.keys()) if KDEProjectsReader._project_path_matches_wildcard_search(repositoryRef[key]["fullName"], proj)]
+            match_list = [key for key in sorted(repository_ref.keys()) if KDEProjectsReader._project_path_matches_wildcard_search(repository_ref[key]["full_name"], proj)]
 
             if re.search(r"\*", proj):
-                for key in matchList:
-                    repositoryRef[key]["found_by"] = "wildcard"
+                for key in match_list:
+                    repository_ref[key]["found_by"] = "wildcard"
 
-            results.extend(matchList)
+            results.extend(match_list)
 
         # Wildcard matches happen as specified if asked for.
         # Non-wildcard matches have an implicit "$proj/*" search as well for
@@ -144,18 +144,18 @@ class KDEProjectsReader:
 
         # If still no wildcard and no '/' then we can use direct lookup by module
         # name.
-        if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repositoryRef:
+        if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repository_ref:
             results.append(proj)
         else:
             find_results()
 
         # As we run find_results twice (for example, when proj is "workspace"), remove duplicates
         results = list(set(results))
-        ret = [repositoryRef[result] for result in results]
+        ret = [repository_ref[result] for result in results]
         return ret
 
     @staticmethod
-    def _project_path_matches_wildcard_search(projectPath: str, searchItem: str) -> bool:
+    def _project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:
         """
         Returns true if the given kde-project full path (e.g.
         kde/kdelibs/nepomuk-core) matches the given search item.
@@ -171,39 +171,39 @@ class KDEProjectsReader:
         "kde/kdelibs/nepomuk-core".
 
         Parameters:
-            projectPath: The full project path from the kde-projects database.
-            searchItem: The search item.
+            project_path: The full project path from the kde-projects database.
+            search_item: The search item.
         Returns:
              True if they match, False otherwise.
         """
 
-        searchParts = searchItem.split("/")
-        nameStack = projectPath.split("/")
+        search_parts = search_item.split("/")
+        name_stack = project_path.split("/")
 
-        if len(nameStack) >= len(searchParts):
-            sizeDifference = len(nameStack) - len(searchParts)
+        if len(name_stack) >= len(search_parts):
+            size_difference = len(name_stack) - len(search_parts)
 
             # We might have to loop if we somehow find the wrong start point for our search.
             # E.g. looking for a/b/* against a/a/b/c, we'd need to start with the second a.
             i = 0
-            while i <= sizeDifference:
+            while i <= size_difference:
                 # Find our common prefix, then ensure the remainder matches item-for-item.
-                while i <= sizeDifference:
-                    if nameStack[i] == searchParts[0]:
+                while i <= size_difference:
+                    if name_stack[i] == search_parts[0]:
                         break
                     i += 1
 
-                if i > sizeDifference:  # Not enough room to find it now
+                if i > size_difference:  # Not enough room to find it now
                     return False
 
-                # At this point we have synched up nameStack to searchParts, ensure they
+                # At this point we have synched up name_stack to search_parts, ensure they
                 # match item-for-item.
                 found = 1
                 j = 0
-                while found and j < len(searchParts):
-                    if searchParts[j] == "*":  # This always works
+                while found and j < len(search_parts):
+                    if search_parts[j] == "*":  # This always works
                         return True
-                    if searchParts[j] != nameStack[i + j]:
+                    if search_parts[j] != name_stack[i + j]:
                         found = 0
                     j += 1
 

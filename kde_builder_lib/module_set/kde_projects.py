@@ -37,31 +37,31 @@ class ModuleSet_KDEProjects(ModuleSet):
 
     def __init__(self, ctx: BuildContext, name: str):
         ModuleSet.__init__(self, ctx, name)
-        self.projectsDataReader = None  # Will be filled in when we get fh
+        self.projects_data_reader = None  # Will be filled in when we get fh
 
     @staticmethod
     def none_true(input_list: list) -> bool:
         return all(not element for element in input_list)
 
     @staticmethod
-    def _create_metadata_module(ctx: BuildContext, moduleName: str) -> Module:
-        metadataModule = Module(ctx, re.sub("/", "-", moduleName))
+    def _create_metadata_module(ctx: BuildContext, module_name: str) -> Module:
+        metadata_module = Module(ctx, re.sub("/", "-", module_name))
 
         # Hardcode the results instead of expanding out the project info
-        metadataModule.set_option({"repository": f"kde:{moduleName}"})
-        metadataModule.set_option({"#kde-project-path": moduleName})
-        metadataModule.set_scm_type("metadata")
-        metadataModule.set_option({"branch": "master"})
-        metadataModule.set_option({"source-dir":  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state")})
-        metadataModule.set_option({"log-dir": "log"})  # overwrite default value, because user may store his directories not under "~/kde"
+        metadata_module.set_option({"repository": f"kde:{module_name}"})
+        metadata_module.set_option({"#kde-project-path": module_name})
+        metadata_module.set_scm_type("metadata")
+        metadata_module.set_option({"branch": "master"})
+        metadata_module.set_option({"source-dir":  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state")})
+        metadata_module.set_option({"log-dir": "log"})  # overwrite default value, because user may store his directories not under "~/kde"
 
-        moduleSet = ModuleSet_KDEProjects(ctx, "<kde-projects dependencies>")
-        metadataModule.set_module_set(moduleSet)
+        module_set = ModuleSet_KDEProjects(ctx, "<kde-projects dependencies>")
+        metadata_module.set_module_set(module_set)
 
         # Ensure we only ever try to update source, not build.
-        metadataModule.phases.reset_to(["update"])
+        metadata_module.phases.reset_to(["update"])
 
-        return metadataModule
+        return metadata_module
 
     @staticmethod
     def get_project_metadata_module(ctx_obj: BuildContext) -> Module:
@@ -78,7 +78,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         ctx = Util.assert_isa(ctx_obj, BuildContext)
         return ModuleSet_KDEProjects._create_metadata_module(ctx, "sysadmin/repo-metadata")
 
-    def _expand_module_candidates(self, ctx: BuildContext, moduleSearchItem: str) -> list[Module]:
+    def _expand_module_candidates(self, ctx: BuildContext, module_search_item: str) -> list[Module]:
         """
         A class method which goes through the modules in our search list (assumed to
         be found in kde-projects), expands them into their equivalent git modules,
@@ -95,7 +95,7 @@ class ModuleSet_KDEProjects(ModuleSet):
 
         Parameters:
             ctx: The ``BuildContext`` in use.
-            moduleSearchItem: The search description to expand in ``Module``s. See
+            module_search_item: The search description to expand in ``Module``s. See
                 _project_path_matches_wildcard_search for a description of the syntax.
 
         Returns:
@@ -106,48 +106,48 @@ class ModuleSet_KDEProjects(ModuleSet):
             Runtime: if the git-push-protocol is unsupported.
             Runtime: if an "assumed" kde-projects module was not actually one.
         """
-        allModuleResults = ctx.get_project_data_reader().get_modules_for_project(moduleSearchItem)
+        all_module_results = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
 
-        if not allModuleResults:
-            BuildException.croak_runtime(f"Unknown KDE project: {moduleSearchItem}")
+        if not all_module_results:
+            BuildException.croak_runtime(f"Unknown KDE project: {module_search_item}")
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.
-        activeResults = allModuleResults
+        active_results = all_module_results
         if not ctx.get_option("use-inactive-modules"):
-            activeResults = [module for module in allModuleResults if module.get("active")]
+            active_results = [module for module in all_module_results if module.get("active")]
 
-        if not activeResults:
-            logger_moduleset.warning(f" y[b[*] Module y[{moduleSearchItem}] is apparently a KDE collection, but contains no\n" + "active modules to build!")
+        if not active_results:
+            logger_moduleset.warning(f" y[b[*] Module y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active modules to build!")
 
-            if allModuleResults:
-                count = len(allModuleResults)
+            if all_module_results:
+                count = len(all_module_results)
                 logger_moduleset.warning("\tAlthough no active modules are available, there were\n" + f"\t{count} inactive modules. Perhaps the git modules are not ready?")
 
         # Setup module options.
-        moduleList = []
-        ignoreList = self.modules_to_ignore()
+        module_list = []
+        ignore_list = self.modules_to_ignore()
 
-        for result in activeResults:
-            newModule = Module(ctx, result["name"])
-            self._initialize_new_module(newModule)
+        for result in active_results:
+            new_module = Module(ctx, result["name"])
+            self._initialize_new_module(new_module)
 
             # Copy metadata from KDE project YAML file
-            newModule.set_option({"repository": result["repo"]})
-            newModule.set_option({"#kde-project-path": result["fullName"]})
-            newModule.set_option({"#kde-repo-path": result.get("inventName", None)})
-            newModule.set_option({"#found-by": result["found_by"]})
+            new_module.set_option({"repository": result["repo"]})
+            new_module.set_option({"#kde-project-path": result["full_name"]})
+            new_module.set_option({"#kde-repo-path": result.get("invent_name", None)})
+            new_module.set_option({"#found-by": result["found_by"]})
             # Temp flag during metadata transition
             if "nameChangingTo" in result:
-                newModule.set_option({"#upcoming-name-change": result["nameChangingTo"]})
+                new_module.set_option({"#upcoming-name-change": result["nameChangingTo"]})
 
-            newModule.set_scm_type("proj")
+            new_module.set_scm_type("proj")
 
-            if self.none_true([KDEProjectsReader._project_path_matches_wildcard_search(result["fullName"], element) for element in ignoreList]):
-                moduleList.append(newModule)
+            if self.none_true([KDEProjectsReader._project_path_matches_wildcard_search(result["full_name"], element) for element in ignore_list]):
+                module_list.append(new_module)
             else:
-                logger_moduleset.debug(f"--- Ignoring matched active module {newModule} in module set " + self.name)
-        return moduleList
+                logger_moduleset.debug(f"--- Ignoring matched active module {new_module} in module set " + self.name)
+        return module_list
 
     # @override
     def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
@@ -157,28 +157,28 @@ class ModuleSet_KDEProjects(ModuleSet):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        moduleList = []  # module names converted to `Module` objects.
-        foundModules = {}
+        module_list = []  # module names converted to `Module` objects.
+        found_modules = {}
 
         # Setup default options for each module
         # Extraction of relevant kde-project modules will be handled immediately
         # after this phase of execution.
         for moduleItem in self.modules_to_find():
             # We might have already grabbed the right module recursively.
-            if moduleItem in foundModules:
+            if moduleItem in found_modules:
                 continue
             # eval in case the YAML processor throws an exception.
             try:
-                candidateModules = self._expand_module_candidates(ctx, moduleItem)
+                candidate_modules = self._expand_module_candidates(ctx, moduleItem)
             except BuildException as e:
                 raise BuildException.croak_runtime(f"The KDE Project database could not be understood: {e}")  # Forward exception objects up
 
-            moduleNames = [item.name for item in candidateModules]
-            foundModules = {module: 1 for module in moduleNames}
-            moduleList.extend(candidateModules)
+            module_names = [item.name for item in candidate_modules]
+            found_modules = {module: 1 for module in module_names}
+            module_list.extend(candidate_modules)
 
-        if not len(moduleList):
+        if not len(module_list):
             logger_moduleset.warning("No modules were defined for the module-set " + self.name)
             logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 
-        return moduleList
+        return module_list

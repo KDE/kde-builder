@@ -47,7 +47,7 @@ class Util_LoggedSubprocess:
         cmd = Util_LoggedSubprocess()
          .module(module)           # required
          .log_to(filename)         # required
-         .set_command(argRef)      # required
+         .set_command(arg_ref)      # required
          .chdir_to(builddir)       # optional
          .announcer(announ)  # optional
 
@@ -163,7 +163,7 @@ class Util_LoggedSubprocess:
             BuildException.croak_internal("Command list needs to be a listref!")
 
         dir_to_run_from = self._chdir_to
-        announceSub = self._announcer
+        announce_sub = self._announcer
         command = argRef
 
         if Debug().pretending():
@@ -172,9 +172,9 @@ class Util_LoggedSubprocess:
 
         # Install callback handler to feed child output to parent if the parent has
         # a callback to filter through it.
-        needsCallback = self.has_subscribers("child_output")
+        needs_callback = self.has_subscribers("child_output")
 
-        if needsCallback:
+        if needs_callback:
             def func(data):
                 # pl2py: in perl they sent "child_data" here, we instead send just the line
                 line = data
@@ -211,7 +211,7 @@ class Util_LoggedSubprocess:
                 Util.disable_locale_message_translation()
 
             callback = None
-            if needsCallback:
+            if needs_callback:
                 def clbk(line):
                     if line is None:
                         return
@@ -219,8 +219,8 @@ class Util_LoggedSubprocess:
 
                 callback = clbk
 
-            if announceSub:
-                announceSub(module)
+            if announce_sub:
+                announce_sub(module)
 
             result = Util.run_logged(module, filename, None, command, callback)
             retval.value = result
@@ -228,7 +228,7 @@ class Util_LoggedSubprocess:
         exitcode = -1
 
         async def on_progress_handler(subp_finished: multiprocessing.Event):
-            if needsCallback:
+            if needs_callback:
                 nonlocal lines_queue
                 while not subp_finished.is_set() or not lines_queue.empty():
                     while not lines_queue.empty():

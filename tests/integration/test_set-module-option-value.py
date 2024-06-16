@@ -12,17 +12,17 @@ def test_set_module_option():
     Test use of --set-module-option-value
     """
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --set-module-option-value module2,tag,fake-tag10 --set-module-option-value setmod2,tag,tag-setmod10".split(" "))
-    moduleList = app.modules
-    assert len(moduleList) == 4, "Right number of modules"
+    module_list = app.modules
+    assert len(module_list) == 4, "Right number of modules"
 
-    module = [m for m in moduleList if f"{m}" == "module2"][0]
+    module = [m for m in module_list if f"{m}" == "module2"][0]
     scm = module.scm()
     branch, sourcetype = scm._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/fake-tag10", "Right tag name"
     assert sourcetype == "tag", "Result came back as a tag"
 
-    module = [m for m in moduleList if f"{m}" == "setmod2"][0]
+    module = [m for m in module_list if f"{m}" == "setmod2"][0]
     branch, sourcetype = module.scm()._determine_preferred_checkout_source()
 
     assert branch == "refs/tags/tag-setmod10", "Right tag name (options block from cmdline)"

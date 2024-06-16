@@ -39,7 +39,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
         fh = Util.pretend_open(path) or BuildException.croak_internal(f"Unable to read ignore data from {path}")
 
         ctx = self.module.context
-        ignoreModules = []
+        ignore_modules = []
         for line in fh:
             # 1 Remove comments
             line = re.sub(f"#.*$", "", line)
@@ -51,9 +51,9 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
             # 3 Remove newlines
             line = line.rstrip("\n")
 
-            ignoreModules.append(line)
+            ignore_modules.append(line)
         fh.close()
-        return ignoreModules
+        return ignore_modules
 
     def logical_module_groups(self) -> dict:
         """

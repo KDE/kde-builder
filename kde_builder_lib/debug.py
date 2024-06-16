@@ -31,7 +31,7 @@ class Debug:
         return cls.__instance
 
     def __str__(self):
-        debugLevelNames = {
+        debug_level_names = {
             Debug.DEBUG: "DEBUG",
             Debug.WHISPER: "WHISPER",
             Debug.INFO: "INFO",
@@ -39,14 +39,14 @@ class Debug:
             Debug.WARNING: "WARNING",
             Debug.ERROR: "ERROR"
         }
-        return f"debugLevel: {debugLevelNames[self.debugLevel]}, isPretending: {self.isPretending}"
+        return f"debugLevel: {debug_level_names[self.debug_level]}, isPretending: {self.is_pretending}"
 
     def __init__(self):
         if not self.__initialized:
             self.__initialized = True
-            self.screenLog = None  # Filehandle pointing to the "build log".
-            self.isPretending = False
-            self.debugLevel = Debug.INFO
+            self.screen_log = None  # Filehandle pointing to the "build log".
+            self.is_pretending = False
+            self.debug_level = Debug.INFO
 
             self.ipc = None  # Set only if we should forward log messages over IPC.
 
@@ -68,22 +68,22 @@ class Debug:
         """
         Subroutine which returns true if pretend mode is on.
         """
-        return self.isPretending
+        return self.is_pretending
 
     def set_pretending(self, val: bool) -> None:
-        self.isPretending = val
+        self.is_pretending = val
 
     @staticmethod
     def is_testing() -> bool:
         # return "HARNESS_ACTIVE" in os.environ
         return "unittest" in sys.modules
 
-    def set_colorful_output(self, useColor: bool) -> None:
+    def set_colorful_output(self, use_color: bool) -> None:
         # No colors unless output to a tty.
         if not sys.stdout.isatty():
             return
 
-        if useColor:
+        if use_color:
             self.RED = "\033[31m"
             self.GREEN = "\033[32m"
             self.YELLOW = "\033[33m"
@@ -97,14 +97,14 @@ class Debug:
         else:
             self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD, self.DIM = [""] * 6
 
-    def set_log_file(self, fileName) -> None:
+    def set_log_file(self, file_name) -> None:
         if self.pretending():
             return
         try:
-            self.screenLog = open(fileName, "w")
+            self.screen_log = open(file_name, "w")
         except IOError:
             logger_root = logging.getLogger()
-            logger_root.error(f"Unable to open log file {fileName}!")
+            logger_root.error(f"Unable to open log file {file_name}!")
 
     def set_ipc(self, ipc) -> None:
         """
@@ -148,14 +148,14 @@ class kbLogger(logging.Logger):
         real_level_method = getattr(super(kbLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
         real_level_method(d.colorize(msg + "]"))
 
-        if d.screenLog is not None:  # todo: This should be just another handler for the logger
+        if d.screen_log is not None:  # todo: This should be just another handler for the logger
             int_message_level = kbLogger.levelNamesMapping[message_level.upper()]
             if kblogger.isEnabledFor(int_message_level):
-                savedColors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
+                saved_colors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
                 # Remove color but still extract codes
                 d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = [""] * 5
-                print(d.colorize(msg), file=d.screenLog)
-                d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = savedColors
+                print(d.colorize(msg), file=d.screen_log)
+                d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = saved_colors
 
     # The next few methods are used to print output at different importance
     # levels to allow for e.g. quiet switches, or verbose switches.  The levels are,

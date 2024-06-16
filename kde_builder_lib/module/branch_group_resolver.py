@@ -15,11 +15,11 @@ class Module_BranchGroupResolver:
     See also https://community.kde.org/Infrastructure/Project_Metadata
     """
 
-    def __init__(self, jsonData: dict):
+    def __init__(self, json_data: dict):
 
         # Copy just the objects we want over.
-        self.layers = jsonData.get("layers", [])
-        self.groups = jsonData.get("groups", [])
+        self.layers = json_data.get("layers", [])
+        self.groups = json_data.get("groups", [])
 
         # For layers and groups, remove anything beginning with a '_' as that is
         # defined in the spec to be a comment of some sort.
@@ -32,9 +32,9 @@ class Module_BranchGroupResolver:
         # later. Note that the specific catch-all group '*' is itself handled
         # as a special case in find_module_branch.
 
-        self.wildcardedGroups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
+        self.wildcarded_groups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
 
-    def _find_logical_group(self, module: str, logicalGroup: str) -> str | None:
+    def _find_logical_group(self, module: str, logical_group: str) -> str | None:
         """
         Returns the branch for the given logical group and module specifier. This
         function should not be called if the module specifier does not actually
@@ -43,25 +43,25 @@ class Module_BranchGroupResolver:
 
         # Using defined-or and still returning None is on purpose, silences
         # warning about use of undefined value.
-        return self.groups[module].get(logicalGroup, None)
+        return self.groups[module].get(logical_group, None)
 
-    def find_module_branch(self, module: str, logicalGroup: str) -> str | None:
+    def find_module_branch(self, module: str, logical_group: str) -> str | None:
         if module in self.groups:
-            return self._find_logical_group(module, logicalGroup)
+            return self._find_logical_group(module, logical_group)
 
         # Map module search spec to prefix string that is required for a match
-        catchAllGroupStats = {key: key[:-1] for key in self.wildcardedGroups.keys()}
+        catch_all_group_stats = {key: key[:-1] for key in self.wildcarded_groups.keys()}
 
         # Sort longest required-prefix to the top... first match that is valid will
         # then also be the right match.
-        orderedCandidates = sorted(catchAllGroupStats.keys(), key=lambda x: catchAllGroupStats[x], reverse=True)
+        ordered_candidates = sorted(catch_all_group_stats.keys(), key=lambda x: catch_all_group_stats[x], reverse=True)
 
-        match = next((candidate for candidate in orderedCandidates if module[:len(catchAllGroupStats[candidate])] == catchAllGroupStats[candidate]), None)
+        match = next((candidate for candidate in ordered_candidates if module[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
 
         if match:
-            return self._find_logical_group(match, logicalGroup)
+            return self._find_logical_group(match, logical_group)
 
         if "*" in self.groups:
-            return self._find_logical_group("*", logicalGroup)
+            return self._find_logical_group("*", logical_group)
 
         return

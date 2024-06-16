@@ -69,21 +69,21 @@ class BuildContext(Module):
             ctx.add_module(Module.Module(ctx, modName))
 
          ...
-         moduleList = ctx.modules
+         module_list = ctx.modules
     """
 
     # According to XDG spec, if XDG_STATE_HOME is not set, then we should
     # default to ~/.local/state
-    xdgStateHome = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")
-    xdgStateHomeShort = xdgStateHome.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
+    xdg_state_home = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")
+    xdg_state_home_short = xdg_state_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
 
     # According to XDG spec, if XDG_CONFIG_HOME is not set, then we should
     # default to ~/.config
-    xdgConfigHome = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")
-    xdgConfigHomeShort = xdgConfigHome.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
+    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")
+    xdg_config_home_short = xdg_config_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
 
     rcfiles = ["./kdesrc-buildrc",
-               f"{xdgConfigHome}/kdesrc-buildrc",
+               f"{xdg_config_home}/kdesrc-buildrc",
                f"""{os.getenv("HOME")}/.kdesrc-buildrc"""]
     LOCKFILE_NAME = ".kdesrc-lock"
     PERSISTENT_FILE_NAME = "kdesrc-build-data"
@@ -103,7 +103,7 @@ class BuildContext(Module):
             self.libname = "lib/x86_64-linux-gnu"
 
         # These options are used for internal state, they are _not_ exposed as cmdline options
-        self.GlobalOptions_private = {
+        self.global_options_private = {
             "filter-out-phases": "",
             "git-push-protocol": "git",
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
@@ -118,7 +118,7 @@ class BuildContext(Module):
 
         # These options are exposed as cmdline options, but _not from here_.
         # Their more complex specifier is made in `Cmdline` _supported_options().
-        self.GlobalOptions_with_extra_specifier = {
+        self.global_options_with_extra_specifier = {
             "build-when-unchanged": True,
             "colorful-output": True,
             "ignore-modules": "",
@@ -128,7 +128,7 @@ class BuildContext(Module):
         }
 
         # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
-        self.GlobalOptions_with_negatable_form = {
+        self.global_options_with_negatable_form = {
             "async": True,
             "compile-commands-export": True,  # 2021-02-06 allow to generate compile_commands.json via cmake, for clangd tooling
             "compile-commands-linking": False,  # 2021-02-06 link generated compile_commands.json back to the source directory
@@ -148,7 +148,7 @@ class BuildContext(Module):
         }
 
         # These options are exposed as cmdline options that require some parameter
-        self.GlobalOptions_with_parameter = {
+        self.global_options_with_parameter = {
             "binpath": "",
             "branch": "",
             "branch-group": "",  # Overrides branch, uses JSON data.
@@ -184,7 +184,7 @@ class BuildContext(Module):
         }
 
         # These options are exposed as cmdline options without parameters
-        self.GlobalOptions_without_parameter = {
+        self.global_options_without_parameter = {
             "build-system-only": "",
             "reconfigure": "",
             "refresh-build-first": "",
@@ -196,11 +196,11 @@ class BuildContext(Module):
         self.context = self  # Fix link to buildContext (i.e. self)
         self.build_options = {
             "global": {
-                **self.GlobalOptions_private,
-                **self.GlobalOptions_with_extra_specifier,
-                **self.GlobalOptions_without_parameter,
-                **self.GlobalOptions_with_negatable_form,
-                **self.GlobalOptions_with_parameter,
+                **self.global_options_private,
+                **self.global_options_with_extra_specifier,
+                **self.global_options_without_parameter,
+                **self.global_options_with_negatable_form,
+                **self.global_options_with_parameter,
             },
             # Module options are stored under here as well, keyed by module.name
         }
@@ -211,14 +211,14 @@ class BuildContext(Module):
             # A map from module *names* (as in modules[] above) to the
             # phase name at which they failed.
         }
-        self.logPaths = {
+        self.log_paths = {
             # Holds a hash table of log path bases as expanded by
             # get_subdir_path (e.g. [source-dir]/log) to the actual log dir
             # *this run*, with the date and unique id added. You must still
             # add the module name to use.
         }
-        self.rcFiles = BuildContext.rcfiles
-        self.rcFile = None
+        self.rc_files = BuildContext.rcfiles
+        self.rc_file = None
         self.env = {}
         self.persistent_options = {}  # These are kept across multiple script runs
         self.ignore_list = []  # List of KDE project paths to ignore completely
@@ -311,7 +311,7 @@ class BuildContext(Module):
             os.environ[key] = value
             logger_buildcontext.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
 
-    def prepend_environment_value(self, envName: str, items: str) -> None:  # pl2py: the items was a list in perl, but it was never used as list. So will type it as str.
+    def prepend_environment_value(self, env_name: str, items: str) -> None:  # pl2py: the items was a list in perl, but it was never used as list. So will type it as str.
         """
         Adds the given library paths to the path already given in an environment
         variable. In addition, detected "system paths" are stripped to ensure
@@ -327,17 +327,17 @@ class BuildContext(Module):
         queued. Either way the current environment will be unmodified afterward.
 
         Parameters:
-            envName: The name of the environment variable to modify
+            env_name: The name of the environment variable to modify
             items: Prepended to the current environment path, in
                 the order given. (i.e. param1, param2, param3 -> param1:param2:param3:existing)
         """
 
-        if envName in self.env:
-            curPaths = self.env[envName].split(":")
-        elif envName in os.environ:
-            curPaths = os.environ.get(envName, "").split(":")
+        if env_name in self.env:
+            cur_paths = self.env[env_name].split(":")
+        elif env_name in os.environ:
+            cur_paths = os.environ.get(env_name, "").split(":")
         else:
-            curPaths = []
+            cur_paths = []
 
         # pl2py: this is kde-builder specific code (not from kdesrc-build).
         # Some modules use python packages in their build process. For example, breeze-gtk uses python-cairo.
@@ -345,27 +345,27 @@ class BuildContext(Module):
         # We remove the current virtual environment path from PATH, because Cmake FindPython3 module always considers PATH,
         # see https://cmake.org/cmake/help/latest/module/FindPython3.html
         # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
-        if sys.prefix != sys.base_prefix and envName == "PATH":
-            if f"{sys.prefix}/bin" in curPaths:
+        if sys.prefix != sys.base_prefix and env_name == "PATH":
+            if f"{sys.prefix}/bin" in cur_paths:
                 logger_buildcontext.debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
-                curPaths.remove(f"{sys.prefix}/bin")
+                cur_paths.remove(f"{sys.prefix}/bin")
             else:
                 logger_buildcontext.debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
 
         # Filter out entries to add that are already in the environment from
         # the system.
-        for path in [item for item in [items] if item in curPaths]:
-            logger_buildcontext.debug(f"\tNot prepending y[{path}] to y[{envName}] as it appears " + f"to already be defined in y[{envName}].")
+        for path in [item for item in [items] if item in cur_paths]:
+            logger_buildcontext.debug(f"\tNot prepending y[{path}] to y[{env_name}] as it appears " + f"to already be defined in y[{env_name}].")
 
-        items = [item for item in [items] if item not in curPaths]
+        items = [item for item in [items] if item not in cur_paths]
 
-        envValue = ":".join(items + curPaths)
+        env_value = ":".join(items + cur_paths)
 
-        envValue = re.sub(r"^:*", "", envValue)
-        envValue = re.sub(r":*$", "", envValue)  # Remove leading/trailing colons
-        envValue = re.sub(r":+", ":", envValue)  # Remove duplicate colons
+        env_value = re.sub(r"^:*", "", env_value)
+        env_value = re.sub(r":*$", "", env_value)  # Remove leading/trailing colons
+        env_value = re.sub(r":+", ":", env_value)  # Remove duplicate colons
 
-        self.queue_environment_variable(envName, envValue)
+        self.queue_environment_variable(env_name, env_value)
 
     def take_lock(self) -> bool:
         """
@@ -379,30 +379,30 @@ class BuildContext(Module):
         Returns:
              Boolean success flag.
         """
-        baseDir = self.base_config_directory()
-        lockfile = f"{baseDir}/{BuildContext.LOCKFILE_NAME}"
+        base_dir = self.base_config_directory()
+        lockfile = f"{base_dir}/{BuildContext.LOCKFILE_NAME}"
 
-        LOCKFILE = None
+        lockfile_fd = None
         try:
-            LOCKFILE = os.open(lockfile, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+            lockfile_fd = os.open(lockfile, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
         except OSError as e:
-            errorCode = e.errno  # Save for later testing.
+            error_code = e.errno  # Save for later testing.
         else:
-            errorCode = 0
+            error_code = 0
 
-        if errorCode == errno.EEXIST:
+        if error_code == errno.EEXIST:
             # Path already exists, read the PID and see if it belongs to a
             # running process.
             try:
-                pidFile = open(lockfile, "r")
+                pid_file = open(lockfile, "r")
             except OSError:
                 # Lockfile is there but we can't open it?!?  Maybe a race
                 # condition but I have to give up somewhere.
                 logger_buildcontext.warning(f" WARNING: Can't open or create lockfile r[{lockfile}]")
                 return True
 
-            pid = pidFile.read()
-            pidFile.close()
+            pid = pid_file.read()
+            pid_file.close()
 
             if pid:
                 # Recent kde-builder; we wrote a PID in there.
@@ -441,17 +441,17 @@ class BuildContext(Module):
             os.unlink(lockfile)
 
             try:
-                LOCKFILE = os.open(lockfile, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
+                lockfile_fd = os.open(lockfile, os.O_WRONLY | os.O_CREAT | os.O_EXCL)
             except OSError:
                 logger_buildcontext.error(f" r[*] Still unable to lock {lockfile}, proceeding anyways...")
                 return True
             # Hope the sysopen worked... fall-through
-        elif errorCode == errno.ENOTTY:
+        elif error_code == errno.ENOTTY:
             # Stupid bugs... normally sysopen will return ENOTTY, not sure who's to blame between
             # glibc and Perl but I know that setting PERLIO=:stdio in the environment "fixes" things.
             pass
-        elif errorCode != 0:  # Some other error occurred.
-            logger_buildcontext.warning(f" r[*]: Error {errorCode} while creating lock file (is {baseDir} available?)")
+        elif error_code != 0:  # Some other error occurred.
+            logger_buildcontext.warning(f" r[*]: Error {error_code} while creating lock file (is {base_dir} available?)")
             logger_buildcontext.warning(" r[*]: Continuing the script for now...")
 
             # Even if we fail it's generally better to allow the script to proceed
@@ -459,19 +459,19 @@ class BuildContext(Module):
             # users start using kde-builder to build KDE.
             return True
 
-        os.write(LOCKFILE, str(os.getpid()).encode())
-        os.close(LOCKFILE)
+        os.write(lockfile_fd, str(os.getpid()).encode())
+        os.close(lockfile_fd)
         return True
 
     def close_lock(self) -> None:
         """
         Releases the lock obtained by take_lock.
         """
-        baseDir = self.base_config_directory()
-        lockFile = f"{baseDir}/{BuildContext.LOCKFILE_NAME}"
+        base_dir = self.base_config_directory()
+        lock_file = f"{base_dir}/{BuildContext.LOCKFILE_NAME}"
 
         try:
-            os.unlink(lockFile)
+            os.unlink(lock_file)
         except Exception as e:
             logger_buildcontext.warning(f" y[*] Failed to close lock: {e}")
 
@@ -486,23 +486,23 @@ class BuildContext(Module):
         directory.
         """
 
-        baseLogPath = module.get_subdir_path("log-dir")
-        if baseLogPath not in self.logPaths:
+        base_log_path = module.get_subdir_path("log-dir")
+        if base_log_path not in self.log_paths:
             # No log dir made for this base, do so now.
             log_id = "01"
             date = datetime.datetime.now().strftime("%F")  # ISO 8601 date
-            while os.path.exists(f"{baseLogPath}/{date}-{log_id}"):
+            while os.path.exists(f"{base_log_path}/{date}-{log_id}"):
                 log_id = str(int(log_id) + 1).zfill(2)
-            self.logPaths[baseLogPath] = f"{baseLogPath}/{date}-{log_id}"
+            self.log_paths[base_log_path] = f"{base_log_path}/{date}-{log_id}"
 
-        logDir = self.logPaths[baseLogPath]
-        Util.super_mkdir(logDir)
+        log_dir = self.log_paths[base_log_path]
+        Util.super_mkdir(log_dir)
 
         # global logs go to basedir directly
         if not isinstance(module, BuildContext):
-            logDir += f"/{module}"
+            log_dir += f"/{module}"
 
-        return logDir
+        return log_dir
 
     def get_log_path_for(self, module: Module, path: str) -> str:
         """
@@ -511,49 +511,49 @@ class BuildContext(Module):
         actually intend to create a log, as this function will also adjust the
         'latest' symlink properly.
         """
-        baseLogPath = module.get_subdir_path("log-dir")
-        logDir = self.get_log_dir_for(module)
+        base_log_path = module.get_subdir_path("log-dir")
+        log_dir = self.get_log_dir_for(module)
 
         # We create this here to avoid needless empty module directories everywhere
-        Util.super_mkdir(logDir)
+        Util.super_mkdir(log_dir)
 
         # Provide a directory to make it easy to see the last build for a module's
         # given phase (like cmake, build, install, etc.) without having to find the
         # log dir for the specific kde-builder run.
-        Util.super_mkdir(f"{baseLogPath}/latest-by-phase/{module}")
+        Util.super_mkdir(f"{base_log_path}/latest-by-phase/{module}")
 
         # Add a symlink to the latest run for this module. 'latest' itself is
         # a directory under the base log directory that holds symlinks mapping
         # each module name to the specific log directory most recently used.
-        latestPath = f"{baseLogPath}/latest"
+        latest_path = f"{base_log_path}/latest"
 
         # Handle stuff like playground/utils or KDE/kdelibs
-        moduleName, modulePath = os.path.splitext(os.path.basename(module.name))
+        module_name, module_path = os.path.splitext(os.path.basename(module.name))
         if "/" in module.name:
-            latestPath += f"/{modulePath}"
+            latest_path += f"/{module_path}"
 
-        Util.super_mkdir(latestPath)
+        Util.super_mkdir(latest_path)
 
-        symlink = f"{latestPath}/{moduleName}"
-        Util.remake_symlink(logDir, symlink)
+        symlink = f"{latest_path}/{module_name}"
+        Util.remake_symlink(log_dir, symlink)
 
-        symlink2 = f"{baseLogPath}/latest-by-phase/{module}/{path}"
-        Util.remake_symlink(f"{logDir}/{path}", symlink2)
+        symlink2 = f"{base_log_path}/latest-by-phase/{module}/{path}"
+        Util.remake_symlink(f"{log_dir}/{path}", symlink2)
 
-        return f"{logDir}/{path}"
+        return f"{log_dir}/{path}"
 
     def rc_file(self) -> None:
         """
         Returns rc file in use. Call load_rc_file first.
         """
-        return self.rcFile
+        return self.rc_file
 
     def set_rc_file(self, file: str) -> None:
         """
         Forces the rc file to be read from to be that given by the first parameter.
         """
-        self.rcFiles = [file]
-        self.rcFile = None
+        self.rc_files = [file]
+        self.rc_file = None
 
     @staticmethod
     def warn_legacy_config(file: str) -> None:
@@ -566,7 +566,7 @@ class BuildContext(Module):
             logger_buildcontext.warning(textwrap.dedent(f"""\
             The b[global configuration file] is stored in the old location. It will still be
             processed correctly, however, it's recommended to move it to the new location.
-            Please move b[~/.kdesrc-buildrc] to b[{BuildContext.xdgConfigHomeShort}/kdesrc-buildrc]
+            Please move b[~/.kdesrc-buildrc] to b[{BuildContext.xdg_config_home_short}/kdesrc-buildrc]
             """))
 
     def load_rc_file(self) -> fileinput.FileInput:
@@ -579,35 +579,35 @@ class BuildContext(Module):
         If unable to find or open the rc file an exception is raised. Empty rc
         files are supported, however.
         """
-        rcFiles = self.rcFiles
+        rc_files = self.rc_files
 
-        for file in rcFiles:
+        for file in rc_files:
             if os.path.exists(file):
                 # fh = open(file, "r")  # does not support current line numbers reading
                 # fh = fileinput.input(files=file, mode="r")  # does not support multiple instances
                 fh = fileinput.FileInput(files=file, mode="r")  # supports multiple instances, so use this.
 
-                self.rcFile = os.path.abspath(file)
+                self.rc_file = os.path.abspath(file)
                 BuildContext.warn_legacy_config(file)
                 return fh
 
         # No rc found, check if we can use default.
-        if len(rcFiles) == 1:
+        if len(rc_files) == 1:
             # This can only happen if the user uses --rc-file, so if we fail to
             # load the file, we need to fail to load at all.
-            failedFile = rcFiles[0]
+            failed_file = rc_files[0]
 
             logger_buildcontext.error(textwrap.dedent(f"""\
-            Unable to open config file {failedFile}
+            Unable to open config file {failed_file}
             
             Script stopping here since you specified --rc-file on the command line to
-            load {failedFile} manually.  If you wish to run the script with no configuration
+            load {failed_file} manually.  If you wish to run the script with no configuration
             file, leave the --rc-file option out of the command line.
             
             If you want to force an empty rc file, use --rc-file /dev/null
             
             """))
-            BuildException.croak_runtime(f"Missing {failedFile}")
+            BuildException.croak_runtime(f"Missing {failed_file}")
 
         if self.get_option("metadata-only"):
             # If configuration file in default location was not found, and no --rc-file option was used, and metadata-only option was used.
@@ -621,7 +621,7 @@ class BuildContext(Module):
             # This way the --metadata-only option could work in both cases: when user has config and when he has not.
             # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process will be stored in persistent file.
             # When he has no config (the current case), we will let the _read_configuration_options function do its work on fake config, then we will return.
-            dummyConfig = textwrap.dedent("""\
+            dummy_config = textwrap.dedent("""\
                 global
                     persistent-data-file /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
                 end global
@@ -632,12 +632,12 @@ class BuildContext(Module):
                 """)
 
             temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
-            temp_file.write(dummyConfig)
+            temp_file.write(dummy_config)
             temp_file_path = temp_file.name
             temp_file.close()
 
             fh = fileinput.FileInput(files=temp_file_path, mode="r")
-            self.rcFile = "/fake/dummy_config"
+            self.rc_file = "/fake/dummy_config"
             return fh
         else:
             # If no configuration and no --rc-file option was used, warn the user and fail.
@@ -650,7 +650,7 @@ class BuildContext(Module):
                 
                 When run, kde-builder will use `kdesrc-buildrc' config file located in the
                 current working directory. If no such file exists, kde-builder will use
-                `{BuildContext.xdgConfigHomeShort}/kdesrc-buildrc' instead.
+                `{BuildContext.xdg_config_home_short}/kdesrc-buildrc' instead.
                 
                 You can generate config with b[--generate-config].
                 """))
@@ -664,7 +664,7 @@ class BuildContext(Module):
 
         The RC file must have been found and loaded first, obviously.
         """
-        rcfile = self.rcFile
+        rcfile = self.rc_file
         if not rcfile:
             BuildException.croak_internal("Call to base_config_directory before load_rc_file")
         return os.path.dirname(rcfile)
@@ -689,7 +689,7 @@ class BuildContext(Module):
                 return True
         return False
 
-    def lookup_module(self, moduleName: str):
+    def lookup_module(self, module_name: str):
         """
         Searches for a module with a name that matches the provided parameter,
         and returns its :class:`Module` object. Returns None if no match was found.
@@ -697,15 +697,15 @@ class BuildContext(Module):
         "global", since the BuildContext also is a (in the "is-a" OOP sense)
         :class:`Module`, specifically the 'global' one.
         """
-        if moduleName == "global":
+        if module_name == "global":
             return self
 
-        options = [module for module in self.modules if module.name == moduleName]
+        options = [module for module in self.modules if module.name == module_name]
         if not options:
             return None
 
         if len(options) > 1:
-            BuildException.croak_internal(f"Detected 2 or more {moduleName} `Module` objects")
+            BuildException.croak_internal(f"Detected 2 or more {module_name} `Module` objects")
         return options[0]
 
     def mark_module_phase_failed(self, phase: str, module: Module) -> None:
@@ -758,11 +758,11 @@ class BuildContext(Module):
 
         # Automatically respond to various global option changes.
         for key, value in options.items():
-            normalizedKey = key
-            normalizedKey = normalizedKey.lstrip("#")  # Remove sticky key modifier.
-            if normalizedKey == "colorful-output":
+            normalized_key = key
+            normalized_key = normalized_key.lstrip("#")  # Remove sticky key modifier.
+            if normalized_key == "colorful-output":
                 Debug().set_colorful_output(value)
-            elif normalizedKey == "pretend":
+            elif normalized_key == "pretend":
                 Debug().set_pretending(value)
 
     # Persistent option handling
@@ -776,40 +776,40 @@ class BuildContext(Module):
         if file:
             file = file.replace("~", os.getenv("HOME"))
         else:
-            configDir = self.base_config_directory()
-            if configDir == BuildContext.xdgConfigHome:
+            config_dir = self.base_config_directory()
+            if config_dir == BuildContext.xdg_config_home:
                 # Global config is used. Store the data file in XDG_STATE_HOME.
-                file = BuildContext.xdgStateHome + "/" + BuildContext.PERSISTENT_FILE_NAME
+                file = BuildContext.xdg_state_home + "/" + BuildContext.PERSISTENT_FILE_NAME
             else:
                 # Local config is used. Store the data file in the same directory.
-                file = configDir + "/." + BuildContext.PERSISTENT_FILE_NAME
+                file = config_dir + "/." + BuildContext.PERSISTENT_FILE_NAME
 
-            rcFiles = self.rcFiles
-            if len(rcFiles) == 1:
+            rc_files = self.rc_files
+            if len(rc_files) == 1:
                 # This can only mean that the user specified an rcfile on the command
                 # line and did not set persistent-data-file in their config file. In
                 # this case, append the name of the rcfile to the persistent build
                 # data file to associate it with that specific rcfile.
-                rcFilePath = rcFiles[0]
+                rc_file_path = rc_files[0]
                 # ...But only if the specified rcfile isn't one of the default ones,
                 # to prevent the user from making an oopsie
-                if rcFilePath in BuildContext.rcfiles:
+                if rc_file_path in BuildContext.rcfiles:
                     logger_buildcontext.warning("The specified rc file is one of the default ones. Ignoring it.")
                 else:
-                    rcFileName = os.path.basename(rcFilePath)
-                    file = f"{file}-{rcFileName}"
+                    rc_file_name = os.path.basename(rc_file_path)
+                    file = f"{file}-{rc_file_name}"
 
             # Fallback to legacy data file if it exists and the new one doesn't.
-            legacyDataFile = os.getenv("HOME") + "/.kdesrc-build-data"
+            legacy_data_file = os.getenv("HOME") + "/.kdesrc-build-data"
 
-            if not os.path.exists(file) and os.path.exists(legacyDataFile):
-                file = legacyDataFile
+            if not os.path.exists(file) and os.path.exists(legacy_data_file):
+                file = legacy_data_file
 
-            if file == legacyDataFile and not self.get_option("#warned-legacy-data-location"):
+            if file == legacy_data_file and not self.get_option("#warned-legacy-data-location"):
                 logger_buildcontext.warning(textwrap.dedent(f"""\
                 The b[global data file] is stored in the old location. It will still be
                 processed correctly, however, it's recommended to move it to the new location.
-                Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdgStateHomeShort}/kdesrc-build-data]"""))
+                Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdg_state_home_short}/kdesrc-build-data]"""))
                 self.set_option({"#warned-legacy-data-location": True})
         return file
 
@@ -860,27 +860,27 @@ class BuildContext(Module):
         if Debug().pretending():
             return
 
-        fileName = self.persistent_option_file_name()
-        dir_name = os.path.dirname(fileName)
+        file_name = self.persistent_option_file_name()
+        dir_name = os.path.dirname(file_name)
 
         if not os.path.isdir(dir_name):
             Util.super_mkdir(dir_name)
 
         try:
-            encodedJSON = json.dumps(self.persistent_options, indent=3)
-            Path(fileName).write_text(encodedJSON)
+            encoded_json = json.dumps(self.persistent_options, indent=3)
+            Path(file_name).write_text(encoded_json)
         except Exception as e:
             logger_buildcontext.error(f"Unable to save persistent module data: b[r[{e}]")
             return
 
     # @override(check_signature=False)
-    def get_persistent_option(self, moduleName: str, key=None) -> str | int | None:
+    def get_persistent_option(self, module_name: str, key=None) -> str | int | None:
         """
         Returns the value of a "persistent" option (normally read in as part of
         startup), or None if there is no value stored.
 
         Parameters:
-            moduleName: The module name to get the option for, or "global" if
+            module_name: The module name to get the option for, or "global" if
                 not for a module.
                 Note that unlike set_option/get_option, no inheritance is done at this
                 point so if an option is present globally but not for a module you
@@ -894,19 +894,19 @@ class BuildContext(Module):
 
         # We must check at each level of indirection to avoid
         # "autovivification"
-        if moduleName not in persistent_opts:
+        if module_name not in persistent_opts:
             return
-        if key not in persistent_opts[moduleName]:
+        if key not in persistent_opts[module_name]:
             return
-        return persistent_opts[moduleName][key]
+        return persistent_opts[module_name][key]
 
     # @override(check_signature=False)
-    def unset_persistent_option(self, moduleName: str, key) -> None:
+    def unset_persistent_option(self, module_name: str, key) -> None:
         """
         Clears a persistent option if set (for a given module and option-name).
 
         Parameters:
-            moduleName: The module name to get the option for, or "global" for
+            module_name: The module name to get the option for, or "global" for
                 the global options.
             key: The name of the value to clear.
 
@@ -916,17 +916,17 @@ class BuildContext(Module):
 
         persistent_opts = self.persistent_options
 
-        if moduleName in persistent_opts and key in persistent_opts[moduleName]:
-            del persistent_opts[moduleName][key]
+        if module_name in persistent_opts and key in persistent_opts[module_name]:
+            del persistent_opts[module_name][key]
 
     # @override(check_signature=False)
-    def set_persistent_option(self, moduleName: str, key, value) -> None:
+    def set_persistent_option(self, module_name: str, key, value) -> None:
         """
         Sets a "persistent" option which will be read in for a module when
         kde-builder starts up and written back out at (normal) program exit.
 
         Parameters:
-            moduleName: The module name to set the option for, or "global".
+            module_name: The module name to set the option for, or "global".
             key: The name of the value to set (i.e. key)
             value: The value to store.
         """
@@ -934,10 +934,10 @@ class BuildContext(Module):
         persistent_opts = self.persistent_options
 
         # Initialize empty hash ref if nothing defined for this module.
-        if moduleName not in persistent_opts:
-            persistent_opts[moduleName] = {}
+        if module_name not in persistent_opts:
+            persistent_opts[module_name] = {}
 
-        persistent_opts[moduleName][key] = value
+        persistent_opts[module_name][key] = value
 
     def get_kde_projects_metadata_module(self) -> Module:
         """
@@ -964,9 +964,9 @@ class BuildContext(Module):
         if self.projects_db:
             return self.projects_db
 
-        projectDatabaseModule = self.get_kde_projects_metadata_module() or BuildException.croak_runtime(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
+        project_database_module = self.get_kde_projects_metadata_module() or BuildException.croak_runtime(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
-        self.projects_db = KDEProjectsReader(projectDatabaseModule)
+        self.projects_db = KDEProjectsReader(project_database_module)
         return self.projects_db
 
     def effective_branch_group(self) -> str:
@@ -975,8 +975,8 @@ class BuildContext(Module):
         this unless KDE project metadata is available (see
         setKDEProjectsMetadataModule and module_branch_group_resolver).
         """
-        branchGroup = self.get_option("branch-group") or "kf5-qt5"
-        return branchGroup
+        branch_group = self.get_option("branch-group") or "kf5-qt5"
+        return branch_group
 
     def module_branch_group_resolver(self) -> Module_BranchGroupResolver:
         """
@@ -987,12 +987,12 @@ class BuildContext(Module):
         """
 
         if not self.logical_module_resolver:
-            metadataModule = self.get_kde_projects_metadata_module()
+            metadata_module = self.get_kde_projects_metadata_module()
 
-            if not metadataModule:
+            if not metadata_module:
                 BuildException.croak_internal("Tried to use branch-group, but needed data wasn't loaded!")
 
-            resolver = Module_BranchGroupResolver(metadataModule.scm().logical_module_groups())
+            resolver = Module_BranchGroupResolver(metadata_module.scm().logical_module_groups())
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver

@@ -16,15 +16,15 @@ def test_cmake_prefix(monkeypatch):
     See bug 395627 -- https://bugs.kde.org/show_bug.cgi?id=395627
     """
 
-    savedCommand = []
+    saved_command = []
     set_command_called = 0
 
     # Redefine set_command to capture whether it was properly called.
     def mock_set_command(self, set_command: list[str]):
         nonlocal set_command_called
-        nonlocal savedCommand
+        nonlocal saved_command
         set_command_called = 1
-        savedCommand = set_command
+        saved_command = set_command
         return self
 
     monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
@@ -37,32 +37,32 @@ def test_cmake_prefix(monkeypatch):
 
     args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kdesrc-buildrc".split(" ")
     app = Application(args)
-    moduleList = app.modules
+    module_list = app.modules
 
-    assert len(moduleList) == 6, "Right number of modules"
-    assert isinstance(moduleList[0].build_system(), BuildSystem_KDECMake)
+    assert len(module_list) == 6, "Right number of modules"
+    assert isinstance(module_list[0].build_system(), BuildSystem_KDECMake)
 
     # This requires log_command to be overridden above
-    result = moduleList[0].setup_build_system()
+    result = module_list[0].setup_build_system()
     assert set_command_called == 1, "Overridden set_command was called"
     assert result, "Setup build system for auto-set prefix path"
 
     # We should expect an auto-set -DCMAKE_PREFIX_PATH passed to cmake somewhere
-    prefix = next((x for x in savedCommand if "-DCMAKE_PREFIX_PATH" in x), None)
+    prefix = next((x for x in saved_command if "-DCMAKE_PREFIX_PATH" in x), None)
     assert prefix == "-DCMAKE_PREFIX_PATH=/tmp/qt5", "Prefix path set to custom Qt prefix"
 
-    result = moduleList[2].setup_build_system()
+    result = module_list[2].setup_build_system()
     assert result, "Setup build system for manual-set prefix path"
 
-    prefixes = [el for el in savedCommand if "-DCMAKE_PREFIX_PATH" in el]
+    prefixes = [el for el in saved_command if "-DCMAKE_PREFIX_PATH" in el]
     assert len(prefixes) == 1, "Only one set prefix path in manual mode"
     if prefixes:
         assert prefixes[0] == "-DCMAKE_PREFIX_PATH=FOO", "Manual-set prefix path is as set by user"
 
-    result = moduleList[4].setup_build_system()
+    result = module_list[4].setup_build_system()
     assert result, "Setup build system for manual-set prefix path"
 
-    prefixes = [el for el in savedCommand if "-DCMAKE_PREFIX_PATH" in el]
+    prefixes = [el for el in saved_command if "-DCMAKE_PREFIX_PATH" in el]
     assert len(prefixes) == 1, "Only one set prefix path in manual mode"
     if prefixes:
         assert prefixes[0] == "-DCMAKE_PREFIX_PATH:PATH=BAR", "Manual-set prefix path is as set by user"
