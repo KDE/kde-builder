@@ -88,7 +88,7 @@ class Application:
             print("No modules to build, exiting.\n")
             exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
-        self.modules: list[Module] = work_load["selectedModules"]
+        self.modules: list[Module] = work_load["selected_modules"]
         self.work_load = work_load
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
@@ -136,10 +136,10 @@ class Application:
         index = node_info["idx"]
         count = node_info["count"]
         build = node_info["build"]
-        current_item = node_info["currentItem"]
-        current_branch = node_info["currentBranch"]
-        parent_item = node_info["parentItem"]
-        parent_branch = node_info["parentBranch"]
+        current_item = node_info["current_item"]
+        current_branch = node_info["current_branch"]
+        parent_item = node_info["parent_item"]
+        parent_branch = node_info["parent_branch"]
 
         build_status = "built" if build else "not built"
         status_info = f"({build_status}: {current_branch})" if current_branch else f"({build_status})"
@@ -167,7 +167,7 @@ class Application:
     @staticmethod
     def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
         depth = node_info["depth"]
-        current_item = node_info["currentItem"]
+        current_item = node_info["current_item"]
 
         connector_stack = context["stack"]
 
@@ -195,11 +195,12 @@ class Application:
         expanded, and we will have downloaded kde-projects metadata.
 
         Returns:
-            dict: A dict containing the following entries:
-
-            - selectedModules: the selected modules to build
-            - dependencyInfo: reference to dependency info object as created by :class:`DependencyResolver`
-            - build: whether to actually perform a build action
+            dict:
+                {
+                    "selected_modules": the selected modules to build
+                    "dependency_info": reference to dependency info object as created by :class:`DependencyResolver`
+                    "build": whether to actually perform a build action
+                }
         """
         argv = options
 
@@ -375,8 +376,8 @@ class Application:
             )
 
             result = {
-                "dependencyInfo": module_graph,
-                "selectedModules": [],
+                "dependency_info": module_graph,
+                "selected_modules": [],
                 "build": False
             }
             return result
@@ -395,8 +396,8 @@ class Application:
                    ]
 
         result = {
-            "dependencyInfo": module_graph,
-            "selectedModules": modules,
+            "dependency_info": module_graph,
+            "selected_modules": modules,
             "build": True
         }
         return result
@@ -621,7 +622,7 @@ class Application:
             self._cleanup_log_directory(ctx)
 
         work_load = self.work_load
-        dependency_graph = work_load["dependencyInfo"]["graph"]
+        dependency_graph = work_load["dependency_info"]["graph"]
         ctx = self.context
 
         Application._output_failed_module_lists(ctx, dependency_graph)

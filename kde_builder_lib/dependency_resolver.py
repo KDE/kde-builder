@@ -660,10 +660,10 @@ class DependencyResolver:
                 "depth": 0,
                 "idx": item_index,
                 "count": item_count,
-                "currentItem": item,
-                "currentBranch": branch,
-                "parentItem": "",
-                "parentBranch": ""
+                "current_item": item,
+                "current_branch": branch,
+                "parent_item": "",
+                "parent_branch": ""
             }
             DependencyResolver._descend_module_graph(module_graph, callback, info, context)
             item_index += 1

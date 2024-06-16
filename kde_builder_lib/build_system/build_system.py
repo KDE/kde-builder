@@ -394,9 +394,9 @@ class BuildSystem:
         ::
 
             {
-              was_successful : $bool, (if successful)
-              warnings       : $int,  (num of warnings, in [0..INT_MAX])
-              work_done      : $bool, (true if the make command had work to do, may be needlessly set)
+              was_successful : bool  # if successful
+              warnings       : int  # num of warnings
+              work_done      : bool  # true if the make command had work to do, may be needlessly set
             }
         """
         module = self.module
