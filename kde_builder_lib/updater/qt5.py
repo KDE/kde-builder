@@ -10,13 +10,13 @@ import os.path
 from .updater import Updater
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..util.util import Util
 
-logger_updater = kbLogger.getLogger("updater")
+logger_updater = KBLogger.getLogger("updater")
 
 
-class Updater_Qt5(Updater):
+class UpdaterQt5(Updater):
     """
     Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated
     "init-repository" script to keep the source up to date and coherent.

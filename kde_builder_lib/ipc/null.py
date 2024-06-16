@@ -6,7 +6,7 @@
 from .ipc import IPC
 
 
-class IPC_Null(IPC):
+class IPCNull(IPC):
     """
     Dummy IPC module in case SysVIPC doesn't work or async mode is not needed.
     """

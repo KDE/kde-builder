@@ -7,13 +7,13 @@ import os
 
 from .build_system import BuildSystem
 from ..build_exception import BuildException
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..util.util import Util
 
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
-class BuildSystem_Autotools(BuildSystem):
+class BuildSystemAutotools(BuildSystem):
     """
     This is a class used to support configuring with autotools.
     """

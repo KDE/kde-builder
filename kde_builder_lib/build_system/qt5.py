@@ -9,13 +9,13 @@ import textwrap
 
 from .build_system import BuildSystem
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..util.util import Util
 
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
-class BuildSystem_Qt5(BuildSystem):
+class BuildSystemQt5(BuildSystem):
     """
     Build system for the Qt5 toolkit
     """

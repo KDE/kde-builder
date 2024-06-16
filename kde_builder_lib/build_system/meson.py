@@ -7,7 +7,7 @@ from .build_system import BuildSystem
 from ..util.util import Util
 
 
-class BuildSystem_Meson(BuildSystem):
+class BuildSystemMeson(BuildSystem):
     """
     This is a build system used to support configuring with Meson (https://mesonbuild.com).
 

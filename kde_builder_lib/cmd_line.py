@@ -9,12 +9,12 @@ import textwrap
 from typing import NoReturn
 
 from .build_context import BuildContext
-from .debug import kbLogger
+from .debug import KBLogger
 from .os_support import OSSupport
 from .phase_list import PhaseList
 from .version import Version
 
-logger_app = kbLogger.getLogger("application")
+logger_app = KBLogger.getLogger("application")
 
 
 class Cmdline:

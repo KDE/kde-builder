@@ -9,13 +9,13 @@ import textwrap
 
 from .build_system import BuildSystem
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..util.util import Util
 
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
-class BuildSystem_Qt4(BuildSystem):
+class BuildSystemQt4(BuildSystem):
     """
     Build system for the Qt4 toolkit. It actually works for Qt6 qtbase as well
     because of how simple it is but don't tell anyone that.

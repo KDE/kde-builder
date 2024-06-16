@@ -8,7 +8,7 @@ from __future__ import annotations
 from .updater import Updater
 
 
-class Updater_KDEProject(Updater):
+class UpdaterKDEProject(Updater):
     """
     An update class for KDE Project modules (i.e. those that use "repository
     kde-projects" in the configuration file).

@@ -27,7 +27,7 @@ import setproctitle
 
 from kde_builder_lib.build_exception import BuildException
 from kde_builder_lib.debug import Debug
-from kde_builder_lib.debug import kbLogger
+from kde_builder_lib.debug import KBLogger
 
 if TYPE_CHECKING:
     from ..module.module import Module
@@ -37,8 +37,8 @@ if sys.platform == "darwin":
 else:
     import multiprocessing
 
-logger_logged_cmd = kbLogger.getLogger("logged-command")
-logger_util = kbLogger.getLogger("util")
+logger_logged_cmd = KBLogger.getLogger("logged-command")
+logger_util = KBLogger.getLogger("util")
 
 
 class Util:
@@ -358,7 +358,7 @@ class Util:
     @staticmethod
     def run_logged_command(module: Module, filename: str, callback_ref: Callable | None, command: list[str]) -> int:
         """
-        Common code for log_command and Util_LoggedSubprocess
+        Common code for log_command and UtilLoggedSubprocess
         """
         logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 

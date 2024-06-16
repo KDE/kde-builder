@@ -17,22 +17,22 @@ from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
-from ..ipc.null import IPC_Null
-from ..util.logged_subprocess import Util_LoggedSubprocess
+from ..debug import KBLogger
+from ..ipc.null import IPCNull
+from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
     from ..module.module import Module
 
-logger_updater = kbLogger.getLogger("updater")
+logger_updater = KBLogger.getLogger("updater")
 
 
 class Updater:
     """
     Class that is responsible for updating git-based source code modules. Can
-    have some features overridden by subclassing (see Updater_KDEProject
+    have some features overridden by subclassing (see UpdaterKDEProject
     for an example).
     """
 
@@ -42,7 +42,7 @@ class Updater:
         self.module = module
         self.ipc = None
 
-    def update_internal(self, ipc=IPC_Null()) -> int:
+    def update_internal(self, ipc=IPCNull()) -> int:
         """
         scm-specific update procedure.
         May change the current directory as necessary.
@@ -399,7 +399,7 @@ class Updater:
 
         croak_reason = None
         result = None
-        cmd = Util_LoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
+        cmd = UtilLoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
 
         if not branch_name:
             new_name = self.make_branchname(remote_name, branch)
@@ -565,8 +565,8 @@ class Updater:
         # For modules that are not actually a 'proj' module we skip branch-group
         # entirely to allow for global/module branch selection
         # options to be selected... kind of complicated, but more DWIMy
-        from .kde_project import Updater_KDEProject
-        if not isinstance(module.scm(), Updater_KDEProject):
+        from .kde_project import UpdaterKDEProject
+        if not isinstance(module.scm(), UpdaterKDEProject):
             priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
 
         checkout_source = None
@@ -585,7 +585,7 @@ class Updater:
         # Likewise branch-group requires special handling. checkout_source is
         # currently the branch-group to be resolved.
         if source_type_ref[0] == "branch-group":
-            Util.assert_isa(self, Updater_KDEProject)
+            Util.assert_isa(self, UpdaterKDEProject)
             checkout_source = self._resolve_branch_group(checkout_source)
 
             if not checkout_source:

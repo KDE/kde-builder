@@ -14,8 +14,8 @@ from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
-from ..util.logged_subprocess import Util_LoggedSubprocess
+from ..debug import KBLogger
+from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 
 if TYPE_CHECKING:
@@ -23,8 +23,8 @@ if TYPE_CHECKING:
     from ..module.module import Module
 
 
-logger_logged_cmd = kbLogger.getLogger("logged-command")
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_logged_cmd = KBLogger.getLogger("logged-command")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
 class BuildSystem:
@@ -52,7 +52,7 @@ class BuildSystem:
         # This is simply the 'default' build system at this point, so options
         # intended for unique/bespoke build systems should be stripped from global
         # before being applied to a module.
-        if not self.__class__.__name__ == "BuildSystem_KDECMake":
+        if not self.__class__.__name__ == "BuildSystemKDECMake":
             self._mask_global_build_system_options()
 
     def _mask_global_build_system_options(self) -> None:
@@ -539,7 +539,7 @@ class BuildSystem:
                 nonlocal warnings
                 warnings += 1
 
-        cmd = Util_LoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(arg_ref)
+        cmd = UtilLoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(arg_ref)
 
         def on_child_output(line):
             # called in parent!

@@ -10,12 +10,12 @@ from typing import NoReturn
 from typing import TYPE_CHECKING
 
 from .debug import Debug
-from .debug import kbLogger
+from .debug import KBLogger
 
 if TYPE_CHECKING:
     from .build_context import BuildContext
 
-logger_app = kbLogger.getLogger("application")
+logger_app = KBLogger.getLogger("application")
 
 
 class StartProgram:

@@ -12,10 +12,10 @@ import re
 import textwrap
 
 from .build_exception import BuildException
-from .debug import kbLogger
+from .debug import KBLogger
 
-logger_var_subst = kbLogger.getLogger("variables_substitution")
-logger_app = kbLogger.getLogger("application")
+logger_var_subst = KBLogger.getLogger("variables_substitution")
+logger_app = KBLogger.getLogger("application")
 
 
 class RecursiveFH:

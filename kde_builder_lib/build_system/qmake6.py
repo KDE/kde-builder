@@ -9,13 +9,13 @@ import re
 from .build_system import BuildSystem
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..util.util import Util
 
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
-class BuildSystem_QMake6(BuildSystem):
+class BuildSystemQMake6(BuildSystem):
     """
     A build system used to build modules that use qmake
     """

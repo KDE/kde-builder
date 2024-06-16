@@ -16,24 +16,24 @@ import traceback
 from typing import TYPE_CHECKING
 
 from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildException_Config
-from ..build_system.autotools import BuildSystem_Autotools
+from kde_builder_lib.build_exception import BuildExceptionConfig
+from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
-from ..build_system.cmake_bootstrap import BuildSystem_CMakeBootstrap
-from ..build_system.kde_cmake import BuildSystem_KDECMake
-from ..build_system.meson import BuildSystem_Meson
-from ..build_system.qmake5 import BuildSystem_QMake5
-from ..build_system.qmake6 import BuildSystem_QMake6
-from ..build_system.qt4 import BuildSystem_Qt4
-from ..build_system.qt5 import BuildSystem_Qt5
-from ..build_system.qt6 import BuildSystem_Qt6
+from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
+from ..build_system.kde_cmake import BuildSystemKDECMake
+from ..build_system.meson import BuildSystemMeson
+from ..build_system.qmake5 import BuildSystemQMake5
+from ..build_system.qmake6 import BuildSystemQMake6
+from ..build_system.qt4 import BuildSystemQt4
+from ..build_system.qt5 import BuildSystemQt5
+from ..build_system.qt6 import BuildSystemQt6
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..ipc.ipc import IPC
 from ..options_base import OptionsBase
-from ..updater.kde_project import Updater_KDEProject
-from ..updater.kde_project_metadata import Updater_KDEProjectMetadata
-from ..updater.qt5 import Updater_Qt5
+from ..updater.kde_project import UpdaterKDEProject
+from ..updater.kde_project_metadata import UpdaterKDEProjectMetadata
+from ..updater.qt5 import UpdaterQt5
 from ..updater.updater import Updater
 from ..util.util import Util
 
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     from ..module_set.module_set import ModuleSet
     from ..phase_list import PhaseList
 
-logger_module = kbLogger.getLogger("module")
+logger_module = KBLogger.getLogger("module")
 
 
 class Module(OptionsBase):
@@ -105,9 +105,9 @@ class Module(OptionsBase):
         return self.name
 
     def get_module_set(self):
-        from ..module_set.null import ModuleSet_Null
+        from ..module_set.null import ModuleSetNull
         if not self.module_set:
-            self.module_set = ModuleSet_Null()
+            self.module_set = ModuleSetNull()
         return self.module_set
 
     def set_module_set(self, module_set: ModuleSet) -> None:
@@ -214,11 +214,11 @@ class Module(OptionsBase):
         if scm_type == "git":
             new_type = Updater(self)
         elif scm_type == "proj":
-            new_type = Updater_KDEProject(self)
+            new_type = UpdaterKDEProject(self)
         elif scm_type == "metadata":
-            new_type = Updater_KDEProjectMetadata(self)
+            new_type = UpdaterKDEProjectMetadata(self)
         elif scm_type == "qt5":
-            new_type = Updater_Qt5(self)
+            new_type = UpdaterQt5(self)
         else:
             new_type = None
 
@@ -243,15 +243,15 @@ class Module(OptionsBase):
         """
         build_system_classes = {
             "generic": BuildSystem,
-            "qmake": BuildSystem_QMake5,
-            "qmake6": BuildSystem_QMake6,
-            "cmake-bootstrap": BuildSystem_CMakeBootstrap,
-            "kde": BuildSystem_KDECMake,
-            "qt": BuildSystem_Qt4,
-            "qt5": BuildSystem_Qt5,
-            "qt6": BuildSystem_Qt6,
-            "autotools": BuildSystem_Autotools,
-            "meson": BuildSystem_Meson,
+            "qmake": BuildSystemQMake5,
+            "qmake6": BuildSystemQMake6,
+            "cmake-bootstrap": BuildSystemCMakeBootstrap,
+            "kde": BuildSystemKDECMake,
+            "qt": BuildSystemQt4,
+            "qt5": BuildSystemQt5,
+            "qt6": BuildSystemQt6,
+            "autotools": BuildSystemAutotools,
+            "meson": BuildSystemMeson,
         }
 
         class_name = build_system_classes[name.lower()] or None
@@ -274,26 +274,26 @@ class Module(OptionsBase):
         # This test must come before the KDE build_system's as cmake's own
         # bootstrap system also has CMakeLists.txt
         if not build_type and os.path.exists(f"{source_dir}/CMakeLists.txt") and os.path.exists(f"{source_dir}/bootstrap"):
-            build_type = BuildSystem_CMakeBootstrap(self)
+            build_type = BuildSystemCMakeBootstrap(self)
 
         if not build_type and (os.path.exists(f"{source_dir}/CMakeLists.txt") or self.is_kde_project()):
-            build_type = BuildSystem_KDECMake(self)
+            build_type = BuildSystemKDECMake(self)
 
         # We have to assign to an array to force glob to return all results,
         # otherwise it acts like a non-reentrant generator whose output depends on
         # how many times it's been called...
         if not build_type and (files := glob.glob(f"{source_dir}/*.pro")):
-            build_type = BuildSystem_QMake5(self)
+            build_type = BuildSystemQMake5(self)
 
         # 'configure' is a popular fall-back option even for other build
         # systems so ensure we check last for autotools.
         if not build_type and (os.path.exists(f"{source_dir}/configure") or os.path.exists(f"{source_dir}/autogen.sh")):
-            build_type = BuildSystem_Autotools(self)
+            build_type = BuildSystemAutotools(self)
 
         # Someday move this up, but for now ensure that Meson happens after
         # configure/autotools support is checked for.
         if not build_type and os.path.exists(f"{source_dir}/meson.build"):
-            build_type = BuildSystem_Meson(self)
+            build_type = BuildSystemMeson(self)
 
         # Don't just assume the build system is KDE-based...
         if not build_type:
@@ -714,7 +714,7 @@ class Module(OptionsBase):
         for mso in ["use-modules", "ignore-modules"]:
             if mso in options:
                 logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
-                raise BuildException_Config(mso, f"Option {mso} can only be used in module-set")
+                raise BuildExceptionConfig(mso, f"Option {mso} can only be used in module-set")
 
         # Special case handling.
         if "filter-out-phases" in options:
@@ -864,7 +864,7 @@ class Module(OptionsBase):
         """
         Returns the "full kde-projects path" for the module. As should be obvious by
         the description, this only works for modules with scm type that is a
-        :class:`Updater_KDEProject` (or its subclasses), but modules that don't fall into this
+        :class:`UpdaterKDEProject` (or its subclasses), but modules that don't fall into this
         hierarchy will just return the module name (with no path components) anyway.
         """
         return self.get_option("#kde-project-path", "module") or self.name

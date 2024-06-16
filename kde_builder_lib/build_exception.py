@@ -70,7 +70,7 @@ class BuildException(Exception):
         raise BuildException.make_exception("Internal", msg, 1)
 
 
-class BuildException_Config(BuildException):
+class BuildExceptionConfig(BuildException):
     """
     A small subclass to hold the option name that caused a config exception to
     be thrown.
@@ -94,7 +94,7 @@ class BuildException_Config(BuildException):
         """
         result = None
 
-        if isinstance(option_name, BuildException_Config):
+        if isinstance(option_name, BuildExceptionConfig):
             # Should only happen if called as method: i.e. option_name == self
             option_name = option_name.problematic_option_name()
 

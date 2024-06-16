@@ -5,12 +5,12 @@
 
 from .module_set import ModuleSet
 from ..build_context import BuildContext
-from ..build_system.qt5 import BuildSystem_Qt5
+from ..build_system.qt5 import BuildSystemQt5
 from ..module.module import Module
 from ..util.util import Util
 
 
-class ModuleSet_Qt5(ModuleSet):
+class ModuleSetQt5(ModuleSet):
     """
     This represents a collection of Qt5 source code modules that are collectively
     kept up to date by Qt's init-repository script. This module set is
@@ -33,7 +33,7 @@ class ModuleSet_Qt5(ModuleSet):
         # See https://wiki.qt.io/Building_Qt_5_from_Git
         new_module.set_option({"repository": "https://invent.kde.org/qt/qt/qt5.git"})
         new_module.set_scm_type("qt5")
-        new_module.set_build_system(BuildSystem_Qt5(new_module))
+        new_module.set_build_system(BuildSystemQt5(new_module))
 
         # Convert the use-modules/ignore-modules entries into a form appropriate
         # for init-repository's module-subset option.

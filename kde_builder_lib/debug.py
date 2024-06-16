@@ -118,7 +118,7 @@ class Debug:
             raise ValueError(f"{ipc} isn't an IPC obj!")
 
 
-class kbLogger(logging.Logger):
+class KBLogger(logging.Logger):
     _loggers = {}
     levelNamesMapping = logging._nameToLevel
 
@@ -144,12 +144,12 @@ class kbLogger(logging.Logger):
             d.ipc.send_log_message(logger_name, message_level, msg)
             return
 
-        kblogger = kbLogger.getLogger(logger_name)
-        real_level_method = getattr(super(kbLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
+        kblogger = KBLogger.getLogger(logger_name)
+        real_level_method = getattr(super(KBLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
         real_level_method(d.colorize(msg + "]"))
 
         if d.screen_log is not None:  # todo: This should be just another handler for the logger
-            int_message_level = kbLogger.levelNamesMapping[message_level.upper()]
+            int_message_level = KBLogger.levelNamesMapping[message_level.upper()]
             if kblogger.isEnabledFor(int_message_level):
                 saved_colors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
                 # Remove color but still extract codes
@@ -170,18 +170,18 @@ class kbLogger(logging.Logger):
     # well, so you don't need to manually add the "]" to reset.
 
     def debug(self, msg: str, *args, **kwargs) -> None:
-        kbLogger.print_clr(self.name, "debug", msg)
+        KBLogger.print_clr(self.name, "debug", msg)
 
     def info(self, msg: str, *args, **kwargs) -> None:
-        kbLogger.print_clr(self.name, "info", msg)
+        KBLogger.print_clr(self.name, "info", msg)
 
     def warning(self, msg: str, *args, **kwargs) -> None:
-        kbLogger.print_clr(self.name, "warning", msg)
+        KBLogger.print_clr(self.name, "warning", msg)
 
     def error(self, msg: str, *args, **kwargs) -> None:
-        kbLogger.print_clr(self.name, "error", msg)
+        KBLogger.print_clr(self.name, "error", msg)
 
     def pretend(self, msg: str) -> None:
         if Debug().pretending():
             msg = re.sub(r"(\w)", r"d[\1", msg, 1)  # Add dim prefix. Clear suffix is actually implicit
-            kbLogger.print_clr(self.name, "debug", msg)
+            KBLogger.print_clr(self.name, "debug", msg)

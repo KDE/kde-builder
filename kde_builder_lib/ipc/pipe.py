@@ -10,7 +10,7 @@ from .ipc import IPC
 from ..build_exception import BuildException
 
 
-class IPC_Pipe(IPC):
+class IPCPipe(IPC):
     """
     IPC class that uses pipes in addition to forking for IPC.
     """

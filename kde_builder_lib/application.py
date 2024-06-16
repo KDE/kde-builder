@@ -24,19 +24,19 @@ from typing import Callable
 from typing import NoReturn
 
 from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildException_Config
+from kde_builder_lib.build_exception import BuildExceptionConfig
 from .build_context import BuildContext
-from .build_system.qmake5 import BuildSystem_QMake5
+from .build_system.qmake5 import BuildSystemQMake5
 from .cmd_line import Cmdline
 from .debug import Debug
-from .debug import kbLogger
+from .debug import KBLogger
 from .debug_order_hints import DebugOrderHints
 from .dependency_resolver import DependencyResolver
 from .module.module import Module
 from .module_resolver import ModuleResolver
-from .module_set.kde_projects import ModuleSet_KDEProjects
+from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
-from .module_set.qt5 import ModuleSet_Qt5
+from .module_set.qt5 import ModuleSetQt5
 from .options_base import OptionsBase
 from .recursive_fh import RecursiveFH
 from .start_program import StartProgram
@@ -44,8 +44,8 @@ from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
 
-logger_var_subst = kbLogger.getLogger("variables_substitution")
-logger_app = kbLogger.getLogger("application")
+logger_var_subst = KBLogger.getLogger("variables_substitution")
+logger_app = KBLogger.getLogger("application")
 
 
 class Application:
@@ -894,7 +894,7 @@ class Application:
                     logger_app.error("y[Please edit your config. Replace \"r[install-session-driver]y[\" with \"g[install-login-session]y[\".")
                 if option == "install-environment-driver":  # todo This message is temporary. Remove it after 24.08.2024.
                     logger_app.error("y[Please edit your config. Replace \"r[install-environment-driver]y[\" with \"g[install-login-session]y[\".")
-                raise BuildException_Config(option, f"Unrecognized option \"{option}\" found at {current_file}:{file_reader.current_filehandle().filelineno()}")
+                raise BuildExceptionConfig(option, f"Unrecognized option \"{option}\" found at {current_file}:{file_reader.current_filehandle().filelineno()}")
 
             # This is addition of python version
             if value == "true":
@@ -905,7 +905,7 @@ class Application:
             try:
                 module.set_option({option: value})
             except Exception as err:
-                if isinstance(err, BuildException_Config):
+                if isinstance(err, BuildExceptionConfig):
                     msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
                     explanation = err.option_usage_explanation()
                     if explanation:
@@ -958,9 +958,9 @@ class Application:
         # You'd probably have to construct an entirely new object and copy the
         # members over in other languages.
         if module_set.get_option("repository") == Application.KDE_PROJECT_ID:
-            module_set.__class__ = ModuleSet_KDEProjects
+            module_set.__class__ = ModuleSetKDEProjects
         elif module_set.get_option("repository") == Application.QT_PROJECT_ID:
-            module_set.__class__ = ModuleSet_Qt5
+            module_set.__class__ = ModuleSetQt5
         return module_set
 
     def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options_ref: list) -> list[Module | ModuleSet]:
@@ -984,7 +984,7 @@ class Application:
             kde-projects or standard sets).
 
         Raises:
-            BuildException_Config
+            BuildExceptionConfig
         """
         module_list = []
         rcfile = ctx.rc_file
@@ -1736,7 +1736,7 @@ class Application:
 
             # qmake is not necessarily named "qmake"
             if not program_path and prog == "qmake":
-                program_path = BuildSystem_QMake5.abs_path_to_qmake()
+                program_path = BuildSystemQMake5.abs_path_to_qmake()
 
             if not program_path:
                 # Don't complain about Qt if we're building it...

@@ -9,7 +9,7 @@ import tempfile
 
 from kde_builder_lib.build_context import BuildContext
 from kde_builder_lib.module.module import Module
-from kde_builder_lib.util.logged_subprocess import Util_LoggedSubprocess
+from kde_builder_lib.util.logged_subprocess import UtilLoggedSubprocess
 
 
 def test_logged_subprocess():
@@ -30,14 +30,14 @@ def test_logged_subprocess():
     def func(mod):
         print(f"Calculating stuff for {mod}")
 
-    cmd = Util_LoggedSubprocess() \
+    cmd = UtilLoggedSubprocess() \
         .module(m) \
         .log_to("test-suite-1") \
         .set_command(["perl", "-E", "my $x = 2 + 2; say qq($x);"]) \
         .chdir_to(tmp) \
         .announcer(func)
 
-    assert isinstance(cmd, Util_LoggedSubprocess), "got the right type of cmd"
+    assert isinstance(cmd, UtilLoggedSubprocess), "got the right type of cmd"
 
     output = None
 
@@ -52,7 +52,7 @@ def test_logged_subprocess():
 
     # Create a second LoggedSubprocess while the first one is still alive, even
     # though it is finished.
-    cmd2 = Util_LoggedSubprocess() \
+    cmd2 = UtilLoggedSubprocess() \
         .module(m) \
         .log_to("test-suite-2") \
         .set_command(["perl", "-E", "my $x = 4 + 4; say qq(here for stdout); die qq(hello);"]) \

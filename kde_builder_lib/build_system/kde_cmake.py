@@ -15,19 +15,19 @@ from typing import TYPE_CHECKING
 from .build_system import BuildSystem
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
-from ..util.logged_subprocess import Util_LoggedSubprocess
+from ..debug import KBLogger
+from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
     from ..module.module import Module
 
-logger_ide_proj = kbLogger.getLogger("ide_project_configs")
-logger_buildsystem = kbLogger.getLogger("build-system")
+logger_ide_proj = KBLogger.getLogger("ide_project_configs")
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
-class BuildSystem_KDECMake(BuildSystem):
+class BuildSystemKDECMake(BuildSystem):
     """
     Class responsible for building CMake-based modules, with special support for KDE modules.
     """
@@ -74,7 +74,7 @@ class BuildSystem_KDECMake(BuildSystem):
 
     @staticmethod
     def _check_generator_is_whitelisted(generator: str) -> bool:
-        return generator in BuildSystem_KDECMake.GENERATOR_MAP
+        return generator in BuildSystemKDECMake.GENERATOR_MAP
 
     @staticmethod
     def _strip_generator_from_cmake_options(args: list[str]) -> list[str]:
@@ -149,7 +149,7 @@ class BuildSystem_KDECMake(BuildSystem):
             match = re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybeToolchain)
             if match:
                 file = match.group(1) or ""
-                if BuildSystem_KDECMake._check_toolchain_ok(file):
+                if BuildSystemKDECMake._check_toolchain_ok(file):
                     accept = 1
                     found = maybeToolchain
                     break
@@ -160,7 +160,7 @@ class BuildSystem_KDECMake(BuildSystem):
             match = re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", found)
             if match:
                 found = match.group(1) or ""
-                if BuildSystem_KDECMake._check_toolchain_ok(found):
+                if BuildSystemKDECMake._check_toolchain_ok(found):
                     return found
         return ""
 
@@ -187,7 +187,7 @@ class BuildSystem_KDECMake(BuildSystem):
         automatically.
         """
         generator = self.get_cmake_generator()
-        generator_opts = BuildSystem_KDECMake.GENERATOR_MAP[generator]["options_name"]
+        generator_opts = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
 
         if not generator_opts:
             return False
@@ -256,7 +256,7 @@ class BuildSystem_KDECMake(BuildSystem):
         returned if there's no required programs.
         """
         generator = self.get_cmake_generator()
-        required = BuildSystem_KDECMake.GENERATOR_MAP[generator]["required_programs"]
+        required = BuildSystemKDECMake.GENERATOR_MAP[generator]["required_programs"]
         return required
 
     # @override(check_signature=False)
@@ -266,7 +266,7 @@ class BuildSystem_KDECMake(BuildSystem):
         be supported by the build system.
         """
         generator = self.get_cmake_generator()
-        progs = BuildSystem_KDECMake.GENERATOR_MAP[generator]["build_commands"]
+        progs = BuildSystemKDECMake.GENERATOR_MAP[generator]["build_commands"]
         return progs
 
     @staticmethod
@@ -294,7 +294,7 @@ class BuildSystem_KDECMake(BuildSystem):
         build_command = self.default_build_command()
         num_tests = "Some"  # overwritten by a specific number, hopefully
 
-        cmd = Util_LoggedSubprocess().module(module).log_to("test-results").set_command([build_command, make_target])
+        cmd = UtilLoggedSubprocess().module(module).log_to("test-results").set_command([build_command, make_target])
 
         def on_child_output(line):
             match = re.match(r"([0-9]+) tests failed out of", line)
@@ -321,7 +321,7 @@ class BuildSystem_KDECMake(BuildSystem):
         """
         module = self.module
         generator = self.get_cmake_generator()
-        target = BuildSystem_KDECMake.GENERATOR_MAP[generator]["install_target"]
+        target = BuildSystemKDECMake.GENERATOR_MAP[generator]["install_target"]
 
         if module.get_option("custom-build-command"):
             target = "install"
@@ -483,7 +483,7 @@ class BuildSystem_KDECMake(BuildSystem):
         Return value style: dict to build results object (see :meth:`BuildSystem.safe_make`)
         """
         generator = self.get_cmake_generator()
-        default_options_name = BuildSystem_KDECMake.GENERATOR_MAP[generator]["options_name"]
+        default_options_name = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
         if options_name is None:
             options_name = f"{default_options_name}"
         return super().build_internal(options_name)
@@ -563,7 +563,7 @@ class BuildSystem_KDECMake(BuildSystem):
 
             module.set_persistent_option("last-cmake-options", Util.get_list_digest(commands))
 
-            cmd = Util_LoggedSubprocess().module(module).log_to("cmake").chdir_to(builddir).set_command(commands)
+            cmd = UtilLoggedSubprocess().module(module).log_to("cmake").chdir_to(builddir).set_command(commands)
 
             reading_optional_packages_not_found = False
             optional_packages_not_found = []

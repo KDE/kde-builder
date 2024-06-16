@@ -19,18 +19,18 @@ import traceback
 
 from .build_exception import BuildException
 from .debug import Debug
-from .debug import kbLogger
+from .debug import KBLogger
 from .kde_projects_reader import KDEProjectsReader
-from .module.branch_group_resolver import Module_BranchGroupResolver
+from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
-from .module_set.kde_projects import ModuleSet_KDEProjects
+from .module_set.kde_projects import ModuleSetKDEProjects
 from .options_base import OptionsBase
 from .phase_list import PhaseList
 from .status_view import StatusView
 from .util.util import Util
 from .version import Version
 
-logger_buildcontext = kbLogger.getLogger("build-context")
+logger_buildcontext = KBLogger.getLogger("build-context")
 
 
 # We derive from Module so that BuildContext acts like the 'global'
@@ -951,7 +951,7 @@ class BuildContext(Module):
         """
         # Initialize if not set
         if not self.kde_projects_metadata:
-            self.kde_projects_metadata = ModuleSet_KDEProjects.get_project_metadata_module(self)
+            self.kde_projects_metadata = ModuleSetKDEProjects.get_project_metadata_module(self)
 
         return self.kde_projects_metadata
 
@@ -978,7 +978,7 @@ class BuildContext(Module):
         branch_group = self.get_option("branch-group") or "kf5-qt5"
         return branch_group
 
-    def module_branch_group_resolver(self) -> Module_BranchGroupResolver:
+    def module_branch_group_resolver(self) -> ModuleBranchGroupResolver:
         """
         Returns a :class:`Module.BranchGroupResolver` which can be used to efficiently
         determine a git branch to use for a given kde-projects module (when the
@@ -992,7 +992,7 @@ class BuildContext(Module):
             if not metadata_module:
                 BuildException.croak_internal("Tried to use branch-group, but needed data wasn't loaded!")
 
-            resolver = Module_BranchGroupResolver(metadata_module.scm().logical_module_groups())
+            resolver = ModuleBranchGroupResolver(metadata_module.scm().logical_module_groups())
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver

@@ -7,7 +7,7 @@ from .build_system import BuildSystem
 from ..util.util import Util
 
 
-class BuildSystem_CMakeBootstrap(BuildSystem):
+class BuildSystemCMakeBootstrap(BuildSystem):
     """
     This is a module used to do only one thing: Bootstrap CMake onto a system
     that doesn't have it, or has only an older version of it.

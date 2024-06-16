@@ -7,14 +7,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .kde_cmake import BuildSystem_KDECMake
+from .kde_cmake import BuildSystemKDECMake
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
     from ..module.module import Module
 
 
-class BuildSystem_Qt6(BuildSystem_KDECMake):
+class BuildSystemQt6(BuildSystemKDECMake):
     """
     Class responsible for building Qt6 CMake-based modules.
     """

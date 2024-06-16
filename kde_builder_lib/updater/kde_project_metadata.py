@@ -6,14 +6,14 @@
 import json
 import re
 
-from .kde_project import Updater_KDEProject
+from .kde_project import UpdaterKDEProject
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..ipc.null import IPC_Null
+from ..ipc.null import IPCNull
 from ..util.util import Util
 
 
-class Updater_KDEProjectMetadata(Updater_KDEProject):
+class UpdaterKDEProjectMetadata(UpdaterKDEProject):
     """
     Updater used only to specifically update the "repo-metadata" module
     used for storing dependency information, among other things.
@@ -76,7 +76,7 @@ class Updater_KDEProjectMetadata(Updater_KDEProject):
         return json_hashref
 
     # @override(check_signature=False)
-    def update_internal(self, ipc=IPC_Null()) -> None:
+    def update_internal(self, ipc=IPCNull()) -> None:
         if Debug().is_testing():
             return
 

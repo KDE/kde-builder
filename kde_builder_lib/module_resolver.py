@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 
 from .build_exception import BuildException
 from .module.module import Module
-from .module_set.kde_projects import ModuleSet_KDEProjects
+from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
 
 if TYPE_CHECKING:
@@ -313,7 +313,7 @@ class ModuleResolver:
 
         elif forced_to_kde_project:
             # Just assume it's a kde-projects module and expand away...
-            selector = ModuleSet_KDEProjects(ctx, "forced_to_kde_project")
+            selector = ModuleSetKDEProjects(ctx, "forced_to_kde_project")
             selector.set_modules_to_find([selector_name])
             selector.set_option({"#include-dependencies": including_deps})
         else:
@@ -370,7 +370,7 @@ class ModuleResolver:
                 guessed_module = lookup_table_ref[guessed_module.name]
                 results.append(guessed_module)
             else:
-                mod_set = ModuleSet_KDEProjects(ctx, "guessed_from_cmdline")
+                mod_set = ModuleSetKDEProjects(ctx, "guessed_from_cmdline")
                 mod_set.set_modules_to_find([guessed_module.name])
 
                 set_results = self.expand_module_sets([mod_set])

@@ -13,12 +13,12 @@ from types import FunctionType
 
 from .build_exception import BuildException
 from .debug import Debug
-from .debug import kbLogger
+from .debug import KBLogger
 from .module.module import Module
 from .updater.updater import Updater
 from .util.util import Util
 
-logger_depres = kbLogger.getLogger("dependency-resolver")
+logger_depres = KBLogger.getLogger("dependency-resolver")
 
 
 class DependencyResolver:

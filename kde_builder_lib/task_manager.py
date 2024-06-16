@@ -19,10 +19,10 @@ import setproctitle
 
 from .build_exception import BuildException
 from .debug import Debug
-from .debug import kbLogger
+from .debug import KBLogger
 from .ipc.ipc import IPC
-from .ipc.null import IPC_Null
-from .ipc.pipe import IPC_Pipe
+from .ipc.null import IPCNull
+from .ipc.pipe import IPCPipe
 from .util.util import Util
 
 if TYPE_CHECKING:
@@ -30,9 +30,9 @@ if TYPE_CHECKING:
     from .application import Application
     from .module.module import Module
 
-logger_ipc = kbLogger.getLogger("ipc")
-logger_buildsystem = kbLogger.getLogger("build-system")
-logger_taskmanager = kbLogger.getLogger("taskmanager")
+logger_ipc = KBLogger.getLogger("ipc")
+logger_buildsystem = KBLogger.getLogger("build-system")
+logger_taskmanager = KBLogger.getLogger("taskmanager")
 
 
 class TaskManager:
@@ -85,9 +85,9 @@ class TaskManager:
                 ctx.set_option({"async": False})
 
         if ctx.uses_concurrent_phases() and ctx.get_option("async"):
-            ipc = IPC_Pipe()
+            ipc = IPCPipe()
         else:
-            ipc = IPC_Null()
+            ipc = IPCNull()
 
         ipc.set_persistent_option_handler(update_opts_sub)
 
@@ -386,7 +386,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, monitor_to_build_ipc: IPC_Pipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext) -> int:
         """
         This function special-cases the handling of the update and build phases, by
         performing them concurrently (where possible), using forked processes.
@@ -401,7 +401,7 @@ class TaskManager:
 
         Parameters:
             monitor_to_build_ipc: IPC Object to use for sending/receiving update/build status. It must be
-                an object type that supports IPC concurrency (e.g. IPC_Pipe).
+                an object type that supports IPC concurrency (e.g. IPCPipe).
             ctx: Build Context to use, from which the module lists will be determined.
 
         Returns:
@@ -426,7 +426,7 @@ class TaskManager:
 
         if monitor_pid == 0:
             # child of build (i.e. monitor and updater)
-            updater_to_monitor_ipc = IPC_Pipe()
+            updater_to_monitor_ipc = IPCPipe()
             updater_pid = os.fork()
 
             if updater_pid == 0:
@@ -633,9 +633,9 @@ class TaskManager:
         return True
 
     @staticmethod
-    def _handle_monitoring(ipc_to_build: IPC_Pipe, ipc_from_updater: IPC_Pipe) -> int:
+    def _handle_monitoring(ipc_to_build: IPCPipe, ipc_from_updater: IPCPipe) -> int:
         """
-        This is the main function for the monitoring process when using :class:`IPC_Pipe`.
+        This is the main function for the monitoring process when using :class:`IPCPipe`.
         It reads in all status reports from the source update process and then holds
         on to them. When the build process is ready to read information we send what
         we have. Otherwise, we're waiting on the update process to send us something.

@@ -13,10 +13,10 @@ from typing import NoReturn
 
 from .build_context import BuildContext
 from .build_exception import BuildException
-from .debug import kbLogger
+from .debug import KBLogger
 from .os_support import OSSupport
 
-logger_fr = kbLogger.getLogger("first-run")
+logger_fr = KBLogger.getLogger("first-run")
 
 
 class FirstRun:

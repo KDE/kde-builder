@@ -12,7 +12,7 @@ import sys
 import textwrap
 import traceback
 
-from kde_builder_lib.debug import kbLogger
+from kde_builder_lib.debug import KBLogger
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -109,19 +109,19 @@ def merge_dicts(a: dict, b: dict, path=None):
 config = merge_dicts(config, override_config)
 logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
 
-# Now will create our kbLogger loggers, set up their levels and handlers
+# Now will create our KBLogger loggers, set up their levels and handlers
 for logger_name, logger_config in config.get("loggers", {}).items():
     level = logger_config.get("level", logging.NOTSET)  # get level from the config
     handlers = logging.getLogger(logger_name).handlers  # get the object handlers that were set for standard logger (their formatters are already set)
 
-    kblogger = kbLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
+    kblogger = KBLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
     for handler in handlers:
         kblogger.addHandler(handler)
 
 if args.debug:
     # setting all loggers to logging.DEBUG level
     for logger_name, _ in config.get("loggers", {}).items():
-        kblogger = kbLogger.getLogger(logger_name)
+        kblogger = KBLogger.getLogger(logger_name)
         kblogger.setLevel(logging.DEBUG)
     sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
 # </editor-fold>

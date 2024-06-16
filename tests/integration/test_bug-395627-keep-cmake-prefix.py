@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from kde_builder_lib.application import Application
-from kde_builder_lib.build_system.kde_cmake import BuildSystem_KDECMake
+from kde_builder_lib.build_system.kde_cmake import BuildSystemKDECMake
 from kde_builder_lib.debug import Debug
-from kde_builder_lib.util.logged_subprocess import Util_LoggedSubprocess
+from kde_builder_lib.util.logged_subprocess import UtilLoggedSubprocess
 
 
 def test_cmake_prefix(monkeypatch):
@@ -27,20 +27,20 @@ def test_cmake_prefix(monkeypatch):
         saved_command = set_command
         return self
 
-    monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
+    monkeypatch.setattr(UtilLoggedSubprocess, "set_command", mock_set_command)
 
     # Redefine start.
     def mock_start(self) -> int:
         return 0  # success
 
-    monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
+    monkeypatch.setattr(UtilLoggedSubprocess, "start", mock_start)
 
     args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kdesrc-buildrc".split(" ")
     app = Application(args)
     module_list = app.modules
 
     assert len(module_list) == 6, "Right number of modules"
-    assert isinstance(module_list[0].build_system(), BuildSystem_KDECMake)
+    assert isinstance(module_list[0].build_system(), BuildSystemKDECMake)
 
     # This requires log_command to be overridden above
     result = module_list[0].setup_build_system()

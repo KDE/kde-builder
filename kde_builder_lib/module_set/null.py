@@ -9,7 +9,7 @@ from .module_set import ModuleSet
 from ..build_exception import BuildException
 
 
-class ModuleSet_Null(ModuleSet):
+class ModuleSetNull(ModuleSet):
     """
     Used automatically by ``Module`` to represent the absence of a ``ModuleSet`` without
     requiring definedness checks.

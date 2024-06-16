@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .qmake6 import BuildSystem_QMake6
+from .qmake6 import BuildSystemQMake6
 
 
-class BuildSystem_QMake5(BuildSystem_QMake6):
+class BuildSystemQMake5(BuildSystemQMake6):
     """
     The only difference is the possible qmake names and the identifier name of the build system.
     """

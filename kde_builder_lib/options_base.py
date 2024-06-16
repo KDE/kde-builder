@@ -25,7 +25,7 @@ from __future__ import annotations
 import copy
 import re
 
-from .build_exception import BuildException_Config
+from .build_exception import BuildExceptionConfig
 from .util.util import Util
 
 
@@ -114,7 +114,7 @@ class OptionsBase:
                 repo, url = match.group(1), match.group(2)
 
                 if not repo or not url:
-                    raise BuildException_Config(repo_option, f"Invalid git-repository-base setting: {value}")
+                    raise BuildExceptionConfig(repo_option, f"Invalid git-repository-base setting: {value}")
 
                 dictref = self.get_option(repo_option)
                 if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash is empty itself).

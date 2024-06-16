@@ -13,20 +13,20 @@ from typing import NoReturn
 from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
-from ..debug import kbLogger
+from ..debug import KBLogger
 
 if TYPE_CHECKING:
     from ..module.module import Module
 
-logger_ipc = kbLogger.getLogger("ipc")
+logger_ipc = KBLogger.getLogger("ipc")
 
 
 class IPC:
     """
     Handles the asynchronous communications needed to perform update and build
     processes at the same time. This can be thought of as a partially-abstract
-    class, really you should use IPC_Null (which is fully synchronous) or
-    IPC_Pipe, which both fall back to common methods implemented here.
+    class, really you should use IPCNull (which is fully synchronous) or
+    IPCPipe, which both fall back to common methods implemented here.
     """
 
     # IPC message types
@@ -99,7 +99,7 @@ class IPC:
         logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
         if not re.match(r"^\s+", msg):
             msg = f"\t{msg}"
-        kbLogger.print_clr(logger_name, message_level, msg)
+        KBLogger.print_clr(logger_name, message_level, msg)
 
     def _update_seen_modules_from_message(self, ipc_type, buffer) -> str | None:
         """
@@ -251,7 +251,7 @@ class IPC:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
                         msg = f"\t{msg}"
-                    kbLogger.print_clr(logger_name, message_level, msg)
+                    KBLogger.print_clr(logger_name, message_level, msg)
         self.messages = {}
 
     def forget_module(self, module: Module) -> None:

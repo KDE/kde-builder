@@ -10,7 +10,7 @@ import os
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.updater.updater import Updater
-from kde_builder_lib.util.logged_subprocess import Util_LoggedSubprocess  # load early so we can override
+from kde_builder_lib.util.logged_subprocess import UtilLoggedSubprocess  # load early so we can override
 
 
 def test_option_reading(monkeypatch):
@@ -20,7 +20,7 @@ def test_option_reading(monkeypatch):
 
     cmd = []
 
-    # Override Util_LoggedSubprocess.set_command for final test to see if it is called with 'cmake'
+    # Override UtilLoggedSubprocess.set_command for final test to see if it is called with 'cmake'
     def mock_set_command(self, set_command: list[str]):
         nonlocal cmd
         if not set_command:
@@ -30,13 +30,13 @@ def test_option_reading(monkeypatch):
             cmd = command
         return self
 
-    monkeypatch.setattr(Util_LoggedSubprocess, "set_command", mock_set_command)
+    monkeypatch.setattr(UtilLoggedSubprocess, "set_command", mock_set_command)
 
     # Override start.
     def mock_start(self) -> int:
         return 0
 
-    monkeypatch.setattr(Util_LoggedSubprocess, "start", mock_start)
+    monkeypatch.setattr(UtilLoggedSubprocess, "start", mock_start)
 
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc".split(" "))
     module_list = app.modules

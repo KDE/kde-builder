@@ -8,8 +8,8 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from ..build_exception import BuildException_Config
-from ..debug import kbLogger
+from ..build_exception import BuildExceptionConfig
+from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
 from ..phase_list import PhaseList
@@ -17,14 +17,14 @@ from ..phase_list import PhaseList
 if TYPE_CHECKING:
     from ..build_context import BuildContext
 
-logger_moduleset = kbLogger.getLogger("module-set")
+logger_moduleset = KBLogger.getLogger("module-set")
 
 
 class ModuleSet(OptionsBase):
     """
     This represents a collective grouping of modules that share common options,
     and share a common repository (in this case, based on the git-repository-base
-    option, but see also the more common ModuleSet_KDEProjects which is used for
+    option, but see also the more common ModuleSetKDEProjects which is used for
     the special kde-projects repositories).
 
     This is parsed from module-set declarations in the rc-file.
@@ -47,7 +47,7 @@ class ModuleSet(OptionsBase):
     5. A PhaseList describing what phases of the build a module should
     participate in by default.
 
-    See also: git-repository-base, ModuleSet_KDEProjects, use-modules
+    See also: git-repository-base, ModuleSetKDEProjects, use-modules
     """
 
     def __init__(self, ctx: BuildContext, name: str):
@@ -120,7 +120,7 @@ class ModuleSet(OptionsBase):
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[use-modules] entry.")
-                raise BuildException_Config("use-modules", "Invalid use-modules")
+                raise BuildExceptionConfig("use-modules", "Invalid use-modules")
 
             self.set_modules_to_find(modules)
             del options["use-modules"]
@@ -130,7 +130,7 @@ class ModuleSet(OptionsBase):
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[ignore-modules] entry.")
-                raise BuildException_Config("ignore-modules", "Invalid ignore-modules")
+                raise BuildExceptionConfig("ignore-modules", "Invalid ignore-modules")
 
             self.add_modules_to_ignore(modules)
             del options["ignore-modules"]

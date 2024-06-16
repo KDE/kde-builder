@@ -12,14 +12,14 @@ from typing import Callable
 from .util import Util
 from ..build_exception import BuildException
 from ..debug import Debug
-from ..debug import kbLogger
+from ..debug import KBLogger
 
 if sys.platform == "darwin":
     import multiprocess as multiprocessing
 else:
     import multiprocessing
 
-logger_logged_cmd = kbLogger.getLogger("logged-command")
+logger_logged_cmd = KBLogger.getLogger("logged-command")
 
 """
 child_output event is called whenever a line of output is produced in the child.
@@ -31,7 +31,7 @@ is in place.
 """
 
 
-class Util_LoggedSubprocess:
+class UtilLoggedSubprocess:
     """
     This integrates the functionality subprocess into kde-builder's logging and module tracking functions.
 
@@ -44,7 +44,7 @@ class Util_LoggedSubprocess:
         def announ(mod):
              logger.note(f"g[{mod}] starting update")
 
-        cmd = Util_LoggedSubprocess()
+        cmd = UtilLoggedSubprocess()
          .module(module)           # required
          .log_to(filename)         # required
          .set_command(arg_ref)      # required

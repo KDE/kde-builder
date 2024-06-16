@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from .module_set import ModuleSet
 from ..build_exception import BuildException
-from ..debug import kbLogger
+from ..debug import KBLogger
 from ..kde_projects_reader import KDEProjectsReader
 from ..module.module import Module
 from ..util.util import Util
@@ -19,10 +19,10 @@ from ..util.util import Util
 if TYPE_CHECKING:
     from ..build_context import BuildContext
 
-logger_moduleset = kbLogger.getLogger("module-set")
+logger_moduleset = KBLogger.getLogger("module-set")
 
 
-class ModuleSet_KDEProjects(ModuleSet):
+class ModuleSetKDEProjects(ModuleSet):
     """
     This represents a collective grouping of modules that share common options,
     based on the KDE project repositories. Metadata for that repository is
@@ -55,7 +55,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         metadata_module.set_option({"source-dir":  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state")})
         metadata_module.set_option({"log-dir": "log"})  # overwrite default value, because user may store his directories not under "~/kde"
 
-        module_set = ModuleSet_KDEProjects(ctx, "<kde-projects dependencies>")
+        module_set = ModuleSetKDEProjects(ctx, "<kde-projects dependencies>")
         metadata_module.set_module_set(module_set)
 
         # Ensure we only ever try to update source, not build.
@@ -76,7 +76,7 @@ class ModuleSet_KDEProjects(ModuleSet):
         """
         from ..build_context import BuildContext
         ctx = Util.assert_isa(ctx_obj, BuildContext)
-        return ModuleSet_KDEProjects._create_metadata_module(ctx, "sysadmin/repo-metadata")
+        return ModuleSetKDEProjects._create_metadata_module(ctx, "sysadmin/repo-metadata")
 
     def _expand_module_candidates(self, ctx: BuildContext, module_search_item: str) -> list[Module]:
         """
