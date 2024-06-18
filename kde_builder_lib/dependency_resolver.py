@@ -424,7 +424,6 @@ class DependencyResolver:
         if module:
             Util.assert_isa(module, Module)
 
-        path = module_desc["path"]
         item = module_desc["item"]
         branch = module_desc["branch"]
         pretty_branch = branch if branch else "*"
@@ -613,12 +612,8 @@ class DependencyResolver:
     @staticmethod
     def _descend_module_graph(module_graph, callback, node_info, context) -> None:
         depth = node_info["depth"]
-        index = node_info["idx"]
-        count = node_info["count"]
         current_item = node_info["current_item"]
         current_branch = node_info["current_branch"]
-        parent_item = node_info["parent_item"]
-        parent_branch = node_info["parent_branch"]
 
         sub_graph = module_graph[current_item]
         callback(node_info, sub_graph["module"], context)

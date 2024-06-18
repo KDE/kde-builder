@@ -15,9 +15,9 @@ def run_command(command):
     try:
         p = subprocess.run(command, stderr=subprocess.STDOUT, timeout=10, universal_newlines=True)
         return not p.returncode
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         return False
-    except subprocess.TimeoutExpired as e:
+    except subprocess.TimeoutExpired:
         return False
 
 

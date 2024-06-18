@@ -150,7 +150,6 @@ class BuildSystemKDECMake(BuildSystem):
             if match:
                 file = match.group(1) or ""
                 if BuildSystemKDECMake._check_toolchain_ok(file):
-                    accept = 1
                     found = maybeToolchain
                     break
             found = maybeToolchain

@@ -282,7 +282,7 @@ class Module(OptionsBase):
         # We have to assign to an array to force glob to return all results,
         # otherwise it acts like a non-reentrant generator whose output depends on
         # how many times it's been called...
-        if not build_type and (files := glob.glob(f"{source_dir}/*.pro")):
+        if not build_type and glob.glob(f"{source_dir}/*.pro"):
             build_type = BuildSystemQMake5(self)
 
         # 'configure' is a popular fall-back option even for other build
@@ -327,9 +327,7 @@ class Module(OptionsBase):
         Returns:
              False on failure, True on success.
         """
-        module_name = self.name
         pathinfo = self.get_install_path_components("build")
-        builddir = pathinfo["fullpath"]
         build_system = self.build_system()
 
         if build_system.name() == "generic" and not Debug().pretending() and not self.has_option("custom-build-command"):
@@ -373,7 +371,6 @@ class Module(OptionsBase):
         Returns:
              True on success, False (0) on failure.
         """
-        module_name = self.name
 
         build_system = self.build_system()
 

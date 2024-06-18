@@ -167,7 +167,7 @@ class UtilLoggedSubprocess:
         command = argRef
 
         if Debug().pretending():
-            logger_logged_cmd.pretend(f"\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
+            logger_logged_cmd.pretend("\tWould have run ('g[" + "]', 'g[".join(command) + "]')")
             return 0
 
         # Install callback handler to feed child output to parent if the parent has

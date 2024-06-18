@@ -133,7 +133,7 @@ class Util:
              The shell error code, so 0 means success, non-zero means failure.
         """
         if not Debug().pretending():
-            logger_util.debug(f"\tExecuting g['" + "' '".join(cmd_list) + "'")
+            logger_util.debug("\tExecuting g['" + "' '".join(cmd_list) + "'")
             return subprocess.run(cmd_list).returncode
 
         logger_util.pretend("\tWould have run g['" + "' '".join(cmd_list) + "'")
@@ -275,46 +275,37 @@ class Util:
         return lines
 
     @staticmethod
-    def prettify_seconds(elapsed):
+    def prettify_seconds(elapsed: int):
         """
         Function to return a string suitable for displaying an elapsed time,
         (like a stopwatch) would. The first parameter is the number of seconds
         elapsed.
         """
-        return_str = ""
-        days = hours = minutes = seconds = fraction = ""
 
-        fraction = int(100 * (elapsed - int(elapsed)))
+        calculated = {}
         elapsed = int(elapsed)
 
-        seconds = elapsed % 60
+        calculated["seconds"] = elapsed % 60
         elapsed = int(elapsed / 60)
 
-        minutes = elapsed % 60
+        calculated["minutes"] = elapsed % 60
         elapsed = int(elapsed / 60)
 
-        hours = elapsed % 24
+        calculated["hours"] = elapsed % 24
         elapsed = int(elapsed / 24)
 
-        days = elapsed
-
-        if fraction:
-            seconds = f"{seconds}.{fraction}"
+        calculated["days"] = elapsed
 
         str_list = []
-        for x in ["days", "hours", "minutes", "seconds"]:
-            # Use a symbolic reference without needing to disable strict refs.
-            # I couldn't disable it even if I wanted to because these variables
-            # aren't global or localized global variables.
-            value = eval(f"locals()[\"{x}\"]")
-            text = x
+        for text in ["days", "hours", "minutes", "seconds"]:
+            value = calculated[text]
             if value == 1:  # Make singular
                 text = re.sub(r"s$", "", text)
 
-            if value or x == "seconds":
+            if text == "seconds":
                 str_list.append(f"{value} {text}")
 
-        # Add 'and ' in front of last element if there was more than one.
+        # Add "and " in front of last element if there was more than one.
         if len(str_list) > 1:
             str_list.append("and " + str_list.pop(0))
 
@@ -575,7 +566,8 @@ class Util:
 
         # Do this before we fork so the path is finalized to prevent auto-detection
         # in the child
-        logpath = module.get_log_path(f"{filename}.log")
+        # Todo Check if this is still needed.
+        module.get_log_path(f"{filename}.log")
 
         def subprocess_run(target: Callable) -> int:
             retval = multiprocessing.Value("i", -1)

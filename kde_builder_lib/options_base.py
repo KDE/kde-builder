@@ -156,7 +156,7 @@ class OptionsBase:
                 value for the env-var to take as the rest of the value).
         """
 
-        if type(value) is dict:
+        if isinstance(value, dict):
             for key in value:
                 self.options["set-env"][key] = value[key]
         else:

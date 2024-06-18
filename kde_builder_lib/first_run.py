@@ -105,7 +105,6 @@ class FirstRun:
     def _install_system_packages(self, deps_data_path) -> None:
 
         vendor = self.oss.vendor_id()
-        os_version = self.oss.vendor_version()
 
         logger_fr.info(f" b[-] Installing b[system packages] for b[{vendor}]...")
 

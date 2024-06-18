@@ -85,11 +85,6 @@ class StatusView:
 
         mod_total, mod_success, mod_failed = self.mod_total, self.mod_success, self.mod_failed
 
-        if mod_total >= 100:
-            fmt_spec = "%03d"
-        else:
-            fmt_spec = "%02d"
-
         status_line = self.status
 
         if mod_total > 1:

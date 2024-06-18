@@ -12,7 +12,6 @@ import re
 import subprocess
 import textwrap
 import time
-from typing import Callable
 from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
@@ -477,7 +476,6 @@ class Updater:
         """
         module = self.module
         cur_repo = module.get_option("repository")
-        result = None
 
         Util.p_chdir((module.fullpath("source")))
 
@@ -867,10 +865,8 @@ class Updater:
         if not remote_name:
             remote_name = "origin"
         module = self.module
-        chosen_name = None
 
-        # Use "$branch" directly if not already used, otherwise try to prefix
-        # with the remote name.
+        # Use "branch" directly if not already used, otherwise try to prefix with the remote name.
         for possibleBranch in [branch, f"{remote_name}-{branch}", f"ksdc-{remote_name}-{branch}"]:
             result = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{possibleBranch}"])
 

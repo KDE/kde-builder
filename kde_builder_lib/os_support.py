@@ -151,7 +151,6 @@ class OSSupport:
     def _read_os_release(file_name: str | None) -> dict:
         files = [file_name] if file_name else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
         file = None
-        error = None
 
         while files:
             f = files.pop(0)

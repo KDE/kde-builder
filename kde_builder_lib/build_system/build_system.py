@@ -318,7 +318,7 @@ class BuildSystem:
             # This variant of log_command runs the sub prune_under_directory($builddir)
             # in a forked child, so that we can log its output.
             if not result:
-                logger_buildsystem.error(f" r[b[*]\tFailed to clean build directory.  Verify the permissions are correct.")
+                logger_buildsystem.error(" r[b[*]\tFailed to clean build directory. Verify the permissions are correct.")
                 return 0  # False for this function.
 
             module.unset_persistent_option("last-build-rev")

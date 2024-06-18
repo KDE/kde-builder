@@ -38,11 +38,10 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
 
         fh = Util.pretend_open(path) or BuildException.croak_internal(f"Unable to read ignore data from {path}")
 
-        ctx = self.module.context
         ignore_modules = []
         for line in fh:
             # 1 Remove comments
-            line = re.sub(f"#.*$", "", line)
+            line = re.sub("#.*$", "", line)
 
             # 2 Filter empty lines
             if not line.strip():

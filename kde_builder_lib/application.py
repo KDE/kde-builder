@@ -138,8 +138,6 @@ class Application:
         build = node_info["build"]
         current_item = node_info["current_item"]
         current_branch = node_info["current_branch"]
-        parent_item = node_info["parent_item"]
-        parent_branch = node_info["parent_branch"]
 
         build_status = "built" if build else "not built"
         status_info = f"({build_status}: {current_branch})" if current_branch else f"({build_status})"
@@ -308,7 +306,6 @@ class Application:
         # We also might have cmdline "selectors" to determine which modules or
         # module-sets to choose. First let's select module sets, and expand them.
 
-        global_cmdline_args = list(cmdline_global_options.keys())
         command_line_modules = len(selectors)
 
         module_resolver = ModuleResolver(ctx)
@@ -988,7 +985,6 @@ class Application:
         """
         module_list = []
         rcfile = ctx.rc_file
-        option, read_modules = None, None
 
         file_reader = RecursiveFH(rcfile, ctx)
         file_reader.add_file(fh, rcfile)
@@ -1020,7 +1016,7 @@ class Application:
         creation_order = False
         seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
         seen_module_sets = {}  # and vice versa -- named sets only though!
-        seen_module_set_items = {}  # To track option override modules.
+        # seen_module_set_items = {}  # To track option override modules.
 
         # Now read in module settings
         while line := file_reader.read_line():
@@ -1069,7 +1065,7 @@ class Application:
                 # Save 'use-modules' entries, so we can see if later module decls
                 # are overriding/overlaying their options.
                 module_set_items = new_module.module_names_to_find()
-                seen_module_set_items = {item: new_module for item in module_set_items}
+                # seen_module_set_items = {item: new_module for item in module_set_items}
 
                 # Reserve enough 'create IDs' for all named modules to use
                 creation_order += len(module_set_items)
@@ -1284,6 +1280,7 @@ class Application:
         having the options be properly set and having the module properly tied into a
         context.
         """
+
         def module_factory(module_name: str) -> Module | None:
             ret = resolver.resolve_module_if_present(module_name)
             return ret
@@ -1422,9 +1419,6 @@ class Application:
 
         logger_app.debug(f"Message is {message}")
         logger_app.debug("\tfor " + ", ".join([str(m) for m in fail_list]))
-
-        homedir = os.environ.get("HOME")
-        logfile = None
 
         logger_app.warning(f"\nr[b[<<<  PACKAGES {message}  >>>]")
 
@@ -1604,10 +1598,12 @@ class Application:
 
             if hashlib.md5(open(dest_file_path, "rb").read()).hexdigest() != existing_md5:
                 if not ctx.get_option("#delete-my-settings"):
-                    logger_app.error(f"\tr[*] Installing \"b[{base_name}]\" would overwrite an existing file:")
-                    logger_app.error(f"\tr[*]  y[b[{dest_file_path}]")
-                    logger_app.error(f"\tr[*] If this is acceptable, please delete the existing file and re-run,")
-                    logger_app.error(f"\tr[*] or pass b[--delete-my-settings] and re-run.")
+                    logger_app.error(textwrap.dedent(f"""\
+                        \tr[*] Installing \"b[{base_name}]\" would overwrite an existing file:
+                        \tr[*]  y[b[{dest_file_path}]
+                        \tr[*] If this is acceptable, please delete the existing file and re-run,
+                        \tr[*] or pass b[--delete-my-settings] and re-run.
+                        """))
 
                     return
                 elif not Debug().pretending():
@@ -1807,7 +1803,7 @@ class Application:
         for sig in signals:
             signal.signal(sig, handler_ref)
 
-    def _hold_performance_power_profile_if_possible(self):
+    def _hold_performance_power_profile_if_possible(self) -> None:
         try:
             import dbus  # Do not import in the beginning of file, user may have not installed dbus-python module (we optionally require it)
 
@@ -1830,14 +1826,14 @@ class Application:
                 ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
 
                 # The hold will be automatically released once kde-builder exits
-                performance_cookie = ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
+                ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
 
                 session_bus = dbus.SessionBus()
                 proxy = session_bus.get_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
                 iface = dbus.Interface(proxy, "org.freedesktop.PowerManagement.Inhibit")
 
                 # The inhibition will be automatically released once kde-builder exits
-                sleep_cookie = iface.Inhibit("kde-builder", "Building modules")
+                iface.Inhibit("kde-builder", "Building modules")
 
             except dbus.DBusException as e:
                 logger_app.warning(f"Error accessing dbus: {e}")

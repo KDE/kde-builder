@@ -222,7 +222,6 @@ class TaskManager:
         # value to write. If the build succeeds we'll reset to 0 then.
         module.set_persistent_option("failure-count", fail_count + 1)
 
-        start_time_ref = time.time()
         if module.build():
             module.set_persistent_option("failure-count", 0)
             return 0
@@ -289,7 +288,7 @@ class TaskManager:
         while modules:
             module = modules.pop(0)
             if self.DO_STOP:
-                logger_taskmanager.warning(f" y[b[* * *] Early exit requested, cancelling build of further modules.")
+                logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further modules.")
                 break
 
             module_name = module.name
@@ -474,7 +473,7 @@ class TaskManager:
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print(f"[monitor process] recv SIGHUP, will end after updater process finishes.")
+                    print("[monitor process] recv SIGHUP, will end after updater process finishes.")
 
                     # If we haven't recv'd yet, forward to monitor in case user didn't
                     # send to process group
@@ -501,7 +500,7 @@ class TaskManager:
             # If the user sends SIGHUP during the build, we should allow the current
             # module to complete and then exit early.
             def signal_handler(signum, frame):
-                print(f"[build process] recv SIGHUP, will end after this module")
+                print("[build process] recv SIGHUP, will end after this module")
 
                 # If we haven't recv'd yet, forward to monitor in case user didn't
                 # send to process group

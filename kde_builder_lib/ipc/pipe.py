@@ -56,7 +56,7 @@ class IPCPipe(IPC):
         written_length = self.fh.write(encoded_msg)
 
         if not written_length or len(encoded_msg) != written_length:
-            BuildException.croak_runtime(f"Unable to write full msg to pipe")
+            BuildException.croak_runtime("Unable to write full msg to pipe")
 
         return True
 

@@ -64,15 +64,15 @@ def test_comparison(mock_module_from_attrs):
 
     # Test that tests are symmetric e.g. a > b => b < a. This permits us to only manually
     # test one pair of these tests now that the test matrix is growing.
-    for l in ["a", "b", "c", "d", "e", "f"]:
-        for r in ["a", "b", "c", "d", "e", "f"]:
-            res = DependencyResolver.make_comparison_func(graph1)(l, r)
+    for left in ["a", "b", "c", "d", "e", "f"]:
+        for right in ["a", "b", "c", "d", "e", "f"]:
+            res = DependencyResolver.make_comparison_func(graph1)(left, right)
 
-            if l == r:
-                assert res == 0, f"'{l}' should be sorted at the same position as itself"
+            if left == right:
+                assert res == 0, f"'{left}' should be sorted at the same position as itself"
             else:
-                assert abs(res) == 1, f"Different module items ('{l}' and '{r}') compare to 1 or -1 (but not 0)"
-                assert DependencyResolver.make_comparison_func(graph1)(r, l) == -res, f"Swapping order of operands should negate the result ('{r}' vs '{l}')"
+                assert abs(res) == 1, f"Different module items ('{left}' and '{right}') compare to 1 or -1 (but not 0)"
+                assert DependencyResolver.make_comparison_func(graph1)(right, left) == -res, f"Swapping order of operands should negate the result ('{right}' vs '{left}')"
 
     assert DependencyResolver.make_comparison_func(graph1)("a", "b") == -1, "'a' should be sorted before 'b' by dependency ordering"
     assert DependencyResolver.make_comparison_func(graph1)("a", "c") == -1, "'a' should be sorted before 'c' by vote ordering"
