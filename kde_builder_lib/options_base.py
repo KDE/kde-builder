@@ -10,7 +10,7 @@ to implement common functions within :class:`BuildContext`, :class:`Module`, and
 
 There is some internal trickery to ensure that program code can override
 user-selected options in certain situations, which is why we don't simply
-use a dict table directly. These are the so-called "sticky" options, seen
+use a dict directly. These are the so-called "sticky" options, seen
 internally as options with a name starting with #.
 
 This class is mostly used to encapsulate common code for handling module and
@@ -31,9 +31,9 @@ from .util.util import Util
 
 class OptionsBase:
     def __init__(self):
-        # We don't directly bless the options hash so that subclasses can
-        # use this base hash table directly (as long as they don't overwrite
-        # 'options', of course.
+        # We don't directly bless the options dict so that subclasses can
+        # use this base dict directly (as long as they don't overwrite
+        # "options", of course).
         self.options = {"set-env": {}}
 
     def has_sticky_option(self, key: str) -> bool:
@@ -105,7 +105,7 @@ class OptionsBase:
             value = options[repo_option]
 
             if isinstance(value, dict):
-                # The case when we merge the constructed OptionBase module (from the config) into the BuildContext. The type of $value is a hash (dict).
+                # The case when we merge the constructed OptionBase module (from the config) into the BuildContext. The type of value is a dict.
                 for key in value.keys():
                     self.options[repo_option][key] = value[key]
                 del options[repo_option]
@@ -117,13 +117,13 @@ class OptionsBase:
                     raise BuildExceptionConfig(repo_option, f"Invalid git-repository-base setting: {value}")
 
                 dictref = self.get_option(repo_option)
-                if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash is empty itself).
+                if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash (dict) is empty itself).
                     dictref = {}
                 dictref[repo] = url
                 self.options[repo_option] = dictref
                 return
 
-        # Everything else can be dumped straight into our hash.
+        # Everything else can be dumped straight into our dict.
         for option in options:
             self.options[option] = options[option]
 

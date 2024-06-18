@@ -220,7 +220,7 @@ class Application:
         ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
-        # Convert list to hash for lookup
+        # Convert list to dict for lookup
         ignored_in_cmdline = {selector: True for selector in opts["ignore-modules"]}
         start_program_and_args: list[str] = opts["start-program"]
 
@@ -312,10 +312,10 @@ class Application:
         command_line_modules = len(selectors)
 
         module_resolver = ModuleResolver(ctx)
-        module_resolver.set_cmdline_options(cmdline_options)
+        module_resolver.cmdline_options = cmdline_options
         module_resolver.set_deferred_options(deferred_options)
         module_resolver.set_input_modules_and_options(option_modules_and_sets)
-        module_resolver.set_ignored_selectors(list(ignored_selectors.keys()))
+        module_resolver.ignored_selectors = list(ignored_selectors.keys())
 
         self._define_new_module_factory(module_resolver)
 
@@ -1336,22 +1336,22 @@ class Application:
         # This glob relies on the date being in the specific format YYYY-MM-DD-ID
         dirs = glob.glob(f"{logdir}/????-??-??-??/")
 
-        needed_table = {}
+        needed_dict = {}
         for trackedLogDir in [f"{logdir}/latest", f"{logdir}/latest-by-phase"]:
             if not os.path.isdir(trackedLogDir):
                 continue
             needed = self._reachable_module_logs(trackedLogDir)
 
-            # Convert a list to a hash lookup since Perl lacks a "list-has"
-            needed_table.update({key: 1 for key in needed})
+            # Convert a list to a dict lookup since Perl lacks a "list-has"
+            needed_dict.update({key: 1 for key in needed})
 
-        length = len(dirs) - len(needed_table)
+        length = len(dirs) - len(needed_dict)
         logger_app.debug(f"Removing g[b[{length}] out of g[b[{len(dirs) - 1}] old log directories...")
 
         for d in dirs:
             match = re.search(r"(\d{4}-\d{2}-\d{2}-\d{2})", d)
             dir_id = match.group(1) if match else None
-            if dir_id and not needed_table.get(dir_id):
+            if dir_id and not needed_dict.get(dir_id):
                 Util.safe_rmtree(d)
 
     @staticmethod

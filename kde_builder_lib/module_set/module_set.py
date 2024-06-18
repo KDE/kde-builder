@@ -148,7 +148,7 @@ class ModuleSet(OptionsBase):
         module_list = []  # module names converted to `Module` objects.
         options_ref = self.options
 
-        # Note: This returns a hashref, not a string.
+        # Note: This returns a dict, not a string.
         repo_set = ctx.get_option("git-repository-base")
 
         # Setup default options for each module

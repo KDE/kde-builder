@@ -142,7 +142,7 @@ class DebugOrderHints:
             # If there is no good reason to perfer one module over another,
             # simply sort by name to get a reproducible order.
             # That simplifies autotesting and/or reproducible builds.
-            # (The items to sort are supplied as a hash so the order of keys is by
+            # (The items to sort are supplied as a dict so the order of keys is by
             # definition not guaranteed.)
 
             name = (name_a > name_b) - (name_a < name_b)

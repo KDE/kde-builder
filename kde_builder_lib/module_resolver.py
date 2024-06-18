@@ -17,6 +17,7 @@ from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
 
 if TYPE_CHECKING:
+    from build_context import BuildContext
     from kde_projects_reader import KDEProjectsReader
 
 
@@ -27,9 +28,7 @@ class ModuleResolver:
     selectors into actual modules.
     """
 
-    # Public API
-
-    def __init__(self, ctx):
+    def __init__(self, ctx: BuildContext):
         """
         Creates a new :class:`ModuleResolver`. You must pass the appropriate
         :class:`BuildContext` Don't forget to call set_cmdline_options(),
@@ -38,13 +37,28 @@ class ModuleResolver:
             resolver = ModuleResolver(ctx)
         """
         self.context = ctx
-        self.ignored_selectors = []
+
+        # Declares all selectors that should be ignored by default in the process of
+        # expanding module sets. Any modules matching these selectors would be elided
+        # from any expanded module sets by default.
+        self.ignored_selectors: list[str] = []
 
         # Read in from rc-file
         self.input_modules_and_options = []
+
+        # The options that should be applied to modules when they are created.
+        # No special handling for global options is performed here (but see
+        # :meth:`OptionsBase.get_option` and its friends).
+        #
+        # A dict, where module-names are keys to values which
+        # are themselves dicts of option-name: value pairs:
+        #
+        #  { mod1: {"cmake-options": "foo", ... },
+        #    mod2: {}
+        #  }
         self.cmdline_options = {}
 
-        # Holds options from 'options' blocks for modules
+        # Holds options from "options" blocks for modules
         self.deferred_options = {}
 
         # Holds Modules defined in course of expanding module-sets
@@ -53,29 +67,13 @@ class ModuleResolver:
         # Holds use-module mentions with their source module-set
         self.referenced_modules = {}
 
-    def set_cmdline_options(self, cmdline_options_ref) -> None:
-        """
-        Sets the options that should be applied to modules when they are created.
-        No special handling for global options is performed here (but see
-        :meth:`OptionsBase.get_option` and its friends).
-
-        You should pass in a dict, where module-names are keys to values which
-        are themselves dicts of option-name: value pairs:
-
-             resolver.set_cmdline_options(
-                { mod1: {"cmake-options": "foo", ... },
-                  mod2: {}
-                })
-        """
-        self.cmdline_options = cmdline_options_ref
-
-    def set_deferred_options(self, deferred_options_ref) -> None:
+    def set_deferred_options(self, deferred_options: list[dict]) -> None:
         """
         Set options to apply later if a module set resolves to a named module, used
         for "options" blocks.
 
-        Each object in the hash can be either options for a later :class:`Module`,
-        or options for an entire set of :class:`Modules` (as determined by use of
+        Each object in the dict can be either options for a later :class:`Module`,
+        or options for an entire set of :class:`Module` (as determined by use of
         repository/use-module items). We want to handle the latter first, since
         we assume single "options" blocks should still be able to override these.
         """
@@ -84,7 +82,7 @@ class ModuleResolver:
         set_indices = []
         final_opts = {}
 
-        for idx, deferred_entry in enumerate(deferred_options_ref):
+        for idx, deferred_entry in enumerate(deferred_options):
             opts = deferred_entry["opts"]
             repo = opts["repository"] if "repository" in opts else None
             referenced_modules = opts.get("use-modules", None)
@@ -110,12 +108,12 @@ class ModuleResolver:
         # indices don't change.
         set_indices.reverse()
         for index in set_indices:
-            del deferred_options_ref[index]
+            del deferred_options[index]
 
         # Go through list a second time (which should be only single module options)
         # and overlay any new options on
 
-        for idx, deferred_entry in enumerate(deferred_options_ref):
+        for idx, deferred_entry in enumerate(deferred_options):
             name = deferred_entry["name"]
             opts = deferred_entry["opts"]
 
@@ -126,17 +124,7 @@ class ModuleResolver:
 
         self.deferred_options = final_opts
 
-    def set_ignored_selectors(self, ignored_selectors_ref) -> None:
-        """
-        Declares all selectors that should be ignored by default in the process of
-        expanding module sets. Any modules matching these selectors would be elided
-        from any expanded module sets by default.
-
-        You should pass a list of selectors.
-        """
-        self.ignored_selectors = ignored_selectors_ref if ignored_selectors_ref else []
-
-    def set_input_modules_and_options(self, mod_opts_ref: list[Module | ModuleSet]) -> None:
+    def set_input_modules_and_options(self, mod_opts: list[Module | ModuleSet]) -> None:
         """
         Declares the list of all modules and module-sets known to the program,
         along with their base options. Modules should be :class:`Module` objects,
@@ -145,23 +133,20 @@ class ModuleResolver:
 
         You should pass a list of Module or ModuleSet (as appropriate).
         """
-        self.input_modules_and_options = mod_opts_ref
+        self.input_modules_and_options = mod_opts
 
-        # Build lookup tables
-        self.defined_modules = {mod.name: mod for mod in mod_opts_ref}
-        self.referenced_modules = self._list_referenced_modules(mod_opts_ref)
+        # Build lookup dictionaries
+        self.defined_modules = {mod.name: mod for mod in mod_opts}
+        self.referenced_modules = self._list_referenced_modules(mod_opts)
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
         """
         Applies cmdline and deferred options to the given modules or module-sets.
         """
 
-        cmdline_options_ref = self.cmdline_options
-        deferred_options_ref = self.deferred_options
-
         for m in modules:
             name = m.name
-            opts = copy.deepcopy(deferred_options_ref.get(name, {}))
+            opts = copy.deepcopy(self.deferred_options.get(name, {}))
 
             # Apply deferred options first
             if m.options.get("#entry_num", 0) > opts.get("#entry_num", 0):
@@ -172,12 +157,12 @@ class ModuleResolver:
 
             m.set_option(opts)
 
-            # Most of time cmdline options will be empty
-            if cmdline_options_ref:
+            # Most of the time cmdline options will be empty
+            if self.cmdline_options:
                 module_cmdline_args = {
                     # order is important here
-                    **(cmdline_options_ref.get("global", {})),
-                    **(cmdline_options_ref.get(name, {}))
+                    **(self.cmdline_options.get("global", {})),
+                    **(self.cmdline_options.get(name, {}))
                 }
 
                 # Remove any options that would interfere with cmdline args
@@ -191,31 +176,29 @@ class ModuleResolver:
         return
 
     @staticmethod
-    def _list_referenced_modules(module_refs) -> dict:
+    def _list_referenced_modules(module_refs: list[Module | ModuleSet]) -> dict:
         """
-        Returns a dict table of all module names referenced in use-module
+        Returns a dict of all module names referenced in use-module
         declarations for any ModuleSet included within the input list. Each entry
-        in the hash table will map the referenced module name to the source
+        in the dict will map the referenced module name to the source
         ModuleSet.
         """
-        set_entry_lookup_table = {}
+        set_entry_lookup_dict = {}
 
         for module_set in [module_ref for module_ref in module_refs if isinstance(module_ref, ModuleSet)]:
             results = module_set.module_names_to_find()
 
-            set_entry_lookup_table.update({result: module_set for result in results})
+            set_entry_lookup_dict.update({result: module_set for result in results})
 
-        return set_entry_lookup_table
+        return set_entry_lookup_dict
 
-    def _expand_single_module_set(self, needed_module_set) -> list[Module]:
+    def _expand_single_module_set(self, needed_module_set: ModuleSet) -> list[Module]:
         """
         Expands out a single module-set listed in referenced_modules and places any
-        Modules created as a result within the lookup table of Modules.
+        Modules created as a result within the lookup dict of Modules.
         Returns the list of created Modules.
         """
         selected_reason = "partial-expansion:" + needed_module_set.name
-        lookup_table_ref = self.defined_modules
-        set_entry_lookup_table_ref = self.referenced_modules
 
         # expand_module_sets applies pending/cmdline options already.
         module_results = self.expand_module_sets([needed_module_set])
@@ -225,16 +208,16 @@ class ModuleResolver:
         for module_result in module_results:
             module_result.set_option({"#selected-by": selected_reason})
 
-        # Copy entries into the lookup table, especially in case they're
+        # Copy entries into the lookup dict, especially in case they're
         # from case 3
-        lookup_table_ref.update({module_result.name: module_result for module_result in module_results})
+        self.defined_modules.update({module_result.name: module_result for module_result in module_results})
 
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
-        # in the lookup table if it uniquely matches a module at all).
-        module_set_referents = [key for key, value in set_entry_lookup_table_ref.items() if value == needed_module_set]
+        # in the lookup dict if it uniquely matches a module at all).
+        module_set_referents = [key for key, value in self.referenced_modules.items() if value == needed_module_set]
 
         for key in module_set_referents:
-            del set_entry_lookup_table_ref[key]
+            del self.referenced_modules[key]
 
         return module_results
 
@@ -248,13 +231,10 @@ class ModuleResolver:
         selector_name = selector
         results: list = []  # Will default to '$selector' if unset by end of sub
 
-        # In the remainder of this code, lookup_table_ref is basically handling
-        # case 1, while set_entry_lookup_table_ref handles case 2. No `Module`s
+        # In the remainder of this code, self.defined_modules is basically handling
+        # case 1, while self.referenced_modules handles case 2. No `Module`s
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
-
-        lookup_table_ref = self.defined_modules
-        set_entry_lookup_table_ref = self.referenced_modules
 
         # Module selectors beginning with '+' force treatment as a kde-projects
         # module, which means they won't be matched here (we're only looking for
@@ -273,17 +253,17 @@ class ModuleResolver:
 
         # See resolve_selectors_into_modules for what the 3 "cases" mentioned below are.
 
-        # Case 2. We make these checks first since they may update %lookupTable
-        if selector_name in set_entry_lookup_table_ref and selector_name not in lookup_table_ref:
-            needed_module_set = set_entry_lookup_table_ref[selector_name]
+        # Case 2. We make these checks first since they may update lookup dict
+        if selector_name in self.referenced_modules and selector_name not in self.defined_modules:
+            needed_module_set = self.referenced_modules[selector_name]
             module_results = self._expand_single_module_set(needed_module_set)
 
             if not including_deps:
                 for module_result in module_results:
                     module_result.set_option({"include-dependencies": False})
 
-            # Now lookupTable should be updated with expanded modules.
-            selector = lookup_table_ref.get(selector_name, None)
+            # Now lookup dict should be updated with expanded modules.
+            selector = self.defined_modules.get(selector_name, None)
 
             # If the selector doesn't match a name exactly it probably matches
             # a wildcard prefix. e.g. 'kdeedu' as a selector would pull in all kdeedu/*
@@ -295,8 +275,8 @@ class ModuleResolver:
                 selector.set_option({"#selected-by": "name"})
 
         # Case 1
-        elif selector_name in lookup_table_ref:
-            selector = lookup_table_ref[selector_name]
+        elif selector_name in self.defined_modules:
+            selector = self.defined_modules[selector_name]
             if not isinstance(selector, ModuleSet):
                 selector.set_option({"#selected-by": "name"})
 
@@ -350,8 +330,6 @@ class ModuleResolver:
         if not any(module.get_option("#guessed-kde-project", "module") for module in modules):
             return modules
 
-        lookup_table_ref = self.defined_modules
-
         self._expand_all_unexpanded_module_sets()
 
         results = []
@@ -364,10 +342,10 @@ class ModuleResolver:
                 continue
 
             # If the module we want could be found from within our rc-file
-            # module-sets (even implicitly), use it. Otherwise assume
+            # module-sets (even implicitly), use it. Otherwise, assume
             # kde-projects and evaluate now.
-            if guessed_module.name in lookup_table_ref:
-                guessed_module = lookup_table_ref[guessed_module.name]
+            if guessed_module.name in self.defined_modules:
+                guessed_module = self.defined_modules[guessed_module.name]
                 results.append(guessed_module)
             else:
                 mod_set = ModuleSetKDEProjects(ctx, "guessed_from_cmdline")
@@ -410,7 +388,6 @@ class ModuleResolver:
         Returns a list of :class:`Module` in build order, with any module-sets fully
         expanded. The desired options will be set for each :class:`Module` returned.
         """
-        ctx = self.context
 
         # Basically there are 3 types of selectors at this point:
         # 1. Directly named and defined modules or module-sets.

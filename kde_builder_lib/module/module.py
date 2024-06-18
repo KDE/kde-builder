@@ -542,11 +542,11 @@ class Module(OptionsBase):
         # Note the global set-env must be checked separately anyways, so
         # we limit inheritance when searching.
         if ctx.name == self.name:
-            env_hash_ref = ctx.get_option("set-env")
+            env_dict = ctx.get_option("set-env")
         else:
-            env_hash_ref = self.get_option("set-env", "module")
+            env_dict = self.get_option("set-env", "module")
 
-        for key, value in env_hash_ref.items():
+        for key, value in env_dict.items():
             ctx.queue_environment_variable(key, value)
 
     def setup_environment(self) -> None:

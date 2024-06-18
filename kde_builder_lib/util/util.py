@@ -700,7 +700,7 @@ class Util:
         return True
 
     @staticmethod
-    def get_list_digest(args: list[str]):
+    def get_list_digest(args: list[str]) -> str:
         """
         Returns a hash digest of the given options in the list. The return value is
         base64-encoded at this time.
@@ -710,7 +710,7 @@ class Util:
         it.  (i.e. passing a reference to a list is not helpful, pass the list itself)
 
         Parameters:
-             args: List of scalar values to hash.
+             args: List of values to hash.
         Returns:
              base64-encoded hash value.
         """

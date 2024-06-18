@@ -69,11 +69,11 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
 
         try:
             json_string = fh.read()  # slurps the whole file
-            json_hashref = json.loads(json_string)
+            json_dict = json.loads(json_string)
             fh.close()
         except BuildException as e:
             BuildException.croak_runtime(f"Unable to load module group data from {path}! :(\n\t{e}")
-        return json_hashref
+        return json_dict
 
     # @override(check_signature=False)
     def update_internal(self, ipc=IPCNull()) -> None:

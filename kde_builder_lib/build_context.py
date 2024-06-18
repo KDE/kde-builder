@@ -111,7 +111,7 @@ class BuildContext(Module):
             "manual-update": "",
             "module-definitions-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/module-definitions",
             "repository": "",  # module's git repo
-            "set-env": {},  # Hash of environment vars to set
+            "set-env": {},  # dict of environment vars to set
             "ssh-identity-file": "",  # If set, is passed to ssh-add.
             "use-modules": ""
         }
@@ -212,7 +212,7 @@ class BuildContext(Module):
             # phase name at which they failed.
         }
         self.log_paths = {
-            # Holds a hash table of log path bases as expanded by
+            # Holds a dict of log path bases as expanded by
             # get_subdir_path (e.g. [source-dir]/log) to the actual log dir
             # *this run*, with the date and unique id added. You must still
             # add the module name to use.
@@ -933,7 +933,7 @@ class BuildContext(Module):
 
         persistent_opts = self.persistent_options
 
-        # Initialize empty hash ref if nothing defined for this module.
+        # Initialize empty dict if nothing defined for this module.
         if module_name not in persistent_opts:
             persistent_opts[module_name] = {}
 

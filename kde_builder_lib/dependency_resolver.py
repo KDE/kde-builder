@@ -350,7 +350,7 @@ class DependencyResolver:
     def _check_dependency_cycles(module_graph: dict) -> int:
         errors = 0
 
-        # sorted() is used for module_graph.keys() because in perl the hash keys are returned in random way.
+        # sorted() is used for module_graph.keys() because in perl the dict keys are returned in random way.
         # So for reproducibility while debugging, the sort was added there.
         # In python 3.7 the keys are returned in the order of adding them.
         # To be able to easily compare perl and python versions, I (Andrew Shark) sorted keys as it is done there.
