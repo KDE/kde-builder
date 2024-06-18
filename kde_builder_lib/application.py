@@ -74,7 +74,7 @@ class Application:
         self.metadata_module = None
         self.run_mode = "build"
         self.modules = None
-        self.module_factory = None  # ref to sub that makes a new Module. # See generate_module_list
+        self.module_factory = None  # function that makes a new Module. See generate_module_list
         self._base_pid = os.getpid()  # See finish()
 
         # Default to colorized output if sending to TTY
@@ -1284,9 +1284,11 @@ class Application:
         having the options be properly set and having the module properly tied into a
         context.
         """
-        ctx = self.context
+        def module_factory(module_name: str) -> Module | None:
+            ret = resolver.resolve_module_if_present(module_name)
+            return ret
 
-        self.module_factory = lambda modu: resolver.resolve_module_if_present(modu)
+        self.module_factory = module_factory
         # We used to need a special module-set to ignore virtual deps (they
         # would throw errors if the name did not exist). But, the resolver
         # handles that fine as well.

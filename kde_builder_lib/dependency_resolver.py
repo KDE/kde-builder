@@ -9,7 +9,8 @@ from __future__ import annotations
 from functools import cmp_to_key
 import json
 import re
-from types import FunctionType
+from typing import Callable
+from typing import TYPE_CHECKING
 
 from .build_exception import BuildException
 from .debug import Debug
@@ -17,6 +18,10 @@ from .debug import KBLogger
 from .module.module import Module
 from .updater.updater import Updater
 from .util.util import Util
+
+if TYPE_CHECKING:
+    from fileinput import FileInput
+    from typing import TextIO
 
 logger_depres = KBLogger.getLogger("dependency-resolver")
 
@@ -34,10 +39,10 @@ class DependencyResolver:
     #     return grep { ++($seen{$_}) == 1 } @_;
     # }
 
-    def __init__(self, module_factory_ref):
+    def __init__(self, module_factory):
         """
         Parameters:
-            module_factory_ref: Function that creates :class:`Module` from
+            module_factory: Function that creates :class:`Module` from
             kde-project module names. Used for :class:`Module` for which the user
             requested recursive dependency inclusion.
 
@@ -49,25 +54,25 @@ class DependencyResolver:
             resolver.resolveDependencies(modules)
         """
 
-        # hash table mapping short module names (m) to a hashref key by branch
-        # name, the value of which is yet another hashref (see
+        # dict mapping short module names (m) to a dict key by branch
+        # name, the value of which is yet another dict (see
         # read_dependency_data). Note that this assumes KDE git infrastructure
         # ensures that all full module names (e.g.
         # kde/workspace/plasma-workspace) map to a *unique* short name (e.g.
         # plasma-workspace) by stripping leading path components
         self.dependencies_of = {}
 
-        # hash table mapping a wildcarded module name with no branch to a
-        # listref of module:branch dependencies.
+        # dict mapping a wildcarded module name with no branch to a
+        # list of module:branch dependencies.
         self.catch_all_dependencies = {}
 
-        # reference to a sub that will properly create a `Module` from a
+        # function that will properly create a `Module` from a
         # given kde-project module name. Used to support automatically adding
         # dependencies to a build.
-        self.module_factory_ref = module_factory_ref
+        self.module_factory = module_factory
 
     @staticmethod
-    def _shorten_module_name(name) -> str:
+    def _shorten_module_name(name: str) -> str:
         """
         This method returns the "short" module name of kde-project full project paths.
         E.g. "kde/kdelibs/foo" would be shortened to "foo".
@@ -81,41 +86,40 @@ class DependencyResolver:
         name = re.sub(r"^.*/", "", name)  # Uses greedy capture by default
         return name
 
-    def _add_dependency(self, dep_name, dep_branch, src_name, src_branch, dep_key="+") -> None:
+    def _add_dependency(self, dep_name: str, dep_branch: str, src_name: str, src_branch: str, dep_key: str | None = "+") -> None:
         """
         Adds an edge in the dependency graph from ``dep_name`` (at the given branch) to
         ``src_name`` (at its respective branch). Use ``*`` as the branch name if it is
         not important.
         """
-        dependencies_of_ref = self.dependencies_of
 
-        # Initialize with hashref if not already defined. The hashref will hold
-        #     - => [ ] (list of explicit *NON* dependencies of item:$branch),
-        #     + => [ ] (list of dependencies of item:$branch)
+        # Initialize with dict if not already defined. The dict will hold
+        #     "-": []  # list of explicit *NON* dependencies of item:branch
+        #     "+": []  # list of dependencies of item:branch
         #
         # Each dependency item is tracked at the module:branch level, and there
-        # is always at least an entry for module:*, where '*' means branch
+        # is always at least an entry for module:*, where "*" means branch
         # is unspecified and should only be used to add dependencies, never
         # take them away.
         #
         # Finally, all (non-)dependencies in a list are also of the form
         # fullname:branch, where "*" is a valid branch.
-        if f"{dep_name}:*" not in dependencies_of_ref:
-            dependencies_of_ref[f"{dep_name}:*"] = {
+        if f"{dep_name}:*" not in self.dependencies_of:
+            self.dependencies_of[f"{dep_name}:*"] = {
                 "-": [],
                 "+": []
             }
 
         # Create actual branch entry if not present
-        if f"{dep_name}:{dep_branch}" not in dependencies_of_ref:
-            dependencies_of_ref[f"{dep_name}:{dep_branch}"] = {
+        if f"{dep_name}:{dep_branch}" not in self.dependencies_of:
+            self.dependencies_of[f"{dep_name}:{dep_branch}"] = {
                 "-": [],
                 "+": []
             }
 
-        dependencies_of_ref[f"{dep_name}:{dep_branch}"][dep_key].append(f"{src_name}:{src_branch}")
+        self.dependencies_of[f"{dep_name}:{dep_branch}"][dep_key].append(f"{src_name}:{src_branch}")
 
-    def read_dependency_data(self, fh) -> None:
+    def read_dependency_data(self, fh: FileInput) -> None:
         """
         Reads in dependency data in a pseudo-Makefile format.
         See repo-metadata/dependencies/dependency-data.
@@ -126,7 +130,6 @@ class DependencyResolver:
         Raises:
             Exception: Can throw an exception on I/O errors or malformed dependencies.
         """
-        dependencies_of_ref = self.dependencies_of
         dependency_atom = re.compile(
             r"^\s*"  # Clear leading whitespace
             r"([^\[:\s]+)"  # (1) Capture anything not a [, :, or whitespace (dependent item)
@@ -193,7 +196,7 @@ class DependencyResolver:
 
         self._canonicalize_dependencies()
 
-    def read_dependency_data_v2(self, fh) -> None:
+    def read_dependency_data_v2(self, fh: TextIO) -> None:
         """
         Reads in v2-format dependency data from KDE repository database, using the KDE
         "invent" repository naming convention.
@@ -237,32 +240,30 @@ class DependencyResolver:
         reproducable dependency ordering (assuming the same dependency items and same
         selectors are used).
         """
-        dependencies_of_ref = self.dependencies_of
 
-        for dependenciesRef in dependencies_of_ref.values():
-            dependenciesRef["-"] = sorted(dependenciesRef["-"])
-            dependenciesRef["+"] = sorted(dependenciesRef["+"])
+        for dependencies in self.dependencies_of.values():
+            dependencies["-"] = sorted(dependencies["-"])
+            dependencies["+"] = sorted(dependencies["+"])
 
-    def _lookup_direct_dependencies(self, path, branch) -> dict:
-        dependencies_of_ref = self.dependencies_of
+    def _lookup_direct_dependencies(self, path: str, branch: str) -> dict:
 
         direct_deps = []
         exclusions = []
 
         item = self._shorten_module_name(path)
-        module_dep_entry_ref = dependencies_of_ref.get(f"{item}:*", None)
+        module_dep_entry = self.dependencies_of.get(f"{item}:*", None)
 
-        if module_dep_entry_ref:
+        if module_dep_entry:
             logger_depres.debug(f"handling dependencies for: {item} without branch (*)")
-            direct_deps.extend(module_dep_entry_ref["+"])
-            exclusions.extend(module_dep_entry_ref["-"])
+            direct_deps.extend(module_dep_entry["+"])
+            exclusions.extend(module_dep_entry["-"])
 
         if branch and branch != "*":
-            module_dep_entry_ref = dependencies_of_ref.get(f"{item}:{branch}", None)
-            if module_dep_entry_ref:
+            module_dep_entry = self.dependencies_of.get(f"{item}:{branch}", None)
+            if module_dep_entry:
                 logger_depres.debug(f"handling dependencies for: {item} with branch ({branch})")
-                direct_deps.extend(module_dep_entry_ref["+"])
-                exclusions.extend(module_dep_entry_ref["-"])
+                direct_deps.extend(module_dep_entry["+"])
+                exclusions.extend(module_dep_entry["-"])
 
         # Apply catch-all dependencies but only for KDE modules, not third-party
         # modules. See _get_dependency_path_of for how this is detected.
@@ -276,7 +277,7 @@ class DependencyResolver:
 
         for exclusion in exclusions:
             # Remove only modules at the exact given branch as a dep.
-            # However catch-alls can remove catch-alls.
+            # However, catch-alls can remove catch-alls.
             # But catch-alls cannot remove a specific branch, such exclusions have
             # to also be specific.
             direct_deps = [directDep for directDep in direct_deps if directDep != exclusion]
@@ -295,7 +296,7 @@ class DependencyResolver:
                 continue
             dep_item = self._shorten_module_name(dep_path)
             if dep_item == item:
-                logger_depres.debug((f"\tBreaking trivial cycle of b[{dep_item}] -> b[{item}]"))
+                logger_depres.debug(f"\tBreaking trivial cycle of b[{dep_item}] -> b[{item}]")
                 result["trivial_cycles"] += 1
                 continue
 
@@ -316,7 +317,7 @@ class DependencyResolver:
         return result
 
     @staticmethod
-    def _run_dependency_vote(module_graph) -> dict:
+    def _run_dependency_vote(module_graph: dict) -> dict:
         for item in module_graph.keys():
             names = list(module_graph[item]["all_deps"]["items"].keys())
             for name in names:
@@ -345,7 +346,8 @@ class DependencyResolver:
         dep_module_graph["traces"]["status"] = 2
         return dep_module_graph["traces"]["result"]
 
-    def _check_dependency_cycles(self, module_graph) -> int:
+    @staticmethod
+    def _check_dependency_cycles(module_graph: dict) -> int:
         errors = 0
 
         # sorted() is used for module_graph.keys() because in perl the hash keys are returned in random way.
@@ -362,7 +364,7 @@ class DependencyResolver:
         return errors
 
     @staticmethod
-    def _copy_up_dependencies_for_module(module_graph, item) -> None:
+    def _copy_up_dependencies_for_module(module_graph: dict, item: str) -> None:
         all_deps = module_graph[item]["all_deps"]
 
         if "done" in all_deps:
@@ -393,7 +395,7 @@ class DependencyResolver:
         return module_graph
 
     @staticmethod
-    def _detect_branch_conflict(module_graph, item, branch) -> str | None:
+    def _detect_branch_conflict(module_graph: dict, item: str, branch: str | None) -> str | None:
         if branch:
             sub_graph = module_graph[item]
             previously_selected_branch = sub_graph.get(branch, None)
@@ -404,7 +406,7 @@ class DependencyResolver:
         return None
 
     @staticmethod
-    def _get_dependency_path_of(module, item, path) -> str:
+    def _get_dependency_path_of(module: Module, item: str, path: str) -> str:
         if module:
             project_path = module.full_project_path()
 
@@ -417,7 +419,7 @@ class DependencyResolver:
         logger_depres.debug(f"\tGuessing path: 'b[{path}]' for item: b[{item}]")
         return path
 
-    def _resolve_dependencies_for_module_description(self, module_graph, module_desc) -> dict:
+    def _resolve_dependencies_for_module_description(self, module_graph: dict, module_desc: dict) -> dict:
         module = module_desc["module"]
         if module:
             Util.assert_isa(module, Module)
@@ -425,7 +427,7 @@ class DependencyResolver:
         path = module_desc["path"]
         item = module_desc["item"]
         branch = module_desc["branch"]
-        pretty_branch = f"{branch}" if branch else "*"
+        pretty_branch = branch if branch else "*"
         include_dependencies = module.get_option("include-dependencies") if module else module_desc["include_dependencies"]
 
         errors = {
@@ -441,7 +443,7 @@ class DependencyResolver:
             dep_path = dep_info["path"]
             dep_branch = dep_info["branch"]
 
-            pretty_dep_branch = f"{dep_branch}" if dep_branch else "*"
+            pretty_dep_branch = dep_branch if dep_branch else "*"
 
             logger_depres.debug(f"\tdep-resolv: b[{item}:{pretty_branch}] depends on b[{dep_item}:{pretty_dep_branch}]")
 
@@ -457,7 +459,7 @@ class DependencyResolver:
                         dep_module_graph["branch"] = dep_branch
 
             else:
-                dep_module = self.module_factory_ref(dep_item)
+                dep_module = self.module_factory(dep_item)
                 resolved_path = DependencyResolver._get_dependency_path_of(dep_module, dep_item, dep_path)
                 # May not exist, e.g. misspellings or 'virtual' dependencies like kf5umbrella.
                 if not dep_module:
@@ -490,7 +492,7 @@ class DependencyResolver:
                 if not module_graph[dep_item]["build"]:
                     logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but no module builds {dep_item} for this run.]")
 
-                if dep_module and dep_branch and (self._get_branch_of(dep_module) or "") != f"{dep_branch}":
+                if dep_module and dep_branch and (self._get_branch_of(dep_module) or "") != dep_branch:
                     wrong_branch = self._get_branch_of(dep_module) or "?"
                     logger_depres.error(f" r[b[*] {item} needs {dep_item}:{pretty_dep_branch}, not {dep_item}:{wrong_branch}]")
                     errors["branch_errors"] += 1
@@ -559,7 +561,7 @@ class DependencyResolver:
                 }
 
                 module_desc = {
-                    "includeDependencies": module.get_option("include-dependencies"),
+                    "include_dependencies": module.get_option("include-dependencies"),
                     "path": path,
                     "item": item,
                     "branch": branch,
@@ -645,7 +647,7 @@ class DependencyResolver:
             item_index += 1
 
     @staticmethod
-    def walk_module_dependency_trees(module_graph, callback, context, modules) -> None:
+    def walk_module_dependency_trees(module_graph: dict, callback: Callable, context: dict, modules: list[Module]) -> None:
 
         item_count = len(modules)
         item_index = 1
@@ -669,7 +671,7 @@ class DependencyResolver:
             item_index += 1
 
     @staticmethod
-    def make_comparison_func(module_graph) -> FunctionType:
+    def make_comparison_func(module_graph: dict) -> Callable:
 
         def _compare_build_order_depends(a, b):
             # comparison results uses:
@@ -720,7 +722,7 @@ class DependencyResolver:
         return _compare_build_order_depends
 
     @staticmethod
-    def sort_modules_into_build_order(module_graph) -> list[Module]:
+    def sort_modules_into_build_order(module_graph: dict) -> list[Module]:
         resolved = list(module_graph.keys())
         built = [el for el in resolved if module_graph[el]["build"] and module_graph[el]["module"]]
         prioritised = sorted(built, key=cmp_to_key(DependencyResolver.make_comparison_func(module_graph)))
@@ -728,7 +730,7 @@ class DependencyResolver:
         return modules
 
     @staticmethod
-    def _get_branch_of(module) -> str | None:
+    def _get_branch_of(module: Module) -> str | None:
         """
         This function extracts the branch of the given Module by calling its
         scm object's branch-determining method. It also ensures that the branch

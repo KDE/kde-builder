@@ -441,7 +441,7 @@ class ModuleResolver:
 
         return modules
 
-    def resolve_module_if_present(self, module_name):
+    def resolve_module_if_present(self, module_name: str) -> Module | None:
         """
         Similar to resolve_selectors_into_modules(), except that no exceptions are
         thrown if the module doesn't exist. Only a single module name is supported.
@@ -458,7 +458,8 @@ class ModuleResolver:
             except BuildException:
                 pass
 
-        return self.defined_modules.get(module_name, None)
+        ret = self.defined_modules.get(module_name, None)
+        return ret
 
     def expand_module_sets(self, build_module_list: list[Module | ModuleSet]) -> list[Module]:
         """
