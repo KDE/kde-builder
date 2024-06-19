@@ -19,7 +19,7 @@ class UpdaterKDEProject(Updater):
     def name() -> str:
         return "proj"
 
-    def _resolve_branch_group(self, branch_group) -> str | None:
+    def _resolve_branch_group(self, branch_group: str) -> str | None:
         """
         Resolves the requested branch-group for this Updater's module.
         Returns the required branch name, or None if none is set.

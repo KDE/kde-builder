@@ -22,6 +22,7 @@ from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 
 if TYPE_CHECKING:
+    from typing import NoReturn
     from ..build_context import BuildContext
     from ..module.module import Module
 
@@ -65,6 +66,9 @@ class Updater:
     # @override(check_signature=False)
     def name() -> str:
         return "git"
+
+    def _resolve_branch_group(self, branch_group: str) -> NoReturn:
+        BuildException.croak_runtime("_resolve_branch_group is implemented in UpdaterKDEProject.")
 
     def current_revision_internal(self) -> str:
         return self.commit_id("HEAD")
@@ -164,7 +168,8 @@ class Updater:
                 logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
         return 1  # success
 
-    def _verify_safe_to_clone_into_source_dir(self, module: Module, srcdir: str) -> None:
+    @staticmethod
+    def _verify_safe_to_clone_into_source_dir(module: Module, srcdir: str) -> None:
         """
         Checks that the required source dir is either not already present or is empty.
         Throws an exception if that's not true.
@@ -175,11 +180,11 @@ class Updater:
                 logger_updater.warning(f"\tRemoving b[{srcdir}]")
                 Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
             else:
-                logger_updater.error(textwrap.dedent("""\
-                The source directory for b[$module] does not exist. kde-builder would download
+                logger_updater.error(textwrap.dedent(f"""\
+                The source directory for b[{module}] does not exist. kde-builder would download
                 it, except there is already a file or directory present in the desired source
                 directory:
-                \ty[b[$srcdir]
+                \ty[b[{srcdir}]
 
                 Please either remove the source directory yourself and re-run this script, or
                 pass the b[--delete-my-patches] option to kde-builder and kde-builder will
@@ -583,7 +588,7 @@ class Updater:
         # Likewise branch-group requires special handling. checkout_source is
         # currently the branch-group to be resolved.
         if source_type_ref[0] == "branch-group":
-            Util.assert_isa(self, UpdaterKDEProject)
+            # noinspection PyUnreachableCode
             checkout_source = self._resolve_branch_group(checkout_source)
 
             if not checkout_source:
