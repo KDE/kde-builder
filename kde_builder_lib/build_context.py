@@ -265,7 +265,7 @@ class BuildContext(Module):
         if self.get_option("use-idle-io-priority"):
             # -p $$ is our PID, -c3 is idle priority
             # 0 return value means success
-            if Util.safe_system(["ionice", "-c3", "-p", os.getpid()]) != 0:
+            if Util.safe_system(["ionice", "-c3", "-p", str(os.getpid())]) != 0:
                 logger_buildcontext.warning(" b[y[*] Unable to lower I/O priority, continuing...")
 
         # Get ready for logged output.
