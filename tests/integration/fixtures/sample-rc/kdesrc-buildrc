@@ -12,7 +12,7 @@ global
     # Make sure the cmdline switch in corresponding test is picked up
     include-dependencies false
 
-    # To prevent 'global' flags from being stripped in modules
+    # To prevent "global" flags from being stripped in modules
     override-build-system kde
 
     # Used to test indirect options expansion

@@ -8,7 +8,7 @@
 local exec_cmd i
 
 # Scan command line for --exec argument and its value.
-# I cound't find any easier built-in way of doing this.
+# I could not find any easier built-in way of doing this.
 for (( i = 1; i <= ${#words}; i++ )); do
   case $words[$i] in
     -e=*|--exec=*)
@@ -37,6 +37,6 @@ _kdesrc_run_precommand() {
 }
 
 _arguments -s \
-  '(-f --fork)'{-f,--fork}'[Launch the program in a new session]' \
-  '(-)1: :_kde-builder_modules' \
-  '*:: :_kdesrc_run_precommand'
+  "(-f --fork)"{-f,--fork}"[Launch the program in a new session]" \
+  "(-)1: :_kde-builder_modules" \
+  "*:: :_kdesrc_run_precommand"

@@ -20,7 +20,7 @@ def test_option_reading(monkeypatch):
 
     cmd = []
 
-    # Override UtilLoggedSubprocess.set_command for final test to see if it is called with 'cmake'
+    # Override UtilLoggedSubprocess.set_command for final test to see if it is called with "cmake"
     def mock_set_command(self, set_command: list[str]):
         nonlocal cmd
         if not set_command:

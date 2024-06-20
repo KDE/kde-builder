@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-# Helper used to handle a generic 'progress update' status for the module
+# Helper used to handle a generic "progress update" status for the module
 # build, update, install, etc. processes.
 #
 # Currently, supports TTY output only, but it's not impossible to visualize

@@ -100,7 +100,7 @@ update process, they are stored and then printed out once it comes time to
 build the module.
 
 This system only works because the update and build processes are separate
-processes.  The 'modern' scheme I'm building towards does not require the
+processes.  The "modern" scheme I'm building towards does not require the
 existence of a separate update process at all, but we may still retain it to
 make squelching work.
 

@@ -208,7 +208,7 @@ class Util:
         As such this should only be called for a forked child about to exec as
         there is no easy way to undo this within the process.
         """
-        # Ensure that program output is untranslated by setting 'C' locale.
+        # Ensure that program output is untranslated by setting "C" locale.
         # We're really trying to affect the LC_MESSAGES locale category, but
         # LC_ALL is a catch-all for that (so needs to be unset if set).
         #
@@ -365,7 +365,7 @@ class Util:
             # Parent
             os.close(pipe_write)
 
-            dec = codecs.getincrementaldecoder('utf8')()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
+            dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
 
             if not callback_ref and logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
@@ -581,14 +581,14 @@ class Util:
             # This happens in a CHILD PROCESS, not in the main process!
             # This means that changes made by log_command or function calls made
             # via log_command will not be saved or noted unless they are made part
-            # of the return value, or sent earlier via a 'progress' event.
+            # of the return value, or sent earlier via a "progress" event.
             setproctitle.setproctitle("kde-builder " + " ".join(arg_ref))  # better indicate what is the process
             if directory:
                 Util.p_chdir(directory)
             retval.value = Util.log_command(module, filename, arg_ref, {"callback": callback_ref})
 
         exitcode = subprocess_run(func)
-        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + '.log')}\n")
+        logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + ".log")}\n""")
         if not exitcode == 0:
             Util._set_error_logfile(module, f"{filename}.log")
         return exitcode
@@ -898,16 +898,16 @@ class Util:
         # Return: 1 on success, 0 on failure.
 
         if os.path.isfile(dst) and not os.path.islink(dst):  # if dst is not a symlink to file, but a regular file
-            BuildException.croak_runtime(f"Could not create '{dst}' symlink, because file with this name exists. Please remove it manually.")
+            BuildException.croak_runtime(f"Could not create \"{dst}\" symlink, because file with this name exists. Please remove it manually.")
 
         if os.path.isdir(dst) and not os.path.islink(dst):  # if dst is not a symlink to directory, but a regular directory
-            BuildException.croak_runtime(f"Could not create '{dst}' symlink, because directory with this name exists. Please remove it manually.")
+            BuildException.croak_runtime(f"Could not create \"{dst}\" symlink, because directory with this name exists. Please remove it manually.")
 
         if os.path.islink(dst) and os.readlink(dst) != src:  # if dst points to wrong src
             try:
                 os.unlink(dst)  # delete wrong symlink
             except OSError:
-                BuildException.croak_runtime(f"Could not delete '{dst}' symlink (needed to update target location). Please remove it manually.")
+                BuildException.croak_runtime(f"Could not delete \"{dst}\" symlink (needed to update target location). Please remove it manually.")
 
         if not os.path.exists(dst) and not os.path.islink(dst):  # pl2py: in perl the -e check also detects the symlinks, but in python the os.path.exists does not detect symlinks.
             try:

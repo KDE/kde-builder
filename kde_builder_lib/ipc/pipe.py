@@ -27,11 +27,11 @@ class IPCPipe(IPC):
         Call this to let the object know it will be the update process.
         """
         os.close(self.pipe_read)
-        self.fh = os.fdopen(self.pipe_write, "wb", 0)  # Disable buffering and any possibility of IO 'interpretation' of the bytes
+        self.fh = os.fdopen(self.pipe_write, "wb", 0)  # Disable buffering and any possibility of IO "interpretation" of the bytes
 
     def set_receiver(self):
         os.close(self.pipe_write)
-        self.fh = os.fdopen(self.pipe_read, "rb", 0)  # Disable buffering and any possibility of IO 'interpretation' of the bytes
+        self.fh = os.fdopen(self.pipe_read, "rb", 0)  # Disable buffering and any possibility of IO "interpretation" of the bytes
 
     @staticmethod
     # @override

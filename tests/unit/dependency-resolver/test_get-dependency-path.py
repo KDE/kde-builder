@@ -44,4 +44,4 @@ def test_dependency_path(mock_module_fullproject):
     assert DependencyResolver._get_dependency_path_of(module2, "foo", "bar") == "bar", "should return the provided default if no module is passed"
 
     module3 = Module("test/path", False)
-    assert DependencyResolver._get_dependency_path_of(module3, "foo", "bar") == "third-party/test/path", "should return 'third-party/' prefixed project path if a non-KDE module object is passed"
+    assert DependencyResolver._get_dependency_path_of(module3, "foo", "bar") == "third-party/test/path", "should return \"third-party/\" prefixed project path if a non-KDE module object is passed"

@@ -64,7 +64,7 @@ def test_logged_subprocess():
     assert prog1_exit == 0, "Program 1 exited correctly"
     assert prog2_exit != 0, "Program 2 failed"
 
-    assert os.path.isdir(f"{tmp}/kde-builder-test/latest/test"), "Test module had a 'latest' dir setup"
+    assert os.path.isdir(f"{tmp}/kde-builder-test/latest/test"), "Test module had a \"latest\" dir setup"
     assert os.path.islink(f"{tmp}/kde-builder-test/latest-by-phase/test/test-suite-1.log"), "Test suite 1 phase log created"
     assert os.path.islink(f"{tmp}/kde-builder-test/latest-by-phase/test/test-suite-2.log"), "Test suite 2 phase log created"
 

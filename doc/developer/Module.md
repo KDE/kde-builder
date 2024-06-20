@@ -116,7 +116,7 @@ just from the method name, sadly.
   this execution. **NOTE** Different modules can have different base paths.
 
 * ``get_log_path``, returns the absolute filename to open() for a log file for
-  this module based on the given basename. Updates the 'latest' symlink, which
+  this module based on the given basename. Updates the "latest" symlink, which
   can trigger clean up of old log dirs after all modules are built. Only use
   when you're really going to open a log file!
 
@@ -124,16 +124,16 @@ just from the method name, sadly.
   directory, including any module name or dest-dir accoutrement. This is the
   directory you can git-clone to, cd to for build, etc.
 
-* ``dest_dir``, returns the 'dest-dir' for the module. dest-dir is effectively
+* ``dest_dir``, returns the "dest-dir" for the module. dest-dir is effectively
   just a way to modify the on-disk module name. It used to be used more heavily
   to allow for having multiple build/source directories for a given
   module (varying by branch or tag), but even with git this value may change
   for KDE-based repositories to set subdirectories that match KDE project
-  paths. Supports expanding '$MODULE' or '${MODULE}' sequences to what
+  paths. Supports expanding "$MODULE" or "${MODULE}" sequences to what
   otherwise would have been the dest-dir.
 
-* ``installation_path``, as labeled on the tin. Prefers the 'prefix' option but
-  falls back to 'install-dir' if not set.
+* ``installation_path``, as labeled on the tin. Prefers the "prefix" option but
+  falls back to "install-dir" if not set.
 
 #### USER AND PERSISTENT OPTIONS
 
@@ -145,11 +145,11 @@ just from the method name, sadly.
   parent process.
 
   * accepts an option name, normally as set in the rc-file. Can also accept a
-    second parameter 'module', to prevent falling back to a global option.
+    second parameter "module", to prevent falling back to a global option.
     However, doing this also permits ``None`` to be returned, so you must check
     whether the result is defined.
 
-  * Options starting with '#' can only be set internally (i.e. not from rc-file
+  * Options starting with "#" can only be set internally (i.e. not from rc-file
     or cmdline) so this can be used as a way to tag modules with data meant not
     to be user-accessible...  but this should probably be factored into a
     dedicated parallel option stack.
@@ -169,7 +169,7 @@ just from the method name, sadly.
 
 * ``full_project_path``, returns the logical module path in the git.kde.org
   infrastructure for the module, if it's defined from a kde-projects module
-  set.  E.g. for the 'juk' module, would return 'kde/kdemultimedia/juk'.
+  set.  E.g. for the "juk" module, would return "kde/kdemultimedia/juk".
 
 * ``is_kde_project``, returns true if the module was sourced from the special
   ``kde-projects`` module set in the user's rc-file. In this case the module's

@@ -21,7 +21,7 @@ class ModuleBranchGroupResolver:
         self.layers = json_data.get("layers", [])
         self.groups = json_data.get("groups", [])
 
-        # For layers and groups, remove anything beginning with a '_' as that is
+        # For layers and groups, remove anything beginning with a "_" as that is
         # defined in the spec to be a comment of some sort.
         self.layers = [layer for layer in self.layers if not layer.startswith("_")]
 
@@ -29,7 +29,7 @@ class ModuleBranchGroupResolver:
         self.groups = {key: self.groups[key] for key in self.groups if not key.startswith("_")}
 
         # Extract wildcarded groups separately as they are handled separately
-        # later. Note that the specific catch-all group '*' is itself handled
+        # later. Note that the specific catch-all group "*" is itself handled
         # as a special case in find_module_branch.
 
         self.wildcarded_groups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}

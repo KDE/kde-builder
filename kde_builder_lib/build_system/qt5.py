@@ -63,8 +63,8 @@ class BuildSystemQt5(BuildSystem):
                 b[y[*]
                 b[y[*] Building the Qt module, but the install directory for Qt is not set to the
                 b[y[*] Qt directory to use.
-                b[y[*]   install directory ('install-dir' option): b[{installdir}]
-                b[y[*]   Qt install to use ('qt-install-dir'  option): b[{qt_installdir}]
+                b[y[*]   install directory ("install-dir" option): b[{installdir}]
+                b[y[*]   Qt install to use ("qt-install-dir"  option): b[{qt_installdir}]
                 b[y[*]
                 b[y[*] Try setting b[qt-install-dir] to the same setting as the Qt module's b[install-dir].
                 b[y[*]

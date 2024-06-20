@@ -33,7 +33,7 @@ from .version import Version
 logger_buildcontext = KBLogger.getLogger("build-context")
 
 
-# We derive from Module so that BuildContext acts like the 'global'
+# We derive from Module so that BuildContext acts like the "global"
 # Module, with some extra functionality.
 # TODO: Derive from OptionsBase directly and remove get_option override
 class BuildContext(Module):
@@ -292,7 +292,7 @@ class BuildContext(Module):
         should do that yourself (but remember to have some way to restore the old
         value if necessary).
 
-        In order to keep compatibility with the old 'setenv' sub, no action is
+        In order to keep compatibility with the old "setenv" sub, no action is
         taken if the value is not equivalent to boolean true.
         """
         if not value:
@@ -482,7 +482,7 @@ class BuildContext(Module):
         default log directory.
 
         As part of setting up what path to use for the log directory, the
-        'latest' symlink will also be setup to point to the returned log
+        "latest" symlink will also be setup to point to the returned log
         directory.
         """
 
@@ -509,7 +509,7 @@ class BuildContext(Module):
         Constructs the appropriate full path to a log file based on the given
         basename (including extensions). Use this instead of get_log_dir_for when you
         actually intend to create a log, as this function will also adjust the
-        'latest' symlink properly.
+        "latest" symlink properly.
         """
         base_log_path = module.get_subdir_path("log-dir")
         log_dir = self.get_log_dir_for(module)
@@ -522,7 +522,7 @@ class BuildContext(Module):
         # log dir for the specific kde-builder run.
         Util.super_mkdir(f"{base_log_path}/latest-by-phase/{module}")
 
-        # Add a symlink to the latest run for this module. 'latest' itself is
+        # Add a symlink to the latest run for this module. "latest" itself is
         # a directory under the base log directory that holds symlinks mapping
         # each module name to the specific log directory most recently used.
         latest_path = f"{base_log_path}/latest"
@@ -614,7 +614,7 @@ class BuildContext(Module):
 
             # In FirstRun user may decide to use --install-distro-packages before --generate-config.
             # --install-distro-packages requires the metadata to be downloaded to read the "disrto-dependencies" from it.
-            # After downloading metadata, we normally should change 'last-metadata-update' persistent option value.
+            # After downloading metadata, we normally should change "last-metadata-update" persistent option value.
             # To store persistent option, we should know persistent-data-file value, and it is read from config.
             # At this moment we know that there is no config at default location, and user did not specified the --rc-file option.
             # And because we do not want to _require_ the config to be available yet, we just will provide dummy config.
@@ -631,7 +631,7 @@ class BuildContext(Module):
                 end module
                 """)
 
-            temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
+            temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
             temp_file.write(dummy_config)
             temp_file_path = temp_file.name
             temp_file.close()
@@ -648,9 +648,9 @@ class BuildContext(Module):
                 kde-builder requires a configuration file to select which KDE software modules
                 to build, what options to build them with, the path to install to, etc.
                 
-                When run, kde-builder will use `kdesrc-buildrc' config file located in the
+                When run, kde-builder will use `kdesrc-buildrc` config file located in the
                 current working directory. If no such file exists, kde-builder will use
-                `{BuildContext.xdg_config_home_short}/kdesrc-buildrc' instead.
+                `{BuildContext.xdg_config_home_short}/kdesrc-buildrc` instead.
                 
                 You can generate config with b[--generate-config].
                 """))
@@ -674,7 +674,7 @@ class BuildContext(Module):
         return modules_list
 
     def uses_concurrent_phases(self) -> bool:
-        # If we have an 'update' phase and any other phase (build / test / install
+        # If we have an "update" phase and any other phase (build / test / install
         # / etc) we should use concurrency if it is available.
         has_update = False
         has_other = False
@@ -695,7 +695,7 @@ class BuildContext(Module):
         and returns its :class:`Module` object. Returns None if no match was found.
         As a special-case, returns the BuildContext itself if the name passed is
         "global", since the BuildContext also is a (in the "is-a" OOP sense)
-        :class:`Module`, specifically the 'global' one.
+        :class:`Module`, specifically the "global" one.
         """
         if module_name == "global":
             return self
@@ -829,7 +829,7 @@ class BuildContext(Module):
         #
         # Layout of this data:
         #  self.persistent_options = {
-        #    'module-name': {
+        #    "module-name": {
         #      option: value,
         #      # for each option/value pair
         #    },
@@ -941,7 +941,7 @@ class BuildContext(Module):
 
     def get_kde_projects_metadata_module(self) -> Module:
         """
-        Returns the :class:`Module` (which has a 'metadata' scm type) that is used for
+        Returns the :class:`Module` (which has a "metadata" scm type) that is used for
         kde-project metadata, so that other modules that need it can call into it if
         necessary.
 

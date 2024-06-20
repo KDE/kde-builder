@@ -64,6 +64,6 @@ end global
 include ${module-definitions-dir}/kf6-qt6.ksb
 
 # To change options for modules that have already been defined, use an
-# 'options' block. See kf6-common-options.ksb for an example
+# "options" block. See kf6-common-options.ksb for an example
 
 # kate: syntax kdesrc-buildrc;

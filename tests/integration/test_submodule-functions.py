@@ -39,7 +39,7 @@ def test_submodule():
     result = run_command(["git", "init"])
     assert result, "git init worked"
 
-    with open("README.md", 'w') as file:
+    with open("README.md", "w") as file:
         file.write("Initial content")
 
     result = run_command("git config --local user.name kde-builder".split(" "))
@@ -65,7 +65,7 @@ def test_submodule():
     result = run_command("git init".split(" "))
     assert result, "git supermodule init worked"
 
-    with open("README.md", 'w') as file:
+    with open("README.md", "w") as file:
         file.write("Initial content")
 
     result = run_command("git config --local user.name kde-builder".split(" "))
@@ -90,7 +90,7 @@ def test_submodule():
     # unless specifically enabled, due to security risks from symlinks. See
     # https://github.blog/2022-10-18-git-security-vulnerabilities-announced/#cve-2022-39253
     result = run_command("git -c protocol.file.allow=always submodule add ../submodule".split(" "))
-    assert result, 'git submodule add worked'
+    assert result, "git submodule add worked"
 
     assert Updater._has_submodules(), "Submodules detected when they are present"
 

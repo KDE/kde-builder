@@ -36,7 +36,7 @@ class OSSupport:
         Manually point to os-release:
         ::
 
-            os = OSSupport('/usr/lib/os-release')
+            os = OSSupport("/usr/lib/os-release")
         """
 
         self.ID = None
@@ -66,7 +66,7 @@ class OSSupport:
 
         Returns the vendor Version from the `os-release` specification.
         The first available value from `VERSION_ID` and then
-        `VERSION_CODENAME` is used, and 'unknown' is returned if neither
+        `VERSION_CODENAME` is used, and "unknown" is returned if neither
         are set.
         """
         if self.VERSION_ID:
@@ -188,7 +188,7 @@ def backslash_decode(src):
         elif slashes == 0:
             dst += char  # normal char
         else:  # slashes == 1
-            if char == '"':
+            if char == "\"":
                 dst += char  # decode double-quote
             elif char == "'":
                 dst += char  # decode single-quote

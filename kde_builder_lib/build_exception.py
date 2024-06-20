@@ -40,7 +40,7 @@ class BuildException(Exception):
         # # Remove this subroutine from the backtrace
         # local $Carp::CarpLevel = 1 + $levels;
 
-        # if exception_type == 'Internal':
+        # if exception_type == "Internal":
         #     message = Carp::cluck(message)  # prints the backtrace
         return BuildException(exception_type, message)
 

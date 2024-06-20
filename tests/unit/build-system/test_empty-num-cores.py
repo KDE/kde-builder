@@ -77,5 +77,5 @@ def test_empty_numcores(mock_buildsystem):
 
         module.set_option({"num-cores": str(max_cores - 1)})
         build_system.build_internal(test_option)
-        assert BuildSystem.made_arguments == ['-j', str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
+        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
         module.set_option({"num-cores": ""})

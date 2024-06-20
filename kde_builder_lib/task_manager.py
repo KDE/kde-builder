@@ -582,7 +582,7 @@ class TaskManager:
         # It's supposed to be running, let's see if there exists the program with
         # that pid (this check is linux-specific at the moment).
         if os.path.isdir("/proc") and not os.path.exists(f"/proc/{pid}"):
-            # local $" = ', '; # override list interpolation separator
+            # local $" = ", "; # override list interpolation separator
 
             logger_taskmanager.warning(textwrap.dedent(f"""\
                 y[b[ *] SSH Agent is enabled, but y[doesn't seem to be running].
@@ -654,8 +654,8 @@ class TaskManager:
 
         # We will write to the build process and read from the update process.
 
-        send_fh = ipc_to_build.fh or BuildException.croak_runtime('??? missing pipe to build proc')
-        recv_fh = ipc_from_updater.fh or BuildException.croak_runtime('??? missing pipe from monitor')
+        send_fh = ipc_to_build.fh or BuildException.croak_runtime("??? missing pipe to build proc")
+        recv_fh = ipc_from_updater.fh or BuildException.croak_runtime("??? missing pipe from monitor")
 
         sel = selectors.DefaultSelector()
         sel.register(recv_fh, selectors.EVENT_READ)

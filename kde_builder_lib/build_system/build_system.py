@@ -49,7 +49,7 @@ class BuildSystem:
     def __init__(self, module: Module):
         self.module = module
 
-        # This is simply the 'default' build system at this point, so options
+        # This is simply the "default" build system at this point, so options
         # intended for unique/bespoke build systems should be stripped from global
         # before being applied to a module.
         if not self.__class__.__name__ == "BuildSystemKDECMake":
@@ -91,7 +91,7 @@ class BuildSystem:
         ::
 
             {
-              "compute": OPTIONAL, if set a max number of CPU cores to use, or '1' if unable to tell
+              "compute": OPTIONAL, if set a max number of CPU cores to use, or "1" if unable to tell
               # no other constraints supported
             }
         """
@@ -368,14 +368,14 @@ class BuildSystem:
         ::
 
             {
-               target         : None, or a valid build target e.g. 'install',
-               message        : 'Compiling.../Installing.../etc.'
+               target         : None, or a valid build target e.g. "install",
+               message        : "Compiling.../Installing.../etc."
                make-options   : [ list of command line arguments to pass to make. See
                                    make-options ],
                prefix-options : [ list of command line arguments to prefix *before* the
                                    make command, used for make-install-prefix support for
                                    e.g. sudo ],
-               logbase        : 'base-log-filename',
+               logbase        : "base-log-filename",
             }
 
         target and message are required. logbase is required if target is left
@@ -434,7 +434,7 @@ class BuildSystem:
         # If using sudo ensure that it doesn't wait on tty, but tries to read from
         # stdin (which should fail as we redirect that from /dev/null)
         if prefix_opts and prefix_opts[0] == "sudo" and [opt for opt in prefix_opts if opt != "-S"]:
-            prefix_opts.insert(1, "-S")  # Add -S right after 'sudo'
+            prefix_opts.insert(1, "-S")  # Add -S right after "sudo"
 
         # Assemble arguments
         args = [*prefix_opts, build_command, *build_command_line]
@@ -461,7 +461,7 @@ class BuildSystem:
         Parameters:
             message: The message to display to the user while the build happens.
             filename: The name of the log file to use (relative to the log directory).
-            arg_ref: An array with the command and its arguments. i.e. ['command', 'arg1', 'arg2']
+            arg_ref: An array with the command and its arguments. i.e. ["command", "arg1", "arg2"]
 
         Returns:
              Dict as defined by safe_make

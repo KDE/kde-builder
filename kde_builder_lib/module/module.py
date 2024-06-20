@@ -285,7 +285,7 @@ class Module(OptionsBase):
         if not build_type and glob.glob(f"{source_dir}/*.pro"):
             build_type = BuildSystemQMake5(self)
 
-        # 'configure' is a popular fall-back option even for other build
+        # "configure" is a popular fall-back option even for other build
         # systems so ensure we check last for autotools.
         if not build_type and (os.path.exists(f"{source_dir}/configure") or os.path.exists(f"{source_dir}/autogen.sh")):
             build_type = BuildSystemAutotools(self)
@@ -574,7 +574,7 @@ class Module(OptionsBase):
             for platformDir in [qt_installdir, installdir]:
                 if not platformDir:  # OK, assume system platform is usable
                     continue
-                if platformDir == "/usr":  # Don't 'fix' things if system platform manually set
+                if platformDir == "/usr":  # Don't "fix" things if system platform manually set
                     continue
 
                 ctx.prepend_environment_value("PKG_CONFIG_PATH", f"{platformDir}/{libname}/pkgconfig")
@@ -777,7 +777,7 @@ class Module(OptionsBase):
         Parameters:
             key: Name of option
             level_limit: Level limit (optional). If not present, then the value
-                'allow-inherit' is used. Options:
+                "allow-inherit" is used. Options:
                   - allow-inherit: Module value is used if present (with exceptions),
                     otherwise global is used.
                   - module: Only module value is used (if you want only global then use the
@@ -877,7 +877,7 @@ class Module(OptionsBase):
         Function to return the name of the destination directory for the
         checkout and build routines. Based on the dest-dir option. The return
         value will be relative to the src/build dir. The user may use the
-        '$MODULE' or '${MODULE}' sequences, which will be replaced by the name of
+        "$MODULE" or "${MODULE}" sequences, which will be replaced by the name of
         the module in question.
         """
         dest_dir = self.get_option("dest-dir")
@@ -898,7 +898,7 @@ class Module(OptionsBase):
                 self.set_option({"#warned-invalid-directory-layout": True})
             base_path = self.name
 
-        # Note the default dest-dir option is '${MODULE}' so this normally is used
+        # Note the default dest-dir option is "${MODULE}" so this normally is used
         dest_dir = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", base_path, dest_dir)
 
         return dest_dir
@@ -908,7 +908,7 @@ class Module(OptionsBase):
         Function to return the installation path of a given module (the value
         that is passed to the CMAKE_INSTALL_PREFIX CMake option).
         It is based on the "install-dir" option.
-        The user may use '$MODULE' or '${MODULE}' in the "install-dir" option to have
+        The user may use "$MODULE" or "${MODULE}" in the "install-dir" option to have
         them replaced by the name of the module in question.
         """
         path = self.get_option("install-dir")

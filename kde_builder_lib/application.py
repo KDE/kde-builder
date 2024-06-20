@@ -154,7 +154,7 @@ class Application:
 
         if depth == 0:
             connector = prefix + " ── "
-            connector_stack.append(prefix + (' ' * 4))
+            connector_stack.append(prefix + (" " * 4))
         else:
             connector = prefix + ("└── " if index == count else "├── ")
             connector_stack.append(prefix + (" " * 4 if index == count else "│   "))
@@ -206,7 +206,7 @@ class Application:
         # doing.
 
         ctx = self.context
-        deferred_options = []  # 'options' blocks
+        deferred_options = []  # "options" blocks
 
         # Process --help, etc. first.
         c = Cmdline()
@@ -389,7 +389,7 @@ class Application:
         # Check for ignored modules (post-expansion)
         modules = [module for module in modules if
                    module.name not in ignored_selectors and
-                   (module.get_module_set().name if module.get_module_set().name else '') not in ignored_selectors
+                   (module.get_module_set().name if module.get_module_set().name else "") not in ignored_selectors
                    ]
 
         result = {
@@ -624,7 +624,7 @@ class Application:
 
         Application._output_failed_module_lists(ctx, dependency_graph)
 
-        # Record all failed modules. Unlike the 'resume-list' option this doesn't
+        # Record all failed modules. Unlike the "resume-list" option this doesn't
         # include any successfully-built modules in between failures.
         failed_modules = ",".join(map(str, ctx.list_failed_modules()))
         if failed_modules:
@@ -877,7 +877,7 @@ class Application:
                 else:
                     end_word = "options"
 
-                logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an 'end {end_word}' before " + "starting a new module.\n")
+                logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an \"end {end_word}\" before " + "starting a new module.\n")
                 raise BuildException.make_exception("Config", f"Invalid file {current_file}")
 
             option, value = Application._split_option_and_value_and_substitute_value(ctx, line, file_reader)
@@ -951,7 +951,7 @@ class Application:
         """
         module_set = self._parse_module_options(ctx, file_reader, module_set, re.compile(r"^end\s+module(-?set)?$"))
 
-        # Perl-specific note! re-blessing the module set into the right 'class'
+        # Perl-specific note! re-blessing the module set into the right "class"
         # You'd probably have to construct an entirely new object and copy the
         # members over in other languages.
         if module_set.get_option("repository") == Application.KDE_PROJECT_ID:
@@ -971,8 +971,8 @@ class Application:
             cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
             deferred_options_ref: A list containing dicts mapping module names to options
-                set by any 'options' blocks read in by this function.
-                Each key (identified by the name of the 'options' block) will point to a
+                set by any "options" blocks read in by this function.
+                Each key (identified by the name of the "options" block) will point to a
                 dict value holding the options to apply.
 
         Returns:
@@ -1033,7 +1033,7 @@ class Application:
 
             new_module = None
 
-            # 'include' directives can change the current file, so check where we're at
+            # "include" directives can change the current file, so check where we're at
             rcfile = file_reader.current_filename()
 
             # Module-set?
@@ -1062,18 +1062,18 @@ class Application:
                 creation_order += 1
                 new_module.create_id = creation_order
 
-                # Save 'use-modules' entries, so we can see if later module decls
+                # Save "use-modules" entries, so we can see if later module decls
                 # are overriding/overlaying their options.
                 module_set_items = new_module.module_names_to_find()
                 # seen_module_set_items = {item: new_module for item in module_set_items}
 
-                # Reserve enough 'create IDs' for all named modules to use
+                # Reserve enough "create IDs" for all named modules to use
                 creation_order += len(module_set_items)
                 if modulename:
                     seen_module_sets[modulename] = new_module
 
             # Duplicate module entry? (Note, this must be checked before the check
-            # below for 'options' sets)
+            # below for "options" sets)
             elif modulename in seen_modules and option_type != "options":
                 logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {file_reader.current_filehandle().filelineno()} of {rcfile}")
                 raise BuildException.make_exception("Config", f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
@@ -1094,7 +1094,7 @@ class Application:
 
                 continue  # Don't add to module list
 
-            # Must follow 'options' handling
+            # Must follow "options" handling
             elif modulename in seen_module_sets:
                 logger_app.error(f"Name {modulename} for module at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module-set")
                 raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
@@ -1159,7 +1159,7 @@ class Application:
         code does not automatically reverse the order; modules are uninstalled in the
         order determined by the build context.
 
-        This function obeys the 'stop-on-failure' option supported by _handle_install.
+        This function obeys the "stop-on-failure" option supported by _handle_install.
 
         Parameters:
             ctx: Build Context from which the uninstall list is generated.
@@ -1388,7 +1388,7 @@ class Application:
             logger_app.warning(textwrap.dedent(f"""
             Possible solution: Install the build dependencies for the modules:
             {names}
-            You can use 'sudo apt build-dep <source_package>', 'sudo dnf builddep <package>', 'sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>' or a similar command for your distro of choice.
+            You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
             See https://community.kde.org/Get_Involved/development/Install_the_dependencies"""))
 
     @staticmethod

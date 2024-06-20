@@ -12,7 +12,7 @@ configuration file, but any modules implictly pulled in from the kde-project
 modules will be sorted appropriately by repo-metadata/dependencies.
 
 2. Modules can be directly specified on the command line. kde-projects modules
-can be forced by preceding the module name with a '+'.
+can be forced by preceding the module name with a "+".
 
 After processing command line module names, any modules that match a module
 (or module-set) given from the configuration file will have the configuration
@@ -65,7 +65,7 @@ Finally we match and expand potential module-sets
 
 Not only does this expansion try to splice in modules under a named
 module-set, but it forces each module that doesn't already have a type into
-having a 'proj' type but with a special "guessed name" annotation, which is
+having a "proj" type but with a special "guessed name" annotation, which is
 used later for proj-expansion.
 
 At this point we should be at the same point as if there were no command-line

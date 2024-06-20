@@ -22,7 +22,7 @@ def test_trivial_cycle():
         }
     }
 
-    assert DependencyResolver._detect_dependency_cycle(graph1, "a", "a"), "should detect 'trivial' cycles of an item to itself"
+    assert DependencyResolver._detect_dependency_cycle(graph1, "a", "a"), "should detect \"trivial\" cycles of an item to itself"
 
 
 def test_cycle_to_self():
@@ -44,7 +44,7 @@ def test_cycle_to_self():
 
 
 def test_no_cycles():
-    # no cycles, should therefore not 'detect' any false positives
+    # no cycles, should therefore not "detect" any false positives
     graph3 = {
         "a": {
             "deps": {
@@ -56,5 +56,5 @@ def test_no_cycles():
         }
     }
 
-    assert not DependencyResolver._detect_dependency_cycle(graph3, "a", "a"), "should not report false positives for 'a'"
-    assert not DependencyResolver._detect_dependency_cycle(graph3, "b", "b"), "should not report false positives for 'b'"
+    assert not DependencyResolver._detect_dependency_cycle(graph3, "a", "a"), "should not report false positives for \"a\""
+    assert not DependencyResolver._detect_dependency_cycle(graph3, "b", "b"), "should not report false positives for \"b\""

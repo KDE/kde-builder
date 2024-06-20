@@ -349,7 +349,7 @@ class Updater:
         if existing_branch is not None:
             existing_branch = existing_branch.removesuffix("\n")
 
-        # The result is empty if in 'detached HEAD' state where we should also
+        # The result is empty if in "detached HEAD" state where we should also
         # clearly not switch branches if there are local changes.
         if module.get_option("#git-was-stashed") and (not existing_branch or (existing_branch != branch_name)):
 
@@ -545,7 +545,7 @@ class Updater:
         various orders of priority.
 
         Returns a *list* containing: (the resultant symbolic ref/or SHA1,"branch" or
-        'tag' (to determine if something like git-pull would be suitable or whether
+        "tag" (to determine if something like git-pull would be suitable or whether
         you have a detached HEAD)). Since the sym-ref is returned first that should
         be what you get in a scalar context, if that's all you want.
         """
@@ -565,7 +565,7 @@ class Updater:
             ["branch-group", "branch", "allow-inherit"],
         ]
 
-        # For modules that are not actually a 'proj' module we skip branch-group
+        # For modules that are not actually a "proj" module we skip branch-group
         # entirely to allow for global/module branch selection
         # options to be selected... kind of complicated, but more DWIMy
         from .kde_project import UpdaterKDEProject
@@ -578,9 +578,9 @@ class Updater:
         source_type_ref = next((x for x in priority_ordered_sources if (checkout_source := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
 
         # The user has no clear desire here (either set for the module or globally.
-        # Note that the default config doesn't generate a global 'branch' setting).
+        # Note that the default config doesn't generate a global "branch" setting).
         # In this case it's unclear which convention source modules will use between
-        # 'master', 'main', or something entirely different.  So just don't guess...
+        # "master", "main", or something entirely different.  So just don't guess...
         if not source_type_ref:
             logger_updater.debug(f"No branch specified for {module}, will use whatever git gives us")
             return "none", "none"
@@ -606,12 +606,12 @@ class Updater:
         """
         Tries to check whether the git module is using submodules or not. Currently,
         we just check the .git/config file (using git-config) to determine whether
-        there are any 'active' submodules.
+        there are any "active" submodules.
 
         MUST BE RUN FROM THE SOURCE DIR
         """
         # The git-config line shows all option names of the form submodule.foo.active,
-        # filtering down to options for which the option is set to 'true'
+        # filtering down to options for which the option is set to "true"
         config_lines = Util.filter_program_output(None, "git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
         return len(config_lines) > 0
 
@@ -754,7 +754,7 @@ class Updater:
         """
 
         # We'll parse git config output to search for branches that have a
-        # remote of $remote_name and a 'merge' of refs/heads/$branch_name.
+        # remote of $remote_name and a "merge" of refs/heads/$branch_name.
 
         # TODO: Replace with git for-each-ref refs/heads and the %(upstream)
         # format.
@@ -958,7 +958,7 @@ class Updater:
             other_push_url_prefix = "https://invent.kde.org/" if protocol == "git" else "ssh://git@invent.kde.org/"
         else:
             logger_updater.error(f" b[y[*] Invalid b[git-push-protocol] {protocol}")
-            logger_updater.error(" b[y[*] Try setting this option to 'git' if you're not using a proxy")
+            logger_updater.error(" b[y[*] Try setting this option to \"git\" if you're not using a proxy")
             BuildException.croak_runtime(f"Invalid git-push-protocol: {protocol}")
 
         p = subprocess.run("git config --global --includes --get url.https://invent.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True)

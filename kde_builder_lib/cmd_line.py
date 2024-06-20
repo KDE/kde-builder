@@ -38,7 +38,7 @@ class Cmdline:
 
         module_list = lookForModSelectors(*opts["selectors"])
 
-        if opts["run_mode"] == 'query':
+        if opts["run_mode"] == "query":
         # handle query option
         exit(0)
 
@@ -68,7 +68,7 @@ class Cmdline:
 
             returned_dict = {
                 "opts": { # see BuildContext's "internalGlobalOptions"
-                    'global': {
+                    "global": {
                         # Always present even if no options read in
                         "opt-name": "opt-value",
                         ...
@@ -209,7 +209,7 @@ class Cmdline:
             elif action:
                 specstr += f", action={action}"
 
-            # example of string: parser.add_argument("--show-info", action='store_true')
+            # example of string: parser.add_argument("--show-info", action="store_true")
             string_of_parser_add_arguments += textwrap.dedent(f"""\
             parser.add_argument({specstr})
             """)

@@ -35,7 +35,7 @@ class KDEProjectsReader:
         self._read_project_data(project_metadata_module)
 
     def _read_project_data(self, project_metadata_module) -> None:
-        # The 'main' method for this class. Reads in *all* KDE projects and notes
+        # The "main" method for this class. Reads in *all* KDE projects and notes
         # their details for later queries.
         # Be careful, can throw exceptions.
 
@@ -128,12 +128,12 @@ class KDEProjectsReader:
             find_results()
 
             # Now setup for a wildcard search to find things like kde/kdelibs/baloo
-            # if just 'kdelibs' is asked for.
+            # if just "kdelibs" is asked for.
             proj += "/*"
 
         proj = re.sub(r"\.git$", "", proj)
 
-        # If still no wildcard and no '/' then we can use direct lookup by module
+        # If still no wildcard and no "/" then we can use direct lookup by module
         # name.
         if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repository_ref:
             results.append(proj)

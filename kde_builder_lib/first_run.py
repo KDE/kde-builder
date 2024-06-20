@@ -146,7 +146,7 @@ class FirstRun:
                     packages.remove(package)
 
         if packages:
-            logger_fr.info(f""" b[*] Would run 'b[{" ".join(install_cmd + packages)}]'""")
+            logger_fr.info(f""" b[*] Would run \"b[{" ".join(install_cmd + packages)}]\"""")
             if not self.confirmed_to_continue():
                 print("Interrupted by user.")
                 return
@@ -167,7 +167,7 @@ class FirstRun:
                 return
 
             for onePackage in packages:
-                logger_fr.info(f"""\n b[*] Running 'b[{" ".join(install_cmd + [onePackage])}]'""")
+                logger_fr.info(f"""\n b[*] Running \"b[{" ".join(install_cmd + [onePackage])}]\"""")
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
                 result = subprocess.run(install_cmd + [onePackage], shell=False)

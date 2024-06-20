@@ -26,6 +26,6 @@ def test_kde_projects():
     assert module_list[0].get_option("cmake-generator") == "Ninja", "Global opts seen even with other options"
     assert module_list[1].get_option("cmake-generator") == "Make", "options block works for kde-projects module-set"
     assert module_list[1].get_option("cmake-options") == "-DSET_FOO:BOOL=ON", "module options block can override set options block"
-    assert module_list[2].get_option("cmake-generator") == 'Make', "options block works for kde-projects module-set after options"
+    assert module_list[2].get_option("cmake-generator") == "Make", "options block works for kde-projects module-set after options"
     assert module_list[2].get_option("cmake-options") == "-DSET_FOO:BOOL=ON", "module-set after options can override options block"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

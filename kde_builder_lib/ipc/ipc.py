@@ -120,9 +120,9 @@ class IPC:
             message = msg
             updated[ipc_module_name] = "success"
         elif ipc_type == IPC.MODULE_SKIPPED:
-            # The difference between success here and 'skipped' below
+            # The difference between success here and "skipped" below
             # is that success means we should build even though we
-            # didn't perform an update, while 'skipped' means the
+            # didn't perform an update, while "skipped" means the
             # *build* should be skipped even though there was no
             # failure.
             message = "skipped"
@@ -217,7 +217,7 @@ class IPC:
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
             message = self._update_seen_modules_from_message(ipc_type, buffer)
 
-            # If we have 'global' messages they are probably for the first module and
+            # If we have "global" messages they are probably for the first module and
             # include standard setup messages, etc. Print first and then print module's
             # messages.
             messages_ref = self.messages
@@ -272,7 +272,7 @@ class IPC:
     def wait_for_stream_start(self) -> None:
         """
         Waits on the IPC connection until one of the ALL_* IPC codes is returned.
-        If IPC.ALL_SKIPPED is returned then the 'no_update' entry will be set in
+        If IPC.ALL_SKIPPED is returned then the "no_update" entry will be set in
         self to flag that you shouldn't wait.
         If IPC.ALL_FAILURE is returned then an exception will be thrown due to the
         fatal error.

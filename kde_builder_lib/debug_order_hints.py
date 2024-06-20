@@ -78,7 +78,7 @@ class DebugOrderHints:
 
             # TODO we could tag explicitly selected modules from command line?
             # If we do so, then the user is probably more interested in debugging
-            # those first, rather than 'unrelated' noise from modules pulled in due
+            # those first, rather than "unrelated" noise from modules pulled in due
             # to possibly overly broad dependency declarations. In that case we
             # should sort explicitly tagged modules next highest, after dependency
             # ordering.
@@ -86,10 +86,10 @@ class DebugOrderHints:
             # Assuming no dependency resolution, next favour possible root causes as
             # may be inferred from the dependency tree.
             #
-            # Assumption: there may be certain 'popular' modules which rely on a
-            # failed module. Those should probably not be considered as 'interesting'
+            # Assumption: there may be certain "popular" modules which rely on a
+            # failed module. Those should probably not be considered as "interesting"
             # as root cause failures in less popuplar dependency trees. This is
-            # essentially a mitigation against noise introduced from raw 'popularity'
+            # essentially a mitigation against noise introduced from raw "popularity"
             # contests (see below).
 
             is_root_a = len(module_graph[name_a]["deps"]) == 0
@@ -100,12 +100,12 @@ class DebugOrderHints:
             if is_root_b and not is_root_a:
                 return 1
 
-            # Next sort by 'popularity': the item with the most votes (back edges) is
+            # Next sort by "popularity": the item with the most votes (back edges) is
             # depended on the most.
             #
             # Assumption: it is probably a good idea to debug that one earlier.
             # This would point the user to fixing the most heavily used dependencies
-            # first before investing time in more 'exotic' modules
+            # first before investing time in more "exotic" modules
 
             vote_a = len(module_graph[name_a]["votes"])
             vote_b = len(module_graph[name_b]["votes"])
@@ -114,7 +114,7 @@ class DebugOrderHints:
             if votes:
                 return votes
 
-            # Try and see if there is something 'interesting' that might e.g. indicate
+            # Try and see if there is something "interesting" that might e.g. indicate
             # issues with the system itself, preventing a successful build.
 
             phase_a = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_a, ""))

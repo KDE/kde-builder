@@ -49,7 +49,7 @@ class DependencyResolver:
         Example:
         ::
             resolver = DependencyResolver(modNew)
-            fh = os.open('file.txt', "r")
+            fh = os.open("file.txt", "r")
             resolver.read_dependency_data(fh)
             resolver.resolveDependencies(modules)
         """
@@ -413,10 +413,10 @@ class DependencyResolver:
             if not module.is_kde_project():
                 project_path = f"third-party/{project_path}"
 
-            logger_depres.debug(f"\tUsing path: 'b[{project_path}]' for item: b[{item}]")
+            logger_depres.debug(f"\tUsing path: \"b[{project_path}]\" for item: b[{item}]")
             return project_path
 
-        logger_depres.debug(f"\tGuessing path: 'b[{path}]' for item: b[{item}]")
+        logger_depres.debug(f"\tGuessing path: \"b[{path}]\" for item: b[{item}]")
         return path
 
     def _resolve_dependencies_for_module_description(self, module_graph: dict, module_desc: dict) -> dict:
@@ -451,7 +451,7 @@ class DependencyResolver:
             if dep_module_graph:
                 previously_selected_branch = self._detect_branch_conflict(module_graph, dep_item, dep_branch)
                 if previously_selected_branch:
-                    logger_depres.error(f"r[Found a dependency conflict in branches ('b[{previously_selected_branch}]' is not 'b[{pretty_dep_branch}]') for b[{dep_item}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{pretty_dep_branch}]\") for b[{dep_item}]! :(")
                     errors["branch_errors"] += 1
                 else:
                     if dep_branch:
@@ -460,7 +460,7 @@ class DependencyResolver:
             else:
                 dep_module = self.module_factory(dep_item)
                 resolved_path = DependencyResolver._get_dependency_path_of(dep_module, dep_item, dep_path)
-                # May not exist, e.g. misspellings or 'virtual' dependencies like kf5umbrella.
+                # May not exist, e.g. misspellings or "virtual" dependencies like kf5umbrella.
                 if not dep_module:
                     logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined module: b[{dep_item}]\n")
 
@@ -534,7 +534,7 @@ class DependencyResolver:
                 logger_depres.debug(f"Module pulled in previously through (transitive) dependencies: {item}")
                 previously_selected_branch = self._detect_branch_conflict(module_graph, item, branch)
                 if previously_selected_branch:
-                    logger_depres.error(f"r[Found a dependency conflict in branches ('b[{previously_selected_branch}]' is not 'b[{branch}]') for b[{item}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{item}]! :(")
                     errors["branch_errors"] += 1
                 elif branch:
                     module_graph[item][branch] = branch
@@ -594,7 +594,7 @@ class DependencyResolver:
         trivial_cycles = errors["trivial_cycles"]
 
         if trivial_cycles:
-            logger_depres.debug(f"Total of 'trivial' dependency cycles detected & eliminated: {trivial_cycles}")
+            logger_depres.debug(f"Total of \"trivial\" dependency cycles detected & eliminated: {trivial_cycles}")
 
         cycles = self._check_dependency_cycles(module_graph)
 
@@ -689,7 +689,7 @@ class DependencyResolver:
             if order:
                 return order
 
-            # Assuming no dependency relation, next sort by 'popularity':
+            # Assuming no dependency relation, next sort by "popularity":
             # the item with the most votes (back edges) is depended on the most
             # so it is probably a good idea to build that one earlier to help
             # maximise the duration of time for which builds can be run in parallel

@@ -27,10 +27,10 @@
 
 - Don't forget to have kde-builder update itself from git!
 
-- You can use the 'branch' and 'tag' options to kde-builder to manually choose
+- You can use the "branch" and "tag" options to kde-builder to manually choose
   the proper git branch or tag to build. With KDE modules you should not
   normally need this. If even these options are not specific enough, then
-  consider the 'revision' option, or manage the source code manually and use
+  consider the "revision" option, or manage the source code manually and use
   `--no-src` for that module.
 
 - You can refer to option values that have been previously set in your

@@ -229,14 +229,14 @@ class ModuleResolver:
         """
         ctx = self.context
         selector_name = selector
-        results: list = []  # Will default to '$selector' if unset by end of sub
+        results: list = []  # Will default to "$selector" if unset by end of sub
 
         # In the remainder of this code, self.defined_modules is basically handling
         # case 1, while self.referenced_modules handles case 2. No `Module`s
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
 
-        # Module selectors beginning with '+' force treatment as a kde-projects
+        # Module selectors beginning with "+" force treatment as a kde-projects
         # module, which means they won't be matched here (we're only looking for
         # sets).
         forced_to_kde_project = selector_name[:1] == "+"
@@ -266,7 +266,7 @@ class ModuleResolver:
             selector = self.defined_modules.get(selector_name, None)
 
             # If the selector doesn't match a name exactly it probably matches
-            # a wildcard prefix. e.g. 'kdeedu' as a selector would pull in all kdeedu/*
+            # a wildcard prefix. e.g. "kdeedu" as a selector would pull in all kdeedu/*
             # modules, but kdeedu is not a module-name itself anymore. In this
             # case just return all the modules in the expanded list.
             if not selector:
@@ -323,7 +323,7 @@ class ModuleResolver:
         # We didn't necessarily fully expand all module-sets available in the
         # input_modules_and_options when we were resolving selectors.
         # Because of this we may need to go a step further and expand out all
-        # remaining module-sets in rcFileModulesAndModuleSets if we have 'guess'
+        # remaining module-sets in rcFileModulesAndModuleSets if we have "guess"
         # modules still left over (since they might be Case 3), and see if we can
         # then successfully match.
 
@@ -453,7 +453,7 @@ class ModuleResolver:
         not actually modified in this process.
 
         Similar to resolve_selectors_into_modules, except that in this case no
-        'guessing' for Modules is allowed; the requested module is returned if
+        "guessing" for Modules is allowed; the requested module is returned if
         present, or None otherwise. Also unlike resolve_selectors_into_modules, no
         exceptions are thrown if the module is not present.
 
