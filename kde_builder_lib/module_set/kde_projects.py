@@ -137,9 +137,6 @@ class ModuleSetKDEProjects(ModuleSet):
             new_module.set_option({"#kde-project-path": result["full_name"]})
             new_module.set_option({"#kde-repo-path": result.get("invent_name", None)})
             new_module.set_option({"#found-by": result["found_by"]})
-            # Temp flag during metadata transition
-            if "nameChangingTo" in result:
-                new_module.set_option({"#upcoming-name-change": result["nameChangingTo"]})
 
             new_module.set_scm_type("proj")
 

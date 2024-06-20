@@ -80,7 +80,7 @@ class KDEProjectsReader:
         with open(filename, "r") as file:
             proj_data = yaml.safe_load(file)
 
-        # This is already 'covered' as a special metadata module, ignore
+        # This is already "covered" as a special metadata module, ignore
         if proj_data["projectpath"] == "repo-management":
             return
 
@@ -96,15 +96,6 @@ class KDEProjectsReader:
             "active": bool(proj_data["repoactive"]),
             "found_by": "direct"  # can be changed in get_modules_for_project
         }
-
-        # Find everything after last /
-        invent_suffix = re.search(r"([^/]+$)", proj_data["repopath"]).group(1)
-        legacy_suffix = re.search(r"([^/]+$)", proj_data["projectpath"]).group(1)
-
-        # We can print a message later for modules where the name will change if
-        # the module is actually used
-        if invent_suffix != legacy_suffix:
-            cur_repository["nameChangingTo"] = invent_suffix
 
         self.repositories[repo_name] = cur_repository
 
