@@ -343,6 +343,11 @@ class BuildSystemKDECMake(BuildSystem):
         else:
             logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
 
+        if module.get_option("generate-clion-project-config"):
+            self.generate_clion_config()
+        else:
+            logger_ide_proj.debug("\tGenerating .idea directory - disabled for this module")
+
         # Use cmake to create the build directory
         if self._safe_run_cmake():
             return False
@@ -417,6 +422,32 @@ class BuildSystemKDECMake(BuildSystem):
         self._write_to_file(f"{config_dir}/extensions.json", extensions_json)
         self._write_to_file(f"{config_dir}/launch.json", launch_json)
         self._write_to_file(f"{config_dir}/tasks.json", tasks_json)
+
+        return True
+
+    def generate_clion_config(self) -> bool:
+        if Debug().pretending():
+            logger_ide_proj.pretend("\tWould have generated .idea directory")
+            return False
+
+        branch_group = self.module.context.get_option("branch-group")
+        project_name = self.module.name
+        if branch_group != "kf6-qt6":
+            project_name += f" ({branch_group})"
+        src_dir = self.module.fullpath("source")
+        config_dir = f"{src_dir}/.idea"
+
+        if os.path.exists(config_dir):
+            if os.path.isdir(config_dir):
+                logger_ide_proj.debug("\tGenerating .idea directory - skipping as it already exists")
+            elif os.path.isfile(config_dir):
+                logger_ide_proj.error("\tGenerating .idea directory - cannot proceed, file .idea exists")
+            return False
+        else:
+            logger_ide_proj.debug(f"\tGenerating .idea directory for {project_name}: {config_dir}")
+
+        os.mkdir(config_dir)
+        self._write_to_file(f"{config_dir}/.name", project_name + "\n")
 
         return True
 

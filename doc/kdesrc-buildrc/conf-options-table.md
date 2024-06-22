@@ -597,6 +597,22 @@ project metadata.
 
 Related command-line option: --directory-layout \<value\>
 
+(conf-generate-clion-project-config)=
+[`generate-clion-project-config`](conf-generate-clion-project-config)
+
+Type: Boolean, Default value: False
+
+Module setting overrides global
+
+Set this option to `true` to make kde-builder create
+CLion project files (.idea directory) in the module source
+directory.
+
+The .idea folder will be created in the project source directory,
+only if it does not already exist.
+
+Related command-line option: [--generate-clion-project-config](#cmdline-generate-clion-project-config)
+
 (conf-generate-vscode-project-config)=
 [`generate-vscode-project-config`](conf-generate-vscode-project-config)
 

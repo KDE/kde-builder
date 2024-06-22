@@ -41,6 +41,7 @@ _arguments \
   "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every module]" \
   "--do-not-compile""[Select a specific set of directories not to be built in a module]"":argument:" \
   "--generate-config""[Installs a base kdesrc-buildrc]" \
+  "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
   "(-! --ignore-modules)"{-!,--ignore-modules}"[Do not include specified modules in the update/build process]"":::_kde-builder_modules" \

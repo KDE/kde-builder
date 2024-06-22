@@ -405,6 +405,11 @@ This allows you to change the directory where modules will be installed
 to. This option implies [`--reconfigure`](#cmdline-reconfigure), but
 using [`--refresh-build`](#cmdline-refresh-build) may still be required.
 
+(cmdline-generate-clion-project-config)=
+[`--generate-clion-project-config`](cmdline-generate-clion-project-config), `--no-generate-clion-project-config`  
+Generate a `.idea` directory with configurations for building and
+debugging in CLion. This option is disabled by default.
+
 (cmdline-generate-vscode-project-config)=
 [`--generate-vscode-project-config`](cmdline-generate-vscode-project-config), `--no-generate-vscode-project-config`  
 Generate a `.vscode` directory with configurations for building and
