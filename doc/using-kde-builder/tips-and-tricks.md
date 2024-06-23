@@ -58,10 +58,6 @@
 - Annoyed by the default directory layout? Consider changing the `directory-layout`
   configuration file option.
 
-- kde-builder supports building from behind a proxy, for all you corporate
-  types trying to get the latest-and-greatest desktop. Just make sure your
-  compilation toolchain is up to the challenge....
-
 - You can use the `custom-build-command` option to setup a custom build tool
   (assumed to be make-compatible). For instance, cmake supports the `ninja`
   tool, and kde-builder can use `ninja` as well via this option.

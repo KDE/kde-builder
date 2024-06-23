@@ -43,7 +43,6 @@ _arguments \
   "--generate-config""[Installs a base kdesrc-buildrc]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
-  "--http-proxy""[Use specified URL as a proxy server for any HTTP network communications]"":argument:" \
   "(-! --ignore-modules)"{-!,--ignore-modules}"[Do not include specified modules in the update/build process]"":::_kde-builder_modules" \
   "--initial-setup""[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc]" \
   "(--install-after-build --no-install-after-build)"{--install-after-build,--no-install-after-build}"[Install the package after it successfully builds]" \

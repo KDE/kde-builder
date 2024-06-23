@@ -162,7 +162,6 @@ class BuildContext(Module):
             "directory-layout": "flat",
             "dest-dir": '${MODULE}',  # single quotes used on purpose!
             "do-not-compile": "",
-            "http-proxy": "",  # Proxy server to use for HTTP.
             "install-dir": os.getenv("HOME") + "/kde/usr",
             "libname": self.libname,
             "libpath": "",
@@ -270,11 +269,6 @@ class BuildContext(Module):
 
         # Get ready for logged output.
         Debug().set_log_file(self.get_log_dir_for(self) + "/build-log")
-
-        # # Propagate HTTP proxy through environment unless overridden.
-        proxy = self.get_option("http-proxy")
-        if proxy and "http_proxy" not in os.environ:
-            self.queue_environment_variable("http_proxy", proxy)
 
     def reset_environment(self) -> None:
         """

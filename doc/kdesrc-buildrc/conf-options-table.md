@@ -64,10 +64,6 @@ protocol which is much better supported is the `https` protocol used for Interne
 If you are using one of these constrained networks you can set this option to `https`. In any other situation you
 should not set this option, as the default protocol is most efficient.
 
-```{tip}
-You may also need the [http-proxy](#conf-http-proxy) option if an HTTP proxy is also needed for network traffic.
-```
-
 This option only applies to modules that are [KDE projects](#kde-projects-module-sets).
 
 ```{note}
@@ -569,22 +565,6 @@ repository are filled in to the values set by this option.
 
 The value must be specified in the form
 `User Name <email@example.com>`.
-
-(conf-http-proxy)=
-[`http-proxy`](conf-http-proxy)
-
-Type: String
-
-This option, if set, uses the specified URL as a proxy server to use
-for any HTTP network communications (for example, when downloading the
-[KDE project database](#kde-projects-module-sets)).
-
-In addition, kde-builder will try to ensure that the tools it
-depends on also use that proxy server, if possible, by setting the
-`http_proxy` environment variable to the indicated server,
-_if that environment variable is not already set_.
-
-Related command-line option: --http-proxy \<value\>
 
 (conf-directory-layout)=
 [`directory-layout`](conf-directory-layout)
