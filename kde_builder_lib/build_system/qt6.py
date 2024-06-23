@@ -25,8 +25,10 @@ class BuildSystemQt6(BuildSystemKDECMake):
         return "Qt6"
 
     # @override
-    def prepare_module_build_environment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
+    def prepare_module_build_environment(self) -> None:
         # We're installing Qt6 modules, make sure our Qt directory matches our
         # install prefix so that environment variables are properly set.
+        module = self.module
+        prefix = self.module.installation_path()
         module.set_option({"qt-install-dir": prefix})
-        return super().prepare_module_build_environment(ctx, module, prefix)
+        return super().prepare_module_build_environment()

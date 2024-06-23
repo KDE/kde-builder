@@ -219,12 +219,16 @@ class BuildSystemKDECMake(BuildSystem):
         return "KDE CMake"
 
     # @override
-    def prepare_module_build_environment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
+    def prepare_module_build_environment(self) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
         set up any needed environment variables, build context settings, etc., in preparation
         for the build and install phases.
         """
+
+        module = self.module
+        ctx = self.module.context
+        prefix = self.module.installation_path()
 
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
         # Let the toolchain files/definitions take care of themselves.

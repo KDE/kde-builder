@@ -138,7 +138,7 @@ class BuildSystem:
             return f"{builddir}/{conf_file_key} is missing"
         return ""
 
-    def prepare_module_build_environment(self, ctx: BuildContext, module: Module, prefix: str) -> None:
+    def prepare_module_build_environment(self) -> None:
         """
         Called by the module being built before it runs its build/install process. Should
         set up any needed environment variables, build context settings, etc., in preparation

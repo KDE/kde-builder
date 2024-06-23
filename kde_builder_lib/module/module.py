@@ -550,7 +550,6 @@ class Module(OptionsBase):
         before forking off commands for e.g. updates, builds, installs, etc.
         """
         ctx = self.context
-        prefix = self.installation_path()
 
         # Add global set-envs and context
         self.context.apply_user_environment()
@@ -587,7 +586,7 @@ class Module(OptionsBase):
             if libpath:
                 ctx.prepend_environment_value("LD_LIBRARY_PATH", libpath)
 
-        build_system.prepare_module_build_environment(ctx, self, prefix)
+        build_system.prepare_module_build_environment()
 
         # Read in user environment defines
         if self.name != ctx.name:  # pl2py: in perl the compare function was called here. See comment there. We just compare here without that function.
