@@ -341,8 +341,7 @@ class BuildSystemKDECMake(BuildSystem):
         else:
             logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
 
-        # Use cmake to create the build directory (sh script return value
-        # semantics).
+        # Use cmake to create the build directory
         if self._safe_run_cmake():
             return False
 
@@ -544,8 +543,7 @@ class BuildSystemKDECMake(BuildSystem):
             logger_buildsystem.debug("Enabling upload of test results")
             commands.append("-DBUILD_experimental:BOOL=ON")
 
-        for item in reversed(["cmake", "-B", ".", "-S", srcdir, "-G", generator]):
-            commands.insert(0, item)  # Add to beginning of list.
+        commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
 
         old_options = module.get_persistent_option("last-cmake-options") or ""
         builddir = module.fullpath("build")

@@ -42,25 +42,9 @@ logger_util = KBLogger.getLogger("util")
 
 
 class Util:
-    """
-    Useful utilities, which are exported into the calling module's namespace by default.
-    """
 
     @staticmethod
-    def list_has(list_ref: list, value):
-        """
-        Function to work around a Perl language limitation.
-        Parameters:
-            list_ref: The list to search. ALWAYS.
-            value: The value to search for.
-        Returns:
-             True if the value is in the list
-        No need to use it in Python. We can just use `if "value" in list_ref`.
-        """
-        return value in list_ref
-
-    @staticmethod
-    def locate_exe(prog: str, preferred: list[str] | None = None):
+    def locate_exe(prog: str, preferred: list[str] | None = None) -> str | None:
         """
         Function to return the path to the given executable based on
         either the given paths or the current PATH.
@@ -114,14 +98,14 @@ class Util:
         return val
 
     @staticmethod
-    def safe_unlink(path):
+    def safe_unlink(path) -> None:
         """
         Function to unlink the given symlink if global-pretend isn't set.
         """
         if Debug().pretending():
             logger_util.pretend(f"\tWould have unlinked {path}.")
-            return 1  # Return true
-        return os.unlink(path)
+            return
+        os.unlink(path)
 
     @staticmethod
     def safe_system(cmd_list: list[str]) -> int:
@@ -140,7 +124,7 @@ class Util:
         return 0  # Return true (success code)
 
     @staticmethod
-    def p_chdir(directory):
+    def p_chdir(directory) -> None:
         """
         Is exactly like "chdir", but it will also print out a message saying that
         we're switching to the directory when debugging.
@@ -151,11 +135,11 @@ class Util:
             os.chdir(directory)
         except OSError as e:
             if Debug().pretending():
-                return 1
+                return
             BuildException.croak_runtime(f"Could not change to directory {directory}: {e}")
 
     @staticmethod
-    def super_mkdir(pathname):
+    def super_mkdir(pathname) -> bool:
         """
         Creates a directory, including any parent directories that may also need
         created. Does nothing in pretend mode (but it does remember that it would
@@ -177,7 +161,7 @@ class Util:
             return True if os.path.exists(pathname) else False
 
     @staticmethod
-    def file_digest_md5(file_name):
+    def file_digest_md5(file_name) -> str:
         """
         Calculates the MD5 digest of a file already on-disk. The digest is
         returned as a hex string digest as from md5.hexdigest
@@ -199,7 +183,7 @@ class Util:
         return md5.hexdigest()
 
     @staticmethod
-    def disable_locale_message_translation():
+    def disable_locale_message_translation() -> None:
         """
         This function is intended to disable the message translation catalog
         settings in the program environment, so that any child processes executed
@@ -275,7 +259,7 @@ class Util:
         return lines
 
     @staticmethod
-    def prettify_seconds(elapsed: int):
+    def prettify_seconds(elapsed: int) -> str:
         """
         Function to return a string suitable for displaying an elapsed time,
         (like a stopwatch) would. The first parameter is the number of seconds
@@ -594,9 +578,9 @@ class Util:
         return exitcode
 
     @staticmethod
-    def split_quoted_on_whitespace(line):
+    def split_quoted_on_whitespace(line) -> list[str]:
         """
-        This function acts like split(" ", arg) except that double-quoted strings
+        This function acts like `line.split(" ")` except that double-quoted strings
         are not split in the process.
 
         Parameters:
@@ -635,28 +619,6 @@ class Util:
                 return False
 
         return fh
-
-    @staticmethod
-    def any(sub_ref, list_ref):
-        """
-        Returns true if the given function returns true for any item in the given list.
-        """
-        return any(sub_ref(item) for item in list_ref)
-
-    # pl2py: perl specific, not needed
-    # @staticmethod
-    # def unique_items(*args):
-    #     """
-    #     Returns unique items of the list. Order not guaranteed.
-    #     """
-    #     # See perlfaq4
-    #     seen = {}
-    #     results = []
-    #     for item in args:
-    #         if item not in seen:
-    #             seen[item] += 1
-    #             results.append(item)
-    #     return results
 
     @staticmethod
     def safe_rmtree(path) -> bool:
@@ -711,21 +673,6 @@ class Util:
         for arg in args:
             md5_hash.update(arg.encode())
         return base64.b64encode(md5_hash.digest()).decode().rstrip("=")
-
-    @staticmethod
-    # Can just use `if not os.listdir(dir_path)` instead.
-    def is_dir_empty(dir_path):
-        """
-        Utility function to see if a directory path is empty or not
-        """
-        try:
-            with os.scandir(dir_path) as entries:
-                for entry in entries:
-                    if not entry.name == "." and not entry.name == "..":
-                        return False  # not empty
-        except OSError:
-            return False
-        return True
 
     @staticmethod
     def safe_lndir(from_path: str, to_path: str) -> int:
@@ -889,7 +836,7 @@ class Util:
             return 0  # an error
 
     @staticmethod
-    def remake_symlink(src, dst):
+    def remake_symlink(src, dst) -> int:
         # Make a symlink from dst to src. If symlink exists, ensures that it points to the requested src.
         # Parameters:
         #   src - path to point to (symlink target)

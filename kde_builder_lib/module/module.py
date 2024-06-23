@@ -407,9 +407,7 @@ class Module(OptionsBase):
             # because the user has asked that it be completely rebuilt.
             logger_module.info(f"\tPreparing build system for y[{self}].")
 
-            # Check to see if we're actually supposed to go through the
-            # cleaning process.
-            if not self.get_option("#cancel-clean") and not build_system.clean_build_system():
+            if not build_system.clean_build_system():
                 logger_module.warning(f"\tUnable to clean r[{self}]!")
                 return False
 

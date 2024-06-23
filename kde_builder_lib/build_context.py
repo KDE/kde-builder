@@ -311,7 +311,7 @@ class BuildContext(Module):
             os.environ[key] = value
             logger_buildcontext.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
 
-    def prepend_environment_value(self, env_name: str, items: str) -> None:  # pl2py: the items was a list in perl, but it was never used as list. So will type it as str.
+    def prepend_environment_value(self, env_name: str, path_element: str) -> None:
         """
         Adds the given library paths to the path already given in an environment
         variable. In addition, detected "system paths" are stripped to ensure
@@ -328,8 +328,7 @@ class BuildContext(Module):
 
         Parameters:
             env_name: The name of the environment variable to modify
-            items: Prepended to the current environment path, in
-                the order given. (i.e. param1, param2, param3 -> param1:param2:param3:existing)
+            path_element: The value to be prepended to the current environment path. I.e. passing "/some/new/path" would set the value to "/some/new/path:/already/existing/path".
         """
 
         if env_name in self.env:
@@ -352,14 +351,16 @@ class BuildContext(Module):
             else:
                 logger_buildcontext.debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
 
-        # Filter out entries to add that are already in the environment from
-        # the system.
-        for path in [item for item in [items] if item in cur_paths]:
-            logger_buildcontext.debug(f"\tNot prepending y[{path}] to y[{env_name}] as it appears " + f"to already be defined in y[{env_name}].")
+        # Filter out entries to add that are already in the environment from the system.
+        if path_element in cur_paths:
+            logger_buildcontext.debug(f"\tNot prepending y[{path_element}] to y[{env_name}] as it appears " + f"to already be defined in y[{env_name}].")
 
-        items = [item for item in [items] if item not in cur_paths]
+        if path_element not in cur_paths:
+            join_list = [path_element] + cur_paths
+        else:
+            join_list = cur_paths
 
-        env_value = ":".join(items + cur_paths)
+        env_value = ":".join(join_list)
 
         env_value = re.sub(r"^:*", "", env_value)
         env_value = re.sub(r":*$", "", env_value)  # Remove leading/trailing colons
