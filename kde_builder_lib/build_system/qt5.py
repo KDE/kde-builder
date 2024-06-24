@@ -53,7 +53,7 @@ class BuildSystemQt5(BuildSystem):
 
         # Get the user's CXXFLAGS
         cxxflags = module.get_option("cxxflags")
-        module.context.queue_environment_variable("CXXFLAGS", cxxflags)
+        module.queue_environment_variable("CXXFLAGS", cxxflags)
 
         installdir = module.get_option("install-dir")
         qt_installdir = module.get_option("qt-install-dir")

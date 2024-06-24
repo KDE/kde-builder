@@ -542,7 +542,7 @@ class Module(OptionsBase):
             env_dict = self.get_option("set-env", "module")
 
         for key, value in env_dict.items():
-            ctx.queue_environment_variable(key, value)
+            self.queue_environment_variable(key, value)
 
     def setup_environment(self) -> None:
         """
@@ -931,3 +931,16 @@ class Module(OptionsBase):
         Adds the given message to the list of post-build messages to show to the user
         """
         self.post_build_msgs.append(new_msg)
+
+    def queue_environment_variable(self, key: str, value: str) -> None:
+        """
+        Adds an environment variable and value to the list of environment
+        variables to apply for the next subprocess execution.
+
+        Note that these changes are /not/ reflected in the current environment,
+        so if you are doing something that requires that kind of update you
+        should do that yourself (but remember to have some way to restore the old
+        value if necessary).
+        """
+        logger_module.debug(f"\tQueueing g[{key}] to be set to y[{value}]")
+        self.context.env[key] = value

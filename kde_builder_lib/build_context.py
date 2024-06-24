@@ -276,25 +276,6 @@ class BuildContext(Module):
         """
         self.env = {}
 
-    def queue_environment_variable(self, key: str, value: str) -> None:
-        """
-        Adds an environment variable and value to the list of environment
-        variables to apply for the next subprocess execution.
-
-        Note that these changes are /not/ reflected in the current environment,
-        so if you are doing something that requires that kind of update you
-        should do that yourself (but remember to have some way to restore the old
-        value if necessary).
-
-        In order to keep compatibility with the old "setenv" sub, no action is
-        taken if the value is not equivalent to boolean true.
-        """
-        if not value:
-            return
-
-        logger_buildcontext.debug(f"\tQueueing g[{key}] to be set to y[{value}]")
-        self.env[key] = value
-
     def commit_environment_changes(self) -> None:
         """
         Applies all changes queued by queue_environment_variable to the actual
