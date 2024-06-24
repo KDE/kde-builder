@@ -531,15 +531,7 @@ class Module(OptionsBase):
         """
         Integrates "set-env" option to the build context environment
         """
-        ctx = self.context
-
-        # Let's see if the user has set env vars to be set.
-        # Note the global set-env must be checked separately anyways, so
-        # we limit inheritance when searching.
-        if ctx.name == self.name:
-            env_dict = ctx.get_option("set-env")
-        else:
-            env_dict = self.get_option("set-env", "module")
+        env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
 
         for key, value in env_dict.items():
             self.queue_environment_variable(key, value)
@@ -551,7 +543,7 @@ class Module(OptionsBase):
         """
         ctx = self.context
 
-        # Add global set-envs and context
+        # Add global set-envs
         self.context.apply_user_environment()
 
         # Build system's environment injection
@@ -588,9 +580,8 @@ class Module(OptionsBase):
 
         build_system.prepare_module_build_environment()
 
-        # Read in user environment defines
-        if self.name != ctx.name:  # pl2py: in perl the compare function was called here. See comment there. We just compare here without that function.
-            self.apply_user_environment()
+        # Add module's set-envs
+        self.apply_user_environment()
 
     def get_log_dir(self) -> str:
         """
@@ -608,17 +599,6 @@ class Module(OptionsBase):
         Use when you know you're going to create a new log
         """
         return self.context.get_log_path_for(self, path)
-
-    # This is left here only for reference. todo After dropping perl version, we can delete this comment.
-    # def compare(self, other):
-    #     # pl2py: the only place where this function was called in perl was the comparison operator in the end of setup_environment function.
-    #     # It returned -1, 0, 1 depending on if self.name is less, equal or bigger than ctx.name.
-    #     # The interesting thing is that despite function returns some value, when it arrives to statement `my $n = $self == $ctx;` it became "converted" to the wanted.
-    #     # For example, when names are different, and -1 is returned by compare, $n gets the empty string (which reads as false).
-    #     # And if names are the same, (for example, I intentionally made a module called "global", 0 is returned, and 1 is arrived to $n (which reads as true).
-    #     # So instead of using this function, we will just compare as needed in the place where that comparison was invoked.
-    #     # But I (Andrew Shark) will place the code which was the effect of calling this comparison here, for reference.
-    #     return self.name == other.name
 
     def update(self, ipc, ctx) -> bool:
         module_name = self.name
