@@ -218,7 +218,6 @@ class BuildContext(Module):
         }
         self.rc_files = BuildContext.rcfiles
         self.rc_file = None
-        self.env = {}
         self.persistent_options = {}  # These are kept across multiple script runs
         self.ignore_list = []  # List of KDE project paths to ignore completely
         self.kde_projects_metadata = None  # Enumeration of kde-projects
@@ -269,79 +268,6 @@ class BuildContext(Module):
 
         # Get ready for logged output.
         Debug().set_log_file(self.get_log_dir_for(self) + "/build-log")
-
-    def reset_environment(self) -> None:
-        """
-        Clears the list of environment variables to set for log_command runs.
-        """
-        self.env = {}
-
-    def commit_environment_changes(self) -> None:
-        """
-        Applies all changes queued by queue_environment_variable to the actual
-        environment irretrievably. Use this before exec()'ing another child, for
-        instance.
-        """
-        for key, value in self.env.items():
-            os.environ[key] = value
-            logger_buildcontext.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
-
-    def prepend_environment_value(self, env_name: str, path_element: str) -> None:
-        """
-        Adds the given library paths to the path already given in an environment
-        variable. In addition, detected "system paths" are stripped to ensure
-        that we don't inadvertently re-add a system path to be promoted over the
-        custom code we're compiling (for instance, when a system Qt is used and
-        installed to /usr).
-
-        If the environment variable to be modified has already been queued using
-        queue_environment_variable, then that (queued) value will be modified and
-        will take effect with the next forked subprocess.
-
-        Otherwise, the current environment variable value will be used, and then
-        queued. Either way the current environment will be unmodified afterward.
-
-        Parameters:
-            env_name: The name of the environment variable to modify
-            path_element: The value to be prepended to the current environment path. I.e. passing "/some/new/path" would set the value to "/some/new/path:/already/existing/path".
-        """
-
-        if env_name in self.env:
-            cur_paths = self.env[env_name].split(":")
-        elif env_name in os.environ:
-            cur_paths = os.environ.get(env_name, "").split(":")
-        else:
-            cur_paths = []
-
-        # pl2py: this is kde-builder specific code (not from kdesrc-build).
-        # Some modules use python packages in their build process. For example, breeze-gtk uses python-cairo.
-        # We want the build process to use system installed package rather than installed in virtual environment.
-        # We remove the current virtual environment path from PATH, because Cmake FindPython3 module always considers PATH,
-        # see https://cmake.org/cmake/help/latest/module/FindPython3.html
-        # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
-        if sys.prefix != sys.base_prefix and env_name == "PATH":
-            if f"{sys.prefix}/bin" in cur_paths:
-                logger_buildcontext.debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
-                cur_paths.remove(f"{sys.prefix}/bin")
-            else:
-                logger_buildcontext.debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
-
-        # Filter out entries to add that are already in the environment from the system.
-        if path_element in cur_paths:
-            logger_buildcontext.debug(f"\tNot prepending y[{path_element}] to y[{env_name}] as it appears " + f"to already be defined in y[{env_name}].")
-
-        if path_element not in cur_paths:
-            join_list = [path_element] + cur_paths
-        else:
-            join_list = cur_paths
-
-        env_value = ":".join(join_list)
-
-        env_value = re.sub(r"^:*", "", env_value)
-        env_value = re.sub(r":*$", "", env_value)  # Remove leading/trailing colons
-        env_value = re.sub(r":+", ":", env_value)  # Remove duplicate colons
-
-        self.queue_environment_variable(env_name, env_value)
 
     def take_lock(self) -> bool:
         """

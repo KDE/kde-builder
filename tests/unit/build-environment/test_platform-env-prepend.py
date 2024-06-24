@@ -32,12 +32,12 @@ def test_environment_prepend():
 
     mod.setup_environment()
 
-    assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
-    assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
+    assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
+    assert no_bare_bin(mod.env["PATH"]), "/bin wasn't prepended to PATH"
 
     # --
 
-    ctx.reset_environment()
+    mod.reset_environment()
 
     mod = Module(ctx, "test")
     new_path = os.environ.get("PATH")
@@ -51,12 +51,12 @@ def test_environment_prepend():
 
     mod.setup_environment()
 
-    assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
-    assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
+    assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
+    assert no_bare_bin(mod.env["PATH"]), "/bin wasn't prepended to PATH"
 
     # --
 
-    ctx.reset_environment()
+    mod.reset_environment()
 
     mod = Module(ctx, "test")
     new_path = os.environ.get("PATH")
@@ -70,14 +70,14 @@ def test_environment_prepend():
 
     mod.setup_environment()
 
-    assert "PATH" in ctx.env, "Entry created for PATH when setting up mod env"
-    assert no_bare_bin(ctx.env["PATH"]), "/bin wasn't prepended to PATH"
+    assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
+    assert no_bare_bin(mod.env["PATH"]), "/bin wasn't prepended to PATH"
 
     # --
 
     # Ensure binpath and libpath options work
 
-    ctx.reset_environment()
+    mod.reset_environment()
 
     mod = Module(ctx, "test")
     os.environ["PATH"] = "/bin:/usr/bin"
@@ -87,5 +87,5 @@ def test_environment_prepend():
 
     mod.setup_environment()
 
-    assert re.search("/tmp/fake/bin", ctx.env["PATH"]), "Ensure `binpath` present in generated PATH"
-    assert re.search("/tmp/fake/lib", ctx.env["LD_LIBRARY_PATH"]), "Ensure `libpath` present in generated LD_LIBRARY_PATH"
+    assert re.search("/tmp/fake/bin", mod.env["PATH"]), "Ensure `binpath` present in generated PATH"
+    assert re.search("/tmp/fake/lib", mod.env["LD_LIBRARY_PATH"]), "Ensure `libpath` present in generated LD_LIBRARY_PATH"

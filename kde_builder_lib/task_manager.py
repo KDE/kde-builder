@@ -185,7 +185,7 @@ class TaskManager:
         Returns:
              The failure phase, or 0 on success.
         """
-        ctx.reset_environment()
+        module.reset_environment()
         module.setup_environment()
 
         # Cache module directories, e.g. to be consumed in kde-builder --run

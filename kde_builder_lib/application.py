@@ -1140,7 +1140,7 @@ class Application:
         failed = False
 
         for module in modules:
-            ctx.reset_environment()
+            module.reset_environment()
             failed = not module.install() or failed
 
             if failed and module.get_option("stop-on-failure"):
@@ -1174,7 +1174,7 @@ class Application:
         failed = False
 
         for module in modules:
-            ctx.reset_environment()
+            module.reset_environment()
             failed = not module.uninstall() or failed
 
             if failed and module.get_option("stop-on-failure"):

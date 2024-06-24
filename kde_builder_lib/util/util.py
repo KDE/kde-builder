@@ -389,7 +389,7 @@ class Util:
             setproctitle.setproctitle("kde-builder run_logged_command: " + " ".join(command))
 
             # Apply altered environment variables.
-            module.context.commit_environment_changes()
+            module.commit_environment_changes()
 
             signal.signal(signal.SIGPIPE, signal.SIG_IGN)
 
