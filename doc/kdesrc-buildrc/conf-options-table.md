@@ -443,18 +443,16 @@ Related command-line option: --cmake-options \<value\>
 
 Type: Boolean, Default value: True
 
-Enables the generation of a `compile_commands.json` via
-CMake inside the build directory.
+Enables the generation of a `compile_commands.json` via CMake inside the build directory.
 
 Related command-line option: --compile-commands-export, --no-compile-commands-export
 
 (conf-compile-commands-linking)=
 [`compile-commands-linking`](conf-compile-commands-linking)
 
-Type: Boolean, Default value: False
+Type: Boolean, Default value: True
 
-Enables the creation of symbolic links from
-`compile_commands.json` generated via CMake inside the build
+Enables the creation of symbolic links from `compile_commands.json` generated via CMake inside the build
 directory to the matching source directory.
 
 Related command-line option: --compile-commands-linking, --no-compile-commands-linking

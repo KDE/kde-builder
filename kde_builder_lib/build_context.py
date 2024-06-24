@@ -130,8 +130,8 @@ class BuildContext(Module):
         # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
         self.global_options_with_negatable_form = {
             "async": True,
-            "compile-commands-export": True,  # 2021-02-06 allow to generate compile_commands.json via cmake, for clangd tooling
-            "compile-commands-linking": False,  # 2021-02-06 link generated compile_commands.json back to the source directory
+            "compile-commands-export": True,
+            "compile-commands-linking": True,
             "delete-my-patches": False,  # Should only be set from cmdline
             "delete-my-settings": False,  # Should only be set from cmdline
             "disable-agent-check": False,  # If true we don't check on ssh-agent
