@@ -285,17 +285,13 @@ class BuildSystemKDECMake(BuildSystem):
         # Step 1: Ensure the tests are built, oh wait we already did that when we ran
         # CMake :)
 
-        make_target = "test"
-        if module.get_option("run-tests") == "upload":
-            make_target = "Experimental"
-
         logger_buildsystem.info("\tRunning test suite...")
 
         # Step 2: Run the tests.
         build_command = self.default_build_command()
         num_tests = "Some"  # overwritten by a specific number, hopefully
 
-        cmd = UtilLoggedSubprocess().module(module).log_to("test-results").set_command([build_command, make_target])
+        cmd = UtilLoggedSubprocess().module(module).log_to("test-results").set_command([build_command, "test"])
 
         def on_child_output(line):
             match = re.match(r"([0-9]+) tests failed out of", line)
@@ -540,10 +536,6 @@ class BuildSystemKDECMake(BuildSystem):
         if module.get_option("run-tests") and [command for command in commands if not re.match(r"^\s*-DBUILD_TESTING(:BOOL)?=(ON|TRUE|1)\s*$", command)]:
             logger_buildsystem.debug("Enabling tests")
             commands.append("-DBUILD_TESTING:BOOL=ON")
-
-        if module.get_option("run-tests") == "upload":
-            logger_buildsystem.debug("Enabling upload of test results")
-            commands.append("-DBUILD_experimental:BOOL=ON")
 
         commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
 

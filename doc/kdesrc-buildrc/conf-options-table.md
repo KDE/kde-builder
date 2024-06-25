@@ -883,7 +883,7 @@ If set to `true`, then the module will be built with
 support for running its test suite, and the test suite will be executed
 as part of the build process. kde-builder will show a simple report of
 the test results. This is useful for developers or those who want to
-ensure their system is setup correctly.
+ensure their system is set up correctly.
 
 Related command-line option: --run-tests, --no-run-tests
 

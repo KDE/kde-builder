@@ -140,7 +140,7 @@ class BuildContext(Module):
             "install-after-build": True,
             "install-login-session": True,
             "purge-old-logs": True,
-            "run-tests": False,  # 1 = make test, upload = make Experimental  # todo why boolean option may have "upload" value?
+            "run-tests": False,
             "stop-on-failure": True,
             "use-clean-install": False,
             "use-idle-io-priority": False,

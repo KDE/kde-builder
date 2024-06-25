@@ -257,7 +257,7 @@ class BuildSystem:
         """
         return "Makefile"
 
-    def run_testsuite(self) -> bool:
+    def run_testsuite(self) -> False:
         """
         Runs the testsuite for the given module.
         Returns true if a testsuite is present and all tests passed, false otherwise.
