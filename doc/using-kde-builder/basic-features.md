@@ -83,10 +83,9 @@ permanently, then you need to adjust the [niceness](#conf-niceness)
 setting in the [configuration file](../getting-started/configure-data). The
 [niceness](#conf-niceness) setting controls how "nice" kde-builder is
 to other programs. In other words, having a higher
-[niceness](#conf-niceness) gives kde-builder a lower priority. So to
+niceness gives kde-builder a lower priority. So to
 give kde-builder a higher priority, reduce the
-[niceness](#conf-niceness) (and vice versa). The
-[niceness](#conf-niceness) can go from 0 (not nice at all, highest
+niceness (and vice versa). The niceness can go from 0 (not nice at all, highest
 priority) to 20 (super nice, lowest priority).
 
 You can also temporarily change the priority for kde-builder by using

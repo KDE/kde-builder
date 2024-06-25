@@ -332,7 +332,7 @@ class Cmdline:
         if args.metadata_only:
             found_options["metadata-only"] = True
 
-        if args.niceness != 10:
+        if args.niceness != "10":
             found_options["niceness"] = args.niceness
 
         if args.no_metadata:

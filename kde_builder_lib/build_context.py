@@ -122,7 +122,7 @@ class BuildContext(Module):
             "build-when-unchanged": True,
             "colorful-output": True,
             "ignore-modules": "",
-            "niceness": "10",  # todo convert to int?
+            "niceness": "10",  # Needs to be a string, not int
             "pretend": "",
             "refresh-build": "",
         }

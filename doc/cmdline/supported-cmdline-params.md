@@ -438,12 +438,12 @@ and should be in the range of 0-20. 0 is highest priority (because it is
 the least "nice"), 20 is the lowest priority. This option defaults to 10.  
 
 Changes the CPU priority given to `kde-builder` (and all processes used
-by `kde-builder` e.g. `make`(1)). \<foo\> should be an integer number
+by `kde-builder` e.g. `make`(1)). Value should be an integer number
 between -20 and 19. Positive values are "nicer" to the rest of the
 system (i.e. lower priority).
 
 Note that the possible priorities available on your system may be
-different than listed here, see `nice`(2) for more information. Note
+different from listed here, see `nice`(2) for more information. Note
 also that this only changes *CPU* priority, often you want to change
 *I/O* priority on systems where that is supported. There is no
 command-line option for I/O priority adjustment, but there is a
