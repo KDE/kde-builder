@@ -17,8 +17,8 @@ def mock_buildsystem(monkeypatch):
     BuildSystem.made_arguments = []
 
     # Defang the build command and just record the args passed to it
-    def mock_safe_make(self, opts_ref):
-        BuildSystem.made_arguments = opts_ref["make-options"]
+    def mock_safe_make(self, opts):
+        BuildSystem.made_arguments = opts["make-options"]
         return {"was_successful": 1}
 
     monkeypatch.setattr(BuildSystem, "safe_make", mock_safe_make)
@@ -55,14 +55,14 @@ def test_empty_numcores(mock_buildsystem):
     ]
 
     for item in test_matrix:
-        test_string, result_ref, test_name = item
+        test_string, result, test_name = item
         module.set_option({test_option: test_string})
         build_system.build_internal(test_option)
-        assert BuildSystem.made_arguments == result_ref, test_name
+        assert BuildSystem.made_arguments == result, test_name
 
         module.set_option({"num-cores": str(max_cores - 1)})
         build_system.build_internal(test_option)
-        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
+        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result], f"{test_name} with num-cores set"
         module.set_option({"num-cores": ""})
 
     test_option = "ninja-options"
@@ -70,12 +70,12 @@ def test_empty_numcores(mock_buildsystem):
     module.set_option({"cmake-generator": "Kate - Ninja"})
 
     for item in test_matrix:
-        test_string, result_ref, test_name = item
+        test_string, result, test_name = item
         module.set_option({test_option: test_string})
         build_system.build_internal(test_option)
-        assert BuildSystem.made_arguments == result_ref, test_name
+        assert BuildSystem.made_arguments == result, test_name
 
         module.set_option({"num-cores": str(max_cores - 1)})
         build_system.build_internal(test_option)
-        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result_ref], f"{test_name} with num-cores set"
+        assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result], f"{test_name} with num-cores set"
         module.set_option({"num-cores": ""})

@@ -152,7 +152,6 @@ class DebugOrderHints:
         return _compare_debug_order
 
     @staticmethod
-    def sort_failures_in_debug_order(module_graph, extra_debug_info, failures_ref: list[Module]) -> list[Module]:
-        failures = failures_ref
+    def sort_failures_in_debug_order(module_graph, extra_debug_info, failures: list[Module]) -> list[Module]:
         prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(module_graph, extra_debug_info)))
         return prioritised

@@ -106,15 +106,15 @@ class KDEProjectsReader:
         e.g. kde/kdebase/kde-runtime would be matched by a proj of either
         "kdebase/kde-runtime" or simply "kde-runtime".
         """
-        repository_ref = self.repositories
+        repositories = self.repositories
         results = []
 
         def find_results():
-            match_list = [key for key in sorted(repository_ref.keys()) if KDEProjectsReader._project_path_matches_wildcard_search(repository_ref[key]["full_name"], proj)]
+            match_list = [key for key in sorted(repositories.keys()) if KDEProjectsReader._project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
 
             if re.search(r"\*", proj):
                 for key in match_list:
-                    repository_ref[key]["found_by"] = "wildcard"
+                    repositories[key]["found_by"] = "wildcard"
 
             results.extend(match_list)
 
@@ -135,14 +135,14 @@ class KDEProjectsReader:
 
         # If still no wildcard and no "/" then we can use direct lookup by module
         # name.
-        if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repository_ref:
+        if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repositories:
             results.append(proj)
         else:
             find_results()
 
         # As we run find_results twice (for example, when proj is "workspace"), remove duplicates
         results = list(set(results))
-        ret = [repository_ref[result] for result in results]
+        ret = [repositories[result] for result in results]
         return ret
 
     @staticmethod

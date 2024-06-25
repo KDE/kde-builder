@@ -146,7 +146,7 @@ class ModuleSet(OptionsBase):
         The modules returned have not been added to the build context.
         """
         module_list = []  # module names converted to `Module` objects.
-        options_ref = self.options
+        options = self.options
 
         # Note: This returns a dict, not a string.
         repo_set = ctx.get_option("git-repository-base")
@@ -167,7 +167,7 @@ class ModuleSet(OptionsBase):
 
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
-            selected_repo = repo_set[options_ref["repository"]]
+            selected_repo = repo_set[options["repository"]]
             new_module.set_option({"repository": selected_repo + module_item})
 
         if not self.modules_to_find():

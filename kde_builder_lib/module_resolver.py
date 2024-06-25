@@ -176,7 +176,7 @@ class ModuleResolver:
         return
 
     @staticmethod
-    def _list_referenced_modules(module_refs: list[Module | ModuleSet]) -> dict:
+    def _list_referenced_modules(modules_and_modulesets: list[Module | ModuleSet]) -> dict:
         """
         Returns a dict of all module names referenced in use-module
         declarations for any ModuleSet included within the input list. Each entry
@@ -185,7 +185,7 @@ class ModuleResolver:
         """
         set_entry_lookup_dict = {}
 
-        for module_set in [module_ref for module_ref in module_refs if isinstance(module_ref, ModuleSet)]:
+        for module_set in [module_or_moduleset for module_or_moduleset in modules_and_modulesets if isinstance(module_or_moduleset, ModuleSet)]:
             results = module_set.module_names_to_find()
 
             set_entry_lookup_dict.update({result: module_set for result in results})

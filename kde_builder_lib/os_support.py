@@ -45,9 +45,9 @@ class OSSupport:
         self.VERSION_ID = None
 
         # file might be None
-        kv_list_ref = self._read_os_release(file)
-        for key in kv_list_ref.keys():
-            setattr(self, key, kv_list_ref[key])
+        kv_list = self._read_os_release(file)
+        for key in kv_list.keys():
+            setattr(self, key, kv_list[key])
 
     def vendor_id(self) -> str:
         """

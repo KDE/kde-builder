@@ -116,11 +116,11 @@ class OptionsBase:
                 if not repo or not url:
                     raise BuildExceptionConfig(repo_option, f"Invalid git-repository-base setting: {value}")
 
-                dictref = self.get_option(repo_option)
-                if dictref == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash (dict) is empty itself).
-                    dictref = {}
-                dictref[repo] = url
-                self.options[repo_option] = dictref
+                dictionary = self.get_option(repo_option)
+                if dictionary == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash (dict) is empty itself).
+                    dictionary = {}
+                dictionary[repo] = url
+                self.options[repo_option] = dictionary
                 return
 
         # Everything else can be dumped straight into our dict.

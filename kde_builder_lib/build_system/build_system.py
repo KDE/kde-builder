@@ -361,7 +361,7 @@ class BuildSystem:
 
         return 1
 
-    def safe_make(self, opts_ref: dict) -> dict:
+    def safe_make(self, opts: dict) -> dict:
         """
         Function to run the build command with the arguments given by the
         passed dict, laid out as:
@@ -412,7 +412,7 @@ class BuildSystem:
             command_to_use = build_command  # Don't need whole cmdline in any errors.
             build_command = Util.locate_exe(build_command)
         else:
-            # command line options passed in opts_ref
+            # command line options passed in opts
             command_to_use = build_command = self.default_build_command()
 
         if not build_command:
@@ -424,12 +424,12 @@ class BuildSystem:
             build_command = re.sub(r"^/.*/", "", build_command)
 
         # Simplify code by forcing lists to exist.
-        if "prefix-options" not in opts_ref:
-            opts_ref["prefix-options"] = []
-        if "make-options" not in opts_ref:
-            opts_ref["make-options"] = []
+        if "prefix-options" not in opts:
+            opts["prefix-options"] = []
+        if "make-options" not in opts:
+            opts["make-options"] = []
 
-        prefix_opts = opts_ref["prefix-options"]
+        prefix_opts = opts["prefix-options"]
 
         # If using sudo ensure that it doesn't wait on tty, but tries to read from
         # stdin (which should fail as we redirect that from /dev/null)
@@ -438,20 +438,20 @@ class BuildSystem:
 
         # Assemble arguments
         args = [*prefix_opts, build_command, *build_command_line]
-        if opts_ref["target"]:
-            args.append(opts_ref["target"])
-        args.extend(opts_ref["make-options"])
+        if opts["target"]:
+            args.append(opts["target"])
+        args.extend(opts["make-options"])
 
-        logname = opts_ref.get("logbase", opts_ref.get("logfile", opts_ref.get("target", "")))  # pl2py: if all of these are undefined, logname remains undef in perl. But undef in perl becomes empty string when stringified.
+        logname = opts.get("logbase", opts.get("logfile", opts.get("target", "")))  # pl2py: if all of these are undefined, logname remains undef in perl. But undef in perl becomes empty string when stringified.
 
         builddir = module.fullpath("build")
         builddir = re.sub(r"/*$", "", builddir)  # Remove trailing /
 
         Util.p_chdir(builddir)
 
-        return self._run_build_command(opts_ref["message"], logname, args)
+        return self._run_build_command(opts["message"], logname, args)
 
-    def _run_build_command(self, message: str, filename: str, arg_ref: list[str]) -> dict:
+    def _run_build_command(self, message: str, filename: str, args: list[str]) -> dict:
         """
         Function to run make and process the build process output in order to
         provide completion updates. This procedure takes the same arguments as
@@ -461,7 +461,7 @@ class BuildSystem:
         Parameters:
             message: The message to display to the user while the build happens.
             filename: The name of the log file to use (relative to the log directory).
-            arg_ref: An array with the command and its arguments. i.e. ["command", "arg1", "arg2"]
+            args: An array with the command and its arguments. i.e. ["command", "arg1", "arg2"]
 
         Returns:
              Dict as defined by safe_make
@@ -469,7 +469,7 @@ class BuildSystem:
 
         module = self.module
         builddir = module.fullpath("build")
-        result_ref = {"was_successful": 0}
+        result = {"was_successful": 0}
         ctx = module.context
 
         # There are situations when we don't want progress output:
@@ -478,16 +478,16 @@ class BuildSystem:
         if not sys.stderr.isatty() or logger_logged_cmd.isEnabledFor(logging.DEBUG):
             logger_buildsystem.warning(f"\t{message}")
 
-            result_ref["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, arg_ref))
+            result["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, args))
 
             # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
             # When the module was built successfully, and you were using --debug, then you will get the message:
             #  "No changes from build, skipping install"
             # from Module.build() method. This is due to "work_done" key was missing in returned dict when debugging.
             # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
-            result_ref["work_done"] = 1
+            result["work_done"] = 1
 
-            return result_ref
+            return result
 
         a_time = int(time.time())
 
@@ -539,7 +539,7 @@ class BuildSystem:
                 nonlocal warnings
                 warnings += 1
 
-        cmd = UtilLoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(arg_ref)
+        cmd = UtilLoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(args)
 
         def on_child_output(line):
             # called in parent!
@@ -549,18 +549,18 @@ class BuildSystem:
 
         try:
             exitcode = cmd.start()
-            result_ref = {
+            result = {
                 "was_successful": exitcode == 0,
                 "warnings": warnings,
                 "work_done": work_done_flag,
             }
         except Exception as err:
             logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
-            result_ref["was_successful"] = 0
+            result["was_successful"] = 0
 
         # Cleanup TTY output.
         a_time = Util.prettify_seconds(int(time.time()) - a_time)
-        status = "g[b[succeeded]" if result_ref["was_successful"] else "r[b[failed]"
+        status = "g[b[succeeded]" if result["was_successful"] else "r[b[failed]"
         status_viewer.release_tty(f"\t{message} {status} (after {a_time})\n")
 
         if warnings:
@@ -577,4 +577,4 @@ class BuildSystem:
             logger_buildsystem.warning(f"\tNote: {msg} compile warnings")
             self.module.set_persistent_option("last-compile-warnings", warnings)
 
-        return result_ref
+        return result

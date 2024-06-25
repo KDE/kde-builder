@@ -178,7 +178,7 @@ class TaskManager:
         return had_error
 
     @staticmethod
-    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time_ref: int) -> str | int:
+    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str | int:
         """
         Builds the given module.
 
@@ -526,8 +526,8 @@ class TaskManager:
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseen_modules_ref = monitor_to_build_ipc.unacknowledged_modules()
-        if unseen_modules_ref:
+        unseen_modules = monitor_to_build_ipc.unacknowledged_modules()
+        if unseen_modules:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
             # should only happen under --stop-on-failure if an early build fails.

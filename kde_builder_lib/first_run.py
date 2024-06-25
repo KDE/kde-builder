@@ -282,7 +282,7 @@ class FirstRun:
         print()
 
     def _find_best_install_cmd(self) -> list[str]:
-        cmds_ref = {
+        cmds = {
             "cmd/install/alpine/unknown": "apk add --virtual .makedeps-kde-builder",
             "cmd/install/arch/unknown": "pacman -S --noconfirm",
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
@@ -292,7 +292,7 @@ class FirstRun:
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
         }
 
-        supported_distros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmds_ref.keys()]
+        supported_distros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmds.keys()]
 
         best_vendor = self.oss.best_distro_match(supported_distros)
         logger_fr.info(f"    Using installer for b[{best_vendor}]")
@@ -302,8 +302,8 @@ class FirstRun:
 
         for opt in [f"{best_vendor}/{version}", f"{best_vendor}/unknown"]:
             key = f"cmd/install/{opt}"
-            if key in cmds_ref.keys():
-                cmd = cmds_ref[key].split(" ")
+            if key in cmds.keys():
+                cmd = cmds[key].split(" ")
                 break
 
         if not cmd:

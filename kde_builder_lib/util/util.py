@@ -84,15 +84,15 @@ class Util:
         return obj
 
     @staticmethod
-    def assert_in(val, list_ref):
+    def assert_in(val, input_list):
         """
         Throws an exception if the first parameter is not included in the
         provided list of possible alternatives.
         Parameters:
             val: The value to check.
-            list_ref: List of alternatives.
+            input_list: List of alternatives.
         """
-        if val not in list_ref:
+        if val not in input_list:
             BuildException.croak_runtime(f"{val} is not a permissible value for its argument")
 
         return val
@@ -331,7 +331,7 @@ class Util:
             os.symlink(f"{logfile}", f"{logdir}/error.log")
 
     @staticmethod
-    def run_logged_command(module: Module, filename: str, callback_ref: Callable | None, command: list[str]) -> int:
+    def run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
         """
         Common code for log_command and UtilLoggedSubprocess
         """
@@ -351,7 +351,7 @@ class Util:
 
             dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
 
-            if not callback_ref and logger_logged_cmd.isEnabledFor(logging.DEBUG):
+            if not callback_func and logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     # If no other callback given, pass to debug() if debug-mode is on.
                     while True:
@@ -362,13 +362,13 @@ class Util:
                             print(line.strip())
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
 
-            if callback_ref:
+            if callback_func:
                 with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
                     while True:
                         line = dec.decode(os.read(pipe_read, 4096))
                         if not line:
                             break
-                        callback_ref(line)  # Note that line may contain several lines (a string containing "\n")
+                        callback_func(line)  # Note that line may contain several lines (a string containing "\n")
                         f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
 
             _, return_code = os.waitpid(pid, 0)
@@ -408,7 +408,7 @@ class Util:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
 
-            if callback_ref or logger_logged_cmd.isEnabledFor(logging.DEBUG):
+            if callback_func or logger_logged_cmd.isEnabledFor(logging.DEBUG):
                 # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
                 # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
                 os.close(1)
@@ -472,7 +472,7 @@ class Util:
         return exitcode == 0
 
     @staticmethod
-    def log_command(module: Module, filename: str, arg_ref: list[str], options_ref: dict | None = None) -> int:
+    def log_command(module: Module, filename: str, args: list[str], options: dict | None = None) -> int:
         """
         Function to run a command, optionally filtering on the output of the child
         command. Use like:
@@ -514,19 +514,19 @@ class Util:
         to always be run, use a python IPC mechanism like os.system(), subprocess, or
         a utility like ``filter_program_output``.
         """
-        if options_ref is None:
-            options_ref = {}
+        if options is None:
+            options = {}
 
-        command = arg_ref
-        callback_ref = options_ref.get("callback", None)
+        command = args
+        callback_func = options.get("callback", None)
 
         if Debug().pretending():
             logger_logged_cmd.pretend("\tWould have run g['" + "' '".join(command) + "'")
             return 0
-        return Util.run_logged_command(module, filename, callback_ref, arg_ref)
+        return Util.run_logged_command(module, filename, callback_func, args)
 
     @staticmethod
-    def run_logged(module: Module, filename: str, directory: str | None, arg_ref: list[str], callback_ref: Callable | None = None) -> int:
+    def run_logged(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
         """
         This is similar to ``log_command`` in that this runs the given command and
         arguments in a separate process. Returns the exit status of the sub-process.
@@ -546,7 +546,7 @@ class Util:
         if not directory:
             directory = ""
         if Debug().pretending():
-            args_str = "', '".join(arg_ref)
+            args_str = "', '".join(args)
             logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
             return 0
 
@@ -568,10 +568,10 @@ class Util:
             # This means that changes made by log_command or function calls made
             # via log_command will not be saved or noted unless they are made part
             # of the return value, or sent earlier via a "progress" event.
-            setproctitle.setproctitle("kde-builder " + " ".join(arg_ref))  # better indicate what is the process
+            setproctitle.setproctitle("kde-builder " + " ".join(args))  # better indicate what is the process
             if directory:
                 Util.p_chdir(directory)
-            retval.value = Util.log_command(module, filename, arg_ref, {"callback": callback_ref})
+            retval.value = Util.log_command(module, filename, args, {"callback": callback_func})
 
         exitcode = subprocess_run(func)
         logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + ".log")}\n""")
@@ -801,7 +801,7 @@ class Util:
                 return retval.value
 
             def func(retval):
-                error_ref = {}
+                error_dict = {}
 
                 with os.scandir(target_dir) as entries:
                     for entry in entries:
@@ -809,16 +809,16 @@ class Util:
                             try:
                                 shutil.rmtree(entry.path)
                             except OSError as ex:
-                                error_ref[entry.path] = ex
+                                error_dict[entry.path] = ex
                         else:
                             try:
                                 os.remove(entry.path)
                             except OSError as ex:
-                                error_ref[entry.path] = ex
+                                error_dict[entry.path] = ex
 
-                if error_ref and len(error_ref):
-                    for file in error_ref:
-                        msg = error_ref[file]
+                if error_dict and len(error_dict):
+                    for file in error_dict:
+                        msg = error_dict[file]
                         if not file:
                             file = "general error"
                         print(f"{file}: error: {msg}", file=log)

@@ -157,14 +157,14 @@ class UtilLoggedSubprocess:
         Util.assert_isa(module, Module)
         if not (filename := self._log_to):
             BuildException.croak_internal("Need to log somewhere")
-        if not (argRef := self._set_command):
+        if not (args := self._set_command):
             BuildException.croak_internal("No command to run!")
-        if not isinstance(argRef, list):
+        if not isinstance(args, list):
             BuildException.croak_internal("Command list needs to be a listref!")
 
         dir_to_run_from = self._chdir_to
         announce_sub = self._announcer
-        command = argRef
+        command = args
 
         if Debug().pretending():
             logger_logged_cmd.pretend("\tWould have run ('g[" + "]', 'g[".join(command) + "]')")

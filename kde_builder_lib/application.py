@@ -923,10 +923,10 @@ class Application:
         read in from the given string (filename:line). An OptionsBase can be tagged under multiple files.
         """
         key = "#defined-at"
-        sources_ref = options_base.get_option(key) if options_base.has_option(key) else []
+        sources = options_base.get_option(key) if options_base.has_option(key) else []
 
-        sources_ref.append(config_source)
-        options_base.set_option({key: sources_ref})
+        sources.append(config_source)
+        options_base.set_option({key: sources})
 
     @staticmethod
     def _get_module_sources(options_base: ModuleSet) -> str:
@@ -935,8 +935,8 @@ class Application:
              rcfile sources for given OptionsBase (comma-separated).
         """
         key = "#defined-at"
-        sources_ref = options_base.get_option(key) or []
-        return ", ".join(sources_ref)
+        sources = options_base.get_option(key) or []
+        return ", ".join(sources)
 
     def _parse_module_set_options(self, ctx: BuildContext, file_reader: RecursiveFH, module_set: ModuleSet) -> ModuleSet:
         """
@@ -962,7 +962,7 @@ class Application:
             module_set.__class__ = ModuleSetQt5
         return module_set
 
-    def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options_ref: list) -> list[Module | ModuleSet]:
+    def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
         """
         Reads in the settings from the configuration, passed in as an open filehandle.
 
@@ -972,7 +972,7 @@ class Application:
             fh: The I/O filehandle object to read from.
             cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
-            deferred_options_ref: A list containing dicts mapping module names to options
+            deferred_options: A list containing dicts mapping module names to options
                 set by any "options" blocks read in by this function.
                 Each key (identified by the name of the "options" block) will point to a
                 dict value holding the options to apply.
@@ -1084,7 +1084,7 @@ class Application:
             elif option_type == "options":
                 options = self._parse_module_options(ctx, file_reader, OptionsBase())
 
-                deferred_options_ref.append({
+                deferred_options.append({
                     "name": modulename,
                     "opts": options.options
                 })
@@ -1793,17 +1793,17 @@ class Application:
         return list(temp_dict.keys())
 
     @staticmethod
-    def _install_signal_handlers(handler_ref: Callable) -> None:
+    def _install_signal_handlers(handler_func: Callable) -> None:
         """
         Installs the given function as a signal handler for a set of signals which
         could kill the program.
 
         Parameters:
-            handler_ref: A function to act as the handler.
+            handler_func: A function to act as the handler.
         """
         signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGABRT, signal.SIGTERM, signal.SIGPIPE]
         for sig in signals:
-            signal.signal(sig, handler_ref)
+            signal.signal(sig, handler_func)
 
     def _hold_performance_power_profile_if_possible(self) -> None:
         try:

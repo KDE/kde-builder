@@ -575,19 +575,19 @@ class Updater:
         checkout_source = None
         # easiest way to be clear that bool context is intended
 
-        source_type_ref = next((x for x in priority_ordered_sources if (checkout_source := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
+        source_type = next((x for x in priority_ordered_sources if (checkout_source := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
 
         # The user has no clear desire here (either set for the module or globally.
         # Note that the default config doesn't generate a global "branch" setting).
         # In this case it's unclear which convention source modules will use between
         # "master", "main", or something entirely different.  So just don't guess...
-        if not source_type_ref:
+        if not source_type:
             logger_updater.debug(f"No branch specified for {module}, will use whatever git gives us")
             return "none", "none"
 
         # Likewise branch-group requires special handling. checkout_source is
         # currently the branch-group to be resolved.
-        if source_type_ref[0] == "branch-group":
+        if source_type[0] == "branch-group":
             # noinspection PyUnreachableCode
             checkout_source = self._resolve_branch_group(checkout_source)
 
@@ -596,10 +596,10 @@ class Updater:
                 logger_updater.debug(f"No specific branch set for {module} and {branch_group}, using master!")
                 checkout_source = "master"
 
-        if source_type_ref[0] == "tag" and not checkout_source.startswith("^refs/tags/"):
+        if source_type[0] == "tag" and not checkout_source.startswith("^refs/tags/"):
             checkout_source = f"refs/tags/{checkout_source}"
 
-        return checkout_source, source_type_ref[1]
+        return checkout_source, source_type[1]
 
     @staticmethod
     def _has_submodules() -> bool:

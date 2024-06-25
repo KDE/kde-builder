@@ -109,7 +109,7 @@ class IPC:
         which module we'll be about to receive messages for from the other end.
         """
         updated = self.updated
-        messages_ref = self.messages
+        messages = self.messages
         message = None
 
         if not ipc_type:
@@ -153,9 +153,9 @@ class IPC:
             ipc_module_name, log_message = buffer.split(",", maxsplit=1)
 
             # Save it for later if we can't print it yet.
-            if ipc_module_name not in messages_ref:
-                messages_ref[ipc_module_name] = []
-            messages_ref[ipc_module_name].append(log_message)
+            if ipc_module_name not in messages:
+                messages[ipc_module_name] = []
+            messages[ipc_module_name].append(log_message)
         elif ipc_type == IPC.ALL_DONE:
             self.updates_done = 1
         elif ipc_type == IPC.MODULE_POSTBUILD_MSG:
@@ -220,12 +220,12 @@ class IPC:
             # If we have "global" messages they are probably for the first module and
             # include standard setup messages, etc. Print first and then print module's
             # messages.
-            messages_ref = self.messages
+            messages = self.messages
             for item in ["global", module_name]:
-                if item in messages_ref:  # pl2py: we specifically check if there is such a key
-                    for msg in messages_ref[item]:
+                if item in messages:  # pl2py: we specifically check if there is such a key
+                    for msg in messages[item]:
                         self._print_logged_message(msg)
-                    del messages_ref[item]
+                    del messages[item]
 
         # We won't print post-build messages now but we need to save them for when
         # they can be printed.
