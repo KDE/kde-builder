@@ -438,7 +438,9 @@ class Application:
 
             if (update_desired and not Debug().pretending()) or update_needed:
                 orig_wd = os.getcwd()
+                metadata_module.current_phase = "update"
                 metadata_module.scm().update_internal()
+                metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
                 Util.p_chdir(orig_wd)
                 # "last-metadata-update" will be set after config is read, so value will be overriden
@@ -1140,7 +1142,7 @@ class Application:
         failed = False
 
         for module in modules:
-            ctx.reset_environment()
+            module.reset_environment()
             failed = not module.install() or failed
 
             if failed and module.get_option("stop-on-failure"):
@@ -1174,7 +1176,7 @@ class Application:
         failed = False
 
         for module in modules:
-            ctx.reset_environment()
+            module.reset_environment()
             failed = not module.uninstall() or failed
 
             if failed and module.get_option("stop-on-failure"):

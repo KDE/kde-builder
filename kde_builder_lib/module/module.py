@@ -11,6 +11,7 @@ import glob
 import os
 import re
 import shutil
+import sys
 import textwrap
 import traceback
 from typing import TYPE_CHECKING
@@ -87,13 +88,14 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
 
         # newOptions:
-        self.name = name
         self.scm_obj = None
         self.build_obj = None
         self.phases: PhaseList = phases
         self.context = ctx
         self.module_set = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs = []
+        self.env = {}
+        self.current_phase = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
 
         # Record current values of what would be last source/build dir, if present,
         # before they are potentially reset during the module build.
@@ -531,28 +533,21 @@ class Module(OptionsBase):
         """
         Integrates "set-env" option to the build context environment
         """
-        ctx = self.context
-
-        # Let's see if the user has set env vars to be set.
-        # Note the global set-env must be checked separately anyways, so
-        # we limit inheritance when searching.
-        if ctx.name == self.name:
-            env_dict = ctx.get_option("set-env")
-        else:
-            env_dict = self.get_option("set-env", "module")
+        env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
 
         for key, value in env_dict.items():
-            ctx.queue_environment_variable(key, value)
+            self.queue_environment_variable(key, value)
 
     def setup_environment(self) -> None:
         """
         Establishes proper build environment in the build context. Should be run
         before forking off commands for e.g. updates, builds, installs, etc.
         """
-        ctx = self.context
-
-        # Add global set-envs and context
-        self.context.apply_user_environment()
+        # Add global set-env to module set-env (only for those variables that are not defined in module, i.e. those that are not overriding the global).
+        global_set_env = self.context.get_option("set-env")
+        for key, value in global_set_env.items():
+            if key not in self.env:
+                self.env[key] = value
 
         # Build system's environment injection
         build_system = self.build_system()
@@ -574,23 +569,22 @@ class Module(OptionsBase):
                 if platformDir == "/usr":  # Don't "fix" things if system platform manually set
                     continue
 
-                ctx.prepend_environment_value("PKG_CONFIG_PATH", f"{platformDir}/{libname}/pkgconfig")
-                ctx.prepend_environment_value("LD_LIBRARY_PATH", f"{platformDir}/{libname}")
-                ctx.prepend_environment_value("PATH", f"{platformDir}/bin")
+                self.prepend_environment_value("PKG_CONFIG_PATH", f"{platformDir}/{libname}/pkgconfig")
+                self.prepend_environment_value("LD_LIBRARY_PATH", f"{platformDir}/{libname}")
+                self.prepend_environment_value("PATH", f"{platformDir}/bin")
 
             binpath = self.get_option("binpath")
             libpath = self.get_option("libpath")
 
             if binpath:
-                ctx.prepend_environment_value("PATH", binpath)
+                self.prepend_environment_value("PATH", binpath)
             if libpath:
-                ctx.prepend_environment_value("LD_LIBRARY_PATH", libpath)
+                self.prepend_environment_value("LD_LIBRARY_PATH", libpath)
 
         build_system.prepare_module_build_environment()
 
-        # Read in user environment defines
-        if self.name != ctx.name:  # pl2py: in perl the compare function was called here. See comment there. We just compare here without that function.
-            self.apply_user_environment()
+        # Add module's set-envs
+        self.apply_user_environment()
 
     def get_log_dir(self) -> str:
         """
@@ -608,17 +602,6 @@ class Module(OptionsBase):
         Use when you know you're going to create a new log
         """
         return self.context.get_log_path_for(self, path)
-
-    # This is left here only for reference. todo After dropping perl version, we can delete this comment.
-    # def compare(self, other):
-    #     # pl2py: the only place where this function was called in perl was the comparison operator in the end of setup_environment function.
-    #     # It returned -1, 0, 1 depending on if self.name is less, equal or bigger than ctx.name.
-    #     # The interesting thing is that despite function returns some value, when it arrives to statement `my $n = $self == $ctx;` it became "converted" to the wanted.
-    #     # For example, when names are different, and -1 is returned by compare, $n gets the empty string (which reads as false).
-    #     # And if names are the same, (for example, I intentionally made a module called "global", 0 is returned, and 1 is arrived to $n (which reads as true).
-    #     # So instead of using this function, we will just compare as needed in the place where that comparison was invoked.
-    #     # But I (Andrew Shark) will place the code which was the effect of calling this comparison here, for reference.
-    #     return self.name == other.name
 
     def update(self, ipc, ctx) -> bool:
         module_name = self.name
@@ -651,6 +634,8 @@ class Module(OptionsBase):
                     """))
         count = None
         return_value = None
+
+        self.current_phase = "update"
 
         try:
             count = self.scm().update_internal(ipc)
@@ -694,6 +679,7 @@ class Module(OptionsBase):
                 logger_module.info(f"\t{self} update complete, {message}")
 
             return_value = True
+        self.current_phase = None
         logger_module.info("")  # Print empty line.
         return return_value
 
@@ -931,3 +917,100 @@ class Module(OptionsBase):
         Adds the given message to the list of post-build messages to show to the user
         """
         self.post_build_msgs.append(new_msg)
+
+    def queue_environment_variable(self, key: str, value: str) -> None:
+        """
+        Adds an environment variable and value to the list of environment
+        variables to apply for the next subprocess execution.
+
+        Note that these changes are /not/ reflected in the current environment,
+        so if you are doing something that requires that kind of update you
+        should do that yourself (but remember to have some way to restore the old
+        value if necessary).
+        """
+        logger_module.debug(f"\tQueueing g[{key}] to be set to y[{value}]")
+        self.env[key] = value
+
+    def reset_environment(self) -> None:
+        """
+        Clears the list of environment variables to set for log_command runs.
+        """
+        self.env = {}
+
+    def commit_environment_changes(self) -> None:
+        """
+        Applies all changes queued by queue_environment_variable to the actual
+        environment irretrievably. Use this before exec()'ing another child, for
+        instance.
+        """
+        for key, value in self.env.items():
+            logger_module.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
+            os.environ[key] = value
+
+        if self.name == "sysadmin-repo-metadata":
+            return
+
+        build_dir = self.fullpath("build")
+        if not os.path.exists(build_dir):
+            os.mkdir(build_dir)
+
+        with open(self.fullpath("build") + "/kde-builder.env", "w") as f:
+            f.write("# kate: syntax bash;\n")
+            for key, value in self.env.items():
+                f.write(f"{key}={value}\n")
+
+    def prepend_environment_value(self, env_name: str, path_element: str) -> None:
+        """
+        Adds the given library paths to the path already given in an environment
+        variable. In addition, detected "system paths" are stripped to ensure
+        that we don't inadvertently re-add a system path to be promoted over the
+        custom code we're compiling (for instance, when a system Qt is used and
+        installed to /usr).
+
+        If the environment variable to be modified has already been queued using
+        queue_environment_variable, then that (queued) value will be modified and
+        will take effect with the next forked subprocess.
+
+        Otherwise, the current environment variable value will be used, and then
+        queued. Either way the current environment will be unmodified afterward.
+
+        Parameters:
+            env_name: The name of the environment variable to modify
+            path_element: The value to be prepended to the current environment path. I.e. passing "/some/new/path" would set the value to "/some/new/path:/already/existing/path".
+        """
+        if env_name in self.env:
+            cur_paths = self.env[env_name].split(":")
+        elif env_name in os.environ:
+            cur_paths = os.environ.get(env_name, "").split(":")
+        else:
+            cur_paths = []
+
+        # pl2py: this is kde-builder specific code (not from kdesrc-build).
+        # Some modules use python packages in their build process. For example, breeze-gtk uses python-cairo.
+        # We want the build process to use system installed package rather than installed in virtual environment.
+        # We remove the current virtual environment path from PATH, because Cmake FindPython3 module always considers PATH,
+        # see https://cmake.org/cmake/help/latest/module/FindPython3.html
+        # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
+        if sys.prefix != sys.base_prefix and env_name == "PATH":
+            if f"{sys.prefix}/bin" in cur_paths:
+                logger_module.debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")
+                cur_paths.remove(f"{sys.prefix}/bin")
+            else:
+                logger_module.debug(f"\tVirtual environment path y[{sys.prefix}/bin] was already removed from y[PATH].")
+
+        # Filter out entries to add that are already in the environment from the system.
+        if path_element in cur_paths:
+            logger_module.debug(f"\tNot prepending y[{path_element}] to y[{env_name}] as it appears " + f"to already be defined in y[{env_name}].")
+
+        if path_element not in cur_paths:
+            join_list = [path_element] + cur_paths
+        else:
+            join_list = cur_paths
+
+        env_value = ":".join(join_list)
+
+        env_value = re.sub(r"^:*", "", env_value)
+        env_value = re.sub(r":*$", "", env_value)  # Remove leading/trailing colons
+        env_value = re.sub(r":+", ":", env_value)  # Remove duplicate colons
+
+        self.queue_environment_variable(env_name, env_value)

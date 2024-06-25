@@ -225,9 +225,7 @@ class BuildSystemKDECMake(BuildSystem):
         set up any needed environment variables, build context settings, etc., in preparation
         for the build and install phases.
         """
-
         module = self.module
-        ctx = self.module.context
         prefix = self.module.installation_path()
 
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
@@ -238,18 +236,18 @@ class BuildSystemKDECMake(BuildSystem):
         # Avoid moving /usr up in env vars
         if prefix != "/usr":
             # Find the normal CMake "config" mode files for find_package()
-            ctx.prepend_environment_value("CMAKE_PREFIX_PATH", prefix)
+            module.prepend_environment_value("CMAKE_PREFIX_PATH", prefix)
             # Try to ensure that older "module" mode find_package() calls also point to right directory
-            ctx.prepend_environment_value("CMAKE_MODULE_PATH", f"{prefix}/lib64/cmake:{prefix}/lib/cmake")
+            module.prepend_environment_value("CMAKE_MODULE_PATH", f"{prefix}/lib64/cmake:{prefix}/lib/cmake")
             # Set the plugin path correctly for configuration-time access e.g. by Extra CMake Modules
-            ctx.prepend_environment_value("QT_PLUGIN_PATH", f"{prefix}/lib64/plugins:{prefix}/lib/plugins")
-            ctx.prepend_environment_value("XDG_DATA_DIRS", f"{prefix}/share")
+            module.prepend_environment_value("QT_PLUGIN_PATH", f"{prefix}/lib64/plugins:{prefix}/lib/plugins")
+            module.prepend_environment_value("XDG_DATA_DIRS", f"{prefix}/share")
 
         qt_installdir = module.get_option("qt-install-dir")
         if qt_installdir and qt_installdir != prefix:
             # Ensure we can find Qt5's own CMake modules
-            ctx.prepend_environment_value("CMAKE_PREFIX_PATH", qt_installdir)
-            ctx.prepend_environment_value("CMAKE_MODULE_PATH", f"{qt_installdir}/lib/cmake")
+            module.prepend_environment_value("CMAKE_PREFIX_PATH", qt_installdir)
+            module.prepend_environment_value("CMAKE_MODULE_PATH", f"{qt_installdir}/lib/cmake")
 
     # @override(check_signature=False)
     def required_programs(self) -> list[str]:
