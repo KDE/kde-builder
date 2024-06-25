@@ -441,6 +441,8 @@ class Util:
             # command run.
             print("# kde-builder running: '" + "' '".join(command) + "'")
             print("# from directory: ", os.getcwd())
+            if module.current_phase != "update":
+                print("# with environment: ", module.fullpath("build") + "/kde-builder.env")
 
             # TODO: Implement this when appropriate, but also keep in mind that
             # filter_program_output might be a better idea if you're parsing

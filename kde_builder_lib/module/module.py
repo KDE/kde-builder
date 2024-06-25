@@ -88,7 +88,6 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
 
         # newOptions:
-        self.name = name
         self.scm_obj = None
         self.build_obj = None
         self.phases: PhaseList = phases
@@ -96,6 +95,7 @@ class Module(OptionsBase):
         self.module_set = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs = []
         self.env = {}
+        self.current_phase = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
 
         # Record current values of what would be last source/build dir, if present,
         # before they are potentially reset during the module build.
@@ -635,6 +635,8 @@ class Module(OptionsBase):
         count = None
         return_value = None
 
+        self.current_phase = "update"
+
         try:
             count = self.scm().update_internal(ipc)
         except Exception as e:
@@ -677,6 +679,7 @@ class Module(OptionsBase):
                 logger_module.info(f"\t{self} update complete, {message}")
 
             return_value = True
+        self.current_phase = None
         logger_module.info("")  # Print empty line.
         return return_value
 
@@ -941,8 +944,20 @@ class Module(OptionsBase):
         instance.
         """
         for key, value in self.env.items():
-            os.environ[key] = value
             logger_module.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
+            os.environ[key] = value
+
+        if self.name == "sysadmin-repo-metadata":
+            return
+
+        build_dir = self.fullpath("build")
+        if not os.path.exists(build_dir):
+            os.mkdir(build_dir)
+
+        with open(self.fullpath("build") + "/kde-builder.env", "w") as f:
+            f.write("# kate: syntax bash;\n")
+            for key, value in self.env.items():
+                f.write(f"{key}={value}\n")
 
     def prepend_environment_value(self, env_name: str, path_element: str) -> None:
         """
