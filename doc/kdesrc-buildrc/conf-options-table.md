@@ -372,9 +372,8 @@ Related command-line option: [--build-when-unchanged](#cmdline-build-when-unchan
 
 Type: String, Default value: Unix Makefiles
 
-Specify which generator to use with CMake. Currently both
-`Ninja` and `Unix Makefiles` as well as extra
-generators based on them like `Eclipse CDT4 - Ninja` are
+Specify which generator to use with CMake. Currently, both
+`Ninja` and `Unix Makefiles` are
 supported. Invalid (unsupported) values are ignored and treated as if
 unset.
 

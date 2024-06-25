@@ -45,8 +45,8 @@ global
     # rather than nested directories
     directory-layout %{directory-layout}
 
-    # Use Ninja as cmake generator instead of gmake
-    cmake-generator Kate - Ninja
+    # Use Ninja as cmake generator
+    cmake-generator Ninja
 
     # Build with LSP support for everything that supports it
     compile-commands-linking %{compile-commands-linking}

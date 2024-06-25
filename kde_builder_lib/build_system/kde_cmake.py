@@ -32,7 +32,7 @@ class BuildSystemKDECMake(BuildSystem):
     Class responsible for building CMake-based modules, with special support for KDE modules.
     """
 
-    BASE_GENERATOR_MAP = {
+    GENERATOR_MAP = {
         "Ninja": {
             "options_name": "ninja-options",
             "install_target": "install",
@@ -47,24 +47,6 @@ class BuildSystemKDECMake(BuildSystem):
             # so prefer GNU Make if present, otherwise try regular make.
             "build_commands": ["gmake", "make"]
         }
-    }
-
-    # Extra generators that are compatible to the base generators above.
-    # See: https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#extra-generators
-    GENERATOR_MAP = {
-        "Ninja": BASE_GENERATOR_MAP["Ninja"],
-        "CodeBlocks - Ninja": BASE_GENERATOR_MAP["Ninja"],
-        "CodeLite - Ninja": BASE_GENERATOR_MAP["Ninja"],
-        "Sublime Text 2 - Ninja": BASE_GENERATOR_MAP["Ninja"],
-        "Kate - Ninja": BASE_GENERATOR_MAP["Ninja"],
-        "Eclipse CDT4 - Ninja": BASE_GENERATOR_MAP["Ninja"],
-
-        "Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "CodeBlocks - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "CodeLite - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "Sublime Text 2 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "Kate - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "Eclipse CDT4 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"]
     }
 
     def __init__(self, module):
