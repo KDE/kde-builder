@@ -952,7 +952,7 @@ class Module(OptionsBase):
 
         build_dir = self.fullpath("build")
         if not os.path.exists(build_dir):
-            os.mkdir(build_dir)
+            Util.super_mkdir(build_dir)
 
         with open(self.fullpath("build") + "/kde-builder.env", "w") as f:
             f.write("# kate: syntax bash;\n")
