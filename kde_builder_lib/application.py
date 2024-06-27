@@ -590,7 +590,7 @@ class Application:
                     return x.get_option(query_mode)
 
             for m in modules:
-                print(f"{m}: ", query(m))
+                print(f"{m}: " + query(m))
 
             return 0
 
