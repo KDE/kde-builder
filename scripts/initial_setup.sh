@@ -126,6 +126,22 @@ ensure_kde_builder_launches() {
   kde-builder --version
 }
 
+check_zsh_fpath() {
+  echo "Checking that fpath contains path to kde-builder zsh completions"
+  local kb_completions_path="$HOME/.local/share/kde-builder/data/completions/zsh/"
+
+  # The $FPATH is not exported to scripts, so we get from launched subshell
+  local FPATH
+  # shellcheck disable=SC2016
+  FPATH=$($SHELL -c 'source ~/.zshrc; echo $FPATH')
+
+  if [[ ":$FPATH:" == *":$kb_completions_path:"* ]]; then
+    echo "Your FPATH is correctly set."
+  else
+    echo -e "${Yellow}Warning: The $kb_completions_path was not found in your fpath. Please add it manually.${Color_Off}"
+  fi
+}
+
 ### --------------------------------
 ###         Script starts
 ### --------------------------------
@@ -153,8 +169,10 @@ install_icon_and_desktop_file
 
 ensure_kde_builder_launches
 
-# todo:
-# Install zsh completions
-# Install kate syntax highlighter for kdesrc-buildrc
+# The $ZSH_VERSION variable is not exported to launched scripts, so we get it from launched subshell
+# shellcheck disable=SC2016
+if [[ -n $($SHELL -c 'echo $ZSH_VERSION') ]]; then  # Check if user's default shell is zsh
+  check_zsh_fpath
+fi
 
 echo -e "${Green}Installation finished.${Color_Off}"
