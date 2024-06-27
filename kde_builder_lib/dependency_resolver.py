@@ -196,44 +196,6 @@ class DependencyResolver:
 
         self._canonicalize_dependencies()
 
-    def read_dependency_data_v2(self, fh: TextIO) -> None:
-        """
-        Reads in v2-format dependency data from KDE repository database, using the KDE
-        "invent" repository naming convention.
-
-        Throws exception on read failure.
-
-        ::
-
-            fh = open("/path/to/dependency-data.json", "r")
-            resolver.read_dependency_data_v2(fh)
-        """
-        logger_depres.warning("b[***] USING y[b[V2 DEPENDENCY METADATA], BUILD IS UNSUPPORTED")
-
-        json_data = fh.read()
-
-        if not json_data:
-            BuildException.croak_runtime("Unable to read JSON dependency data")
-
-        dependencies = json.loads(json_data)
-
-        if not dependencies:
-            BuildException.croak_runtime("Unable to decode V2 dependencies")
-
-        if not dependencies.get("metadata_version", 1) == 2:
-            BuildException.croak_runtime("Unknown dependency version")
-
-        if not dependencies["module_dependencies"]:
-            BuildException.croak_runtime("V2 dependencies contain no dependencies")
-
-        for depModule, srcList in dependencies["module_dependencies"].items():
-            dep_name = self._shorten_module_name(depModule)
-            for srcModule in srcList:
-                src_name = self._shorten_module_name(srcModule)
-                self._add_dependency(dep_name, "*", src_name, "*")
-
-        self._canonicalize_dependencies()
-
     def _canonicalize_dependencies(self) -> None:
         """
         Ensures that all stored dependencies are stored in a way that allows for

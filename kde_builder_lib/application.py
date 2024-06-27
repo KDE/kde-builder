@@ -497,25 +497,14 @@ class Application:
                 srcdir = metadata_module.fullpath("source")
                 dependencies = None
 
-                dependency_file = f"{srcdir}/dependencies/dependencies_v2-{branch_group}.json"
-                if os.path.exists(dependency_file) and "KDESRC_BUILD_BETA" in os.environ:
-                    try:
-                        dependencies = Util.pretend_open(dependency_file)
-                    except Exception as e:
-                        print(f"Unable to open {dependency_file}: {e}")
-                        exit(1)
+                dependency_file = f"{srcdir}/dependencies/dependency-data-{branch_group}"
+                try:
+                    dependencies = Util.pretend_open(dependency_file)
+                except Exception as e:
+                    print(f"Unable to open {dependency_file}: {e}")
 
-                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-                    dependency_resolver.read_dependency_data_v2(dependencies)
-                else:
-                    dependency_file = f"{srcdir}/dependencies/dependency-data-{branch_group}"
-                    try:
-                        dependencies = Util.pretend_open(dependency_file)
-                    except Exception as e:
-                        print(f"Unable to open {dependency_file}: {e}")
-
-                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-                    dependency_resolver.read_dependency_data(dependencies)
+                logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                dependency_resolver.read_dependency_data(dependencies)
 
                 dependencies.close()
 
