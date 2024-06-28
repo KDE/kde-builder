@@ -11,6 +11,7 @@ setproctitle = "*"
 dbus-python = "*"
 overrides = "*"
 pytest = "*"
+pytest-cov = "*"
 exceptiongroup = "*"  # needed for python 3.10
 
 [requires]
