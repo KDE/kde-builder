@@ -19,8 +19,13 @@ unit_and_integration_tests:
     - pipenv graph
     - export PYTHONPATH="$PYTHONPATH:$(pwd)"
   script:
-    - pipenv run pytest
-
+    - pipenv run pytest --cov --cov-report term --cov-report xml:coverage.xml
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+  coverage: '/TOTAL.*\s+(\d+%)$/'
 # ---
 
 include:
