@@ -1,8 +1,5 @@
 # Changelog
 
-2024-06-26
-: Removed deprecated "Extra Generators" from supported CMake Generators.
-
 2024-05-29
 : Launching the built binaries which names are different from their module name no longer require specifying --exec in --run.
 

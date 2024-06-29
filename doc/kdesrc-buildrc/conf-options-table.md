@@ -372,10 +372,14 @@ Related command-line option: [--build-when-unchanged](#cmdline-build-when-unchan
 
 Type: String, Default value: Unix Makefiles
 
-Specify which generator to use with CMake. Currently, both
-`Ninja` and `Unix Makefiles` are
-supported. Invalid (unsupported) values are ignored and treated as if
-unset.
+Specify which generator to use with CMake. `Ninja` and `Unix Makefiles` are supported.
+
+```{note}
+The Extra Generators (like `Kate - Ninja`) are also supported. But note that they are deprecated since cmake version 3.27.
+See [documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#extra-generators).
+```
+
+Invalid (unsupported) values are ignored and treated as if unset.
 
 Note that if a valid generator is also specified through [cmake-options](#conf-cmake-options)
 it will override the value for `cmake-generator`.
