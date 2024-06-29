@@ -250,7 +250,7 @@ class BuildContext(Module):
         Parameters should simply be a list of KDE project paths to ignore,
         e.g. "extragear/utils/kdesrc-build". Partial paths are acceptable, matches
         are determined by comparing the path provided to the suffix of the full path
-        of modules being compared.  See :meth:`KDEProjectsReader._project_path_matches_wildcard_search`.
+        of modules being compared.  See :meth:`KDEProjectsReader.project_path_matches_wildcard_search`.
 
         Existing items on the ignore list are not removed.
         """

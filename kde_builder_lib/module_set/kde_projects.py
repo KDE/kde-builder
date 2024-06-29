@@ -96,7 +96,7 @@ class ModuleSetKDEProjects(ModuleSet):
         Parameters:
             ctx: The ``BuildContext`` in use.
             module_search_item: The search description to expand in ``Module``s. See
-                _project_path_matches_wildcard_search for a description of the syntax.
+                project_path_matches_wildcard_search for a description of the syntax.
 
         Returns:
             modules List of expanded git Modules.
@@ -140,7 +140,7 @@ class ModuleSetKDEProjects(ModuleSet):
 
             new_module.set_scm_type("proj")
 
-            if self.none_true([KDEProjectsReader._project_path_matches_wildcard_search(result["full_name"], element) for element in ignore_list]):
+            if self.none_true([KDEProjectsReader.project_path_matches_wildcard_search(result["full_name"], element) for element in ignore_list]):
                 module_list.append(new_module)
             else:
                 logger_moduleset.debug(f"--- Ignoring matched active module {new_module} in module set " + self.name)

@@ -110,7 +110,7 @@ class KDEProjectsReader:
         results = []
 
         def find_results():
-            match_list = [key for key in sorted(repositories.keys()) if KDEProjectsReader._project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
+            match_list = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
 
             if re.search(r"\*", proj):
                 for key in match_list:
@@ -146,7 +146,7 @@ class KDEProjectsReader:
         return ret
 
     @staticmethod
-    def _project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:
+    def project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:
         """
         Returns true if the given kde-project full path (e.g.
         kde/kdelibs/nepomuk-core) matches the given search item.
