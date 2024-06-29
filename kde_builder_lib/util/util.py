@@ -387,18 +387,6 @@ class Util:
                 except OSError as e:
                     logger_util.error(f"Error {e} opening log to {logpath}!")
 
-            # Call internal function, name given by $command[1]
-            if command[0] == "kde-builder":
-                # No colors!
-                Debug().set_colorful_output(False)
-                logger_util.debug(f"Calling {command[1]}")
-
-                cmd = command[1]
-                del command[0:2]  # Remove first two elements.
-
-                exitcode = int(cmd())
-                sys.exit(exitcode)
-
             # Make sure we log everything.
             os.close(2)  # close stderr
             os.dup2(1, 2)  # open stderr, that will be our stdout
