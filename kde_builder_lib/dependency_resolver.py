@@ -7,7 +7,6 @@
 from __future__ import annotations
 
 from functools import cmp_to_key
-import json
 import re
 from typing import Callable
 from typing import TYPE_CHECKING
@@ -21,7 +20,6 @@ from .util.util import Util
 
 if TYPE_CHECKING:
     from fileinput import FileInput
-    from typing import TextIO
 
 logger_depres = KBLogger.getLogger("dependency-resolver")
 

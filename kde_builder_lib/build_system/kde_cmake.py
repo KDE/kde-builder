@@ -20,7 +20,6 @@ from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 
 if TYPE_CHECKING:
-    from ..build_context import BuildContext
     from ..module.module import Module
 
 logger_ide_proj = KBLogger.getLogger("ide_project_configs")

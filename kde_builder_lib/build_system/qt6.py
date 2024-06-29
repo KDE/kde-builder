@@ -5,13 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from .kde_cmake import BuildSystemKDECMake
-
-if TYPE_CHECKING:
-    from ..build_context import BuildContext
-    from ..module.module import Module
 
 
 class BuildSystemQt6(BuildSystemKDECMake):
