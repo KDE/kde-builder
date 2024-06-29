@@ -297,40 +297,6 @@ class Util:
         return return_str
 
     @staticmethod
-    def _set_error_logfile(module, logfile) -> None:
-        """
-        Function to mark a file as being the error log for a module. This also
-        creates a symlink in the module log directory for easy viewing.
-        Parameters:
-            module: The module in question.
-            logfile: The filename in the log directory of the error log.
-        """
-        if not logfile:
-            return
-
-        logdir = module.get_log_dir()
-
-        if module.has_sticky_option("error-log-file"):
-            logger_util.error(f"{module} already has error log set, tried to set to r[b[{logfile}]")
-            return
-
-        module.set_option({"#error-log-file": f"{logdir}/{logfile}"})
-        logger_util.debug(f"Logfile for {module} is {logfile}")
-
-        # Setup symlink in the module log directory pointing to the appropriate
-        # file.  Make sure to remove it first if it already exists.
-        if os.path.islink(f"{logdir}/error.log"):
-            os.unlink(f"{logdir}/error.log")
-
-        if os.path.exists(f"{logdir}/error.log"):
-            # Maybe it was a regular file?
-            logger_util.error("r[b[ * Unable to create symlink to error log file]")
-            return
-
-        if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
-            os.symlink(f"{logfile}", f"{logdir}/error.log")
-
-    @staticmethod
     def run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
         """
         Common code for log_command and UtilLoggedSubprocess
@@ -576,7 +542,7 @@ class Util:
         exitcode = subprocess_run(func)
         logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + ".log")}\n""")
         if not exitcode == 0:
-            Util._set_error_logfile(module, f"{filename}.log")
+            module.set_error_logfile(f"{filename}.log")
         return exitcode
 
     @staticmethod

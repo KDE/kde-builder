@@ -1014,3 +1014,34 @@ class Module(OptionsBase):
         env_value = re.sub(r":+", ":", env_value)  # Remove duplicate colons
 
         self.queue_environment_variable(env_name, env_value)
+
+    def set_error_logfile(self, logfile: str) -> None:
+        """
+        Function to mark a file as being the error log for a module. This also creates a symlink in the module log directory for easy viewing.
+        Parameters:
+            logfile: The filename in the log directory of the error log.
+        """
+        if not logfile:
+            return
+
+        logdir = self.get_log_dir()
+
+        if self.has_sticky_option("error-log-file"):
+            logger_module.error(f"{self} already has error log set, tried to set to r[b[{logfile}]")
+            return
+
+        self.set_option({"#error-log-file": f"{logdir}/{logfile}"})
+        logger_module.debug(f"Logfile for {self} is {logfile}")
+
+        # Setup symlink in the module log directory pointing to the appropriate
+        # file. Make sure to remove it first if it already exists.
+        if os.path.islink(f"{logdir}/error.log"):
+            os.unlink(f"{logdir}/error.log")
+
+        if os.path.exists(f"{logdir}/error.log"):
+            # Maybe it was a regular file?
+            logger_module.error("r[b[ * Unable to create symlink to error log file]")
+            return
+
+        if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
+            os.symlink(f"{logfile}", f"{logdir}/error.log")

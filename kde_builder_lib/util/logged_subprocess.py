@@ -257,7 +257,7 @@ class UtilLoggedSubprocess:
 
         # If an exception was thrown or we didn't succeed, set error log
         if not succeeded:
-            Util._set_error_logfile(module, f"{filename}.log")
+            module.set_error_logfile(f"{filename}.log")
 
         return exitcode
 
