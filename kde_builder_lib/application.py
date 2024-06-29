@@ -567,7 +567,7 @@ class Application:
                     return x.full_project_path()
             elif query_mode == "branch":
                 def query(x):
-                    return x.scm()._determine_preferred_checkout_source()[0] or ""
+                    return x.scm().determine_preferred_checkout_source()[0] or ""
             elif query_mode == "module-set":
                 def query(x):
                     return x.module_set.name or "undefined_module-set"

@@ -20,7 +20,7 @@ def test_tag_names_based_on_time():
         scm = mod.scm()
         assert isinstance(scm, Updater)
 
-        branch, sourcetype = scm._determine_preferred_checkout_source()
+        branch, sourcetype = scm.determine_preferred_checkout_source()
         assert branch == "master@{3 weeks ago}", "Right tag name"
         assert sourcetype == "tag", "Result came back as a tag with detached HEAD"
         assert sourcetype == "tag", "Result came back as a tag with detached HEAD"

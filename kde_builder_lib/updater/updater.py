@@ -93,7 +93,7 @@ class Updater:
         return an_id
 
     def _verify_ref_present(self, module: Module, repo: str) -> bool:
-        ref, commit_type = self._determine_preferred_checkout_source(module)
+        ref, commit_type = self.determine_preferred_checkout_source(module)
 
         if Debug().pretending():
             return True
@@ -136,7 +136,7 @@ class Updater:
 
         Util.p_chdir(module.get_source_dir())
 
-        commit_id, commit_type = self._determine_preferred_checkout_source(module)
+        commit_id, commit_type = self.determine_preferred_checkout_source(module)
 
         if commit_type != "none":
             commit_id = re.sub(r"^refs/tags/", "", commit_id)  # git-clone -b doesn't like refs/tags/
@@ -500,7 +500,7 @@ class Updater:
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
-        commit_id, commit_type = self._determine_preferred_checkout_source(module)
+        commit_id, commit_type = self.determine_preferred_checkout_source(module)
         if commit_type == "none":
             commit_type = "branch"
             commit_id = self._detect_default_remote_head(remote_name)
@@ -539,7 +539,7 @@ class Updater:
         head = head.removesuffix("\n")
         return head
 
-    def _determine_preferred_checkout_source(self, module: Module | None = None) -> tuple:
+    def determine_preferred_checkout_source(self, module: Module | None = None) -> tuple:
         """
         Goes through all the various combination of git checkout selection options in
         various orders of priority.

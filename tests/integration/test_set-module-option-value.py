@@ -17,13 +17,13 @@ def test_set_module_option():
 
     module = [m for m in module_list if f"{m}" == "module2"][0]
     scm = module.scm()
-    branch, sourcetype = scm._determine_preferred_checkout_source()
+    branch, sourcetype = scm.determine_preferred_checkout_source()
 
     assert branch == "refs/tags/fake-tag10", "Right tag name"
     assert sourcetype == "tag", "Result came back as a tag"
 
     module = [m for m in module_list if f"{m}" == "setmod2"][0]
-    branch, sourcetype = module.scm()._determine_preferred_checkout_source()
+    branch, sourcetype = module.scm().determine_preferred_checkout_source()
 
     assert branch == "refs/tags/tag-setmod10", "Right tag name (options block from cmdline)"
     assert sourcetype == "tag", "cmdline options block came back as tag"
