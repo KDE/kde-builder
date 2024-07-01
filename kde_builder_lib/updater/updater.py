@@ -101,6 +101,10 @@ class Updater:
         if commit_type == "none":
             ref = "HEAD"
 
+        match = re.search(r"mr/(\d+)", ref)
+        if match:
+            ref = f"refs/merge-requests/{match.group(1)}/head"
+
         process = subprocess.Popen(f"git ls-remote --exit-code {repo} {ref}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             _, _ = process.communicate(timeout=10)
@@ -138,7 +142,7 @@ class Updater:
 
         commit_id, commit_type = self.determine_preferred_checkout_source(module)
 
-        if commit_type != "none":
+        if commit_type != "none" and not re.search(r"mr/(\d+)", commitId):  # in case user uses "mr/123" branch, we will checkout it later
             commit_id = re.sub(r"^refs/tags/", "", commit_id)  # git-clone -b doesn't like refs/tags/
             args.insert(0, commit_id)  # Checkout branch right away
             args.insert(0, "-b")
@@ -146,11 +150,15 @@ class Updater:
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
         if not exitcode == 0:
-            BuildException.croak_runtime("Failed to make initial clone of $module")
+            BuildException.croak_runtime(f"Failed to make initial clone of {module}")
 
         ipc.notify_persistent_option_change(module.name, "git-cloned-repository", git_repo)
 
         Util.p_chdir(srcdir)
+
+        # In case user has set branch option as "mr/123", we must add fetch to the config, do fetch, and checkout the needed branch now.
+        # Let's add mr tracked branches unconditionally here (not only when "mr/123" branches) after clone, because it anyway will be done at next updates.
+        self.update_existing_clone()  # this will add fetch to git config, do the fetch, and checkout the needed branch.
 
         # Setup user configuration
         if name := module.get_option("git-user"):
@@ -276,6 +284,16 @@ class Updater:
             exitcode = Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])
             if not exitcode == 0:
                 BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
+
+        mr_fetch_str = f"+refs/merge-requests/*/head:refs/remotes/{remote}/mr/*"
+        existing_remote_fetches = subprocess.run(f"git config --get-all remote.{remote}.fetch", shell=True, capture_output=True, text=True).stdout
+        existing_remote_fetches = existing_remote_fetches.rstrip("\n").split("\n")
+
+        if mr_fetch_str not in existing_remote_fetches:
+            logger_updater.debug("Adding a fetch for mr/ branches")
+            Util.run_logged(self.module, "git-add-fetch", None, ["git", "config", f"remote.{remote}.fetch", mr_fetch_str])
+        else:
+            logger_updater.debug("A fetch for mr/ branches was already set")
 
         # If we make it here, no exceptions were thrown
         if not self.is_push_url_managed():

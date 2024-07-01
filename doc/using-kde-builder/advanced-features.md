@@ -43,6 +43,21 @@ This function depends on some standard conventions used in most KDE
 modules. Therefore it may not work for all programs.
 ```
 
+If you want to test someone else's merge request, or even set of merge requests across different projects, you can
+specify the `branch` in the `mr/<number>` format:
+
+```
+options kio
+    branch mr/123
+end options
+
+options ark
+    branch mr/456
+end options
+```
+
+After that, build the projects as normal. 
+
 (stopping-the-build-early)=
 ## Stopping the build early
 
