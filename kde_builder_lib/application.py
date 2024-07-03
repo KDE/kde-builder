@@ -882,7 +882,7 @@ class Application:
                     logger_app.error("y[Please edit your config. Replace \"r[install-session-driver]y[\" with \"g[install-login-session]y[\".")
                 if option == "install-environment-driver":  # todo This message is temporary. Remove it after 24.08.2024.
                     logger_app.error("y[Please edit your config. Replace \"r[install-environment-driver]y[\" with \"g[install-login-session]y[\".")
-                raise BuildExceptionConfig(option, f"Unrecognized option \"{option}\" found at {current_file}:{file_reader.current_filehandle().filelineno()}")
+                logger_app.error(f"Unrecognized option \"{option}\" found at {current_file}:{file_reader.current_filehandle().filelineno()}")
 
             # This is addition of python version
             if value == "true":
