@@ -27,7 +27,6 @@ from ..build_system.qmake5 import BuildSystemQMake5
 from ..build_system.qmake6 import BuildSystemQMake6
 from ..build_system.qt4 import BuildSystemQt4
 from ..build_system.qt5 import BuildSystemQt5
-from ..build_system.qt6 import BuildSystemQt6
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.ipc import IPC
@@ -251,7 +250,6 @@ class Module(OptionsBase):
             "kde": BuildSystemKDECMake,
             "qt": BuildSystemQt4,
             "qt5": BuildSystemQt5,
-            "qt6": BuildSystemQt6,
             "autotools": BuildSystemAutotools,
             "meson": BuildSystemMeson,
         }
