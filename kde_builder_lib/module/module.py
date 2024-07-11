@@ -527,25 +527,18 @@ class Module(OptionsBase):
         self.unset_persistent_option("last-install-rev")
         return True
 
-    def apply_user_environment(self) -> None:
-        """
-        Integrates "set-env" option to the build context environment
-        """
-        env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
-
-        for key, value in env_dict.items():
-            self.queue_environment_variable(key, value)
-
     def setup_environment(self) -> None:
         """
-        Establishes proper build environment in the build context. Should be run
+        Establishes proper build environment. Should be run
         before forking off commands for e.g. updates, builds, installs, etc.
         """
+        module_set_env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
+        global_set_env_dict = self.context.get_option("set-env")
+
         # Add global set-env to module set-env (only for those variables that are not defined in module, i.e. those that are not overriding the global).
-        global_set_env = self.context.get_option("set-env")
-        for key, value in global_set_env.items():
-            if key not in self.env:
-                self.env[key] = value
+        for key, value in global_set_env_dict.items():
+            if key not in module_set_env_dict:
+                self.queue_environment_variable(key, value)
 
         # Build system's environment injection
         build_system = self.build_system()
@@ -582,7 +575,8 @@ class Module(OptionsBase):
         build_system.prepare_module_build_environment()
 
         # Add module's set-envs
-        self.apply_user_environment()
+        for key, value in module_set_env_dict.items():
+            self.queue_environment_variable(key, value)
 
     def get_log_dir(self) -> str:
         """
