@@ -473,15 +473,10 @@ class BuildSystemKDECMake(BuildSystem):
                 f.write(env_content)
 
     # @override
-    def build_internal(self, options_name=None) -> dict:
-        """
-        Return value style: dict to build results object (see :meth:`BuildSystem.safe_make`)
-        """
+    def build_options_name(self) -> str:
         generator = self.get_cmake_generator()
-        default_options_name = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
-        if options_name is None:
-            options_name = f"{default_options_name}"
-        return super().build_internal(options_name)
+        options_name = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
+        return options_name
 
     def _safe_run_cmake(self) -> int:
         """

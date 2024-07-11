@@ -44,9 +44,9 @@ class BuildSystemMeson(BuildSystem):
     def supports_auto_parallelism() -> bool:
         return True  # meson requires ninja so supports this by default
 
-    # @override(check_signature=False)
-    def build_internal(self) -> dict:
-        return super().build_internal("ninja-options")
+    # @override
+    def build_options_name(self) -> str:
+        return "ninja-options"
 
     @staticmethod
     # @override

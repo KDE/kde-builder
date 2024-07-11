@@ -166,6 +166,9 @@ class BuildSystem:
     def name() -> str:
         return "generic"
 
+    def build_options_name(self) -> str:
+        return "make-options"
+
     @staticmethod
     def build_commands() -> list[str]:
         """
@@ -200,10 +203,9 @@ class BuildSystem:
         """
         return False
 
-    def build_internal(self, options_name: str = "make-options") -> dict:
-        """
-        Return value style: dict to build results object (see safe_make)
-        """
+    def get_build_options(self) -> list[str]:
+        options_name = self.build_options_name()
+        assert options_name in ["make-options", "ninja-options"]
 
         # I removed the default value to num-cores but forgot to account for old
         # configs that needed a value for num-cores, as this is handled
@@ -217,8 +219,8 @@ class BuildSystem:
             logger_buildsystem.warning(" y[b[*] Removing empty -j setting during build for y[b[" + str(self.module) + "]")
             option_val = re.sub(r"(^|[^a-zA-Z_])-j *", r"\1", option_val)  # Remove the -j entirely for now
 
-        make_options = option_val.split(" ")
-        make_options = [el for el in make_options if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
+        build_options = option_val.split(" ")
+        build_options = [el for el in build_options if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         # Look for CPU core limits to enforce. This handles core limits for all
         # current build systems.
@@ -227,15 +229,22 @@ class BuildSystem:
 
         if num_cores:
             # Prepend parallelism arg to allow user settings to override
-            make_options.insert(0, str(num_cores))
-            make_options.insert(0, "-j")
+            build_options = ["-j", str(num_cores)] + build_options
 
-        return self.safe_make({
+        return build_options
+
+    def build_internal(self) -> dict:
+        """
+        Return value style: dict to build results object (see safe_make)
+        """
+        build_options = self.get_build_options()
+        ret = self.safe_make({
             "target": None,
             "message": "Compiling...",
-            "make-options": make_options,
+            "make-options": build_options,
             "logbase": "build",
         })
+        return ret
 
     def configure_internal(self) -> bool:
         """
