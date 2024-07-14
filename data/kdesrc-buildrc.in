@@ -52,6 +52,10 @@ global
     compile-commands-linking %{compile-commands-linking}
     compile-commands-export %{compile-commands-export}
 
+    # Generate .idea config files in project directories
+    # Enable this if you want to use CLion for development
+    generate-clion-project-config %{generate-clion-project-config}
+
     # Generate .vscode config files in project directories
     # Enable this if you want to use Visual Studio Code for development
     generate-vscode-project-config %{generate-vscode-project-config}

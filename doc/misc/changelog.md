@@ -1,5 +1,8 @@
 # Changelog
 
+2024-07-14
+: Added option `generate-clion-project-config` for the CLion IDE project generation.
+
 2024-05-29
 : Launching the built binaries which names are different from their module name no longer require specifying --exec in --run.
 

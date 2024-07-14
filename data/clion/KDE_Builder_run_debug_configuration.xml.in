@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration
+    default="false"
+    name="KDE Builder run/debug configuration"
+    type="CMakeRunConfiguration"
+    factoryName="Application"
+    REDIRECT_INPUT="false"
+    ELEVATE="false"
+    USE_EXTERNAL_CONSOLE="false"
+    EMULATE_TERMINAL="true"
+    PASS_PARENT_ENVS_2="true"
+    ENVFILE="%{ENVFILE}"
+    CONFIG_NAME="KDE Builder cmake profile"
+    RUN_PATH="%{RUN_PATH}"
+    EXPLICIT_BUILD_TARGET_NAME="all"
+  >
+    <envs>
+%{env_entries}
+    </envs>
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      <option name="CMake.Install" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -342,6 +342,12 @@ class BuildSystemKDECMake(BuildSystem):
         if self._safe_run_cmake():
             return False
 
+        # Note, that this must be after _safe_run_cmake(), because we need the list of cmake generate options that were used there.
+        if module.get_option("generate-clion-project-config"):
+            self.generate_clion_config()
+        else:
+            logger_ide_proj.debug("\tGenerating .idea directory - disabled for this module")
+
         if module.get_option("generate-vscode-project-config"):
             self.convert_prefixsh_to_env()
 
@@ -412,6 +418,92 @@ class BuildSystemKDECMake(BuildSystem):
         self._write_to_file(f"{config_dir}/extensions.json", extensions_json)
         self._write_to_file(f"{config_dir}/launch.json", launch_json)
         self._write_to_file(f"{config_dir}/tasks.json", tasks_json)
+
+        return True
+
+    def generate_clion_config(self) -> bool:
+        if Debug().pretending():
+            logger_ide_proj.pretend("\tWould have generated .idea directory")
+            return False
+
+        branch_group = self.module.context.get_option("branch-group")
+        project_name = self.module.name
+        if branch_group != "kf6-qt6":
+            project_name += f" ({branch_group})"
+        src_dir = self.module.fullpath("source")
+        config_dir = f"{src_dir}/.idea"
+
+        if os.path.exists(config_dir):
+            if os.path.isdir(config_dir):
+                logger_ide_proj.debug("\tGenerating .idea directory - skipping as it already exists")
+            elif os.path.isfile(config_dir):
+                logger_ide_proj.error("\tGenerating .idea directory - cannot proceed, file .idea exists")
+            return False
+        else:
+            logger_ide_proj.debug(f"\tGenerating .idea directory for {project_name}: {config_dir}")
+
+        os.mkdir(config_dir)
+        os.mkdir(config_dir + "/runConfigurations")
+
+        self._write_to_file(f"{config_dir}/.name", project_name + "\n")
+
+        module: Module = self.module
+        build_dir = module.fullpath("build")
+        cmake_opts = module.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
+        cmake_opts = " ".join(cmake_opts)
+        build_opts = self.get_build_options()
+        build_opts = " ".join(build_opts)
+
+        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
+        data_dir = f"{base_dir}/data/clion"
+
+        cmake_xml = self._read_file(f"{data_dir}/cmake.xml.in")
+        cmake_xml = cmake_xml.replace("%{GENERATION_DIR}", build_dir)
+        cmake_xml = cmake_xml.replace("%{GENERATION_OPTIONS}", cmake_opts)
+        cmake_xml = cmake_xml.replace("%{BUILD_OPTIONS}", build_opts)
+        env_entries_str = ""
+        for key, val in module.env.items():
+            env_entries_str += " " * 12 + f"""<env name="{key}" value="{val}" />\n"""
+        env_entries_str = env_entries_str.removesuffix("\n")
+        cmake_xml = cmake_xml.replace("%{env_entries}", env_entries_str)
+
+        self._write_to_file(f"{config_dir}/cmake.xml", cmake_xml)
+
+        run_conf_xml = self._read_file(f"{data_dir}/KDE_Builder_run_debug_configuration.xml.in")
+        extra_run_env = module.get_option("source-when-start-program")
+        run_conf_xml = run_conf_xml.replace("%{ENVFILE}", extra_run_env)
+        install_dir = module.installation_path()
+        executable = install_dir + "/bin/" + module.name
+        run_conf_xml = run_conf_xml.replace("%{RUN_PATH}", executable)
+
+        # Currently, unlike in PyCharm run configurations, it CLion run configurations it is not possible to specify several env files.
+        # And because we need to keep user's env from source-when-start-program file in a file (so user can easily edit it),
+        # we will convert the prefix.sh into the individual variables.
+
+        prefix_content = self._read_file(build_dir + "/prefix.sh")
+        # Their format is very weird: it needs to use trailing "$" in variable names, and does not support expansions.
+        # So, instead of expansion, will just use variables as is.
+        prefix_content = prefix_content.replace("$PATH", "$PATH$")
+        prefix_content = prefix_content.replace("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "$XDG_DATA_DIRS$:/usr/local/share/:/usr/share/")
+        prefix_content = prefix_content.replace("${XDG_CONFIG_DIRS:-/etc/xdg}", "$XDG_CONFIG_DIRS$:/etc/xdg")
+        prefix_content = prefix_content.replace("$QT_PLUGIN_PATH", "$QT_PLUGIN_PATH$")
+        prefix_content = prefix_content.replace("$QML2_IMPORT_PATH", "$QML2_IMPORT_PATH$")
+        prefix_content = prefix_content.replace("$QT_QUICK_CONTROLS_STYLE_PATH", "$QT_QUICK_CONTROLS_STYLE_PATH$")
+
+        env_entries_str = ""
+        for line in prefix_content.split("\n"):
+            if line.startswith("#") or line == "":
+                continue
+            line = line.removeprefix("export ")
+            var, val = line.split("=", maxsplit=1)
+            env_entries_str += " " * 6 + f"""<env name="{var}" value="{val}" />\n"""
+        env_entries_str = env_entries_str.removesuffix("\n")
+
+        run_conf_xml = run_conf_xml.replace("%{env_entries}", env_entries_str)
+        self._write_to_file(f"{config_dir}/runConfigurations/KDE_Builder_run_debug_configuration.xml", run_conf_xml)
+
+        misc_xml = self._read_file(f"{data_dir}/misc.xml")
+        self._write_to_file(f"{config_dir}/misc.xml", misc_xml)
 
         return True
 
@@ -532,6 +624,7 @@ class BuildSystemKDECMake(BuildSystem):
             commands.append("-DBUILD_TESTING:BOOL=ON")
 
         commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
+        self.module.cmake_opts = commands  # Remember them for later, if user wants to generate clion project configs
 
         old_options = module.get_persistent_option("last-cmake-options") or ""
         builddir = module.fullpath("build")

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSharedSettings">
+    <configurations>
+      <configuration
+        PROFILE_NAME="KDE Builder cmake profile"
+        ENABLED="true"
+        GENERATION_DIR="%{GENERATION_DIR}"
+        TOOLCHAIN_NAME="KDE Builder toolchain"
+        GENERATION_OPTIONS="%{GENERATION_OPTIONS}"
+        BUILD_OPTIONS="%{BUILD_OPTIONS}"
+      >
+        <ADDITIONAL_GENERATION_ENVIRONMENT>
+          <envs>
+%{env_entries}
+          </envs>
+        </ADDITIONAL_GENERATION_ENVIRONMENT>
+      </configuration>
+    </configurations>
+  </component>
+</project>

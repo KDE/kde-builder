@@ -135,6 +135,7 @@ class BuildContext(Module):
             "delete-my-patches": False,  # Should only be set from cmdline
             "delete-my-settings": False,  # Should only be set from cmdline
             "disable-agent-check": False,  # If true we don't check on ssh-agent
+            "generate-clion-project-config": False,
             "generate-vscode-project-config": False,
             "include-dependencies": True,
             "install-after-build": True,

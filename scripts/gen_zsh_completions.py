@@ -139,6 +139,7 @@ short_descriptions = {  # contains one of the options (any of them) from set, an
     "--do-not-compile": "Select a specific set of directories not to be built in a module",
     "--force-build": "Disable skipping the build process.",
     "--generate-config": "Installs a base kdesrc-buildrc",
+    "--generate-clion-project-config": "Generate a clion project config",
     "--generate-vscode-project-config": "Generate a vscode project config",
     "--help": "Displays help on commandline options",
     "--list-installed": "Print installed modules and exit",

@@ -1,0 +1,7 @@
+<application>
+  <component name="CPPToolchains" version="9">
+    <toolchains detectedVersion="5">
+      <toolchain name="KDE Builder toolchain" toolSetKind="SYSTEM_UNIX_TOOLSET" customCMakePath="cmake" debuggerKind="CUSTOM_GDB" customGDBPath="gdb" />
+    </toolchains>
+  </component>
+</application>

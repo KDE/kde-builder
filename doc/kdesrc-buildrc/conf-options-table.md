@@ -600,6 +600,27 @@ project metadata.
 
 Related command-line option: --directory-layout \<value\>
 
+(conf-generate-clion-project-config)=
+[`generate-clion-project-config`](conf-generate-clion-project-config)
+
+Type: Boolean, Default value: False
+
+Module setting overrides global
+
+Set this option to `true` to make KDE Builder create CLion project files (.idea directory) in the module source directory.
+
+The .idea folder will be created in the project source directory, only if it does not already exist.
+
+```{note}
+You will need to manually create a toolchain named "KDE Builder toolchain" in Clion.  
+This cannot be automated, because this configuration is stored in IDE configs, not in the project configs.  
+The IDE configs location is dependent on the IDE version.  
+If you do not have any toolchanis yet, place the `data/clion/toolchains.xml` file into the configuration
+directory of the IDE, i.e. the path would look like `/home/andrew/.config/JetBrains/CLion2024.2/options/linux/toolchains.xml`.
+```
+
+Related command-line option: [--generate-clion-project-config](#cmdline-generate-clion-project-config)
+
 (conf-generate-vscode-project-config)=
 [`generate-vscode-project-config`](conf-generate-vscode-project-config)
 

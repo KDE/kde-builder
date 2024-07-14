@@ -9,6 +9,7 @@ License: CC0-1.0
 
 Files:  .gitignore
         data/00-plasma.conf.in
+        data/clion/*
         data/kdesrc-buildrc.in
         data/kde-builder-logging.yaml
         data/kde-builder.desktop.in
