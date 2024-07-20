@@ -47,8 +47,7 @@ logger_module = KBLogger.getLogger("module")
 
 class Module(OptionsBase):
     """
-    A subclass of :class:`OptionsBase`, which represents a source code module of some
-    sort that can be updated, built, tested and installed.
+    Represents a source code module of some sort that can be updated, built, tested and installed.
 
     This uses abstract interfaces to represent the build_system and the source code
     version control system (:class:`BuildSystem` and :class:`Updater` respectively).
@@ -107,20 +106,29 @@ class Module(OptionsBase):
         return self.name
 
     def get_module_set(self):
+        """
+        Returns the :class:`ModuleSet` that was assigned earlier. If no ModuleSet was assigned, returns a valid (but null) ModuleSet.
+        """
         from ..module_set.null import ModuleSetNull
         if not self.module_set:
             self.module_set = ModuleSetNull()
         return self.module_set
 
     def set_module_set(self, module_set: ModuleSet) -> None:
+        """
+        Optional, specifies the `ModuleSet` this module was spawned from.
+        """
         from ..module_set.module_set import ModuleSet
         Util.assert_isa(module_set, ModuleSet)
         self.module_set = module_set
 
     def get_subdir_path(self, subdir_option: str) -> str:
         """
-        Function to retrieve a subdirectory path with tilde-expansion and relative path handling.
-        The parameter is the option key (e.g. build-dir or log-dir) to read and interpret.
+        Returns a subdirectory path from the rc-file (based on the option-name) as an absolute path.
+
+        Handles tilde expansion and relative paths.
+        Parameters:
+            subdir_option: The option key (e.g. "build-dir" or "log-dir") to read and interpret.
         """
         directory = self.get_option(subdir_option)
 
@@ -196,14 +204,17 @@ class Module(OptionsBase):
 
     def get_source_dir(self) -> str:
         """
+        Returns absolute base path to the source directory
+
         Do note that this returns the *base* path to the source directory,
-        without the module name or kde_projects stuff appended. If you want that
-        use function fullpath().
+        without the module name or kde_projects stuff appended. If you want that, use :meth:`fullpath()`.
         """
         return self.get_subdir_path("source-dir")
 
     def scm(self):
-
+        """
+        Autodetects the appropriate scm plugin if not already done (or manually set), and then returns the `Updater` plugin.
+        """
         if self.scm_obj:
             return self.scm_obj
 
@@ -212,6 +223,11 @@ class Module(OptionsBase):
         return self.scm_obj
 
     def set_scm_type(self, scm_type: str) -> None:
+        """
+        Sets the source control plugin (git, kde-projects) based on the given scm_type name.
+
+        Normally auto-detection is used instead, this permits manual setup.
+        """
         new_type = None
         if scm_type == "git":
             new_type = Updater(self)
@@ -228,16 +244,25 @@ class Module(OptionsBase):
 
     def scm_type(self) -> str:
         """
-        Returns a string describing the scm platform of the given module.
+        Returns the name of the scm plugin, as determined by :meth:`scm()`.
+
         Return value: "git" at this point, as appropriate.
         """
         return self.scm().name()
 
     def current_scm_revision(self) -> str:
+        """
+        Returns a string with scm-specific revision ID.
+
+        Can be a Git-style SHA or something else entirely.
+        Can case an autodetection of the scm plugin.
+        """
         return self.scm().current_revision_internal()
 
     def build_system_from_name(self, name: str) -> BuildSystem:
         """
+        As with :meth:`set_scm_type()`, used to manually set the build system plugin. This is exposed to the user as "override-build-system".
+
         Returns a new build system object, given the appropriate name.
         This is a suboptimal way to fix the problem of allowing users to override
         the detected build system (we could instead use introspection to figure out
@@ -261,6 +286,9 @@ class Module(OptionsBase):
         return class_name(self)
 
     def build_system(self) -> BuildSystem:
+        """
+        Autodetects the appropriate build system plugin if not already done (or manually set) and then returns the `BuildSystem` plugin.
+        """
         if self.build_obj and self.build_obj.name() != "generic":
             return self.build_obj
 
@@ -305,26 +333,29 @@ class Module(OptionsBase):
 
     def set_build_system(self, obj: BuildSystem) -> None:
         """
-        Sets the build system **object**, although you can find the build system
-        type afterwards (see build_system_type).
+        Sets the build system **object**, although you can find the build system type afterwards (see build_system_type).
+
+        Like :meth:`build_system_from_name()`, but passes the proper `BuildSystem` directly.
         """
         Util.assert_isa(obj, BuildSystem)
         self.build_obj = obj
 
     def build_system_type(self) -> str:
         """
+        Returns the name of the build system plugin, as determined by :meth:`build_system()`.
+
         Current possible build system types: KDE (i.e. cmake), Qt, autotools (either configure or autogen.sh).
         A final possibility is "pendingSource" which simply means that we don't know yet.
 
         If the build system type is not set ("pendingSource" counts as being set!) when this function is called
         then it will be autodetected if possible, but note that not all possible types will be detected this way.
-        If in doubt use setBuildSystemType
         """
         return self.build_system().name()
 
     def build(self) -> bool:
         """
-        Function to build this module.
+        Executes the build and install (or pretends to in pretend mode) using the appropriate build system. Can also run the testsuite as part of the build.
+
         Returns:
              False on failure, True on success.
         """
@@ -368,7 +399,9 @@ class Module(OptionsBase):
 
     def setup_build_system(self) -> bool:
         """
-        Function to set up the build system in a directory.
+        Sets up the build system for the module to permit :meth:`build()` to work, including creating build dir, running cmake/configure/etc.
+
+        It is called automatically but will not take any action if the build system is already established.
         Returns:
              True on success, False (0) on failure.
         """
@@ -437,7 +470,8 @@ class Module(OptionsBase):
 
     def install(self) -> bool:
         """
-        Responsible for installing the module (no update, build, etc.)
+        Installs (or pretends to install) the module.
+
         Returns:
              False on failure, True on success.
         Exceptions may be thrown for abnormal conditions (e.g. no build dir exists)
@@ -498,8 +532,9 @@ class Module(OptionsBase):
 
     def uninstall(self) -> bool:
         """
-        Handles uninstalling this module
+        Uninstalls (or pretends to uninstall) the module.
 
+        Not normally called but can be configured to be called.
         Returns:
              False on failure, True on success.
         """
@@ -530,8 +565,9 @@ class Module(OptionsBase):
 
     def setup_environment(self) -> None:
         """
-        Establishes proper build environment. Should be run
-        before forking off commands for e.g. updates, builds, installs, etc.
+        Establishes proper build environment.
+
+        Should be run before forking off commands for e.g. updates, builds, installs, etc.
         """
         module_set_env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
         global_set_env_dict = self.context.get_option("set-env")
@@ -581,22 +617,26 @@ class Module(OptionsBase):
 
     def get_log_dir(self) -> str:
         """
-        Returns the path to the log directory used during this run for this
-        ``Module``, based on an autogenerated unique id. The id doesn't change
-        once generated within a single run of the script.
+        Returns the base path to the log directory for this module during this execution.
+
+        **NOTE** Different modules can have different base paths.
+        The dir name is based on an autogenerated unique id. The id doesn't change once generated within a single run of the kde-builder.
         """
         return self.context.get_log_dir_for(self)
 
     def get_log_path(self, path: str) -> str:
         """
-        Returns a full path that can be open()'d to write a log
-        file, based on the given basename (with extension).
+        Returns a full path that can be open()'d to write a log file, based on the given basename (with extension).
+
         Updates the "latest" symlink as well, unlike get_log_dir
         Use when you know you're going to create a new log
         """
         return self.context.get_log_path_for(self, path)
 
     def update(self, ipc, ctx) -> bool:
+        """
+        Executes the update (or pretends to do so) using the appropriate source control system and returns a True/False value reflecting success.
+        """
         module_name = self.name
         module_src_dir = self.get_source_dir()
         kdesrc = ctx.get_source_dir()
@@ -679,10 +719,12 @@ class Module(OptionsBase):
     # @override
     def set_option(self, options: dict) -> None:
         """
-        This calls :meth:`OptionsBase.set_option` and performs any Module-specific
-        handling.
-        """
+        Sets a configuration option that can be checked later using :meth:`get_option()`.
 
+        Normally set from user input (cmdline or rc-file) but supports ways for kde-builder to internally override user settings or set hidden flags
+        for action in later phases. Does not survive beyond the current execution.
+        This calls :meth:`OptionsBase.set_option` and performs any Module-specific handling.
+        """
         # Ensure we don't accidentally get fed module-set options
         for mso in ["use-modules", "ignore-modules"]:
             if mso in options:
@@ -736,8 +778,9 @@ class Module(OptionsBase):
     # @override(check_signature=False)
     def get_option(self, key: str, level_limit="allow-inherit") -> str | bool | dict | None:
         """
-        This function returns an option value for a given module. Some globals
-        can't be overridden by a module's choice (but see 2nd parameter below).
+        Returns an option value for a given module.
+
+        Some globals can't be overridden by a module's choice (but see level_limit parameter below).
         If so, the module's choice will be ignored, and a warning will be issued.
 
         Option names are case-sensitive!
@@ -749,6 +792,10 @@ class Module(OptionsBase):
         Likewise, some qt module options do not obey the previous proviso since
         Qt options are not likely to agree nicely with generic KDE build_system
         options.
+
+        Options starting with "#" can only be set internally (i.e. not from rc-file
+        or cmdline) so this can be used as a way to tag modules with data meant not
+        to be user-accessible.
 
         Parameters:
             key: Name of option
@@ -765,7 +812,6 @@ class Module(OptionsBase):
           dict - "set-env"
           str - almost everything else
         """
-
         ctx = self.context
 
         # Some global options would probably make no sense applied to Qt.
@@ -790,16 +836,18 @@ class Module(OptionsBase):
         if key in conf_flags and ctx_value:
             return (f"{ctx_value} " + self.options.get(key, "")).strip()
 
-        # Everything else overrides the global option, unless it's simply not
-        # set at all.
+        # Everything else overrides the global option, unless it's simply not set at all.
         return self.options.get(key, ctx_value)
 
     def get_persistent_option(self, key: str) -> str | int | None:
         """
-        Gets persistent options set for this module. First parameter is the name
-        of the option to lookup. None is returned if the option is not set,
-        although even if the option is set, the value returned might be empty.
-        Note that ``BuildContext`` also has this function, with a slightly
+        Returns option value that had been set in a previous kde-builder run (saved in a file on disk).
+
+        Parameters:
+             key: The name of the option to lookup.
+
+        None is returned if the option is not set, although even if the option is set, the value returned might be empty.
+        Note that `BuildContext` also has this function, with a slightly
         different signature, which OVERRIDEs this function since Perl does not
         have parameter-based method overloading.
 
@@ -809,7 +857,8 @@ class Module(OptionsBase):
 
     def set_persistent_option(self, key: str, value) -> None:
         """
-        Sets a persistent option (i.e. survives between processes) for this module.
+        Sets an option to a string value, that will be read-in again on the next kde-builder run and can then be queried again.
+
         Parameters:
             key: The name of the persistent option.
             value: Its actual value.
@@ -820,12 +869,19 @@ class Module(OptionsBase):
 
     def unset_persistent_option(self, key: str) -> None:
         """
-        Unsets a persistent option for this module.
-        Only parameter is the name of the option to unset.
+        Removes an existing persistent option.
+
+        Parameters:
+            key: The name of the option to unset.
         """
         self.context.unset_persistent_option(self.name, key)
 
     def fullpath(self, dirtype: str) -> str:
+        """
+        Returns the absolute full path to the source or build directory, including any module name or dest-dir.
+
+        This is the directory you can git-clone to, cd to for build, etc.
+        """
         # Returns the path to the desired directory type (source or build),
         # including the module destination directory itself.
         Util.assert_in(dirtype, ["build", "source"])
@@ -835,8 +891,10 @@ class Module(OptionsBase):
 
     def full_project_path(self) -> str:
         """
-        Returns the "full kde-projects path" for the module. As should be obvious by
-        the description, this only works for modules with scm type that is a
+        Returns the "legacy kde project path" for the module.
+
+        E.g. for the "juk" module, would return "kde/kdemultimedia/juk".
+        This only works for modules with scm type that is a
         :class:`UpdaterKDEProject` (or its subclasses), but modules that don't fall into this
         hierarchy will just return the module name (with no path components) anyway.
         """
@@ -850,11 +908,15 @@ class Module(OptionsBase):
 
     def dest_dir(self) -> str:
         """
-        Function to return the name of the destination directory for the
-        checkout and build routines. Based on the dest-dir option. The return
-        value will be relative to the src/build dir. The user may use the
-        "$MODULE" or "${MODULE}" sequences, which will be replaced by the name of
-        the module in question.
+        Returns the "dest-dir" for the module, used for the checkout and build routines.
+
+        The return value will be relative to the src/build dir. The user may use the
+        "$MODULE" or "${MODULE}" sequences, which will be replaced by the name of the module in question.
+
+        dest-dir is effectively just a way to modify the on-disk module name. It used to be used more heavily
+        to allow for having multiple build/source directories for a given module (varying by branch or tag),
+        but even with git this value may change for KDE-based repositories to set subdirectories that match KDE project
+        paths. Supports expanding "$MODULE" or "${MODULE}" sequences to what otherwise would have been the dest-dir.
         """
         dest_dir = self.get_option("dest-dir")
         base_path = None
@@ -881,8 +943,9 @@ class Module(OptionsBase):
 
     def installation_path(self) -> str:
         """
-        Function to return the installation path of a given module (the value
-        that is passed to the CMAKE_INSTALL_PREFIX CMake option).
+        Returns the installation path of a given module
+
+        This is the value that is passed to the CMAKE_INSTALL_PREFIX CMake option.
         It is based on the "install-dir" option.
         The user may use "$MODULE" or "${MODULE}" in the "install-dir" option to have
         them replaced by the name of the module in question.
@@ -895,19 +958,18 @@ class Module(OptionsBase):
 
     def get_post_build_messages(self) -> list[str]:
         """
-        Returns a list of any "post-build" messages that have been set for the module
-        to show after the build has ended. These may be messages such as warning of a
-        local source conflict that may have scrolled past or similar things the user
+        Returns a list of any "post-build" messages that have been set for the module to show after the build has ended.
+
+        These may be messages such as warning of a local source conflict that may have scrolled past or similar things the user
         needs to know about.
 
-        Each entry in the list will be a text message that should be shown (perhaps
-        with additional formatting).
+        Each entry in the list will be a text message that should be shown (perhaps with additional formatting).
         """
         return self.post_build_msgs
 
     def add_post_build_message(self, new_msg: str) -> None:
         """
-        Adds the given message to the list of post-build messages to show to the user
+        Adds the given message to the list of post-build messages to show to the user.
         """
         self.post_build_msgs.append(new_msg)
 
@@ -932,9 +994,9 @@ class Module(OptionsBase):
 
     def commit_environment_changes(self) -> None:
         """
-        Applies all changes queued by queue_environment_variable to the actual
-        environment irretrievably. Use this before exec()'ing another child, for
-        instance.
+        Applies all changes queued by queue_environment_variable to the actual environment irretrievably.
+
+        Use this before exec()'ing another child, for instance.
         """
         for key, value in self.env.items():
             logger_module.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
@@ -954,8 +1016,9 @@ class Module(OptionsBase):
 
     def prepend_environment_value(self, env_name: str, path_element: str) -> None:
         """
-        Adds the given library paths to the path already given in an environment
-        variable. In addition, detected "system paths" are stripped to ensure
+        Adds the given library paths to the path already given in an environment variable.
+
+        In addition, detected "system paths" are stripped to ensure
         that we don't inadvertently re-add a system path to be promoted over the
         custom code we're compiling (for instance, when a system Qt is used and
         installed to /usr).
@@ -1011,6 +1074,7 @@ class Module(OptionsBase):
     def set_error_logfile(self, logfile: str) -> None:
         """
         Function to mark a file as being the error log for a module. This also creates a symlink in the module log directory for easy viewing.
+
         Parameters:
             logfile: The filename in the log directory of the error log.
         """

@@ -409,10 +409,10 @@ class BuildContext(Module):
 
     def get_log_path_for(self, module: Module, path: str) -> str:
         """
-        Constructs the appropriate full path to a log file based on the given
-        basename (including extensions). Use this instead of get_log_dir_for when you
-        actually intend to create a log, as this function will also adjust the
-        "latest" symlink properly.
+        Returns the absolute filename to open() for a log file for this module based on the given basename (including extensions). Updates the "latest" symlink.
+
+        Use this instead of get_log_dir_for when you actually intend to create a log, as this function will also adjust the
+        "latest" symlink properly (which can trigger clean up of old log dirs after all modules are built).
         """
         base_log_path = module.get_subdir_path("log-dir")
         log_dir = self.get_log_dir_for(module)
