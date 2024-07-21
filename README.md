@@ -1,5 +1,5 @@
 <!--
-SPDX-License-Identifier: CC-BY-4.0
+SPDX-License-Identifier: CC-BY-SA-4.0
 SPDX-FileCopyrightText: 2024 Andrew Shark <ashark@linuxcomp.ru>
 -->
 
