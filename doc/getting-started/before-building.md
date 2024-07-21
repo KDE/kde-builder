@@ -1,25 +1,6 @@
 (before-building)=
 # Installation and initial configuration
 
-(before-building-users)=
-## Setup a new user account
-
-It is recommended that you use a different user account to build,
-install, and run your KDE software from, since less permissions are
-required, and to avoid interfering with your distribution's packages. If
-you already have KDE packages installed, the best choice would be to
-create a different (dedicated) user to build and run the new KDE.
-
-```{tip}
-Leaving your system KDE untouched also allows you to have an emergency
-fallback in case a coding mistake causes your latest software build to
-be unusable.
-```
-
-You can also change configuration to install to a system-wide directory
-(e.g. `/usr/src/local`) if you wish. This document does not cover this
-installation type, since we assume you know what you are doing.
-
 (initial-setup-of-kde-builder)=
 ## Initial Setup of KDE Builder
 

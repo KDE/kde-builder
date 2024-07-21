@@ -200,13 +200,13 @@ Related command-line option: --num-cores-low-mem \<value\>
 
 Type: String
 
-Use this option to change where kde-builder stores its persistent
-data. The default is to store this data in a file called
-`.kdesrc-build-data`, placed in the same directory as the
-configuration file in use. If the global configuration file is in use,
-it will be saved to `~/.local/state/kdesrc-build-data`
-(`$XDG_STATE_HOME/kdesrc-build-data`, if `$XDG_STATE_HOME` is set). If you have multiple available
-configurations in the same directory, you may want to manually set this
+Use this option to change where kde-builder stores its persistent data.
+
+By default, the location for this data is determined as follows: in case the used config file was from the current working directory, then file for this data 
+will be called `.kdesrc-build-data`, placed in the same directory as the configuration file; in case the config from
+`~/.config/kdesrc-buildrc` was used, then file for this data will be `~/.local/state/kdesrc-build-data`.
+
+If you have multiple available configurations in the same directory, you may want to manually set this
 option, so that different configurations do not end up with conflicting
 persistent data.
 
@@ -249,7 +249,8 @@ Related command-line option: --use-idle-io-priority, --no-use-idle-io-priority
 
 Type: Boolean, Default value: False
 
-Allow kde-builder to also clone and pull from repositories marked as inactive.
+Some projects in repo-metadata are marked as inactive, and kde-builder ignores them. This option, if enabled, allows kde-builder to consider them as 
+active, which can be used to clone archived projects.
 
 Related command-line option: --use-inactive-modules, --no-use-inactive-modules
 
@@ -372,17 +373,17 @@ Related command-line option: [--build-when-unchanged](#cmdline-build-when-unchan
 
 Type: String, Default value: Unix Makefiles
 
-Specify which generator to use with CMake. `Ninja` and `Unix Makefiles` are supported.
+The generator that will be used by cmake. You can use `Ninja` or `Unix Makefiles` on Linux.
 
 ```{note}
 The Extra Generators (like `Kate - Ninja`) are also supported. But note that they are deprecated since cmake version 3.27.
 See [documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#extra-generators).
 ```
 
-Invalid (unsupported) values are ignored and treated as if unset.
+If you specify invalid value, it will be ignored.
 
-Note that if a valid generator is also specified through [cmake-options](#conf-cmake-options)
-it will override the value for `cmake-generator`.
+Also note, that you may also specify the generator directly in [cmake-options](#conf-cmake-options) (with "-G" option). In this case, if it is valid, it 
+will be used, and not the value from the `cmake-generator`.
 
 Related command-line option: --cmake-generator \<value\>
 
@@ -391,17 +392,16 @@ Related command-line option: --cmake-generator \<value\>
 
 Type: String
 
-Specify a toolchain file to use with CMake.
+A toolchain file to be used by cmake.
 
-When a valid toolchain file is configured, kde-builder will _no
-longer set environment variables automatically_. You can use [set-env](#conf-set-env),
-[binpath](#conf-binpath) and [libpath](#conf-libpath) to fix up the environment
-manually if your toolchain file does not work out of the box with
-kde-builder. Refer to [the overview of standard flags added by kde-builder](#kde-builder-std-flags)
-for more information.
+By default, the toolchain is not set, and kde-builder automatically sets the needed environment variables, see the
+[standard flags added by kde-builder](#kde-builder-std-flags).  
+In case you specify a valid toolchain file with this option, kde-builder will not set them automatically.
+So, if it is required to set some environment variables, you can do so with [set-env](#conf-set-env). Also see [binpath](#conf-binpath) and 
+[libpath](#conf-libpath).
 
-Note that if a valid toolchain is also specified through [cmake-options](#conf-cmake-options)
-it will override the value for `cmake-toolchain`.
+Also note, that you may also specify a toolchain in [cmake-options](#conf-cmake-options) (with "-DCMAKE_TOOLCHAIN_FILE" option), and if it is valid, it 
+will be used, and not the value from `cmake-toolchain`.
 
 Related command-line option: --cmake-toolchain \<value\>
 
@@ -419,13 +419,11 @@ it is applied to all modules that KDE Builder builds. When used as a
 module option, it is added to the end of the global options. This allows
 you to specify common CMake options in the global section.
 
-If a valid generator is specified among the listed options it will
-override the value of [cmake-generator](#conf-cmake-generator). Invalid (unsupported)
-generators are ignored and will not be passed to CMake.
+If you specify a valid (supported) generator in `cmake-options`, it will override the value from [cmake-generator](#conf-cmake-generator) option. In case 
+invalid (unsupported) generator was used, it will be ignored and will not be passed to cmake.
 
-If a valid toolchain file is specified among the listed options it
-will override the value of [cmake-toolchain](#conf-cmake-toolchain). Invalid toolchains are
-ignored and will not be passed to CMake.
+If you specify a valid toolchain file in `cmake-options`, it will override the value from [cmake-toolchain](#conf-cmake-toolchain) option. In case invalid 
+toolchain was used, it will be ignored and not be passed to cmake.
 
 Since these options are passed directly to the CMake command line,
 they should be given as they would be typed into CMake. For example:
@@ -446,7 +444,7 @@ Related command-line option: --cmake-options \<value\>
 
 Type: Boolean, Default value: True
 
-Enables the generation of a `compile_commands.json` via CMake inside the build directory.
+If enabled, the `compile_commands.json` file will be generated in the build directory.
 
 Related command-line option: --compile-commands-export, --no-compile-commands-export
 
@@ -455,8 +453,7 @@ Related command-line option: --compile-commands-export, --no-compile-commands-ex
 
 Type: Boolean, Default value: True
 
-Enables the creation of symbolic links from `compile_commands.json` generated via CMake inside the build
-directory to the matching source directory.
+If enabled, kde-builder will make a symbolic link in the source directory, pointing to the `compile_commands.json` file in the build directory.
 
 Related command-line option: --compile-commands-linking, --no-compile-commands-linking
 
@@ -572,31 +569,26 @@ The value must be specified in the form
 
 Type: String, Valid values: `flat`, `invent`, `metadata`, Default value: flat
 
-This option is used to configure the layout which kde-builder should
-use when creating source and build directories.
+Controls the structure of source and build directories for the modules when kde-builder creates them.
 
-The `flat` layout will group all modules directly
-underneath the top level source and build directories. For example,
-`source/extragear/network/telepathy/ktp-text-ui` in the
-`metadata` layout would be `source/ktp-text-ui`
-using the `flat` layout instead.
+Assuming your [`source-dir`](conf-source-dir) is set to `~/kde/src`, and you do not redefine [`dest-dir`](conf-dest-dir).
 
-The `invent` layout creates a directory hierarchy
-mirroring the relative paths of repositories on [invent.kde.org](https://invent.kde.org/). For example
-`source/kde/applications/kate` in the `metadata`
-layout would be `source/utilities/kate` using the
-`invent` layout instead. This layout only affects KDE
-projects. It is a good choice for people starting out with
-kde-builder.
+Let's take KCalc as an example. It's metadata.yaml contains the following lines:
+```yaml
+projectpath: kde/kdeutils/kcalc
+repopath: utilities/kcalc
+```
 
-Finally, the `metadata` layout is the same as the old
-default behaviour. This layout organises KDE projects according to the
-project paths specified in the project metadata for these modules. This
-is a good choice if you want a directory layout which tracks with
-certain KDE processes, but note that this path is therefore not always
-stable. As a result, kde-builder may abandon an old copy of the
-repository and clone a new one for a project due to changes in the
-project metadata.
+If you use `flat` layout, the KCalc source directory will be created in the source-dir in the subfolder, named as a module: `~/kde/src/kcalc`.
+
+If you use `invent` layout, the source directory will be created in the source-dir in the subfolders, as seen in the repository path in
+[invent.kde.org](https://invent.kde.org/) (corresponds to the repopath field in metadata): `~/kde/src/utilities/kcalc`.
+
+If you use `metadata` layout, the source directory will be created in the source-dir in the subfolders, as seen in the projectpath field in metadata: 
+`~/kde/src/kde/kdeutils/kcalc`.
+
+Please avoid the `metadata` layout, as projectpath field is not stable (and so, when it changes, kde-builder will clone the repo to the new path and 
+your work may stay in the source dir from old path) and projectpath is a subject for removal.
 
 Related command-line option: --directory-layout \<value\>
 
@@ -628,17 +620,11 @@ Type: Boolean, Default value: False
 
 Module setting overrides global
 
-Set this option to `true` to make kde-builder create VS
-Code project files (.vscode directory) in the module source
-directory.
+Visual Studio Code IDE uses .vscode directory for the project settings in the source directory. If this directory does not exist yet, and this option 
+is enabled, it will be created with the build settings and environment from kde-builder, making it easy to just start hacking on a project.
 
-The .vscode folder will be created in the project source directory,
-only if it does not already exist. The configurations will enable the
-use of LSP, building, debugging, and running the project from within VS
-Code.
-
-The configuration also recommends extensions to install that are
-useful for working on most KDE projects.
+The generated .vscode project will have such conveniences as enabled use of LSP, launch/debug configuration, and will recommend to install extensions that 
+may be useful for KDE development.
 
 Related command-line option: [--generate-vscode-project-config](#cmdline-generate-vscode-project-config)
 
@@ -688,8 +674,7 @@ a different directory than where the KDE Platform libraries are
 installed, such as if you were using kde-builder only to build
 applications.
 
-You can use `${MODULE}` or `$MODULE` in the
-path to have them expanded to the module's name.
+The `${MODULE}` or `$MODULE` substring in the value of this option will be replaced with the module name.
 
 Related command-line option: [--install-dir](#cmdline-install-dir)
 
@@ -698,11 +683,8 @@ Related command-line option: [--install-dir](#cmdline-install-dir)
 
 Type: String, Default value: Auto detected
 
-Set this option to change the default name of the installed library
-directory inside ${install-dir} and ${qt-install-dir}. On many systems
-this is either "lib" or "lib64". Auto-detection is attempted to set the
-correct name by default, but if the guess is wrong then it can be
-changed with this setting.
+Controls the installed library directory name inside ${install-dir} and ${qt-install-dir}. Usually it is "lib" or "lib64".
+This is auto-detected by default. But in case something is wrong in autodetection, you can set it manually with this option.
 
 Related command-line option: --libname \<value\>
 

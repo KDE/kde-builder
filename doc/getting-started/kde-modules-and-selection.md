@@ -271,9 +271,8 @@ you'd rather not download, build, and install kremotecontrol every time
 you update `kdeutils`.
 
 You can achieve this by using the [ignore-modules](#conf-ignore-modules)
-configuration option. On the command line the [--ignore-modules](#cmdline-ignore-modules) option 
-[does](#ignoring-modules) the same thing, but is more convenient for filtering out a module
-just once.
+configuration option. Alternatively, you can use [--ignore-modules](#cmdline-ignore-modules) option in the command line
+in case you want to [ignore](#ignoring-modules) some modules just once.
 
 ```{code-block} text
 :name: example-ignoring-a-module

@@ -1,24 +1,11 @@
 (configure-data)=
-# Setting the Configuration Data
+# Editing the configuration file
 
-To use KDE Builder, you should have a file in your `~/.config` (or in
-`$XDG_CONFIG_HOME`, if set) directory called `kdesrc-buildrc`, which
-sets the general options and specifies the modules you would like to
-download and build.
-
-```{note}
-It is possible to use different configuration files for KDE Builder,
-which is described in [](../kdesrc-buildrc/index). If you need to use
-multiple configurations, please see that chapter. Here, we will assume
-that the configuration is stored in `~/.config/kdesrc-buildrc`.
-```
-
-Here we assume that you have already generated the configuration file,
-like it was [described](#generate-rcfile) in previous chapter.
+In the previous page, it was [described](#generate-rcfile) how to generate the configuration file.
+The default location is in `~/.config/kdesrc-buildrc`.
 
 The default settings should be appropriate to perform a KDE build. Some
 settings that you may wish to alter include:
-
 
 - [branch-group](#conf-branch-group), which can be used to choose the
   appropriate branch of development for the KDE modules as a whole.

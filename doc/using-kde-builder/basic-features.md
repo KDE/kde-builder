@@ -47,10 +47,6 @@ use this option.
 (kde-builder-std-flags)=
 ## Standard flags added by kde-builder
 
-Nota Bene: this section does not apply to modules for which you have
-configured a custom toolchain, using e.g.
-[cmake-toolchain](#conf-cmake-toolchain).
-
 To save you time, kde-builder adds some standard paths to your
 environment for you:
 
@@ -65,6 +61,9 @@ environment for you:
 - The path to the KDE-provided pkg-config is added automatically to
   `PKG_CONFIG_PATH`. This means that you do not need to use
   [set-env](#conf-set-env) to add these.
+
+
+Note that this does not apply if you are using custom toolchain file, for example with [cmake-toolchain](#conf-cmake-toolchain).
 
 (build-priority)=
 ## Changing kde-builder's build priority

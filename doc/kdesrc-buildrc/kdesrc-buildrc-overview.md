@@ -1,11 +1,6 @@
 (kdesrc-buildrc-overview)=
 # Overview of kde-builder configuration
 
-To use the KDE Builder, you must have a file in your home directory called
-`.kdesrc-buildrc`, which describes the modules you would like to
-download and build, and any options or configuration parameters to use
-for these modules.
-
 (kdesrc-buildrc-layout)=
 ## Layout of the configuration file
 

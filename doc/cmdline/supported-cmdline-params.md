@@ -266,17 +266,20 @@ kdepim: master
 
 (cmdline-dependency-tree)=
 [`--dependency-tree`](cmdline-dependency-tree)  
-Prints out dependency information on the modules that would be built
-using a tree format (recursive). Listed information also includes which
-specific commit/branch/tag is depended on and whether the dependency
-would be built. Note: the generated output may become quite large for
-applications with many dependencies.
+Prints the tree of the dependencies, generated from the modules specified in command line.
+The tree will be recursive, i.e. you could see the dependencies of dependencies.
+The output format looks similar to the `tree` utility.
+In addition, each line will have information if the dependency will be built, and if case it will, also a branch to be used.
+
+If you want to grep in the output, you can use [--dependency-tree-fullpath](cmdline-dependency-tree-fullpath) instead.
 
 (cmdline-dependency-tree-fullpath)=
 [`--dependency-tree-fullpath`](cmdline-dependency-tree-fullpath)  
-Prints out dependency information on the modules that would be built
-using a tree format (recursive). In fullpath format. Note: the generated
-output may become quite large for applications with many dependencies.
+Prints the tree of the dependencies, generated from the modules specified in command line.
+The tree will be recursive, i.e. you could see the dependencies of dependencies.
+The output format looks similar to the `find` utility.
+
+It is easier to grep something with this format. However, if you want to visualize the tree, you can use [--dependency-tree](cmdline-dependency-tree) instead.
 
 (cmdline-list-installed)=
 [`--list-installed`](cmdline-list-installed)  
@@ -457,11 +460,8 @@ options, there is a generic way to set this from the command line).
 
 (cmdline-rc-file)=
 [`--rc-file`](cmdline-rc-file) \<file\>  
-The file to read the configuration options from. The default value for
-this parameter is `kdesrc-buildrc` (checked in the current working
-directory). If this file doesn't exist, `~/.config/kdesrc-buildrc`
-(`$XDG_CONFIG_HOME/kdesrc-buildrc`, if `$XDG_CONFIG_HOME` is set) will
-be used instead. See also [](../kdesrc-buildrc/index).
+Path to the configuration file to use by kde-builder. The default is `kdesrc-buildrc` from current working directory (if exists) or otherwise `~/.
+config/kdesrc-buildrc`.
 
 ## Setup
 

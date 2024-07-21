@@ -23,8 +23,7 @@ KDE Builder features include:
 
   Also, KDE Builder will [add standard flags](#kde-builder-std-flags)
   as appropriate to save you the trouble and possible errors from typing
-  them yourself. Nota Bene: this does not apply when a (custom)
-  toolchain is configured through e.g. [cmake-toolchain](#conf-cmake-toolchain).
+  them yourself.
 
 - KDE Builder can checkout a specific branch or tag
   of a module. You can also ensure that a specific
