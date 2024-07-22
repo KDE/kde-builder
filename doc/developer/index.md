@@ -7,9 +7,9 @@ nosearch:
 ```{toctree}
 concepts
 appendix-modules
-Module
 Internals
 IPC-notes
 adding-new-options
 adding-logger
+ide-configs-generation
 ```
