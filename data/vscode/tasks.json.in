@@ -1,23 +1,31 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            // Have `kde-builder` rebuild the project.
-            "label": "Rebuild",
-            "type": "shell",
-            "options": {
-                "shell": {
-                    "args": [
-                        "-c",
-                        "-i" // Needed for the shell to use kde-builder
-                    ]
-                }
-            },
-            "command": "kde-builder --no-src --no-include-dependencies ${workspaceRootFolderName}",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "KDE Builder CMake: build",
+			"type": "cmake",
+			"command": "build",
+			"targets": [
+				"all"
+			],
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task"
+		},
+		{
+			"label": "KDE Builder CMake: install",
+			"type": "cmake",
+			"command": "install",
+			"problemMatcher": [],
+			"detail": "CMake template install task"
+		},
+		{
+			"label": "KDE Builder pre-launch task",
+			"detail": "Combines cmake build and install",
+			"dependsOn": [
+				"KDE Builder CMake: build",
+				"KDE Builder CMake: install"
+			]
+		}
+	]
 }

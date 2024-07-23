@@ -1,17 +1,16 @@
 {
-    "cmake.buildDirectory": "$build_dir",
-    "cmake.environment": {
-        "CMAKE_PREFIX_PATH": "$install_dir:${env:CMAKE_PREFIX_PATH}",
-        "MANPATH": "$install_dir/share/man:${env:MANPATH}",
-        "PATH": "$install_dir/bin:${env:PATH}",
-        "PKG_CONFIG_PATH": "$install_dir/$lib_dir/pkgconfig:${env:PKG_CONFIG_PATH}",
-        "PYTHONPATH": "$install_dir/$lib_dir/site-packages:${env:PYTHONPATH}",
-        "QML2_IMPORT_PATH": "$install_dir/$lib_dir/qml:${env:QML2_IMPORT_PATH}",
-        "QT_PLUGIN_PATH": "$install_dir/$lib_dir/plugins:${env:QT_PLUGIN_PATH}",
-        "QT_QUICK_CONTROLS_STYLE_PATH": "$install_dir/$lib_dir/qml/QtQuick/Controls.2/:${env:QT_QUICK_CONTROLS_STYLE_PATH}",
-        "XDG_DATA_DIRS": "$install_dir/share:${env:XDG_DATA_DIRS}",
-        "XDG_CONFIG_DIRS": "$install_dir/etc/xdg:${env:XDG_CONFIG_DIRS}"
+    "cmake.buildDirectory": "%{build_dir}",
+    "cmake.generator": "%{generator}",
+    "cmake.configureSettings": {
+%{configureSettings}
     },
+    "cmake.environment": {
+%{environment}
+    },
+    "cmake.buildArgs": [ %{buildArgs} ],
+    // Both cpptools and clangd extensions have IntelliSense completions, so they are in conflict.
+    // We disable the cpptools IntelliSense, because clangd completions work way better at the moment.
+    "C_Cpp.intelliSenseEngine": "disabled",
     // Disable CMake Presets, which can't inherit environment variables from 
     // `cmake.environment` above.
     // See: https://github.com/microsoft/vscode-cmake-tools/issues/3578
@@ -21,4 +20,5 @@
             160,
         ]
     },
+    "qttools.injectNatvisFile": false // Disable injecting natvis file in launch.json, as it currently does not work for gdb/lldb, see https://github.com/tonka3000/vscode-qt-tools/issues/44
 }

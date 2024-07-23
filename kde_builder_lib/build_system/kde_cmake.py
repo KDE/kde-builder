@@ -333,14 +333,15 @@ class BuildSystemKDECMake(BuildSystem):
     def configure_internal(self) -> bool:
         module = self.module
 
+        # Use cmake to create the build directory
+        if self._safe_run_cmake():
+            return False
+
+        # Note, that this must be after _safe_run_cmake(), because we need the list of cmake generate options that were used there.
         if module.get_option("generate-vscode-project-config"):
             self.generate_vs_code_config()
         else:
             logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
-
-        # Use cmake to create the build directory
-        if self._safe_run_cmake():
-            return False
 
         # Note, that this must be after _safe_run_cmake(), because we need the list of cmake generate options that were used there.
         if module.get_option("generate-clion-project-config"):
@@ -377,7 +378,6 @@ class BuildSystemKDECMake(BuildSystem):
         build_dir = module.fullpath("build")
         src_dir = module.fullpath("source")
         install_dir = module.installation_path()
-        lib_dir = module.get_option("libname")
         config_dir = f"{src_dir}/.vscode"
 
         if os.path.exists(config_dir):
@@ -399,16 +399,67 @@ class BuildSystemKDECMake(BuildSystem):
 
         # settings.json configures the paths for CMake, QML, Qt, etc.
         settings_json = self._read_file(f"{data_dir}/settings.json.in")
-        settings_json = settings_json.replace("$build_dir", build_dir)
-        settings_json = settings_json.replace("$install_dir", install_dir)
-        settings_json = settings_json.replace("$lib_dir", lib_dir)
+
+        settings_json = settings_json.replace("%{build_dir}", build_dir)
+
+        cmake_opts = module.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
+        settings_json = settings_json.replace("%{generator}", cmake_opts[1])
+
+        configureSettings_str = ""
+        for cmake_opt in cmake_opts[2:]:  # The first 2 elements are ["-G", generator]
+            opt, val = cmake_opt.split("=", maxsplit=1)
+            opt = opt.removeprefix("-D")
+            configureSettings_str += f"        \"{opt}\": \"{val}\",\n"
+        configureSettings_str = configureSettings_str.removesuffix(",\n")
+        settings_json = settings_json.replace("%{configureSettings}", configureSettings_str)
+
+        cmake_environment_str = ""
+        for key, val in module.env.items():
+            cmake_environment_str += " " * 8 + f""""{key}": "{val}",\n"""
+        cmake_environment_str = cmake_environment_str.removesuffix(",\n")
+        settings_json = settings_json.replace("%{environment}", cmake_environment_str)
+
+        build_opts = self.get_build_options()
+        buildArgs_str = ""
+        for build_opt in build_opts:
+            buildArgs_str += f"\"{build_opt}\", "
+        buildArgs_str = buildArgs_str.removesuffix(", ")
+        settings_json = settings_json.replace("%{buildArgs}", buildArgs_str)
+
+        settings_json = settings_json.replace("%{install_dir}", install_dir)
 
         # extensions.json recommends extensions to install/enable.
         extensions_json = self._read_file(f"{data_dir}/extensions.json.in")
 
         # launch.json configures the run with debugger functionality.
         launch_json = self._read_file(f"{data_dir}/launch.json.in")
-        launch_json = launch_json.replace("$install_dir", install_dir)
+        program = install_dir + "/bin/" + module.name
+        launch_json = launch_json.replace("%{program}", program)
+        launch_json = launch_json.replace("%{install_dir}", install_dir)
+
+        prefix_content = self._read_file(build_dir + "/prefix.sh")
+        prefix_content = prefix_content.replace("$PATH", "${env:PATH}")
+        prefix_content = prefix_content.replace("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "${env:XDG_DATA_DIRS}:/usr/local/share/:/usr/share/")
+        prefix_content = prefix_content.replace("${XDG_CONFIG_DIRS:-/etc/xdg}", "${env:XDG_CONFIG_DIRS}:/etc/xdg")
+        prefix_content = prefix_content.replace("$QT_PLUGIN_PATH", "${env:QT_PLUGIN_PATH}")
+        prefix_content = prefix_content.replace("$QML2_IMPORT_PATH", "${env:QML2_IMPORT_PATH}")
+        prefix_content = prefix_content.replace("$QT_QUICK_CONTROLS_STYLE_PATH", "${env:QT_QUICK_CONTROLS_STYLE_PATH}")
+
+        launch_env_entries_str = ""
+        for line in prefix_content.split("\n"):
+            if line.startswith("#") or line == "":
+                continue
+            line = line.removeprefix("export ")
+            var, val = line.split("=", maxsplit=1)
+            launch_env_entries_str += " " * 16 + "{\n" + " " * 20 + f""""name": "{var}",\n""" + " " * 20 + f""""value": "{val}"\n""" + " " * 16 + "},\n"
+        launch_env_entries_str = launch_env_entries_str.removesuffix(",\n")
+
+        launch_json = launch_json.replace("%{launch_env_entries}", launch_env_entries_str)
+
+        extra_run_env = module.get_option("source-when-start-program")
+        # Currently, sourcing a _script_ is not possible, see https://github.com/microsoft/vscode-cpptools/issues/9329 feature request.
+        # For now, will just use an envFile, hoping user is aware of this behavior in vs code, and used the env file in the value of source-when-start-program option.
+        launch_json = launch_json.replace("%{envFile}", extra_run_env)
 
         # tasks.json contains tasks to be easily / automatically run.
         tasks_json = self._read_file(f"{data_dir}/tasks.json.in")

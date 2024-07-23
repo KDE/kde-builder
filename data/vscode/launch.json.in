@@ -1,15 +1,23 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "KDE Builder launch configuration",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${command:cmake.launchTargetPath}",
-            "envFile": "${command:cmake.buildDirectory}/prefix.env",
+            "program": "%{program}",
             "args": [],
+            "preLaunchTask": "KDE Builder pre-launch task",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
+            "environment": [
+%{launch_env_entries}
+            ],
+            "envFile": "%{envFile}", // cannot be a script, see https://github.com/microsoft/vscode-cpptools/issues/9329 feature request.
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -24,9 +32,12 @@
             "name": "kcm",
             "type": "cppdbg",
             "request": "launch",
-            "preLaunchTask": "Rebuild",
-            "envFile": "${command:cmake.buildDirectory}/prefix.env",
-            "program": "$installDir/bin/kcmshell6",
+            "preLaunchTask": "KDE Builder pre-launch task",
+            "environment": [
+%{launch_env_entries}
+            ],
+            "envFile": "%{envFile}", // cannot be a script, see https://github.com/microsoft/vscode-cpptools/issues/9329 feature request.
+            "program": "%{install_dir}/bin/kcmshell6",
             "args": [
                 // Set build target to the target KCM. Example: "kcm_kwinrules".
                 // This argument will be passed to `kcmshell6` automatically.
