@@ -59,6 +59,10 @@ global
     # Generate .vscode config files in project directories
     # Enable this if you want to use Visual Studio Code for development
     generate-vscode-project-config %{generate-vscode-project-config}
+
+    # Generate copy-pastable files for manual qtcreator config creation
+    # Enable this if you want to use Qt Creator for development
+    generate-qtcreator-project-config %{generate-qtcreator-project-config}
 end global
 
 # With base options set, the remainder of the file is used to define modules to build, in the

@@ -628,6 +628,23 @@ may be useful for KDE development.
 
 Related command-line option: [--generate-vscode-project-config](#cmdline-generate-vscode-project-config)
 
+(conf-generate-qtcreator-project-config)=
+[`generate-qtcreator-project-config`](conf-generate-qtcreator-project-config)
+
+Type: Boolean, Default value: False
+
+Module setting overrides global
+
+Set this option to `true` to make KDE Builder create files, for ability to easily copy content from them to
+Qt Creator configuration. They are generated to `.qtcreator` directory.
+
+```{note}
+See developer documentation why it is currently not possible to just generate a project configuration like it is possible for other IDEs.  
+See the documentation on develop.kde.org on how to configure the Qt Creator manually to replicate KDE Builder environment.  
+```
+
+Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config)
+
 (conf-include-dependencies)=
 [`include-dependencies`](conf-include-dependencies)
 

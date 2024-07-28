@@ -14,6 +14,7 @@ Files:  .gitignore
         data/kde-builder-logging.yaml
         data/kde-builder.desktop.in
         data/vscode/*
+        data/qtcreator/*
         doc/conf.py
         Pipfile
         doc/_static/*.png

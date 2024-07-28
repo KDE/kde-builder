@@ -276,6 +276,7 @@ class FirstRun:
         fill_placeholder("compile-commands-export", "bool_to_str")
         fill_placeholder("generate-clion-project-config", "bool_to_str")
         fill_placeholder("generate-vscode-project-config", "bool_to_str")
+        fill_placeholder("generate-qtcreator-project-config", "bool_to_str")
 
         os.makedirs(xdg_config_home, exist_ok=True)
         with open(f"{xdg_config_home}/kdesrc-buildrc", "w") as sampleFh:

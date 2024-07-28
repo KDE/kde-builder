@@ -43,6 +43,7 @@ _arguments \
   "--generate-config""[Installs a base kdesrc-buildrc]" \
   "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
+  "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
   "(-! --ignore-modules)"{-!,--ignore-modules}"[Do not include specified modules in the update/build process]"":::_kde-builder_modules" \
   "--initial-setup""[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc]" \

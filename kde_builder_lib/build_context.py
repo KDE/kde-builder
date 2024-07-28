@@ -137,6 +137,7 @@ class BuildContext(Module):
             "disable-agent-check": False,  # If true we don't check on ssh-agent
             "generate-clion-project-config": False,
             "generate-vscode-project-config": False,
+            "generate-qtcreator-project-config": False,
             "include-dependencies": True,
             "install-after-build": True,
             "install-login-session": True,

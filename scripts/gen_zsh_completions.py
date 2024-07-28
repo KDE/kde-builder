@@ -141,6 +141,7 @@ short_descriptions = {  # contains one of the options (any of them) from set, an
     "--generate-config": "Installs a base kdesrc-buildrc",
     "--generate-clion-project-config": "Generate a clion project config",
     "--generate-vscode-project-config": "Generate a vscode project config",
+    "--generate-qtcreator-project-config": "Generate a qtcreator project config",
     "--help": "Displays help on commandline options",
     "--list-installed": "Print installed modules and exit",
     "--ignore-modules": "Do not include specified modules in the update/build process",

@@ -418,6 +418,11 @@ debugging in CLion. This option is disabled by default.
 Generate a `.vscode` directory with configurations for building and
 debugging in Visual Studio Code. This option is disabled by default.
 
+(cmdline-generate-qtcreator-project-config)=
+[`--generate-qtcreator-project-config`](cmdline-generate-clion-project-config), `--no-generate-qtcreator-project-config`  
+Generate a `.qtcreator` directory with files that can be used for copying to the Qt Creator configuration
+for building and debugging. This option is disabled by default.
+
 ## Script runtime
 
 (cmdline-async)=

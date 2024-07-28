@@ -1,5 +1,8 @@
 # Changelog
 
+2024-07-28
+: Added option `generate-qtcreator-project-config` for the CLion IDE project generation.
+
 2024-07-14
 : Added option `generate-clion-project-config` for the CLion IDE project generation.
 

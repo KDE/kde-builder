@@ -349,6 +349,12 @@ class BuildSystemKDECMake(BuildSystem):
         else:
             logger_ide_proj.debug("\tGenerating .idea directory - disabled for this module")
 
+        # Note, that this must be after _safe_run_cmake(), because we need the list of cmake generate options that were used there.
+        if module.get_option("generate-qtcreator-project-config"):
+            self.generate_qtcreator_config()
+        else:
+            logger_ide_proj.debug("\tGenerating qtcreator configs - disabled for this module")
+
         if module.get_option("generate-vscode-project-config"):
             self.convert_prefixsh_to_env()
 
@@ -555,6 +561,55 @@ class BuildSystemKDECMake(BuildSystem):
 
         misc_xml = self._read_file(f"{data_dir}/misc.xml")
         self._write_to_file(f"{config_dir}/misc.xml", misc_xml)
+
+        return True
+
+    def generate_qtcreator_config(self) -> bool:
+        """
+        Generate config-helping files for Qt Creator.
+
+        Generates the snippets in ${source-dir}/.qtcreator for manually recreating build/run configuration.
+        Currently, CMakeLists.txt.shared configurations import are not supported by Qt Creator.
+        See developers documentation for more info.
+        """
+        if Debug().pretending():
+            logger_ide_proj.pretend("\tWould have generated .qtcreator directory")
+            return False
+
+        module: Module = self.module
+        project_name = module.name
+        build_dir = module.fullpath("build")
+        src_dir = module.fullpath("source")
+        config_dir = f"{src_dir}/.qtcreator"
+
+        logger_ide_proj.debug(f"\tGenerating .qtcreator directory for {project_name}: {config_dir}")
+        os.makedirs(config_dir, exist_ok=True)
+
+        cmake_opts = module.cmake_opts[7:]  # The first 7 elements are ["cmake", "-B", ".", "-S", srcdir, "-G", generator], we are not interested in them
+        cmake_opts = "\n".join(cmake_opts) + "\n"
+        self._write_to_file(f"{config_dir}/cmake_Initial_Configuration.txt", cmake_opts)
+
+        configure_and_build_env_str = ""
+        for key, val in module.env.items():
+            configure_and_build_env_str += f"{key}={val}\n"
+        self._write_to_file(f"{config_dir}/cmake_Configure_and_Build_Environment.txt", configure_and_build_env_str)
+
+        prefix_content = self._read_file(build_dir + "/prefix.sh")
+        prefix_content = prefix_content.replace("export ", "")
+        prefix_content = prefix_content.replace(":$PATH", "")
+        prefix_content = prefix_content.replace(":${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "")
+        prefix_content = prefix_content.replace(":${XDG_CONFIG_DIRS:-/etc/xdg}", "")
+        prefix_content = prefix_content.replace(":$QT_PLUGIN_PATH", "")
+        prefix_content = prefix_content.replace(":$QML2_IMPORT_PATH", "")
+        prefix_content = prefix_content.replace(":$QT_QUICK_CONTROLS_STYLE_PATH", "")
+        prefix_content = prefix_content.replace("=", "=+")  # "=+" means prepend, "+=" means append. We prepend.
+
+        run_env_str = ""
+        for line in prefix_content.split("\n"):
+            if line.startswith("#") or line == "":
+                continue
+            run_env_str += f"""{line}\n"""
+        self._write_to_file(f"{config_dir}/Run_Environment.txt", run_env_str)
 
         return True
 
