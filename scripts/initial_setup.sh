@@ -130,10 +130,11 @@ check_zsh_fpath() {
   echo "Checking that fpath contains path to kde-builder zsh completions"
   local kb_completions_path="$HOME/.local/share/kde-builder/data/completions/zsh/"
 
+  local ZDOTDIR="${ZDOTDIR:-$HOME}"
   # The $FPATH is not exported to scripts, so we get from launched subshell
   local FPATH
   # shellcheck disable=SC2016
-  FPATH=$($SHELL -c 'source ~/.zshrc; echo $FPATH')
+  FPATH=$($SHELL -c "source $ZDOTDIR/.zshrc; echo "'$FPATH')
 
   if [[ ":$FPATH:" == *":$kb_completions_path:"* ]]; then
     echo "Your FPATH is correctly set."
