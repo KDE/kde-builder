@@ -673,19 +673,27 @@ class Module(OptionsBase):
         try:
             count = self.scm().update_internal(ipc)
         except Exception as e:
-            traceback.print_exc()
+            if e.__class__.__name__ != "BuildException":
+                # Do not print traceback for our BuildException type exceptions, as we want just a short error message in the output.
+                # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
+                traceback.print_exc()
+
             reason = IPC.MODULE_FAILURE
 
             ctx.mark_module_phase_failed("build", self)
-            e = e.message
+            if e.__class__.__name__ == "BuildException":
+                # noinspection PyUnresolvedReferences
+                e_str = e.message
+            else:
+                e_str = str(e)
 
             logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
-            logger_module.error(f" > y[{e}]")
+            logger_module.error(f" > y[{e_str}]")
 
             ipc.send_ipc_message(reason, module_name)
             self.phases.filter_out_phase("build")
             return_value = False
-        else:
+        else:  # executed if there were no exceptions in try block
             message = ""
             if count is None:
                 message = Debug().colorize("b[y[Unknown changes].")
