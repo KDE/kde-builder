@@ -41,7 +41,6 @@ class IPC:
     ALL_FAILURE = 6  # Used to indicate a major update failure (don't build)
     ALL_UPDATING = 7  # Informational message, feel free to start the build.
 
-    MODULE_CONFLICT = 8  # Used to indicate specifically that a source conflict has occurred.
     MODULE_LOGMSG = 9  # Tagged message should be put to TTY for module.
     MODULE_PERSIST_OPT = 10  # Change to a persistent module option
 
@@ -127,9 +126,6 @@ class IPC:
             # failure.
             message = "skipped"
             updated[buffer] = "success"
-        elif ipc_type == IPC.MODULE_CONFLICT:
-            message = "conflicts present"
-            updated[buffer] = "failed"
         elif ipc_type == IPC.MODULE_FAILURE:
             message = "update failed"
             updated[buffer] = "failed"
@@ -389,7 +385,6 @@ class MsgType(IntEnum):
     ALL_SKIPPED = IPC.ALL_SKIPPED
     ALL_FAILURE = IPC.ALL_FAILURE
     ALL_UPDATING = IPC.ALL_UPDATING
-    MODULE_CONFLICT = IPC.MODULE_CONFLICT
     MODULE_LOGMSG = IPC.MODULE_LOGMSG
     MODULE_PERSIST_OPT = IPC.MODULE_PERSIST_OPT
     ALL_DONE = IPC.ALL_DONE

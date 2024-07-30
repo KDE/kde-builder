@@ -45,15 +45,6 @@ class BuildException(Exception):
         return BuildException(exception_type, message)
 
     @staticmethod
-    def had_an_exception(e):
-        """
-        Helper function to return exception if exception is a :class:`BuildException`.
-        """
-        if e and isinstance(e, BuildException):
-            return e
-        return
-
-    @staticmethod
     def croak_runtime(msg: str) -> NoReturn:
         """
         Should be used for "runtime errors" (i.e. unrecoverable runtime problems that

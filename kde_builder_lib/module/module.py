@@ -676,12 +676,8 @@ class Module(OptionsBase):
             traceback.print_exc()
             reason = IPC.MODULE_FAILURE
 
-            if BuildException.had_an_exception(e):
-                if e.exception_type == "ConflictPresent":
-                    reason = IPC.MODULE_CONFLICT
-                else:
-                    ctx.mark_module_phase_failed("build", self)
-                e = e.message
+            ctx.mark_module_phase_failed("build", self)
+            e = e.message
 
             logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
             logger_module.error(f" > y[{e}]")
