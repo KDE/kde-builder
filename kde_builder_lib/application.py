@@ -341,11 +341,17 @@ class Application:
 
         filtered_modules: list[Module] = []
         for module in modules:
-            branch = resolver.find_module_branch(module.full_project_path(), branch_group) if module.is_kde_project() else True  # Just a placeholder truthy value
-            if branch is not None and not branch:
+            if module.is_kde_project():
+                branch = resolver.find_module_branch(module.full_project_path(), branch_group)
+            else:
+                branch = True  # Just a placeholder truthy value
+
+            if branch is not None and not branch:  # i.e. the branch is explicitly specified as empty string
                 logger_app.debug(f"Removing {module.full_project_path()} due to branch-group")
-            if branch is None or branch:  # This is the actual test
-                filtered_modules.append(module)
+                continue
+
+            filtered_modules.append(module)
+
         modules = filtered_modules
 
         module_graph = self._resolve_module_dependency_graph(modules)
