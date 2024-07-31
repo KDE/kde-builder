@@ -24,9 +24,10 @@ class IdeProjectConfigGenerator:
     Class responsible for creating IDE-specific files in source directories of modules.
     """
 
-    def __init__(self, module: Module):
+    def __init__(self, module: Module, cmake_opts: list[str]):
         self.module = module
         self.build_opts = module.build_system().get_build_options()
+        self.cmake_opts = cmake_opts
 
     def _generate_vs_code_config(self) -> bool:
         """
@@ -68,7 +69,7 @@ class IdeProjectConfigGenerator:
 
         settings_json = settings_json.replace("%{build_dir}", build_dir)
 
-        cmake_opts = module.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
+        cmake_opts = self.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
         settings_json = settings_json.replace("%{generator}", cmake_opts[1])
 
         configureSettings_str = ""
@@ -166,7 +167,7 @@ class IdeProjectConfigGenerator:
 
         module: Module = self.module
         build_dir = module.fullpath("build")
-        cmake_opts = module.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
+        cmake_opts = self.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
         cmake_opts = " ".join(cmake_opts)
         build_opts = self.build_opts
         build_opts = " ".join(build_opts)
@@ -245,7 +246,7 @@ class IdeProjectConfigGenerator:
         logger_ide_proj.debug(f"\tGenerating .qtcreator directory for {project_name}: {config_dir}")
         os.makedirs(config_dir, exist_ok=True)
 
-        cmake_opts = module.cmake_opts[7:]  # The first 7 elements are ["cmake", "-B", ".", "-S", srcdir, "-G", generator], we are not interested in them
+        cmake_opts = self.cmake_opts[7:]  # The first 7 elements are ["cmake", "-B", ".", "-S", srcdir, "-G", generator], we are not interested in them
         cmake_opts = "\n".join(cmake_opts) + "\n"
         self._write_to_file(f"{config_dir}/cmake_Initial_Configuration.txt", cmake_opts)
 

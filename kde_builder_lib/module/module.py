@@ -94,7 +94,6 @@ class Module(OptionsBase):
         self.post_build_msgs = []
         self.env = {}
         self.current_phase = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
-        self.cmake_opts = []  # Used to remember cmake options used in cmake generate, to be able to pass it to clion project config generation.
 
         # Record current values of what would be last source/build dir, if present,
         # before they are potentially reset during the module build.

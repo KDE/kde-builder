@@ -329,9 +329,6 @@ class BuildSystemKDECMake(BuildSystem):
         if self._safe_run_cmake():
             return False
 
-        # Note, that this must be after _safe_run_cmake(), because we need the list of cmake generate options that were used there.
-        IdeProjectConfigGenerator(module).generate_ide_project_configs()
-
         # handle the linking of compile_commands.json back to source directory if wanted
         # allows stuff like clangd to function out of the box
         if module.get_option("compile-commands-linking"):
@@ -402,7 +399,9 @@ class BuildSystemKDECMake(BuildSystem):
             commands.append("-DBUILD_TESTING:BOOL=ON")
 
         commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
-        self.module.cmake_opts = commands  # Remember them for later, if user wants to generate clion project configs
+
+        # Generate IDE configs now, so if cmake configure fails, user already have them, and could then debug cmake script in their IDE.
+        IdeProjectConfigGenerator(module, commands).generate_ide_project_configs()
 
         old_options = module.get_persistent_option("last-cmake-options") or ""
         builddir = module.fullpath("build")
