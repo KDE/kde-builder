@@ -1306,41 +1306,30 @@ class Application:
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:
         """
-        This function removes log directories from old kde-builder runs. All log
-        directories not referenced by log_dir/latest somehow are made to go away.
+        Removes log directories from previous kde-builder runs.
 
-        Parameters:
-            ctx: Build context.
-
-        Returns:
-            None
+        All log directories that are not referenced by log_dir/latest somehow are made to go away.
         """
         Util.assert_isa(ctx, BuildContext)
         logdir = ctx.get_subdir_path("log-dir")
 
         if not os.path.exists(f"{logdir}/latest"):  # Could happen for error on first run...
-            return 0
+            return
 
-        # This glob relies on the date being in the specific format YYYY-MM-DD-ID
-        dirs = glob.glob(f"{logdir}/????-??-??-??/")
+        found_dirs = [f for f in os.listdir(logdir) if re.search(r"(\d{4}-\d{2}-\d{2}[-_]\d+)", f)]
 
-        needed_dict = {}
-        for trackedLogDir in [f"{logdir}/latest", f"{logdir}/latest-by-phase"]:
-            if not os.path.isdir(trackedLogDir):
+        keep_dirs = []
+        for tracked_log_dir in [f"{logdir}/latest", f"{logdir}/latest-by-phase"]:
+            if not os.path.isdir(tracked_log_dir):
                 continue
-            needed = self._reachable_module_logs(trackedLogDir)
+            keep_dirs = self._symlinked_log_dirs(tracked_log_dir)
 
-            # Convert a list to a dict lookup since Perl lacks a "list-has"
-            needed_dict.update({key: 1 for key in needed})
+        length = len(found_dirs) - len(keep_dirs)
+        logger_app.debug(f"Removing g[b[{length}] out of g[b[{len(found_dirs) - 1}] old log directories...")
 
-        length = len(dirs) - len(needed_dict)
-        logger_app.debug(f"Removing g[b[{length}] out of g[b[{len(dirs) - 1}] old log directories...")
-
-        for d in dirs:
-            match = re.search(r"(\d{4}-\d{2}-\d{2}-\d{2})", d)
-            dir_id = match.group(1) if match else None
-            if dir_id and not needed_dict.get(dir_id):
-                Util.safe_rmtree(d)
+        for dir_id in found_dirs:
+            if dir_id not in keep_dirs:
+                Util.safe_rmtree(logdir + "/" + dir_id)
 
     @staticmethod
     def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:
@@ -1747,16 +1736,18 @@ class Application:
                 """))
         return not was_error
 
-    def _reachable_module_logs(self, logdir: str) -> list[str]:
+    def _symlinked_log_dirs(self, logdir: str) -> list[str]:
         """
-        Returns a list of module directories IDs (based on YYYY-MM-DD-XX format) that must be kept due to being
-        referenced from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.
+        Returns a list of module directories IDs that are still referenced by symlinks.
+
+        Can be used to get the list of directories that must be kept when removing old log directories.
+        References are checked from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.
+        The directories IDs are based on YYYY-MM-DD_XX format.
 
         This function may call itself recursively if needed.
 
         Parameters:
-            logdir: The log directory under which to search for symlinks, including the "/latest" or "/latest-by-phase"
-            part of the path.
+            logdir: The log directory under which to search for symlinks, including the "/latest" or "/latest-by-phase" part of the path.
         """
         links = []
 
@@ -1766,20 +1757,16 @@ class Application:
                     if entry.is_symlink():  # symlinks to files/folders
                         link = os.readlink(entry.path)
                         links.append(link)
-                    elif not re.match(r"^\.{1,2}$", entry.name) and not entry.is_file():  # regular (not symlinks) files/folders
-                        # Skip . and .. directories
-                        # Skip regular files (note that it is not a symlink to file, because of previous is_symlink check). _reachable_module_logs expects a directory as parameter, but there may be files, for example ".directory".
-                        links.extend(self._reachable_module_logs(os.path.join(logdir, entry.name)))  # for regular directories, get links from it
+                    elif entry.name != "." and entry.name != ".." and not entry.is_file():  # regular (not symlinks) files/folders
+                        # Skip regular files (note that it is not a symlink to file, because of previous is_symlink check), because there may be files in logdir, for example ".directory" file.
+                        links.extend(self._symlinked_log_dirs(os.path.join(logdir, entry.name)))  # for regular directories, get links from it
         except OSError as e:
             BuildException.croak_runtime(f"Can't opendir {logdir}: {e}")
 
         # Extract numeric directories IDs from directories/files paths in links list.
-        dirs = [re.search(r"(\d{4}-\d\d-\d\d-\d\d)", d).group(1) for d in links if re.search(r"(\d{4}-\d\d-\d\d-\d\d)", d)]  # if we use pretending, then symlink will point to /dev/null, so check if found matching group first
-
-        # Convert to unique list by abusing dict keys.
-        temp_dict = {a_dir: None for a_dir in dirs}
-
-        return list(temp_dict.keys())
+        dirs = [re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d).group(1) for d in links if re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d)]  # if we use pretending, then symlink will point to /dev/null, so check if found matching group first
+        uniq_dirs = list(set(dirs))
+        return uniq_dirs
 
     @staticmethod
     def _install_signal_handlers(handler_func: Callable) -> None:

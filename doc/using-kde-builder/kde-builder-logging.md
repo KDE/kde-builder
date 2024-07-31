@@ -1,5 +1,5 @@
 (kde-builder-logging)=
-# kde-builder's build logging
+# Build logging
 
 (logging-overview)=
 ## Logging overview
@@ -19,9 +19,9 @@ which defaults to `~/kde/log`. In the rest of this section, this value will be r
 
 Under `${log-dir}`, there is a set of directories, one for every time that
 kde-builder was run. Each directory is named with the date, and the run
-number. For instance, the second time that kde-builder is run on May
-26, 2004, it would create a directory called `2004-05-26-02`, where the
-2004-05-26 is for the date, and the -02 is the run number.
+number. For instance, the second time that kde-builder is run on
+31 July 2024, it would create a directory named `2024-07-31_02`, where the
+2024-07-31 is for the date, and the 02 is the run number.
 
 For your convenience, kde-builder will also create a link to the logs
 for your latest run, called `latest`. So the logs for the most recent

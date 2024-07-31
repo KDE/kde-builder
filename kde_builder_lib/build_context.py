@@ -381,23 +381,30 @@ class BuildContext(Module):
 
     def get_log_dir_for(self, module: Module) -> str:
         """
-        This function accepts a Module parameter, and returns the log directory
-        for it. You can also pass a BuildContext (including this one) to get the
+        Returns the log directory of specified module.
+
+        You can also pass a BuildContext (including this one) to get the
         default log directory.
 
         As part of setting up what path to use for the log directory, the
-        "latest" symlink will also be setup to point to the returned log
+        "latest" symlink will also be set up to point to the returned log
         directory.
         """
-
         base_log_path = module.get_subdir_path("log-dir")
         if base_log_path not in self.log_paths:
             # No log dir made for this base, do so now.
-            log_id = "01"
-            date = datetime.datetime.now().strftime("%F")  # ISO 8601 date
-            while os.path.exists(f"{base_log_path}/{date}-{log_id}"):
-                log_id = str(int(log_id) + 1).zfill(2)
-            self.log_paths[base_log_path] = f"{base_log_path}/{date}-{log_id}"
+            date = datetime.datetime.now().strftime("%F")  # ISO 8601 date (example: "2024-01-31")
+
+            existing_folders = os.listdir(base_log_path) if os.path.exists(base_log_path) else []
+            todays_ids_str = [folder.removeprefix(date)[1:] for folder in existing_folders if folder.startswith(date)]
+
+            max_id = 0
+            for id_str in todays_ids_str:
+                if id_str.isdigit() and int(id_str) > max_id:
+                    max_id = int(id_str)
+
+            log_id = str(max_id + 1).zfill(2)
+            self.log_paths[base_log_path] = f"{base_log_path}/{date}_{log_id}"
 
         log_dir = self.log_paths[base_log_path]
         Util.super_mkdir(log_dir)
