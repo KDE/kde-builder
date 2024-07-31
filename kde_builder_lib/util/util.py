@@ -259,41 +259,41 @@ class Util:
         return lines
 
     @staticmethod
-    def prettify_seconds(elapsed: int) -> str:
+    def prettify_seconds(total_seconds: int) -> str:
         """
-        Function to return a string suitable for displaying an elapsed time,
-        (like a stopwatch) would. The first parameter is the number of seconds
-        elapsed.
-        """
+        Convert total number of seconds to a human-readable string.
 
+        For example, 3601 will be converted to "1 hour, 0 minutes and 1 second" string.
+        """
+        # noinspection PyDictCreation
         calculated = {}
-        elapsed = int(elapsed)
+        remaining = total_seconds
 
-        calculated["seconds"] = elapsed % 60
-        elapsed = int(elapsed / 60)
+        calculated["seconds"] = remaining % 60
+        remaining = int(remaining / 60)
 
-        calculated["minutes"] = elapsed % 60
-        elapsed = int(elapsed / 60)
+        calculated["minutes"] = remaining % 60
+        remaining = int(remaining / 60)
 
-        calculated["hours"] = elapsed % 24
-        elapsed = int(elapsed / 24)
+        calculated["hours"] = remaining % 24
+        remaining = int(remaining / 24)
 
-        calculated["days"] = elapsed
+        calculated["days"] = remaining
 
-        str_list = []
+        str_list: list[str] = []
         for text in ["days", "hours", "minutes", "seconds"]:
             value = calculated[text]
             if value == 1:  # Make singular
                 text = re.sub(r"s$", "", text)
 
-            if text == "seconds":
-                str_list.append(f"{value} {text}")
+            if value == 0 and len(str_list) == 0:
+                # Skip leading zero values, like "0 days".
+                continue
 
-        # Add "and " in front of last element if there was more than one.
-        if len(str_list) > 1:
-            str_list.append("and " + str_list.pop(0))
+            str_list.append(f"{value} {text}")
 
         return_str = ", ".join(str_list)
+        return_str = re.sub(r", ([^,]*)$", r" and \1", return_str)  # Replace last ", " with " and ".
         return return_str
 
     @staticmethod
