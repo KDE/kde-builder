@@ -491,10 +491,6 @@ class Util:
 
             builddir = module.fullpath("build")  # need to pass dir to use
             result = run_logged(module, "build", builddir, ["make", "-j8"])
-            def func(result):
-                print(f"Process result: {result}")
-
-            func(result)
         """
 
         if not directory:

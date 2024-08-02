@@ -86,7 +86,6 @@ class BuildSystemAutotools(BuildSystem):
         bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
         try:
             configure_command = self._find_configure_commands()
-            Util.p_chdir(module.fullpath("build"))
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])
             result = exitcode
         except BuildException as err:
