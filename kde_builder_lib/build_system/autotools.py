@@ -16,6 +16,8 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 class BuildSystemAutotools(BuildSystem):
     """
     This is a class used to support configuring with autotools.
+
+    This build system is currently only used for "gpgme" and "libgpg-error" modules. See `kde-builder --query build-system | grep autotools`.
     """
 
     @staticmethod
@@ -23,29 +25,20 @@ class BuildSystemAutotools(BuildSystem):
     def name() -> str:
         return "autotools"
 
-    def _find_configure_commands(self) -> str:
+    def _autogen(self) -> str:
         """
-        Returns the specific configure command to use.
-
-        This may execute commands to re-run autoconf to generate the script.
-
-        If these commands fail will raise exception.
+        Runs "autogen.sh" (if presented), and returns "autogen.sh" or "configure" (depending on if "configure" is presented (after running "autogen.sh" or in repo)).
         """
         module = self.module
         sourcedir = module.fullpath("source")
 
-        configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
         configure_in_file = next((item for item in ["configure.in", "configure.ac"] if os.path.exists(f"{sourcedir}/{item}")), None)
 
-        if configure_command != "autogen.sh" and configure_in_file:
-            return configure_command
-
-        # If we have a configure.in or configure.ac but configure_command is autogen.sh
+        # If we have a configure.in or configure.ac and autogen.sh exists,
         # we assume that configure is created by autogen.sh as usual in some GNU Projects.
-        # So we run autogen.sh first to create the configure command and
-        # recheck for that.
-        if configure_in_file and configure_command == "autogen.sh":
-            exitcode = Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/{configure_command}"])
+        # So we run autogen.sh first to create the configure command.
+        if configure_in_file and os.path.exists(f"{sourcedir}/autogen.sh"):
+            exitcode = Util.run_logged(module, "autogen", sourcedir, [f"{sourcedir}/autogen.sh"])
 
             if exitcode != 0:
                 print(f"Autogen failed with exit code {exitcode}")
@@ -66,6 +59,7 @@ class BuildSystemAutotools(BuildSystem):
             configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
             return configure_command
 
+        configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
         if not configure_command:
             BuildException.croak_runtime("No configure command available")
 
@@ -85,7 +79,7 @@ class BuildSystemAutotools(BuildSystem):
         # to convert to empty string in that case.
         bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
         try:
-            configure_command = self._find_configure_commands()
+            configure_command = self._autogen()
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])
             result = exitcode
         except BuildException as err:
