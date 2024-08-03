@@ -293,6 +293,13 @@ class Application:
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
         ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
 
+        if not ctx.get_option("qt-install-dir"):
+            # gpgme and libgpg-error are needed only when user uses custom-built Qt.
+            not_needed_names = ["gpgme", "libgpg-error"]
+            for not_needed_name in not_needed_names:
+                logger_app.debug(f"Adding {not_needed_name} to ignored modules list since qt-install-dir is unset.")
+                ignored_selectors[not_needed_name] = True
+
         if start_program_and_args:
             StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
 
