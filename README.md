@@ -17,6 +17,15 @@ The successor project is written in Python - a much more acknowledged language. 
 
 ## Basic Usage
 
+Before installing, configure your PATH environment variable to include the `~/.local/bin` path - the location where the kde-builder will be installed.
+See Arch Wiki [article](https://wiki.archlinux.org/title/Environment_variables#Per_user) for more information.
+
+For example, add this code to your `~/.bashrc` or `~/.zshrc`.
+
+```bash
+PATH="$HOME/.local/bin:$PATH"
+```
+
 Installation:
 
 ```bash

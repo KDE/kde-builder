@@ -7,6 +7,9 @@
 (get-kde-builder)=
 ### Install KDE Builder
 
+Before installing, configure your PATH environment variable to include the `~/.local/bin` path - the location where the kde-builder will be installed.
+See Arch Wiki [article](https://wiki.archlinux.org/title/Environment_variables#Per_user) for more information.
+
 You can install KDE Builder with its installation script:
 
 ```bash

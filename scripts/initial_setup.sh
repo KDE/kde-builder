@@ -83,8 +83,7 @@ prepare_bin_path() {
   if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
     echo "Your PATH is correctly set."
   else
-    echo -e "${Red}Your PATH is missing ~/.local/bin, you might want to add it.${Color_Off}"
-    echo "Note, that if your ~/.profile adds ~/.local/bin to PATH only when it exists, you can just relaunch shell or run: source ~/.profile"
+    echo -e "${Red}Your PATH is missing ~/.local/bin. You need to add it.${Color_Off}"
     err_report  # manually show error message
     exit 1
   fi
