@@ -109,7 +109,8 @@ class ModuleSetKDEProjects(ModuleSet):
         all_module_results = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
 
         if not all_module_results:
-            BuildException.croak_runtime(f"Unknown KDE project: {module_search_item}")
+            logger_moduleset.error(f" r[*] y[{module_search_item}] is not found in KDE projects, and there is no defined module with such name in the config.")
+            exit(99)
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.
@@ -164,12 +165,8 @@ class ModuleSetKDEProjects(ModuleSet):
             # We might have already grabbed the right module recursively.
             if moduleItem in found_modules:
                 continue
-            # eval in case the YAML processor throws an exception.
-            try:
-                candidate_modules = self._expand_module_candidates(ctx, moduleItem)
-            except BuildException as e:
-                raise BuildException.croak_runtime(f"The KDE Project database could not be understood: {e}")  # Forward exception objects up
 
+            candidate_modules = self._expand_module_candidates(ctx, moduleItem)
             module_names = [item.name for item in candidate_modules]
             found_modules = {module: 1 for module in module_names}
             module_list.extend(candidate_modules)
