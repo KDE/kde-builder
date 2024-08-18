@@ -497,6 +497,7 @@ class Application:
                                            juk: kcalc
                                            dolphin: konsole
                                            kde-builder: juk
+                                           kde-builder: third-party/taglib
                                            """)
                 import tempfile
                 with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
