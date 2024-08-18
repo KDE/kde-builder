@@ -432,7 +432,7 @@ class ModuleResolver:
         if self.defined_modules.get(module_name) is None:
             try:
                 self._expand_single_module_set(*self._resolve_single_selector("+" + module_name))
-            except BuildException:
+            except BuildException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
         ret = self.defined_modules.get(module_name, None)

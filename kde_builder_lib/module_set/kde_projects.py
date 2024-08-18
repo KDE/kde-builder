@@ -10,7 +10,7 @@ import re
 from typing import TYPE_CHECKING
 
 from .module_set import ModuleSet
-from ..build_exception import BuildException
+from ..build_exception import UnknownKdeProjectException
 from ..debug import KBLogger
 from ..kde_projects_reader import KDEProjectsReader
 from ..module.module import Module
@@ -104,13 +104,14 @@ class ModuleSetKDEProjects(ModuleSet):
         Raises:
             Runtime: if the kde-projects database was required but couldn't be downloaded or read.
             Runtime: if the git-push-protocol is unsupported.
-            Runtime: if an "assumed" kde-projects module was not actually one.
+            UnknownKdeProjectException: if an "assumed" kde-projects module was not actually one.
         """
         all_module_results = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
 
         if not all_module_results:
-            logger_moduleset.error(f" r[*] y[{module_search_item}] is not found in KDE projects, and there is no defined module with such name in the config.")
-            exit(99)
+            # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
+            # are not defined in config is normal.
+            raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.

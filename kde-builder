@@ -12,6 +12,7 @@ import sys
 import textwrap
 import traceback
 
+from kde_builder_lib.build_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
@@ -162,6 +163,10 @@ try:
     app = Application(sys.argv[1:])  # the 0 element is script name
     result = app.run_all_module_phases()
     app.finish(result)
+except UnknownKdeProjectException as err:
+    logger_app = KBLogger.getLogger("application")
+    logger_app.error(f" r[*] y[{err.unknown_project_name}] is not found in KDE projects, and there is no defined module with such name in the config.")
+    exit(99)
 except BuildException as err:
     print(textwrap.dedent(f"""
     kde-builder encountered an exceptional error condition:

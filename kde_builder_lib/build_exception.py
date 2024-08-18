@@ -15,7 +15,7 @@ class BuildException(Exception):
     dispatch based on type and automatically stringified.
     """
 
-    def __init__(self, exception_type, msg):
+    def __init__(self, exception_type: str, msg: str):
         self.exception_type = exception_type
         self.message = msg
 
@@ -104,3 +104,13 @@ class BuildExceptionConfig(BuildException):
             end module-set
             """)
         return result
+
+
+class UnknownKdeProjectException(BuildException):
+    """
+    Raised when a specific project name is not found in repo-metadata kde projects and is not a defined module in config.
+    """
+
+    def __init__(self, message: str, unknown_project_name: str):
+        self.message = message
+        self.unknown_project_name = unknown_project_name
