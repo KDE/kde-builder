@@ -11,7 +11,7 @@ import sys
 
 class Debug:
     """
-    Debugging routines and constants for use with kde-builder
+    Debugging routines and constants for use with kde-builder.
     """
 
     # Debugging level constants.
@@ -108,8 +108,9 @@ class Debug:
 
     def set_ipc(self, ipc) -> None:
         """
-        Sets an IPC object to use to proxy logged messages over, to avoid having
-        multiple procs fighting over the same TTY. Needless to say, you should only
+        Set an IPC object to use to proxy logged messages over, to avoid having multiple procs fighting over the same TTY.
+
+        Needless to say, you should only
         bother with this if the IPC method is actually concurrent.
         """
         self.ipc = ipc
@@ -119,6 +120,10 @@ class Debug:
 
 
 class KBLogger(logging.Logger):
+    """
+    KDE Builder specific logger.
+    """
+
     _loggers = {}
     levelNamesMapping = logging._nameToLevel
 
@@ -135,7 +140,6 @@ class KBLogger(logging.Logger):
         """
         Subroutine used to actually display the data, calls :meth:`Debug.colorize` on each entry first.
         """
-
         d = Debug()
         # If we have an IPC object that means there's multiple procs trying to
         # share the same TTY. Just forward messages to the one proc that should be

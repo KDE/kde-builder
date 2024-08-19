@@ -173,8 +173,7 @@ class BuildSystemKDECMake(BuildSystem):
     # @override(check_signature=False)
     def supports_auto_parallelism(self) -> bool:
         """
-        Returns true if CMake is run with ninja, which supports setting -j
-        automatically.
+        Return true if CMake is run with ninja, which supports setting -j automatically.
         """
         generator = self.get_cmake_generator()
         generator_opts = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
@@ -212,9 +211,9 @@ class BuildSystemKDECMake(BuildSystem):
     # @override
     def prepare_module_build_environment(self) -> None:
         """
-        Called by the module being built before it runs its build/install process. Should
-        set up any needed environment variables, build context settings, etc., in preparation
-        for the build and install phases.
+        Set up any needed environment variables, build context settings, etc., in preparation for the build and install phases.
+
+        Called by the module being built before it runs its build/install process.
         """
         module = self.module
         prefix = self.module.installation_path()
@@ -243,9 +242,9 @@ class BuildSystemKDECMake(BuildSystem):
     # @override(check_signature=False)
     def required_programs(self) -> list[str]:
         """
-        This should return a list of executable names that must be present to
-        even bother attempting to use this build system. An empty list should be
-        returned if there's no required programs.
+        Return a list of executable names that must be present to even bother attempting to use this build system.
+
+        An empty list should be returned if there's no required programs.
         """
         generator = self.get_cmake_generator()
         required = BuildSystemKDECMake.GENERATOR_MAP[generator]["required_programs"]
@@ -254,8 +253,7 @@ class BuildSystemKDECMake(BuildSystem):
     # @override(check_signature=False)
     def build_commands(self) -> list[str]:
         """
-        Returns a list of possible build commands to run, any one of which should
-        be supported by the build system.
+        Return a list of possible build commands to run, any one of which should be supported by the build system.
         """
         generator = self.get_cmake_generator()
         progs = BuildSystemKDECMake.GENERATOR_MAP[generator]["build_commands"]
@@ -304,8 +302,7 @@ class BuildSystemKDECMake(BuildSystem):
     # @override
     def install_internal(self, cmd_prefix: list[str]) -> bool:
         """
-        Re-implementing the one in BuildSystem since in CMake we want to call
-        make install/fast, so it only installs rather than building + installing
+        Re-implementing the one in BuildSystem since in CMake we want to call make install/fast, so it only installs rather than building + installing.
         """
         module = self.module
         generator = self.get_cmake_generator()
@@ -347,7 +344,8 @@ class BuildSystemKDECMake(BuildSystem):
 
     def _safe_run_cmake(self) -> int:
         """
-        Function to run CMake to create the build directory for a module.
+        Run CMake to create the build directory for a module.
+
         CMake is not actually run if pretend mode is enabled.
 
         Returns:

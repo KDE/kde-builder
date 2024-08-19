@@ -23,19 +23,12 @@ if TYPE_CHECKING:
 
 class ModuleResolver:
     """
-    A class that handles general management tasks associated with the
-    module build list, including option handling and resolution of module
-    selectors into actual modules.
+    Handles general management tasks associated with the module build list.
+
+    This includes option handling and resolution of module selectors into actual modules.
     """
 
     def __init__(self, ctx: BuildContext):
-        """
-        Creates a new :class:`ModuleResolver`. You must pass the appropriate
-        :class:`BuildContext` Don't forget to call set_cmdline_options(),
-        set_ignored_selectors() and set_input_modules_and_options().
-
-            resolver = ModuleResolver(ctx)
-        """
         self.context = ctx
 
         # Declares all selectors that should be ignored by default in the process of
@@ -69,15 +62,13 @@ class ModuleResolver:
 
     def set_deferred_options(self, deferred_options: list[dict]) -> None:
         """
-        Set options to apply later if a module set resolves to a named module, used
-        for "options" blocks.
+        Set options to apply later if a module set resolves to a named module, used for "options" blocks.
 
         Each object in the dict can be either options for a later :class:`Module`,
         or options for an entire set of :class:`Module` (as determined by use of
         repository/use-module items). We want to handle the latter first, since
         we assume single "options" blocks should still be able to override these.
         """
-
         proj_db: KDEProjectsReader = self.context.get_project_data_reader()
         set_indices = []
         final_opts = {}
@@ -126,12 +117,7 @@ class ModuleResolver:
 
     def set_input_modules_and_options(self, mod_opts: list[Module | ModuleSet]) -> None:
         """
-        Declares the list of all modules and module-sets known to the program,
-        along with their base options. Modules should be :class:`Module` objects,
-        module-sets should be :class:`ModuleSet` objects, no other types should be
-        present in the list.
-
-        You should pass a list of Module or ModuleSet (as appropriate).
+        Declare the list of all modules and module-sets known to the program, along with their base options.
         """
         self.input_modules_and_options = mod_opts
 
@@ -141,9 +127,8 @@ class ModuleResolver:
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
         """
-        Applies cmdline and deferred options to the given modules or module-sets.
+        Apply cmdline and deferred options to the given modules or module-sets.
         """
-
         for m in modules:
             name = m.name
             opts = copy.deepcopy(self.deferred_options.get(name, {}))
@@ -178,10 +163,9 @@ class ModuleResolver:
     @staticmethod
     def _list_referenced_modules(modules_and_modulesets: list[Module | ModuleSet]) -> dict:
         """
-        Returns a dict of all module names referenced in use-module
-        declarations for any ModuleSet included within the input list. Each entry
-        in the dict will map the referenced module name to the source
-        ModuleSet.
+        Return a dict of all module names referenced in use-module declarations for any ModuleSet included within the input list.
+
+        Each entry in the dict will map the referenced module name to the source ModuleSet.
         """
         set_entry_lookup_dict = {}
 
@@ -194,8 +178,8 @@ class ModuleResolver:
 
     def _expand_single_module_set(self, needed_module_set: ModuleSet) -> list[Module]:
         """
-        Expands out a single module-set listed in referenced_modules and places any
-        Modules created as a result within the lookup dict of Modules.
+        Expand out a single module-set listed in referenced_modules and places any Modules created as a result within the lookup dict of Modules.
+
         Returns the list of created Modules.
         """
         selected_reason = "partial-expansion:" + needed_module_set.name
@@ -223,7 +207,8 @@ class ModuleResolver:
 
     def _resolve_single_selector(self, selector: str) -> list:
         """
-        Determines the most appropriate module to return for a given selector.
+        Determine the most appropriate module to return for a given selector.
+
         The selector may refer to a module or module-set, which means that the
         return value may be a list of modules.
         """
@@ -361,8 +346,9 @@ class ModuleResolver:
 
     def resolve_selectors_into_modules(self, selectors: list[str]) -> list[Module]:
         """
-        Resolves the given list of module selectors into :class:`Module` objects,
-        using the pending command-line options, ignore-selectors and available
+        Resolve the given list of module selectors into :class:`Module` objects.
+
+        Uses the pending command-line options, ignore-selectors and available
         modules/module-sets.
 
         Selectors always choose an available :class:`Module` or :class:`ModuleSet` if
@@ -380,7 +366,7 @@ class ModuleResolver:
         If you are just looking for a Module that should already be present, see
         resolve_module_if_present().
 
-            modules = resolver.resolve_selectors_into_modules("kdelibs", "juk")
+            modules = resolver.resolve_selectors_into_modules(["kdelibs", "juk"])
 
         Resolves already-stored module selectors into :class:`Module`, based on
         the options, modules, and module-sets set.
@@ -388,7 +374,6 @@ class ModuleResolver:
         Returns a list of :class:`Module` in build order, with any module-sets fully
         expanded. The desired options will be set for each :class:`Module` returned.
         """
-
         # Basically there are 3 types of selectors at this point:
         # 1. Directly named and defined modules or module-sets.
         # 2. Referenced (but undefined) modules. These are mentioned in a
@@ -420,8 +405,9 @@ class ModuleResolver:
 
     def resolve_module_if_present(self, module_name: str) -> Module | None:
         """
-        Similar to resolve_selectors_into_modules(), except that no exceptions are
-        thrown if the module doesn't exist. Only a single module name is supported.
+        Similar to resolve_selectors_into_modules(), except that no exceptions are thrown if the module doesn't exist.
+
+        Only a single module name is supported.
         """
         if self.referenced_modules:
             self._expand_all_unexpanded_module_sets()
@@ -440,8 +426,7 @@ class ModuleResolver:
 
     def expand_module_sets(self, build_module_list: list[Module | ModuleSet]) -> list[Module]:
         """
-        Replaces ModuleSets in the given list with their component Modules, and
-        returns the new list.
+        Replace ModuleSets in the given list with their component Modules, and return the new list.
 
         Converts any :class:`ModuleSet` objects in the given list of Modules and
         ModuleSets into their component :class:`Module` objects (with proper options
@@ -482,8 +467,6 @@ class ModuleResolver:
 
 
 """
-IMPLEMENTATION
-
 This class uses a multi-pass option resolving system, in accordance with
 the way kde-builder handles options. Consider a simple kdesrc-buildrc:
 
@@ -561,8 +544,6 @@ anywhere within an rc-file, it may be required to completely expand all
 module sets in order to verify that a referenced :class:`Module` is **not**
 already known.
 
-OUTPUTS
-
 From the perspective of calling code, the "outputs" of this module are
 lists of :class:`Module` objects, in the order they were selected (or mentioned
 in the rc-file). See expand_module_sets() and resolve_selectors_into_modules().
@@ -573,5 +554,4 @@ as the union of rc-file and cmdline options).
 
 Note that dependency resolution is **not** handled by this module, see
 :class:`DependencyResolver` for that.
-
 """

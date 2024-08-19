@@ -15,7 +15,7 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystemAutotools(BuildSystem):
     """
-    This is a class used to support configuring with autotools.
+    Support configuring with autotools.
 
     This build system is currently only used for "gpgme" and "libgpg-error" modules. See `kde-builder --query build-system | grep autotools`.
     """
@@ -27,7 +27,7 @@ class BuildSystemAutotools(BuildSystem):
 
     def _autogen(self) -> str:
         """
-        Runs "autogen.sh" (if presented), and returns "autogen.sh" or "configure" (depending on if "configure" is presented (after running "autogen.sh" or in repo)).
+        Run "autogen.sh" (if presented), and return "autogen.sh" or "configure" (depending on if "configure" is presented (after running "autogen.sh" or in repo)).
         """
         module = self.module
         sourcedir = module.fullpath("source")
@@ -67,9 +67,6 @@ class BuildSystemAutotools(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         sourcedir = module.fullpath("source")
         builddir = module.fullpath("build")

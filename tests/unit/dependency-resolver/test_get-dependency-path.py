@@ -33,7 +33,7 @@ def mock_module_fullproject(monkeypatch):
 
 def test_dependency_path(mock_module_fullproject):
     """
-    Verify that _get_dependency_path_of() works properly
+    Verify that _get_dependency_path_of() works properly.
     """
     module1 = Module("test/path", True)
 

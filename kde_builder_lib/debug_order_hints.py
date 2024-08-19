@@ -14,8 +14,9 @@ if TYPE_CHECKING:
 
 class DebugOrderHints:
     """
-    This module is motivated by the desire to help the user debug a kde-builder
-    failure more easily. It provides support code to rank build failures on a per
+    Help the user debug a kde-builder failure more easily.
+
+    It provides support code to rank build failures on a per
     module from "most" to "least" interesting, as well as to sort the list of
     (all) failures by their respective rankings. This ranking is determined by
     trying to evaluate whether a given build failure fits a number of
@@ -27,6 +28,8 @@ class DebugOrderHints:
     @staticmethod
     def _get_phase_score(phase: str) -> int:
         """
+        Get phase score.
+
         Assumption: build & install phases are interesting.
         Install is particularly interesting because that should "rarely" fail,
         and so if it does there are probably underlying system issues at work.
@@ -39,7 +42,6 @@ class DebugOrderHints:
         more serious such as an unclean git repository, causing scm commands
         to bail.
         """
-
         if phase == "install":
             return 4
         if phase == "test":

@@ -11,11 +11,10 @@ from kde_builder_lib.util.logged_subprocess import UtilLoggedSubprocess
 
 def test_cmake_prefix(monkeypatch):
     """
-    Verify that a user-set CMAKE_PREFIX_PATH is not removed, even if we supply
-    "magic" of our own
+    Verify that a user-set CMAKE_PREFIX_PATH is not removed, even if we supply "magic" of our own.
+
     See bug 395627 -- https://bugs.kde.org/show_bug.cgi?id=395627
     """
-
     saved_command = []
     set_command_called = 0
 

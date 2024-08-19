@@ -15,8 +15,7 @@ from ..util.util import Util
 
 class UpdaterKDEProjectMetadata(UpdaterKDEProject):
     """
-    Updater used only to specifically update the "repo-metadata" module
-    used for storing dependency information, among other things.
+    Updater used only to specifically update the "repo-metadata" module used for storing dependency information, among other things.
 
     Note: 2020-06-20 the previous "kde-build-metadata" module was combined into
     the "repo-metadata" module, under the "/dependencies" folder.
@@ -29,7 +28,7 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
 
     def ignored_modules(self) -> list[str]:
         """
-        Returns a list of the full kde-project paths for each module to ignore.
+        Return a list of the full kde-project paths for each module to ignore.
         """
         path = self.module.fullpath("source") + "/dependencies/build-script-ignore"
 
@@ -56,9 +55,10 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
 
     def logical_module_groups(self) -> dict:
         """
-        If JSON support is present, and the metadata has already been downloaded
-        (e.g. with ``update_internal``), returns a dict to the logical module group
-        data contained within the kde-build-metadata, decoded from its JSON format.
+        Return a dict to the logical module group data.
+
+        JSON support should be present, and the metadata should already be downloaded (e.g. with ``update_internal``).
+        Logical module group data is contained within the kde-build-metadata, decoded from its JSON format.
         See https://community.kde.org/Infrastructure/Project_Metadata
         """
         path = self.module.fullpath("source") + "/dependencies/logical-module-structure.json"

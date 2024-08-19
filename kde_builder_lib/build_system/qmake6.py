@@ -17,7 +17,7 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystemQMake6(BuildSystem):
     """
-    A build system used to build modules that use qmake
+    A build system used to build modules that use qmake.
     """
 
     possible_qmake_names = ["qmake-qt6", "qmake6", "qmake-mac", "qmake"]
@@ -35,9 +35,11 @@ class BuildSystemQMake6(BuildSystem):
     # @override(check_signature=False)
     def needs_builddir_hack(self) -> bool:
         """
+        Indicate if build dir hack is needed.
+
         I've never had problems with modern QMake-using modules being built in a
         specific build directory, until I tried using QMake to build Qt5 modules
-        (past qtbase).  Many seem fail with builddir != srcdir
+        (past qtbase). Many seem fail with builddir != srcdir
         """
         module = self.module
 
@@ -47,7 +49,9 @@ class BuildSystemQMake6(BuildSystem):
     @classmethod
     def abs_path_to_qmake(cls) -> str:
         """
-        Returns the absolute path to "qmake". Note the actual executable name may
+        Return the absolute path to "qmake".
+
+        Note the actual executable name may
         not necessarily be "qmake" as some distributions rename it to allow for
         co-installability with previous Qt versions.
         If no suitable qmake can be found, None is returned.
@@ -56,9 +60,6 @@ class BuildSystemQMake6(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         builddir = module.fullpath("build")
         sourcedir = builddir if self.needs_builddir_hack() else module.fullpath("source")

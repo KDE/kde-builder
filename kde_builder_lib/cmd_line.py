@@ -19,8 +19,9 @@ logger_app = KBLogger.getLogger("application")
 
 class Cmdline:
     """
-    This class centralizes handling of command line options, to simplify handling
-    of user command input, for automated testing using mock command lines, and to
+    Centralizes handling of command line options.
+
+    Needed to simplify handling of user command input, for automated testing using mock command lines, and to
     speed up simple operations by separating command line argument parsing from the
     heavyweight module list generation process.
 
@@ -60,8 +61,7 @@ class Cmdline:
 
     def read_command_line_options_and_selectors(self, options: list[str]) -> dict:
         """
-        This function decodes the command line options passed into it and returns a
-        dictionary describing what actions to take.
+        Decode the command line options passed into it and return a dictionary describing what actions to take.
 
         The resulting object will be shaped as follows:
         ::
@@ -507,9 +507,8 @@ class Cmdline:
     @staticmethod
     def _supported_options() -> list[str]:
         """
-        Return option names ready to be fed into GetOptionsFromArray
+        Return option names ready to be fed into GetOptionsFromArray.
         """
-
         # See https://perldoc.perl.org/5.005/Getopt::Long for options specification format
 
         non_context_options = [

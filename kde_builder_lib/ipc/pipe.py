@@ -36,20 +36,16 @@ class IPCPipe(IPC):
     @staticmethod
     # @override
     def supports_concurrency() -> bool:
-        """
-        Reimplementation of :meth:`IPC.supports_concurrency`.
-        """
         return True
 
     # @override(check_signature=False)
     def send_message(self, msg: bytes) -> bool:
         """
-        Required reimplementation of :meth:`IPC.send_message`.
+        Send message.
 
-        Parameters:
+        Args:
              msg: The (encoded) message to send.
         """
-
         # Since streaming does not provide message boundaries, we will insert
         # ourselves, by sending a 2-byte unsigned length, then the message.
         encoded_msg = struct.pack("H", len(msg)) + msg
@@ -67,9 +63,6 @@ class IPCPipe(IPC):
 
     # @override(check_signature=False)
     def receive_message(self) -> bytes:
-        """
-        Required reimplementation of :meth:`IPC.receive_message`.
-        """
         # Read unsigned short with msg length, then the message
         msg_length = self._read_number_of_bytes(2)
         if not msg_length:

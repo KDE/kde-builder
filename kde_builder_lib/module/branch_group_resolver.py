@@ -8,9 +8,9 @@ from __future__ import annotations
 
 class ModuleBranchGroupResolver:
     """
-    This provides an object that can be used to look up the appropriate git branch
-    to use for a given KDE project module and given desired logical branch group, using
-    supplied JSON data (from repo-metadata's /dependencies directory).
+    Provides an object that can be used to look up the appropriate git branch to use for a given KDE project module and given desired logical branch group.
+
+    Uses supplied JSON data (from repo-metadata's /dependencies directory).
 
     See also https://community.kde.org/Infrastructure/Project_Metadata
     """
@@ -36,11 +36,10 @@ class ModuleBranchGroupResolver:
 
     def _find_logical_group(self, module: str, logical_group: str) -> str | None:
         """
-        Returns the branch for the given logical group and module specifier. This
-        function should not be called if the module specifier does not actually
-        exist.
-        """
+        Return the branch for the given logical group and module specifier.
 
+        This function should not be called if the module specifier does not actually exist.
+        """
         # Using defined-or and still returning None is on purpose, silences
         # warning about use of undefined value.
         return self.groups[module].get(logical_group, None)

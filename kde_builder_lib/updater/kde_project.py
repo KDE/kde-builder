@@ -10,8 +10,7 @@ from .updater import Updater
 
 class UpdaterKDEProject(Updater):
     """
-    An update class for KDE Project modules (i.e. those that use "repository
-    kde-projects" in the configuration file).
+    An update class for KDE Project modules (i.e. those that use "repository kde-projects" in the configuration file).
     """
 
     @staticmethod
@@ -21,10 +20,10 @@ class UpdaterKDEProject(Updater):
 
     def _resolve_branch_group(self, branch_group: str) -> str | None:
         """
-        Resolves the requested branch-group for this Updater's module.
+        Resolve the requested branch-group for this Updater's module.
+
         Returns the required branch name, or None if none is set.
         """
-
         module = self.module
 
         # If we're using a logical group we need to query the global build context
@@ -36,9 +35,6 @@ class UpdaterKDEProject(Updater):
 
     # @override(check_signature=False)
     def _module_is_needed(self) -> bool:
-        """
-        Reimplementation
-        """
         module = self.module
 
         # selected-by looks at cmdline options, found-by looks at how we read
@@ -53,16 +49,9 @@ class UpdaterKDEProject(Updater):
     @staticmethod
     # @override(check_signature=False)
     def _is_plausible_existing_remote(name: str, url: str, configured_url: str) -> bool:
-        """
-        Reimplementation
-        """
-
         return url == configured_url or url.startswith("kde:")
 
     @staticmethod
     # @override
     def is_push_url_managed() -> bool:
-        """
-        Reimplementation
-        """
         return True

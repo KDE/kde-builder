@@ -17,7 +17,7 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystemQt5(BuildSystem):
     """
-    Build system for the Qt5 toolkit
+    Build system for the Qt5 toolkit.
     """
 
     @staticmethod
@@ -32,9 +32,6 @@ class BuildSystemQt5(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         srcdir = module.fullpath("source")
         script = f"{srcdir}/configure"

@@ -23,7 +23,7 @@ def run_command(command):
 
 def test_submodule():
     """
-    Test submodule-related features
+    Test submodule-related features.
     """
     # Create an empty directory for a git module, ensure submodule-related things
     # work without a submodule, then add a submodule and ensure that things remain

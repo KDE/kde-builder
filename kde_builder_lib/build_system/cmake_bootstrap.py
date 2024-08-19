@@ -9,8 +9,7 @@ from ..util.util import Util
 
 class BuildSystemCMakeBootstrap(BuildSystem):
     """
-    This is a module used to do only one thing: Bootstrap CMake onto a system
-    that doesn't have it, or has only an older version of it.
+    Bootstrap CMake onto a system that doesn't have it, or has only an older version of it.
     """
 
     @staticmethod
@@ -25,9 +24,6 @@ class BuildSystemCMakeBootstrap(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         sourcedir = module.fullpath("source")
         installdir = module.installation_path()

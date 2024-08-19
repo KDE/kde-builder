@@ -58,7 +58,7 @@ def graph1(mock_module_from_attrs):
 
 def test_proper_order(graph1):
     """
-    Test sorting modules into build order
+    Test sorting modules into build order.
     """
     expected1 = [graph1[item]["module"] for item in ["a", "c", "b", "d", "e"]]
     actual1 = DependencyResolver.sort_modules_into_build_order(graph1)

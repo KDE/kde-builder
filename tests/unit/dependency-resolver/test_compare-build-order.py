@@ -21,7 +21,7 @@ def mock_module_from_attrs(monkeypatch):
 
 def test_comparison(mock_module_from_attrs):
     """
-    Test comparison operation for sorting modules into build order
+    Test comparison operation for sorting modules into build order.
     """
     graph1 = {
         "a": {

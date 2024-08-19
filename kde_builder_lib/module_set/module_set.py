@@ -22,8 +22,9 @@ logger_moduleset = KBLogger.getLogger("module-set")
 
 class ModuleSet(OptionsBase):
     """
-    This represents a collective grouping of modules that share common options,
-    and share a common repository (in this case, based on the git-repository-base
+    Represents a collective grouping of modules that share common options.
+
+    Also, they share a common repository (in this case, based on the git-repository-base
     option, but see also the more common ModuleSetKDEProjects which is used for
     the special kde-projects repositories).
 
@@ -75,10 +76,10 @@ class ModuleSet(OptionsBase):
 
     def module_names_to_find(self) -> list[str]:
         """
-        Same as modules_to_find, but strips away any path components to leave just
-        module names.
-        E.g. a "use-modules kde/kdelibs juk.git" would give (kdelibs, juk) as the
-        result list.
+        Get module names to find.
+
+        Same as modules_to_find, but strips away any path components to leave just module names.
+        E.g. a "use-modules kde/kdelibs juk.git" would give (kdelibs, juk) as the result list.
         """
         ret = [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modules_to_find()]
         return ret
@@ -91,8 +92,9 @@ class ModuleSet(OptionsBase):
 
     def _initialize_new_module(self, new_module: Module) -> None:
         """
-        Should be called for each new ``Module`` created in order to set up common
-        module options.
+        Initialize new module.
+
+        Should be called for each new ``Module`` created in order to set up common module options.
         """
         new_module.set_module_set(self)
         new_module.set_scm_type("git")
@@ -111,9 +113,8 @@ class ModuleSet(OptionsBase):
     # @override
     def set_option(self, options: dict) -> None:
         """
-        Handles module-set specific options for OptionsBase's set_option
+        Handle module-set specific options for OptionsBase's set_option.
         """
-
         # Special-case handling
         if "use-modules" in options:
             modules = options["use-modules"].split(" ")
@@ -140,8 +141,9 @@ class ModuleSet(OptionsBase):
 
     def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
         """
-        This function should be called after options are read and build metadata is
-        available in order to convert this module set to a list of Module.
+        Convert this module set to a list of Module.
+
+        This function should be called after options are read and build metadata is available.
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """

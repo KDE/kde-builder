@@ -19,12 +19,15 @@ logger_app = KBLogger.getLogger("application")
 
 
 class StartProgram:
+    """
+    Run the installed binary of some module.
+    """
+
     @staticmethod
     def execute_built_binary(ctx: BuildContext, args: list[str]) -> NoReturn:
         """
-        Executes the binary from install-dir/bin, and sources the environment file before that.
+        Execute the binary from install-dir/bin, and sources the environment file before that.
         """
-
         opt_fork = 0
 
         # We manually care of options. They can only appear in front of executable name.

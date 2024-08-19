@@ -17,8 +17,7 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystemQt4(BuildSystem):
     """
-    Build system for the Qt4 toolkit. It actually works for Qt6 qtbase as well
-    because of how simple it is but don't tell anyone that.
+    Build system for the Qt4 toolkit. It actually works for Qt6 qtbase as well because of how simple it is but don't tell anyone that.
     """
 
     # @override(check_signature=False)
@@ -38,9 +37,6 @@ class BuildSystemQt4(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         srcdir = module.fullpath("source")
         script = f"{srcdir}/configure"

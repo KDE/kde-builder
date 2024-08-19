@@ -38,8 +38,7 @@ logger_buildcontext = KBLogger.getLogger("build-context")
 # TODO: Derive from OptionsBase directly and remove get_option override
 class BuildContext(Module):
     """
-    This contains the information needed about the build context, e.g. list of
-    modules, what phases each module is in, the various options, etc.
+    Contains the information needed about the build context, e.g. list of modules, what phases each module is in, the various options, etc.
 
     It also records information on which modules encountered errors (and what
     error), where to put log files, persistent options that should be available on
@@ -248,7 +247,8 @@ class BuildContext(Module):
 
     def add_to_ignore_list(self, moduleslist: list[str]) -> None:
         """
-        Adds a list of modules to ignore processing on completely.
+        Add a list of modules to ignore processing on completely.
+
         Parameters should simply be a list of KDE project paths to ignore,
         e.g. "extragear/utils/kdesrc-build". Partial paths are acceptable, matches
         are determined by comparing the path provided to the suffix of the full path
@@ -273,8 +273,9 @@ class BuildContext(Module):
 
     def take_lock(self) -> bool:
         """
-        Tries to take the lock for our current base directory, which currently is
-        what passes for preventing people from accidentally running kde-builder
+        Try to take the lock for our current base directory.
+
+        The lock currently is what passes for preventing people from accidentally running kde-builder
         multiple times at once. The lock is based on the base directory instead
         of being global to allow for motivated and/or brave users to properly
         configure kde-builder to run simultaneously with different
@@ -381,7 +382,7 @@ class BuildContext(Module):
 
     def get_log_dir_for(self, module: Module) -> str:
         """
-        Returns the log directory of specified module.
+        Return the log directory of specified module.
 
         You can also pass a BuildContext (including this one) to get the
         default log directory.
@@ -417,7 +418,7 @@ class BuildContext(Module):
 
     def get_log_path_for(self, module: Module, path: str) -> str:
         """
-        Returns the absolute filename to open() for a log file for this module based on the given basename (including extensions). Updates the "latest" symlink.
+        Return the absolute filename to open() for a log file for this module based on the given basename (including extensions). Update the "latest" symlink.
 
         Use this instead of get_log_dir_for when you actually intend to create a log, as this function will also adjust the
         "latest" symlink properly (which can trigger clean up of old log dirs after all modules are built).
@@ -455,13 +456,13 @@ class BuildContext(Module):
 
     def rc_file(self) -> None:
         """
-        Returns rc file in use. Call load_rc_file first.
+        Return rc file in use. Call load_rc_file first.
         """
         return self.rc_file
 
     def set_rc_file(self, file: str) -> None:
         """
-        Forces the rc file to be read from to be that given by the first parameter.
+        Force the rc file to be read from the path given.
         """
         self.rc_files = [file]
         self.rc_file = None
@@ -482,8 +483,9 @@ class BuildContext(Module):
 
     def load_rc_file(self) -> fileinput.FileInput:
         """
-        Returns an open filehandle to the user's chosen rc file. Use set_rc_file
-        to choose a file to load before calling this function, otherwise
+        Return an open filehandle to the user's chosen rc file.
+
+        Use set_rc_file to choose a file to load before calling this function, otherwise
         load_rc_file will search the default search path. After this function is
         called, rc_file() can be used to determine which file was loaded.
 
@@ -569,8 +571,9 @@ class BuildContext(Module):
 
     def base_config_directory(self) -> str:
         """
-        Returns the base directory that holds the configuration file. This is
-        typically used as the directory base for other necessary kde-builder
+        Return the base directory that holds the configuration file.
+
+        This is typically used as the directory base for other necessary kde-builder
         execution files, such as the persistent data store and lock file.
 
         The RC file must have been found and loaded first, obviously.
@@ -602,8 +605,9 @@ class BuildContext(Module):
 
     def lookup_module(self, module_name: str):
         """
-        Searches for a module with a name that matches the provided parameter,
-        and returns its :class:`Module` object. Returns None if no match was found.
+        Search for a module with a name that matches the provided parameter, and return its :class:`Module` object.
+
+        Returns None if no match was found.
         As a special-case, returns the BuildContext itself if the name passed is
         "global", since the BuildContext also is a (in the "is-a" OOP sense)
         :class:`Module`, specifically the "global" one.
@@ -625,15 +629,14 @@ class BuildContext(Module):
 
     def failed_modules_in_phase(self, phase: str) -> list[Module]:
         """
-        Returns a list of Modules that failed to complete the given phase.
+        Return a list of Modules that failed to complete the given phase.
         """
         failures = [module for module in self.modules if self.errors.get(module.name, "") == phase]
         return failures
 
     def list_failed_modules(self) -> list[Module]:
         """
-        Returns a list of modules that had a failure of some sort, in the order the modules
-        are listed in our current module list.
+        Return a list of modules that had a failure of some sort, in the order the modules are listed in our current module list.
         """
         modules = self.modules
 
@@ -644,6 +647,8 @@ class BuildContext(Module):
     # @override(check_signature=False)
     def get_option(self, key: str) -> str | dict | list | bool:
         """
+        Get context option.
+
         Our immediate parent class Module overrides this, but we actually
         want the OptionsBase version to be used instead, until we break the recursive
         use of Module's own get_option calls on our get_option.
@@ -680,7 +685,7 @@ class BuildContext(Module):
 
     def persistent_option_file_name(self) -> str:
         """
-        Returns the name of the file to use for persistent data.
+        Return the name of the file to use for persistent data.
         """
         file = self.get_option("persistent-data-file")
 
@@ -726,12 +731,10 @@ class BuildContext(Module):
 
     def load_persistent_options(self) -> None:
         """
-        Reads in all persistent options from the file where they are kept
-        (kdesrc-build-data) for use in the program.
+        Read in all persistent options from the file where they are kept (kdesrc-build-data) for use in the program.
 
         The directory used is the same directory that contains the rc file in use.
         """
-
         # pl2py note: this was commented there.
         # We need to keep persistent data with the context instead of with the
         # applicable modules since otherwise we might forget to write out
@@ -765,7 +768,8 @@ class BuildContext(Module):
 
     def store_persistent_options(self) -> None:
         """
-        Writes out persistent options to the kdesrc-build-data file.
+        Write out persistent options to the kdesrc-build-data file.
+
         The directory used is the same directory that contains the rc file in use.
         """
         if Debug().pretending():
@@ -787,10 +791,9 @@ class BuildContext(Module):
     # @override(check_signature=False)
     def get_persistent_option(self, module_name: str, key=None) -> str | int | None:
         """
-        Returns the value of a "persistent" option (normally read in as part of
-        startup), or None if there is no value stored.
+        Return the value of a "persistent" option (normally read in as part of startup), or None if there is no value stored.
 
-        Parameters:
+        Args:
             module_name: The module name to get the option for, or "global" if
                 not for a module.
                 Note that unlike set_option/get_option, no inheritance is done at this
@@ -814,9 +817,9 @@ class BuildContext(Module):
     # @override(check_signature=False)
     def unset_persistent_option(self, module_name: str, key) -> None:
         """
-        Clears a persistent option if set (for a given module and option-name).
+        Clear a persistent option if set (for a given module and option-name).
 
-        Parameters:
+        Args:
             module_name: The module name to get the option for, or "global" for
                 the global options.
             key: The name of the value to clear.
@@ -824,7 +827,6 @@ class BuildContext(Module):
         Returns:
             None
         """
-
         persistent_opts = self.persistent_options
 
         if module_name in persistent_opts and key in persistent_opts[module_name]:
@@ -833,15 +835,13 @@ class BuildContext(Module):
     # @override(check_signature=False)
     def set_persistent_option(self, module_name: str, key, value) -> None:
         """
-        Sets a "persistent" option which will be read in for a module when
-        kde-builder starts up and written back out at (normal) program exit.
+        Set a "persistent" option which will be read in for a module when kde-builder starts up and written back out at (normal) program exit.
 
-        Parameters:
+        Args:
             module_name: The module name to set the option for, or "global".
             key: The name of the value to set (i.e. key)
             value: The value to store.
         """
-
         persistent_opts = self.persistent_options
 
         # Initialize empty dict if nothing defined for this module.
@@ -852,9 +852,7 @@ class BuildContext(Module):
 
     def get_kde_projects_metadata_module(self) -> Module:
         """
-        Returns the :class:`Module` (which has a "metadata" scm type) that is used for
-        kde-project metadata, so that other modules that need it can call into it if
-        necessary.
+        Return the :class:`Module` (which has a "metadata" scm type) that is used for kde-project metadata, so that other modules that need it can call into it if necessary.
 
         Also, may return None if the metadata is unavailable or has not yet
         been set by setKDEProjectsMetadataModule (this method does not
@@ -868,8 +866,9 @@ class BuildContext(Module):
 
     def get_project_data_reader(self) -> KDEProjectsReader:
         """
-        Returns a KDEProjectsReader module, which has already read in the database and
-        is ready to be queried. Note that exceptions can be thrown in the process
+        Return a KDEProjectsReader module, which has already read in the database and is ready to be queried.
+
+        Note that exceptions can be thrown in the process
         of downloading and parsing the database information, so be ready for that.
         """
         if self.projects_db:
@@ -882,8 +881,9 @@ class BuildContext(Module):
 
     def effective_branch_group(self) -> str:
         """
-        Returns the effective branch group to use for modules. You should not call
-        this unless KDE project metadata is available (see
+        Return the effective branch group to use for modules.
+
+        You should not call this unless KDE project metadata is available (see
         setKDEProjectsMetadataModule and module_branch_group_resolver).
         """
         branch_group = self.get_option("branch-group") or "kf5-qt5"
@@ -891,12 +891,12 @@ class BuildContext(Module):
 
     def module_branch_group_resolver(self) -> ModuleBranchGroupResolver:
         """
-        Returns a :class:`Module.BranchGroupResolver` which can be used to efficiently
-        determine a git branch to use for a given kde-projects module (when the
+        Return a :class:`Module.BranchGroupResolver`.
+
+        It can be used to efficiently determine a git branch to use for a given kde-projects module (when the
         branch-group option is in use), as specified at
         https://community.kde.org/Infrastructure/Project_Metadata.
         """
-
         if not self.logical_module_resolver:
             metadata_module = self.get_kde_projects_metadata_module()
 

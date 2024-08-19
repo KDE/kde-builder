@@ -11,8 +11,7 @@ from ..build_exception import BuildException
 
 class ModuleSetNull(ModuleSet):
     """
-    Used automatically by ``Module`` to represent the absence of a ``ModuleSet`` without
-    requiring definedness checks.
+    Used automatically by ``Module`` to represent the absence of a ``ModuleSet`` without requiring definedness checks.
     """
 
     def __init__(self):

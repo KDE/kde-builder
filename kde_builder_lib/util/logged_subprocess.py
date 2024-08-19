@@ -33,7 +33,7 @@ is in place.
 
 class UtilLoggedSubprocess:
     """
-    This integrates the functionality subprocess into kde-builder's logging and module tracking functions.
+    Integrate the functionality subprocess into kde-builder's logging and module tracking functions.
 
     Unlike most of the rest of kde-builder, this is a "fluent" interface due to the number of adjustables vars that must be set,
     including which module is being built, the log file to use, what directory to build from, etc.
@@ -74,9 +74,11 @@ class UtilLoggedSubprocess:
 
     def __init__(self):
         """
-        These attributes are the configurable options that should be set before calling
-        ``start`` to execute the desired command. If called without arguments, returns
-        the existing value.
+        Initialize UtilLoggedSubprocess.
+
+        These attributes are the configurable options that should be set before calling ``start`` to execute the desired command.
+
+        If called without arguments, returns the existing value.
         """
         # start of attributes
         self._module = None
@@ -91,32 +93,34 @@ class UtilLoggedSubprocess:
 
     def module(self, module):
         """
-        Sets the ``Module`` that is being executed against.
+        Set the ``Module`` that is being executed against.
         """
         self._module = module
         return self
 
     def log_to(self, log_to):
         """
-        Sets the base filename (without a .log extension) that should receive command output
-        in the log directory. This must be set even if child output will not be examined.
+        Set the base filename (without a .log extension) that should receive command output in the log directory.
+
+        This must be set even if child output will not be examined.
         """
         self._log_to = log_to
         return self
 
     def chdir_to(self, chdir_to):
         """
-        Sets the directory to run the command from just before execution in the child
-        process. Optional, if not set the directory will not be changed. The directory is
-        never changed for the parent process!
+        Set the directory to run the command from just before execution in the child process.
+
+        Optional, if not set the directory will not be changed. The directory is never changed for the parent process!
         """
         self._chdir_to = chdir_to
         return self
 
     def set_command(self, set_command: list[str]):
         """
-        Sets the command, and any arguments, to be run, as a reference to a list. E.g.
+        Set the command, and any arguments, to be run, as a reference to a list.
 
+        E.g.
             cmd.set_command(["make", "-j4"])
         """
         self._set_command = set_command
@@ -124,10 +128,10 @@ class UtilLoggedSubprocess:
 
     def disable_translations(self, disable_translations: bool | None = None):
         """
-        Optional. If set to a true value, causes the child process to attempt to
-        disable command localization by setting the "C" locale in the shell
-        environment. This can be needed for filtering command output but should be
-        avoided if possible otherwise.
+        Make the child process to attempt to disable command localization by setting the "C" locale in the shell environment.
+
+        Optional.
+        This can be needed for filtering command output but should be avoided if possible otherwise.
         """
         if disable_translations is not None:
             self._disable_translations = disable_translations
@@ -135,9 +139,9 @@ class UtilLoggedSubprocess:
 
     def announcer(self, announcer):
         """
-        Optional. Can be set to a sub that will be called with a single parameter (the
-        ``Module`` being built) in the child process just before the build starts.
+        Set a function that will be called with a single parameter (the ``Module`` being built) in the child process just before the build starts.
 
+        Optional.
         You can use this to make an announcement just before the command is run since
         there's no way to guarantee the timing in a longer build.
         """
@@ -147,6 +151,7 @@ class UtilLoggedSubprocess:
     def start(self) -> int:
         """
         Begins the execution, if possible.
+
         Returns the exit code of the command being run. 0 indicates success, non-zero
         indicates failure.
 
@@ -264,14 +269,15 @@ class UtilLoggedSubprocess:
     @staticmethod
     def _send_to_parent(queue, data: list[str]):
         """
-        Sends the given data to the parent process. Our calling code and this
+        Send the given data to the parent process.
+
+        Our calling code and this
         package must share the same single channel (over the "progress" event).
         Although we only support handling for the calling
         code (to send line-by-line output back to the parent), to support future
         expansion we send a dict which we can add different keys to if we need to
         support other use cases.
         """
-
         # pl2py: In perl they sent progress event here with {"child_data": data}. We will not send progress event, instead the on_progress_handler will check for entries in queue in loop
         for line in data:
             if line:

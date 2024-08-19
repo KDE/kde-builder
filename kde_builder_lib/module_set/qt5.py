@@ -12,8 +12,9 @@ from ..util.util import Util
 
 class ModuleSetQt5(ModuleSet):
     """
-    This represents a collection of Qt5 source code modules that are collectively
-    kept up to date by Qt's init-repository script. This module set is
+    Represents a collection of Qt5 source code modules.
+
+    They are collectively kept up to date by Qt's init-repository script. This module set is
     essentially used to make sure that generated Modules use proper scm()
     and buildSystems()
 
@@ -45,8 +46,9 @@ class ModuleSetQt5(ModuleSet):
     # @override
     def convert_to_modules(self, ctx) -> list[Module]:
         """
-        This function should be called after options are read and build metadata is
-        available in order to convert this module set to a list of ``Module``.
+        Convert this module set to a list of ``Module``.
+
+        This function should be called after options are read and build metadata is available. 
 
         In our case, we will return ONLY ONE MODULE. That module will handle
         "submodules" via the init-repository script so from kde-builder's perspective it

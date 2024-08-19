@@ -15,9 +15,7 @@ from .build_exception import BuildException
 
 class OSSupport:
     """
-    Provides support code for handling distro-specific functionality, such as lists
-    of package dependencies, command lines to update packages in the first place,
-    and so on.
+    Provides support code for handling distro-specific functionality, such as lists, of package dependencies, command lines to update packages in the first place, and so on.
 
     See https://www.freedesktop.org/software/systemd/man/os-release.html for the
     relevant specification.
@@ -31,6 +29,8 @@ class OSSupport:
 
     def __init__(self, file: str | None = None):
         """
+        Initialize OSSupport.
+
             os = OSSupport()
 
         Manually point to os-release:
@@ -38,7 +38,6 @@ class OSSupport:
 
             os = OSSupport("/usr/lib/os-release")
         """
-
         self.ID = None
         self.ID_LIKE = None
         self.VERSION_CODENAME = None
@@ -51,8 +50,8 @@ class OSSupport:
 
     def vendor_id(self) -> str:
         """
-        Returns the vendor ID from the `os-release` specification, or
-        "unknown" if /etc/os-release could not be read.
+        Return the vendor ID from the `os-release` specification, or "unknown" if /etc/os-release could not be read.
+
         ::
 
             vendor = os.vendor_id  # "gentoo", "debian", etc.
@@ -78,9 +77,8 @@ class OSSupport:
 
     def is_debian_based(self) -> bool:
         """
-        Returns boolean. 1 (true) if this is a Linux distribution based on Debian, 0 (false) otherwise.
+        Return boolean. 1 (true) if this is a Linux distribution based on Debian, 0 (false) otherwise.
         """
-
         if self.ID == "debian":
             return True
 
@@ -93,8 +91,8 @@ class OSSupport:
 
     def detect_total_memory(self) -> int:
         """
-        Returns the amount of installed memory, in kilobytes. Linux and FreeBSD are
-        supported.
+        Return the amount of installed memory, in kilobytes. Linux and FreeBSD are supported.
+
         Throws a runtime exception if unable to autodetect memory capacity.
             mem_total_KiB = os.detect_total_memory()
         """
@@ -119,18 +117,16 @@ class OSSupport:
 
     def best_distro_match(self, distros: list[str]) -> str:
         """
+        Use the ID (and if needed, ID_LIKE) parameter in /etc/os-release to find the best possible match amongst the provided distro IDs.
+
+        The list of distros should be ordered with most specific distro first.
+
             # Might return "fedora" if running on Scientific Linux
             distro = os.best_distro_match(["ubuntu", "fedora", "arch", "debian"]);
-
-        This uses the ID (and if needed, ID_LIKE) parameter in
-        /etc/os-release to find the best possible match amongst the
-        provided distro IDs. The list of distros should be ordered with
-        most specific distro first.
 
         If no match is found, returns a generic os string (**not** None, "", or
         similar): "linux" or "freebsd" as the case may be.
         """
-
         ids = [self.vendor_id()]
         like_distros = self.ID_LIKE or ""
         if like_distros:
@@ -175,7 +171,9 @@ class OSSupport:
 
 
 def backslash_decode(src):
-    """decode backslash-escapes"""
+    """
+    Decode backslash-escapes.
+    """
     slashes = 0  # count backslashes
     dst = ""
     for loc in range(0, len(src)):

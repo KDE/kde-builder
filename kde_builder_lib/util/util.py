@@ -42,12 +42,15 @@ logger_util = KBLogger.getLogger("util")
 
 
 class Util:
+    """
+    Helper methods that may be used across the KDE Builder code.
+    """
 
     @staticmethod
     def locate_exe(prog: str, preferred: list[str] | None = None) -> str | None:
         """
-        Function to return the path to the given executable based on
-        either the given paths or the current PATH.
+        Return the path to the given executable based on either the given paths or the current PATH.
+
         E.g.:
         ::
 
@@ -58,7 +61,6 @@ class Util:
         This assumes that the module environment has already been updated since
         binpath doesn't exactly correspond to os.environ["PATH"].
         """
-
         if preferred is None:
             preferred = []
 
@@ -75,6 +77,8 @@ class Util:
     @staticmethod
     def assert_isa(obj, class_name):
         """
+        Do assert on object.
+
         Throws an exception if the first parameter is not an object at all, or if
         it is not an object of the type given by the second parameter (which
         should be a string of the class name). There is no return value.
@@ -86,9 +90,12 @@ class Util:
     @staticmethod
     def assert_in(val, input_list):
         """
+        Do assert on element in list.
+
         Throws an exception if the first parameter is not included in the
         provided list of possible alternatives.
-        Parameters:
+
+        Args:
             val: The value to check.
             input_list: List of alternatives.
         """
@@ -100,7 +107,7 @@ class Util:
     @staticmethod
     def safe_unlink(path) -> None:
         """
-        Function to unlink the given symlink if global-pretend isn't set.
+        Unlink the given symlink if global-pretend isn't set.
         """
         if Debug().pretending():
             logger_util.pretend(f"\tWould have unlinked {path}.")
@@ -110,8 +117,7 @@ class Util:
     @staticmethod
     def safe_system(cmd_list: list[str]) -> int:
         """
-        Function to execute the system call on the given list if the pretend
-        global option is not set.
+        Execute the system call on the given list if the pretend global option is not set.
 
         Returns:
              The shell error code, so 0 means success, non-zero means failure.
@@ -126,8 +132,7 @@ class Util:
     @staticmethod
     def p_chdir(directory) -> None:
         """
-        Is exactly like "chdir", but it will also print out a message saying that
-        we're switching to the directory when debugging.
+        Is exactly like "chdir", but it will also print out a message saying that we're switching to the directory when debugging.
         """
         logger_util.debug(f"\tcd g[{directory}]")
 
@@ -141,13 +146,13 @@ class Util:
     @staticmethod
     def super_mkdir(pathname) -> bool:
         """
-        Creates a directory, including any parent directories that may also need
-        created. Does nothing in pretend mode (but it does remember that it would
+        Create a directory, including any parent directories that may also need created.
+
+        Does nothing in pretend mode (but it does remember that it would
         have created the path to avoid message spam).
 
         Throws an exception on failure. See Path.
         """
-
         if not hasattr(Util, "createdPaths"):
             Util.createdPaths = {}
 
@@ -163,10 +168,11 @@ class Util:
     @staticmethod
     def file_digest_md5(file_name) -> str:
         """
-        Calculates the MD5 digest of a file already on-disk. The digest is
-        returned as a hex string digest as from md5.hexdigest
+        Calculate the MD5 digest of a file already on-disk.
 
-        Parameters:
+        The digest is returned as a hex string digest as from md5.hexdigest
+
+        Args:
              file_name: File name to read
 
         Returns:
@@ -185,9 +191,9 @@ class Util:
     @staticmethod
     def disable_locale_message_translation() -> None:
         """
-        This function is intended to disable the message translation catalog
-        settings in the program environment, so that any child processes executed
-        will have their output untranslated (and therefore scrapeable).
+        Disable the message translation catalog settings in the program environment.
+
+        So any child processes executed will have their output untranslated (and therefore scrapeable).
 
         As such this should only be called for a forked child about to exec as
         there is no easy way to undo this within the process.
@@ -209,7 +215,9 @@ class Util:
     @staticmethod
     def filter_program_output(filter_func: Callable | None, program: str, *args) -> list[str]:
         """
-        Returns a list of output lines from a program. Use this only if you expect
+        Return a list of output lines from a program.
+
+        Use this only if you expect
         that the output after filtering will be short.
 
             def filter(arg):
@@ -217,7 +225,7 @@ class Util:
                     return True
             output = filter_program_output(filter, "git", "describe", "HEAD")
 
-        Parameters:
+        Args:
             filter_func: function to use as a filter (this function  will
                 be passed a line at a time and should return True if the line should be
                 returned). If no filtering is desired pass None.
@@ -225,7 +233,6 @@ class Util:
                 accessible in PATH).
             *args: All remaining arguments are passed to the program.
         """
-
         if filter_func is None:
             def filter_func(_):
                 return True  # Default to all lines
@@ -299,7 +306,9 @@ class Util:
     @staticmethod
     def run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
         """
-        Common code for log_command and UtilLoggedSubprocess
+        Run logged command.
+
+        Common code for log_command and UtilLoggedSubprocess.
         """
         logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 
@@ -421,15 +430,16 @@ class Util:
     @staticmethod
     def good_exitcode(exitcode: int) -> bool:
         """
-        Returns True if exitcode is 0, False otherwise.
+        Return True if exitcode is 0, False otherwise.
         """
         return exitcode == 0
 
     @staticmethod
     def log_command(module: Module, filename: str, args: list[str], options: dict | None = None) -> int:
         """
-        Function to run a command, optionally filtering on the output of the child
-        command. Use like:
+        Run a command, optionally filtering on the output of the child command.
+
+        Use like:
 
             exitcode = log_command(module, "build-output", ["make", "-j4"])
 
@@ -482,8 +492,10 @@ class Util:
     @staticmethod
     def run_logged(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
         """
+        Return the exit status of the sub-process.
+
         This is similar to ``log_command`` in that this runs the given command and
-        arguments in a separate process. Returns the exit status of the sub-process.
+        arguments in a separate process.
 
         ``directory`` parameter allows you to set the working directory to use in the *subprocess* it creates.
         If the ``directory`` parameter is None then the directory is not changed.
@@ -492,7 +504,6 @@ class Util:
             builddir = module.fullpath("build")  # need to pass dir to use
             result = run_logged(module, "build", builddir, ["make", "-j8"])
         """
-
         if not directory:
             directory = ""
         if Debug().pretending():
@@ -532,11 +543,13 @@ class Util:
     @staticmethod
     def split_quoted_on_whitespace(line) -> list[str]:
         """
-        This function acts like `line.split(" ")` except that double-quoted strings
-        are not split in the process.
+        Split quoted on whitespace.
 
-        Parameters:
+        This function acts like `line.split(" ")` except that double-quoted strings are not split in the process.
+
+        Args:
             line: String to split on whitespace.
+
         Returns:
             A list of the individual words and quoted values in the string.
             The quotes themselves are not returned.
@@ -546,10 +559,11 @@ class Util:
     @staticmethod
     def pretend_open(path, default_text: str = ""):
         """
-        Opens the given file and returns a filehandle to it if the file actually exists or the script is not in pretend mode.
+        Open the given file and return a filehandle to it if the file actually exists or the script is not in pretend mode.
+
         If the script is in pretend mode and the file is not already present then an open filehandle to an empty string is returned.
 
-        Parameters:
+        Args:
             path: Path to the file to open.
             default_text: String to use if the file doesn't exist in pretend mode
 
@@ -558,7 +572,6 @@ class Util:
             false if there is an error opening an existing file (or if the file doesn't
             exist when not in pretend mode)
         """
-
         if Debug().pretending() and not os.path.exists(path):
             try:
                 fh = StringIO(default_text)
@@ -575,10 +588,11 @@ class Util:
     @staticmethod
     def safe_rmtree(path) -> bool:
         """
-        Function to delete a directory and all files and subdirectories within.
+        Delete a directory and all files and subdirectories within.
+
         Does nothing in pretend mode. An analog to "rm -rf" from Linux.
 
-        Parameters:
+        Args:
              path: Path to delete
         Returns:
              True on success, False for failure.
@@ -608,19 +622,20 @@ class Util:
     @staticmethod
     def get_list_digest(args: list[str]) -> str:
         """
-        Returns a hash digest of the given options in the list. The return value is
-        base64-encoded at this time.
+        Return a hash digest of the given options in the list.
+
+        The return value is base64-encoded at this time.
 
         Note: Don't be dumb and pass data that depends on execution state as the
         returned hash is almost certainly not useful for whatever you're doing with
         it.  (i.e. passing a reference to a list is not helpful, pass the list itself)
 
-        Parameters:
+        Args:
              args: List of values to hash.
+
         Returns:
              base64-encoded hash value.
         """
-
         md5_hash = hashlib.md5()
         for arg in args:
             md5_hash.update(arg.encode())
@@ -629,9 +644,9 @@ class Util:
     @staticmethod
     def safe_lndir(from_path: str, to_path: str) -> int:
         """
-        Recursively symlink a directory into another location, in a
-        similar fashion to how the XFree/X.org lndir() program does it. This is
-        reimplemented here since some systems lndir doesn't seem to work right.
+        Recursively symlink a directory into another location, in a similar fashion to how the XFree/X.org lndir() program does it.
+
+        This is reimplemented here since some systems lndir doesn't seem to work right.
 
         Use by passing two `absolute` paths, the first being where to symlink files
         from, and the second being what directory to symlink them into.
@@ -651,7 +666,6 @@ class Util:
         Returns:
             1 if successful, 0 if unsuccessful.
         """
-
         if Debug().pretending():
             return 1
 
@@ -715,8 +729,7 @@ class Util:
     @staticmethod
     def prune_under_directory(module: Module, target_dir: str) -> int:
         """
-        Delete recursively everything under the given directory, unless
-        we're in pretend mode.
+        Delete recursively everything under the given directory, unless we're in pretend mode.
 
         Used from :class:`BuildSystem` to handle cleaning a build directory.
 
@@ -728,7 +741,6 @@ class Util:
         Returns:
             1 on success, 0 on failure.
         """
-
         logpath = module.get_log_path("clean-builddir.log")
         log = None
         try:
@@ -789,13 +801,15 @@ class Util:
 
     @staticmethod
     def remake_symlink(src, dst) -> int:
-        # Make a symlink from dst to src. If symlink exists, ensures that it points to the requested src.
-        # Parameters:
-        #   src - path to point to (symlink target)
-        #   dst - path to point from (symlink name)
-        #
-        # Return: 1 on success, 0 on failure.
+        """
+        Make a symlink from dst to src. If symlink exists, ensures that it points to the requested src.
 
+        Args:
+          src: path to point to (symlink target)
+          dst: path to point from (symlink name)
+
+        Return: 1 on success, 0 on failure.
+        """
         if os.path.isfile(dst) and not os.path.islink(dst):  # if dst is not a symlink to file, but a regular file
             BuildException.croak_runtime(f"Could not create \"{dst}\" symlink, because file with this name exists. Please remove it manually.")
 

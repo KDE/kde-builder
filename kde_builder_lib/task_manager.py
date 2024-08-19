@@ -37,9 +37,7 @@ logger_taskmanager = KBLogger.getLogger("taskmanager")
 
 class TaskManager:
     """
-    This class consolidates the actual orchestration of all the module update,
-    build_system setup, configure, build, and install jobs once the
-    :class:`Application` has set up the :class:`BuildContext` for the current build.
+    Consolidates the actual orchestration of all the module update, build_system setup, configure, build, and install jobs once the :class:`Application` has set up the :class:`BuildContext` for the current build.
 
     In particular, the concurrent portion of the build is concentrated more-or-less
     entirely within "run_all_tasks", although other parts of the script have to be
@@ -66,7 +64,7 @@ class TaskManager:
 
     def run_all_tasks(self):
         """
-        Returns shell-style result code
+        Return shell-style result code.
         """
         # What we're going to do is fork another child to perform the source
         # updates while we build.  Setup for this first by initializing some
@@ -118,9 +116,9 @@ class TaskManager:
 
     def _handle_updates(self, ipc: IPC, ctx: BuildContext) -> int:
         """
-        Function to update a list of modules.
+        Update a list of modules.
 
-        Parameters:
+        Args:
             ipc: IPC module to pass results to.
             ctx: Build Context, which will be used to determine the module update list.
 
@@ -180,7 +178,7 @@ class TaskManager:
     @staticmethod
     def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str | int:
         """
-        Builds the given module.
+        Build the given module.
 
         Returns:
              The failure phase, or 0 on success.
@@ -229,9 +227,9 @@ class TaskManager:
 
     def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
-        Function to handle the build process.
+        Handle the build process.
 
-        Parameters:
+        Args:
             ipc: IPC object to receive results from.
             ctx: Build Context, which is used to determine list of modules to build.
 
@@ -387,8 +385,7 @@ class TaskManager:
 
     def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext) -> int:
         """
-        This function special-cases the handling of the update and build phases, by
-        performing them concurrently (where possible), using forked processes.
+        Special-cases the handling of the update and build phases, by performing them concurrently (where possible), using forked processes.
 
         Only one thread or process of execution will return from this procedure. Any
         other processes will be forced to exit after running their assigned module
@@ -398,7 +395,7 @@ class TaskManager:
         for display on the terminal instead of allowing them all to interrupt each
         other.
 
-        Parameters:
+        Args:
             monitor_to_build_ipc: IPC Object to use for sending/receiving update/build status. It must be
                 an object type that supports IPC concurrency (e.g. IPCPipe).
             ctx: Build Context to use, from which the module lists will be determined.
@@ -547,12 +544,13 @@ class TaskManager:
     @staticmethod
     def _check_for_ssh_agent(ctx: BuildContext):
         """
-        Checks if we are supposed to use ssh agent by examining the environment, and
-        if so, checks if ssh-agent has a list of identities. If it doesn't, we run
+        Check if we are supposed to use ssh agent by examining the environment, and if so, checks if ssh-agent has a list of identities.
+
+        If it doesn't, we run
         ssh-add (with no arguments) and inform the user. This can be controlled with
         the disable-agent-check parameter.
 
-        Parameters:
+        Args:
             ctx: Build context
         """
         # Don't bother with all this if the user isn't even using SSH.
@@ -634,7 +632,8 @@ class TaskManager:
     @staticmethod
     def _handle_monitoring(ipc_to_build: IPCPipe, ipc_from_updater: IPCPipe) -> int:
         """
-        This is the main function for the monitoring process when using :class:`IPCPipe`.
+        Handle monitoring process when using :class:`IPCPipe`.
+
         It reads in all status reports from the source update process and then holds
         on to them. When the build process is ready to read information we send what
         we have. Otherwise, we're waiting on the update process to send us something.
@@ -643,7 +642,7 @@ class TaskManager:
         process to go from start to finish without undue interruption on it waiting
         to write out its status to the build process (which is usually busy).
 
-        Parameters:
+        Args:
             ipc_to_build: the IPC object to use to send to build process.
             ipc_from_updater: the IPC object to use to receive from update process.
 

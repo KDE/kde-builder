@@ -277,15 +277,14 @@ class IdeProjectConfigGenerator:
     @staticmethod
     def _read_file(file_path: str) -> str:
         """
-        Reads the contents of a file.
+        Read the contents of a file.
 
-        Parameters:
+        Args:
             file_path: The path to the file to read.
 
         Returns:
              The contents of the file as a string.
         """
-
         content = ""  # Avoid lefting content uninitialized. We still need to return empty string in case file could not be opened.
         try:
             with open(file_path, "r") as file:
@@ -297,9 +296,9 @@ class IdeProjectConfigGenerator:
     @staticmethod
     def _write_to_file(file_path: str, content: str) -> None:
         """
-        Writes content to a file.
+        Write content to a file.
 
-        Parameters:
+        Args:
             file_path: The path to the file to write to.
             content: The content to write to the file.
         """

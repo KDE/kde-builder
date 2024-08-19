@@ -11,7 +11,7 @@ from kde_builder_lib.util.util import Util
 
 def test_safe_lndir():
     """
-    Test safe_lndir_p
+    Test safe_lndir_p.
     """
     tmpdir = tempfile.mkdtemp(prefix="kde-builder-testXXXXXX")
     assert tmpdir, "tempdir created"

@@ -19,6 +19,10 @@ logger_app = KBLogger.getLogger("application")
 
 
 class RecursiveFH:
+    """
+    Handles the recursive (using "include" lines) reading of config file.
+    """
+
     # TODO: Replace make_exception with appropriate croak_* function.
     def __init__(self, rcfile, ctx):
         self.filehandles = []  # Stack of filehandles to read
@@ -32,7 +36,7 @@ class RecursiveFH:
 
     def add_file(self, fh, fn) -> None:
         """
-        Adds a new filehandle to read config data from.
+        Add a new filehandle to read config data from.
 
         This should be called in conjunction with push_base_path to allow for recursive
         includes from different folders to maintain the correct notion of the current
@@ -61,8 +65,8 @@ class RecursiveFH:
 
     def push_base_path(self, base_path) -> None:
         """
-        Sets the base directory to use for any future encountered include entries
-        that use relative notation, and saves the existing base path (as on a stack).
+        Set the base directory to use for any future encountered include entries that use relative notation, and saves the existing base path (as on a stack).
+
         Use in conjunction with add_file, and use pop_filehandle and pop_base_path
         when done with the filehandle.
         """
@@ -70,13 +74,13 @@ class RecursiveFH:
 
     def pop_base_path(self):
         """
-        See above
+        See above.
         """
         return self.base_path.pop()
 
     def current_base_path(self):
         """
-        Returns the current base path to use for relative include declarations.
+        Return the current base path to use for relative include declarations.
         """
         cur_base = self.pop_base_path()
         self.push_base_path(cur_base)
@@ -84,7 +88,8 @@ class RecursiveFH:
 
     def read_line(self) -> str | None:
         """
-        Reads the next line of input and returns it.
+        Read the next line of input and return it.
+
         If a line of the form "include foo" is read, this function automatically
         opens the given file and starts reading from it instead. The original
         file is not read again until the entire included file has been read. This
@@ -95,7 +100,6 @@ class RecursiveFH:
         None is returned on end-of-file (but only of the initial filehandle, not
         included files from there)
         """
-
         while True:  # READLINE
             line = None
             fh = self.current_filehandle()

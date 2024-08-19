@@ -28,8 +28,9 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystem:
     """
-    Abstract base module for the various build systems, includes built-in
-    implementations of generic functions and supports hooks for subclasses to
+    Abstract base module for the various build systems.
+
+    Includes built-in implementations of generic functions and supports hooks for subclasses to
     provide needed detailed functionality.
 
     ::
@@ -56,8 +57,9 @@ class BuildSystem:
 
     def _mask_global_build_system_options(self) -> None:
         """
-        Removes or masks global build system-related options, so that they aren't
-        accidentally picked up for use with our non-default build system.
+        Remove or mask global build system-related options.
+
+        This is done so that they aren't accidentally picked up for use with our non-default build system.
         Module-specific options are left intact.
         """
         module = self.module
@@ -73,6 +75,7 @@ class BuildSystem:
     def has_toolchain(self) -> bool:
         """
         Check if a (custom) toolchain is defined.
+
         If a build system is configured with a (custom) toolchain, it is assumed that
          - the user knows what they are doing, or
          - they are using an SDK that knows what it is about
@@ -84,8 +87,9 @@ class BuildSystem:
 
     def build_constraints(self) -> dict:
         """
-        Returns a dict holding the resource constraints to try to apply during the
-        build. Buildsystems should apply the constraints they understand before
+        Return a dict holding the resource constraints to try to apply during the build.
+
+        Buildsystems should apply the constraints they understand before
         running the build command.
         ::
 
@@ -119,9 +123,9 @@ class BuildSystem:
 
     def needs_refreshed(self) -> str:
         """
-        Function to determine if a given module needs to have the build system
-        recreated from scratch.
-        If so, it returns a non-empty string
+        Determine if a given module needs to have the build system recreated from scratch.
+
+        If so, it returns a non-empty string.
         """
         module = self.module
         builddir = module.fullpath("build")
@@ -139,26 +143,26 @@ class BuildSystem:
 
     def prepare_module_build_environment(self) -> None:
         """
-        Called by the module being built before it runs its build/install process. Should
-        set up any needed environment variables, build context settings, etc., in preparation
-        for the build and install phases. Should take `has_toolchain()` into account here.
+        Set up any needed environment variables, build context settings, etc., in preparation for the build and install phases.
+
+        Called by the module being built before it runs its build/install process.
+        Should take `has_toolchain()` into account here.
         """
         pass
 
     @staticmethod
     def needs_installed() -> bool:
         """
-        Returns true if the module should have make install run in order to be
-        used, or false if installation is not required or possible.
+        Return true if the module should have make install run in order to be used, or false if installation is not required or possible.
         """
         return True
 
     @staticmethod
     def required_programs() -> list[str]:
         """
-        This should return a list of executable names that must be present to
-        even bother attempting to use this build system. An empty list should be
-        returned if there's no required programs.
+        Return a list of executable names that must be present to even bother attempting to use this build system.
+
+        An empty list should be returned if there's no required programs.
         """
         return []
 
@@ -172,8 +176,7 @@ class BuildSystem:
     @staticmethod
     def build_commands() -> list[str]:
         """
-        Returns a list of possible build commands to run, any one of which should
-        be supported by the build system.
+        Return a list of possible build commands to run, any one of which should be supported by the build system.
         """
         # Non Linux systems can sometimes fail to build when GNU Make would work,
         # so prefer GNU Make if present, otherwise try regular make.
@@ -191,9 +194,7 @@ class BuildSystem:
     @staticmethod
     def supports_auto_parallelism() -> bool:
         """
-        Returns a boolean value indicating if the build_system will automatically
-        perform a parallel build without needing the -j command line option (or
-        equivalent).
+        Indicate if the build_system will automatically perform a parallel build without needing the -j command line option (or equivalent).
 
         If the build system returns false then that means auto-detection by
         kde-builder should be used to set the -j flag to something appropriate.
@@ -235,7 +236,7 @@ class BuildSystem:
 
     def build_internal(self) -> dict:
         """
-        Return value style: dict to build results object (see safe_make)
+        Return dict with build results (see safe_make).
         """
         build_options = self.get_build_options()
         ret = self.safe_make({
@@ -247,9 +248,6 @@ class BuildSystem:
         return ret
 
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         # It is possible to make it here if there's no source dir and if we're
         # pretending. If we're not actually pretending then this should be a
         # bug...
@@ -260,14 +258,14 @@ class BuildSystem:
     @staticmethod
     def configured_module_file_name() -> str:
         """
-        Returns name of file that should exist (relative to the module's build directory)
-        if the module has been configured.
+        Return name of file that should exist (relative to the module's build directory) if the module has been configured.
         """
         return "Makefile"
 
     def run_testsuite(self) -> False:
         """
-        Runs the testsuite for the given module.
+        Run the testsuite for the given module.
+
         Returns true if a testsuite is present and all tests passed, false otherwise.
         """
         module = self.module
@@ -276,7 +274,8 @@ class BuildSystem:
 
     def install_internal(self, cmd_prefix: list[str]) -> bool:
         """
-        Used to install a module (that has already been built, tested, etc.)
+        Install a module (that has already been built, tested, etc.).
+
         All options passed are prefixed to the eventual command to be run.
         Returns boolean false if unable to install, true otherwise.
         """
@@ -290,7 +289,8 @@ class BuildSystem:
 
     def uninstall_internal(self, cmd_prefix: list[str]) -> bool:
         """
-        Used to uninstall a previously installed module.
+        Uninstall a previously installed module.
+
         All options passed are prefixed to the eventual command to be run.
         Returns boolean false if unable to uninstall, true otherwise.
         """
@@ -304,8 +304,10 @@ class BuildSystem:
 
     def clean_build_system(self) -> int:
         """
-        Function to clean the build system for the given module. Works by
-        recursively deleting the directory and then recreating it.
+        Clean the build system for the given module.
+
+        Works by recursively deleting the directory and then recreating it.
+
         Returns:
              0 for failure, non-zero for success.
         """
@@ -346,9 +348,9 @@ class BuildSystem:
 
     def create_build_system(self) -> int:
         """
-        Creates the build directory for the associated module, and handles
-        pre-configure setup that might be necessary to permit the build to complete
-        from the build directory.
+        Create the build directory for the associated module, and handle pre-configure setup.
+
+        Pre-configure setup might be necessary to permit the build to complete from the build directory.
 
         Returns:
              1 on success, 0 on failure.
@@ -371,8 +373,9 @@ class BuildSystem:
 
     def safe_make(self, opts: dict) -> dict:
         """
-        Function to run the build command with the arguments given by the
-        passed dict, laid out as:
+        Run the build command with the arguments given by the passed dict.
+
+        Passed dict is laid out as:
         ::
 
             {
@@ -461,12 +464,13 @@ class BuildSystem:
 
     def _run_build_command(self, message: str, filename: str, args: list[str]) -> dict:
         """
-        Function to run make and process the build process output in order to
-        provide completion updates. This procedure takes the same arguments as
+        Run make and process the build process output in order to provide completion updates.
+
+        This procedure takes the same arguments as
         log_command() (described here as well), except that the callback argument
         is not used.
 
-        Parameters:
+        Args:
             message: The message to display to the user while the build happens.
             filename: The name of the log file to use (relative to the log directory).
             args: An array with the command and its arguments. i.e. ["command", "arg1", "arg2"]
@@ -474,7 +478,6 @@ class BuildSystem:
         Returns:
              Dict as defined by safe_make
         """
-
         module = self.module
         builddir = module.fullpath("build")
         result = {"was_successful": 0}

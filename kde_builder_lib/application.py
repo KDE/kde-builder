@@ -50,8 +50,9 @@ logger_app = KBLogger.getLogger("application")
 
 class Application:
     """
-    Contains the application-layer logic (e.g. creating a build context, reading
-    options, parsing command-line, etc.). Most of the specific tasks are delegated
+    Contains the application-layer logic (e.g. creating a build context, reading options, parsing command-line, etc.).
+
+    Most of the specific tasks are delegated
     to supporting classes, this class primarily does the orchestration that goes
     from reading command line options, choosing which modules to build, overseeing
     the build process, and reporting the results to the user.
@@ -185,8 +186,9 @@ class Application:
 
     def generate_module_list(self, options: list[str]) -> dict:
         """
-        Generates the build context and module list based on the command line options
-        and module selectors provided, resolves dependencies on those modules if needed,
+        Generate the build context and module list based on the command line options and module selectors provided.
+
+        Resolves dependencies on those modules if needed,
         filters out ignored or skipped modules, and sets up the module factory.
 
         After this function is called all module set selectors will have been
@@ -417,11 +419,10 @@ class Application:
 
     def _download_kde_project_metadata(self) -> None:
         """
-        Causes kde-projects metadata to be downloaded (unless ``--pretend``, ``--no-src``, or
-        ``--no-metadata`` is in effect, although we'll download even in ``--pretend`` if
-        nothing is available).
-        """
+        Download kde-projects metadata, unless ``--pretend``, ``--no-src``, or ``--no-metadata`` is in effect.
 
+        Although we'll download even in ``--pretend`` if nothing is available.
+        """
         ctx = self.context
         update_needed = False
 
@@ -478,8 +479,7 @@ class Application:
 
     def _resolve_module_dependency_graph(self, modules: list[Module]) -> dict:
         """
-        Returns a graph of Modules according to the KDE project database dependency
-        information.
+        Return a graph of Modules according to the KDE project database dependency information.
 
         The sysadmin/repo-metadata repository must have already been updated, and the
         module factory must be setup. The modules for which to calculate the graph
@@ -555,8 +555,9 @@ class Application:
 
     def run_all_module_phases(self) -> int | bool:
         """
-        Runs all update, build, install, etc. phases. Basically this *is* the
-        script. The metadata module must already have performed its update by this point.
+        Run all update, build, install, etc. phases.
+
+        Basically this *is* the script. The metadata module must already have performed its update by this point.
         """
         ctx = self.context
         modules = self.modules
@@ -665,8 +666,9 @@ class Application:
 
     def finish(self, exitcode: int | bool = 0) -> NoReturn:
         """
-        Exits the script cleanly, including removing any lock files created.
-        Parameters:
+        Exit the script cleanly, including removing any lock files created.
+
+        Args:
             exitcode: Optional; if passed, is used as the exit code, otherwise 0 is used.
         """
         ctx = self.context
@@ -698,12 +700,13 @@ class Application:
     @staticmethod
     def _read_next_logical_line(file_reader: RecursiveFH) -> str | None:
         """
-        Reads a "line" from a file. This line is stripped of comments and extraneous
-        whitespace. Also, backslash-continued multiple lines are merged into a single
-        line.
+        Read a "line" from a file.
 
-        Parameters:
+        This line is stripped of comments and extraneous whitespace. Also, backslash-continued multiple lines are merged into a single line.
+
+        Args:
             file_reader: The reference to the filehandle to read from.
+
         Returns:
              The text of the line.
         """
@@ -730,14 +733,17 @@ class Application:
     @staticmethod
     def _split_option_and_value_and_substitute_value(ctx: BuildContext, input_line: str, file_reader: RecursiveFH) -> tuple:
         """
-        Takes an input line, and extracts it into an option name, and simplified
-        value. The value has "false" converted to False, white space simplified (like in
+        Take an input line, and extract it into an option name, and simplified value.
+
+        The value has "false" converted to False, white space simplified (like in
         Qt), tildes (~) in what appear to be path-like entries are converted to
         the home directory path, and reference to global option is substituted with its value.
 
-        Parameters:
+        Args:
             ctx: The build context (used for translating option values).
             input_line: The line to split.
+            file_reader: The recursive filehandle to read from.
+
         Returns:
              Tuple (option-name, option-value)
         """
@@ -799,8 +805,7 @@ class Application:
     @staticmethod
     def _validate_module_set(ctx: BuildContext, module_set: ModuleSet) -> None:
         """
-        Ensures that the given :class:`ModuleSet` has at least a valid repository and
-        use-modules setting based on the given BuildContext.
+        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-modules setting based on the given BuildContext.
         """
         name = module_set.name if module_set.name else "unnamed"
         rc_sources = Application._get_module_sources(module_set)
@@ -841,9 +846,9 @@ class Application:
 
     def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBase, end_re=None):
         """
-        Reads in the options from the config file and adds them to the option store.
+        Read in the options from the config file and add them to the option store.
 
-        Parameters:
+        Args:
             ctx: A BuildContext object to use for creating the returned :class:`Module` under.
             file_reader: A reference to the file handle to read from.
             module: The :class:`OptionsBase` to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.
@@ -925,8 +930,9 @@ class Application:
     @staticmethod
     def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
         """
-        Marks the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being
-        read in from the given string (filename:line). An OptionsBase can be tagged under multiple files.
+        Mark the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being read in from the given string (filename:line).
+
+        An OptionsBase can be tagged under multiple files.
         """
         key = "#defined-at"
         sources = options_base.get_option(key) if options_base.has_option(key) else []
@@ -937,8 +943,7 @@ class Application:
     @staticmethod
     def _get_module_sources(options_base: ModuleSet) -> str:
         """
-        Returns:
-             rcfile sources for given OptionsBase (comma-separated).
+        Return rcfile sources for given OptionsBase (comma-separated).
         """
         key = "#defined-at"
         sources = options_base.get_option(key) or []
@@ -946,9 +951,9 @@ class Application:
 
     def _parse_module_set_options(self, ctx: BuildContext, file_reader: RecursiveFH, module_set: ModuleSet) -> ModuleSet:
         """
-        Reads in a "module_set".
+        Read in a "module_set".
 
-        Parameters:
+        Args:
             ctx: The build context.
             file_reader: The filehandle to the config file to read from.
             module_set: The :class:`ModuleSet` to use.
@@ -970,9 +975,9 @@ class Application:
 
     def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
         """
-        Reads in the settings from the configuration, passed in as an open filehandle.
+        Read in the settings from the configuration, passed in as an open filehandle.
 
-        Parameters:
+        Args:
             ctx: The :class:`BuildContext` to update based on the configuration read and
                 any pending command-line options (see global options in BuildContext).
             fh: The I/O filehandle object to read from.
@@ -1130,12 +1135,14 @@ class Application:
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
         """
-        Handles the installation process. Simply calls "make install" in the build
+        Handle the installation process.
+
+        Simply calls "make install" in the build
         directory, though there is also provision for cleaning the build directory
         afterwards, or stopping immediately if there is a build failure (normally
         every built module is attempted to be installed).
 
-        Parameters:
+        Args:
             ctx: BuildContext from which the install list is generated.
 
         Returns:
@@ -1159,7 +1166,9 @@ class Application:
     @staticmethod
     def _handle_uninstall(ctx: BuildContext) -> bool:
         """
-        Handles the uninstall process. Simply calls "make uninstall" in the build
+        Handle the uninstall process.
+
+        Simply calls "make uninstall" in the build
         directory, while assuming that Qt or CMake actually handles it.
 
         The order of the modules is often significant, and it may work better to
@@ -1169,7 +1178,7 @@ class Application:
 
         This function obeys the "stop-on-failure" option supported by _handle_install.
 
-        Parameters:
+        Args:
             ctx: Build Context from which the uninstall list is generated.
 
         Returns:
@@ -1193,8 +1202,9 @@ class Application:
     @staticmethod
     def _apply_module_filters(ctx: BuildContext, module_list: list[Module]) -> list[Module]:
         """
-        Applies any module-specific filtering that is necessary after reading command
-        line and rc-file options. (This is as opposed to phase filters, which leave
+        Apply any module-specific filtering that is necessary after reading command line and rc-file options.
+
+        (This is as opposed to phase filters, which leave
         each module as-is but change the phases they operate as part of, this
         function could remove a module entirely from the build).
 
@@ -1202,7 +1212,7 @@ class Application:
         added in theory.
         This function supports --{resume,stop}-* for both modules and module-sets.
 
-        Parameters:
+        Args:
             ctx: :class:`BuildContext` in use.
             module_list: List of :class:`Module` or :class:`ModuleSet` to apply filters on.
 
@@ -1283,12 +1293,11 @@ class Application:
 
     def _define_new_module_factory(self, resolver: ModuleResolver) -> None:
         """
-        This defines the factory function needed for lower-level code to properly be
-        able to create :class:`Module` objects from just the module name, while still
-        having the options be properly set and having the module properly tied into a
-        context.
-        """
+        Define the module factory function.
 
+        The factory function is needed for lower-level code to properly be able to create :class:`Module` objects from just the module name, while still
+        having the options be properly set and having the module properly tied into a context.
+        """
         def module_factory(module_name: str) -> Module | None:
             ret = resolver.resolve_module_if_present(module_name)
             return ret
@@ -1301,8 +1310,7 @@ class Application:
     @staticmethod
     def _update_module_phases(modules: list[Module]) -> list[Module]:
         """
-        Updates the built-in phase list for all Modules passed into this function in
-        accordance with the options set by the user.
+        Update the built-in phase list for all Modules passed into this function in accordance with the options set by the user.
         """
         logger_app.debug("Filtering out module phases.")
         for module in modules:
@@ -1323,7 +1331,7 @@ class Application:
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:
         """
-        Removes log directories from previous kde-builder runs.
+        Remove log directories from previous kde-builder runs.
 
         All log directories that are not referenced by log_dir/latest somehow are made to go away.
         """
@@ -1352,19 +1360,19 @@ class Application:
     def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:
         """
         Print out a "possible solution" message.
+
         It will display a list of command lines to run.
 
         No message is printed out if the list of failed modules is empty, so this
         function can be called unconditionally.
 
-        Parameters:
+        Args:
             ctx: Build Context
             fail_list: List of :class:`Module` that had failed to build/configure/cmake.
 
         Returns:
             None
         """
-
         Util.assert_isa(ctx, BuildContext)
 
         if not fail_list:
@@ -1391,8 +1399,9 @@ class Application:
     @staticmethod
     def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list[Module]) -> None:
         """
-        Print out an error message, and a list of modules that match that error
-        message. It will also display the log file name if one can be determined.
+        Print out an error message, and a list of modules that match that error message.
+
+        It will also display the log file name if one can be determined.
         The message will be displayed all in uppercase, with PACKAGES prepended, so
         all you have to do is give a descriptive message of what this list of
         packages failed at doing.
@@ -1400,7 +1409,7 @@ class Application:
         No message is printed out if the list of failed modules is empty, so this
         function can be called unconditionally.
 
-        Parameters:
+        Args:
             ctx: Build Context
             message: Message to print (e.g. "failed to foo")
             fail_list: List of :class:`Module` that had failed to foo
@@ -1441,12 +1450,11 @@ class Application:
     @staticmethod
     def _output_failed_module_lists(ctx: BuildContext, module_graph: dict) -> None:
         """
-        This function reads the list of failed modules for each phase in the build
-        context and calls _output_failed_module_list for all the module failures.
+        Read the list of failed modules for each phase in the build context and call _output_failed_module_list for all the module failures.
 
-        Parameters:
+        Args:
             ctx: Build context
-            module_graph:
+            module_graph: The module graph.
 
         Return value:
             None
@@ -1502,8 +1510,7 @@ class Application:
     @staticmethod
     def _install_templated_file(source_path: str, destination_path: str, ctx: BuildContext) -> None:
         """
-        This function takes a given file and a build context, and installs it to a
-        given location while expanding out template entries within the source file.
+        Take a given file and a build context, and install it to a given location while expanding out template entries within the source file.
 
         The template language is *extremely* simple: <% foo %> is replaced entirely
         with the result of `ctx.get_option(foo)`. If the result
@@ -1518,7 +1525,7 @@ class Application:
 
         Error handling: Any errors will result in an exception being thrown.
 
-        Parameters:
+        Args:
             source_path: Pathname to the source file (use absolute paths)
             destination_path: Pathname to the destination file (use absolute paths)
             ctx: Build context to use for looking up template values
@@ -1526,7 +1533,6 @@ class Application:
         Returns:
              None
         """
-
         Util.assert_isa(ctx, BuildContext)
 
         try:
@@ -1571,14 +1577,15 @@ class Application:
     @staticmethod
     def _install_custom_file(ctx: BuildContext, source_file_path: str, dest_file_path: str, md5_key_name: str) -> None:
         """
-        This function installs a source file to a destination path, assuming the
-        source file is a "templated" source file (see also _install_templated_file), and
+        Installs a source file to a destination path.
+
+        Assuming the source file is a "templated" source file (see also _install_templated_file), and
         records a digest of the file actually installed. This function will overwrite
         a destination if the destination is identical to the last-installed file.
 
         Error handling: Any errors will result in an exception being thrown.
 
-        Parameters:
+        Args:
             ctx: Build context to use for looking up template values.
             source_file_path: The full path to the source file.
             dest_file_path: The full path to the destination file (incl. name).
@@ -1612,7 +1619,7 @@ class Application:
 
     def install_login_session(self) -> None:
         """
-        This function makes an entire built-from-source Plasma session accessible from the SDDM login screen.
+        Make an entire built-from-source Plasma session accessible from the SDDM login screen.
 
         It copies the needed files to the specific locations. After this, you can log out and select your new
         Plasma session in SDDM's session chooser menu.
@@ -1623,7 +1630,6 @@ class Application:
         then the installation script is invoked. Otherwise, invocation is skipped, so user is not asked to enter sudo
         password.
         """
-
         real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
         ctx = self.context
@@ -1689,8 +1695,7 @@ class Application:
 
     def _check_for_essential_build_programs(self) -> bool:
         """
-        Checks if programs which are absolutely essential to the *build* process are available.
-        The check is made for modules that are actually present in the build context.
+        Check if programs which are absolutely essential to the *build* process are available. The check is made for modules that are actually present in the build context.
 
         Returns:
             False if not all required programs are present. True otherwise.
@@ -1755,7 +1760,7 @@ class Application:
 
     def _symlinked_log_dirs(self, logdir: str) -> list[str]:
         """
-        Returns a list of module directories IDs that are still referenced by symlinks.
+        Return a list of module directories IDs that are still referenced by symlinks.
 
         Can be used to get the list of directories that must be kept when removing old log directories.
         References are checked from the "<log-dir>/latest/<module_name>" symlink and from the "<log-dir>/latest-by-phase/<module_name>/*.log" symlinks.
@@ -1763,7 +1768,7 @@ class Application:
 
         This function may call itself recursively if needed.
 
-        Parameters:
+        Args:
             logdir: The log directory under which to search for symlinks, including the "/latest" or "/latest-by-phase" part of the path.
         """
         links = []
@@ -1788,10 +1793,9 @@ class Application:
     @staticmethod
     def _install_signal_handlers(handler_func: Callable) -> None:
         """
-        Installs the given function as a signal handler for a set of signals which
-        could kill the program.
+        Installs the given function as a signal handler for a set of signals which could kill the program.
 
-        Parameters:
+        Args:
             handler_func: A function to act as the handler.
         """
         signals = [signal.SIGHUP, signal.SIGINT, signal.SIGQUIT, signal.SIGABRT, signal.SIGTERM, signal.SIGPIPE]

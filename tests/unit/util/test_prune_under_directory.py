@@ -13,7 +13,7 @@ from kde_builder_lib.util.util import Util
 
 def test_prune_under_dir():
     """
-    Test prune_under_directory_p, including ability to remove read-only files in subtree
+    Test prune_under_directory_p, including ability to remove read-only files in subtree.
     """
     tmpdir = tempfile.mkdtemp(prefix="kde-builder-testXXXXXX")
     assert tmpdir, "tempdir created"

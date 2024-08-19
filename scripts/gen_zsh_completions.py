@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 """
-This script generates the zsh completions file.
+Generate the zsh completions file.
 """
 
 import os.path

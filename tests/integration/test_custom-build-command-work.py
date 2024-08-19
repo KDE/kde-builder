@@ -13,8 +13,7 @@ from kde_builder_lib.module.module import Module
 
 def test_build_internal(monkeypatch):
     """
-    Ensure that the custom-build-command can at least make it to the
-    module.build_internal() portion when no build system can be auto-detected.
+    Ensure that the custom-build-command can at least make it to the module.build_internal() portion when no build system can be auto-detected.
     """
 
     # Mock override

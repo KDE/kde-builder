@@ -8,7 +8,7 @@ from kde_builder_lib.dependency_resolver import DependencyResolver
 
 def test_trivial_cycle():
     """
-    Test detection of dependency cycles in a dependency graph
+    Test detection of dependency cycles in a dependency graph.
     """
     # trivial cycle a -> a
     graph1 = {

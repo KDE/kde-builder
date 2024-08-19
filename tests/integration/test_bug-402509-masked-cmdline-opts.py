@@ -9,8 +9,9 @@ from kde_builder_lib.debug import Debug
 
 def test_cmdline_selector_not_eaten():
     """
-    Checks that we don't inadvertently eat non-option arguments in cmdline
-    processing, which happened with some cmdline options that were inadvertently
+    Checks that we don't inadvertently eat non-option arguments in cmdline processing.
+
+    It happened with some cmdline options that were inadvertently
     handled both directly in _readCommandLineOptionsAndSelectors and indirectly
     via being in BuildContext default Global Flags
 

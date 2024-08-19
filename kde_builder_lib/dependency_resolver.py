@@ -26,8 +26,9 @@ logger_depres = KBLogger.getLogger("dependency-resolver")
 
 class DependencyResolver:
     """
-    This class handles resolving dependencies between modules. Each "module"
-    from the perspective of this resolver is simply a module full name, as
+    Handle resolving dependencies between modules.
+
+    Each "module" from the perspective of this resolver is simply a module full name, as
     given by the KDE Project database (e.g. extragear/utils/kdesrc-build).
     """
 
@@ -39,7 +40,9 @@ class DependencyResolver:
 
     def __init__(self, module_factory):
         """
-        Parameters:
+        Initialize DependencyResolver.
+
+        Args:
             module_factory: Function that creates :class:`Module` from
             kde-project module names. Used for :class:`Module` for which the user
             requested recursive dependency inclusion.
@@ -51,7 +54,6 @@ class DependencyResolver:
             resolver.read_dependency_data(fh)
             resolver.resolveDependencies(modules)
         """
-
         # dict mapping short module names (m) to a dict key by branch
         # name, the value of which is yet another dict (see
         # read_dependency_data). Note that this assumes KDE git infrastructure
@@ -72,10 +74,11 @@ class DependencyResolver:
     @staticmethod
     def _shorten_module_name(name: str) -> str:
         """
-        This method returns the "short" module name of kde-project full project paths.
+        Return the "short" module name of kde-project full project paths.
+
         E.g. "kde/kdelibs/foo" would be shortened to "foo".
 
-        Parameters:
+        Args:
             name: A string holding the full module virtual path
 
         Returns:
@@ -86,11 +89,10 @@ class DependencyResolver:
 
     def _add_dependency(self, dep_name: str, dep_branch: str, src_name: str, src_branch: str, dep_key: str | None = "+") -> None:
         """
-        Adds an edge in the dependency graph from ``dep_name`` (at the given branch) to
-        ``src_name`` (at its respective branch). Use ``*`` as the branch name if it is
-        not important.
-        """
+        Add an edge in the dependency graph from ``dep_name`` (at the given branch) to ``src_name`` (at its respective branch).
 
+        Use ``*`` as the branch name if it is not important.
+        """
         # Initialize with dict if not already defined. The dict will hold
         #     "-": []  # list of explicit *NON* dependencies of item:branch
         #     "+": []  # list of dependencies of item:branch
@@ -119,10 +121,11 @@ class DependencyResolver:
 
     def read_dependency_data(self, fh: FileInput) -> None:
         """
-        Reads in dependency data in a pseudo-Makefile format.
+        Read in dependency data in a pseudo-Makefile format.
+
         See repo-metadata/dependencies/dependency-data.
 
-        Parameters:
+        Args:
             fh: Filehandle to read dependencies from (should already be opened).
 
         Raises:
@@ -196,11 +199,10 @@ class DependencyResolver:
 
     def _canonicalize_dependencies(self) -> None:
         """
-        Ensures that all stored dependencies are stored in a way that allows for
-        reproducable dependency ordering (assuming the same dependency items and same
-        selectors are used).
-        """
+        Ensure that all stored dependencies are stored in a way that allows for reproducible dependency ordering.
 
+        Assuming the same dependency items and same selectors are used.
+        """
         for dependencies in self.dependencies_of.values():
             dependencies["-"] = sorted(dependencies["-"])
             dependencies["+"] = sorted(dependencies["+"])
@@ -687,13 +689,13 @@ class DependencyResolver:
     @staticmethod
     def _get_branch_of(module: Module) -> str | None:
         """
-        This function extracts the branch of the given Module by calling its
-        scm object's branch-determining method. It also ensures that the branch
+        Extract the branch of the given Module by calling its scm object's branch-determining method.
+
+        It also ensures that the branch
         returned was really intended to be a branch (as opposed to a detached HEAD);
         None is returned when the desired commit is not a branch name, otherwise
         the user-requested branch name is returned.
         """
-
         scm = module.scm()
 
         # when the module's SCM is not git,

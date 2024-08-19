@@ -10,7 +10,7 @@ from kde_builder_lib.updater.updater import Updater
 
 def test_tag_names_based_on_time():
     """
-    Test tag names based on time
+    Test tag names based on time.
     """
     app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/branch-time-based/kdesrc-buildrc"])
     module_list = app.modules

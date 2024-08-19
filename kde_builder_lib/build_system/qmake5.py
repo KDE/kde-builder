@@ -9,6 +9,7 @@ class BuildSystemQMake5(BuildSystemQMake6):
     """
     The only difference is the possible qmake names and the identifier name of the build system.
     """
+
     possible_qmake_names = ["qmake-qt5", "qmake5", "qmake-mac", "qmake"]
 
     @staticmethod

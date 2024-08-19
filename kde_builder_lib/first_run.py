@@ -70,7 +70,7 @@ class FirstRun:
     @staticmethod
     def _read_packages(vendor, version, deps_data_path) -> dict:
         """
-        Reads from the files from data/pkg and dumps the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
+        Read from the files from data/pkg and dump the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
         """
         packages = {}
         cur_key = ""
@@ -189,12 +189,10 @@ class FirstRun:
 
     def suggested_num_cores_for_low_memory(self) -> int:
         """
-        Returns the suggested number of cores to use for make jobs for build jobs where
-        memory is a bottleneck, such as qtwebengine.
+        Return the suggested number of cores to use for make jobs for build jobs where memory is a bottleneck, such as qtwebengine.
 
             num_cores = FirstRun.suggested_num_cores_for_low_memory()
         """
-
         # Try to detect the amount of total memory for a corresponding option for
         # heavyweight modules
         mem_total = None
@@ -213,8 +211,7 @@ class FirstRun:
 
     def _get_num_cores_for_low_memory(self, num_cores: int) -> int:
         """
-        Return the highest number of cores we can use based on available memory, but
-        without exceeding the base number of cores available.
+        Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available.
         """
         return min(self.suggested_num_cores_for_low_memory(), num_cores)
 

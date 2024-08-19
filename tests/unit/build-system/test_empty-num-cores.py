@@ -26,8 +26,7 @@ def mock_buildsystem(monkeypatch):
 
 def test_empty_numcores(mock_buildsystem):
     """
-    Test that empty num-cores settings (which could lead to blank -j being passed
-    to the build in some old configs) have their -j filtered out.
+    Test that empty num-cores settings (which could lead to blank -j being passed to the build in some old configs) have their -j filtered out.
     """
     # Set up a shell build system
     ctx = BuildContext()

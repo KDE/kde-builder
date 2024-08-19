@@ -26,7 +26,7 @@ def mock_module(monkeypatch):
 
 def test_debug_order(mock_module):
     """
-    Test comparison operation for sorting modules into debug order
+    Test comparison operation for sorting modules into debug order.
     """
     a1 = Module("A:i-d2-v0-c0", 0)
     b1 = Module("B:i-d1-v1-c0", 0)

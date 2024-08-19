@@ -9,8 +9,7 @@ import subprocess
 
 class Version:
     """
-    This class is just a place to put the kde-builder version number
-    in one spot, so it only needs changed in one place for a version bump.
+    A place to put the kde-builder version number in one spot, so it only needs changed in one place for a version bump.
     """
 
     # It is expected that future git tags will be in the form "YY.MM" and will
@@ -22,9 +21,10 @@ class Version:
     @staticmethod
     def set_base_path(new_path: str) -> None:
         """
-        Should be called before using ``script_version`` to set the base path for the
-        script. This is needed to auto-detect the version in git for kde-builder
-        instances running from a git repo.
+        Set base path.
+
+        Should be called before using ``script_version`` to set the base path for the script.
+        This is needed to auto-detect the version in git for kde-builder instances running from a git repo.
         """
         Version.SCRIPT_PATH = new_path if new_path else Version.SCRIPT_PATH
 
@@ -32,6 +32,7 @@ class Version:
     def script_version() -> str:
         """
         Call this function to return the kde-builder version.
+
         ::
 
             version = kde_builder_lib.Version.script_version()  # "22.07"

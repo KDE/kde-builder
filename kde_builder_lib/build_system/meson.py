@@ -9,7 +9,7 @@ from ..util.util import Util
 
 class BuildSystemMeson(BuildSystem):
     """
-    This is a build system used to support configuring with Meson (https://mesonbuild.com).
+    Build system used to support configuring with Meson (https://mesonbuild.com).
 
     Note that Meson requires Ninja as its underlying build system so anything dealing with Meson
     can assume Ninja support is present.
@@ -24,9 +24,6 @@ class BuildSystemMeson(BuildSystem):
 
     # @override
     def configure_internal(self) -> bool:
-        """
-        Return value style: boolean
-        """
         module = self.module
         sourcedir = module.fullpath("source")
         builddir = module.fullpath("build")

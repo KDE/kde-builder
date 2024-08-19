@@ -31,9 +31,9 @@ logger_updater = KBLogger.getLogger("updater")
 
 class Updater:
     """
-    Class that is responsible for updating git-based source code modules. Can
-    have some features overridden by subclassing (see UpdaterKDEProject
-    for an example).
+    Responsible for updating git-based source code modules.
+
+    Can have some features overridden by subclassing (see UpdaterKDEProject for an example).
     """
 
     DEFAULT_GIT_REMOTE = "origin"
@@ -45,6 +45,7 @@ class Updater:
     def update_internal(self, ipc=IPCNull()) -> int:
         """
         scm-specific update procedure.
+
         May change the current directory as necessary.
         """
         self.ipc = ipc
@@ -75,7 +76,7 @@ class Updater:
 
     def commit_id(self, commit: str) -> str:
         """
-        Returns the current sha1 of the given git "commit-ish".
+        Return the current sha1 of the given git "commit-ish".
         """
         if commit is None:
             BuildException.croak_internal("Must specify git-commit to retrieve id for")
@@ -119,7 +120,7 @@ class Updater:
 
     def _clone(self, git_repo: str) -> int:
         """
-        Perform a git clone to checkout the latest branch of a given git module
+        Perform a git clone to checkout the latest branch of a given git module.
 
         First parameter is the repository (typically URL) to use.
 
@@ -171,7 +172,8 @@ class Updater:
     @staticmethod
     def _verify_safe_to_clone_into_source_dir(module: Module, srcdir: str) -> None:
         """
-        Checks that the required source dir is either not already present or is empty.
+        Check that the required source dir is either not already present or is empty.
+
         Throws an exception if that's not true.
         """
         if os.path.exists(f"{srcdir}") and not os.listdir(srcdir):
@@ -202,8 +204,7 @@ class Updater:
 
     def update_checkout(self) -> int:
         """
-        Either performs the initial checkout or updates the current git checkout
-        for git-using modules, as appropriate.
+        Either performs the initial checkout or updates the current git checkout for git-using modules, as appropriate.
 
         Returns the number of *commits* affected, or
         throws exception on an update error.
@@ -237,9 +238,6 @@ class Updater:
 
     @staticmethod
     def _module_is_needed() -> bool:
-        """
-        Intended to be reimplemented
-        """
         return True
 
     @staticmethod
@@ -254,10 +252,11 @@ class Updater:
 
     def _setup_remote(self, remote: str) -> int:
         """
-        Ensures the given remote is pre-configured for the module's git repository.
+        Ensure the given remote is pre-configured for the module's git repository.
+
         The remote is either set up from scratch or its URLs are updated.
 
-        Parameters:
+        Args:
             remote: name (alias) of the remote to configure
 
         Returns 1 or raises exception on an error.
@@ -303,8 +302,7 @@ class Updater:
 
     def _setup_best_remote(self) -> str:
         """
-        Selects a git remote for the user's selected repository (preferring a
-        defined remote if available, using "origin" otherwise).
+        Select a git remote for the user's selected repository (preferring a defined remote if available, using "origin" otherwise).
 
         Assumes the current directory is already set to the source directory.
 
@@ -336,8 +334,7 @@ class Updater:
 
     def _warn_if_stashed_from_wrong_branch(self, remote_name: str, branch: str, branch_name: str) -> bool:
         """
-        Returns true if there is a git stash active from the wrong branch, so we
-        don't mistakenly try to apply the stash after we switch branch.
+        Return true if there is a git stash active from the wrong branch, so we don't mistakenly try to apply the stash after we switch branch.
         """
         module = self.module
 
@@ -374,8 +371,9 @@ class Updater:
 
     def _update_to_remote_head(self, remote_name: str, branch: str) -> int:
         """
-        Completes the steps needed to update a git checkout to be checked-out to
-        a given remote-tracking branch. Any existing local branch with the given
+        Completes the steps needed to update a git checkout to be checked-out to a given remote-tracking branch.
+
+        Any existing local branch with the given
         branch set as upstream will be used if one exists, otherwise one will be
         created. The given branch will be rebased into the local branch.
 
@@ -383,7 +381,7 @@ class Updater:
         Assumes we're already in the needed source dir.
         Assumes we're in a clean working directory (use git-stash to achieve if necessary).
 
-        Parameters:
+        Args:
             remote_name: The remote to use.
             branch: The branch to update to.
 
@@ -446,8 +444,9 @@ class Updater:
 
     def _update_to_detached_head(self, commit: str) -> int:
         """
-        Completes the steps needed to update a git checkout to be checked-out to
-        a given commit. The local checkout is left in a detached HEAD state,
+        Completes the steps needed to update a git checkout to be checked-out to a given commit.
+
+        The local checkout is left in a detached HEAD state,
         even if there is a local branch which happens to be pointed to the
         desired commit. Based the given commit is used directly, no rebase/merge
         is performed.
@@ -456,7 +455,7 @@ class Updater:
         Assumes we're already in the needed source dir.
         Assumes we're in a clean working directory (use git-stash to achieve if necessary).
 
-        Parameters:
+        Args:
             commit: The commit to update to. This can be in pretty
                 much any format that git itself will respect (e.g. tag, sha1, etc.).
                 It is recommended to use refs/foo/bar syntax for specificity.
@@ -475,7 +474,8 @@ class Updater:
 
     def update_existing_clone(self) -> int:
         """
-        Updates an already existing git checkout by running git pull.
+        Update an already existing git checkout by running git pull.
+
         Throws an exception on error.
         Returns the number of affected *commits*.
         """
@@ -515,8 +515,9 @@ class Updater:
     @staticmethod
     def _detect_default_remote_head(remote_name: str) -> str:
         """
-        Tries to determine the best remote branch name to use as a default if the
-        user hasn't selected one, by resolving the remote symbolic ref "HEAD" from
+        Try to determine the best remote branch name to use as a default if the user hasn't selected one.
+
+        Determination is done by resolving the remote symbolic ref "HEAD" from
         its entry in the .git dir. This can also be found by introspecting the
         output of "git remote show $REMOTE_NAME" or "git branch -r" but these are
         incredibly slow.
@@ -541,15 +542,13 @@ class Updater:
 
     def determine_preferred_checkout_source(self, module: Module | None = None) -> tuple:
         """
-        Goes through all the various combination of git checkout selection options in
-        various orders of priority.
+        Goes through all the various combination of git checkout selection options in various orders of priority.
 
         Returns a *list* containing: (the resultant symbolic ref/or SHA1,"branch" or
         "tag" (to determine if something like git-pull would be suitable or whether
         you have a detached HEAD)). Since the sym-ref is returned first that should
         be what you get in a scalar context, if that's all you want.
         """
-
         if not module:
             module = self.module
 
@@ -604,8 +603,9 @@ class Updater:
     @staticmethod
     def _has_submodules() -> bool:
         """
-        Tries to check whether the git module is using submodules or not. Currently,
-        we just check the .git/config file (using git-config) to determine whether
+        Try to check whether the git module is using submodules or not.
+
+        Currently, we just check the .git/config file (using git-config) to determine whether
         there are any "active" submodules.
 
         MUST BE RUN FROM THE SOURCE DIR
@@ -638,7 +638,8 @@ class Updater:
 
     def _notify_post_build_message(self, *args: str) -> None:
         """
-        Wrapper to send a post-build (warning) message via the IPC object.
+        Send a post-build (warning) message via the IPC object.
+
         This just takes care of the boilerplate to forward its arguments as message.
         """
         module = self.module
@@ -646,10 +647,10 @@ class Updater:
 
     def stash_and_update(self, commit_type: str, remote_name: str, commit_id: str) -> int:
         """
-        Stashes existing changes if necessary, and then runs appropriate update function
-        (_update_to_remote_head or _update_to_detached_head) in order to advance the given module to the desired head.
-        Finally, if changes were stashed, they are applied and the stash stack is
-        popped.
+        Stashes existing changes if necessary, and then runs appropriate update function.
+
+        Update function (_update_to_remote_head or _update_to_detached_head) is run in order to advance the given module to the desired head.
+        Finally, if changes were stashed, they are applied and the stash stack is popped.
 
         It is assumed that the required remote has been set up already, that we
         are on the right branch, and that we are already in the correct
@@ -736,15 +737,16 @@ class Updater:
 
     def get_remote_branch_name(self, remote_name: str, branch_name: str) -> str:
         """
-        This function finds an existing remote-tracking branch name for the
-        given repository's named remote. For instance if the user was using the
+        Find an existing remote-tracking branch name for the given repository's named remote.
+
+        For instance if the user was using the
         local remote-tracking branch called "qt-stable" to track kde-qt's master
         branch, this function would return the branchname "qt-stable" when
         passed kde-qt and "master".
 
         The current directory must be the source directory of the git module.
 
-        Parameters:
+        Args:
             remote_name: The git remote to use (normally origin).
             branch_name: The remote head name to find a local branch for.
 
@@ -752,7 +754,6 @@ class Updater:
             Empty string if no match is found, or the name of the local
             remote-tracking branch if one exists.
         """
-
         # We'll parse git config output to search for branches that have a
         # remote of $remote_name and a "merge" of refs/heads/$branch_name.
 
@@ -776,14 +777,13 @@ class Updater:
 
     def _is_plausible_existing_remote(self, name: str, url: str, configured_url: str) -> bool:
         """
-        Filter for best_remote_name to determine if a given remote name and url looks
-        like a plausible prior existing remote for a given configured repository URL.
+        Filter for best_remote_name to determine if a given remote name and url looks like a plausible prior existing remote for a given configured repository URL.
 
         Note that the actual repository fetch URL is not necessarily the same as the
         configured (expected) fetch URL: an upstream might have moved, or kde-builder
         configuration might have been updated to the same effect.
 
-        Parameters:
+        Args:
             name: name of the remote found
             url: the configured (fetch) URL
             configured_url: the configured URL for the module (the expected fetch URL).
@@ -796,11 +796,11 @@ class Updater:
 
     def best_remote_name(self) -> list[str]:
         """
+        Return a list of all remote aliased matching the supplied repository (besides the internal alias that is).
+
         99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
-        should try to utilize when doing checkouts for instance. To aid in this,
-        this function returns a list of all remote aliased matching the
-        supplied repository (besides the internal alias that is).
+        should try to utilize when doing checkouts for instance. To aid in this, this function is run.
 
         Assumes that we are already in the proper source directory.
 
@@ -845,9 +845,9 @@ class Updater:
 
     def make_branchname(self, remote_name: str, branch: str) -> str:
         """
-        Generates a potential new branch name for the case where we have to set up
-        a new remote-tracking branch for a repository/branch. There are several
-        criteria that go into this:
+        Generate a potential new branch name for the case where we have to set up a new remote-tracking branch for a repository/branch.
+
+        There are several criteria that go into this:
         - The local branch name will be equal to the remote branch name to match usual
           Git convention.
         - The name chosen must not already exist. This method tests for that.
@@ -860,9 +860,10 @@ class Updater:
         you've already checked that a suitable remote-tracking branch doesn't
         exist.
 
-        Parameters:
+        Args:
             remote_name: The name of a git remote to use.
             branch: The name of the remote head we need to make a branch name of.
+
         Returns:
              A useful branch name that doesn't already exist, or "" if no
             name can be generated.
@@ -883,8 +884,9 @@ class Updater:
     @staticmethod
     def count_command_output(*args: str) -> int:
         """
-        Returns the number of lines in the output of the given command. The command
-        and all required arguments should be passed as a normal list, and the current
+        Return the number of lines in the output of the given command.
+
+        The command and all required arguments should be passed as a normal list, and the current
         directory should already be set as appropriate.
 
         Return value is the number of lines of output.
@@ -905,9 +907,9 @@ class Updater:
     @staticmethod
     def slurp_git_config_output(args: list[str]) -> list[str]:
         """
-        A simple wrapper that is used to split the output of "git config --null"
-        correctly. All parameters are then passed to filter_program_output (so look
-        there for help on usage).
+        Split the output of "git config --null" correctly.
+
+        All parameters are then passed to filter_program_output (so look there for help on usage).
         """
         # Don't call with $self->, all args are passed to filter_program_output
 
@@ -920,8 +922,7 @@ class Updater:
     @staticmethod
     def has_remote(remote: str) -> bool:
         """
-        Returns true if the git module in the current directory has a remote of the
-        name given by the first parameter.
+        Return true if the git module in the current directory has a remote of the name given by the first parameter.
         """
         has_remote = False
 
@@ -939,8 +940,7 @@ class Updater:
     @staticmethod
     def verify_git_config(context_options: BuildContext) -> bool:
         """
-        Function to add the "kde:" alias to the user's git config if it's not
-        already set.
+        Add the "kde:" alias to the user's git config if it's not already set.
 
         Call this as a static class function, not as an object method
         (i.e. Updater_Git.verify_git_config, not foo.verify_git_config)

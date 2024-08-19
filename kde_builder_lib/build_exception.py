@@ -11,8 +11,7 @@ from typing import NoReturn
 
 class BuildException(Exception):
     """
-    A class to wrap "exception" messages for the script, allowing them to be
-    dispatch based on type and automatically stringified.
+    A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified.
     """
 
     def __init__(self, exception_type: str, msg: str):
@@ -25,10 +24,11 @@ class BuildException(Exception):
     @staticmethod
     def make_exception(exception_type: str, msg: str, levels=None):
         """
-        Returns an exception object to pass to "raise" function
+        Return an exception object to pass to "raise" function.
+
         The returned object will be an instance of :class:`BuildException`.
 
-        Parameters:
+        Args:
             exception_type: Exception type, "Exception" if not defined.
             msg: Message to show to user
             levels: Number of levels to remove from backtrace.
@@ -47,24 +47,21 @@ class BuildException(Exception):
     @staticmethod
     def croak_runtime(msg: str) -> NoReturn:
         """
-        Should be used for "runtime errors" (i.e. unrecoverable runtime problems that
-        don't indicate a bug in the program itself).
+        Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
         """
         raise BuildException.make_exception("Runtime", msg, 1)
 
     @staticmethod
     def croak_internal(msg: str) -> NoReturn:
         """
-        Should be used for "logic errors" (i.e. impossibilities in program state, things
-        that shouldn't be possible no matter what input is fed at runtime)
+        Use for "logic errors" (i.e. impossibilities in program state, things that shouldn't be possible no matter what input is fed at runtime).
         """
         raise BuildException.make_exception("Internal", msg, 1)
 
 
 class BuildExceptionConfig(BuildException):
     """
-    A small subclass to hold the option name that caused a config exception to
-    be thrown.
+    A small subclass to hold the option name that caused a config exception to be thrown.
 
     Typically, this will be caught by config-reading code in :class:`Application`,
     which will add filename and line number information to the message.
@@ -80,8 +77,7 @@ class BuildExceptionConfig(BuildException):
     @staticmethod
     def option_usage_explanation(option_name) -> str | None:
         """
-        Should return a lengthy explanation of how to use a given option for use in
-        error messages, or None if no explanation is unavailable.
+        Return a lengthy explanation of how to use a given option for use in error messages, or None if no explanation is unavailable.
         """
         result = None
 

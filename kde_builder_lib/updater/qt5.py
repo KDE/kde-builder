@@ -18,8 +18,7 @@ logger_updater = KBLogger.getLogger("updater")
 
 class UpdaterQt5(Updater):
     """
-    Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated
-    "init-repository" script to keep the source up to date and coherent.
+    Handles updating Qt 5 source code. Requires git but uses Qt 5's dedicated "init-repository" script to keep the source up to date and coherent.
     """
 
     @staticmethod
@@ -29,8 +28,7 @@ class UpdaterQt5(Updater):
 
     def _update_repository(self) -> int:
         """
-        Handles calling init-repository to clone or update the appropriate Qt 5
-        submodules.
+        Handle calling init-repository to clone or update the appropriate Qt 5 submodules.
 
         Returns number of commits updated (or rather, will...)
         """
@@ -63,10 +61,10 @@ class UpdaterQt5(Updater):
     # @override
     def update_existing_clone(self) -> int:
         """
-        Updates an existing Qt5 super module checkout.
+        Update an existing Qt5 super module checkout.
+
         Throws exceptions on failure, otherwise returns number of commits updated
         """
-
         # Update init-repository and the shell of the super module itself.
         result = super().update_existing_clone()
 
@@ -78,8 +76,7 @@ class UpdaterQt5(Updater):
     # @override(check_signature=False)
     def update_checkout(self) -> int:
         """
-        Either performs the initial checkout or updates the current git checkout
-        for git-using modules, as appropriate.
+        Either performs the initial checkout or updates the current git checkout for git-using modules, as appropriate.
 
         If errors are encountered, an exception is raised.
 

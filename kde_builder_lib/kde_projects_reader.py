@@ -15,19 +15,16 @@ from .debug import Debug
 
 class KDEProjectsReader:
     """
-    Enumerates and provides basic metadata of KDE projects, based on
-    the YAML metadata included in sysadmin/repo-management.
+    Enumerates and provides basic metadata of KDE projects, based on the YAML metadata included in sysadmin/repo-management.
     """
 
     def __init__(self, project_metadata_module):
         """
-        Constructs a new KDEProjectsReader. This doesn't contradict any part of the class
-        documentation which claims this class is a singleton.
+        Construct a new KDEProjectsReader. This doesn't contradict any part of the class documentation which claims this class is a singleton.
 
-        Parameters:
+        Args:
             project_metadata_module: :class:`Module` that is the repo-metadata module.
         """
-
         # pl2py: no need to check _verifyYAMLModuleLoaded()
 
         self.repositories = {}  # Maps short names to repo info blocks
@@ -101,6 +98,8 @@ class KDEProjectsReader:
 
     def get_modules_for_project(self, proj: str) -> list[dict]:
         """
+        Get modules for project.
+
         Note on ``proj``: A "/"-separated path is fine, in which case we look
         for the right-most part of the full path which matches all of searchProject.
         e.g. kde/kdebase/kde-runtime would be matched by a proj of either
@@ -148,8 +147,7 @@ class KDEProjectsReader:
     @staticmethod
     def project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:
         """
-        Returns true if the given kde-project full path (e.g.
-        kde/kdelibs/nepomuk-core) matches the given search item.
+        Return true if the given kde-project full path (e.g. kde/kdelibs/nepomuk-core) matches the given search item.
 
         The search item itself is based on path-components. Each path component in
         the search item must be present in the equivalent path component in the
@@ -161,13 +159,13 @@ class KDEProjectsReader:
         "kde/kdelibs/nepomuk-core". However, "kdelibs/*" would match
         "kde/kdelibs/nepomuk-core".
 
-        Parameters:
+        Args:
             project_path: The full project path from the kde-projects database.
             search_item: The search item.
+
         Returns:
              True if they match, False otherwise.
         """
-
         search_parts = search_item.split("/")
         name_stack = project_path.split("/")
 
