@@ -3,10 +3,6 @@ Upstream-Name: kde-builder
 Upstream-Contact: KDE <community@kde.org>
 Source: https://invent.kde.org/sdk/kde-builder
 
-Files:  tests/integration/fixtures/*
-Copyright: 2018, 2019, 2021, 2023 Michael Pyne <mpyne@kde.org>
-License: CC0-1.0
-
 Files:  .gitignore
         data/00-plasma.conf.in
         data/clion/*
@@ -15,9 +11,11 @@ Files:  .gitignore
         data/kde-builder.desktop.in
         data/vscode/*
         data/qtcreator/*
-        doc/conf.py
-        Pipfile
         doc/_static/*.png
+        doc/conf.py
+        tests/integration/fixtures/*
+        Pipfile
+        ruff.toml
 Copyright: none
 License: CC0-1.0
 

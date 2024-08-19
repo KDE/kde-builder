@@ -3,6 +3,7 @@
 
 stages:
   - test
+  - lint
   - build
 
 unit_and_integration_tests:
@@ -26,6 +27,7 @@ unit_and_integration_tests:
         coverage_format: cobertura
         path: coverage.xml
   coverage: '/TOTAL.*\s+(\d+%)$/'
+
 # ---
 
 include:
@@ -43,3 +45,12 @@ build_sphinx_app_docs:
     - python3 -m pip install sphinx myst-parser sphinx-book-theme
     - git clone https://invent.kde.org/sysadmin/ci-utilities.git
     - git clone https://invent.kde.org/sysadmin/ci-notary-service.git
+
+reuse:
+  stage: lint
+
+ruff:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/ruff:latest
+  script:
+    - ruff check --output-format=gitlab .

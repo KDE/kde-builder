@@ -1,0 +1,27 @@
+[lint]
+select = ["D"]
+
+pydocstyle.convention = "google"
+
+# See https://docs.astral.sh/ruff/rules/ for the list of rules
+ignore = ["D100", "D102", "D103", "D105", "D107", "D200", "D203", "D212", "D406", "D407", "D413"]
+
+# Ignoring:
+# D100 https://docs.astral.sh/ruff/rules/undocumented-public-module/. We do not document the modules (python files).
+# D102 https://docs.astral.sh/ruff/rules/undocumented-public-method/. We do not always document methods.
+# D103 https://docs.astral.sh/ruff/rules/undocumented-public-function/. We do not always document functions.
+# D105 https://docs.astral.sh/ruff/rules/undocumented-magic-method/. We do not always document magic methods.
+# D107 https://docs.astral.sh/ruff/rules/undocumented-public-init/. We do not always document __init__ methods.
+# D200 https://docs.astral.sh/ruff/rules/fits-on-one-line/. We do not agree that one line docstrings should open and close on the same line, as this makes inconsistent look of them.
+# D212 https://docs.astral.sh/ruff/rules/multi-line-summary-first-line/. We use D213 rule instead.
+
+# D203 https://docs.astral.sh/ruff/rules/one-blank-line-before-class/. Just to be explicit. Already disabled by following google pydocstyle convention. We use D211 rule instead.
+# D406 https://docs.astral.sh/ruff/rules/new-line-after-section-name/. Just to be explicit. Already disabled by following google pydocstyle convention.
+# D407 https://docs.astral.sh/ruff/rules/dashed-underline-after-section/. Just to be explicit. Already disabled by following google pydocstyle convention.
+# D413 https://docs.astral.sh/ruff/rules/blank-line-after-last-section/. Just to be explicit. Already disabled by following google pydocstyle convention.
+
+# Enable rules on top of google pydocstyle convention.
+extend-select = ["D204", "D401", "D404"]
+# D204 https://docs.astral.sh/ruff/rules/one-blank-line-after-class/. Follow pep257 convention: add blank line after _class_ docstring.
+# D401 https://docs.astral.sh/ruff/rules/non-imperative-mood/. Follow pep257 convention: write the first line in the imperative mood.
+# D404 https://docs.astral.sh/ruff/rules/docstring-starts-with-this/. Follow pep257 convention: do not start docstring with "this" word.
