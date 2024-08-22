@@ -17,6 +17,9 @@ The successor project is written in Python - a much more acknowledged language. 
 
 ## Basic Usage
 
+Before installing, configure your PATH environment variable to include the `~/.local/bin` path - the location where kde-builder will be installed.
+See [documentation page](https://kde-builder.kde.org/en/getting-started/before-building.html) for more information.
+
 Installation:
 
 ```bash

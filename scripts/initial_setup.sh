@@ -80,11 +80,18 @@ prepare_bin_path() {
   echo "Preparing bin path"
   mkdir -p ~/.local/bin
 
+  if [[ $ID_LIKE == *"debian"* || $ID == "debian" ]] && [[ -f ~/.profile ]]; then
+    # On Debian-like distros, the default ~/.profile automatically adds ~/.local/bin to PATH when it exists.
+    # Because the ~/.local/bin directory could be created just now, we source the ~/.profile, so the user does not need to do it themselves - and PATH variable becomes updated.
+    # shellcheck disable=SC1090
+    source ~/.profile
+  fi
+
   if [[ ":$PATH:" == *":$HOME/.local/bin:"* ]]; then
     echo "Your PATH is correctly set."
   else
-    echo -e "${Red}Your PATH is missing ~/.local/bin, you might want to add it.${Color_Off}"
-    echo "Note, that if your ~/.profile adds ~/.local/bin to PATH only when it exists, you can just relaunch shell or run: source ~/.profile"
+    echo -e "${Red}Your PATH is missing ~/.local/bin. You need to add it.${Color_Off}"
+    echo -e "See documentation page: https://kde-builder.kde.org/en/getting-started/before-building.html"
     err_report  # manually show error message
     exit 1
   fi
