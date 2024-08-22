@@ -166,14 +166,14 @@ class FirstRun:
                 print("Interrupted by user.")
                 return
 
-            for onePackage in packages:
-                logger_fr.info(f"""\n b[*] Running \"b[{" ".join(install_cmd + [onePackage])}]\"""")
+            for one_package in packages:
+                logger_fr.info(f"""\n b[*] Running \"b[{" ".join(install_cmd + [one_package])}]\"""")
                 # Allow for Ctrl+C.
                 time.sleep(250 / 1000)
-                result = subprocess.run(install_cmd + [onePackage], shell=False)
+                result = subprocess.run(install_cmd + [one_package], shell=False)
 
                 if result.returncode != 0:
-                    individual_failed_packages.append(onePackage)
+                    individual_failed_packages.append(one_package)
 
             if not_found_in_repo_packages:  # repeat this, because that info was in the very beginning before the long installation output
                 logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
@@ -224,9 +224,9 @@ class FirstRun:
                            f"{xdg_config_home}/kdesrc-buildrc",
                            os.environ.get("HOME") + "/.kdesrc-buildrc"]
         located_file = None
-        for knownLocation in known_locations:
-            if os.path.isfile(knownLocation):
-                located_file = knownLocation
+        for known_location in known_locations:
+            if os.path.isfile(known_location):
+                located_file = known_location
                 break
 
         if located_file:
@@ -276,8 +276,8 @@ class FirstRun:
         fill_placeholder("generate-qtcreator-project-config", "bool_to_str")
 
         os.makedirs(xdg_config_home, exist_ok=True)
-        with open(f"{xdg_config_home}/kdesrc-buildrc", "w") as sampleFh:
-            sampleFh.write(sample_rc)
+        with open(f"{xdg_config_home}/kdesrc-buildrc", "w") as sample_fh:
+            sample_fh.write(sample_rc)
         print()
 
     def _find_best_install_cmd(self) -> list[str]:

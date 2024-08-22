@@ -125,25 +125,25 @@ class BuildSystemKDECMake(BuildSystem):
     def _strip_toolchain_from_cmake_options(args: list[str]) -> list[str]:
         filtered = []
 
-        for maybeToolchain in args:
+        for maybe_toolchain in args:
             accept = 1
-            if re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybeToolchain):
+            if re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybe_toolchain):
                 accept = 0
             if accept == 1:
-                filtered.append(maybeToolchain)
+                filtered.append(maybe_toolchain)
         return filtered
 
     @staticmethod
     def _find_toolchain_in_cmake_options(args: list[str]) -> str:
         found = None
-        for maybeToolchain in args:
-            match = re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybeToolchain)
+        for maybe_toolchain in args:
+            match = re.match(r"^-DCMAKE_TOOLCHAIN_FILE=(\S*(\s*\S)*)\s*", maybe_toolchain)
             if match:
                 file = match.group(1) or ""
                 if BuildSystemKDECMake._check_toolchain_ok(file):
-                    found = maybeToolchain
+                    found = maybe_toolchain
                     break
-            found = maybeToolchain
+            found = maybe_toolchain
             break
 
         if found:

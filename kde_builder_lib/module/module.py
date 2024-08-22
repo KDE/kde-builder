@@ -592,15 +592,15 @@ class Module(OptionsBase):
 
             # Ensure the platform libraries we're building can be found, as long as they
             # are not the system's own libraries.
-            for platformDir in [qt_installdir, installdir]:
-                if not platformDir:  # OK, assume system platform is usable
+            for platform_dir in [qt_installdir, installdir]:
+                if not platform_dir:  # OK, assume system platform is usable
                     continue
-                if platformDir == "/usr":  # Don't "fix" things if system platform manually set
+                if platform_dir == "/usr":  # Don't "fix" things if system platform manually set
                     continue
 
-                self.prepend_environment_value("PKG_CONFIG_PATH", f"{platformDir}/{libname}/pkgconfig")
-                self.prepend_environment_value("LD_LIBRARY_PATH", f"{platformDir}/{libname}")
-                self.prepend_environment_value("PATH", f"{platformDir}/bin")
+                self.prepend_environment_value("PKG_CONFIG_PATH", f"{platform_dir}/{libname}/pkgconfig")
+                self.prepend_environment_value("LD_LIBRARY_PATH", f"{platform_dir}/{libname}")
+                self.prepend_environment_value("PATH", f"{platform_dir}/bin")
 
             binpath = self.get_option("binpath")
             libpath = self.get_option("libpath")

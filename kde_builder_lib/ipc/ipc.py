@@ -242,8 +242,8 @@ class IPC:
         """
         messages = self.messages
 
-        for module, logMessages in messages.items():
-            non_empty_messages = [logMessage for logMessage in logMessages if logMessage.split(",", maxsplit=2)[2]]
+        for module, log_messages in messages.items():
+            non_empty_messages = [logMessage for logMessage in log_messages if logMessage.split(",", maxsplit=2)[2]]
             if non_empty_messages:
                 logger_ipc.debug(f"\nUnhandled messages for module {module}:")
                 for combined_msg in non_empty_messages:

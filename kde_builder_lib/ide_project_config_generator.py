@@ -72,13 +72,13 @@ class IdeProjectConfigGenerator:
         cmake_opts = self.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
         settings_json = settings_json.replace("%{generator}", cmake_opts[1])
 
-        configureSettings_str = ""
+        configure_settings_str = ""
         for cmake_opt in cmake_opts[2:]:  # The first 2 elements are ["-G", generator]
             opt, val = cmake_opt.split("=", maxsplit=1)
             opt = opt.removeprefix("-D")
-            configureSettings_str += f"        \"{opt}\": \"{val}\",\n"
-        configureSettings_str = configureSettings_str.removesuffix(",\n")
-        settings_json = settings_json.replace("%{configureSettings}", configureSettings_str)
+            configure_settings_str += f"        \"{opt}\": \"{val}\",\n"
+        configure_settings_str = configure_settings_str.removesuffix(",\n")
+        settings_json = settings_json.replace("%{configureSettings}", configure_settings_str)
 
         cmake_environment_str = ""
         for key, val in module.env.items():
@@ -87,11 +87,11 @@ class IdeProjectConfigGenerator:
         settings_json = settings_json.replace("%{environment}", cmake_environment_str)
 
         build_opts = self.build_opts
-        buildArgs_str = ""
+        build_args_str = ""
         for build_opt in build_opts:
-            buildArgs_str += f"\"{build_opt}\", "
-        buildArgs_str = buildArgs_str.removesuffix(", ")
-        settings_json = settings_json.replace("%{buildArgs}", buildArgs_str)
+            build_args_str += f"\"{build_opt}\", "
+        build_args_str = build_args_str.removesuffix(", ")
+        settings_json = settings_json.replace("%{buildArgs}", build_args_str)
 
         settings_json = settings_json.replace("%{install_dir}", install_dir)
 

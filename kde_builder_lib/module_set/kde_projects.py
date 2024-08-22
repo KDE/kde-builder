@@ -161,12 +161,12 @@ class ModuleSetKDEProjects(ModuleSet):
         # Setup default options for each module
         # Extraction of relevant kde-project modules will be handled immediately
         # after this phase of execution.
-        for moduleItem in self.modules_to_find():
+        for module_item in self.modules_to_find():
             # We might have already grabbed the right module recursively.
-            if moduleItem in found_modules:
+            if module_item in found_modules:
                 continue
 
-            candidate_modules = self._expand_module_candidates(ctx, moduleItem)
+            candidate_modules = self._expand_module_candidates(ctx, module_item)
             module_names = [item.name for item in candidate_modules]
             found_modules = {module: 1 for module in module_names}
             module_list.extend(candidate_modules)

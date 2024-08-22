@@ -130,8 +130,8 @@ class OSSupport:
         ids = [self.vendor_id()]
         like_distros = self.ID_LIKE or ""
         if like_distros:
-            for likeDistro in like_distros.split(" "):
-                ids.append(likeDistro)
+            for like_distro in like_distros.split(" "):
+                ids.append(like_distro)
 
         for an_id in ids:
             if any(an_id == distro for distro in distros):

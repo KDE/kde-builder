@@ -9,7 +9,7 @@ import textwrap
 from typing import NoReturn
 
 
-class BuildException(Exception):
+class BuildException(Exception):  # noqa: N818
     """
     A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified.
     """

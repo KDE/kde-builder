@@ -230,8 +230,8 @@ class DependencyResolver:
         # Apply catch-all dependencies but only for KDE modules, not third-party
         # modules. See _get_dependency_path_of for how this is detected.
         if not re.match(r"^third-party/", item):
-            for catchAll, deps in self.catch_all_dependencies.items():
-                prefix = catchAll
+            for catch_all, deps in self.catch_all_dependencies.items():
+                prefix = catch_all
                 prefix = re.sub(r"\*$", "", prefix)
 
                 if re.match(f"^{prefix}", path) or not prefix:

@@ -1121,8 +1121,8 @@ class Application:
 
             using_default = False
 
-        for name, moduleSet in seen_module_sets.items():
-            Application._validate_module_set(ctx, moduleSet)
+        for name, module_set in seen_module_sets.items():
+            Application._validate_module_set(ctx, module_set)
 
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.

@@ -761,9 +761,9 @@ class Updater:
         # format.
         branches = self.slurp_git_config_output(["git", "config", "--null", "--get-regexp", r"branch\..*\.remote", remote_name])
 
-        for gitBranch in branches:
+        for git_branch in branches:
             # The key/value is \n separated, we just want the key.
-            key_name = gitBranch.split("\n")[0]
+            key_name = git_branch.split("\n")[0]
             this_branch = re.match(r"^branch\.(.*)\.remote$", key_name).group(1)
 
             # We have the local branch name, see if it points to the remote
@@ -873,11 +873,11 @@ class Updater:
         module = self.module
 
         # Use "branch" directly if not already used, otherwise try to prefix with the remote name.
-        for possibleBranch in [branch, f"{remote_name}-{branch}", f"ksdc-{remote_name}-{branch}"]:
-            result = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{possibleBranch}"])
+        for possible_branch in [branch, f"{remote_name}-{branch}", f"ksdc-{remote_name}-{branch}"]:
+            result = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{possible_branch}"])
 
             if result == 1:
-                return possibleBranch
+                return possible_branch
 
         BuildException.croak_runtime(f"Unable to find good branch name for {module} branch name {branch}")
 

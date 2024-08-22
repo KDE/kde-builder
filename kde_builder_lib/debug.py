@@ -125,11 +125,11 @@ class KBLogger(logging.Logger):
     """
 
     _loggers = {}
-    levelNamesMapping = logging._nameToLevel
+    # noinspection PyProtectedMember,PyUnresolvedReferences
+    level_names_mapping = logging._nameToLevel
 
-    # noinspection PyPep8Naming
     @classmethod
-    def getLogger(cls, name, level=logging.NOTSET):
+    def getLogger(cls, name, level=logging.NOTSET):  # noqa: N802
         if name not in cls._loggers:
             logger = cls(name, level)
             cls._loggers[name] = logger
@@ -153,7 +153,7 @@ class KBLogger(logging.Logger):
         real_level_method(d.colorize(msg + "]"))
 
         if d.screen_log is not None:  # todo: This should be just another handler for the logger
-            int_message_level = KBLogger.levelNamesMapping[message_level.upper()]
+            int_message_level = KBLogger.level_names_mapping[message_level.upper()]
             if kblogger.isEnabledFor(int_message_level):
                 saved_colors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
                 # Remove color but still extract codes
