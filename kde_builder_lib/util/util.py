@@ -420,7 +420,7 @@ class Util:
                 logger_util.error(textwrap.dedent(f"""\
                     r[b[Unable to execute "{cmd_string}"]!
                     {e}
-                    
+
                     Please check your binpath setting (it controls the PATH used by kde-builder).
                     Currently it is set to g[{os.environ.get("PATH")}].
                     """))

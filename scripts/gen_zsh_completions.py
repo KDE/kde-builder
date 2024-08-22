@@ -56,7 +56,7 @@ def add_conflicting_options(conflicting_options: list) -> int:
 for line in specifiers:
     nargs = None
     negatable = False
-    
+
     if line.endswith("=s"):
         nargs = 1
         line = line.removesuffix("=s")
@@ -72,7 +72,7 @@ for line in specifiers:
         line = line.removesuffix(":10")
     else:
         nargs = 0
-    
+
     parts = line.split("|")
     dashed_parts = []
     for part in parts:
@@ -85,7 +85,7 @@ for line in specifiers:
                 add_conflicting_options(dashed_parts)
     set_id = add_conflicting_options(dashed_parts)
     individual_options.extend(dashed_parts)
-    
+
     if nargs == 0:
         set_tails[set_id] = ""
     elif nargs == 1:
@@ -203,30 +203,30 @@ for conflicting_set in conflicting_sets:
 # sort first by positive options; positive and negative goes in pair.
 def set_sort(input_set) -> list:
     listed = list(input_set)
-    
+
     negative = []
     positive = []
-    
+
     for el in listed:
         if el.startswith("--no-"):
             negative.append(el)
         else:
             positive.append(el)
-    
+
     result = []
     positive.sort()
-    
+
     while len(positive) > 0:
         el = positive.pop(0)
         result.append(el)
         if "--no-" + el.removeprefix("--") in negative:
             result.append("--no-" + el.removeprefix("--"))
             negative.remove("--no-" + el.removeprefix("--"))
-    
+
     negative.sort()
     while len(negative) > 0:
         result.append(negative.pop(0))
-    
+
     return result
 
 
@@ -244,7 +244,7 @@ for conflicting_set in conflicting_sets:
     if len(conflicting_set) > 1:
         sting_spaced = " ".join(set_sort(conflicting_set))
         sting_commaed = ",".join(set_sort(conflicting_set))
-        
+
         appending = set_tails[id(conflicting_set)]
         print(f"  \"({sting_spaced})\"{{{sting_commaed}}}{appending} \\")
     else:

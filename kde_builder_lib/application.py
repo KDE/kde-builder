@@ -814,12 +814,12 @@ class Application:
         selected_repo = module_set.get_option("repository")
         if not selected_repo:
             logger_app.error(textwrap.dedent(f"""\
-            
+
             There was no repository selected for the y[b[{name}] module-set declared at
                 {rc_sources}
-            
+
             A repository is needed to determine where to download the source code from.
-            
+
             Most will want to use the b[g[kde-projects] repository. See also
             https://docs.kde.org/?application=kdesrc-build&branch=trunk5&path=kde-modules-and-selection.html#module-sets
             """))
@@ -834,10 +834,10 @@ class Application:
             logger_app.error(textwrap.dedent(f"""\
             There is no repository assigned to y[b[{selected_repo}] when assigning a
             {module_set_id} at {rc_sources}.
-            
+
             These repositories are defined by g[b[git-repository-base] in the global
             section of your configuration.
-            
+
             Make sure you spelled your repository name right, but you probably meant
             to use the magic b[{project_id}] repository for your module-set instead.
             """))

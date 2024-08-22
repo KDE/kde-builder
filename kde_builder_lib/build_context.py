@@ -512,13 +512,13 @@ class BuildContext(Module):
 
             logger_buildcontext.error(textwrap.dedent(f"""\
             Unable to open config file {failed_file}
-            
+
             Script stopping here since you specified --rc-file on the command line to
             load {failed_file} manually.  If you wish to run the script with no configuration
             file, leave the --rc-file option out of the command line.
-            
+
             If you want to force an empty rc file, use --rc-file /dev/null
-            
+
             """))
             BuildException.croak_runtime(f"Missing {failed_file}")
 
@@ -538,7 +538,7 @@ class BuildContext(Module):
                 global
                     persistent-data-file /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
                 end global
-    
+
                 # To suppress warning about no modules in configuration.
                 module fake
                 end module
@@ -557,14 +557,14 @@ class BuildContext(Module):
 
             logger_buildcontext.error(textwrap.dedent(f"""\
                 b[No configuration file is present.]
-                
+
                 kde-builder requires a configuration file to select which KDE software modules
                 to build, what options to build them with, the path to install to, etc.
-                
+
                 When run, kde-builder will use `kdesrc-buildrc` config file located in the
                 current working directory. If no such file exists, kde-builder will use
                 `{BuildContext.xdg_config_home_short}/kdesrc-buildrc` instead.
-                
+
                 You can generate config with b[--generate-config].
                 """))
             BuildException.croak_runtime("No configuration available")

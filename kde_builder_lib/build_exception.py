@@ -88,11 +88,11 @@ class BuildExceptionConfig(BuildException):
         if option_name == "git-repository-base":
             result = textwrap.dedent("""\
             The y[git-repository-base] option requires a repository name and URL.
-            
+
             e.g. git-repository base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
-            
+
             Use this in a "module-set" group:
-            
+
             e.g.
             module-set kdesdk-set
                 repository y[b[kde-sdk]

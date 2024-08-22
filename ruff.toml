@@ -1,12 +1,15 @@
 [lint]
-select = ["D", "N"]
+select = ["D", "E", "N", "W"]
 
 pydocstyle.convention = "google"
 
 # See https://docs.astral.sh/ruff/rules/ for the list of rules
-ignore = ["D100", "D102", "D103", "D105", "D107", "D200", "D203", "D212", "D406", "D407", "D413"]
+ignore = ["D100", "D102", "D103", "D105", "D107", "D200", "D203", "D212", "D406", "D407", "D413", "E501"]
 
 # Ignoring:
+
+# E501 https://docs.astral.sh/ruff/rules/line-too-long/. We use lines longer than "standard".
+
 # D100 https://docs.astral.sh/ruff/rules/undocumented-public-module/. We do not document the modules (python files).
 # D102 https://docs.astral.sh/ruff/rules/undocumented-public-method/. We do not always document methods.
 # D103 https://docs.astral.sh/ruff/rules/undocumented-public-function/. We do not always document functions.

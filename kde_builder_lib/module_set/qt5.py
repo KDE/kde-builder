@@ -48,7 +48,7 @@ class ModuleSetQt5(ModuleSet):
         """
         Convert this module set to a list of ``Module``.
 
-        This function should be called after options are read and build metadata is available. 
+        This function should be called after options are read and build metadata is available.
 
         In our case, we will return ONLY ONE MODULE. That module will handle
         "submodules" via the init-repository script so from kde-builder's perspective it
