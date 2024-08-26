@@ -10,9 +10,13 @@ import fileinput
 import os
 import re
 import textwrap
+from typing import TYPE_CHECKING
 
 from .build_exception import BuildException
 from .debug import KBLogger
+
+if TYPE_CHECKING:
+    from .build_context import BuildContext
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
 logger_app = KBLogger.getLogger("application")
@@ -24,17 +28,17 @@ class RecursiveFH:
     """
 
     # TODO: Replace make_exception with appropriate croak_* function.
-    def __init__(self, rcfile, ctx):
-        self.filehandles = []  # Stack of filehandles to read
-        self.filenames = []  # Corresponding tack of filenames (full paths)
-        self.base_path = []  # Base directory path for relative includes
-        self.current = None  # Current filehandle to read
-        self.current_fn = None  # Current filename
+    def __init__(self, rcfile: str, ctx: BuildContext):
+        self.filehandles: list[fileinput.FileInput] = []  # Stack of filehandles to read
+        self.filenames: list[str] = []  # Corresponding stack of filenames (full paths)
+        self.base_path: list[str] = []  # Base directory path for relative includes
+        self.current: fileinput.FileInput | None = None  # Current filehandle to read
+        self.current_fn: str | None = None  # Current filename
         self.ctx = ctx
 
         self.push_base_path(os.path.dirname(rcfile))  # rcfile should already be absolute
 
-    def add_file(self, fh, fn) -> None:
+    def add_file(self, fh: fileinput.FileInput, fn: str) -> None:
         """
         Add a new filehandle to read config data from.
 
@@ -53,17 +57,17 @@ class RecursiveFH:
         new_filename = self.filenames[-1] if self.filenames else None
         self.set_current_file(new_fh, new_filename)
 
-    def current_filehandle(self):
+    def current_filehandle(self) -> fileinput.FileInput | None:
         return self.current
 
-    def current_filename(self):
+    def current_filename(self) -> str | None:
         return self.current_fn
 
-    def set_current_file(self, fh, fn) -> None:
+    def set_current_file(self, fh: fileinput.FileInput, fn: str) -> None:
         self.current = fh
         self.current_fn = fn
 
-    def push_base_path(self, base_path) -> None:
+    def push_base_path(self, base_path: str) -> None:
         """
         Set the base directory to use for any future encountered include entries that use relative notation, and saves the existing base path (as on a stack).
 
@@ -72,13 +76,13 @@ class RecursiveFH:
         """
         self.base_path.append(base_path)
 
-    def pop_base_path(self):
+    def pop_base_path(self) -> str:
         """
         See above.
         """
         return self.base_path.pop()
 
-    def current_base_path(self):
+    def current_base_path(self) -> str:
         """
         Return the current base path to use for relative include declarations.
         """
