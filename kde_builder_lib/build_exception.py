@@ -22,6 +22,15 @@ class BuildException(Exception):  # noqa: N818
         return self.exception_type + " Error: " + self.message
 
 
+class ConfigError(BuildException):
+    """
+    Use for "config errors".
+    """
+
+    def __init__(self, msg: str):
+        super().__init__("Config", msg)
+
+
 class SetOptionError(BuildException):
     """
     A small subclass to hold the option name that caused a config exception to be thrown.

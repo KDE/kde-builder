@@ -23,7 +23,7 @@ import traceback
 from typing import Callable
 from typing import NoReturn
 
-from kde_builder_lib.build_exception import BuildException
+from kde_builder_lib.build_exception import ConfigError
 from kde_builder_lib.build_exception import KBRuntimeError
 from kde_builder_lib.build_exception import SetOptionError
 from .build_context import BuildContext
@@ -824,7 +824,7 @@ class Application:
             Most will want to use the b[g[kde-projects] repository. See also
             https://docs.kde.org/?application=kdesrc-build&branch=trunk5&path=kde-modules-and-selection.html#module-sets
             """))
-            raise BuildException("Config", "Missing repository option")
+            raise ConfigError("Missing repository option")
 
         repo_set = ctx.get_option("git-repository-base")
         if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
@@ -843,7 +843,7 @@ class Application:
             to use the magic b[{project_id}] repository for your module-set instead.
             """))
 
-            raise BuildException("Config", "Unknown repository base")
+            raise ConfigError("Unknown repository base")
 
     def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBase, end_re=None):
         """
@@ -892,7 +892,7 @@ class Application:
                     end_word = "options"
 
                 logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an \"end {end_word}\" before " + "starting a new module.\n")
-                raise BuildException("Config", f"Invalid file {current_file}")
+                raise ConfigError(f"Invalid file {current_file}")
 
             option, value = Application._split_option_and_value_and_substitute_value(ctx, line, file_reader)
 
@@ -1014,7 +1014,7 @@ class Application:
             if not re.match(r"^global\s*$", line):
                 logger_app.error(f"Invalid configuration file: {rcfile}.")
                 logger_app.error(f"Expecting global settings section at b[r[line {fh.filelineno()}]!")
-                raise BuildException("Config", "Missing global section")
+                raise ConfigError("Missing global section")
 
             # Now read in each global option.
             global_opts = self._parse_module_options(ctx, file_reader, OptionsBase())
@@ -1060,15 +1060,15 @@ class Application:
                 if not module_set_re.match(line):
                     logger_app.error(f"Invalid configuration file {rcfile}!")
                     logger_app.error(f"Expecting a start of module section at r[b[line {file_reader.current_filehandle().filelineno()}].")
-                    raise BuildException("Config", "Ungrouped/Unknown option")
+                    raise ConfigError("Ungrouped/Unknown option")
 
                 if modulename and modulename in seen_module_sets.keys():
                     logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{file_reader.current_filehandle().filelineno()}")
-                    raise BuildException("Config", f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise ConfigError(f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 if modulename and modulename in seen_modules.keys():
                     logger_app.error(f"Name {modulename} for module-set at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module")
-                    raise BuildException("Config", f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise ConfigError(f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 # A module_set can give us more than one module to add.
                 new_module = self._parse_module_set_options(ctx, file_reader, ModuleSet(ctx, modulename or f"Unnamed module-set at {rcfile}:{file_reader.current_filehandle().filelineno()}"))
@@ -1089,7 +1089,7 @@ class Application:
             # below for "options" sets)
             elif modulename in seen_modules and option_type != "options":
                 logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {file_reader.current_filehandle().filelineno()} of {rcfile}")
-                raise BuildException("Config", f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                raise ConfigError(f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
             # Module/module-set options overrides
             elif option_type == "options":
@@ -1110,7 +1110,7 @@ class Application:
             # Must follow "options" handling
             elif modulename in seen_module_sets:
                 logger_app.error(f"Name {modulename} for module at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module-set")
-                raise BuildException("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                raise ConfigError(f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
             else:
                 new_module = self._parse_module_options(ctx, file_reader, Module(ctx, modulename))
                 new_module.create_id = creation_order + 1
