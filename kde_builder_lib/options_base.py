@@ -8,7 +8,7 @@ from __future__ import annotations
 import copy
 import re
 
-from .build_exception import BuildExceptionConfig
+from .build_exception import SetOptionError
 from .util.util import Util
 
 
@@ -111,10 +111,12 @@ class OptionsBase:
                 del options[repo_option]
             else:
                 match = re.match(r"^([a-zA-Z0-9_-]+)\s+(.+)$", value)
-                repo, url = match.group(1), match.group(2)
+                repo, url = None, None
+                if match:
+                    repo, url = match.group(1), match.group(2)
 
                 if not repo or not url:
-                    raise BuildExceptionConfig(repo_option, f"Invalid git-repository-base setting: {value}")
+                    raise SetOptionError(repo_option, f"Invalid git-repository-base setting: {value}")
 
                 dictionary = self.get_option(repo_option)
                 if dictionary == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash (dict) is empty itself).

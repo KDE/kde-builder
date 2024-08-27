@@ -24,7 +24,7 @@ from typing import Callable
 from typing import NoReturn
 
 from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildExceptionConfig
+from kde_builder_lib.build_exception import SetOptionError
 from .build_context import BuildContext
 from .build_system.qmake5 import BuildSystemQMake5
 from .cmd_line import Cmdline
@@ -914,13 +914,12 @@ class Application:
 
             try:
                 module.set_option({option: value})
-            except Exception as err:
-                if isinstance(err, BuildExceptionConfig):
-                    msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
-                    explanation = err.option_usage_explanation()
-                    if explanation:
-                        msg = msg + "\n" + explanation
-                    err.message = msg
+            except SetOptionError as err:
+                msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
+                explanation = err.option_usage_explanation()
+                if explanation:
+                    msg = msg + "\n" + explanation
+                err.message = msg
                 raise  # re-throw
 
             line = self._read_next_logical_line(file_reader)
@@ -994,7 +993,7 @@ class Application:
             kde-projects or standard sets).
 
         Raises:
-            BuildExceptionConfig
+            SetOptionError
         """
         module_list = []
         rcfile = ctx.rc_file

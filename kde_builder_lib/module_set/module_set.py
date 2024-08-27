@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from ..build_exception import BuildExceptionConfig
+from ..build_exception import SetOptionError
 from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
@@ -121,7 +121,7 @@ class ModuleSet(OptionsBase):
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[use-modules] entry.")
-                raise BuildExceptionConfig("use-modules", "Invalid use-modules")
+                raise SetOptionError("use-modules", "Invalid use-modules")
 
             self.set_modules_to_find(modules)
             del options["use-modules"]
@@ -131,7 +131,7 @@ class ModuleSet(OptionsBase):
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[ignore-modules] entry.")
-                raise BuildExceptionConfig("ignore-modules", "Invalid ignore-modules")
+                raise SetOptionError("ignore-modules", "Invalid ignore-modules")
 
             self.add_modules_to_ignore(modules)
             del options["ignore-modules"]

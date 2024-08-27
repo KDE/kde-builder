@@ -17,7 +17,7 @@ import traceback
 from typing import TYPE_CHECKING
 
 from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildExceptionConfig
+from kde_builder_lib.build_exception import SetOptionError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
 from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
@@ -734,7 +734,7 @@ class Module(OptionsBase):
         for mso in ["use-modules", "ignore-modules"]:
             if mso in options:
                 logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
-                raise BuildExceptionConfig(mso, f"Option {mso} can only be used in module-set")
+                raise SetOptionError(mso, f"Option {mso} can only be used in module-set")
 
         # Special case handling.
         if "filter-out-phases" in options:

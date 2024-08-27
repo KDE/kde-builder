@@ -59,7 +59,7 @@ class BuildException(Exception):  # noqa: N818
         raise BuildException.make_exception("Internal", msg, 1)
 
 
-class BuildExceptionConfig(BuildException):
+class SetOptionError(BuildException):
     """
     A small subclass to hold the option name that caused a config exception to be thrown.
 
@@ -67,29 +67,22 @@ class BuildExceptionConfig(BuildException):
     which will add filename and line number information to the message.
     """
 
-    def __init__(self, bad_option_name, msg):
-        BuildException.__init__(self, "Config", msg)
+    def __init__(self, bad_option_name: str, msg: str):
+        super().__init__("Config", msg)
         self.config_invalid_option_name = bad_option_name
 
-    def problematic_option_name(self):
-        return self.config_invalid_option_name
-
-    @staticmethod
-    def option_usage_explanation(option_name) -> str | None:
+    def option_usage_explanation(self) -> str:
         """
-        Return a lengthy explanation of how to use a given option for use in error messages, or None if no explanation is unavailable.
+        Return a lengthy explanation of how to use a given option for use in error messages.
         """
-        result = None
-
-        if isinstance(option_name, BuildExceptionConfig):
-            # Should only happen if called as method: i.e. option_name == self
-            option_name = option_name.problematic_option_name()
+        result = ""
+        option_name = self.config_invalid_option_name
 
         if option_name == "git-repository-base":
             result = textwrap.dedent("""\
             The y[git-repository-base] option requires a repository name and URL.
 
-            e.g. git-repository base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
+            e.g. git-repository-base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
 
             Use this in a "module-set" group:
 
