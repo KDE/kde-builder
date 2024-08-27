@@ -16,7 +16,7 @@ import textwrap
 import traceback
 from typing import TYPE_CHECKING
 
-from kde_builder_lib.build_exception import BuildException
+from kde_builder_lib.build_exception import KBRuntimeError
 from kde_builder_lib.build_exception import SetOptionError
 from ..build_exception import ProgramError
 from ..build_system.autotools import BuildSystemAutotools
@@ -283,7 +283,7 @@ class Module(OptionsBase):
 
         class_name = build_system_classes[name.lower()] or None
         if not class_name:
-            BuildException.croak_runtime(f"Invalid build system {name} requested")
+            raise KBRuntimeError(f"Invalid build system {name} requested")
         return class_name(self)
 
     def build_system(self) -> BuildSystem:

@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING
 
 import setproctitle
 
-from kde_builder_lib.build_exception import BuildException
+from kde_builder_lib.build_exception import KBRuntimeError
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.debug import KBLogger
 from ..build_exception import ProgramError
@@ -101,7 +101,7 @@ class Util:
             input_list: List of alternatives.
         """
         if val not in input_list:
-            BuildException.croak_runtime(f"{val} is not a permissible value for its argument")
+            raise KBRuntimeError(f"{val} is not a permissible value for its argument")
 
         return val
 
@@ -142,7 +142,7 @@ class Util:
         except OSError as e:
             if Debug().pretending():
                 return
-            BuildException.croak_runtime(f"Could not change to directory {directory}: {e}")
+            raise KBRuntimeError(f"Could not change to directory {directory}: {e}")
 
     @staticmethod
     def super_mkdir(pathname) -> bool:
@@ -242,7 +242,7 @@ class Util:
 
         # Check early for whether an executable exists.
         if not Util.locate_exe(program):
-            BuildException.croak_runtime(f"Can't find {program} in PATH!")
+            raise KBRuntimeError(f"Can't find {program} in PATH!")
 
         # todo Originally, the Util.disable_locale_message_translation() was applied to the subprocess, check if it is needed
         p = subprocess.run([program, *args], shell=False, capture_output=True)
@@ -688,14 +688,14 @@ class Util:
         #         return
         #
         #     if not Util.super_mkdir(dir):
-        #         BuildException.croak_runtime(f"Couldn't create directory {dir}: $!")
+        #         raise KBRuntimeError(f"Couldn't create directory {dir}: $!")
         #
         #     # Symlink the file.  Check if it's a regular file because File::Find
         #     # has no qualms about telling you you have a file called "foo/bar"
         #     # before pointing out that it was really a directory.
         #     if os.path.isfile(file) and not os.path.exists(f"{dir}/$_"):
         #         if not os.symlink(file, f"{dir}/$_"):
-        #             BuildException.croak_runtime(f"Couldn't create file {dir}/$_: $!")
+        #             raise KBRuntimeError(f"Couldn't create file {dir}/$_: $!")
 
         def subprocess_run(target: Callable):
             retval = multiprocessing.Value("i", -1)
@@ -812,16 +812,16 @@ class Util:
         Return: 1 on success, 0 on failure.
         """
         if os.path.isfile(dst) and not os.path.islink(dst):  # if dst is not a symlink to file, but a regular file
-            BuildException.croak_runtime(f"Could not create \"{dst}\" symlink, because file with this name exists. Please remove it manually.")
+            raise KBRuntimeError(f"Could not create \"{dst}\" symlink, because file with this name exists. Please remove it manually.")
 
         if os.path.isdir(dst) and not os.path.islink(dst):  # if dst is not a symlink to directory, but a regular directory
-            BuildException.croak_runtime(f"Could not create \"{dst}\" symlink, because directory with this name exists. Please remove it manually.")
+            raise KBRuntimeError(f"Could not create \"{dst}\" symlink, because directory with this name exists. Please remove it manually.")
 
         if os.path.islink(dst) and os.readlink(dst) != src:  # if dst points to wrong src
             try:
                 os.unlink(dst)  # delete wrong symlink
             except OSError:
-                BuildException.croak_runtime(f"Could not delete \"{dst}\" symlink (needed to update target location). Please remove it manually.")
+                raise KBRuntimeError(f"Could not delete \"{dst}\" symlink (needed to update target location). Please remove it manually.")
 
         if not os.path.exists(dst) and not os.path.islink(dst):  # pl2py: in perl the -e check also detects the symlinks, but in python the os.path.exists does not detect symlinks.
             try:

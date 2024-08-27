@@ -17,7 +17,7 @@ import tempfile
 import textwrap
 import traceback
 
-from .build_exception import BuildException
+from .build_exception import KBRuntimeError
 from .build_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
@@ -521,7 +521,7 @@ class BuildContext(Module):
             If you want to force an empty rc file, use --rc-file /dev/null
 
             """))
-            BuildException.croak_runtime(f"Missing {failed_file}")
+            raise KBRuntimeError(f"Missing {failed_file}")
 
         if self.get_option("metadata-only"):
             # If configuration file in default location was not found, and no --rc-file option was used, and metadata-only option was used.
@@ -568,7 +568,7 @@ class BuildContext(Module):
 
                 You can generate config with b[--generate-config].
                 """))
-            BuildException.croak_runtime("No configuration available")
+            raise KBRuntimeError("No configuration available")
 
     def base_config_directory(self) -> str:
         """
@@ -875,7 +875,9 @@ class BuildContext(Module):
         if self.projects_db:
             return self.projects_db
 
-        project_database_module = self.get_kde_projects_metadata_module() or BuildException.croak_runtime(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
+        project_database_module = self.get_kde_projects_metadata_module()
+        if not project_database_module:
+            raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
         self.projects_db = KDEProjectsReader(project_database_module)
         return self.projects_db

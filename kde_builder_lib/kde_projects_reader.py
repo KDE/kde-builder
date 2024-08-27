@@ -9,7 +9,7 @@ import re
 
 import yaml
 
-from .build_exception import BuildException
+from .build_exception import KBRuntimeError
 from .debug import Debug
 
 
@@ -43,7 +43,7 @@ class KDEProjectsReader:
         srcdir = project_metadata_module.fullpath("source")
 
         if not os.path.isdir(srcdir):
-            BuildException.croak_runtime(f"No such source directory {srcdir}!")
+            raise KBRuntimeError(f"No such source directory {srcdir}!")
 
         # NOTE: This is approx 1280 entries as of Feb 2023.  Need to memoize this
         # so that only entries that are used end up being read.
@@ -55,7 +55,7 @@ class KDEProjectsReader:
             self._read_yaml(metadata_path)
 
         if not len(repo_meta_files) > 0:
-            BuildException.croak_runtime(f"Failed to find KDE project entries from {srcdir}!")
+            raise KBRuntimeError(f"Failed to find KDE project entries from {srcdir}!")
 
     def _load_mock_project_data(self) -> None:
         # Load some sample projects for use in test mode

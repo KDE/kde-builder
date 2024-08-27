@@ -7,6 +7,7 @@ import os
 
 from .build_system import BuildSystem
 from ..build_exception import BuildException
+from ..build_exception import KBRuntimeError
 from ..debug import KBLogger
 from ..util.util import Util
 
@@ -61,7 +62,7 @@ class BuildSystemAutotools(BuildSystem):
 
         configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
         if not configure_command:
-            BuildException.croak_runtime("No configure command available")
+            raise KBRuntimeError("No configure command available")
 
         return configure_command
 

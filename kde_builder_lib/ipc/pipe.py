@@ -7,7 +7,7 @@ import os
 import struct
 
 from .ipc import IPC
-from ..build_exception import BuildException
+from ..build_exception import KBRuntimeError
 from ..build_exception import ProgramError
 
 
@@ -53,7 +53,7 @@ class IPCPipe(IPC):
         written_length = self.fh.write(encoded_msg)
 
         if not written_length or len(encoded_msg) != written_length:
-            BuildException.croak_runtime("Unable to write full msg to pipe")
+            raise KBRuntimeError("Unable to write full msg to pipe")
 
         return True
 

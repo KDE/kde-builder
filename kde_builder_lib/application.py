@@ -24,6 +24,7 @@ from typing import Callable
 from typing import NoReturn
 
 from kde_builder_lib.build_exception import BuildException
+from kde_builder_lib.build_exception import KBRuntimeError
 from kde_builder_lib.build_exception import SetOptionError
 from .build_context import BuildContext
 from .build_system.qmake5 import BuildSystemQMake5
@@ -268,7 +269,7 @@ class Application:
             if not module_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
-                BuildException.croak_runtime("Invalid --resume flag")
+                raise KBRuntimeError("Invalid --resume flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --resume, ignoring them.")
             selectors = module_list.split(", ")
@@ -278,7 +279,7 @@ class Application:
             if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which modules have previously failed to build.")
-                BuildException.croak_runtime("Invalid --rebuild-failures flag")
+                raise KBRuntimeError("Invalid --rebuild-failures flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --rebuild-failures, ignoring them.")
             selectors = re.split(r",\s*", module_list)
@@ -369,7 +370,7 @@ class Application:
         module_graph = self._resolve_module_dependency_graph(modules)
 
         if not module_graph or "graph" not in module_graph:
-            BuildException.croak_runtime("Failed to resolve dependency graph")
+            raise KBRuntimeError("Failed to resolve dependency graph")
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             dep_tree_ctx = {
@@ -435,7 +436,7 @@ class Application:
             Debug().set_pretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
             if not Util.super_mkdir(source_dir):
                 update_needed = True
-                BuildException.croak_runtime(f"Could not create {source_dir} directory!")
+                raise KBRuntimeError(f"Could not create {source_dir} directory!")
             Debug().set_pretending(was_pretending)
 
             module_source = metadata_module.fullpath("source")
@@ -1232,7 +1233,7 @@ class Application:
             You specified both r[b[--resume-from] and r[b[--resume-after] but you can only
             use one.
             """))
-            BuildException.croak_runtime("Both --resume-after and --resume-from specified.")
+            raise KBRuntimeError("Both --resume-after and --resume-from specified.")
 
         if ctx.get_option("stop-before") and ctx.get_option("stop-after"):
             # This one's an error.
@@ -1240,7 +1241,7 @@ class Application:
             You specified both r[b[--stop-before] and r[b[--stop-after] but you can only
             use one.
             """))
-            BuildException.croak_runtime("Both --stop-before and --stop-from specified.")
+            raise KBRuntimeError("Both --stop-before and --stop-from specified.")
 
         if not module_list:  # Empty input?
             return []
@@ -1286,7 +1287,7 @@ class Application:
 
         if start_index > stop_index or len(module_list) == 0:
             # Lost all modules somehow.
-            BuildException.croak_runtime(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
+            raise KBRuntimeError(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
 
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
@@ -1537,17 +1538,17 @@ class Application:
         try:
             input_file = fileinput.FileInput(files=source_path, mode="r")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template source {source_path}: {e}")
+            raise KBRuntimeError(f"Unable to open template source {source_path}: {e}")
 
         try:
             output_file = open(destination_path, "w")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template output {destination_path}: {e}")
+            raise KBRuntimeError(f"Unable to open template output {destination_path}: {e}")
 
         for line in input_file:
             if line is None:
                 os.unlink(destination_path)
-                BuildException.croak_runtime(f"Failed to read from {source_path} at line {input_file.filelineno()}")
+                raise KBRuntimeError(f"Failed to read from {source_path} at line {input_file.filelineno()}")
 
             # Some lines should only be present in the source as they aid with testing.
             if "kde-builder: filter" in line:
@@ -1563,7 +1564,7 @@ class Application:
                 def repl():
                     optval = ctx.get_option(match.group(1))
                     if optval is None:  # pl2py: perl // "logical defined-or" operator checks the definedness, not truth. So empty string is considered as normal value.
-                        BuildException.croak_runtime(f"Invalid variable {match.group(1)}")
+                        raise KBRuntimeError(f"Invalid variable {match.group(1)}")
                     return optval
 
                 line = re.sub(pattern, repl(), line)  # Replace all matching expressions, use extended regexp with comments, and replacement is Python code to execute.
@@ -1571,7 +1572,7 @@ class Application:
             try:
                 output_file.write(line)
             except Exception as e:
-                BuildException.croak_runtime(f"Unable to write line to {destination_path}: {e}")
+                raise KBRuntimeError(f"Unable to write line to {destination_path}: {e}")
 
     @staticmethod
     def _install_custom_file(ctx: BuildContext, source_file_path: str, dest_file_path: str, md5_key_name: str) -> None:
@@ -1782,7 +1783,7 @@ class Application:
                         # Skip regular files (note that it is not a symlink to file, because of previous is_symlink check), because there may be files in logdir, for example ".directory" file.
                         links.extend(self._symlinked_log_dirs(os.path.join(logdir, entry.name)))  # for regular directories, get links from it
         except OSError as e:
-            BuildException.croak_runtime(f"Can't opendir {logdir}: {e}")
+            raise KBRuntimeError(f"Can't opendir {logdir}: {e}")
 
         # Extract numeric directories IDs from directories/files paths in links list.
         dirs = [re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d).group(1) for d in links if re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d)]  # if we use pretending, then symlink will point to /dev/null, so check if found matching group first

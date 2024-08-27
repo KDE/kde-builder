@@ -8,7 +8,7 @@ from __future__ import annotations
 import os.path
 
 from .updater import Updater
-from ..build_exception import BuildException
+from ..build_exception import KBRuntimeError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..util.util import Util
@@ -36,7 +36,7 @@ class UpdaterQt5(Updater):
         srcdir = module.fullpath("source")
 
         if not Debug().pretending() and (not os.path.exists(f"{srcdir}/init-repository") or not os.access(f"{srcdir}/init-repository", os.X_OK)):
-            BuildException.croak_runtime("The Qt 5 repository update script could not be found, or is not executable!")
+            raise KBRuntimeError("The Qt 5 repository update script could not be found, or is not executable!")
 
         # See https://wiki.qt.io/Building_Qt_5_from_Git#Getting_the_source_code for
         # why we skip web engine by default. As of 2019-01-12 it is only used for
@@ -54,7 +54,7 @@ class UpdaterQt5(Updater):
         result = Util.good_exitcode(Util.run_logged(module, "init-repository", srcdir, command))
 
         if not result:
-            BuildException.croak_runtime("Couldn't update Qt 5 repository submodules!")
+            raise KBRuntimeError("Couldn't update Qt 5 repository submodules!")
 
         return 1  # TODO: Count commits
 

@@ -12,7 +12,7 @@ from typing import Callable
 from typing import NoReturn
 from typing import TYPE_CHECKING
 
-from ..build_exception import BuildException
+from ..build_exception import KBRuntimeError
 from ..build_exception import ProgramError
 from ..debug import KBLogger
 
@@ -116,7 +116,7 @@ class IPC:
         message = None
 
         if not ipc_type:
-            BuildException.croak_runtime("IPC failure: no IPC mechanism defined")
+            raise KBRuntimeError("IPC failure: no IPC mechanism defined")
 
         if ipc_type == IPC.MODULE_SUCCESS:
             ipc_module_name, msg = buffer.split(",")
@@ -294,7 +294,7 @@ class IPC:
             if not ipc_type:
                 raise ProgramError("IPC Failure waiting for stream start :(")
             if ipc_type == IPC.ALL_FAILURE:
-                BuildException.croak_runtime(f"Unable to perform source update for any module:\n\t{buffer}")
+                raise KBRuntimeError(f"Unable to perform source update for any module:\n\t{buffer}")
             elif ipc_type == IPC.ALL_SKIPPED:
                 self.no_update = 1
                 self.updates_done = 1
@@ -304,7 +304,7 @@ class IPC:
                     self.messages[ipc_module_name] = []
                 self.messages[ipc_module_name].append(log_message)
             elif ipc_type != IPC.ALL_UPDATING:
-                BuildException.croak_runtime(f"IPC failure while expecting an update status: Incorrect type: {ipc_type}")
+                raise KBRuntimeError(f"IPC failure while expecting an update status: Incorrect type: {ipc_type}")
 
     def send_ipc_message(self, ipc_type, msg: str) -> bool:
         """

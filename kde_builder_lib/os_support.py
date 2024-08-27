@@ -10,7 +10,7 @@ import re
 import subprocess
 import sys
 
-from .build_exception import BuildException
+from .build_exception import KBRuntimeError
 
 
 class OSSupport:
@@ -111,7 +111,7 @@ class OSSupport:
                 mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
                 mem_total = int(mem_total)
         else:
-            BuildException.croak_runtime(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendor_id()}")
+            raise KBRuntimeError(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendor_id()}")
 
         return mem_total
 

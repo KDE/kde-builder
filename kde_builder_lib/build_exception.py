@@ -21,13 +21,6 @@ class BuildException(Exception):  # noqa: N818
     def __str__(self) -> str:
         return self.exception_type + " Error: " + self.message
 
-    @staticmethod
-    def croak_runtime(msg: str) -> NoReturn:
-        """
-        Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
-        """
-        raise BuildException("Runtime", msg)
-
 
 class SetOptionError(BuildException):
     """
@@ -84,3 +77,12 @@ class ProgramError(BuildException):
 
     def __init__(self, msg: str):
         super().__init__("Internal", msg)
+
+
+class KBRuntimeError(BuildException):
+    """
+    Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
+    """
+
+    def __init__(self, msg: str):
+        super().__init__("Runtime", msg)
