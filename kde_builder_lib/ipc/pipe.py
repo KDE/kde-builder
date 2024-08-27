@@ -7,7 +7,8 @@ import os
 import struct
 
 from .ipc import IPC
-from ..build_exception import BuildException
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 
 
 class IPCPipe(IPC):
@@ -52,7 +53,7 @@ class IPCPipe(IPC):
         written_length = self.fh.write(encoded_msg)
 
         if not written_length or len(encoded_msg) != written_length:
-            BuildException.croak_runtime("Unable to write full msg to pipe")
+            raise KBRuntimeError("Unable to write full msg to pipe")
 
         return True
 
@@ -70,7 +71,7 @@ class IPCPipe(IPC):
 
         msg_length = struct.unpack("H", msg_length)[0]  # Decode to Perl type
         if not msg_length:
-            BuildException.croak_internal(f"Failed to read {msg_length} bytes as needed by earlier message!")
+            raise ProgramError(f"Failed to read {msg_length} bytes as needed by earlier message!")
 
         return self._read_number_of_bytes(msg_length)
 

@@ -11,7 +11,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from .build_exception import BuildException
+from .kb_exception import KBException
+from .kb_exception import KBRuntimeError
 from .module.module import Module
 from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
@@ -187,7 +188,7 @@ class ModuleResolver:
         # expand_module_sets applies pending/cmdline options already.
         module_results = self.expand_module_sets([needed_module_set])
         if not module_results:
-            BuildException.croak_runtime(f"{needed_module_set.name} expanded to an empty list of modules!")
+            raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of modules!")
 
         for module_result in module_results:
             module_result.set_option({"#selected-by": selected_reason})
@@ -339,7 +340,7 @@ class ModuleResolver:
                 set_results = self.expand_module_sets([mod_set])
                 search_item = guessed_module.name
                 if not set_results:
-                    BuildException.croak_runtime(f"{search_item} doesn't match any modules.")
+                    raise KBRuntimeError(f"{search_item} doesn't match any modules.")
                 results.extend(set_results)
 
         return results
@@ -418,7 +419,7 @@ class ModuleResolver:
         if self.defined_modules.get(module_name) is None:
             try:
                 self._expand_single_module_set(*self._resolve_single_selector("+" + module_name))
-            except BuildException:  # UnknownKdeProjectException for third party dependencies is caught here.
+            except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
         ret = self.defined_modules.get(module_name, None)

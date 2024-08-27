@@ -12,7 +12,8 @@ import sys
 import textwrap
 import traceback
 
-from kde_builder_lib.build_exception import UnknownKdeProjectException
+from kde_builder_lib.kb_exception import ProgramError
+from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
@@ -150,7 +151,7 @@ if setup_steps:
 
 from kde_builder_lib.version import Version  # noqa: E402
 from kde_builder_lib.application import Application  # noqa: E402
-from kde_builder_lib.build_exception import BuildException  # noqa: E402
+from kde_builder_lib.kb_exception import KBException  # noqa: E402
 
 Version.set_base_path(RealBinDir)
 
@@ -167,26 +168,32 @@ except UnknownKdeProjectException as err:
     logger_app = KBLogger.getLogger("application")
     logger_app.error(f" r[*] y[{err.unknown_project_name}] is not found in KDE projects, and there is no defined module with such name in the config.")
     exit(99)
-except BuildException as err:
+except ProgramError as err:
     print(textwrap.dedent(f"""
     kde-builder encountered an exceptional error condition:
-     ========
-        {err}
-     ========
+    ========
+    {err}
+    ========
     Can't continue, so stopping now.
-    
+
     """))
 
-    if err.exception_type == "Internal":
-        print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
+    print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
     traceback.print_exc()
     if app:
         app.finish(99)  # noreturn
     exit(99)  # if app couldn't be created
 
+except KBException as err:
+    logger_app = KBLogger.getLogger("application")
+    logger_app.error(str(err))
+    if app:
+        app.finish(99)  # noreturn
+    exit(99)  # if app couldn't be created
+
 except Exception as err:
-    # We encountered some other kind of error that didn't raise a `BuildException`
+    # We encountered some other kind of error that didn't raise a `KBException`
     print(textwrap.dedent(f"""\
     Encountered an error in the execution of the script.
     --> {err}

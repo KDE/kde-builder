@@ -23,8 +23,9 @@ import traceback
 from typing import Callable
 from typing import NoReturn
 
-from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildExceptionConfig
+from kde_builder_lib.kb_exception import ConfigError
+from kde_builder_lib.kb_exception import KBRuntimeError
+from kde_builder_lib.kb_exception import SetOptionError
 from .build_context import BuildContext
 from .build_system.qmake5 import BuildSystemQMake5
 from .cmd_line import Cmdline
@@ -268,7 +269,7 @@ class Application:
             if not module_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
-                BuildException.croak_runtime("Invalid --resume flag")
+                raise KBRuntimeError("Invalid --resume flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --resume, ignoring them.")
             selectors = module_list.split(", ")
@@ -278,7 +279,7 @@ class Application:
             if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which modules have previously failed to build.")
-                BuildException.croak_runtime("Invalid --rebuild-failures flag")
+                raise KBRuntimeError("Invalid --rebuild-failures flag")
             if selectors:
                 logger_app.debug("Some selectors were presented alongside with --rebuild-failures, ignoring them.")
             selectors = re.split(r",\s*", module_list)
@@ -369,7 +370,7 @@ class Application:
         module_graph = self._resolve_module_dependency_graph(modules)
 
         if not module_graph or "graph" not in module_graph:
-            BuildException.croak_runtime("Failed to resolve dependency graph")
+            raise KBRuntimeError("Failed to resolve dependency graph")
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             dep_tree_ctx = {
@@ -435,7 +436,7 @@ class Application:
             Debug().set_pretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
             if not Util.super_mkdir(source_dir):
                 update_needed = True
-                BuildException.croak_runtime(f"Could not create {source_dir} directory!")
+                raise KBRuntimeError(f"Could not create {source_dir} directory!")
             Debug().set_pretending(was_pretending)
 
             module_source = metadata_module.fullpath("source")
@@ -823,7 +824,7 @@ class Application:
             Most will want to use the b[g[kde-projects] repository. See also
             https://docs.kde.org/?application=kdesrc-build&branch=trunk5&path=kde-modules-and-selection.html#module-sets
             """))
-            raise BuildException.make_exception("Config", "Missing repository option")
+            raise ConfigError("Missing repository option")
 
         repo_set = ctx.get_option("git-repository-base")
         if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
@@ -842,7 +843,7 @@ class Application:
             to use the magic b[{project_id}] repository for your module-set instead.
             """))
 
-            raise BuildException.make_exception("Config", "Unknown repository base")
+            raise ConfigError("Unknown repository base")
 
     def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBase, end_re=None):
         """
@@ -891,7 +892,7 @@ class Application:
                     end_word = "options"
 
                 logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an \"end {end_word}\" before " + "starting a new module.\n")
-                raise BuildException.make_exception("Config", f"Invalid file {current_file}")
+                raise ConfigError(f"Invalid file {current_file}")
 
             option, value = Application._split_option_and_value_and_substitute_value(ctx, line, file_reader)
 
@@ -914,13 +915,12 @@ class Application:
 
             try:
                 module.set_option({option: value})
-            except Exception as err:
-                if isinstance(err, BuildExceptionConfig):
-                    msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
-                    explanation = err.option_usage_explanation()
-                    if explanation:
-                        msg = msg + "\n" + explanation
-                    err.message = msg
+            except SetOptionError as err:
+                msg = f"{current_file}:{file_reader.current_filehandle().filelineno()}: " + err.message
+                explanation = err.option_usage_explanation()
+                if explanation:
+                    msg = msg + "\n" + explanation
+                err.message = msg
                 raise  # re-throw
 
             line = self._read_next_logical_line(file_reader)
@@ -994,7 +994,7 @@ class Application:
             kde-projects or standard sets).
 
         Raises:
-            BuildExceptionConfig
+            SetOptionError
         """
         module_list = []
         rcfile = ctx.rc_file
@@ -1014,7 +1014,7 @@ class Application:
             if not re.match(r"^global\s*$", line):
                 logger_app.error(f"Invalid configuration file: {rcfile}.")
                 logger_app.error(f"Expecting global settings section at b[r[line {fh.filelineno()}]!")
-                raise BuildException.make_exception("Config", "Missing global section")
+                raise ConfigError("Missing global section")
 
             # Now read in each global option.
             global_opts = self._parse_module_options(ctx, file_reader, OptionsBase())
@@ -1060,15 +1060,15 @@ class Application:
                 if not module_set_re.match(line):
                     logger_app.error(f"Invalid configuration file {rcfile}!")
                     logger_app.error(f"Expecting a start of module section at r[b[line {file_reader.current_filehandle().filelineno()}].")
-                    raise BuildException.make_exception("Config", "Ungrouped/Unknown option")
+                    raise ConfigError("Ungrouped/Unknown option")
 
                 if modulename and modulename in seen_module_sets.keys():
                     logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{file_reader.current_filehandle().filelineno()}")
-                    raise BuildException.make_exception("Config", f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise ConfigError(f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 if modulename and modulename in seen_modules.keys():
                     logger_app.error(f"Name {modulename} for module-set at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module")
-                    raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise ConfigError(f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 # A module_set can give us more than one module to add.
                 new_module = self._parse_module_set_options(ctx, file_reader, ModuleSet(ctx, modulename or f"Unnamed module-set at {rcfile}:{file_reader.current_filehandle().filelineno()}"))
@@ -1089,7 +1089,7 @@ class Application:
             # below for "options" sets)
             elif modulename in seen_modules and option_type != "options":
                 logger_app.error(f"Duplicate module declaration b[r[{modulename}] on line {file_reader.current_filehandle().filelineno()} of {rcfile}")
-                raise BuildException.make_exception("Config", f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                raise ConfigError(f"Duplicate module {modulename} declared at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
             # Module/module-set options overrides
             elif option_type == "options":
@@ -1110,7 +1110,7 @@ class Application:
             # Must follow "options" handling
             elif modulename in seen_module_sets:
                 logger_app.error(f"Name {modulename} for module at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module-set")
-                raise BuildException.make_exception("Config", f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                raise ConfigError(f"Can't re-use name {modulename} for module defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
             else:
                 new_module = self._parse_module_options(ctx, file_reader, Module(ctx, modulename))
                 new_module.create_id = creation_order + 1
@@ -1233,7 +1233,7 @@ class Application:
             You specified both r[b[--resume-from] and r[b[--resume-after] but you can only
             use one.
             """))
-            BuildException.croak_runtime("Both --resume-after and --resume-from specified.")
+            raise KBRuntimeError("Both --resume-after and --resume-from specified.")
 
         if ctx.get_option("stop-before") and ctx.get_option("stop-after"):
             # This one's an error.
@@ -1241,7 +1241,7 @@ class Application:
             You specified both r[b[--stop-before] and r[b[--stop-after] but you can only
             use one.
             """))
-            BuildException.croak_runtime("Both --stop-before and --stop-from specified.")
+            raise KBRuntimeError("Both --stop-before and --stop-from specified.")
 
         if not module_list:  # Empty input?
             return []
@@ -1287,7 +1287,7 @@ class Application:
 
         if start_index > stop_index or len(module_list) == 0:
             # Lost all modules somehow.
-            BuildException.croak_runtime(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
+            raise KBRuntimeError(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
 
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
@@ -1538,17 +1538,17 @@ class Application:
         try:
             input_file = fileinput.FileInput(files=source_path, mode="r")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template source {source_path}: {e}")
+            raise KBRuntimeError(f"Unable to open template source {source_path}: {e}")
 
         try:
             output_file = open(destination_path, "w")
         except OSError as e:
-            BuildException.croak_runtime(f"Unable to open template output {destination_path}: {e}")
+            raise KBRuntimeError(f"Unable to open template output {destination_path}: {e}")
 
         for line in input_file:
             if line is None:
                 os.unlink(destination_path)
-                BuildException.croak_runtime(f"Failed to read from {source_path} at line {input_file.filelineno()}")
+                raise KBRuntimeError(f"Failed to read from {source_path} at line {input_file.filelineno()}")
 
             # Some lines should only be present in the source as they aid with testing.
             if "kde-builder: filter" in line:
@@ -1564,7 +1564,7 @@ class Application:
                 def repl():
                     optval = ctx.get_option(match.group(1))
                     if optval is None:  # pl2py: perl // "logical defined-or" operator checks the definedness, not truth. So empty string is considered as normal value.
-                        BuildException.croak_runtime(f"Invalid variable {match.group(1)}")
+                        raise KBRuntimeError(f"Invalid variable {match.group(1)}")
                     return optval
 
                 line = re.sub(pattern, repl(), line)  # Replace all matching expressions, use extended regexp with comments, and replacement is Python code to execute.
@@ -1572,7 +1572,7 @@ class Application:
             try:
                 output_file.write(line)
             except Exception as e:
-                BuildException.croak_runtime(f"Unable to write line to {destination_path}: {e}")
+                raise KBRuntimeError(f"Unable to write line to {destination_path}: {e}")
 
     @staticmethod
     def _install_custom_file(ctx: BuildContext, source_file_path: str, dest_file_path: str, md5_key_name: str) -> None:
@@ -1783,7 +1783,7 @@ class Application:
                         # Skip regular files (note that it is not a symlink to file, because of previous is_symlink check), because there may be files in logdir, for example ".directory" file.
                         links.extend(self._symlinked_log_dirs(os.path.join(logdir, entry.name)))  # for regular directories, get links from it
         except OSError as e:
-            BuildException.croak_runtime(f"Can't opendir {logdir}: {e}")
+            raise KBRuntimeError(f"Can't opendir {logdir}: {e}")
 
         # Extract numeric directories IDs from directories/files paths in links list.
         dirs = [re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d).group(1) for d in links if re.search(r"(\d{4}-\d\d-\d\d[-_]\d+)", d)]  # if we use pretending, then symlink will point to /dev/null, so check if found matching group first

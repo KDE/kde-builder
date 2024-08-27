@@ -6,7 +6,7 @@
 from typing import NoReturn
 
 from .module_set import ModuleSet
-from ..build_exception import BuildException
+from ..kb_exception import ProgramError
 
 
 class ModuleSetNull(ModuleSet):
@@ -22,4 +22,4 @@ class ModuleSetNull(ModuleSet):
     @staticmethod
     # @override(check_signature=False)
     def convert_to_modules(*_) -> NoReturn:
-        BuildException.croak_internal("kde-builder should not have made it to this call. :-(")
+        raise ProgramError("kde-builder should not have made it to this call. :-(")

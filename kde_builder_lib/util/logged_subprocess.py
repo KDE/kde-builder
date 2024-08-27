@@ -10,7 +10,7 @@ import sys
 from typing import Callable
 
 from .util import Util
-from ..build_exception import BuildException
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 
@@ -161,11 +161,11 @@ class UtilLoggedSubprocess:
         module = self._module
         Util.assert_isa(module, Module)
         if not (filename := self._log_to):
-            BuildException.croak_internal("Need to log somewhere")
+            raise ProgramError("Need to log somewhere")
         if not (args := self._set_command):
-            BuildException.croak_internal("No command to run!")
+            raise ProgramError("No command to run!")
         if not isinstance(args, list):
-            BuildException.croak_internal("Command list needs to be a listref!")
+            raise ProgramError("Command list needs to be a listref!")
 
         dir_to_run_from = self._chdir_to
         announce_sub = self._announcer

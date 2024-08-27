@@ -14,7 +14,8 @@ import textwrap
 import time
 from typing import TYPE_CHECKING
 
-from ..build_exception import BuildException
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.null import IPCNull
@@ -49,18 +50,8 @@ class Updater:
         May change the current directory as necessary.
         """
         self.ipc = ipc
-        err = None
-        num_commits = None
-
-        try:
-            num_commits = self.update_checkout()
-        except Exception as _err:
-            err = _err
-
+        num_commits = self.update_checkout()
         self.ipc = None
-
-        if err:
-            raise err
         return num_commits
 
     @staticmethod
@@ -69,7 +60,7 @@ class Updater:
         return "git"
 
     def _resolve_branch_group(self, branch_group: str) -> NoReturn:
-        BuildException.croak_runtime("_resolve_branch_group is implemented in UpdaterKDEProject.")
+        raise KBRuntimeError("_resolve_branch_group is implemented in UpdaterKDEProject.")
 
     def current_revision_internal(self) -> str:
         return self.commit_id("HEAD")
@@ -79,7 +70,7 @@ class Updater:
         Return the current sha1 of the given git "commit-ish".
         """
         if commit is None:
-            BuildException.croak_internal("Must specify git-commit to retrieve id for")
+            raise ProgramError("Must specify git-commit to retrieve id for")
         module = self.module
 
         gitdir = module.fullpath("source") + "/.git"
@@ -116,7 +107,7 @@ class Updater:
         if result == 0:  # Ref is present
             return True
 
-        BuildException.croak_runtime(f"git had error exit {result} when verifying {ref} present in repository at {repo}")
+        raise KBRuntimeError(f"git had error exit {result} when verifying {ref} present in repository at {repo}")
 
     def _clone(self, git_repo: str) -> int:
         """
@@ -131,7 +122,9 @@ class Updater:
         srcdir = module.fullpath("source")
         args = ["--", git_repo, srcdir]
 
-        ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
+        if not self.ipc:
+            raise ProgramError("Missing IPC object")
+        ipc = self.ipc
 
         logger_updater.warning(f"Cloning g[{module}]")
 
@@ -147,7 +140,7 @@ class Updater:
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
         if not exitcode == 0:
-            BuildException.croak_runtime("Failed to make initial clone of $module")
+            raise KBRuntimeError("Failed to make initial clone of $module")
 
         ipc.notify_persistent_option_change(module.name, "git-cloned-repository", git_repo)
 
@@ -157,7 +150,7 @@ class Updater:
         if name := module.get_option("git-user"):
             username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
             if not username or not email:
-                BuildException.croak_runtime(f"Invalid username or email for git-user option: {name}" +
+                raise KBRuntimeError(f"Invalid username or email for git-user option: {name}" +
                                              " (should be in format 'User Name <username@example.net>'")
 
             logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
@@ -180,7 +173,8 @@ class Updater:
             if module.get_option("#delete-my-patches"):
                 logger_updater.warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
                 logger_updater.warning(f"\tRemoving b[{srcdir}]")
-                Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
+                if not Util.safe_rmtree(srcdir):
+                    raise ProgramError(f"Unable to delete {srcdir}!")
             else:
                 logger_updater.error(textwrap.dedent(f"""\
                 The source directory for b[{module}] does not exist. kde-builder would download
@@ -200,7 +194,7 @@ class Updater:
                 if os.path.exists(f"{srcdir}/.git"):
                     logger_updater.error(f"git status of {srcdir}:")
                     print(subprocess.check_output(["git", "status", srcdir]))
-                BuildException.croak_runtime("Conflicting source-dir present")
+                raise KBRuntimeError("Conflicting source-dir present")
 
     def update_checkout(self) -> int:
         """
@@ -222,13 +216,13 @@ class Updater:
 
             git_repo = module.get_option("repository")
             if not git_repo:
-                BuildException.croak_internal(f"Unable to checkout {module}, you must specify a repository to use.")
+                raise ProgramError(f"Unable to checkout {module}, you must specify a repository to use.")
 
             if not self._verify_ref_present(module, git_repo):
                 if self._module_is_needed():
-                    BuildException.croak_runtime(f"{module} build was requested, but it has no source code at the requested git branch")
+                    raise KBRuntimeError(f"{module} build was requested, but it has no source code at the requested git branch")
                 else:
-                    BuildException.croak_runtime("The required git branch does not exist at the source repository")
+                    raise KBRuntimeError("The required git branch does not exist at the source repository")
 
             self._clone(git_repo)
             if Debug().pretending():
@@ -269,12 +263,12 @@ class Updater:
             logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
             exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])
             if not exitcode == 0:
-                BuildException.croak_runtime(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
+                raise KBRuntimeError(f"Unable to update the URL for git remote {remote} of {module} ({repo})")
         else:
             logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
             exitcode = Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])
             if not exitcode == 0:
-                BuildException.croak_runtime(f"Unable to add new git remote {remote} of {module} ({repo})")
+                raise KBRuntimeError(f"Unable to add new git remote {remote} of {module} ({repo})")
 
         # If we make it here, no exceptions were thrown
         if not self.is_push_url_managed():
@@ -297,7 +291,7 @@ class Updater:
 
         exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
         if not exitcode == 0:
-            BuildException.croak_runtime(f"Unable to remove preconfigured push URL for {module}!")
+            raise KBRuntimeError(f"Unable to remove preconfigured push URL for {module}!")
         return 1  # overall success
 
     def _setup_best_remote(self) -> str:
@@ -312,7 +306,9 @@ class Updater:
         """
         module = self.module
         cur_repo = module.get_option("repository")
-        ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
+        if not self.ipc:
+            raise ProgramError("Missing IPC object")
+        ipc = self.ipc
 
         # Search for an existing remote name first. If none, add our alias.
         remote_names = self.best_remote_name()
@@ -439,7 +435,7 @@ class Updater:
                 result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remote_name}/{branch}"])
 
         if not result == 0:
-            BuildException.croak_runtime(croak_reason)
+            raise KBRuntimeError(croak_reason)
         return 1  # success
 
     def _update_to_detached_head(self, commit: str) -> int:
@@ -486,7 +482,7 @@ class Updater:
 
         # Try to save the user if they are doing a merge or rebase
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
-            BuildException.croak_runtime(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
+            raise KBRuntimeError(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
         remote_name = self._setup_best_remote()
         logger_updater.info(f"Fetching remote changes to g[{module}]")
@@ -496,7 +492,7 @@ class Updater:
         # before we start comparing branches and such.
 
         if not exitcode == 0:
-            BuildException.croak_runtime(f"Unable to perform git fetch for {remote_name} ({cur_repo})")
+            raise KBRuntimeError(f"Unable to perform git fetch for {remote_name} ({cur_repo})")
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
@@ -524,7 +520,7 @@ class Updater:
         """
         if not os.path.isdir(".git"):
             caller_name = inspect.currentframe().f_back.f_code.co_name
-            BuildException.croak_internal("Run " + caller_name + " from git repo!")
+            raise ProgramError("Run " + caller_name + " from git repo!")
 
         with open(f".git/refs/remotes/{remote_name}/HEAD", "r") as file:
             data = file.read()
@@ -535,7 +531,7 @@ class Updater:
         match = re.search(r"^ref: *refs/remotes/[^/]+/([^/]+)$", data)
         head = match.group(1) if match else None
         if not head:
-            BuildException.croak_runtime(f"Can't find HEAD for remote {remote_name}")
+            raise KBRuntimeError(f"Can't find HEAD for remote {remote_name}")
 
         head = head.removesuffix("\n")
         return head
@@ -690,7 +686,7 @@ class Updater:
             self._notify_post_build_message(f"b[{module}] may have local changes that we couldn't handle, so the module was left alone.")
 
             result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
-            BuildException.croak_runtime(f"Unable to stash local changes (if any) for {module}, aborting update.")
+            raise KBRuntimeError(f"Unable to stash local changes (if any) for {module}, aborting update.")
 
         # next: check if the stash was truly necessary.
         # compare counts (not just testing if there is *any* stash) because there
@@ -713,7 +709,7 @@ class Updater:
             result = 1
         else:
             result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
-            BuildException.croak_runtime(f"Unable to update source code for {module}")
+            raise KBRuntimeError(f"Unable to update source code for {module}")
 
         # we ignore git-status exit code deliberately, it's a debugging aid
 
@@ -879,7 +875,7 @@ class Updater:
             if result == 1:
                 return possible_branch
 
-        BuildException.croak_runtime(f"Unable to find good branch name for {module} branch name {branch}")
+        raise KBRuntimeError(f"Unable to find good branch name for {module} branch name {branch}")
 
     @staticmethod
     def count_command_output(*args: str) -> int:
@@ -959,7 +955,7 @@ class Updater:
         else:
             logger_updater.error(f" b[y[*] Invalid b[git-push-protocol] {protocol}")
             logger_updater.error(" b[y[*] Try setting this option to \"git\" if you're not using a proxy")
-            BuildException.croak_runtime(f"Invalid git-push-protocol: {protocol}")
+            raise KBRuntimeError(f"Invalid git-push-protocol: {protocol}")
 
         p = subprocess.run("git config --global --includes --get url.https://invent.kde.org/.insteadOf kde:", shell=True, capture_output=True, text=True)
         config_output = p.stdout.removesuffix("\n")

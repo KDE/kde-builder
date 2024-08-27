@@ -11,7 +11,7 @@ import re
 from typing import Callable
 from typing import TYPE_CHECKING
 
-from .build_exception import BuildException
+from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .module.module import Module
@@ -155,7 +155,7 @@ class DependencyResolver:
                 continue
 
             if not re.match(dependency_atom, line):
-                BuildException.croak_internal(f"Invalid line {line} when reading dependency data.")
+                raise ProgramError(f"Invalid line {line} when reading dependency data.")
 
             match = re.search(dependency_atom, line)
             if match:

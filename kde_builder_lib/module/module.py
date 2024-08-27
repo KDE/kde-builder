@@ -16,8 +16,9 @@ import textwrap
 import traceback
 from typing import TYPE_CHECKING
 
-from kde_builder_lib.build_exception import BuildException
-from kde_builder_lib.build_exception import BuildExceptionConfig
+from kde_builder_lib.kb_exception import KBRuntimeError
+from kde_builder_lib.kb_exception import SetOptionError
+from ..kb_exception import ProgramError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
 from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
@@ -71,14 +72,14 @@ class Module(OptionsBase):
         self.name = name
 
         if not self.name:
-            BuildException.croak_internal("Empty Module constructed")
+            raise ProgramError("Empty Module constructed")
 
         OptionsBase.__init__(self)
 
         # If building a BuildContext instead of a `Module`, then the context
         # can't have been set up yet...
         if self.__class__.__name__ != "BuildContext" and ctx.__class__.__name__ != "BuildContext":
-            BuildException.croak_internal(f"Invalid context {ctx}")
+            raise ProgramError(f"Invalid context {ctx}")
 
         phases = None
         if ctx:
@@ -282,7 +283,7 @@ class Module(OptionsBase):
 
         class_name = build_system_classes[name.lower()] or None
         if not class_name:
-            BuildException.croak_runtime(f"Invalid build system {name} requested")
+            raise KBRuntimeError(f"Invalid build system {name} requested")
         return class_name(self)
 
     def build_system(self) -> BuildSystem:
@@ -413,7 +414,7 @@ class Module(OptionsBase):
             return True
 
         if build_system.name() == "generic" and not Debug().pretending():
-            BuildException.croak_internal("Build system determination still pending when build attempted.")
+            raise ProgramError("Build system determination still pending when build attempted.")
 
         # Check if a previous build has happened in a different directory (which
         # can happen due to name changes on KDE.org side or flat-layout option
@@ -674,15 +675,15 @@ class Module(OptionsBase):
         try:
             count = self.scm().update_internal(ipc)
         except Exception as e:
-            if e.__class__.__name__ != "BuildException":
-                # Do not print traceback for our BuildException type exceptions, as we want just a short error message in the output.
+            if e.__class__.__name__ != "KBException":
+                # Do not print traceback for our KBException type exceptions, as we want just a short error message in the output.
                 # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
                 traceback.print_exc()
 
             reason = IPC.MODULE_FAILURE
 
             ctx.mark_module_phase_failed("build", self)
-            if e.__class__.__name__ == "BuildException":
+            if e.__class__.__name__ == "KBException":
                 # noinspection PyUnresolvedReferences
                 e_str = e.message
             else:
@@ -734,7 +735,7 @@ class Module(OptionsBase):
         for mso in ["use-modules", "ignore-modules"]:
             if mso in options:
                 logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
-                raise BuildExceptionConfig(mso, f"Option {mso} can only be used in module-set")
+                raise SetOptionError(mso, f"Option {mso} can only be used in module-set")
 
         # Special case handling.
         if "filter-out-phases" in options:

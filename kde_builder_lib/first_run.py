@@ -12,7 +12,8 @@ import time
 from typing import NoReturn
 
 from .build_context import BuildContext
-from .build_exception import BuildException
+from .kb_exception import KBException
+from .kb_exception import SetupError
 from .debug import KBLogger
 from .os_support import OSSupport
 
@@ -58,7 +59,7 @@ class FirstRun:
             if "generate-config" in setup_steps:
                 logger_fr.warning("=== generate-config ===")
                 self._setup_base_configuration()
-        except BuildException as e:
+        except KBException as e:
             msg = e.message
             logger_fr.error(f"  b[r[*] r[{msg}]")
             exit(1)
@@ -85,10 +86,6 @@ class FirstRun:
                     continue
                 packages[cur_key].append(line)
         return packages
-
-    @staticmethod
-    def _throw(msg: str) -> NoReturn:
-        raise BuildException.make_exception("Setup", msg)
 
     def confirmed_to_continue(self) -> bool:
         if self.prefilled_prompt_answer is None:
@@ -198,7 +195,7 @@ class FirstRun:
         mem_total = None
         try:
             mem_total = self.oss.detect_total_memory()
-        except BuildException as e:
+        except KBException as e:
             logger_fr.warning(str(e))
 
         if not mem_total:
@@ -306,7 +303,7 @@ class FirstRun:
                 break
 
         if not cmd:
-            self._throw(f"No installer for {best_vendor}!")
+            raise SetupError(f"No installer for {best_vendor}!")
 
         # If not running as root already, add sudo
         if os.geteuid() != 0:

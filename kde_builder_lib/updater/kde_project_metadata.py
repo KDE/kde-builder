@@ -7,7 +7,9 @@ import json
 import re
 
 from .kde_project import UpdaterKDEProject
-from ..build_exception import BuildException
+from ..kb_exception import KBException
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..ipc.null import IPCNull
 from ..util.util import Util
@@ -35,7 +37,9 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
         # Now that we in theory have up-to-date source code, read in the
         # ignore file and propagate that information to our context object.
 
-        fh = Util.pretend_open(path) or BuildException.croak_internal(f"Unable to read ignore data from {path}")
+        fh = Util.pretend_open(path)
+        if not fh:
+            raise ProgramError(f"Unable to read ignore data from {path}")
 
         ignore_modules = []
         for line in fh:
@@ -64,14 +68,16 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
         path = self.module.fullpath("source") + "/dependencies/logical-module-structure.json"
 
         # The {} is an empty JSON obj to support pretend mode
-        fh = Util.pretend_open(path, "{}") or BuildException.croak_internal("Unable to read logical module structure")
+        fh = Util.pretend_open(path, "{}")
+        if not fh:
+            raise ProgramError("Unable to read logical module structure")
 
         try:
             json_string = fh.read()  # slurps the whole file
             json_dict = json.loads(json_string)
             fh.close()
-        except BuildException as e:
-            BuildException.croak_runtime(f"Unable to load module group data from {path}! :(\n\t{e}")
+        except KBException as e:
+            raise KBRuntimeError(f"Unable to load module group data from {path}! :(\n\t{e}")
         return json_dict
 
     # @override(check_signature=False)

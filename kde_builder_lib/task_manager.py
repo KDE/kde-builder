@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 
 import setproctitle
 
-from .build_exception import BuildException
+from .kb_exception import KBRuntimeError
 from .debug import Debug
 from .debug import KBLogger
 from .ipc.ipc import IPC
@@ -653,8 +653,12 @@ class TaskManager:
 
         # We will write to the build process and read from the update process.
 
-        send_fh = ipc_to_build.fh or BuildException.croak_runtime("??? missing pipe to build proc")
-        recv_fh = ipc_from_updater.fh or BuildException.croak_runtime("??? missing pipe from monitor")
+        send_fh = ipc_to_build.fh
+        if not send_fh:
+            raise KBRuntimeError("??? missing pipe to build proc")
+        recv_fh = ipc_from_updater.fh
+        if not recv_fh:
+            raise KBRuntimeError("??? missing pipe from monitor")
 
         sel = selectors.DefaultSelector()
         sel.register(recv_fh, selectors.EVENT_READ)
