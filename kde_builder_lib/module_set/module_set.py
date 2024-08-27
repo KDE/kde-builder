@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from ..build_exception import SetOptionError
+from ..kb_exception import SetOptionError
 from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase

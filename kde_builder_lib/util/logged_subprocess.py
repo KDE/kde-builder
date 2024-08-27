@@ -10,7 +10,7 @@ import sys
 from typing import Callable
 
 from .util import Util
-from ..build_exception import ProgramError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 

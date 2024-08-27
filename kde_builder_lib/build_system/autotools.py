@@ -6,8 +6,8 @@
 import os
 
 from .build_system import BuildSystem
-from ..build_exception import BuildException
-from ..build_exception import KBRuntimeError
+from ..kb_exception import KBException
+from ..kb_exception import KBRuntimeError
 from ..debug import KBLogger
 from ..util.util import Util
 
@@ -80,7 +80,7 @@ class BuildSystemAutotools(BuildSystem):
             configure_command = self._autogen()
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])
             result = exitcode
-        except BuildException as err:
+        except KBException as err:
             logger_buildsystem.error(f"\tError configuring {module}: r[b[{err}]")
             return False
 

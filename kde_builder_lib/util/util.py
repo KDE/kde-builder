@@ -25,10 +25,10 @@ from typing import TYPE_CHECKING
 
 import setproctitle
 
-from kde_builder_lib.build_exception import KBRuntimeError
+from kde_builder_lib.kb_exception import KBRuntimeError
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.debug import KBLogger
-from ..build_exception import ProgramError
+from ..kb_exception import ProgramError
 
 if TYPE_CHECKING:
     from ..module.module import Module

@@ -8,7 +8,7 @@ from __future__ import annotations
 import copy
 import re
 
-from .build_exception import SetOptionError
+from .kb_exception import SetOptionError
 from .util.util import Util
 
 

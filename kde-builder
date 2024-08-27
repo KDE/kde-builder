@@ -12,8 +12,8 @@ import sys
 import textwrap
 import traceback
 
-from kde_builder_lib.build_exception import ProgramError
-from kde_builder_lib.build_exception import UnknownKdeProjectException
+from kde_builder_lib.kb_exception import ProgramError
+from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
@@ -151,7 +151,7 @@ if setup_steps:
 
 from kde_builder_lib.version import Version  # noqa: E402
 from kde_builder_lib.application import Application  # noqa: E402
-from kde_builder_lib.build_exception import BuildException  # noqa: E402
+from kde_builder_lib.kb_exception import KBException  # noqa: E402
 
 Version.set_base_path(RealBinDir)
 
@@ -185,7 +185,7 @@ except ProgramError as err:
         app.finish(99)  # noreturn
     exit(99)  # if app couldn't be created
 
-except BuildException as err:
+except KBException as err:
     logger_app = KBLogger.getLogger("application")
     logger_app.error(str(err))
     if app:
@@ -193,7 +193,7 @@ except BuildException as err:
     exit(99)  # if app couldn't be created
 
 except Exception as err:
-    # We encountered some other kind of error that didn't raise a `BuildException`
+    # We encountered some other kind of error that didn't raise a `KBException`
     print(textwrap.dedent(f"""\
     Encountered an error in the execution of the script.
     --> {err}

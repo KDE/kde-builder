@@ -7,7 +7,7 @@ import glob
 import re
 
 from .build_system import BuildSystem
-from ..build_exception import ProgramError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..util.util import Util

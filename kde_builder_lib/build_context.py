@@ -17,8 +17,8 @@ import tempfile
 import textwrap
 import traceback
 
-from .build_exception import KBRuntimeError
-from .build_exception import ProgramError
+from .kb_exception import KBRuntimeError
+from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .kde_projects_reader import KDEProjectsReader

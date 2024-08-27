@@ -6,7 +6,7 @@
 from typing import NoReturn
 
 from .module_set import ModuleSet
-from ..build_exception import ProgramError
+from ..kb_exception import ProgramError
 
 
 class ModuleSetNull(ModuleSet):

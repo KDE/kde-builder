@@ -23,9 +23,9 @@ import traceback
 from typing import Callable
 from typing import NoReturn
 
-from kde_builder_lib.build_exception import ConfigError
-from kde_builder_lib.build_exception import KBRuntimeError
-from kde_builder_lib.build_exception import SetOptionError
+from kde_builder_lib.kb_exception import ConfigError
+from kde_builder_lib.kb_exception import KBRuntimeError
+from kde_builder_lib.kb_exception import SetOptionError
 from .build_context import BuildContext
 from .build_system.qmake5 import BuildSystemQMake5
 from .cmd_line import Cmdline

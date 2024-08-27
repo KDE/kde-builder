@@ -12,7 +12,7 @@ import re
 import textwrap
 from typing import TYPE_CHECKING
 
-from .build_exception import ConfigError
+from .kb_exception import ConfigError
 from .debug import KBLogger
 
 if TYPE_CHECKING:

@@ -14,8 +14,8 @@ import textwrap
 import time
 from typing import TYPE_CHECKING
 
-from ..build_exception import KBRuntimeError
-from ..build_exception import ProgramError
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.null import IPCNull

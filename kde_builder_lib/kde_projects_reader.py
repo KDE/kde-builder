@@ -9,7 +9,7 @@ import re
 
 import yaml
 
-from .build_exception import KBRuntimeError
+from .kb_exception import KBRuntimeError
 from .debug import Debug
 
 

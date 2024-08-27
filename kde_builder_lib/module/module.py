@@ -16,9 +16,9 @@ import textwrap
 import traceback
 from typing import TYPE_CHECKING
 
-from kde_builder_lib.build_exception import KBRuntimeError
-from kde_builder_lib.build_exception import SetOptionError
-from ..build_exception import ProgramError
+from kde_builder_lib.kb_exception import KBRuntimeError
+from kde_builder_lib.kb_exception import SetOptionError
+from ..kb_exception import ProgramError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
 from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
@@ -675,15 +675,15 @@ class Module(OptionsBase):
         try:
             count = self.scm().update_internal(ipc)
         except Exception as e:
-            if e.__class__.__name__ != "BuildException":
-                # Do not print traceback for our BuildException type exceptions, as we want just a short error message in the output.
+            if e.__class__.__name__ != "KBException":
+                # Do not print traceback for our KBException type exceptions, as we want just a short error message in the output.
                 # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
                 traceback.print_exc()
 
             reason = IPC.MODULE_FAILURE
 
             ctx.mark_module_phase_failed("build", self)
-            if e.__class__.__name__ == "BuildException":
+            if e.__class__.__name__ == "KBException":
                 # noinspection PyUnresolvedReferences
                 e_str = e.message
             else:

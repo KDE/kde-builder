@@ -10,7 +10,7 @@ import re
 from typing import TYPE_CHECKING
 
 from .module_set import ModuleSet
-from ..build_exception import UnknownKdeProjectException
+from ..kb_exception import UnknownKdeProjectException
 from ..debug import KBLogger
 from ..kde_projects_reader import KDEProjectsReader
 from ..module.module import Module

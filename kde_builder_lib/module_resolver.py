@@ -11,8 +11,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from .build_exception import BuildException
-from .build_exception import KBRuntimeError
+from .kb_exception import KBException
+from .kb_exception import KBRuntimeError
 from .module.module import Module
 from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
@@ -419,7 +419,7 @@ class ModuleResolver:
         if self.defined_modules.get(module_name) is None:
             try:
                 self._expand_single_module_set(*self._resolve_single_selector("+" + module_name))
-            except BuildException:  # UnknownKdeProjectException for third party dependencies is caught here.
+            except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
         ret = self.defined_modules.get(module_name, None)

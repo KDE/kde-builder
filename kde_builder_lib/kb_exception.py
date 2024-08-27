@@ -9,7 +9,7 @@ import textwrap
 from typing import NoReturn
 
 
-class BuildException(Exception):  # noqa: N818
+class KBException(Exception):  # noqa: N818
     """
     A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified.
     """
@@ -22,7 +22,7 @@ class BuildException(Exception):  # noqa: N818
         return self.exception_type + " Error: " + self.message
 
 
-class ConfigError(BuildException):
+class ConfigError(KBException):
     """
     Use for "config errors".
     """
@@ -31,7 +31,7 @@ class ConfigError(BuildException):
         super().__init__("Config", msg)
 
 
-class SetOptionError(BuildException):
+class SetOptionError(KBException):
     """
     A small subclass to hold the option name that caused a config exception to be thrown.
 
@@ -67,7 +67,7 @@ class SetOptionError(BuildException):
         return result
 
 
-class UnknownKdeProjectException(BuildException):
+class UnknownKdeProjectException(KBException):
     """
     Raised when a specific project name is not found in repo-metadata kde projects and is not a defined module in config.
     """
@@ -77,7 +77,7 @@ class UnknownKdeProjectException(BuildException):
         self.unknown_project_name = unknown_project_name
 
 
-class ProgramError(BuildException):
+class ProgramError(KBException):
     """
     Use for "logic errors" (i.e. impossibilities in program state, things that shouldn't be possible no matter what input is fed at runtime).
 
@@ -88,7 +88,7 @@ class ProgramError(BuildException):
         super().__init__("Internal", msg)
 
 
-class KBRuntimeError(BuildException):
+class KBRuntimeError(KBException):
     """
     Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
     """
@@ -97,7 +97,7 @@ class KBRuntimeError(BuildException):
         super().__init__("Runtime", msg)
 
 
-class SetupError(BuildException):
+class SetupError(KBException):
     """
     Use for "setup errors" in FirstRun.
     """

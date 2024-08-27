@@ -5,7 +5,7 @@
 import pytest
 
 from kde_builder_lib.application import Application
-from kde_builder_lib.build_exception import UnknownKdeProjectException
+from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import Debug
 
 

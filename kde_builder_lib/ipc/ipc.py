@@ -12,8 +12,8 @@ from typing import Callable
 from typing import NoReturn
 from typing import TYPE_CHECKING
 
-from ..build_exception import KBRuntimeError
-from ..build_exception import ProgramError
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 from ..debug import KBLogger
 
 if TYPE_CHECKING:

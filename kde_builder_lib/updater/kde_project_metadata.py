@@ -7,9 +7,9 @@ import json
 import re
 
 from .kde_project import UpdaterKDEProject
-from ..build_exception import BuildException
-from ..build_exception import KBRuntimeError
-from ..build_exception import ProgramError
+from ..kb_exception import KBException
+from ..kb_exception import KBRuntimeError
+from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..ipc.null import IPCNull
 from ..util.util import Util
@@ -76,7 +76,7 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
             json_string = fh.read()  # slurps the whole file
             json_dict = json.loads(json_string)
             fh.close()
-        except BuildException as e:
+        except KBException as e:
             raise KBRuntimeError(f"Unable to load module group data from {path}! :(\n\t{e}")
         return json_dict
 

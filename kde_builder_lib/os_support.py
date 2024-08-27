@@ -10,7 +10,7 @@ import re
 import subprocess
 import sys
 
-from .build_exception import KBRuntimeError
+from .kb_exception import KBRuntimeError
 
 
 class OSSupport:

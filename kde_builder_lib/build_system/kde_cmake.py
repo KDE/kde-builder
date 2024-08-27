@@ -9,7 +9,7 @@ import os.path
 import re
 
 from .build_system import BuildSystem
-from ..build_exception import ProgramError
+from ..kb_exception import ProgramError
 from ..debug import KBLogger
 from ..ide_project_config_generator import IdeProjectConfigGenerator
 from ..util.logged_subprocess import UtilLoggedSubprocess

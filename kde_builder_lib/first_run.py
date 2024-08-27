@@ -12,8 +12,8 @@ import time
 from typing import NoReturn
 
 from .build_context import BuildContext
-from .build_exception import BuildException
-from .build_exception import SetupError
+from .kb_exception import KBException
+from .kb_exception import SetupError
 from .debug import KBLogger
 from .os_support import OSSupport
 
@@ -59,7 +59,7 @@ class FirstRun:
             if "generate-config" in setup_steps:
                 logger_fr.warning("=== generate-config ===")
                 self._setup_base_configuration()
-        except BuildException as e:
+        except KBException as e:
             msg = e.message
             logger_fr.error(f"  b[r[*] r[{msg}]")
             exit(1)
@@ -195,7 +195,7 @@ class FirstRun:
         mem_total = None
         try:
             mem_total = self.oss.detect_total_memory()
-        except BuildException as e:
+        except KBException as e:
             logger_fr.warning(str(e))
 
         if not mem_total:
