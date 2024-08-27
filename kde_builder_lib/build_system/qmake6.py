@@ -7,7 +7,7 @@ import glob
 import re
 
 from .build_system import BuildSystem
-from ..build_exception import BuildException
+from ..build_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..util.util import Util
@@ -72,7 +72,7 @@ class BuildSystemQMake6(BuildSystem):
             project_files = [f"{module}.pro"]
 
         if not project_files or not project_files[0]:
-            BuildException.croak_internal(f"No *.pro files could be found for {module}")
+            raise ProgramError(f"No *.pro files could be found for {module}")
 
         if len(project_files) > 1:
             logger_buildsystem.error(f" b[r[*] Too many possible *.pro files for {module}")

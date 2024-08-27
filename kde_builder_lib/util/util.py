@@ -28,6 +28,7 @@ import setproctitle
 from kde_builder_lib.build_exception import BuildException
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.debug import KBLogger
+from ..build_exception import ProgramError
 
 if TYPE_CHECKING:
     from ..module.module import Module
@@ -84,7 +85,7 @@ class Util:
         should be a string of the class name). There is no return value.
         """
         if not isinstance(obj, class_name):
-            BuildException.croak_internal(f"{obj} is not of type {class_name}, but of type " + type(obj))
+            raise ProgramError(f"{obj} is not of type {class_name}, but of type " + type(obj))
         return obj
 
     @staticmethod
@@ -313,7 +314,7 @@ class Util:
         logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
-            BuildException.croak_internal(f"Pass only base filename for {module}/{filename}")
+            raise ProgramError(f"Pass only base filename for {module}/{filename}")
         logpath = module.get_log_path(f"{filename}.log")
 
         # Fork a child, with its stdout connected to CHILD.
@@ -350,7 +351,7 @@ class Util:
             try:
                 os.close(pipe_read)
             except OSError as e:
-                BuildException.croak_internal(f"syscall failed waiting on log_command to finish: {e}")
+                raise ProgramError(f"syscall failed waiting on log_command to finish: {e}")
 
             # kernel stuff went OK but the child gave a failing exit code
             if return_code != 0:
@@ -670,7 +671,7 @@ class Util:
             return 1
 
         if not os.path.isabs(from_path) or not os.path.isabs(to_path):
-            BuildException.croak_internal("Both paths to safe_lndir must be absolute paths!")
+            raise ProgramError("Both paths to safe_lndir must be absolute paths!")
 
         # Create destination directory.
         if not Util.super_mkdir(to_path):

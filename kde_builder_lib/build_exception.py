@@ -28,13 +28,6 @@ class BuildException(Exception):  # noqa: N818
         """
         raise BuildException("Runtime", msg)
 
-    @staticmethod
-    def croak_internal(msg: str) -> NoReturn:
-        """
-        Use for "logic errors" (i.e. impossibilities in program state, things that shouldn't be possible no matter what input is fed at runtime).
-        """
-        raise BuildException("Internal", msg)
-
 
 class SetOptionError(BuildException):
     """
@@ -80,3 +73,14 @@ class UnknownKdeProjectException(BuildException):
     def __init__(self, message: str, unknown_project_name: str):
         self.message = message
         self.unknown_project_name = unknown_project_name
+
+
+class ProgramError(BuildException):
+    """
+    Use for "logic errors" (i.e. impossibilities in program state, things that shouldn't be possible no matter what input is fed at runtime).
+
+    As this type of exception indicate bug in KDE Builder itself, we will print the traceback in the end of the script.
+    """
+
+    def __init__(self, msg: str):
+        super().__init__("Internal", msg)

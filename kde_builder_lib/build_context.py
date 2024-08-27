@@ -18,6 +18,7 @@ import textwrap
 import traceback
 
 from .build_exception import BuildException
+from .build_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .kde_projects_reader import KDEProjectsReader
@@ -580,7 +581,7 @@ class BuildContext(Module):
         """
         rcfile = self.rc_file
         if not rcfile:
-            BuildException.croak_internal("Call to base_config_directory before load_rc_file")
+            raise ProgramError("Call to base_config_directory before load_rc_file")
         return os.path.dirname(rcfile)
 
     def modules_in_phase(self, phase: str) -> list[Module]:
@@ -620,7 +621,7 @@ class BuildContext(Module):
             return None
 
         if len(options) > 1:
-            BuildException.croak_internal(f"Detected 2 or more {module_name} `Module` objects")
+            raise ProgramError(f"Detected 2 or more {module_name} `Module` objects")
         return options[0]
 
     def mark_module_phase_failed(self, phase: str, module: Module) -> None:
@@ -901,7 +902,7 @@ class BuildContext(Module):
             metadata_module = self.get_kde_projects_metadata_module()
 
             if not metadata_module:
-                BuildException.croak_internal("Tried to use branch-group, but needed data wasn't loaded!")
+                raise ProgramError("Tried to use branch-group, but needed data wasn't loaded!")
 
             resolver = ModuleBranchGroupResolver(metadata_module.scm().logical_module_groups())
             self.logical_module_resolver = resolver

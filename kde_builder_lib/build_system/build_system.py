@@ -12,7 +12,7 @@ import sys
 import time
 from typing import TYPE_CHECKING
 
-from ..build_exception import BuildException
+from ..build_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..util.logged_subprocess import UtilLoggedSubprocess
@@ -253,7 +253,7 @@ class BuildSystem:
         # bug...
         if Debug().pretending():
             return True
-        BuildException.croak_internal("We were not supposed to get to this point...")
+        raise ProgramError("We were not supposed to get to this point...")
 
     @staticmethod
     def configured_module_file_name() -> str:

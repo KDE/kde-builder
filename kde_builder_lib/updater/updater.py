@@ -15,6 +15,7 @@ import time
 from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
+from ..build_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.null import IPCNull
@@ -69,7 +70,7 @@ class Updater:
         Return the current sha1 of the given git "commit-ish".
         """
         if commit is None:
-            BuildException.croak_internal("Must specify git-commit to retrieve id for")
+            raise ProgramError("Must specify git-commit to retrieve id for")
         module = self.module
 
         gitdir = module.fullpath("source") + "/.git"
@@ -121,7 +122,9 @@ class Updater:
         srcdir = module.fullpath("source")
         args = ["--", git_repo, srcdir]
 
-        ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
+        if not self.ipc:
+            raise ProgramError("Missing IPC object")
+        ipc = self.ipc
 
         logger_updater.warning(f"Cloning g[{module}]")
 
@@ -170,7 +173,8 @@ class Updater:
             if module.get_option("#delete-my-patches"):
                 logger_updater.warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
                 logger_updater.warning(f"\tRemoving b[{srcdir}]")
-                Util.safe_rmtree(srcdir) or BuildException.croak_internal(f"Unable to delete {srcdir}!")
+                if not Util.safe_rmtree(srcdir):
+                    raise ProgramError(f"Unable to delete {srcdir}!")
             else:
                 logger_updater.error(textwrap.dedent(f"""\
                 The source directory for b[{module}] does not exist. kde-builder would download
@@ -212,7 +216,7 @@ class Updater:
 
             git_repo = module.get_option("repository")
             if not git_repo:
-                BuildException.croak_internal(f"Unable to checkout {module}, you must specify a repository to use.")
+                raise ProgramError(f"Unable to checkout {module}, you must specify a repository to use.")
 
             if not self._verify_ref_present(module, git_repo):
                 if self._module_is_needed():
@@ -302,7 +306,9 @@ class Updater:
         """
         module = self.module
         cur_repo = module.get_option("repository")
-        ipc = self.ipc or BuildException.croak_internal("Missing IPC object")
+        if not self.ipc:
+            raise ProgramError("Missing IPC object")
+        ipc = self.ipc
 
         # Search for an existing remote name first. If none, add our alias.
         remote_names = self.best_remote_name()
@@ -514,7 +520,7 @@ class Updater:
         """
         if not os.path.isdir(".git"):
             caller_name = inspect.currentframe().f_back.f_code.co_name
-            BuildException.croak_internal("Run " + caller_name + " from git repo!")
+            raise ProgramError("Run " + caller_name + " from git repo!")
 
         with open(f".git/refs/remotes/{remote_name}/HEAD", "r") as file:
             data = file.read()

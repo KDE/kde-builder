@@ -13,6 +13,7 @@ from typing import NoReturn
 from typing import TYPE_CHECKING
 
 from ..build_exception import BuildException
+from ..build_exception import ProgramError
 from ..debug import KBLogger
 
 if TYPE_CHECKING:
@@ -164,7 +165,7 @@ class IPC:
                 self.postbuild_msg[ipc_module_name] = []
             self.postbuild_msg[ipc_module_name].append(post_build_msg)
         else:
-            BuildException.croak_internal(f"Unhandled IPC type: {ipc_type}")
+            raise ProgramError(f"Unhandled IPC type: {ipc_type}")
         return message
 
     def set_persistent_option_handler(self, handler: Callable) -> None:
@@ -291,7 +292,7 @@ class IPC:
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
 
             if not ipc_type:
-                BuildException.croak_internal("IPC Failure waiting for stream start :(")
+                raise ProgramError("IPC Failure waiting for stream start :(")
             if ipc_type == IPC.ALL_FAILURE:
                 BuildException.croak_runtime(f"Unable to perform source update for any module:\n\t{buffer}")
             elif ipc_type == IPC.ALL_SKIPPED:
@@ -340,7 +341,7 @@ class IPC:
              The list with IPC type and message content, or list with two None on failure.
         """
         if self.updates_done:
-            BuildException.croak_internal("Trying to pull message from closed IPC channel!")
+            raise ProgramError("Trying to pull message from closed IPC channel!")
         msg = self.receive_message()
         return self.unpack_msg(msg) if msg else (None, None)
 
@@ -351,13 +352,13 @@ class IPC:
         # send_message should accept one parameter (the message to send) and return
         # true on success, or false on failure.  $! should hold the error information
         # if false is returned.
-        BuildException.croak_internal("Unimplemented.")
+        raise ProgramError("Unimplemented.")
 
     def receive_message(self) -> NoReturn:
         """
         Return a message received from the other side, or None for EOF or error.
         """
-        BuildException.croak_internal("Unimplemented.")
+        raise ProgramError("Unimplemented.")
 
     @staticmethod
     def supports_concurrency() -> bool:

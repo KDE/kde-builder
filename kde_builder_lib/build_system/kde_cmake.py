@@ -9,7 +9,7 @@ import os.path
 import re
 
 from .build_system import BuildSystem
-from ..build_exception import BuildException
+from ..build_exception import ProgramError
 from ..debug import KBLogger
 from ..ide_project_config_generator import IdeProjectConfigGenerator
 from ..util.logged_subprocess import UtilLoggedSubprocess
@@ -190,7 +190,7 @@ class BuildSystemKDECMake(BuildSystem):
         generator = next((gen for gen in (self._find_generator_in_c_make_options(cmake_options), module.get_option("cmake-generator"), "Unix Makefiles") if self._check_generator_is_whitelisted(gen)), None)
 
         if not generator:
-            BuildException.croak_internal(f"Unable to determine CMake generator for: {module}")
+            raise ProgramError(f"Unable to determine CMake generator for: {module}")
         return generator
 
     def get_cmake_generator(self) -> str:

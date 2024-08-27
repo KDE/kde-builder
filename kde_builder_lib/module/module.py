@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 
 from kde_builder_lib.build_exception import BuildException
 from kde_builder_lib.build_exception import SetOptionError
+from ..build_exception import ProgramError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
 from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
@@ -71,14 +72,14 @@ class Module(OptionsBase):
         self.name = name
 
         if not self.name:
-            BuildException.croak_internal("Empty Module constructed")
+            raise ProgramError("Empty Module constructed")
 
         OptionsBase.__init__(self)
 
         # If building a BuildContext instead of a `Module`, then the context
         # can't have been set up yet...
         if self.__class__.__name__ != "BuildContext" and ctx.__class__.__name__ != "BuildContext":
-            BuildException.croak_internal(f"Invalid context {ctx}")
+            raise ProgramError(f"Invalid context {ctx}")
 
         phases = None
         if ctx:
@@ -413,7 +414,7 @@ class Module(OptionsBase):
             return True
 
         if build_system.name() == "generic" and not Debug().pretending():
-            BuildException.croak_internal("Build system determination still pending when build attempted.")
+            raise ProgramError("Build system determination still pending when build attempted.")
 
         # Check if a previous build has happened in a different directory (which
         # can happen due to name changes on KDE.org side or flat-layout option

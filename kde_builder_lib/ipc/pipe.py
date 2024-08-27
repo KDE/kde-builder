@@ -8,6 +8,7 @@ import struct
 
 from .ipc import IPC
 from ..build_exception import BuildException
+from ..build_exception import ProgramError
 
 
 class IPCPipe(IPC):
@@ -70,7 +71,7 @@ class IPCPipe(IPC):
 
         msg_length = struct.unpack("H", msg_length)[0]  # Decode to Perl type
         if not msg_length:
-            BuildException.croak_internal(f"Failed to read {msg_length} bytes as needed by earlier message!")
+            raise ProgramError(f"Failed to read {msg_length} bytes as needed by earlier message!")
 
         return self._read_number_of_bytes(msg_length)
 
