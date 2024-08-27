@@ -13,6 +13,7 @@ from typing import NoReturn
 
 from .build_context import BuildContext
 from .build_exception import BuildException
+from .build_exception import SetupError
 from .debug import KBLogger
 from .os_support import OSSupport
 
@@ -85,10 +86,6 @@ class FirstRun:
                     continue
                 packages[cur_key].append(line)
         return packages
-
-    @staticmethod
-    def _throw(msg: str) -> NoReturn:
-        raise BuildException("Setup", msg)
 
     def confirmed_to_continue(self) -> bool:
         if self.prefilled_prompt_answer is None:
@@ -306,7 +303,7 @@ class FirstRun:
                 break
 
         if not cmd:
-            self._throw(f"No installer for {best_vendor}!")
+            raise SetupError(f"No installer for {best_vendor}!")
 
         # If not running as root already, add sudo
         if os.geteuid() != 0:

@@ -95,3 +95,12 @@ class KBRuntimeError(BuildException):
 
     def __init__(self, msg: str):
         super().__init__("Runtime", msg)
+
+
+class SetupError(BuildException):
+    """
+    Use for "setup errors" in FirstRun.
+    """
+
+    def __init__(self, msg: str):
+        super().__init__("Setup", msg)
