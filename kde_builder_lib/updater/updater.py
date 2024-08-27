@@ -49,18 +49,8 @@ class Updater:
         May change the current directory as necessary.
         """
         self.ipc = ipc
-        err = None
-        num_commits = None
-
-        try:
-            num_commits = self.update_checkout()
-        except Exception as _err:
-            err = _err
-
+        num_commits = self.update_checkout()
         self.ipc = None
-
-        if err:
-            raise err
         return num_commits
 
     @staticmethod
