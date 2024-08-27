@@ -88,7 +88,7 @@ class FirstRun:
 
     @staticmethod
     def _throw(msg: str) -> NoReturn:
-        raise BuildException.make_exception("Setup", msg)
+        raise BuildException("Setup", msg)
 
     def confirmed_to_continue(self) -> bool:
         if self.prefilled_prompt_answer is None:

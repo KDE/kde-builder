@@ -22,41 +22,18 @@ class BuildException(Exception):  # noqa: N818
         return self.exception_type + " Error: " + self.message
 
     @staticmethod
-    def make_exception(exception_type: str, msg: str, levels=None):
-        """
-        Return an exception object to pass to "raise" function.
-
-        The returned object will be an instance of :class:`BuildException`.
-
-        Args:
-            exception_type: Exception type, "Exception" if not defined.
-            msg: Message to show to user
-            levels: Number of levels to remove from backtrace.
-        """
-        exception_type = exception_type if exception_type else "Exception"
-        message = msg
-        levels = levels if levels else 0  # Allow for more levels to be removed from bt
-
-        # # Remove this subroutine from the backtrace
-        # local $Carp::CarpLevel = 1 + $levels;
-
-        # if exception_type == "Internal":
-        #     message = Carp::cluck(message)  # prints the backtrace
-        return BuildException(exception_type, message)
-
-    @staticmethod
     def croak_runtime(msg: str) -> NoReturn:
         """
         Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
         """
-        raise BuildException.make_exception("Runtime", msg, 1)
+        raise BuildException("Runtime", msg)
 
     @staticmethod
     def croak_internal(msg: str) -> NoReturn:
         """
         Use for "logic errors" (i.e. impossibilities in program state, things that shouldn't be possible no matter what input is fed at runtime).
         """
-        raise BuildException.make_exception("Internal", msg, 1)
+        raise BuildException("Internal", msg)
 
 
 class SetOptionError(BuildException):

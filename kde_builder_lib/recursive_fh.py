@@ -130,7 +130,7 @@ class RecursiveFH:
                     filename = match.group(1)
 
                 if not filename:
-                    raise BuildException.make_exception("Config", f"Unable to handle file include \"{line}\" from {self.current_fn}:{fh.filelineno()}")
+                    raise BuildException("Config", f"Unable to handle file include \"{line}\" from {self.current_fn}:{fh.filelineno()}")
 
                 # Existing configurations (before 2023 December) may have pointed to the build-include files located in root of project
                 # Warn those users to update the path, and automatically map to new location
@@ -194,7 +194,7 @@ class RecursiveFH:
                     if not os.path.exists(filename):  # so we throw exception manually
                         raise FileNotFoundError
                 except IOError:
-                    raise BuildException.make_exception("Config", f"Unable to open file \"{filename}\" which was included from {self.current_fn}:{fh.filelineno()}")
+                    raise BuildException("Config", f"Unable to open file \"{filename}\" which was included from {self.current_fn}:{fh.filelineno()}")
 
                 prefix = os.path.dirname(filename)  # Recalculate base path
                 self.add_file(new_fh, filename)
