@@ -36,21 +36,21 @@ def find_missing_modules() -> list[str]:
         except ImportError:
             return False
 
-    for neededModule in required_modules:
-        if validate_mod(neededModule):
+    for needed_module in required_modules:
+        if validate_mod(needed_module):
             continue
-        missing_modules.append(neededModule)
+        missing_modules.append(needed_module)
 
     return missing_modules
 
 
 # Ensure that required Python modules are available so that the user isn't surprised later with an exception
-missingModuleDescriptions = find_missing_modules()
-if missingModuleDescriptions:
+missing_module_descriptions = find_missing_modules()
+if missing_module_descriptions:
     print(textwrap.dedent("""\
         Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:"""))
-    for missingModuleDesc in missingModuleDescriptions:
-        print("\t" + missingModuleDesc)
+    for missing_module_desc in missing_module_descriptions:
+        print("\t" + missing_module_desc)
 
     print("\nKDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org\n"
           "Ensure you have successfully executed this script:\n"
