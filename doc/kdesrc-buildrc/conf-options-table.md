@@ -743,16 +743,6 @@ from attempting to build this module. It will still be kept up-to-date
 when updating from git. This option is exactly equivalent to the [--no-build](#cmdline-no-build) command line
 option.
 
-(conf-manual-update)=
-[`manual-update`](conf-manual-update)
-
-Type: Boolean, Default value: False
-
-Set the option value to `true` to keep the build process
-from attempting to update (and by extension, build or install) this
-module. If you set this option for a module, then you have essentially
-commented it out.
-
 (conf-ninja-options)=
 [`ninja-options`](conf-ninja-options)
 

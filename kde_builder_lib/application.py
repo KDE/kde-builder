@@ -1314,10 +1314,6 @@ class Application:
         """
         logger_app.debug("Filtering out module phases.")
         for module in modules:
-            if module.get_option("manual-update") or module.get_option("no-src"):
-                module.phases.clear()
-                continue
-
             if module.get_option("manual-build"):
                 module.phases.filter_out_phase("build")
                 module.phases.filter_out_phase("test")
