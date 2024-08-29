@@ -325,13 +325,6 @@ class Application:
             # Build everything in the rc-file, in the order specified.
             modules = module_resolver.expand_module_sets(option_modules_and_sets)
 
-        # If modules were on the command line then they are effectively forced to
-        # process unless overridden by command line options as well. If phases
-        # *were* overridden on the command line, then no update pass is required
-        # (all modules already have correct phases)
-        if not command_line_modules:
-            modules = Application._update_module_phases(modules)
-
         # TODO: Verify this does anything still
         metadata_module = ctx.get_kde_projects_metadata_module()
         ctx.add_to_ignore_list(metadata_module.scm().ignored_modules())
@@ -1306,28 +1299,6 @@ class Application:
         # We used to need a special module-set to ignore virtual deps (they
         # would throw errors if the name did not exist). But, the resolver
         # handles that fine as well.
-
-    @staticmethod
-    def _update_module_phases(modules: list[Module]) -> list[Module]:
-        """
-        Update the built-in phase list for all Modules passed into this function in accordance with the options set by the user.
-        """
-        logger_app.debug("Filtering out module phases.")
-        for module in modules:
-            if module.get_option("manual-update") or module.get_option("no-src"):
-                module.phases.clear()
-                continue
-
-            if module.get_option("manual-build"):
-                module.phases.filter_out_phase("build")
-                module.phases.filter_out_phase("test")
-                module.phases.filter_out_phase("install")
-
-            if not module.get_option("install-after-build"):
-                module.phases.filter_out_phase("install")
-            if module.get_option("run-tests"):
-                module.phases.add_phase("test")
-        return modules
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:
         """

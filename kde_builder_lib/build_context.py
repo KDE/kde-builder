@@ -107,8 +107,6 @@ class BuildContext(Module):
             "filter-out-phases": "",
             "git-push-protocol": "git",
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
-            "manual-build": "",
-            "manual-update": "",
             "module-definitions-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/module-definitions",
             "repository": "",  # module's git repo
             "set-env": {},  # dict of environment vars to set
@@ -139,7 +137,6 @@ class BuildContext(Module):
             "generate-vscode-project-config": False,
             "generate-qtcreator-project-config": False,
             "include-dependencies": True,
-            "install-after-build": True,
             "install-login-session": True,
             "purge-old-logs": True,
             "run-tests": False,

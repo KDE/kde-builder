@@ -390,8 +390,8 @@ class Module(OptionsBase):
         if not build_results.get("work_done", None) and not self.get_option("refresh-build") and self.get_persistent_option("last-install-rev") is not None:
             logger_module.info("\tNo changes from build, skipping install (--refresh-build this module to force install)")
             return True
-        elif not self.get_option("install-after-build"):
-            logger_module.info("\tSkipping install due to install-after-build setting")
+        elif not self.phases.has("install"):
+            logger_module.info("\tSkipping install due to disabled install phase.")
             return True
 
         self.ctx.status_view.__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().

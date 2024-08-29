@@ -665,17 +665,6 @@ Plasma more recent than supported on common operating systems.
 
 Related command-line option: [--include-dependencies](#cmdline-include-dependencies)
 
-(conf-install-after-build)=
-[`install-after-build`](conf-install-after-build)
-
-Type: String, Default value: True
-
-This option is used to install the package after it successfully
-builds. You can also use the [--no-install](#cmdline-no-install) command line
-flag.
-
-Related command-line option: --install-after-build, --no-install-after-build
-
 (conf-install-dir)=
 [`install-dir`](conf-install-dir)
 
@@ -743,26 +732,6 @@ build systems that use `ninja` for build (such as the [Meson build system](#conf
 see the [ninja-options](#conf-ninja-options) setting.
 
 Related command-line option: --make-options \<value\>
-
-(conf-manual-build)=
-[`manual-build`](conf-manual-build)
-
-Type: Boolean, Default value: False
-
-Set the option value to `true` to keep the build process
-from attempting to build this module. It will still be kept up-to-date
-when updating from git. This option is exactly equivalent to the [--no-build](#cmdline-no-build) command line
-option.
-
-(conf-manual-update)=
-[`manual-update`](conf-manual-update)
-
-Type: Boolean, Default value: False
-
-Set the option value to `true` to keep the build process
-from attempting to update (and by extension, build or install) this
-module. If you set this option for a module, then you have essentially
-commented it out.
 
 (conf-ninja-options)=
 [`ninja-options`](conf-ninja-options)

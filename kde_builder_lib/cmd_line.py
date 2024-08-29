@@ -239,8 +239,8 @@ class Cmdline:
         if args.no_install:
             phases.filter_out_phase("install")
         if args.no_tests:
-            # The "right thing" to do
-            phases.filter_out_phase("test")
+            # TODO The "right thing" to do
+            # phases.filter_out_phase("test")
             # What actually works at this point.
             found_options["run-tests"] = False
         if args.no_build:

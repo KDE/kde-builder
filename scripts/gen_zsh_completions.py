@@ -147,7 +147,6 @@ short_descriptions = {  # contains one of the options (any of them) from set, an
     "--ignore-modules": "Do not include specified modules in the update/build process",
     "--include-dependencies": "Builds/Skip KDE-based dependencies",
     "--initial-setup": "Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc",
-    "--install-after-build": "Install the package after it successfully builds",
     "--install-dir": "Where to install the module after it is built",
     "--install-distro-packages": "Installs required system pkgs",
     "--install-only": "Only perform/Skip the install process",
