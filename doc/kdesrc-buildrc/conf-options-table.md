@@ -665,17 +665,6 @@ Plasma more recent than supported on common operating systems.
 
 Related command-line option: [--include-dependencies](#cmdline-include-dependencies)
 
-(conf-install-after-build)=
-[`install-after-build`](conf-install-after-build)
-
-Type: String, Default value: True
-
-This option is used to install the package after it successfully
-builds. You can also use the [--no-install](#cmdline-no-install) command line
-flag.
-
-Related command-line option: --install-after-build, --no-install-after-build
-
 (conf-install-dir)=
 [`install-dir`](conf-install-dir)
 

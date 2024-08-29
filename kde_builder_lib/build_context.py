@@ -139,7 +139,6 @@ class BuildContext(Module):
             "generate-vscode-project-config": False,
             "generate-qtcreator-project-config": False,
             "include-dependencies": True,
-            "install-after-build": True,
             "install-login-session": True,
             "purge-old-logs": True,
             "run-tests": False,

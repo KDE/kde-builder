@@ -1323,8 +1323,6 @@ class Application:
                 module.phases.filter_out_phase("test")
                 module.phases.filter_out_phase("install")
 
-            if not module.get_option("install-after-build"):
-                module.phases.filter_out_phase("install")
             if module.get_option("run-tests"):
                 module.phases.add_phase("test")
         return modules
