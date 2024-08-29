@@ -1313,10 +1313,6 @@ class Application:
         Update the built-in phase list for all Modules passed into this function in accordance with the options set by the user.
         """
         logger_app.debug("Filtering out module phases.")
-        for module in modules:
-            if module.get_option("manual-build"):
-                module.phases.filter_out_phase("build")
-                module.phases.filter_out_phase("install")
         return modules
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:

@@ -733,16 +733,6 @@ see the [ninja-options](#conf-ninja-options) setting.
 
 Related command-line option: --make-options \<value\>
 
-(conf-manual-build)=
-[`manual-build`](conf-manual-build)
-
-Type: Boolean, Default value: False
-
-Set the option value to `true` to keep the build process
-from attempting to build this module. It will still be kept up-to-date
-when updating from git. This option is exactly equivalent to the [--no-build](#cmdline-no-build) command line
-option.
-
 (conf-ninja-options)=
 [`ninja-options`](conf-ninja-options)
 
