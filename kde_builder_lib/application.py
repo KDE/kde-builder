@@ -1316,11 +1316,7 @@ class Application:
         for module in modules:
             if module.get_option("manual-build"):
                 module.phases.filter_out_phase("build")
-                module.phases.filter_out_phase("test")
                 module.phases.filter_out_phase("install")
-
-            if module.get_option("run-tests"):
-                module.phases.add_phase("test")
         return modules
 
     def _cleanup_log_directory(self, ctx: BuildContext) -> None:
