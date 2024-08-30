@@ -294,8 +294,8 @@ class Util:
             if value == 1:  # Make singular
                 text = re.sub(r"s$", "", text)
 
-            if value == 0 and len(str_list) == 0:
-                # Skip leading zero values, like "0 days".
+            if value == 0 and len(str_list) == 0 and text != "seconds":
+                # Skip leading zero values, like "0 days". But allow "0 seconds" alone.
                 continue
 
             str_list.append(f"{value} {text}")
