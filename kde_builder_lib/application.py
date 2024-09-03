@@ -22,6 +22,7 @@ from time import time
 import traceback
 from typing import Callable
 from typing import NoReturn
+from typing import TypeVar
 
 from kde_builder_lib.kb_exception import ConfigError
 from kde_builder_lib.kb_exception import KBRuntimeError
@@ -47,6 +48,8 @@ from .util.util import Util
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
 logger_app = KBLogger.getLogger("application")
+
+OptionsBaseT = TypeVar("OptionsBaseT", bound=OptionsBase)
 
 
 class Application:
@@ -838,7 +841,7 @@ class Application:
 
             raise ConfigError("Unknown repository base")
 
-    def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBase, end_re=None):
+    def _parse_module_options(self, ctx: BuildContext, file_reader: RecursiveFH, module: OptionsBaseT, end_re=None) -> OptionsBaseT:
         """
         Read in the options from the config file and add them to the option store.
 
@@ -989,7 +992,7 @@ class Application:
         Raises:
             SetOptionError
         """
-        module_list = []
+        module_and_module_set_list = []
         rcfile = ctx.rc_file
 
         file_reader = RecursiveFH(rcfile, ctx)
@@ -1018,8 +1021,8 @@ class Application:
             ctx.merge_options_from(global_opts)
             break
 
-        using_default = True
-        creation_order = False
+        nothing_defined = True
+        creation_order = 0
         seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
         seen_module_sets = {}  # and vice versa -- named sets only though!
         # seen_module_set_items = {}  # To track option override modules.
@@ -1037,8 +1040,6 @@ class Application:
             if match:
                 option_type, modulename = match.group(1), match.group(2)
 
-            new_module = None
-
             # "include" directives can change the current file, so check where we're at
             rcfile = file_reader.current_filename()
 
@@ -1047,36 +1048,37 @@ class Application:
                 module_set_re = re.compile(r"^module-set\s*([-/.\w]+)?\s*$")
                 match = module_set_re.match(line)
                 if match:
-                    modulename = match.group(1)
-
-                # modulename may be blank -- use the regex directly to match
-                if not module_set_re.match(line):
+                    module_set_name = match.group(1)  # module_set_name may be blank (because the capture group is optional)
+                else:
                     logger_app.error(f"Invalid configuration file {rcfile}!")
                     logger_app.error(f"Expecting a start of module section at r[b[line {file_reader.current_filehandle().filelineno()}].")
                     raise ConfigError("Ungrouped/Unknown option")
 
-                if modulename and modulename in seen_module_sets.keys():
-                    logger_app.error(f"Duplicate module-set {modulename} at {rcfile}:{file_reader.current_filehandle().filelineno()}")
-                    raise ConfigError(f"Duplicate module-set {modulename} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                if module_set_name and module_set_name in seen_module_sets.keys():
+                    logger_app.error(f"Duplicate module-set {module_set_name} at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                    raise ConfigError(f"Duplicate module-set {module_set_name} defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
-                if modulename and modulename in seen_modules.keys():
-                    logger_app.error(f"Name {modulename} for module-set at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module")
-                    raise ConfigError(f"Can't re-use name {modulename} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
+                if module_set_name and module_set_name in seen_modules.keys():
+                    logger_app.error(f"Name {module_set_name} for module-set at {rcfile}:{file_reader.current_filehandle().filelineno()} is already in use on a module")
+                    raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined at {rcfile}:{file_reader.current_filehandle().filelineno()}")
 
                 # A module_set can give us more than one module to add.
-                new_module = self._parse_module_set_options(ctx, file_reader, ModuleSet(ctx, modulename or f"Unnamed module-set at {rcfile}:{file_reader.current_filehandle().filelineno()}"))
+                new_module_set = self._parse_module_set_options(ctx, file_reader, ModuleSet(ctx, module_set_name or f"Unnamed module-set at {rcfile}:{file_reader.current_filehandle().filelineno()}"))
                 creation_order += 1
-                new_module.create_id = creation_order
+                new_module_set.create_id = creation_order
 
                 # Save "use-modules" entries, so we can see if later module decls
                 # are overriding/overlaying their options.
-                module_set_items = new_module.module_names_to_find()
-                # seen_module_set_items = {item: new_module for item in module_set_items}
+                module_set_items = new_module_set.module_names_to_find()
+                # seen_module_set_items = {item: new_module_set for item in module_set_items}
 
                 # Reserve enough "create IDs" for all named modules to use
                 creation_order += len(module_set_items)
-                if modulename:
-                    seen_module_sets[modulename] = new_module
+                if module_set_name:
+                    seen_module_sets[module_set_name] = new_module_set
+
+                module_and_module_set_list.append(new_module_set)
+                nothing_defined = False
 
             # Duplicate module entry? (Note, this must be checked before the check
             # below for "options" sets)
@@ -1110,20 +1112,19 @@ class Application:
                 creation_order += 1
                 seen_modules[modulename] = new_module
 
-            module_list.append(new_module)
-
-            using_default = False
+                module_and_module_set_list.append(new_module)
+                nothing_defined = False
 
         for name, module_set in seen_module_sets.items():
             Application._validate_module_set(ctx, module_set)
 
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.
-        if using_default:
+        if nothing_defined:
             logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
             return []
 
-        return module_list
+        return module_and_module_set_list
 
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
