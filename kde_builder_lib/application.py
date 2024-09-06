@@ -247,9 +247,8 @@ class Application:
         # _read_configuration_options will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
-        fh = ctx.load_rc_file()
-        option_modules_and_sets: list[Module | ModuleSet] = self._read_configuration_options(ctx, fh, cmdline_global_options, deferred_options)
-        fh.close()
+        ctx.detect_config_file()
+        option_modules_and_sets: list[Module | ModuleSet] = self._read_configuration_options(ctx, ctx.rc_file, cmdline_global_options, deferred_options)
 
         ctx.load_persistent_options()
 
@@ -969,14 +968,14 @@ class Application:
             module_set.__class__ = ModuleSetQt5
         return module_set
 
-    def _read_configuration_options(self, ctx: BuildContext, fh: fileinput.FileInput, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
+    def _read_configuration_options(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
         """
-        Read in the settings from the configuration, passed in as an open filehandle.
+        Read in the settings from the configuration.
 
         Args:
             ctx: The :class:`BuildContext` to update based on the configuration read and
                 any pending command-line options (see global options in BuildContext).
-            fh: The I/O filehandle object to read from.
+            config_path: Full path of the config file to read from.
             cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
             deferred_options: A list containing dicts mapping module names to options
@@ -994,6 +993,10 @@ class Application:
         """
         module_and_module_set_list = []
         rcfile = ctx.rc_file
+
+        # fh = open(config_path, "r")  # does not support current line numbers reading
+        # fh = fileinput.input(files=config_path, mode="r")  # does not support multiple instances
+        fh = fileinput.FileInput(files=config_path, mode="r")  # supports multiple instances, so use this.
 
         file_reader = RecursiveFH(rcfile, ctx)
         file_reader.add_file(fh, rcfile)
@@ -1122,8 +1125,8 @@ class Application:
         # The good question is what exactly should be built, but oh well.
         if nothing_defined:
             logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
-            return []
 
+        fh.close()
         return module_and_module_set_list
 
     @staticmethod

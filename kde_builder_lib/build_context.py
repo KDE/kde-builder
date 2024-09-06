@@ -61,7 +61,7 @@ class BuildContext(Module):
          ctx = BuildContext.BuildContext()
 
          ctx.set_rc_file("/path/to/kdesrc-buildrc")
-         fh = ctx.load_rc_file()
+         fh = ctx.detect_config_file()
 
          ...
 
@@ -452,12 +452,6 @@ class BuildContext(Module):
 
         return f"{log_dir}/{path}"
 
-    def rc_file(self) -> None:
-        """
-        Return rc file in use. Call load_rc_file first.
-        """
-        return self.rc_file
-
     def set_rc_file(self, file: str) -> None:
         """
         Force the rc file to be read from the path given.
@@ -479,13 +473,12 @@ class BuildContext(Module):
             Please move b[~/.kdesrc-buildrc] to b[{BuildContext.xdg_config_home_short}/kdesrc-buildrc]
             """))
 
-    def load_rc_file(self) -> fileinput.FileInput:
+    def detect_config_file(self) -> None:
         """
-        Return an open filehandle to the user's chosen rc file.
+        Determine a full path to the user's chosen rc file and set it to self.rc_file.
 
         Use set_rc_file to choose a file to load before calling this function, otherwise
-        load_rc_file will search the default search path. After this function is
-        called, rc_file() can be used to determine which file was loaded.
+        detect_config_file will search the default search path.
 
         If unable to find or open the rc file an exception is raised. Empty rc
         files are supported, however.
@@ -494,13 +487,9 @@ class BuildContext(Module):
 
         for file in rc_files:
             if os.path.exists(file):
-                # fh = open(file, "r")  # does not support current line numbers reading
-                # fh = fileinput.input(files=file, mode="r")  # does not support multiple instances
-                fh = fileinput.FileInput(files=file, mode="r")  # supports multiple instances, so use this.
-
-                self.rc_file = os.path.abspath(file)
                 BuildContext.warn_legacy_config(file)
-                return fh
+                self.rc_file = os.path.abspath(file)
+                return
 
         # No rc found, check if we can use default.
         if len(rc_files) == 1:
@@ -547,9 +536,8 @@ class BuildContext(Module):
             temp_file_path = temp_file.name
             temp_file.close()
 
-            fh = fileinput.FileInput(files=temp_file_path, mode="r")
-            self.rc_file = "/fake/dummy_config"
-            return fh
+            self.rc_file = temp_file_path
+            return
         else:
             # If no configuration and no --rc-file option was used, warn the user and fail.
 
@@ -578,7 +566,7 @@ class BuildContext(Module):
         """
         rcfile = self.rc_file
         if not rcfile:
-            raise ProgramError("Call to base_config_directory before load_rc_file")
+            raise ProgramError("Call to base_config_directory before detect_config_file")
         return os.path.dirname(rcfile)
 
     def modules_in_phase(self, phase: str) -> list[Module]:
