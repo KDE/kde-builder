@@ -520,7 +520,7 @@ class BuildContext(Module):
             # And because we do not want to _require_ the config to be available yet, we just will provide dummy config.
             # This way the --metadata-only option could work in both cases: when user has config and when he has not.
             # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process will be stored in persistent file.
-            # When he has no config (the current case), we will let the _read_configuration_options function do its work on fake config, then we will return.
+            # When he has no config (the current case), we will let the _process_configs_content function do its work on fake config, then we will return.
             dummy_config = textwrap.dedent("""\
                 global
                     persistent-data-file /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)

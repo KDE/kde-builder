@@ -244,11 +244,11 @@ class Application:
         # We download repo-metadata before reading config, because config already includes the module-definitions from it.
         self._download_kde_project_metadata()  # Uses test data automatically
 
-        # _read_configuration_options will add pending global opts to ctx while ensuring
+        # _process_configs_content will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         ctx.detect_config_file()
-        option_modules_and_sets: list[Module | ModuleSet] = self._read_configuration_options(ctx, ctx.rc_file, cmdline_global_options, deferred_options)
+        option_modules_and_sets: list[Module | ModuleSet] = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options, deferred_options)
 
         ctx.load_persistent_options()
 
@@ -982,7 +982,7 @@ class Application:
             module_set.__class__ = ModuleSetQt5
         return module_set
 
-    def _read_configuration_options(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
+    def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
         """
         Read in the settings from the configuration.
 
@@ -1005,76 +1005,48 @@ class Application:
         Raises:
             SetOptionError
         """
+        config_content = self.read_ksb_file(ctx.rc_file)
         module_and_module_set_list = []
         rcfile = ctx.rc_file
 
-        fh = open(config_path, "r")
+        first_node = next(iter(config_content))
+        first_node_content = config_content.pop(first_node)
 
-        # Read in global settings
-        while line := fh.readline():
-            line = re.sub(r"#.*$", "", line)  # Remove comments
-            line = re.sub(r"^\s+", "", line)  # Remove leading whitespace
-            if not line:
-                continue  # Skip blank lines
-
-            # First command in .kdesrc-buildrc should be a global
-            # options declaration, even if none are defined.
-            if not re.match(r"^global\s*$", line):
-                logger_app.error(f"Invalid configuration file: {rcfile}.")
-                logger_app.error(f"Expecting global settings section!")
-                raise ConfigError("Missing global section")
-
-            # Now read in each global option.
-            global_node = self._read_ksb_node(fh, rcfile)
-            global_opts = self._process_module_options(ctx, global_node, rcfile, OptionsBase())
-
+        if first_node != "global":
+            # First command in .kdesrc-buildrc should be a global options declaration, even if none are defined.
+            logger_app.error(f"Invalid configuration file: {rcfile}.")
+            logger_app.error(f"Expecting global settings section!")
+            raise ConfigError("Missing global section")
+        else:
+            global_opts = self._process_module_options(ctx, first_node_content, rcfile, OptionsBase())
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
             for key in cmdline_global_options.keys():
                 global_opts.options.pop(key, None)
             ctx.merge_options_from(global_opts)
-            break
+
+        # Now, after global options were resolved and set, we can resolve paths in include lines and read those config files.
+        # if node_name.startswith("include "): ... TODO
 
         nothing_defined = True
         creation_order = 0
         seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
-        seen_module_sets = {}  # and vice versa -- named sets only though!
+        seen_module_sets = {}  # and vice versa
         # seen_module_set_items = {}  # To track option override modules.
 
-        # Now read in module settings
-        while line := fh.readline():
-            line = re.sub(r"#.*$", "", line)  # Remove comments
-            line = re.sub(r"^\s*", "", line)  # Remove leading whitespace
-            if line.strip() == "":
-                continue  # Skip blank lines
-
-            # Get modulename (has dash, dots, slashes, or letters/numbers)
-            match = re.match(r"^(options|module)\s+([-/.\w]+)\s*$", line)
-            option_type, modulename = None, None
-            if match:
-                option_type, modulename = match.group(1), match.group(2)
-
-            # Module-set?
-            if not modulename:
-                module_set_re = re.compile(r"^module-set\s*([-/.\w]+)?\s*$")
-                match = module_set_re.match(line)
-                if match:
-                    module_set_name = match.group(1)  # module_set_name may be blank (because the capture group is optional)
-                else:
-                    logger_app.error(f"Invalid configuration file {rcfile}!")
-                    logger_app.error(f"Expecting a start of module section.")
-                    raise ConfigError("Ungrouped/Unknown option")
-
-                if module_set_name and module_set_name in seen_module_sets.keys():
+        for node_name, node in config_content.items():
+            if node_name.startswith("module-set "):
+                module_set_name = node_name.split(" ", maxsplit=1)[1]
+                assert module_set_name  # ensure the module-set has some name
+                if module_set_name in seen_module_sets.keys():
                     logger_app.error(f"Duplicate module-set {module_set_name} in {rcfile}.")
                     raise ConfigError(f"Duplicate module-set {module_set_name} defined in {rcfile}")
 
-                if module_set_name and module_set_name in seen_modules.keys():
+                if module_set_name in seen_modules.keys():
                     logger_app.error(f"Name {module_set_name} for module-set in {rcfile} is already in use on a module")
                     raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
-                module_set_node = self._read_ksb_node(fh, rcfile)
-                new_module_set = self._process_module_set_options(ctx, module_set_node, rcfile, ModuleSet(ctx, module_set_name or f"Unnamed module-set at {rcfile}"))
+                new_module_set = self._process_module_set_options(ctx, node, rcfile, ModuleSet(ctx, module_set_name))
                 creation_order += 1
                 new_module_set.create_id = creation_order
 
@@ -1085,48 +1057,42 @@ class Application:
 
                 # Reserve enough "create IDs" for all named modules to use
                 creation_order += len(module_set_items)
-                if module_set_name:
-                    seen_module_sets[module_set_name] = new_module_set
+                seen_module_sets[module_set_name] = new_module_set
 
                 module_and_module_set_list.append(new_module_set)
                 nothing_defined = False
 
-            # Duplicate module entry? (Note, this must be checked before the check
-            # below for "options" sets)
-            elif modulename in seen_modules and option_type != "options":
-                logger_app.error(f"Duplicate module declaration b[r[{modulename}] in {rcfile}")
-                raise ConfigError(f"Duplicate module {modulename} declared in {rcfile}")
+            if node_name.startswith("module "):
+                module_name = node_name.split(" ", maxsplit=1)[1]
+                assert module_name  # ensure the module has some name
+                if module_name in seen_modules:
+                    logger_app.error(f"Duplicate module declaration b[r[{module_name}] in {rcfile}")
+                    raise ConfigError(f"Duplicate module {module_name} declared in {rcfile}")
+                if module_name in seen_module_sets:
+                    logger_app.error(f"Name {module_name} for module in {rcfile} is already in use on a module-set")
+                    raise ConfigError(f"Can't re-use name {module_name} for module defined in {rcfile}")
 
-            # Module/module-set options overrides
-            elif option_type == "options":
-                options_node = self._read_ksb_node(fh, rcfile)
-                options = self._process_module_options(ctx, options_node, rcfile, OptionsBase())
-
-                deferred_options.append({
-                    "name": modulename,
-                    "opts": options.options
-                })
-
-                # NOTE: There is no duplicate options block checking here, and we
-                # now currently rely on there being no duplicate checks to allow
-                # for things like kf5-common-options.ksb to be included
-                # multiple times.
-
-                continue  # Don't add to module list
-
-            # Must follow "options" handling
-            elif modulename in seen_module_sets:
-                logger_app.error(f"Name {modulename} for module in {rcfile} is already in use on a module-set")
-                raise ConfigError(f"Can't re-use name {modulename} for module defined in {rcfile}")
-            else:
-                module_node = self._read_ksb_node(fh, rcfile)
-                new_module = self._process_module_options(ctx, module_node, rcfile, Module(ctx, modulename))
+                new_module = self._process_module_options(ctx, node, rcfile, Module(ctx, module_name))
                 new_module.create_id = creation_order + 1
                 creation_order += 1
-                seen_modules[modulename] = new_module
+                seen_modules[module_name] = new_module
 
                 module_and_module_set_list.append(new_module)
                 nothing_defined = False
+
+            if node_name.startswith("options "):
+                options_name = node_name.split(" ", maxsplit=1)[1]
+                assert options_name  # ensure the options has some name
+                options = self._process_module_options(ctx, node, rcfile, OptionsBase())
+
+                deferred_options.append({
+                    "name": options_name,
+                    "opts": options.options
+                })
+
+                # NOTE: There is no duplicate options block checking here, and we now currently rely on there being no duplicate checks to allow
+                # for things like kf5-common-options.ksb to be included multiple times.
+                continue  # Don't add to module list
 
         for name, module_set in seen_module_sets.items():
             Application._validate_module_set(ctx, module_set)
@@ -1136,8 +1102,54 @@ class Application:
         if nothing_defined:
             logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
 
-        fh.close()
         return module_and_module_set_list
+
+    @staticmethod
+    def read_ksb_file(config_path: str) -> dict:
+        """
+        Read in the settings from the configuration.
+
+        Args:
+            config_path: Full path of the config file to read from.
+        """
+        ret_dict = {}
+        rcfile = config_path
+        fh = open(config_path, "r")
+
+        while line := fh.readline():
+            line = re.sub(r"#.*$", "", line)  # Remove comments
+            line = re.sub(r"^\s+", "", line)  # Remove leading whitespace
+            if not line.strip():
+                continue  # Skip blank lines
+
+            if re.match(r"^global\s*$", line):
+                key = "global"
+            elif match := re.match(r"^(options|module)\s+([-/.\w]+)\s*$", line):  # Get modulename (has dash, dots, slashes, or letters/numbers)
+                key = match.group(1) + " " + match.group(2)
+            elif match := re.match(r"^module-set\s*([-/.\w]+)?\s*$", line):
+                if match.group(1):
+                    key = "module-set " + match.group(1)
+                else:
+                    key = "module-set " + f"Unnamed module-set at {rcfile}"  # module_set_name may be blank (because the capture group is optional)
+            elif re.match(r"^\s*include\s+\S", line):
+                line = line.rstrip("\n")
+                match = re.match(r"^\s*include\s+(.+?)\s*$", line)
+                filename = ""
+                if match:
+                    filename = match.group(1)
+                key = "include " + filename
+                ret_dict[key] = "true"  # use "true" as a value
+                continue  # do not expect "end" marker after include line.
+            else:
+                logger_app.error(f"Invalid configuration file {rcfile}!")
+                logger_app.error(f"Expecting a start of module section.")
+                raise ConfigError("Ungrouped/Unknown option")
+
+            node = Application._read_ksb_node(fh, rcfile)
+            ret_dict[key] = node
+
+        fh.close()
+        return ret_dict
 
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
