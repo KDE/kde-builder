@@ -727,26 +727,16 @@ class Application:
         return None
 
     @staticmethod
-    def _split_option_and_value_and_substitute_value(ctx: BuildContext, input_line: str, file_reader: RecursiveFH) -> tuple:
+    def _split_option_and_value(input_line: str) -> tuple:
         """
-        Take an input line, and extract it into an option name, and simplified value.
-
-        The value has "false" converted to False, white space simplified (like in
-        Qt), tildes (~) in what appear to be path-like entries are converted to
-        the home directory path, and reference to global option is substituted with its value.
+        Take an input line, and extract it into an option name and value.
 
         Args:
-            ctx: The build context (used for translating option values).
             input_line: The line to split.
-            file_reader: The recursive filehandle to read from.
 
         Returns:
              Tuple (option-name, option-value)
         """
-        Util.assert_isa(ctx, BuildContext)
-        file_name = file_reader.current_filename()
-        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
-
         # The option is the first word, followed by the
         # flags on the rest of the line.  The interpretation
         # of the flags is dependent on the option.
@@ -764,8 +754,31 @@ class Application:
 
         value = value.strip()
 
+        return option, value
+
+    @staticmethod
+    def substitute_value(ctx: BuildContext, unresolved_value: str, file_reader: RecursiveFH) -> str | bool:
+        """
+        Take an option value read from config, and resolve it.
+
+        The value has "false" converted to False, white space simplified (like in
+        Qt), tildes (~) in what appear to be path-like entries are converted to
+        the home directory path, and reference to global option is substituted with its value.
+
+        Args:
+            ctx: The build context (used for translating option values).
+            unresolved_value: The value to substitute.
+            file_reader: The recursive filehandle to read from.
+
+        Returns:
+             Tuple (option-name, option-value)
+        """
+        Util.assert_isa(ctx, BuildContext)
+        file_name = file_reader.current_filename()
+        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+
         # Simplify whitespace.
-        value = re.sub(r"\s+", " ", value)
+        value = re.sub(r"\s+", " ", unresolved_value)
 
         # Replace reference to global option with their value.
         if re.findall(option_re, value):
@@ -782,8 +795,7 @@ class Application:
 
             value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
 
-            # Replace other references as well.  Keep this RE up to date with
-            # the other one.
+            # Replace other references as well. Keep this RE up to date with the other one.
             sub_var_name = re.findall(option_re, value)[0] if re.findall(option_re, value) else None
 
         # Replace tildes with home directory.
@@ -796,7 +808,7 @@ class Application:
         if value.lower() == "false":
             value = False
 
-        return option, value
+        return value
 
     @staticmethod
     def _validate_module_set(ctx: BuildContext, module_set: ModuleSet) -> None:
@@ -889,7 +901,8 @@ class Application:
                 logger_app.error(f"Invalid configuration file {current_file} at line {file_reader.current_filehandle().filelineno()}\nAdd an \"end {end_word}\" before " + "starting a new module.\n")
                 raise ConfigError(f"Invalid file {current_file}")
 
-            option, value = Application._split_option_and_value_and_substitute_value(ctx, line, file_reader)
+            option, value = Application._split_option_and_value(line)
+            value = Application.substitute_value(ctx, value, file_reader)
 
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
                 ctx.set_option({option: value})  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
