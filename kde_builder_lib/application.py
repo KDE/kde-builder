@@ -1151,6 +1151,11 @@ class Application:
                 raise ConfigError("Ungrouped/Unknown option")
 
             node = Application._read_ksb_node(fh, rcfile)
+            if key in ret_dict:
+                msg = f"Duplicate entry \"{key}\" found in {rcfile}."
+                if key.startswith("options "):
+                    msg += " Note that \"options\" can be duplicated only in _different_ files."
+                raise ConfigError(msg)
             ret_dict[key] = node
 
         fh.close()
