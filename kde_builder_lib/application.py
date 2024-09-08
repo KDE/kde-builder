@@ -41,6 +41,7 @@ from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
 from .module_set.qt5 import ModuleSetQt5
 from .options_base import OptionsBase
+from .recursive_config_nodes_iterator import RecursiveConfigNodesIterator
 from .start_program import StartProgram
 from .task_manager import TaskManager
 from .updater.updater import Updater
@@ -1025,7 +1026,11 @@ class Application:
             ctx.merge_options_from(global_opts)
 
         # Now, after global options were resolved and set, we can resolve paths in include lines and read those config files.
-        # if node_name.startswith("include "): ... TODO
+        node_reader = RecursiveConfigNodesIterator(config_content, rcfile, ctx)
+
+        config_nodes_list = []
+        for node in node_reader:
+            config_nodes_list.append(node)
 
         nothing_defined = True
         creation_order = 0
@@ -1033,7 +1038,7 @@ class Application:
         seen_module_sets = {}  # and vice versa
         # seen_module_set_items = {}  # To track option override modules.
 
-        for node_name, node in config_content.items():
+        for node_name, node, config_filename in config_nodes_list:
             if node_name.startswith("module-set "):
                 module_set_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_set_name  # ensure the module-set has some name
@@ -1046,7 +1051,7 @@ class Application:
                     raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
-                new_module_set = self._process_module_set_options(ctx, node, rcfile, ModuleSet(ctx, module_set_name))
+                new_module_set = self._process_module_set_options(ctx, node, config_filename, ModuleSet(ctx, module_set_name))
                 creation_order += 1
                 new_module_set.create_id = creation_order
 
@@ -1066,13 +1071,13 @@ class Application:
                 module_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_name  # ensure the module has some name
                 if module_name in seen_modules:
-                    logger_app.error(f"Duplicate module declaration b[r[{module_name}] in {rcfile}")
-                    raise ConfigError(f"Duplicate module {module_name} declared in {rcfile}")
+                    logger_app.error(f"Duplicate module declaration b[r[{module_name}] in {config_filename}")
+                    raise ConfigError(f"Duplicate module {module_name} declared in {config_filename}")
                 if module_name in seen_module_sets:
-                    logger_app.error(f"Name {module_name} for module in {rcfile} is already in use on a module-set")
-                    raise ConfigError(f"Can't re-use name {module_name} for module defined in {rcfile}")
+                    logger_app.error(f"Name {module_name} for module in {config_filename} is already in use on a module-set")
+                    raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
 
-                new_module = self._process_module_options(ctx, node, rcfile, Module(ctx, module_name))
+                new_module = self._process_module_options(ctx, node, config_filename, Module(ctx, module_name))
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
@@ -1083,7 +1088,7 @@ class Application:
             if node_name.startswith("options "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options = self._process_module_options(ctx, node, rcfile, OptionsBase())
+                options = self._process_module_options(ctx, node, config_filename, OptionsBase())
 
                 deferred_options.append({
                     "name": options_name,
