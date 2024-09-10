@@ -22,8 +22,8 @@ from time import time
 import traceback
 from typing import Callable
 from typing import NoReturn
-from typing import TextIO
 from typing import TypeVar
+import yaml
 
 from kde_builder_lib.kb_exception import ConfigError
 from kde_builder_lib.kb_exception import KBRuntimeError
@@ -696,69 +696,6 @@ class Application:
     # internal helper functions
 
     @staticmethod
-    def _read_next_logical_line(file_reader: TextIO) -> str | None:
-        """
-        Read a "line" from a file.
-
-        This line is stripped of comments and extraneous whitespace. Also, backslash-continued multiple lines are merged into a single line.
-
-        Args:
-            file_reader: The reference to the filehandle to read from.
-
-        Returns:
-             The text of the line.
-        """
-        line = file_reader.readline()
-        while line:
-            # Remove trailing newline
-            line = line.rstrip("\n")
-
-            # Replace \ followed by optional space at EOL and try again.
-            if re.search(r"\\\s*$", line):
-                line = re.sub(r"\\\s*$", "", line)
-                line += file_reader.readline()
-                continue
-
-            if re.search(r"#.*$", line):
-                line = re.sub(r"#.*$", "", line)  # Remove comments
-            if re.match(r"^\s*$", line):
-                line = file_reader.readline()
-                continue  # Skip blank lines
-
-            return line
-        return None
-
-    @staticmethod
-    def _split_option_and_value(input_line: str) -> tuple:
-        """
-        Take an input line, and extract it into an option name and value.
-
-        Args:
-            input_line: The line to split.
-
-        Returns:
-             Tuple (option-name, option-value)
-        """
-        # The option is the first word, followed by the
-        # flags on the rest of the line.  The interpretation
-        # of the flags is dependent on the option.
-        pattern = re.compile(
-            r"^\s*"  # Find all spaces
-            r"([-\w]+)"  # First match, alphanumeric, -, and _
-            # (?: ) means non-capturing group, so (.*) is $value
-            # So, skip spaces and pick up the rest of the line.
-            r"(?:\s+(.*))?$"
-        )
-
-        match = re.match(pattern, input_line)
-        option = match.group(1)
-        value = match.group(2) or ""
-
-        value = value.strip()
-
-        return option, value
-
-    @staticmethod
     def substitute_value(ctx: BuildContext, unresolved_value: str, file_name: str) -> str | bool:
         """
         Take an option value read from config, and resolve it.
@@ -911,33 +848,6 @@ class Application:
         return module
 
     @staticmethod
-    def _read_ksb_node(file_handler: TextIO, file_name: str) -> dict:
-        """
-        Read in the options of the node (a section that is terminated with "end" word) from ksb file and construct dict.
-
-        Args:
-            file_handler: A file handle to read from.
-            file_name: A full path for file name that is read.
-        """
-        end_re = re.compile(r"^\s*end")
-
-        ret_dict = {}
-        # Read in each option
-        line = Application._read_next_logical_line(file_handler)
-        while line and not re.search(end_re, line):
-
-            # Sanity check, make sure the section is correctly terminated
-            if re.match(r"^(module\b|options\b)", line):
-                logger_app.error(f"Invalid configuration file {file_name}\nAdd an \"end\" before starting a new module.\n")
-                raise ConfigError(f"Invalid file {file_name}")
-
-            option, value = Application._split_option_and_value(line)
-            ret_dict[option] = value
-            line = Application._read_next_logical_line(file_handler)
-
-        return ret_dict
-
-    @staticmethod
     def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
         """
         Mark the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being read in from the given string (filename:line).
@@ -1007,7 +917,8 @@ class Application:
         Raises:
             SetOptionError
         """
-        config_content = self.read_ksb_file(ctx.rc_file)
+        with open(ctx.rc_file, "r") as f:
+            config_content = yaml.safe_load(f)
         module_and_module_set_list = []
         rcfile = ctx.rc_file
 
@@ -1109,58 +1020,6 @@ class Application:
             logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
 
         return module_and_module_set_list
-
-    @staticmethod
-    def read_ksb_file(config_path: str) -> dict:
-        """
-        Read in the settings from the configuration.
-
-        Args:
-            config_path: Full path of the config file to read from.
-        """
-        ret_dict = {}
-        rcfile = config_path
-        fh = open(config_path, "r")
-
-        while line := fh.readline():
-            line = re.sub(r"#.*$", "", line)  # Remove comments
-            line = re.sub(r"^\s+", "", line)  # Remove leading whitespace
-            if not line.strip():
-                continue  # Skip blank lines
-
-            if re.match(r"^global\s*$", line):
-                key = "global"
-            elif match := re.match(r"^(options|module)\s+([-/.\w]+)\s*$", line):  # Get modulename (has dash, dots, slashes, or letters/numbers)
-                key = match.group(1) + " " + match.group(2)
-            elif match := re.match(r"^module-set\s*([-/.\w]+)?\s*$", line):
-                if match.group(1):
-                    key = "module-set " + match.group(1)
-                else:
-                    key = "module-set " + f"Unnamed module-set at {rcfile}"  # module_set_name may be blank (because the capture group is optional)
-            elif re.match(r"^\s*include\s+\S", line):
-                line = line.rstrip("\n")
-                match = re.match(r"^\s*include\s+(.+?)\s*$", line)
-                filename = ""
-                if match:
-                    filename = match.group(1)
-                key = "include " + filename
-                ret_dict[key] = "true"  # use "true" as a value
-                continue  # do not expect "end" marker after include line.
-            else:
-                logger_app.error(f"Invalid configuration file {rcfile}!")
-                logger_app.error(f"Expecting a start of module section.")
-                raise ConfigError("Ungrouped/Unknown option")
-
-            node = Application._read_ksb_node(fh, rcfile)
-            if key in ret_dict:
-                msg = f"Duplicate entry \"{key}\" found in {rcfile}."
-                if key.startswith("options "):
-                    msg += " Note that \"options\" can be duplicated only in _different_ files."
-                raise ConfigError(msg)
-            ret_dict[key] = node
-
-        fh.close()
-        return ret_dict
 
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
