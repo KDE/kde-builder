@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import datetime
 import errno
-import fileinput
 import json
 import os
 from pathlib import Path
@@ -83,9 +82,8 @@ class BuildContext(Module):
     xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")
     xdg_config_home_short = xdg_config_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
 
-    rcfiles = ["./kdesrc-buildrc",
-               f"{xdg_config_home}/kdesrc-buildrc",
-               f"""{os.getenv("HOME")}/.kdesrc-buildrc"""]
+    rcfiles = ["./kde-builder.yaml",
+               f"{xdg_config_home}/kde-builder.yaml"]
     LOCKFILE_NAME = ".kdesrc-lock"
     PERSISTENT_FILE_NAME = "kdesrc-build-data"
     SCRIPT_VERSION = Version.script_version()
@@ -463,20 +461,6 @@ class BuildContext(Module):
         self.rc_files = [file]
         self.rc_file = None
 
-    @staticmethod
-    def warn_legacy_config(file: str) -> None:
-        """
-        Warns a user if the config file is stored in the old location.
-        """
-        if file.startswith(os.getenv("HOME")):
-            file = re.sub(os.getenv("HOME"), "~", file)
-        if file == "~/.kdesrc-buildrc":
-            logger_buildcontext.warning(textwrap.dedent(f"""\
-            The b[global configuration file] is stored in the old location. It will still be
-            processed correctly, however, it's recommended to move it to the new location.
-            Please move b[~/.kdesrc-buildrc] to b[{BuildContext.xdg_config_home_short}/kdesrc-buildrc]
-            """))
-
     def detect_config_file(self) -> None:
         """
         Determine a full path to the user's chosen rc file and set it to self.rc_file.
@@ -491,9 +475,29 @@ class BuildContext(Module):
 
         for file in rc_files:
             if os.path.exists(file):
-                BuildContext.warn_legacy_config(file)
                 self.rc_file = os.path.abspath(file)
                 return
+
+        # Now, as we did not found any kde-builder configs, in case we find legacy ksb format config, hint user to convert it.
+        # We keep the search order as was used for legacy configs.
+        legacy_configs = [
+            "./kdesrc-buildrc",
+            f"{BuildContext.xdg_config_home}/kdesrc-buildrc",
+            f"""{os.getenv("HOME")}/.kdesrc-buildrc"""
+        ]
+
+        for file in legacy_configs:
+            if os.path.exists(file):
+                legacy_config_full_path = os.path.abspath(file)
+                dirname_config_path = os.path.dirname(legacy_config_full_path)
+                modern_config_full_path = dirname_config_path + "/kde-builder.yaml"
+                real_bin_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+                logger_buildcontext.error(textwrap.dedent(f"""\
+                     r[*] The y[{modern_config_full_path}] config was not found, but the legacy ksb config y[{legacy_config_full_path}] was found.
+                       Please, convert your legacy config to the new format with the following command:
+                        {real_bin_dir}/scripts/convert_ksb_config.py y[{legacy_config_full_path} {modern_config_full_path}]
+                    """))
+                raise KBRuntimeError(f"Missing config.")
 
         # No rc found, check if we can use default.
         if len(rc_files) == 1:
