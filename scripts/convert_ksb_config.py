@@ -11,6 +11,7 @@ Convert the config from ksb format to the yaml format.
 import sys
 from typing import TextIO
 import re
+import yaml
 
 
 class KSBParser:
@@ -167,4 +168,70 @@ if __name__ == "__main__":
     print(f"Converting {ksb_file} to {yaml_file}")
 
     config_content = KSBParser.read_ksb_file(ksb_file)
+
+    # # Create a new dictionary with the new key-value pair at the beginning
+    # config_content = {"config-version": 2, **config_content}
+
+    # Replace "true" and "false" strings to real boolean values
+    for node in config_content:
+        if not isinstance(config_content[node], dict):
+            continue  # "include" lines are not dicts
+        for option, value in config_content[node].items():
+            if value == "true":
+                config_content[node][option] = True
+            if value == "false":
+                config_content[node][option] = False
+
+    # Rename entries: "module" -> "project"; "module-set" -> "group", "options" -> "override".
+    old_keys = list(config_content.keys())
+    for node in old_keys:
+        new_name = None
+        if node.startswith("module "):
+            new_name = "project " + node.removeprefix("module ")
+        if node.startswith("module-set "):
+            new_name = "group " + node.removeprefix("module-set ")
+        if node.startswith("options "):
+            new_name = "override " + node.removeprefix("options ")
+
+        # store the recognized node under new name, and remove old name
+        if new_name:
+            config_content[new_name] = config_content[node]
+            del config_content[node]
+
+    # Rename "use-modules" -> "use-projects"; "ignore-modules" -> "ignore-projects". Listify/dictify some options value.
+    old_keys = list(config_content.keys())
+    for node in old_keys:
+        if not isinstance(config_content[node], dict):
+            continue  # "include" lines are not dicts
+        old_item_keys = list(config_content[node].keys())
+        for option in old_item_keys:
+            if option == "use-modules":
+                config_content[node]["use-projects"] = config_content[node]["use-modules"].split(" ")
+                del config_content[node]["use-modules"]
+            if option == "ignore-modules":
+                config_content[node]["ignore-projects"] = config_content[node]["ignore-modules"].split(" ")
+                del config_content[node]["ignore-modules"]
+            if option == "set-env":
+                value = config_content[node]["set-env"]
+                name, val = value.split(" ", maxsplit=1)
+                config_content[node]["set-env"] = {name: val}
+
+
+    class MyDumper(yaml.SafeDumper):  # noqa: D101
+        # https://github.com/yaml/pyyaml/issues/127#issuecomment-525800484
+        # HACK: insert blank lines between top-level objects
+        # inspired by https://stackoverflow.com/a/44284819/3786245
+        def write_line_break(self, data=None):
+            super().write_line_break(data)
+
+            if len(self.indents) == 1:
+                super().write_line_break()
+
+        # https://stackoverflow.com/a/39681672/7869636
+        def increase_indent(self, flow=False, indentless=False):
+            return super(MyDumper, self).increase_indent(flow, False)
+
+    # Finally, export the resulting yaml file
+    with open(yaml_file, "w") as file:
+        yaml.dump(config_content, file, Dumper=MyDumper, sort_keys=False)
     pass
