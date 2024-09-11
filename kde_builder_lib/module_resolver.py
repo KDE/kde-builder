@@ -88,7 +88,7 @@ class ModuleResolver:
             set_indices.append(idx)  # so we can delete this once loop complete
 
             # Use KDE project database to pull list of matching `Module`s
-            for m in referenced_modules.split(" "):
+            for m in referenced_modules:
                 mods = proj_db.get_modules_for_project(m)
                 for mod in mods:
                     name = mod["name"]

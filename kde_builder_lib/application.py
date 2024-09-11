@@ -293,8 +293,8 @@ class Application:
                     print(key)
             exit(0)
 
-        ignored_in_global_section = {selector: True for selector in ctx.options["ignore-projects"].split(" ") if selector != ""}  # do not place empty string key, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
-        ctx.options["ignore-projects"] = ""
+        ignored_in_global_section = {selector: True for selector in ctx.options["ignore-projects"] if selector != ""}  # do not place empty string key, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
+        ctx.options["ignore-projects"] = []
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
         ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
@@ -696,7 +696,7 @@ class Application:
     # internal helper functions
 
     @staticmethod
-    def substitute_value(ctx: BuildContext, unresolved_value: str, file_name: str) -> str | bool:
+    def substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | None, file_name: str) -> str | bool | list | dict:
         """
         Take an option value read from config, and resolve it.
 
@@ -712,6 +712,15 @@ class Application:
         Returns:
              Tuple (option-name, option-value)
         """
+        if isinstance(unresolved_value, bool):
+            return unresolved_value
+        if isinstance(unresolved_value, list):
+            return unresolved_value
+        if isinstance(unresolved_value, dict):
+            return unresolved_value
+        if unresolved_value is None:  # in tests, there is a config that does not specify value
+            return ""
+
         Util.assert_isa(ctx, BuildContext)
         option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
 
@@ -922,13 +931,23 @@ class Application:
         module_and_module_set_list = []
         rcfile = ctx.rc_file
 
+        # first_node = next(iter(config_content))
+        # first_node_content = config_content.pop(first_node)
+
+        # if first_node != "config-version":
+        #     # First key in the kde-builder.yaml should be "config-version".
+        #     logger_app.error(f"Invalid configuration file: {rcfile}.\nThe very first element in config should be \"config-version\".")
+        #     raise ConfigError("Unexpected first key instead of \"config-version\".")
+        # elif first_node_content != 2:
+        #     raise ConfigError(f"Unrecognized config version number. The version 2 was expected, but {first_node_content} was given.")
+
         first_node = next(iter(config_content))
         first_node_content = config_content.pop(first_node)
 
         if first_node != "global":
-            # First command in .kdesrc-buildrc should be a global options declaration, even if none are defined.
+            # First key in kde-builder.yaml should be "global".
             logger_app.error(f"Invalid configuration file: {rcfile}.")
-            logger_app.error(f"Expecting global settings section!")
+            logger_app.error(f"Expecting global settings node!")
             raise ConfigError("Missing global section")
         else:
             global_opts = self._process_module_options(ctx, first_node_content, rcfile, OptionsBase())
@@ -951,7 +970,7 @@ class Application:
         # seen_module_set_items = {}  # To track option override modules.
 
         for node_name, node, config_filename in config_nodes_list:
-            if node_name.startswith("module-set "):
+            if node_name.startswith("group "):
                 module_set_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_set_name  # ensure the module-set has some name
                 if module_set_name in seen_module_sets.keys():
@@ -979,7 +998,7 @@ class Application:
                 module_and_module_set_list.append(new_module_set)
                 nothing_defined = False
 
-            if node_name.startswith("module "):
+            if node_name.startswith("project "):
                 module_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_name  # ensure the module has some name
                 if module_name in seen_modules:
@@ -997,7 +1016,7 @@ class Application:
                 module_and_module_set_list.append(new_module)
                 nothing_defined = False
 
-            if node_name.startswith("options "):
+            if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
                 options = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))

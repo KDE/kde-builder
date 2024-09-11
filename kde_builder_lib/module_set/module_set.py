@@ -118,7 +118,8 @@ class ModuleSet(OptionsBase):
         """
         # Special-case handling
         if "use-projects" in options:
-            modules = options["use-projects"].split(" ")
+            assert isinstance(options["use-projects"], list)
+            modules = options["use-projects"]
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[use-projects] entry.")
@@ -128,7 +129,8 @@ class ModuleSet(OptionsBase):
             del options["use-projects"]
 
         if "ignore-projects" in options:
-            modules = options["ignore-projects"].split(" ")
+            assert isinstance(options["ignore-projects"], list)
+            modules = options["ignore-projects"]
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[ignore-projects] entry.")
