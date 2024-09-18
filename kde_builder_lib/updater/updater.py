@@ -486,7 +486,7 @@ class Updater:
 
         remote_name = self._setup_best_remote()
         logger_updater.info(f"Fetching remote changes to g[{module}]")
-        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "--tags", remote_name])
+        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "-f", "--tags", remote_name])
 
         # Download updated objects. This also updates remote heads so do this
         # before we start comparing branches and such.
