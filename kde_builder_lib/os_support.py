@@ -164,7 +164,7 @@ class OSSupport:
 
         result = {}
         for line in lines:
-            key, value = line.split("=")
+            key, value = line.split("=", maxsplit=1)
             value = backslash_decode(value.removeprefix("\"").removesuffix("\""))  # possibly also quoted in single quotes
             result[key] = value
         return result
