@@ -16,24 +16,26 @@ local -aU kde_builder_modules_and_module_sets
 # ": " is output separator,
 # "frameworks" is module-set name, containing the module
 
-if _cache_invalid kde_builder_modules_and_module_sets || ! _retrieve_cache kde_builder_modules_and_module_sets ; then
+if _cache_invalid kde_builder_modules || ! _retrieve_cache kde_builder_modules; then
   # strip ":*" suffix (i.e. everything after and including first column).
   # (@) array Expansion Flags are needed because we need to operate on each element separately.
   kde_builder_modules=( "${(@)${(f)"$(
     _call_program kde-builder-modules \
       kde-builder -M --query module-set
     )"}%%:*}" )
+  _store_cache kde_builder_modules kde_builder_modules  
+fi
+_wanted modules expl "module" \
+  compadd -a kde_builder_modules
 
+if _cache_invalid kde_builder_module_sets || ! _retrieve_cache kde_builder_module_sets ; then
   # strip "*: " prefix (i.e. everything before column and including the column and space after it).
   # (@) array Expansion Flags are needed because we need to operate on each element separately.
   kde_builder_module_sets=( "${(@)${(f)"$(
     _call_program kde-builder-module-sets \
       kde-builder -M --query module-set
     )"}#*: }" )
-
-  kde_builder_modules_and_module_sets=("${kde_builder_modules[@]}" "${kde_builder_module_sets[@]}")
-  _store_cache kde_builder_modules_and_module_sets kde_builder_modules_and_module_sets
+  _store_cache kde_builder_module_sets kde_builder_module_sets
 fi
-
-_wanted modules_and_module_sets expl "module or module-set" \
-  compadd -a kde_builder_modules_and_module_sets
+_wanted module_sets expl "module-set" \
+  compadd -a kde_builder_module_sets
