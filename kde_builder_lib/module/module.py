@@ -68,13 +68,12 @@ class Module(OptionsBase):
     """
 
     def __init__(self, ctx: BuildContext, name: str):
+        OptionsBase.__init__(self)
         self.ctx = ctx
         self.name = name
 
         if not self.name:
             raise ProgramError("Empty Module constructed")
-
-        OptionsBase.__init__(self)
 
         # If building a BuildContext instead of a `Module`, then the context
         # can't have been set up yet...
@@ -96,11 +95,16 @@ class Module(OptionsBase):
         self.env = {}
         self.current_phase = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
 
-        # Record current values of what would be last source/build dir, if present,
-        # before they are potentially reset during the module build.
-        self.set_option({"#last-source-dir": self.get_persistent_option("source-dir") or ""})
-        self.set_option({"#last-build-dir": self.get_persistent_option("build-dir") or ""})
-        self.scm_obj = None
+        if self.__class__.__name__ != "BuildContext":
+            # Avoid setting this for BuildContext, because it has its own option value type verification code, which needs BuildContext to be already initialized
+            # (for reading self.all_boolean_options).
+            # But currently, BuildContext is inherited from Module, so we initialize Module first (as part of BuildContext initialization).
+            # TODO make a proper inheritance scheme. The BuildContext and Module most likely should be inherited from common abstract class.
+
+            # Record current values of what would be last source/build dir, if present,
+            # before they are potentially reset during the module build.
+            self.set_option({"#last-source-dir": self.get_persistent_option("source-dir") or ""})
+            self.set_option({"#last-build-dir": self.get_persistent_option("build-dir") or ""})
 
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
@@ -1107,3 +1111,10 @@ class Module(OptionsBase):
 
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
             os.symlink(f"{logfile}", f"{logdir}/error.log")
+
+    # @override
+    def verify_option_value_type(self, option_name, option_value) -> None:
+        """
+        Ensure we are setting the correct type for value of option.
+        """
+        self.ctx.verify_option_value_type(option_name, option_value)

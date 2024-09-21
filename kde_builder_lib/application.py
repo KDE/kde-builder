@@ -1088,7 +1088,7 @@ class Application:
             if node_name.startswith("options "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options = self._process_module_options(ctx, node, config_filename, OptionsBase())
+                options = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))
 
                 deferred_options.append({
                     "name": options_name,

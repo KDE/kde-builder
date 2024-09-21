@@ -21,6 +21,7 @@ from .kb_exception import KBRuntimeError
 from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
+from .kb_exception import SetOptionError
 from .kde_projects_reader import KDEProjectsReader
 from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
@@ -116,6 +117,7 @@ class BuildContext(Module):
 
         # These options are exposed as cmdline options, but _not from here_.
         # Their more complex specifier is made in `Cmdline` _supported_options().
+        # If adding new option here, and it is boolean, do not forget to add it in the boolean_extra_specified_options.
         self.global_options_with_extra_specifier = {
             "build-when-unchanged": True,
             "colorful-output": True,
@@ -225,6 +227,8 @@ class BuildContext(Module):
         self.projects_db = None  # See get_project_data_reader
 
         self.options = self.build_options["global"]
+        boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]
+        self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
 
     def add_module(self, module: Module) -> None:
         if not module:
@@ -895,3 +899,8 @@ class BuildContext(Module):
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver
+
+    # @override
+    def verify_option_value_type(self, option_name, option_value) -> None:
+        if option_name in self.all_boolean_options and not isinstance(option_value, bool):
+            raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid boolean value \"{option_value}\".")

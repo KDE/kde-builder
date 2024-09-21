@@ -61,6 +61,7 @@ class ModuleSet(OptionsBase):
         self.module_ignore_decls = []
         self.module_order = {}  # maps module names to position in list
         self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
+        self.ctx = ctx
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
@@ -177,3 +178,10 @@ class ModuleSet(OptionsBase):
             logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
 
         return module_list
+
+    # @override
+    def verify_option_value_type(self, option_name, option_value) -> None:
+        """
+        Ensure we are setting the correct type for value of option.
+        """
+        self.ctx.verify_option_value_type(option_name, option_value)

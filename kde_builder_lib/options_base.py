@@ -7,9 +7,13 @@ from __future__ import annotations
 
 import copy
 import re
+from typing import TYPE_CHECKING
 
 from .kb_exception import SetOptionError
 from .util.util import Util
+
+if TYPE_CHECKING:
+    from .build_context import BuildContext
 
 
 class OptionsBase:
@@ -31,11 +35,12 @@ class OptionsBase:
     what options to set, see :class:`Application` and its friends.
     """
 
-    def __init__(self):
+    def __init__(self, ctx: BuildContext | None = None):
         # We don't directly bless the options dict so that subclasses can
         # use this base dict directly (as long as they don't overwrite
         # "options", of course).
         self.options = {"set-env": {}}
+        self.ctx = ctx
 
     def has_sticky_option(self, key: str) -> bool:
         """
@@ -127,6 +132,7 @@ class OptionsBase:
 
         # Everything else can be dumped straight into our dict.
         for option in options:
+            self.verify_option_value_type(option, options[option])
             self.options[option] = options[option]
 
     def delete_option(self, key: str) -> None:
@@ -164,3 +170,12 @@ class OptionsBase:
         else:
             var, env_value = value.split(" ", maxsplit=1)
             self.options["set-env"][var] = env_value
+
+    def verify_option_value_type(self, option_name, option_value) -> None:
+        """
+        Ensure we are setting the correct type for value of option.
+        """
+        if self.ctx:
+            self.ctx.verify_option_value_type(option_name, option_value)
+        else:
+            return
