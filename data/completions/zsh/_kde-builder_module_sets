@@ -24,5 +24,5 @@ if _cache_invalid kde_builder_modulesets || ! _retrieve_cache kde_builder_module
   _store_cache kde_builder_module_sets kde_builder_module_sets
 fi
 
-_wanted module_sets expl "module-set" \
+_wanted module_sets expl "module set" \
   compadd -a kde_builder_module_set
