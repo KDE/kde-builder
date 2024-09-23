@@ -392,9 +392,20 @@ class BuildSystemKDECMake(BuildSystem):
         if qt_installdir and qt_installdir != installdir and not [command for command in commands if re.match(r"^\s*-DCMAKE_PREFIX_PATH", command)]:
             commands.append(f"-DCMAKE_PREFIX_PATH={qt_installdir}")
 
-        if module.get_option("run-tests") and [command for command in commands if not re.match(r"^\s*-DBUILD_TESTING(:BOOL)?=(ON|TRUE|1)\s*$", command)]:
-            logger_buildsystem.debug("Enabling tests")
-            commands.append("-DBUILD_TESTING:BOOL=ON")
+        if module.get_option("run-tests"):
+            found_build_testing_index = -1
+            for index, command in enumerate(commands):
+                if not re.match(r"^\s*-DBUILD_TESTING(:BOOL)?=", command):
+                    continue
+                found_build_testing_index = index
+                # The last occurrence of variable takes precedence. So continue iterations over the rest of the list.
+
+            if found_build_testing_index == -1:
+                logger_buildsystem.debug("\tAdding BUILD_TESTING variable with ON value.")
+                commands.append("-DBUILD_TESTING:BOOL=ON")
+            else:
+                logger_buildsystem.debug("\tOverriding BUILD_TESTING variable with ON value.")
+                commands[found_build_testing_index] = "-DBUILD_TESTING:BOOL=ON"
 
         commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
 
