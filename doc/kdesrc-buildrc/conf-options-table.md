@@ -973,14 +973,6 @@ presented will still be processed.
 
 Related command-line option: [--no-install](#cmdline-no-install)
 
-(conf-no-tests)=
-[`no-tests`](conf-no-tests)
-
-Remove _test_ phase. The other phases that were presented
-will still be processed.
-
-Related command-line option: --no-tests
-
 (conf-no-build)=
 [`no-build`](conf-no-build)
 

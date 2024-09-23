@@ -158,7 +158,6 @@ short_descriptions = {  # contains one of the options (any of them) from set, an
     "--metadata-only": "Only perform/Skip the metadata download process",
     "--nice": "Priority kde-builder will set for itself",
     "--ninja-options": "Pass command line options to the ninja build command",
-    "--no-tests": "Tests",
     "--num-cores": "Set the number of available CPUs",
     "--num-cores-low-mem": "Set the number of CPUs that is deemed safe for heavyweight or other highly-intensive modules",
     "--override-build-system": "Manually specify the correct build type",

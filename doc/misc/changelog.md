@@ -1,5 +1,8 @@
 # Changelog
 
+2024-09-23
+: Removed option `no-tests`.
+
 2024-07-28
 : Added option `generate-qtcreator-project-config` for the CLion IDE project generation.
 

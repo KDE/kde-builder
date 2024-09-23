@@ -387,7 +387,6 @@ class Module(OptionsBase):
 
         self.set_persistent_option("last-build-rev", self.current_scm_revision())
 
-        # TODO: This should be a simple phase to run.
         if self.get_option("run-tests"):
             self.build_system().run_testsuite()
 
@@ -399,7 +398,7 @@ class Module(OptionsBase):
             return True
 
         self.ctx.status_view.__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().
-        # TODO: Likewise this should be a phase to run.
+        # TODO: this should be a phase to run.
         return self.install()
 
     def setup_build_system(self) -> bool:
@@ -756,9 +755,6 @@ class Module(OptionsBase):
         if "no-install" in options:
             self.phases.filter_out_phase("install")
             del options["no-install"]
-        if "no-tests" in options:
-            self.phases.filter_out_phase("test")  # May not work properly yet.
-            del options["no-tests"]
         if "no-build" in options:
             self.phases.filter_out_phase("build")
             del options["no-build"]

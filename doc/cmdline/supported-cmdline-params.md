@@ -311,12 +311,6 @@ depends on the build phase completing so this is effectively equivalent
 to `--src-only`, but the semantics may change in the future (e.g. when
 test suites are moved into their own phase).
 
-(cmdline-no-tests)=
-[`--no-tests`](cmdline-no-tests)  
-Disables running the test suite for CMake-based modules. To be fully
-effective this requires re-running CMake, which can be forced by using
-the `--reconfigure` or `--refresh-build` options.
-
 (cmdline-no-install)=
 [`--no-install`](cmdline-no-install)  
 Skip the install phase from the build. Other phases are included as normal.

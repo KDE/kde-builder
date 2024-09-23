@@ -58,7 +58,6 @@ _arguments \
   "--make-options""[Pass command line options to the make command]"":argument:" \
   "(--nice --niceness)"{--nice,--niceness}"[Priority kde-builder will set for itself]"":argument:" \
   "--ninja-options""[Pass command line options to the ninja build command]"":argument:" \
-  "--no-tests""[Tests]" \
   "--num-cores-low-mem""[Set the number of CPUs that is deemed safe for heavyweight or other highly-intensive modules]"":argument:" \
   "--num-cores""[Set the number of available CPUs]"":argument:" \
   "--override-build-system""[Manually specify the correct build type]"":argument:" \
