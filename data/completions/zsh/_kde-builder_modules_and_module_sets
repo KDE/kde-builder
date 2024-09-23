@@ -28,7 +28,7 @@ fi
 _wanted modules expl "module" \
   compadd -a kde_builder_modules
 
-if _cache_invalid kde_builder_module_sets || ! _retrieve_cache kde_builder_module_sets ; then
+if _cache_invalid kde_builder_module_sets || ! _retrieve_cache kde_builder_module_sets; then
   # strip "*: " prefix (i.e. everything before column and including the column and space after it).
   # (@) array Expansion Flags are needed because we need to operate on each element separately.
   kde_builder_module_sets=( "${(@)${(f)"$(
