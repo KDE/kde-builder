@@ -509,7 +509,7 @@ class Util:
             directory = ""
         if Debug().pretending():
             args_str = "', '".join(args)
-            logger_logged_cmd.pretend(f"\tWould have run g{{'{args_str}'}}")
+            logger_logged_cmd.pretend(f"\tWould have run] (g['{args_str}'])")
             return 0
 
         # Do this before we fork so the path is finalized to prevent auto-detection
