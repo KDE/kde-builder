@@ -48,19 +48,32 @@ install_runtime_packages() {
     (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus)
   else
     echo -e "${Yellow}Warning: Unsupported OS: $ID, skipping installation of runtime packages.${Color_Off}" 1>&2
-    cat << EOF
-The following python modules are required (please install manually):
-    yaml
-    setproctitle
-EOF
 
-    read -r -p "Do you want to proceed? (y/n) " answer
-    if [ "$answer" = "y" ]; then
-      echo "Continuing..."
-    else
-      echo "Cancelled by user."
+    if ! type git >/dev/null 2>&1; then
+      echo -e "${Red}The git binary is missing. Please install git package manually.${Color_Off}"
+      err_report  # manually show error message
       exit 1
     fi
+
+    check_python_module() {
+      local pymod_name="$1"
+      if ! python3 -c "import $pymod_name" &>/dev/null; then
+        echo -e "${Red}The required python python module \"$pymod_name\" is missing. Please install it manually.${Color_Off}"
+        err_report  # manually show error message
+
+        local answer
+        read -r -p "Do you want to proceed anyway? (y/n) " answer
+        if [ "$answer" = "y" ]; then
+          echo "Continuing..."
+        else
+          echo "Cancelled by user."
+          exit 1
+        fi
+      fi
+    }
+
+    check_python_module yaml
+    check_python_module setproctitle
   fi
 }
 
