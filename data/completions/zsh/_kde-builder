@@ -9,19 +9,19 @@
 
 _arguments \
   "(--dependency-tree --dependency-tree-fullpath)"{--dependency-tree,--dependency-tree-fullpath}"[Print out dependency information on the modules that would be built]" \
-  "(--src-only -S -s --no-src)"{--src-only,-S,-s,--no-src}"[Only perform/Skip update source code]" \
-  "(--after --from --resume-after --resume-from -a -f)"{--after,--from,--resume-after,--resume-from,-a,-f}"[Skips modules until just before or after the given package, then operates as normal]"":::_kde-builder_modules" \
-  "(--stop-after --stop-before --to --until)"{--stop-after,--stop-before,--to,--until}"[Stops just before or after the given package is reached]"":::_kde-builder_modules" \
-  "(--show-info --show-options-specifiers --version -v)"{--show-info,--show-options-specifiers,--version,-v}"[Script information]" \
-  "(--metadata-only -M --no-metadata)"{--metadata-only,-M,--no-metadata}"[Only perform/Skip the metadata download process]" \
-  "(--build-only --no-build)"{--build-only,--no-build}"[Only perform/Skip the build process.]" \
-  "(--install-only --no-install)"{--install-only,--no-install}"[Only perform/Skip the install process]" \
+  "(--src-only -s)"{--src-only,-s}"[Only perform update source code]" \
+  "(--from --resume-from -f)"{--from,--resume-from,-f}"[Skips modules until just before the given package, then operates as normal]"":::_kde-builder_modules" \
+  "(--after --resume-after -a)"{--after,--resume-after,-a}"[Skips modules until just after the given package, then operates as normal]"":argument:" \
+  "(--stop-before --until)"{--stop-before,--until}"[Stops just before the given package is reached]"":::_kde-builder_modules" \
+  "(--stop-after --to)"{--stop-after,--to}"[Stops just after the given package is reached]"":argument:" \
+  "(-M --no-metadata)"{-M,--no-metadata}"[Skip the metadata download process]" \
   "(--include-dependencies --no-include-dependencies -D -d)"{--include-dependencies,--no-include-dependencies,-D,-d}"[Builds/Skip KDE-based dependencies]" \
   "(--async --no-async)"{--async,--no-async}"[Perform source update and build process in parallel]" \
   "--binpath""[Set the environment variable PATH while building]"":argument:" \
   "--branch-group""[General group from which you want modules to be chosen]"":argument:" \
   "--branch""[Checkout the specified branch]"":argument:" \
   "--build-dir""[The directory that contains the built sources]"":argument:" \
+  "--build-only""[Only perform the build process]" \
   "--build-system-only""[Abort building a module just before the make command]" \
   "(--build-when-unchanged --no-build-when-unchanged --force-build --no-force-build)"{--build-when-unchanged,--no-build-when-unchanged,--force-build,--no-force-build}"[Disable skipping the build process.]" \
   "--cmake-generator""[Which generator to use with CMake]"":argument:" \
@@ -40,24 +40,29 @@ _arguments \
   "--directory-layout""[Layout which kde-builder should use when creating source and build directories]"":argument:" \
   "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every module]" \
   "--do-not-compile""[Select a specific set of directories not to be built in a module]"":argument:" \
-  "--generate-config""[Installs a base kdesrc-buildrc]" \
   "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
-  "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
+  "--generate-config""[Installs a base kdesrc-buildrc]" \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
+  "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
   "(-! --ignore-modules)"{-!,--ignore-modules}"[Do not include specified modules in the update/build process]"":::_kde-builder_modules" \
   "--initial-setup""[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc]" \
   "--install-dir""[Where to install the module after it is built]"":argument:" \
   "--install-distro-packages""[Installs required system pkgs]" \
   "(--install-login-session --no-install-login-session)"{--install-login-session,--no-install-login-session} \
+  "--install-only""[Only perform the install process]" \
   "--libname""[Default name of the installed library directory]"":argument:" \
   "--libpath""[Set the environment variable LD_LIBRARY_PATH while building]"":argument:" \
   "--list-installed""[Print installed modules and exit]" \
   "--log-dir""[Directory used to hold the log files generated by the script]"":argument:" \
   "--make-install-prefix""[A command and its options to precede the make install command used to install modules]"":argument:" \
   "--make-options""[Pass command line options to the make command]"":argument:" \
+  "--metadata-only""[Only perform the metadata download process]" \
   "(--nice --niceness)"{--nice,--niceness}"[Priority kde-builder will set for itself]"":argument:" \
   "--ninja-options""[Pass command line options to the ninja build command]"":argument:" \
+  "--no-build""[Do not build the sources]" \
+  "--no-install""[Skip the install process]" \
+  "(-S --no-src)"{-S,--no-src}"[Do not perform update source code]" \
   "--num-cores-low-mem""[Set the number of CPUs that is deemed safe for heavyweight or other highly-intensive modules]"":argument:" \
   "--num-cores""[Set the number of available CPUs]"":argument:" \
   "--override-build-system""[Manually specify the correct build type]"":argument:" \
@@ -78,6 +83,8 @@ _arguments \
   "--revision""[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the modules with support for running their test suite]" \
   "--set-module-option-value""[Override an option in your configuration file for a specific module]"":argument:" \
+  "--show-info""[Show tool information]" \
+  "--show-options-specifiers""[Show options information]" \
   "--source-dir""[Directory that stores the KDE sources]"":argument:" \
   "--source-when-start-program"":argument:" \
   "(--stop-on-failure --no-stop-on-failure)"{--stop-on-failure,--no-stop-on-failure}"[Stops/Does not stop the build as soon as a package fails to build]" \
@@ -86,6 +93,7 @@ _arguments \
   "(--use-clean-install --no-use-clean-install)"{--use-clean-install,--no-use-clean-install}"[Run make uninstall directly before running make install]" \
   "(--use-idle-io-priority --no-use-idle-io-priority)"{--use-idle-io-priority,--no-use-idle-io-priority} \
   "(--use-inactive-modules --no-use-inactive-modules)"{--use-inactive-modules,--no-use-inactive-modules}"[Allow kde-builder to also clone and pull from repositories marked as inactive]" \
+  "(--version -v)"{--version,-v}"[Script information]" \
   \
   "*:: :_kde-builder_modules_and_module_sets"
 
