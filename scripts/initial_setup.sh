@@ -34,7 +34,7 @@ install_runtime_packages() {
   elif [ "$ID" = "fedora" ]; then
     (set -x; sudo dnf install git python3-dbus python3-pyyaml python3-setproctitle)
   elif [ "$ID" = "gentoo" ]; then
-    (set -x; sudo emerge -q dev-python/dbus-python dev-python/pyyaml dev-python/setproctitle)
+    (set -x; sudo emerge -qu dev-python/dbus-python dev-python/pyyaml dev-python/setproctitle)
   elif [ "$ID" = "opensuse-leap" ]; then
     (set -x; sudo zypper install python311 python311-PyYAML)
     # Does not have packages: dbus-python, setproctitle
