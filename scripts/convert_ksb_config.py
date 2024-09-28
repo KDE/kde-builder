@@ -52,6 +52,11 @@ class KSBParser:
                 filename = ""
                 if match:
                     filename = match.group(1)
+                filename = filename.replace("${module-definitions-dir}", "${build-configs-dir}")\
+                    .replace("kf5-qt5.ksb", "kde5.yaml")\
+                    .replace("kf6-qt6.ksb", "kde6.yaml")\
+                    .replace("kf${_ver}-qt${_ver}.ksb", "kde${_ver}.yaml")\
+                    .replace(".ksb", ".yaml")
                 key = "include " + filename
                 ret_dict[key] = ""  # use empty line as a value
                 continue  # do not expect "end" marker after include line.

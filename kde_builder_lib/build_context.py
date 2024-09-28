@@ -103,10 +103,10 @@ class BuildContext(Module):
 
         # These options are used for internal state, they are _not_ exposed as cmdline options
         self.global_options_private = {
+            "build-configs-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs",
             "filter-out-phases": "",
             "git-push-protocol": "git",
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
-            "module-definitions-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/module-definitions",
             "repository": "",  # module's git repo
             "set-env": {},  # dict of environment vars to set
             "ssh-identity-file": "",  # If set, is passed to ssh-add.
