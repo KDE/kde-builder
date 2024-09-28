@@ -3,6 +3,7 @@
 # This should exercise embedded kde-projects test data (including metadata.json
 # replacement and dependency-data replacement)
 
+config-version: 2
 global:
     source-dir: /tmp
     make-options: -j4

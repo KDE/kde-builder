@@ -174,8 +174,8 @@ if __name__ == "__main__":
 
     config_content = KSBParser.read_ksb_file(ksb_file)
 
-    # # Create a new dictionary with the new key-value pair at the beginning
-    # config_content = {"config-version": 2, **config_content}
+    # Create a new dictionary with the new key-value pair at the beginning
+    config_content = {"config-version": 2, **config_content}
 
     # Replace "true" and "false" strings to real boolean values
     for node in config_content:

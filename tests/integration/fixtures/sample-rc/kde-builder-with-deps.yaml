@@ -2,6 +2,7 @@
 
 # This should be same as kde-builder.yaml except for include-dependencies
 
+config-version: 2
 global:
     source-dir: /tmp
     make-options: -j4

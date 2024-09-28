@@ -931,15 +931,15 @@ class Application:
         module_and_module_set_list = []
         rcfile = ctx.rc_file
 
-        # first_node = next(iter(config_content))
-        # first_node_content = config_content.pop(first_node)
+        first_node = next(iter(config_content))
+        first_node_content = config_content.pop(first_node)
 
-        # if first_node != "config-version":
-        #     # First key in the kde-builder.yaml should be "config-version".
-        #     logger_app.error(f"Invalid configuration file: {rcfile}.\nThe very first element in config should be \"config-version\".")
-        #     raise ConfigError("Unexpected first key instead of \"config-version\".")
-        # elif first_node_content != 2:
-        #     raise ConfigError(f"Unrecognized config version number. The version 2 was expected, but {first_node_content} was given.")
+        if first_node != "config-version":
+            # First key in the kde-builder.yaml should be "config-version".
+            logger_app.error(f"Invalid configuration file: {rcfile}\nThe very first element in config should be \"config-version\".")
+            raise ConfigError("Unexpected first key instead of \"config-version\".")
+        elif first_node_content != 2:
+            raise ConfigError(f"Unrecognized config version number. The version 2 was expected, but {first_node_content} was given.")
 
         first_node = next(iter(config_content))
         first_node_content = config_content.pop(first_node)

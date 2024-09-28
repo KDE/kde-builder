@@ -1,3 +1,4 @@
+config-version: 2
 global:
     source-dir: /tmp
     qt-install-dir: /tmp/qt5

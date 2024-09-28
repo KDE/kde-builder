@@ -3,6 +3,7 @@
 # This should be the same as kde-builder-with-deps.yaml except for
 # include-dependencies
 
+config-version: 2
 global:
     source-dir: /tmp
     make-options: -j4
