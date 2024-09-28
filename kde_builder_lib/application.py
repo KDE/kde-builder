@@ -1828,8 +1828,8 @@ class Application:
 
                 logger_app.info("Holding performance profile")
 
-                service = system_bus.get_object("net.hadess.PowerProfiles", "/net/hadess/PowerProfiles")
-                ppd = dbus.Interface(service, "net.hadess.PowerProfiles")
+                service = system_bus.get_object("org.freedesktop.UPower.PowerProfiles", "/org/freedesktop/UPower/PowerProfiles")
+                ppd = dbus.Interface(service, "org.freedesktop.UPower.PowerProfiles")
 
                 # The hold will be automatically released once kde-builder exits
                 ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
