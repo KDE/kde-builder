@@ -174,6 +174,6 @@ class ModuleSetKDEProjects(ModuleSet):
 
         if not len(module_list):
             logger_moduleset.warning("No modules were defined for the module-set " + self.name)
-            logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
 
         return module_list

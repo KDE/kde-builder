@@ -110,7 +110,7 @@ class BuildContext(Module):
             "repository": "",  # module's git repo
             "set-env": {},  # dict of environment vars to set
             "ssh-identity-file": "",  # If set, is passed to ssh-add.
-            "use-modules": ""
+            "use-projects": ""
         }
 
         # These options are exposed as cmdline options, but _not from here_.

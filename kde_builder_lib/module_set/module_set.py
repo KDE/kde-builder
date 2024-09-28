@@ -117,15 +117,15 @@ class ModuleSet(OptionsBase):
         Handle module-set specific options for OptionsBase's set_option.
         """
         # Special-case handling
-        if "use-modules" in options:
-            modules = options["use-modules"].split(" ")
+        if "use-projects" in options:
+            modules = options["use-projects"].split(" ")
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
-                logger_moduleset.error("in the y[use-modules] entry.")
-                raise SetOptionError("use-modules", "Invalid use-modules")
+                logger_moduleset.error("in the y[use-projects] entry.")
+                raise SetOptionError("use-projects", "Invalid use-projects")
 
             self.set_modules_to_find(modules)
-            del options["use-modules"]
+            del options["use-projects"]
 
         if "ignore-projects" in options:
             modules = options["ignore-projects"].split(" ")
@@ -175,7 +175,7 @@ class ModuleSet(OptionsBase):
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
-            logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
 
         return module_list
 
