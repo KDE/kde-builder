@@ -226,7 +226,7 @@ class Application:
         self.run_mode: str = opts["run_mode"]
 
         # Convert list to dict for lookup
-        ignored_in_cmdline = {selector: True for selector in opts["ignore-modules"]}
+        ignored_in_cmdline = {selector: True for selector in opts["ignore-projects"]}
         start_program_and_args: list[str] = opts["start-program"]
 
         # rc-file needs special handling.
@@ -293,8 +293,8 @@ class Application:
                     print(key)
             exit(0)
 
-        ignored_in_global_section = {selector: True for selector in ctx.options["ignore-modules"].split(" ") if selector != ""}  # do not place empty string key, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
-        ctx.options["ignore-modules"] = ""
+        ignored_in_global_section = {selector: True for selector in ctx.options["ignore-projects"].split(" ") if selector != ""}  # do not place empty string key, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
+        ctx.options["ignore-projects"] = ""
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
         ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}

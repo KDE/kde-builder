@@ -119,7 +119,7 @@ class BuildContext(Module):
         self.global_options_with_extra_specifier = {
             "build-when-unchanged": True,
             "colorful-output": True,
-            "ignore-modules": "",
+            "ignore-projects": "",
             "niceness": "10",  # Needs to be a string, not int
             "pretend": "",
             "refresh-build": "",

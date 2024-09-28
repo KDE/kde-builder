@@ -127,15 +127,15 @@ class ModuleSet(OptionsBase):
             self.set_modules_to_find(modules)
             del options["use-modules"]
 
-        if "ignore-modules" in options:
-            modules = options["ignore-modules"].split(" ")
+        if "ignore-projects" in options:
+            modules = options["ignore-projects"].split(" ")
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
-                logger_moduleset.error("in the y[ignore-modules] entry.")
-                raise SetOptionError("ignore-modules", "Invalid ignore-modules")
+                logger_moduleset.error("in the y[ignore-projects] entry.")
+                raise SetOptionError("ignore-projects", "Invalid ignore-projects")
 
             self.add_modules_to_ignore(modules)
-            del options["ignore-modules"]
+            del options["ignore-projects"]
 
         # Actually set options.
         OptionsBase.set_option(self, options)

@@ -108,7 +108,7 @@ class Cmdline:
             "phases": [],
             "run_mode": "build",
             "selectors": [],
-            "ignore-modules": [],
+            "ignore-projects": [],
             "start-program": [],
         }
         found_options = {}
@@ -282,8 +282,8 @@ class Cmdline:
                     if module not in opts["opts"]:
                         opts["opts"][module] = {}
                     opts["opts"][module][option] = value
-        if args.ignore_modules:
-            found_options["ignore-modules"] = args.ignore_modules
+        if args.ignore_projects:
+            found_options["ignore-projects"] = args.ignore_projects
         # </editor-fold desc="arg functions">
         exec(flag_handlers)
         exec(global_opts_handler)
@@ -292,8 +292,8 @@ class Cmdline:
         for unknown_arg in unknown_args:
             opts["selectors"].append(unknown_arg)
 
-        # Don't get ignore-modules confused with global options
-        protected_keys = ["ignore-modules"]
+        # Don't get ignore-projects confused with global options
+        protected_keys = ["ignore-projects"]
         for key in protected_keys:
             if key in found_options:
                 opts[key] = found_options[key]
@@ -529,7 +529,7 @@ class Cmdline:
         context_options_with_extra_specifier = [
             "build-when-unchanged|force-build!",
             "colorful-output|color!",
-            "ignore-modules|!=s{,}",
+            "ignore-projects|!=s{,}",
             "niceness|nice:10",
             "pretend|dry-run|p",
             "refresh-build|r",
