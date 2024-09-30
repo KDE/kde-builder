@@ -46,7 +46,8 @@ class ModuleSetKDEProjects(ModuleSet):
         metadata_module = Module(ctx, re.sub("/", "-", module_name))
 
         # Hardcode the results instead of expanding out the project info
-        metadata_module.set_option({"repository": f"kde:{module_name}"})
+        metadata_module.set_option({"repository": f"kde:{module_name}"})  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
+        # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
         metadata_module.set_option({"#kde-project-path": module_name})
         metadata_module.set_scm_type("metadata")
         metadata_module.set_option({"branch": "master"})

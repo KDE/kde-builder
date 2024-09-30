@@ -439,16 +439,17 @@ class Application:
             update_desired = not ctx.get_option("no-metadata") and ctx.phases.has("update")
             update_needed = (not os.path.exists(module_source)) or (not os.listdir(module_source))
 
-            if update_needed:
-                Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status
-
             if not update_desired and not update_needed:
                 ctx.set_option({"metadata-update-skipped": 1})
 
-            if update_needed and Debug().pretending():
-                logger_app.warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
-                                   " y[b[*] --pretend mode will resume after metadata is available.")
-                Debug().set_pretending(False)
+            if update_needed:
+                if Debug().pretending():
+                    logger_app.warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
+                                       " y[b[*] --pretend mode will resume after metadata is available.")
+                    Debug().set_pretending(False)
+
+                # This must be not in pretending mode, because we use "kde:" alias in the repository option of repo-metadata module, and so we really need to edit user's git config.
+                Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status.
 
             if (update_desired and not Debug().pretending()) or update_needed:
                 orig_wd = os.getcwd()
