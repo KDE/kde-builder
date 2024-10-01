@@ -114,7 +114,7 @@ class FirstRun:
         not_found_in_repo_packages = []
 
         # Remake the command for Arch Linux to not require running sudo command when not needed (https://bugs.kde.org/show_bug.cgi?id=471542)
-        if self.oss.vendor_id() == "arch":
+        if self.oss.is_based_on("arch"):
             required_packages_and_required_groups = packages
             missing_packages_and_required_groups = subprocess.run("pacman -T " + " ".join(required_packages_and_required_groups), shell=True, capture_output=True, check=False).stdout.decode("utf-8").removesuffix("\n").split("\n")
             all_possible_groups = subprocess.run("pacman -Sg", shell=True, capture_output=True, check=False).stdout.decode("utf-8").removesuffix("\n").split("\n")
@@ -128,7 +128,7 @@ class FirstRun:
                     missing_packages_from_required_groups += missing_packages_from_required_group
             packages = missing_packages_not_grouped + missing_packages_from_required_groups
 
-        if self.oss.is_debian_based():
+        if self.oss.is_based_on("debian"):
             all_available_packages = subprocess.run("apt list", shell=True, capture_output=True).stdout.decode("utf-8").removesuffix("\n").split("\n")
             all_available_packages.pop(0)  # The 0 element is "Listing..."
             all_available_packages = [pkg.split("/")[0] for pkg in all_available_packages]

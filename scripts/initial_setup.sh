@@ -26,7 +26,7 @@ install_runtime_packages() {
   if [ "$ID" = "alpine" ]; then
     (set -x; sudo apk update)
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
-  elif [ "$ID" = "arch" ] || [ "$ID" = "manjaro" ]; then
+  elif [[ "$ID_LIKE" == *"arch"* || "$ID" = "arch" ]]; then
     (set -x; sudo pacman -S git dbus-python python-yaml python-setproctitle --needed)
   elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ] || [ "$ID" = "neon" ]; then
     (set -x; sudo apt update)

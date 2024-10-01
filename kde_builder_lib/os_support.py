@@ -75,17 +75,17 @@ class OSSupport:
         else:
             return "unknown"
 
-    def is_debian_based(self) -> bool:
+    def is_based_on(self, id_str: str) -> bool:
         """
-        Return boolean. 1 (true) if this is a Linux distribution based on Debian, 0 (false) otherwise.
+        Return true if passed id_str matches ID or is contained in ID_LIKE of /etc/os-release.
         """
-        if self.ID == "debian":
+        if self.ID == id_str:
             return True
 
         like_distros = self.ID_LIKE or ""
         if like_distros:
             like_distros_list = like_distros.split(" ")
-            if "debian" in like_distros_list:
+            if id_str in like_distros_list:
                 return True
         return False
 
