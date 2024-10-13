@@ -11,155 +11,61 @@ Generate the zsh completions file.
 import os.path
 import subprocess
 
-p = subprocess.run("~/bin/kde-builder --show-options-specifiers", cwd=os.path.expanduser(os.getcwd() + "/.."), shell=True, capture_output=True, text=True)
-p = p.stdout
-specifiers = p.split("\n")
-specifiers = list(filter(None, specifiers))  # remove empty string from last line
-specifiers.sort()
-if not specifiers:
-    print("Cannot get options specifiers")
-    exit(1)
-
-
-individual_options = []
-conflicting_sets = []
-set_tails = {}
-
-# Manually handled conflicts. No need to fully specify the set, just add one option from each, and final conflict set will contain all elements from conflicting sets.
-# A single option such as "--quiet" is considered as a set of one element.
-conflicting_sets.extend([
-    {"--dependency-tree", "--dependency-tree-fullpath"},
-    {"--src-only"},
-    {"--resume-from"},
-    {"--resume-after"},
-    {"--stop-before"},
-    {"--stop-after"},
-    {"--no-metadata"},
-    {"-d", "-D", "--include-dependencies"}
-])
-
-
-# Returns the id of set to which the conflicting_options were added
-def add_conflicting_options(conflicting_options: list) -> int:
-    for conflicting_set in conflicting_sets:
-        for conflicting_option in conflicting_options:
-            if conflicting_option in conflicting_set:
-                conflicting_set.update(conflicting_options)
-                return id(conflicting_set)
-    new_set = set(conflicting_options)
-    conflicting_sets.append(new_set)
-    return id(new_set)
-
-
-# Start parsing specifiers
-for line in specifiers:
-    nargs = None
-    negatable = False
-
-    if line.endswith("=s"):
-        nargs = 1
-        line = line.removesuffix("=s")
-    elif line.endswith("!"):
-        nargs = 0
-        line = line.removesuffix("!")
-        negatable = True
-    elif line.endswith("=s{,}"):
-        nargs = -1  # unlimited
-        line = line.removesuffix("=s{,}")
-    elif line.endswith(":10"):  # for --nice
-        nargs = 1  # will assume it is mandatory
-        line = line.removesuffix(":10")
-    else:
-        nargs = 0
-
-    parts = line.split("|")
-    dashed_parts = []
-    for part in parts:
-        if len(part) == 1:
-            dashed_parts.append("-" + part)
-        else:
-            dashed_parts.append("--" + part)
-            if negatable:
-                dashed_parts.append("--no-" + part)
-                add_conflicting_options(dashed_parts)
-    set_id = add_conflicting_options(dashed_parts)
-    individual_options.extend(dashed_parts)
-
-    if nargs == 0:
-        set_tails[set_id] = ""
-    elif nargs == 1:
-        if line == "rc-file":
-            set_tails[set_id] = "\":::_files\""
-            continue
-        elif any(option for option in ["--resume-from", "--stop-before"] if option in dashed_parts):
-            set_tails[set_id] = "\":::_kde-builder_modules\""
-            continue
-        set_tails[set_id] = "\":argument:\""
-    else:  # infinite
-        if any(option for option in ["--ignore-modules"] if option in dashed_parts):
-            set_tails[set_id] = "\":::_kde-builder_modules\""
-            continue
-        set_tails[set_id] = "\":arguments:\""
-
-all_conflicting = []
-for conflicting_set in conflicting_sets:
-    all_conflicting.extend(list(conflicting_set))
-
-not_conflicting = []
-for individual_option in individual_options:
-    if individual_option not in all_conflicting:
-        not_conflicting.append(individual_option)
 
 # Adding descriptions:
 # Note: Use "Edit | Sort Lines" to sort them alphabetically
-short_descriptions = {  # contains one of the options (any of them) from set, and description for a set
+short_descriptions = {  # contains one of the options (the first one if it has variants), and description for it
     "--async": "Perform source update and build process in parallel",
     "--binpath": "Set the environment variable PATH while building",
     "--branch": "Checkout the specified branch",
     "--branch-group": "General group from which you want modules to be chosen",
     "--build-dir": "The directory that contains the built sources",
     "--build-only": "Only perform the build process",
-    "--no-build": "Do not build the sources",
     "--build-system-only": "Abort building a module just before the make command",
+    "--build-when-unchanged": "Disable skipping the build process.",
     "--cmake-generator": "Which generator to use with CMake",
     "--cmake-options": "Flags to pass to CMake when creating the build system for the module",
     "--cmake-toolchain": "Specify a toolchain file to use with CMake",
-    "--color": "Toggle colorful output",
+    "--colorful-output": "Toggle colorful output",
     "--compile-commands-export": "Generation of a compile_commands.json",
     "--compile-commands-linking": "Creation of symbolic links from compile_commands.json to source directory",
     "--configure-flags": "Flags to pass to ./configure ",
     "--custom-build-command": "Run a different command in order to perform the build process",
     "--cxxflags": "Flags to use for building the module",
+    "--debug": "Enable debug mode",
     "--delete-my-patches": "Let kde-builder delete source directories that may contain user data",
     "--delete-my-settings": "Overwrite existing files which may contain user data",
     "--dependency-tree": "Print out dependency information on the modules that would be built",
+    "--dependency-tree-fullpath": "Print out dependency information (fullpath) on the modules that would be built",
     "--dest-dir": "The name a module is given on disk",
     "--directory-layout": "Layout which kde-builder should use when creating source and build directories",
     "--disable-agent-check": "Prevent ssh from asking for your pass phrase for every module",
     "--do-not-compile": "Select a specific set of directories not to be built in a module",
-    "--force-build": "Disable skipping the build process.",
-    "--generate-config": "Installs a base kdesrc-buildrc",
     "--generate-clion-project-config": "Generate a clion project config",
-    "--generate-vscode-project-config": "Generate a vscode project config",
+    "--generate-config": "Installs a base kdesrc-buildrc",
     "--generate-qtcreator-project-config": "Generate a qtcreator project config",
+    "--generate-vscode-project-config": "Generate a vscode project config",
     "--help": "Displays help on commandline options",
-    "--list-installed": "Print installed modules and exit",
     "--ignore-modules": "Do not include specified modules in the update/build process",
     "--include-dependencies": "Builds/Skip KDE-based dependencies",
     "--initial-setup": "Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc",
     "--install-dir": "Where to install the module after it is built",
     "--install-distro-packages": "Installs required system pkgs",
+    "--install-login-session": "Install a login session",
     "--install-only": "Only perform the install process",
-    "--no-install": "Skip the install process",
     "--libname": "Default name of the installed library directory",
     "--libpath": "Set the environment variable LD_LIBRARY_PATH while building",
+    "--list-installed": "Print installed modules and exit",
     "--log-dir": "Directory used to hold the log files generated by the script",
     "--make-install-prefix": "A command and its options to precede the make install command used to install modules",
     "--make-options": "Pass command line options to the make command",
     "--metadata-only": "Only perform the metadata download process",
-    "--no-metadata": "Skip the metadata download process",
-    "--nice": "Priority kde-builder will set for itself",
+    "--niceness": "Priority kde-builder will set for itself",
     "--ninja-options": "Pass command line options to the ninja build command",
+    "--no-build": "Do not build the sources",
+    "--no-install": "Skip the install process",
+    "--no-metadata": "Skip the metadata download process",
+    "--no-src": "Do not perform update source code",
     "--num-cores": "Set the number of available CPUs",
     "--num-cores-low-mem": "Set the number of CPUs that is deemed safe for heavyweight or other highly-intensive modules",
     "--override-build-system": "Manually specify the correct build type",
@@ -173,39 +79,154 @@ short_descriptions = {  # contains one of the options (any of them) from set, an
     "--rebuild-failures": "Only those modules which failed to build on a previous run.",
     "--reconfigure": "Run cmake or configure again, without cleaning the build directory",
     "--refresh-build": "Start the build from scratch",
+    "--refresh-build-first": "Start the build from scratch of first project",
     "--remove-after-install": "Delete the source and/or build directory after the module is successfully installed",
     "--resume": "Resume after a build failure",
-    "--resume-from": "Skips modules until just before the given package, then operates as normal",
     "--resume-after": "Skips modules until just after the given package, then operates as normal",
+    "--resume-from": "Skips modules until just before the given package, then operates as normal",
+    "--resume-refresh-build-first": "Resume after a build failure and start the build from scratch of first project",
     "--revision": "Checkout a specific numbered revision",
-    # "--run": "A program to run with kde-builder",  # Todo Needs to be added separately
     "--run-tests": "Built the modules with support for running their test suite",
     "--set-module-option-value": "Override an option in your configuration file for a specific module",
     "--show-info": "Show tool information",
     "--show-options-specifiers": "Show options information",
     "--source-dir": "Directory that stores the KDE sources",
+    "--source-when-start-program": "Source a file before starting the project",
     "--src-only": "Only perform update source code",
-    "--no-src": "Do not perform update source code",
     "--stop-after": "Stops just after the given package is reached",
     "--stop-before": "Stops just before the given package is reached",
     "--stop-on-failure": "Stops/Does not stop the build as soon as a package fails to build",
     "--tag": "Download a specific release of a module",
     "--uninstall": "Uninstalls the module",
     "--use-clean-install": "Run make uninstall directly before running make install",
-    "--use-idle-io-priority ": "Use lower priority for disk and other I/O",
+    "--use-idle-io-priority": "Use lower priority for disk and other I/O",
     "--use-inactive-modules": "Allow kde-builder to also clone and pull from repositories marked as inactive",
     "--verbose": "Change the level of verbosity",
     "--version": "Script information",
+    # "--run": "A program to run with kde-builder",  # Todo Needs to be added separately
 }
 
-for conflicting_set in conflicting_sets:
-    for opt in list(conflicting_set):
-        if opt in short_descriptions:
-            set_tails[id(conflicting_set)] = f"\"[{short_descriptions[opt]}]\"" + set_tails[id(conflicting_set)]
-            break
+# Manually handled mutually exclusive options. Just add main (main - means the first if there are variations of option) option name from each optspec,
+# and final set will contain all elements from conflicting sets.
+# A single option such as "--quiet" is considered as a set of one element.
+mut_excl = [
+    {"--dependency-tree", "--dependency-tree-fullpath"},
+    {"--src-only", "--no-src"},
+    {"--resume-from", "--resume-after"},
+    {"--stop-before", "--stop-after"},
+    {"--no-metadata", "--no-metadata"},
+    {"--build-only", "--no-build"},
+    {"--install-only", "--no-install"},
+    {"-d", "-D", "--include-dependencies"}
+]
 
 
-# sort first by positive options; positive and negative goes in pair.
+def get_specifiers() -> list:
+    p = subprocess.run("~/bin/kde-builder --show-options-specifiers", cwd=os.path.expanduser(os.getcwd() + "/.."), shell=True, capture_output=True, text=True)
+    p = p.stdout
+    specifiers = p.split("\n")
+    specifiers = list(filter(None, specifiers))  # remove empty string from last line
+    specifiers.sort()
+    if not specifiers:
+        print("Cannot get options specifiers")
+        exit(1)
+    return specifiers
+
+
+specifiers = get_specifiers()
+
+data = {}
+
+
+def prepare_data(specifiers: list, data: dict) -> None:
+
+    # Pasre options
+    for line in specifiers:
+        nargs = None
+        negatable = False
+
+        if line.endswith("=s"):
+            nargs = 1
+            line = line.removesuffix("=s")
+        elif line.endswith("!"):
+            nargs = 0
+            line = line.removesuffix("!")
+            negatable = True
+        elif line.endswith("=s{,}"):
+            nargs = -1  # unlimited
+            line = line.removesuffix("=s{,}")
+        elif line.endswith(":10"):  # for --nice
+            nargs = 1  # will assume it is mandatory
+            line = line.removesuffix(":10")
+        else:
+            nargs = 0
+
+        parts = line.split("|")
+        dashed_parts = []
+        for part in parts:
+            if len(part) == 1:
+                dashed_parts.append("-" + part)
+            else:
+                dashed_parts.append("--" + part)
+                if negatable:
+                    dashed_parts.append("--no-" + part)
+
+        if nargs == 0:
+            expl_str = ""
+        elif nargs == 1:
+            if line == "rc-file":
+                expl_str = "\":::_files\""
+            elif any(option for option in ["--resume-from", "--stop-before"] if option in dashed_parts):
+                expl_str = "\":::_kde-builder_modules\""
+            else:
+                expl_str = "\":argument:\""
+        else:  # infinite
+            if any(option for option in ["--ignore-modules"] if option in dashed_parts):
+                expl_str = "\":::_kde-builder_modules\""
+            else:
+                expl_str = "\":arguments:\""
+
+        option_main_name = dashed_parts[0]
+        description = ""
+        if option_main_name in short_descriptions:
+            description = short_descriptions[option_main_name]
+
+        data[option_main_name] = {
+            "variations": dashed_parts,  # the main name and also negatable form and aliases
+            "arg_spec": expl_str,  # defines what will be completed after the option
+            "description": description,  # short text description for the option
+            "mutually_exclusives": None,  # all variations, plus all variations from mutually exclusive options. We will fill in this later.
+        }
+
+    # Mutually exclusives filling
+    for excl_set in mut_excl:
+        fully_made_set = set()
+        for el in excl_set:
+            variations = data[el]["variations"]
+            fully_made_set.update(variations)
+        # Now our fully_made_set is filled.
+        for el in excl_set:
+            data[el]["mutually_exclusives"] = fully_made_set
+
+    # Special treatment for -d and -D
+    del data["-d"]
+    del data["-D"]
+    data["--include-dependencies"]["variations"].extend(["-d", "-D"])
+
+    # Filling unfilled mutually_exclusives by the option variations itself (if any).
+    for main_opt_name in data:
+        if data[main_opt_name]["mutually_exclusives"] is None:
+            if len(data[main_opt_name]["variations"]) > 1:
+                data[main_opt_name]["mutually_exclusives"] = set(data[main_opt_name]["variations"])
+            else:
+                data[main_opt_name]["mutually_exclusives"] = ""
+
+
+prepare_data(specifiers, data)
+
+
+# Custom sort. Sort by positive variants, but list the negative next to positive.
+# I.e. we would have: [--a-opt, --no-a-opt, --z-opt, --no-z-opt]
 def set_sort(input_set) -> list:
     listed = list(input_set)
 
@@ -237,28 +258,32 @@ def set_sort(input_set) -> list:
 
 # Start printing
 print("""\
-#compdef kdesrc-build kde-builder
+#compdef kde-builder
 
 # SPDX-FileCopyrightText: None
 #
 # SPDX-License-Identifier: CC0-1.0
 
 # Autogenerated by gen_zsh_completions.py. Do not edit it manually.
-# See https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/supported-cmdline-params.html for description of options
+# See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html for description of options.
 
 _arguments \\\
 """)
 
-for conflicting_set in conflicting_sets:
-    if len(conflicting_set) > 1:
-        sting_spaced = " ".join(set_sort(conflicting_set))
-        sting_commaed = ",".join(set_sort(conflicting_set))
+for option_main_name in data:
+    work_data = data[option_main_name]
+    mutually_exclusives_str = " ".join(set_sort(work_data["mutually_exclusives"]))
+    variations_str = ",".join(set_sort(work_data["variations"]))
+    if "," in variations_str:  # when there is only one element, we cannot use curly braces
+        variations_str = "{" + variations_str + "}"
+    description = work_data["description"]
+    arg_spec = work_data["arg_spec"]
 
-        appending = set_tails[id(conflicting_set)]
-        print(f"  \"({sting_spaced})\"{{{sting_commaed}}}{appending} \\")
+    if len(work_data["mutually_exclusives"]) > 0:
+        print(f"  \"({mutually_exclusives_str})\"{variations_str}\"[{description}]\"{arg_spec} \\")
     else:
-        appending = set_tails[id(conflicting_set)]
-        print(f"  \"{list(conflicting_set)[0]}\"{appending} \\")
+        print(f"  {variations_str}\"[{description}]\"{arg_spec} \\")
+
 
 print("""\
   \\
