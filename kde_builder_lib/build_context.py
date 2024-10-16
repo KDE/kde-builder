@@ -103,7 +103,7 @@ class BuildContext(Module):
         if os.path.isdir("/usr/lib/x86_64-linux-gnu"):
             self.libname = "lib/x86_64-linux-gnu"
 
-        # These options are used for internal state, they are _not_ exposed as cmdline options
+        # These options are used for internal state, they are _not_ used in cmdline options
         self.global_options_private = {
             "filter-out-phases": "",
             "git-push-protocol": "git",
@@ -115,8 +115,7 @@ class BuildContext(Module):
             "use-modules": ""
         }
 
-        # These options are exposed as cmdline options, but _not from here_.
-        # Their more complex specifier is made in `Cmdline` _supported_options().
+        # These options are used in cmdline options.
         # If adding new option here, and it is boolean, do not forget to add it in the boolean_extra_specified_options.
         self.global_options_with_extra_specifier = {
             "build-when-unchanged": True,
@@ -148,7 +147,7 @@ class BuildContext(Module):
             "use-inactive-modules": False,
         }
 
-        # These options are exposed as cmdline options that require some parameter
+        # These options are used in cmdline options and require some parameter
         self.global_options_with_parameter = {
             "binpath": "",
             "branch": "",
@@ -183,7 +182,7 @@ class BuildContext(Module):
             "tag": "",
         }
 
-        # These options are exposed as cmdline options without parameters
+        # These options are used in cmdline options without parameters
         self.global_options_without_parameter = {
             "build-system-only": "",
             "reconfigure": "",
