@@ -169,8 +169,10 @@ check_zsh_fpath() {
 
 if [ -f /etc/os-release ]; then
   source /etc/os-release
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  ID="macOS"
 else
-  echo "${Red}Not found /etc/os-release file.${Color_Off}" 1>&2
+  echo "${Red}Unable to detect operating system.${Color_Off}" 1>&2
   exit 1
 fi
 
