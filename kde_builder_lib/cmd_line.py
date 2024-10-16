@@ -115,35 +115,6 @@ class Cmdline:
 
         parser = argparse.ArgumentParser(add_help=False)
 
-        # Create a code as a string, containing functions to be run for flag options
-        flag_handlers = ""
-        for key in BuildContext().global_options_with_negatable_form.keys():
-            if key == "async":  # as async is reserved word in python, we use such way to access it
-                flag_handlers += textwrap.dedent("""\
-                    if vars(args)["async"] is not None:
-                        found_options["async"] = vars(args)["async"]
-                    """)
-                continue
-
-            opt_name = key.replace("-", "_")
-
-            flag_handlers += textwrap.dedent(f"""\
-            if args.{opt_name} is not None:
-                found_options[\"{key}\"] = args.{opt_name}
-            """)
-
-        # Similar procedure for global options (they require one argument)
-        global_opts_handler = ""
-        for key in BuildContext().global_options_with_parameter.keys():
-            opt_name = key.replace("-", "_")
-
-            global_opts_handler += textwrap.dedent(f"""\
-            if args.{opt_name}:
-                found_options[\"{key}\"] = args.{opt_name}[0]
-            """)
-
-        supported_options = Cmdline._supported_options()
-
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
         run_index = -1
@@ -161,59 +132,93 @@ class Cmdline:
                 logger_app.error("You need to specify a module with the --run option")
                 exit(1)  # Do not continue
 
-        supported_options.remove("set-module-option-value=s")  # specify differently, allowing it to be repeated in cmdline
-        parser.add_argument("--set-module-option-value", type=lambda x: x.split(",", 2), action="append")
-
-        # Generate the code as a string with `parser.add_argument(...) ...`.
-        # This is done by parsing supported_options and extracting option variants (long, alias, short ...), parameter numbers and default values.
-        string_of_parser_add_arguments = ""
-        for key in supported_options:
-            # global flags and global options are not duplicating options defined in options in _supported_options(). That function ensures that.
-
-            line = key
-            nargs = None
-            action = None
-            if line.endswith("=s"):
-                nargs = 1
-                line = line.removesuffix("=s")
-            elif line.endswith("!"):  # negatable boolean
-                action = "argparse.BooleanOptionalAction"
-                line = line.removesuffix("!")
-            elif line.endswith("=s{,}"):  # one or more option values
-                nargs = "\"+\""
-                line = line.removesuffix("=s{,}")
-            elif line.endswith(":s"):  # optional string argument
-                nargs = "\"?\""
-                line = line.removesuffix(":s")
-            elif line.endswith("=i"):
-                nargs = 1
-                line = line.removesuffix("=i")
-            elif line.endswith(":10"):  # for --nice
-                nargs = "\"?\""
-                nargs += ", default=10"
-                line = line.removesuffix(":10")
-            else:  # for example, for "-p" to not eat selector.
-                action = "\"store_true\""
-
-            parts = line.split("|")
-            dashed_parts = []
-            for part in parts:
-                if len(part) == 1:
-                    dashed_parts.append("\"-" + part + "\"")
-                else:
-                    dashed_parts.append("\"--" + part + "\"")
-
-            specstr = ", ".join(dashed_parts)
-            if nargs:
-                specstr += f", nargs={nargs}"
-            elif action:
-                specstr += f", action={action}"
-
-            # example of string: parser.add_argument("--show-info", action="store_true")
-            string_of_parser_add_arguments += textwrap.dedent(f"""\
-            parser.add_argument({specstr})
-            """)
-        exec(string_of_parser_add_arguments)
+        # <editor-fold desc="Adding parser arguments">
+        parser.add_argument("--set-module-option-value", type=lambda x: x.split(",", 2), action="append")  # allowing it to be repeated in cmdline
+        parser.add_argument("--dependency-tree", action="store_true")
+        parser.add_argument("--dependency-tree-fullpath", action="store_true")
+        parser.add_argument("--help", "-h", action="store_true")
+        parser.add_argument("--list-installed", action="store_true")
+        parser.add_argument("--no-metadata", "-M", action="store_true")
+        parser.add_argument("--query", nargs=1)
+        parser.add_argument("--rc-file", nargs=1)
+        parser.add_argument("--rebuild-failures", action="store_true")
+        parser.add_argument("--resume", action="store_true")
+        parser.add_argument("--resume-after", "--after", "-a", nargs=1)
+        parser.add_argument("--resume-from", "--from", "-f", nargs=1)
+        parser.add_argument("--resume-refresh-build-first", "-R", action="store_true")
+        parser.add_argument("--show-info", action="store_true")
+        parser.add_argument("--show-options-specifiers", action="store_true")
+        parser.add_argument("--stop-after", "--to", nargs=1)
+        parser.add_argument("--stop-before", "--until", nargs=1)
+        parser.add_argument("--version", "-v", action="store_true")
+        parser.add_argument("--build-only", action="store_true")
+        parser.add_argument("--install-only", action="store_true")
+        parser.add_argument("--no-build", action="store_true")
+        parser.add_argument("--no-install", action="store_true")
+        parser.add_argument("--no-src", "-S", action="store_true")
+        parser.add_argument("--src-only", "-s", action="store_true")
+        parser.add_argument("--uninstall", action="store_true")
+        parser.add_argument("--build-when-unchanged", "--force-build", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--colorful-output", "--color", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--ignore-modules", "-!", nargs="+")
+        parser.add_argument("--niceness", "--nice", nargs="?", default=10)
+        parser.add_argument("--pretend", "--dry-run", "-p", action="store_true")
+        parser.add_argument("--refresh-build", "-r", action="store_true")
+        parser.add_argument("-d", action="store_true")
+        parser.add_argument("-D", action="store_true")
+        parser.add_argument("--async", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--compile-commands-export", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--compile-commands-linking", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--delete-my-patches", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--delete-my-settings", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--disable-agent-check", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--generate-clion-project-config", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--generate-vscode-project-config", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--generate-qtcreator-project-config", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--include-dependencies", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--install-login-session", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--purge-old-logs", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--run-tests", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--stop-on-failure", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--use-clean-install", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--use-idle-io-priority", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--use-inactive-modules", action=argparse.BooleanOptionalAction)
+        parser.add_argument("--binpath", nargs=1)
+        parser.add_argument("--branch", nargs=1)
+        parser.add_argument("--branch-group", nargs=1)
+        parser.add_argument("--build-dir", nargs=1)
+        parser.add_argument("--cmake-generator", nargs=1)
+        parser.add_argument("--cmake-options", nargs=1)
+        parser.add_argument("--cmake-toolchain", nargs=1)
+        parser.add_argument("--configure-flags", nargs=1)
+        parser.add_argument("--custom-build-command", nargs=1)
+        parser.add_argument("--cxxflags", nargs=1)
+        parser.add_argument("--directory-layout", nargs=1)
+        parser.add_argument("--dest-dir", nargs=1)
+        parser.add_argument("--do-not-compile", nargs=1)
+        parser.add_argument("--install-dir", nargs=1)
+        parser.add_argument("--libname", nargs=1)
+        parser.add_argument("--libpath", nargs=1)
+        parser.add_argument("--log-dir", nargs=1)
+        parser.add_argument("--make-install-prefix", nargs=1)
+        parser.add_argument("--make-options", nargs=1)
+        parser.add_argument("--ninja-options", nargs=1)
+        parser.add_argument("--num-cores", nargs=1)
+        parser.add_argument("--num-cores-low-mem", nargs=1)
+        parser.add_argument("--override-build-system", nargs=1)
+        parser.add_argument("--persistent-data-file", nargs=1)
+        parser.add_argument("--qmake-options", nargs=1)
+        parser.add_argument("--qt-install-dir", nargs=1)
+        parser.add_argument("--remove-after-install", nargs=1)
+        parser.add_argument("--revision", nargs=1)
+        parser.add_argument("--source-dir", nargs=1)
+        parser.add_argument("--source-when-start-program", nargs=1)
+        parser.add_argument("--tag", nargs=1)
+        parser.add_argument("--build-system-only", action="store_true")
+        parser.add_argument("--reconfigure", action="store_true")
+        parser.add_argument("--refresh-build-first", action="store_true")
+        parser.add_argument("--metadata-only", action="store_true")
+        # </editor-fold desc="Adding parser arguments">
 
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
@@ -285,8 +290,108 @@ class Cmdline:
         if args.ignore_modules:
             found_options["ignore-modules"] = args.ignore_modules
         # </editor-fold desc="arg functions">
-        exec(flag_handlers)
-        exec(global_opts_handler)
+
+        # <editor-fold desc="global options with negatable form">
+        if vars(args)["async"] is not None:
+            found_options["async"] = vars(args)["async"]
+        if args.compile_commands_export is not None:
+            found_options["compile-commands-export"] = args.compile_commands_export
+        if args.compile_commands_linking is not None:
+            found_options["compile-commands-linking"] = args.compile_commands_linking
+        if args.delete_my_patches is not None:
+            found_options["delete-my-patches"] = args.delete_my_patches
+        if args.delete_my_settings is not None:
+            found_options["delete-my-settings"] = args.delete_my_settings
+        if args.disable_agent_check is not None:
+            found_options["disable-agent-check"] = args.disable_agent_check
+        if args.generate_clion_project_config is not None:
+            found_options["generate-clion-project-config"] = args.generate_clion_project_config
+        if args.generate_vscode_project_config is not None:
+            found_options["generate-vscode-project-config"] = args.generate_vscode_project_config
+        if args.generate_qtcreator_project_config is not None:
+            found_options["generate-qtcreator-project-config"] = args.generate_qtcreator_project_config
+        if args.include_dependencies is not None:
+            found_options["include-dependencies"] = args.include_dependencies
+        if args.install_login_session is not None:
+            found_options["install-login-session"] = args.install_login_session
+        if args.purge_old_logs is not None:
+            found_options["purge-old-logs"] = args.purge_old_logs
+        if args.run_tests is not None:
+            found_options["run-tests"] = args.run_tests
+        if args.stop_on_failure is not None:
+            found_options["stop-on-failure"] = args.stop_on_failure
+        if args.use_clean_install is not None:
+            found_options["use-clean-install"] = args.use_clean_install
+        if args.use_idle_io_priority is not None:
+            found_options["use-idle-io-priority"] = args.use_idle_io_priority
+        if args.use_inactive_modules is not None:
+            found_options["use-inactive-modules"] = args.use_inactive_modules
+        # </editor-fold desc="global options with negatable form">
+
+        # <editor-fold desc="global options with parameter">
+        if args.binpath:
+            found_options["binpath"] = args.binpath[0]
+        if args.branch:
+            found_options["branch"] = args.branch[0]
+        if args.branch_group:
+            found_options["branch-group"] = args.branch_group[0]
+        if args.build_dir:
+            found_options["build-dir"] = args.build_dir[0]
+        if args.cmake_generator:
+            found_options["cmake-generator"] = args.cmake_generator[0]
+        if args.cmake_options:
+            found_options["cmake-options"] = args.cmake_options[0]
+        if args.cmake_toolchain:
+            found_options["cmake-toolchain"] = args.cmake_toolchain[0]
+        if args.configure_flags:
+            found_options["configure-flags"] = args.configure_flags[0]
+        if args.custom_build_command:
+            found_options["custom-build-command"] = args.custom_build_command[0]
+        if args.cxxflags:
+            found_options["cxxflags"] = args.cxxflags[0]
+        if args.directory_layout:
+            found_options["directory-layout"] = args.directory_layout[0]
+        if args.dest_dir:
+            found_options["dest-dir"] = args.dest_dir[0]
+        if args.do_not_compile:
+            found_options["do-not-compile"] = args.do_not_compile[0]
+        if args.install_dir:
+            found_options["install-dir"] = args.install_dir[0]
+        if args.libname:
+            found_options["libname"] = args.libname[0]
+        if args.libpath:
+            found_options["libpath"] = args.libpath[0]
+        if args.log_dir:
+            found_options["log-dir"] = args.log_dir[0]
+        if args.make_install_prefix:
+            found_options["make-install-prefix"] = args.make_install_prefix[0]
+        if args.make_options:
+            found_options["make-options"] = args.make_options[0]
+        if args.ninja_options:
+            found_options["ninja-options"] = args.ninja_options[0]
+        if args.num_cores:
+            found_options["num-cores"] = args.num_cores[0]
+        if args.num_cores_low_mem:
+            found_options["num-cores-low-mem"] = args.num_cores_low_mem[0]
+        if args.override_build_system:
+            found_options["override-build-system"] = args.override_build_system[0]
+        if args.persistent_data_file:
+            found_options["persistent-data-file"] = args.persistent_data_file[0]
+        if args.qmake_options:
+            found_options["qmake-options"] = args.qmake_options[0]
+        if args.qt_install_dir:
+            found_options["qt-install-dir"] = args.qt_install_dir[0]
+        if args.remove_after_install:
+            found_options["remove-after-install"] = args.remove_after_install[0]
+        if args.revision:
+            found_options["revision"] = args.revision[0]
+        if args.source_dir:
+            found_options["source-dir"] = args.source_dir[0]
+        if args.source_when_start_program:
+            found_options["source-when-start-program"] = args.source_when_start_program[0]
+        if args.tag:
+            found_options["tag"] = args.tag[0]
+        # </editor-fold desc="global options with parameter">
 
         # Module selectors (i.e. an actual argument)
         for unknown_arg in unknown_args:
