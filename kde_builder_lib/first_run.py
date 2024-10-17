@@ -242,8 +242,8 @@ class FirstRun:
 
         num_cores_low = self._get_num_cores_for_low_memory(num_cores)
 
-        sample_rc = sample_rc.replace("%{num_cores}", str(num_cores))
-        sample_rc = sample_rc.replace("%{num_cores_low}", str(num_cores_low))
+        sample_rc = sample_rc.replace("%{num_cores}", "\"" + str(num_cores) + "\"")
+        sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + str(num_cores_low) + "\"")
 
         gl = BuildContext().build_options["global"]  # real global defaults
 

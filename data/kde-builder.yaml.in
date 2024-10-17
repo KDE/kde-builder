@@ -71,7 +71,7 @@ global:
 # This line includes build configs that are provided in build-configs dir in repo-metadata.
 # https://invent.kde.org/sysadmin/repo-metadata/-/tree/master/build-configs
 # KDE Builder automatically updates repo-metadata, so you are always using an up-to-date configs.
-include ${build-configs-dir}/kde6.ksb: ""
+include ${build-configs-dir}/kde6.yaml: ""
 
 # ===============================================================================================
 # Starting from here, you can add your custom projects and override options for defined projects.
