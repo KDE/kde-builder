@@ -117,25 +117,27 @@ class ModuleSet(OptionsBase):
         Handle module-set specific options for OptionsBase's set_option.
         """
         # Special-case handling
-        if "use-modules" in options:
-            modules = options["use-modules"].split(" ")
+        if "use-projects" in options:
+            assert isinstance(options["use-projects"], list)
+            modules = options["use-projects"]
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
-                logger_moduleset.error("in the y[use-modules] entry.")
-                raise SetOptionError("use-modules", "Invalid use-modules")
+                logger_moduleset.error("in the y[use-projects] entry.")
+                raise SetOptionError("use-projects", "Invalid use-projects")
 
             self.set_modules_to_find(modules)
-            del options["use-modules"]
+            del options["use-projects"]
 
-        if "ignore-modules" in options:
-            modules = options["ignore-modules"].split(" ")
+        if "ignore-projects" in options:
+            assert isinstance(options["ignore-projects"], list)
+            modules = options["ignore-projects"]
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
-                logger_moduleset.error("in the y[ignore-modules] entry.")
-                raise SetOptionError("ignore-modules", "Invalid ignore-modules")
+                logger_moduleset.error("in the y[ignore-projects] entry.")
+                raise SetOptionError("ignore-projects", "Invalid ignore-projects")
 
             self.add_modules_to_ignore(modules)
-            del options["ignore-modules"]
+            del options["ignore-projects"]
 
         # Actually set options.
         OptionsBase.set_option(self, options)
@@ -175,7 +177,7 @@ class ModuleSet(OptionsBase):
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
-            logger_moduleset.warning("You should use the g[b[use-modules] option to make the module-set useful.")
+            logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
 
         return module_list
 

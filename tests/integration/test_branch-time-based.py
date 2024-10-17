@@ -12,7 +12,7 @@ def test_tag_names_based_on_time():
     """
     Test tag names based on time.
     """
-    app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/branch-time-based/kdesrc-buildrc"])
+    app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/branch-time-based/kde-builder.yaml"])
     module_list = app.modules
     assert len(module_list) == 3, "Right number of modules"
 

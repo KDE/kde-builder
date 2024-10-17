@@ -217,9 +217,9 @@ class FirstRun:
         # default to ~/.config
         xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
         xdg_config_home_short = xdg_config_home.replace(os.environ.get("HOME"), "~")  # Replace $HOME with ~
-        known_locations = [os.getcwd() + "/kdesrc-buildrc",
-                           f"{xdg_config_home}/kdesrc-buildrc",
-                           os.environ.get("HOME") + "/.kdesrc-buildrc"]
+        known_locations = [os.getcwd() + "/kde-builder.yaml",
+                           f"{xdg_config_home}/kde-builder.yaml",
+                           os.environ.get("HOME") + "/kde-builder.yaml"]
         located_file = None
         for known_location in known_locations:
             if os.path.isfile(known_location):
@@ -231,9 +231,9 @@ class FirstRun:
             logger_fr.warning(f"b[*] You already have a configuration file: b[y[{printable_located_file}]")
             return
 
-        logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdg_config_home_short}/kdesrc-buildrc\"]...")
+        logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdg_config_home_short}/kde-builder.yaml\"]...")
 
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kdesrc-buildrc.in", "r") as data_file:
+        with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kde-builder.yaml.in", "r") as data_file:
             sample_rc = data_file.read()
 
         num_cores = os.cpu_count()
@@ -273,7 +273,7 @@ class FirstRun:
         fill_placeholder("generate-qtcreator-project-config", "bool_to_str")
 
         os.makedirs(xdg_config_home, exist_ok=True)
-        with open(f"{xdg_config_home}/kdesrc-buildrc", "w") as sample_fh:
+        with open(f"{xdg_config_home}/kde-builder.yaml", "w") as sample_fh:
             sample_fh.write(sample_rc)
         print()
 

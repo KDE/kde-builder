@@ -34,7 +34,7 @@ def test_cmake_prefix(monkeypatch):
 
     monkeypatch.setattr(UtilLoggedSubprocess, "start", mock_start)
 
-    args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kdesrc-buildrc".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kde-builder.yaml".split(" ")
     app = Application(args)
     module_list = app.modules
 

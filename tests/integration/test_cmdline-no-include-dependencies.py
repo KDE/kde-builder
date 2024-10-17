@@ -51,7 +51,7 @@ def test_no_include_deps(mock_application):
     """
     Verify that --no-include-dependencies is recognized and results in right value.
     """
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc-with-deps --no-include-dependencies setmod1 setmod3".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder-with-deps.yaml --no-include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
     module_list = app.modules
 
@@ -62,7 +62,7 @@ def test_no_include_deps(mock_application):
 
 
 def test_no_include_deps_ignore_modules(mock_application):
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc-with-deps --no-include-dependencies setmod1 setmod3 --ignore-modules setmod2".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder-with-deps.yaml --no-include-dependencies setmod1 setmod3 --ignore-projects setmod2".split(" ")
     app = Application(args)
     module_list = app.modules
 

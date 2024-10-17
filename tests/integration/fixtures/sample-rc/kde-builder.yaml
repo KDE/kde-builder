@@ -1,0 +1,37 @@
+# Sample rc file just for testing purposes
+
+# This should be the same as kde-builder-with-deps.yaml except for
+# include-dependencies
+
+config-version: 2
+global:
+    source-dir: /tmp
+    make-options: -j4
+    git-repository-base: fake git://localhost/git-set/
+    cmake-options: >
+        "-DCMAKE_BUILD_TYPE=a b" bar=c baz
+    cxxflags: # empty
+    # Make sure the cmdline switch in corresponding test is picked up
+    include-dependencies: false
+
+    # To prevent "global" flags from being stripped in modules
+    override-build-system: kde
+
+    # Used to test indirect options expansion
+    num-cores: "8"
+
+group set1:
+    repository: fake
+    use-projects:
+        - setmod1
+        - setmod2
+        - setmod3
+    branch: fake-branch2
+
+project module2:
+    repository: git://localhost/git/module2.git
+    make-options: -j ${num-cores}
+    tag: fake-tag5
+
+override setmod2:
+    tag: tag-setmod2

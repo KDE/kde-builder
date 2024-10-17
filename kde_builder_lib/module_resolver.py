@@ -77,18 +77,18 @@ class ModuleResolver:
         for idx, deferred_entry in enumerate(deferred_options):
             opts = deferred_entry["opts"]
             repo = opts["repository"] if "repository" in opts else None
-            referenced_modules = opts.get("use-modules", None)
+            referenced_modules = opts.get("use-projects", None)
 
             # Skip options blocks that don't reference module-sets
             if not referenced_modules or repo != "kde-projects":
                 continue
 
-            del opts["use-modules"]
+            del opts["use-projects"]
             del opts["repository"]
             set_indices.append(idx)  # so we can delete this once loop complete
 
             # Use KDE project database to pull list of matching `Module`s
-            for m in referenced_modules.split(" "):
+            for m in referenced_modules:
                 mods = proj_db.get_modules_for_project(m)
                 for mod in mods:
                     name = mod["name"]

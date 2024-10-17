@@ -735,7 +735,7 @@ class Module(OptionsBase):
         This calls :meth:`OptionsBase.set_option` and performs any Module-specific handling.
         """
         # Ensure we don't accidentally get fed module-set options
-        for mso in ["use-modules", "ignore-modules"]:
+        for mso in ["use-projects", "ignore-projects"]:
             if mso in options:
                 logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
                 raise SetOptionError(mso, f"Option {mso} can only be used in module-set")

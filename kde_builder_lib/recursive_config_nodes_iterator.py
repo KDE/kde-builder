@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import re
 from typing import TYPE_CHECKING
+import yaml
 
 from .kb_exception import ConfigError
 from .debug import KBLogger
@@ -92,7 +93,8 @@ class RecursiveConfigNodesIterator:
                     try:
                         if not os.path.exists(filename):  # so we throw exception manually
                             raise FileNotFoundError
-                        new_config_content = Application.read_ksb_file(filename)
+                        with open(filename, "r") as f:
+                            new_config_content = yaml.safe_load(f)
                     except IOError:
                         raise ConfigError(f"Unable to open file \"{filename}\" which was included from {self.current_filename}")
 

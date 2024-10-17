@@ -17,7 +17,7 @@ def test_cmdline_selector_not_eaten():
 
     See bug 402509 -- https://bugs.kde.org/show_bug.cgi?id=402509
     """
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --stop-on-failure setmod3".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --stop-on-failure setmod3".split(" ")
 
     app = Application(args)
     module_list = app.modules

@@ -50,7 +50,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
 
 
 def test_include_deps(mock_app_res_mod_dep_graph):
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --include-dependencies setmod1 setmod3".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
     module_list = app.modules
 
@@ -63,11 +63,11 @@ def test_include_deps(mock_app_res_mod_dep_graph):
 
 def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     """
-    Verify that --ignore-modules works for modules that would be included with --include-dependencies in effect.
+    Verify that --ignore-projects works for modules that would be included with --include-dependencies in effect.
 
     See bug 394497 -- https://bugs.kde.org/show_bug.cgi?id=394497
     """
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --include-dependencies setmod1 setmod3 --ignore-modules setmod2".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --include-dependencies setmod1 setmod3 --ignore-projects setmod2".split(" ")
     app = Application(args)
     module_list = app.modules
 
@@ -81,7 +81,7 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
     """
     Verify that --include-dependencies on a module_set name filters out the whole set.
     """
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kdesrc-buildrc --ignore-modules set1".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --ignore-projects set1".split(" ")
 
     app = Application(args)
     module_list = app.modules

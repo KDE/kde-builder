@@ -1,5 +1,8 @@
 # Changelog
 
+2024-10-18
+: Switched to yaml format for configuration file.
+
 2024-09-23
 : Removed option `no-tests`.
 

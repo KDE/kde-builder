@@ -1,0 +1,13 @@
+config-version: 2
+global:
+    source-dir: /tmp
+    git-repository-base: "kde kde:"
+    _bisect-tag: master@{3 weeks ago}
+
+group pim:
+    repository: kde
+    use-projects:
+        - kdepim
+        - kdepim-runtime
+        - akonadi
+    revision: ${_bisect-tag}
