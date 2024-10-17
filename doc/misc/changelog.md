@@ -1,5 +1,8 @@
 # Changelog
 
+2024-10-27
+: Added `meson-options` option.
+
 2024-10-18
 : Switched to yaml format for configuration file.
 

@@ -735,6 +735,16 @@ see the [ninja-options](#conf-ninja-options) setting.
 
 Related command-line option: --make-options \<value\>
 
+(conf-meson-options)=
+[`meson-options`](conf-meson-options)
+
+Type: String
+
+Set this option in order to pass command line options to the
+`meson` configure command.
+
+Related command-line option: --meson-options \<value\>
+
 (conf-ninja-options)=
 [`ninja-options`](conf-ninja-options)
 

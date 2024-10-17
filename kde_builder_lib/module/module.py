@@ -791,7 +791,7 @@ class Module(OptionsBase):
 
         Option names are case-sensitive!
 
-        Some options (e.g. cmake-options, configure-flags) have the global value
+        Some options (e.g. cmake-options, configure-flags, meson-options) have the global value
         and then the module's own value appended together. To get the actual
         module setting you must use the level limit parameter set to "module".
 
@@ -838,7 +838,7 @@ class Module(OptionsBase):
             return ctx_value
 
         # Some options append to the global (e.g. conf flags)
-        conf_flags = ["cmake-options", "configure-flags", "cxxflags"]
+        conf_flags = ["cmake-options", "configure-flags", "cxxflags", "meson-options"]
         if key in conf_flags and ctx_value:
             return (f"{ctx_value} " + self.options.get(key, "")).strip()
 

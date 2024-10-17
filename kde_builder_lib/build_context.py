@@ -167,6 +167,7 @@ class BuildContext(Module):
             "log-dir": os.getenv("HOME") + "/kde/log",
             "make-install-prefix": "",  # Some people need sudo
             "make-options": "",
+            "meson-options": "",
             "ninja-options": "",
             "num-cores": "",  # Used for build constraints
             "num-cores-low-mem": "2",  # Needs to be a string, not int
