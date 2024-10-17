@@ -414,6 +414,9 @@ class Cmdline:
         if args.make_options is not None:
             found_options["make-options"] = args.make_options[0]
 
+        if args.meson_options is not None:
+            found_options["meson-options"] = args.meson_options[0]
+
         if args.ninja_options is not None:
             found_options["ninja-options"] = args.ninja_options[0]
 
