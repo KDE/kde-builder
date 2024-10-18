@@ -527,16 +527,16 @@ class BuildContext(Module):
             # At this moment we know that there is no config at default location, and user did not specified the --rc-file option.
             # And because we do not want to _require_ the config to be available yet, we just will provide dummy config.
             # This way the --metadata-only option could work in both cases: when user has config and when he has not.
-            # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process will be stored in persistent file.
-            # When he has no config (the current case), we will let the _process_configs_content function do its work on fake config, then we will return.
+            # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process, it will be stored in persistent file.
+            # When he has no config (the current case), we will let the _process_configs_content() function do its work on fake config, then we will return.
             dummy_config = textwrap.dedent("""\
-                global
-                    persistent-data-file /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
-                end global
+                config-version: 2
+                global:
+                  persistent-data-file: /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
 
                 # To suppress warning about no modules in configuration.
-                module fake
-                end module
+                project fake:
+                  branch: fake
                 """)
 
             temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
