@@ -3,8 +3,12 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from ..debug import KBLogger
 from .build_system import BuildSystem
 from ..util.util import Util
+
+
+logger_buildsystem = KBLogger.getLogger("build-system")
 
 
 class BuildSystemMeson(BuildSystem):
@@ -28,6 +32,13 @@ class BuildSystemMeson(BuildSystem):
         sourcedir = module.fullpath("source")
         builddir = module.fullpath("build")
         installdir = module.installation_path()
+
+        # Previously, the "configure-flags" option was used also for meson projects. Later we introduced "meson-options" option.
+        # Ensure that user is not trying to use the old option to control meson setup.
+        # TODO remove this check after 18.01.2025.
+        if module.get_option("configure-flags", "module"):
+            logger_buildsystem.error("\t  Config error: \"configure-flags\" option was used for project with meson build system. Use \"meson-options\" instead.")
+            return False
 
         setup_options = Util.split_quoted_on_whitespace(module.get_option("meson-options"))
 
