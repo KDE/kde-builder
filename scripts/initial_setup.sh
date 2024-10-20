@@ -41,7 +41,7 @@ install_runtime_packages() {
     pip install pipenv
     # For building from source code the Python module dbus-python.
     (set -x; sudo zypper install cmake gcc libdbus-c++-devel libglib-testing-devel python311-devel)
-  elif [ "$ID" = "opensuse-tumbleweed" ]; then
+  elif [[ "$ID_LIKE" == *"opensuse-tumbleweed"* || "$ID" = "opensuse-tumbleweed" ]]; then
     (set -x; sudo zypper refresh)
     (set -x; sudo zypper install git python311-pyaml python311-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
