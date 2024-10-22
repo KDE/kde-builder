@@ -28,8 +28,9 @@ _arguments \
   --debug"[Enable debug mode]" \
   "(--delete-my-patches --no-delete-my-patches)"{--delete-my-patches,--no-delete-my-patches}"[Let kde-builder delete source directories that may contain user data]" \
   "(--delete-my-settings --no-delete-my-settings)"{--delete-my-settings,--no-delete-my-settings}"[Overwrite existing files which may contain user data]" \
-  "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree"[Print out dependency information on the modules that would be built]" \
-  "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the modules that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree"[Print out dependency information on the modules that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the modules that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree-yaml"[Print out dependency information on the modules that would be built in machine readable format (YAML)]" \
   --dest-dir"[The name a module is given on disk]"":argument:" \
   --directory-layout"[Layout which kde-builder should use when creating source and build directories]"":argument:" \
   "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every module]" \
@@ -39,7 +40,7 @@ _arguments \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
-  "(-! --ignore-projects)"{-!,--ignore-projects}"[Do not include specified projects in the update/build process]"":::_kde-builder_modules" \
+  "(-! --ignore-projects)"{-!,--ignore-projects}"[]"":arguments:" \
   "(--include-dependencies --no-include-dependencies -D -d)"{--include-dependencies,--no-include-dependencies,-D,-d}"[Builds/Skip KDE-based dependencies]" \
   --initial-setup"[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base config file]" \
   --install-dir"[Where to install the module after it is built]"":argument:" \
@@ -97,3 +98,4 @@ _arguments \
   "(--version -v)"{--version,-v}"[Script information]" \
   \
   "*:: :_kde-builder_modules_and_module_sets"
+
