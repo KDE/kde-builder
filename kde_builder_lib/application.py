@@ -169,6 +169,28 @@ class Application:
         context["report"](connector + current_item + " " + status_info)
 
     @staticmethod
+    def _yield_module_dependency_tree_entry_yaml(node_info: dict, module: Module, context: dict) -> None:
+        build = node_info["build"]
+        current_item = node_info["current_item"]
+        current_branch = node_info["current_branch"]
+        parent_item = node_info["parent_item"]
+
+        if not context.get("flat_modules"):
+            context["flat_modules"] = {}
+        
+        if current_item not in context["flat_modules"]:
+            context["flat_modules"][current_item] = {
+                "build": build,
+                "branch": current_branch,
+                "deps": []
+            }
+        
+        if parent_item:
+            # DependencyResolver should have visted the parent first
+            if current_item not in context["flat_modules"][parent_item]["deps"]:
+                context["flat_modules"][parent_item]["deps"].append(current_item)
+
+    @staticmethod
     def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
         depth = node_info["depth"]
         current_item = node_info["current_item"]
@@ -368,7 +390,11 @@ class Application:
         if not module_graph or "graph" not in module_graph:
             raise KBRuntimeError("Failed to resolve dependency graph")
 
-        if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
+        if (
+            "dependency-tree" in cmdline_global_options
+            or "dependency-tree-fullpath" in cmdline_global_options
+            or "dependency-tree-yaml" in cmdline_global_options
+        ):
             dep_tree_ctx = {
                 "stack": [""],
                 "depth": 0,
@@ -377,6 +403,8 @@ class Application:
 
             if "dependency-tree" in cmdline_global_options:
                 callback = self._yield_module_dependency_tree_entry
+            elif "dependency-tree-yaml" in cmdline_global_options:
+                callback = self._yield_module_dependency_tree_entry_yaml
             else:
                 callback = self._yield_module_dependency_tree_entry_full_path
 
@@ -386,6 +414,9 @@ class Application:
                 dep_tree_ctx,
                 modules
             )
+
+            if "dependency-tree-yaml" in cmdline_global_options:
+                print(yaml.dump(dep_tree_ctx["flat_modules"], default_flow_style=False))
 
             result = {
                 "dependency_info": module_graph,

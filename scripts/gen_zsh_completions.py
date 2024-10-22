@@ -37,6 +37,7 @@ short_descriptions = {  # contains one of the options (the first one if it has v
     "--delete-my-settings": "Overwrite existing files which may contain user data",
     "--dependency-tree": "Print out dependency information on the modules that would be built",
     "--dependency-tree-fullpath": "Print out dependency information (fullpath) on the modules that would be built",
+    "--dependency-tree-yaml": "Print out dependency information on the modules that would be built in machine readable format (YAML)",
     "--dest-dir": "The name a module is given on disk",
     "--directory-layout": "Layout which kde-builder should use when creating source and build directories",
     "--disable-agent-check": "Prevent ssh from asking for your pass phrase for every module",
@@ -110,7 +111,7 @@ short_descriptions = {  # contains one of the options (the first one if it has v
 # and final set will contain all elements from conflicting sets.
 # A single option such as "--quiet" is considered as a set of one element.
 mut_excl = [
-    {"--dependency-tree", "--dependency-tree-fullpath"},
+    {"--dependency-tree", "--dependency-tree-fullpath", "--dependency-tree-yaml"},
     {"--src-only", "--no-src"},
     {"--resume-from", "--resume-after"},
     {"--stop-before", "--stop-after"},

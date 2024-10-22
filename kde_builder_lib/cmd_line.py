@@ -315,6 +315,9 @@ class Cmdline:
         if args.dependency_tree_fullpath:
             found_options["dependency-tree-fullpath"] = True
 
+        if args.dependency_tree_yaml:
+            found_options["dependency-tree-yaml"] = True
+
         if args.directory_layout is not None:
             found_options["directory-layout"] = args.directory_layout[0]
 
@@ -508,6 +511,7 @@ class Cmdline:
         non_context_options = [
             "dependency-tree",
             "dependency-tree-fullpath",
+            "dependency-tree-yaml",
             "help|h",
             "list-installed",
             "no-metadata|M",
