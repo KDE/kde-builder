@@ -177,14 +177,14 @@ class Application:
 
         if not context.get("flat_modules"):
             context["flat_modules"] = {}
-        
+
         if current_item not in context["flat_modules"]:
             context["flat_modules"][current_item] = {
                 "build": build,
                 "branch": current_branch,
                 "deps": []
             }
-        
+
         if parent_item:
             # DependencyResolver should have visted the parent first
             if current_item not in context["flat_modules"][parent_item]["deps"]:
