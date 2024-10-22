@@ -281,6 +281,10 @@ The output format looks similar to the `find` utility.
 
 It is easier to grep something with this format. However, if you want to visualize the tree, you can use [--dependency-tree](cmdline-dependency-tree) instead.
 
+(cmdline-dependency-tree--yaml)=
+[`--dependency-tree-yaml`](cmdline-dependency-tree-yaml)  
+Like [--dependency-tree](cmdline-dependency-tree), but the output is in YAML format for machine consumption.
+
 (cmdline-list-installed)=
 [`--list-installed`](cmdline-list-installed)  
 Print installed projects and exit. This can be used to generate

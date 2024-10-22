@@ -27,8 +27,9 @@ _arguments \
   --debug"[Enable debug mode]" \
   "(--delete-my-patches --no-delete-my-patches)"{--delete-my-patches,--no-delete-my-patches}"[Let kde-builder delete source directories that may contain user data]" \
   "(--delete-my-settings --no-delete-my-settings)"{--delete-my-settings,--no-delete-my-settings}"[Overwrite existing files which may contain user data]" \
-  "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree"[Print out dependency information on the projects that would be built]" \
-  "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the projects that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree"[Print out dependency information on the projects that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the projects that would be built]" \
+  "(--dependency-tree --dependency-tree-fullpath --dependency-tree-yaml)"--dependency-tree-yaml"[Print out dependency information on the projects that would be built in machine readable format (YAML)]" \
   --dest-dir"[The name a project is given on disk]"":argument:" \
   --directory-layout"[Layout which kde-builder should use when creating source and build directories]"":argument:" \
   "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every project]" \
