@@ -96,7 +96,7 @@ class ModuleResolver:
                         final_opts[name] = copy.deepcopy(opts)
 
         # Delete options for module sets, so we don't accidentally process them now
-        # that use-modules/repository keys are gone.  Must be done back-to-front so
+        # that use-projects/repository keys are gone.  Must be done back-to-front so
         # indices don't change.
         set_indices.reverse()
         for index in set_indices:
@@ -354,7 +354,7 @@ class ModuleResolver:
 
         Selectors always choose an available :class:`Module` or :class:`ModuleSet` if
         present (based on the .name of each Module or ModuleSet, including any
-        use-modules entries for ModuleSet objects). If a selector cannot be
+        use-projects entries for ModuleSet objects). If a selector cannot be
         directly found then ModuleSet objects may be expanded into their
         constituent Module objects and the search performed again. If a selector
         still cannot be found an exception is thrown.
@@ -378,11 +378,11 @@ class ModuleResolver:
         # Basically there are 3 types of selectors at this point:
         # 1. Directly named and defined modules or module-sets.
         # 2. Referenced (but undefined) modules. These are mentioned in a
-        #    use-modules in a module set but not actually available as `Module`
+        #    use-projects in a module set but not actually available as `Module`
         #    objects yet. But we know they will exist.
         # 3. Indirect modules. These are modules that do exist in the KDE project
         #    metadata, and will be pulled in once all module-sets are expanded
-        #    (whether that's due to implicit wildcarding with use-modules, or due
+        #    (whether that's due to implicit wildcarding with use-projects, or due
         #    to dependency following). However, we don't even know the names for
         #    these yet.
 
@@ -469,33 +469,30 @@ class ModuleResolver:
 
 """
 This class uses a multi-pass option resolving system, in accordance with
-the way kde-builder handles options. Consider a simple kdesrc-buildrc:
+the way kde-builder handles options. Consider a simple kde-builder.yaml:
 
- global
-     cmake-options -DCMAKE_BUILD_TYPE=Debug
-     ...
- end global
+ global:
+   cmake-options: -DCMAKE_BUILD_TYPE=Debug
+   ...
 
- module-set ms-foo
-     cmake-options -DCMAKE_BUILD_TYPE=RelWithDebInfo
-     repository kde-projects
-     use-modules kde/kdemultimedia
-     include-dependencies true
- end module-set
+ group ms-foo:
+   cmake-options: -DCMAKE_BUILD_TYPE=RelWithDebInfo
+   repository: kde-projects
+   use-projects:
+     - kde/kdemultimedia
+   include-dependencies: true
 
- options framework1
-     set-env BUILD_DEBUG 1
- end options
+ override framework1:
+   set-env:
+     - BUILD_DEBUG: 1
 
- module taglib
-     repository git://...
-     branch 1.6
- end module
+ project taglib:
+   repository: git://...
+   branch: 1.6
 
- options juk
-     cxxflags -g3 -Og
-     custom-build-command ninja
- end options
+ override juk:
+   cxxflags: -g3 -Og
+   custom-build-command: ninja
 
 In this case we'd expect that a module like taglib ends up with its
 ``cmake-options`` derived from the global section directly, while all modules
@@ -510,11 +507,11 @@ There are many ways to convince kde-builder to add a module into its build list:
 
 1. Mention it directly on the command line.
 
-2. Include it in the kdesrc-buildrc file, either as a new ``module`` block or
-in a ``use-modules`` of a ``module-set``.
+2. Include it in the kde-builder.yaml file, either as a new ``module`` block or
+in a ``use-projects`` of a ``module-set``.
 
 3. For KDE modules, mention a component of its project path in a
-``use-modules`` declaration within a ``kde-projects``-based module set. E.g. the
+``use-projects`` declaration within a ``kde-projects``-based module set. E.g. the
 "kde/kdemultimedia" entry above, which will pull in the juk module even though
 "juk" is not named directly.
 

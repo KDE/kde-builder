@@ -1,11 +1,11 @@
 (basic-features)=
 # Basic kde-builder features
 
-(using-qt)=
+(building-qt)=
 ## Building Qt
 
 KDE Builder supports building the Qt toolkit used by KDE software as a
-convenience to users. This support is handled by a special module-set
+convenience to users. This support is handled by a special group
 named `qt6-set`.
 
 ```{note}
@@ -17,10 +17,10 @@ In order to build Qt, you should make sure that the
 [qt-install-dir](#conf-qt-install-dir) option is set to the directory
 you'd like to install Qt to, as described in the section called [](../getting-started/configure-data).
 
-Now check if you are using default module definitions. This is done by this config line:
+Now check if you are using default build configs. This is done by this config line:
 
-```
-include ${module-definitions-dir}/kf6-qt6.ksb
+```yaml
+include ${build-configs-dir}/kde6.yaml: ""
 ```
 
 If this is the case, you are on a safe side. You can just run the following command:
@@ -29,8 +29,8 @@ If this is the case, you are on a safe side. You can just run the following comm
 kde-builder qt6-set
 ```
 
-If for some reason you are not using default module definitions, then you should ensure that
-the `qt6-set` module-set is added to your `.kdesrc-buildrc` _before_ any other modules in the file.
+If for some reason you are not using default build configs, then you should ensure that
+the `qt6-set` group is added to your `kde-builder.yaml` _before_ any other projects in the file.
 
 Now you should verify that the [repository](#conf-repository) option and
 [branch](#conf-branch) options are set appropriately:
@@ -110,8 +110,8 @@ kde-builder --nice=15
 Or you can edit the [configuration file](../getting-started/configure-data) to make the
 change permanent:
 
-```
-niceness 15
+```yaml
+niceness: "15"
 ```
 
 ```{tip}
@@ -130,7 +130,7 @@ ionice, (but only to enable or disable it completely) using the
 You may wish to have kde-builder run the installation with super user
 privileges. This may be for the unrecommended system-wide installation.
 This is also useful when using a recommended single user KDE build,
-however. This is because some modules install
+however. This is because some projects install
 programs that will briefly need elevated permissions when run. They are
 not able to achieve these permission levels unless they are installed
 with the elevated permissions.
@@ -141,29 +141,27 @@ this option to specify a command to use to perform the installation as
 another user. The recommended way to use this command is with the sudo
 program, which will run the install command as the super user.
 
-For example, to install all modules using sudo, you could do something
+For example, to install all projects using sudo, you could do something
 like this:
 
-```text
-global
-  make-install-prefix sudo
+```yaml
+global:
+  make-install-prefix: sudo
   # Other options
-end global
 ```
 
 To use [make-install-prefix](#conf-make-install-prefix) for only a
-single module, this would work:
+single project, this would work:
 
-```text
-module some-module-name
-  make-install-prefix sudo
-end module
+```yaml
+project some-module-name:
+  make-install-prefix: sudo
 ```
 
 (build-progress)=
-## Showing the progress of a module build
+## Showing the progress of a project build
 
 This feature is always available, and is automatically enabled when
 possible. What this does is display an estimated build progress while
-building a module. That way you know about how much longer it will take
-to build a module.
+building a project. That way you know about how much longer it will take
+to build a project.

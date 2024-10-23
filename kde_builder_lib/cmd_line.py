@@ -53,7 +53,7 @@ class Cmdline:
         * Command line options (such as ``--pretend`` or ``--no-src``), which normally apply globally (i.e. overriding module-specific options in the config file)
         * Command line options that apply to specific modules (using ``--set-module-option-value``)
         * Build modes (install, build only, query)
-        * Modules to *ignore* building, using ``--ignore-modules``, which gobbles up all remaining options.
+        * Modules to *ignore* building, using ``--ignore-projects``, which gobbles up all remaining options.
     """
 
     def __init__(self):
@@ -86,7 +86,7 @@ class Cmdline:
                     "frameworks-set",
                     # etc.  MAY BE EMPTY in which case the command should build everything known
                 ],
-                "ignore-modules": [
+                "ignore-projects": [
                     "plasma-nm",
                     "plasma-mobile",
                     # etc.  MAY BE EMPTY in which case no modules should be stripped from a module-set
@@ -463,7 +463,7 @@ class Cmdline:
 
         Documentation: https://kde-builder.kde.org
             Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
-            Table of available configuration options:       https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html
+            Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
         """))
         exit()
 

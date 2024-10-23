@@ -1,5 +1,5 @@
 (building-and-troubleshooting)=
-# Using the kde-builder script
+# Using the kde-builder tool
 
 With the configuration data established, now you are ready to run the
 tool.
@@ -14,10 +14,9 @@ you want to download it manually, run the command:
 kde-builder --metadata-only
 ```
 
-This command will setup the source directory and connect to the KDE git
-repositories to download the database of KDE git repositories, and the
-database of dependency metadata, without making any further changes. It
-is useful to run this separately as this metadata is useful for other
+This command will set up the source directory and download special repository
+from invent.kde.org containing data about all KDE projects, their dependencies between each other and from third party projects.
+No other changes will be made. It is useful to run this separately as this metadata is useful for other
 kde-builder commands.
 
 (pretend-mode)=
@@ -41,7 +40,7 @@ kde-builder kcalc
 ```
 
 This command will download the appropriate source code, build and
-install each module in order. Afterwards, you should see output similar
+install each project in order. Afterwards, you should see output similar
 to that in [example_title](#example-build-sequence):
 
 ```{code-block}
@@ -49,54 +48,58 @@ to that in [example_title](#example-build-sequence):
 :caption: Example output of a kde-builder run
 
 $ kde-builder kcalc
-Updating kde-build-metadata (to branch master)
-Updating sysadmin-repo-metadata (to branch master)
+Fetching remote changes to sysadmin-repo-metadata
+Merging sysadmin-repo-metadata changes from branch master
+Holding performance profile
 
-Building libdbusmenu-qt (1/200)
-        No changes to libdbusmenu-qt source, proceeding to build.
-        Compiling... succeeded (after 0 seconds)
-        Installing.. succeeded (after 0 seconds)
+Building extra-cmake-modules from frameworks (1/26)
+        Fetching remote changes to extra-cmake-modules
+        Merging extra-cmake-modules changes from branch master
+        No changes to extra-cmake-modules source code, but proceeding to build anyway.
+        Compiling... succeeded (after 2 seconds)
+        Installing extra-cmake-modules succeeded (after 2 seconds)
 
-Building taglib (2/200)
-        Updating taglib (to branch master)
-        Source update complete for taglib: 68 files affected.
+Building plasma-wayland-protocols from kf6-support (2/26)
+        Fetching remote changes to plasma-wayland-protocols
+        Merging plasma-wayland-protocols changes from branch master
+        No changes to plasma-wayland-protocols source code, but proceeding to build anyway.
         Compiling... succeeded (after 0 seconds)
-        Installing.. succeeded (after 0 seconds)
+        Installing plasma-wayland-protocols succeeded (after 2 seconds)
 
-Building extra-cmake-modules from <module-set at line 32> (3/200)
-        Updating extra-cmake-modules (to branch master)
-        Source update complete for extra-cmake-modules: 2 files affected.
-        Compiling... succeeded (after 0 seconds)
-        Installing.. succeeded (after 0 seconds)
+Building kconfig from frameworks (3/26)
+        Fetching remote changes to kconfig
+        Merging kconfig changes from branch master
+        Source update complete for kconfig: 1 file affected.
+        Compiling... succeeded (after 2 seconds)
+        Note: -- 3 -- compile warnings
+        Installing kconfig succeeded (after 2 seconds)
 
         ...
 
-Building kdevelop from kdev (200/200)
-        Updating kdevelop (to branch master)
-        Source update complete for kdevelop: 29 files affected.
-        Compiling... succeeded (after 1 minute, and 34 seconds)
-        Installing.. succeeded (after 2 seconds)
+Building kcalc from kdeutils (26/26)
+        Fetching remote changes to kcalc
+        Merging kcalc changes from branch master
+        No changes to kcalc source code, but proceeding to build anyway.
+        Compiling... succeeded (after 1 minute and 34 seconds)
+        Installing kcalc succeeded (after 2 seconds)
 
 <<<  PACKAGES SUCCESSFULLY BUILT  >>>
-Built 200 modules
+Built 26 modules
 
-Your logs are saved in /home/username/kde/log/2018-01-20-07
+:-)
+Your logs are saved in /home/username/kde/log/2024-10-20_07
 ```
 
 (fixing-build-failures)=
 ## Resolving build failures
 
-Depending on how many modules you are downloading, it is possible that
-kde-builder will not succeed the first time you compile KDE software.
-Do not despair!
-
 KDE Builder logs the output of every command it runs. By default, the
 log files are kept in `~/kde/log`. To see what caused an error
-for a module in the last kde-builder command, usually it is sufficient
-to look at `~/kde/log/latest/module-name/error.log`.
+for a project in the last kde-builder command, usually it is sufficient
+to look at `~/kde/log/latest/project-name/error.log`.
 
 ```{tip}
-Perhaps the easiest way to find out what error caused a module to fail
+Perhaps the easiest way to find out what error caused a project to fail
 to build is to search backward with a case-insensitive search, starting
 from the end of the file looking for the word `error`. Once that is
 found, scroll up to make sure there are no other error messages nearby.
@@ -104,12 +107,12 @@ The first error message in a group is usually the underlying problem.
 ```
 
 In that file, you will see the error that caused the build to fail for
-that module. If the file says (at the bottom) that you are missing some
+that project. If the file says (at the bottom) that you are missing some
 packages, try installing the package (including any appropriate -dev
-packages) before trying to build that module again. Make sure that when
+packages) before trying to build that project again. Make sure that when
 you run kde-builder again to pass the
 [--reconfigure](#cmdline-reconfigure) option so that kde-builder forces
-the module to check for the missing packages again.
+the project to check for the missing packages again.
 
 Or, if the error appears to be a build error (such as a syntax error,
 "incorrect prototype", "unknown type", or similar) then it is probably
@@ -119,7 +122,7 @@ few days. If it is not resolved within that time, feel free to mail the
 order to report the build failure.
 
 On the other hand, assuming everything went well, you should have a new
-KDE install on your computer, and now it is simply a matter of running
+KDE installation on your computer, and now it is simply a matter of running
 it, described in the section [](#installing-login-session).
 
 ```{note}

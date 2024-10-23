@@ -2,26 +2,26 @@
 # Advanced features
 
 (partial-builds)=
-## Partially building a module
+## Partially building a project
 
-It is possible to build only pieces from a single KDE module. For
-example, you may want to compile only one program from a module.
+It is possible to build only pieces from a single KDE project. For
+example, you may want to compile only one program from a project.
 KDE Builder has features to make this easy. There are several
 complementing ways to do this.
 
 (not-compiling)=
 ### Removing directories from a build
 
-It is possible to download an entire repository but have the build
-system leave out a few directories when it does the build. This requires
-that the module uses CMake and that the module's build system allows the
+It is possible to have the build system leave out a few directories when it does the build of
+a project. This requires
+that the project uses CMake and that the project's build system allows the
 directory to remove to be optional.
 
 This is controlled with the [do-not-compile](#conf-do-not-compile)
 option.
 
 ```{important}
-This option requires at least that the build system for the module is
+This option requires at least that the build system for the project is
 reconfigured after changing it. This is done using the
 `kde-builder --reconfigure module` command.
 ```
@@ -32,34 +32,33 @@ Possibly outdated info. Curently there is no any active repo under kde/kdebindin
 
 To remove the `python` directory from the kdebindings build process:
 
-```text
-module kdebindings
-  do-not-compile python
-end module
+```yaml
+project kdebindings:
+  do-not-compile: python
 ```
 
 ```{note}
 This function depends on some standard conventions used in most KDE
-modules. Therefore it may not work for all programs.
+projects. Therefore it may not work for all programs.
 ```
 
 (stopping-the-build-early)=
 ## Stopping the build early
 
-(the-build-continues)=
+(stopping-on-build-failure)=
 ### Decide the stopping on failures strategy
 
-KDE Builder can update, build and install all modules in the
-specified list of modules to build, even if a module fails to build.
+KDE Builder can update, build and install all projects in the
+specified list of projects to build, even if a project fails to build.
 This is usually a convenience to allow you to update software packages
 even if a simple mistake is made in one of the source repositories
 during development that causes the build to break.
 
 However, you may wish KDE Builder to stop what it is doing once a
-module fails to build and install. This can help save you time that will
-be wasted trying to make progress when modules remaining in the build
+project fails to build and install. This can help save you time that will
+be wasted trying to make progress when projects remaining in the build
 list will not be able to successfully build either, especially if you
-have not ever successfully built the modules in the list.
+have not ever successfully built the projects in the list.
 
 The primary method to do this is to use the
 [--no-stop-on-failure](#cmdline-stop-on-failure) command line option
@@ -69,20 +68,20 @@ This option can also be set in the [configuration
 file](#conf-stop-on-failure) to make it the normal mode of operation.
 
 It is also possible to tell kde-builder at runtime to stop building
-*after* completing the current module it is working on. This is as
+*after* completing the current project it is working on. This is as
 opposed to interrupting kde-builder using a shortcut like
 Ctrl+C, which interrupts kde-builder
-immediately, losing the progress of the current module.
+immediately, losing the progress of the current project.
 
 ```{important}
-Interrupting kde-builder during a module install when the
+Interrupting kde-builder during a project install when the
 [use-clean-install](#conf-use-clean-install) option is enabled will mean
-that the interrupted module will be unavailable until kde-builder is
-able to successfully build the module!
+that the interrupted project will be unavailable until kde-builder is
+able to successfully build the project!
 
 If you need to interrupt kde-builder without permitting a graceful
 shutdown in this situation, at least try to avoid doing this while
-kde-builder is installing a module.
+kde-builder is installing a project.
 ```
 
 (stopping-early-without-stop-on-failure)=
@@ -113,9 +112,9 @@ normal and not an indication of an error.
 ```
 
 Once kde-builder has acknowledged the signal, it will stop processing
-after the current module is built and installed. If kde-builder is
+after the current project is built and installed. If kde-builder is
 still updating source code when the request is received, kde-builder
-will stop after the module source code update is complete. Once both the
+will stop after the project source code update is complete. Once both the
 update and build processes have stopped early, kde-builder will print
 its partial results and exit.
 
@@ -126,36 +125,36 @@ its partial results and exit.
 ### Automatic rebuilds
 
 There are situations where KDE Builder will automatically attempt to
-rebuild the module:
+rebuild the project:
 
 - If you change [configure-flags](#conf-configure-flags) or
-  [cmake-options](#conf-cmake-options) for a module, then kde-builder
+  [cmake-options](#conf-cmake-options) for a project, then kde-builder
   will detect that and automatically re-run configure or cmake for that
-  module.
+  project.
 
 - If the buildsystem does not exist (even if kde-builder did not delete
   it) then kde-builder will automatically re-create it. This is useful
   to allow for performing a full
-  [--refresh-build](#cmdline-refresh-build) for a specific module
+  [--refresh-build](#cmdline-refresh-build) for a specific project
   without having that performed on other modules.
 
 (manual-rebuilds)=
-### Manually rebuilding a module
+### Manually rebuilding a project
 
-If you make a change to a module's option settings, or the module's
+If you make a change to a project's option settings, or the project's
 source code changes in a way kde-builder does not recognize, you may
 need to manually rebuild the module.
 
-You can do this by simply running `kde-builder --refresh-build module`.
+You can do this by simply running `kde-builder --refresh-build project`.
 
-If you would like to have kde-builder automatically rebuild the module
+If you would like to have kde-builder automatically rebuild the project
 during the next normal build update instead, you can create a special
-file. Every module has a build directory. If you create a file called
-`.refresh-me` in the build directory for a module, kde-builder will
-rebuild the module next time the build process occurs, even if it would
+file. Every project has a build directory. If you create a file called
+`.refresh-me` in the build directory for a project, kde-builder will
+rebuild the project next time the build process occurs, even if it would
 normally perform the faster incremental build.
 
-Rebuild using `.refresh-me` for module kcalc:
+Rebuild using `.refresh-me` for project kcalc:
 
 ```bash
 touch ~/kde/build/kcalc/.refresh-me
@@ -163,7 +162,7 @@ kde-builder kcalc
 ```
 
 ```{tip}
-By default, the build directory is `~/kde/build/module-name/`. If you change
+By default, the build directory is `~/kde/build/project-name/`. If you change
 the setting of the [build-dir](#conf-build-dir) option, then use that
 instead of `~/kde/build`.
 ```
@@ -177,7 +176,7 @@ for when you are running kde-builder from the command line.
 
 However, you may want to change the setting for environment variables
 that kde-builder does not provide an option for directly. For
-instance, to setup any required environment variables when running
+instance, to set up any required environment variables when running
 kde-builder on a timer such as Cron. This is possible with the
 [set-env](#conf-set-env) option.
 
@@ -185,12 +184,16 @@ Unlike most options, it can be set more than once, and it accepts two
 entries, separated by a space. The first one is the name of the
 environment variable to set, and the remainder of the line is the value.
 
-Set `DISTRO=BSD` for all modules:
+Set `DISTRO=BSD` for all projects:
 
-```text
-global
-  set-env DISTRO BSD
-end global
+```yaml
+global:
+  set-env:
+    - DISTRO: BSD
+```
+
+```{note}
+Todo: Check the words about setting it more than once.
 ```
 
 (resuming)=
@@ -199,8 +202,8 @@ end global
 (resuming-failed)=
 ### Resuming a failed or canceled build
 
-You can tell kde-builder to start building from a different module than
-it normally would. This can be useful when a set of modules failed, or
+You can tell kde-builder to start building from a different project than
+it normally would. This can be useful when a set of projects failed, or
 if you canceled a build run in the middle. You can control this using
 the [--resume-from](#cmdline-resume-from) option and the
 [--resume-after](#cmdline-resume-after) option.
@@ -208,37 +211,37 @@ the [--resume-from](#cmdline-resume-from) option and the
 Resuming the build starting from kxmlgui:
 
 ```bash
-kde-builder --resume-from=kxmlgui
+kde-builder --resume-from kxmlgui
 ```
 
 Resuming the build starting after kxmlgui (in case you manually fixed
-the issue and installed the module yourself):
+the issue and installed the project yourself):
 
 ```bash
-kde-builder --resume-after=kxmlgui
+kde-builder --resume-after kxmlgui
 ```
 
 If the last kde-builder build ended with a build failure, you can also
 use the [--resume](#cmdline-resume) command line option, which resumes
-the last build starting at the module that failed. The source and
+the last build starting at the project that failed. The source and
 metadata updates are skipped as well (but if you need these, it's
 generally better to use [--resume-from](#cmdline-resume-from) instead).
 
-(ignoring-modules)=
-### Ignoring modules in a build
+(ignoring-projects)=
+### Ignoring projects in a build
 
 Similar to the way you can [resume the build from a
-module](#resuming-failed), you can instead choose to update and build
-everything normally, but ignore a set of modules.
+project](#resuming-failed), you can instead choose to update and build
+everything normally, but ignore a set of projects.
 
-You can do this using the [--ignore-modules](#cmdline-ignore-modules)
-option. This option tells kde-builder to ignore all the modules on the
+You can do this using the [--ignore-projects](#cmdline-ignore-projects)
+option. This option tells kde-builder to ignore all the projects on the
 command line when performing the update and build.
 
 Ignoring extragear/multimedia and kdereview during a full run:
 
 ```bash
-kde-builder --ignore-modules extragear/multimedia kdereview
+kde-builder --ignore-projects extragear/multimedia kdereview
 ```
 
 (changing-env-from-cmd-line)=
@@ -260,6 +263,10 @@ names. If it does not recognize the name, it will warn you, otherwise it
 will remember the value you set it to and override any setting from the
 configuration file.
 
+```{note}
+Todo: Check the statement about unrecognised option and searching it in its list.
+```
+
 Setting the [source-dir](#conf-source-dir) option to `/dev/null` for
 testing:
 
@@ -267,17 +274,17 @@ testing:
 kde-builder --pretend --source-dir=/dev/null
 ```
 
-(changing-module-opts)=
-### Changing module options
+(changing-project-opts)=
+### Changing project options
 
-It is also possible to change options only for a specific module. The
-syntax is similar: `--<module>,<option-name>=<value>`.
+It is also possible to change options only for a specific project. The
+syntax is similar: `--<project>,<option-name>=<value>`.
 
-This change overrides any duplicate setting for the module found in the
+This change overrides any duplicate setting for the project found in the
 [configuration file](../getting-started/configure-data), and applies only while the option
 is passed on the command line.
 
-Using a different build directory for the kcalc module:
+Using a different build directory for the kcalc project:
 
 ```
 kde-builder --kcalc,build-dir=temp-build
@@ -289,7 +296,7 @@ kde-builder --kcalc,build-dir=temp-build
 It is possible to log into the Plasma session built by KDE Builder. This can be used for testing new features.
 
 In your configuration file, enable the [install-login-session](#conf-install-login-session) option. Build the `plasma-workspace`
-module. KDE Builder will install the session at the end of the process.
+project. KDE Builder will install the session at the end of the process.
 
 The installation script requires write access to these locations, so you will be asked to enter a sudo password:
 - `/usr/local/share/xsessions/`

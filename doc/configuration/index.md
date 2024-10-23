@@ -2,10 +2,10 @@
 nosearch:
 ---
 
-(kdesrc-buildrc)=
+(config-file)=
 # Configuring kde-builder
 
 ```{toctree}
-kdesrc-buildrc-overview
+config-file-overview
 conf-options-table
 ```

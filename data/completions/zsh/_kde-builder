@@ -35,13 +35,13 @@ _arguments \
   "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every module]" \
   --do-not-compile"[Select a specific set of directories not to be built in a module]"":argument:" \
   "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
-  --generate-config"[Installs a base kdesrc-buildrc]" \
+  --generate-config"[Installs a base config file]" \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
-  "(-! --ignore-modules)"{-!,--ignore-modules}"[Do not include specified modules in the update/build process]"":::_kde-builder_modules" \
+  "(-! --ignore-projects)"{-!,--ignore-projects}"[Do not include specified projects in the update/build process]"":::_kde-builder_modules" \
   "(--include-dependencies --no-include-dependencies -D -d)"{--include-dependencies,--no-include-dependencies,-D,-d}"[Builds/Skip KDE-based dependencies]" \
-  --initial-setup"[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc]" \
+  --initial-setup"[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base config file]" \
   --install-dir"[Where to install the module after it is built]"":argument:" \
   --install-distro-packages"[Installs required system pkgs]" \
   "(--install-login-session --no-install-login-session)"{--install-login-session,--no-install-login-session}"[Install a login session]" \

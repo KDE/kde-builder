@@ -56,13 +56,15 @@ class SetOptionError(KBException):
 
             e.g. git-repository-base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
 
-            Use this in a "module-set" group:
+            Use this in a "group" group:
 
             e.g.
-            module-set kdesdk-set
-                repository y[b[kde-sdk]
-                use-modules kde-builder kde-dev-scripts clazy
-            end module-set
+            group kdesdk-set:
+              repository: y[b[kde-sdk]
+              use-projects:
+                - kde-builder
+                - kde-dev-scripts
+                - clazy
             """)
         return result
 

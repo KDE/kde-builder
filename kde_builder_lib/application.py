@@ -760,7 +760,7 @@ class Application:
     @staticmethod
     def _validate_module_set(ctx: BuildContext, module_set: ModuleSet) -> None:
         """
-        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-modules setting based on the given BuildContext.
+        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-projects setting based on the given BuildContext.
         """
         name = module_set.name if module_set.name else "unnamed"
         rc_sources = Application._get_module_sources(module_set)
@@ -986,7 +986,7 @@ class Application:
                 creation_order += 1
                 new_module_set.create_id = creation_order
 
-                # Save "use-modules" entries, so we can see if later module decls
+                # Save "use-projects" entries, so we can see if later module decls
                 # are overriding/overlaying their options.
                 module_set_items = new_module_set.module_names_to_find()
                 # seen_module_set_items = {item: new_module_set for item in module_set_items}

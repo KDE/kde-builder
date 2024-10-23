@@ -6,9 +6,9 @@
 (cmdline-pretend)=
 [`--pretend`](cmdline-pretend) (or `--dry-run` or `-p`)  
 Operate in a "dry run" mode. No network accesses are made, no log files
-are created, no modules are built, and no other permanent changes to
+are created, no projects are built, and no other permanent changes to
 disk are made. One *important exception* is that if you try to build a
-module that comes from the KDE projects, and the repo-metadata hasn't
+project that comes from the KDE projects, and the repo-metadata hasn't
 been downloaded yet, the repo-metadata will be downloaded since the
 pretend-mode output may change significantly based on the repo-metadata
 results.
@@ -20,27 +20,27 @@ whether source code would be checked out or updated).
 (cmdline-include-dependencies)=
 [`--include-dependencies`](cmdline-include-dependencies) (or `-d`), `--no-include-dependencies` (or `-D`)  
 This option causes kde-builder to automatically include other KDE and
-Qt modules in the build, if required, for the modules you have requested
+Qt projects (modules) in the build, if required, for the projects you have requested
 to build on the command line or in your [configuration
 file](../getting-started/configure-data).
 
-The modules that are added are as recorded within the KDE repo-metadata
-dependencies. See the section called [](#kde-projects-module-sets).
+The projects that are added are as recorded within the KDE repo-metadata
+dependencies. See the section called [](#kde-projects-groups).
 
 The corresponding configuration file option is
 [include-dependencies](#conf-include-dependencies).
 
 This option is enabled by default.
 
-(cmdline-ignore-modules)=
-[`--ignore-modules`](cmdline-ignore-modules) (or `-!`) module \[module ...]  
-Do not include the modules passed on the rest of the command line in the
+(cmdline-ignore-projects)=
+[`--ignore-projects`](cmdline-ignore-projects) (or `-!`) project \[project ...]  
+Do not include the projects passed on the rest of the command line in the
 update/build process (this is useful if you want to build most of the
-modules in your [configuration file](../getting-started/configure-data) and just skip a
+projects in your [configuration file](../getting-started/configure-data) and just skip a
 few).
 
 Note that this option does not override
-[ignore-modules](#conf-ignore-modules) config option in global section.
+[ignore-projects](#conf-ignore-projects) config option in global section.
 Instead, it appends it.
 
 (cmdline-run)=
@@ -71,15 +71,15 @@ kde-builder --run kate-syntax-highlighter --list-themes
 
 (cmdline-source-when-start-program)=
 [`--source-when-start-program`](cmdline-source-when-start-program) \<file\>  
-With this option, you can specify a path to shell file, which will be sourced before the module is launched with `--run` option.
+With this option, you can specify a path to shell file, which will be sourced before the project is launched with `--run` option.
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
 (cmdline-revision)=
 [`--revision`](cmdline-revision) \<id\>  
 This option causes kde-builder to checkout a specific numbered revision
-for each module, overriding any [branch](#conf-branch),
+for each project, overriding any [branch](#conf-branch),
 [tag](#conf-tag), or [revision](#conf-revision) options already set for
-these modules.
+these projects.
 
 This option is likely not a good idea, and is only supported for
 compatibility with older scripts.
@@ -87,7 +87,7 @@ compatibility with older scripts.
 (cmdline-delete-my-patches)=
 [`--delete-my-patches`](cmdline-delete-my-patches), `--no-delete-my-patches`  
 This option is used to let kde-builder delete source directories that
-may contain user data, so that the module can be re-downloaded. This
+may contain user data, so that the project can be re-downloaded. This
 would normally only be useful for KDE developers (who might have local
 changes that would be deleted).
 
@@ -96,7 +96,7 @@ re-run with it if it is needed.
 
 This option must be passed to allow `kde-builder` to remove conflicting
 source directories. Currently even this only happens when trying to
-git clone a module if an existing source directory is present.
+git clone a project if an existing source directory is present.
 Never specify this option unless it is suggested by `kde-builder`, and
 only if you don't mind the source directories that are referenced being
 deleted and re-cloned.
@@ -109,7 +109,7 @@ may contain user data.
 (cmdline-option-name)=
 [`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration
-file](../getting-started/configure-data) for every module. For instance, to override the
+file](../getting-started/configure-data) for every project. For instance, to override the
 [log-dir](#conf-log-dir) option, you would do: `--log-dir /path/to/dir`.
 
 ```{note}
@@ -123,14 +123,14 @@ command line options that are preferred by kde-builder.
 (cmdline-set-module-option-value)=
 [`--set-module-option-value`](cmdline-set-module-option-value) \<module-name\>,\<option-name\>,\<option-value\>  
 You can use this option to override an option in your [configuration
-file](../getting-started/configure-data) for a specific module.
+file](../getting-started/configure-data) for a specific project.
 
 ## Resuming and stopping
 
 (cmdline-resume-from)=
-[`--resume-from`](cmdline-resume-from) (or `--from` or `-f`) \<module\>  
-This option is used to resume the build starting from the given module.
-You should not specify other module names on the command line.
+[`--resume-from`](cmdline-resume-from) (or `--from` or `-f`) \<project\>  
+This option is used to resume the build starting from the given project.
+You should not specify other project names on the command line.
 
 ```{note}
 If you want to avoid source updates when resuming, simply pass
@@ -143,9 +143,9 @@ option if you have fixed the build error and want kde-builder to
 complete the build.
 
 (cmdline-resume-after)=
-[`--resume-after`](cmdline-resume-after) (or `--after` or `-a`) \<module\>  
-This option is used to resume the build starting after the given module.
-You should not specify other module names on the command line.
+[`--resume-after`](cmdline-resume-after) (or `--after` or `-a`) \<project\>  
+This option is used to resume the build starting after the given project.
+You should not specify other project names on the command line.
 
 ```{note}
 If you want to avoid source updates when resuming, simply pass
@@ -155,118 +155,118 @@ If you want to avoid source updates when resuming, simply pass
 See also: [--resume-from](#cmdline-resume-from) and the section called
 [](#resuming-failed). You would prefer to use this command line
 option if you have fixed the build error and have also built and
-installed the module yourself, and want kde-builder to start again with
-the next module.
+installed the project yourself, and want kde-builder to start again with
+the next project.
 
 (cmdline-resume)=
 [`--resume`](cmdline-resume)  
 This option can be used to run kde-builder after it has had a build
 failure.
 
-It resumes the build from the module that failed, using the list of
-modules that were waiting to be built before, and disables source and
+It resumes the build from the project that failed, using the list of
+projects that were waiting to be built before, and disables source and
 metadata updates as well. The use case is when a simple mistake or
 missing dependency causes the build failure. Once you correct the error
-you can quickly get back into building the modules you were building
+you can quickly get back into building the projects you were building
 before, without fiddling with `--resume-from` and `--stop-before`.
 
 (cmdline-resume-refresh-build-first)=
 [`--resume-refresh-build-first`](cmdline-resume-refresh-build-first) (or `-R`)  
 This option is an alias for using `--resume` and `--refresh-build-first` at the same time.
-It is convenient to use when some module failed to build, and you want to refresh build it,
-and then continue (re-)building modules after that one, as if it was built successfully in
+It is convenient to use when some project failed to build, and you want to refresh build it,
+and then continue (re-)building projects after that one, as if it was built successfully in
 the first place.
 
 (cmdline-stop-before)=
-[`--stop-before`](cmdline-stop-before) (or `--until`) \<module\>  
+[`--stop-before`](cmdline-stop-before) (or `--until`) \<project\>  
 This option is used to stop the normal build process just *before* a
-module would ordinarily be built.
+project would ordinarily be built.
 
-For example, if the normal build list was moduleA, moduleB, moduleC,
+For example, if the normal build list was projectA, projectB, projectC,
 then `--stop-before moduleB` would cause kde-builder to only build
-`moduleA`.
+`projectA`.
 
 (cmdline-stop-after)=
-[`--stop-after`](cmdline-stop-after) (or `--to`) \<module\>  
+[`--stop-after`](cmdline-stop-after) (or `--to`) \<project\>  
 This option is used to stop the normal build process just *after* a
-module would ordinarily be built.
+project would ordinarily be built.
 
-For example, if the normal build list was moduleA, moduleB, moduleC,
-then `--stop-after moduleB` would cause kde-builder to build `moduleA`
-and `moduleB`.
+For example, if the normal build list was projectA, projectB, projectC,
+then `--stop-after moduleB` would cause kde-builder to build `projectA`
+and `projectB`.
 
 (cmdline-stop-on-failure)=
 [`--stop-on-failure`](cmdline-stop-on-failure), `--no-stop-on-failure`  
 This option controls if the build will be aborted as soon as a failure
 occurs. Default behavior is --stop-on-failure. You may override it if
-you wish to still process the rest of the modules in the build, to avoid
-wasting time in case the problem is with a single module.
+you wish to still process the rest of the projects in the build, to avoid
+wasting time in case the problem is with a single project.
 
 See also the [stop-on-failure](#conf-stop-on-failure) configuration file
 option.
 
 (cmdline-rebuild-failures)=
 [`--rebuild-failures`](cmdline-rebuild-failures)  
-Use this option to build only those modules which failed to build on a
+Use this option to build only those projects which failed to build on a
 previous kde-builder run. This is useful if a significant number of
 failures occurred mixed with successful builds. After fixing the issue
-causing the build failures you can then easily build only the modules
+causing the build failures you can then easily build only the projects
 that failed previously.
 
 ```{note}
-Note that the list of "previously-failed modules" is reset every time a
-kde-builder run finishes with some module failures. However, it is not
+Note that the list of "previously-failed projects" is reset every time a
+kde-builder run finishes with some project failures. However, it is not
 reset by a completely successful build, so you can successfully rebuild
-a module or two and this flag will still work.
+a project or two and this flag will still work.
 ```
 
 ## Modules information
 
 (cmdline-query)=
 [`--query`](cmdline-query) mode  
-This command causes kde-builder to query a parameter of the modules in
+This command causes kde-builder to query a parameter of the projects in
 the build list (either passed on the command line or read in from the
-configuration file), outputting the result to screen (one module per
+configuration file), outputting the result to screen (one project per
 line).
 
 This option must be provided with a "mode", which may be one of the
 following:
 
-- `source-dir` - the full path to where the module's source code is stored.
+- `source-dir` - the full path to where the project's source code is stored.
 
-- `build-dir` - the full path to where the module build process occurs.
+- `build-dir` - the full path to where the project build process occurs.
 
-- `install-dir` - the full path to where the module will be installed.
+- `install-dir` - the full path to where the project will be installed.
 
-- `project-path` - the location of the module within the hierarchy of KDE
-   source code repositories. See the section called [](#kde-projects-module-sets) for more information
+- `project-path` - the location of the project within the hierarchy of KDE
+   source code repositories. See the section called [](#kde-projects-groups) for more information
    on this hierarchy.
 
-- `branch` - the resolved git branch that will be used for each module, based
+- `branch` - the resolved git branch that will be used for each project, based
    on the [tag](#conf-tag), [branch](#conf-branch) and [branch-group](#conf-branch-group) settings in effect.
 
-- `module-set` - the name of module-set which contains the module. This can be used
+- `module-set` - the name of group which contains the project. This can be used
    to generate zsh autocompletion cache.
 
-- `build-system` - the name of build system detected for the module. This can be used
+- `build-system` - the name of build system detected for the project. This can be used
    to debug build system auto-detection problems, or when developing tests for specific
    build systems.
 
 - Any option name that is valid for modules in the [configuration
-  file](../kdesrc-buildrc/conf-options-table).
+  file](../configuration/conf-options-table).
 
 For example, the command
 `kde-builder --query branch kactivities kdepim` might end up with
 output like:
 
-```
+```yaml
 kactivities: master
 kdepim: master
 ```
 
 (cmdline-dependency-tree)=
 [`--dependency-tree`](cmdline-dependency-tree)  
-Prints the tree of the dependencies, generated from the modules specified in command line.
+Prints the tree of the dependencies, generated from the projects specified in command line.
 The tree will be recursive, i.e. you could see the dependencies of dependencies.
 The output format looks similar to the `tree` utility.
 In addition, each line will have information if the dependency will be built, and if case it will, also a branch to be used.
@@ -275,7 +275,7 @@ If you want to grep in the output, you can use [--dependency-tree-fullpath](cmdl
 
 (cmdline-dependency-tree-fullpath)=
 [`--dependency-tree-fullpath`](cmdline-dependency-tree-fullpath)  
-Prints the tree of the dependencies, generated from the modules specified in command line.
+Prints the tree of the dependencies, generated from the projects specified in command line.
 The tree will be recursive, i.e. you could see the dependencies of dependencies.
 The output format looks similar to the `find` utility.
 
@@ -283,14 +283,14 @@ It is easier to grep something with this format. However, if you want to visuali
 
 (cmdline-list-installed)=
 [`--list-installed`](cmdline-list-installed)  
-Print installed modules and exit. This can be used to generate
+Print installed projects and exit. This can be used to generate
 autocompletion for the --run option.
 
 ## Exclude specific action
 
 (cmdline-no-metadata)=
 [`--no-metadata`](cmdline-no-metadata) (or `-M`)  
-Skip the metadata update phase. The source updates for the modules themselves will still occur
+Skip the metadata update phase. The source updates for the projects themselves will still occur
 unless you pass [--no-src](#cmdline-no-src) as well.
 
 This can be useful if you are frequently re-running kde-builder since
@@ -335,25 +335,25 @@ performed if applicable, but this will change in a future release).
 (cmdline-install-only)=
 [`--install-only`](cmdline-install-only)  
 If this is the only command-line option, it tries to install all the
-modules contained in `log/latest/build-status`. If command-line options
-are specified after this option, they are all assumed to be modules to
+projects contained in `log/latest/build-status`. If command-line options
+are specified after this option, they are all assumed to be projects to
 install (even if they did not successfully build on the last run).
 
 (cmdline-uninstall)=
 [`--uninstall`](cmdline-uninstall)
 Skips the update and build phase and immediately attempts to uninstall
-the modules given. **NOTE**: This is only supported for buildsystems
+the projects given. **NOTE**: This is only supported for buildsystems
 that supports the `make uninstall` command (e.g. KDE CMake-based).
 
 (cmdline-build-system-only)=
 [`--build-system-only`](cmdline-build-system-only)  
-Interrupts the build process for each module built. The build process
+Interrupts the build process for each project built. The build process
 consists of normal setup up to and including running `cmake` or
 `configure` (as appropriate), but `make` is not run and no installation
 is attempted. This is mostly only useful to get things like
 `configure --help` and `cmake-gui` to work. Normally you want
 `--reconfigure` or `--refresh-build`.  
-This option causes kde-builder to abort building a module just before
+This option causes kde-builder to abort building a project just before
 the `make` command would have been run. This is supported for
 compatibility with older versions only, this effect is not helpful for
 the current KDE build system.
@@ -371,22 +371,22 @@ default.
 
 (cmdline-refresh-build)=
 [`--refresh-build`](cmdline-refresh-build) (or `-r`)  
-Removes the build directory for a module before the build phase starts.
+Removes the build directory for a project before the build phase starts.
 This has the desired side effect of forcing `kde-builder` to
-re-configure the module and build it from a "pristine" state with no
+re-configure the project and build it from a "pristine" state with no
 existing temporary or intermediate output files. Use this option if you
-have problems getting a module to build but realize it will take longer
+have problems getting a project to build but realize it will take longer
 (possibly much longer) for the build to complete as a result. When in
 doubt use this option for the entire `kde-builder` run.
 
 (cmdline-refresh-build-first)=
 [`--refresh-build-first`](cmdline-refresh-build-first)  
-Enables the `refresh-build` option for the first module appeared in final modules list to build.
+Enables the `refresh-build` option for the first project appeared in final projects list to build.
 Useful in conjunction with `--resume`. See also [`--resume-refresh-build-first`](#cmdline-resume-refresh-build-first).
 
 (cmdline-reconfigure)=
 [`--reconfigure`](cmdline-reconfigure)  
-Run `cmake` (for KDE modules) or `configure` (for non-cmake modules) again, without
+Run `cmake` (for KDE projects) or `configure` (for non-cmake projects) again, without
 cleaning the build directory.
 Usually you actually want `--refresh-build`, but if you are 100% sure
 your change to `cmake-options` will not invalidate your current
@@ -398,7 +398,7 @@ and automatically re-run the build setup. This option is implied if
 
 (cmdline-install-dir)=
 [`--install-dir`](cmdline-install-dir) path  
-This allows you to change the directory where modules will be installed
+This allows you to change the directory where projects will be installed
 to. This option implies [`--reconfigure`](#cmdline-reconfigure), but
 using [`--refresh-build`](#cmdline-refresh-build) may still be required.
 
@@ -422,7 +422,7 @@ for building and debugging. This option is disabled by default.
 (cmdline-async)=
 [`--async`](cmdline-async), `--no-async`  
 Enables or disables the [asynchronous mode](#conf-async), which can
-perform the source code updates and module builds at the same time. If
+perform the source code updates and project builds at the same time. If
 disabled, the update will be performed in its entirety before the build
 starts. Disabling this option will slow down the overall process. If you
 encounter IPC errors while running kde-builder try disabling it, and
@@ -459,8 +459,8 @@ options, there is a generic way to set this from the command line).
 
 (cmdline-rc-file)=
 [`--rc-file`](cmdline-rc-file) \<file\>  
-Path to the configuration file to use by kde-builder. The default is `kdesrc-buildrc` from current working directory (if exists) or otherwise `~/.
-config/kdesrc-buildrc`.
+Path to the configuration file to use by kde-builder. The default is `kde-builder.yaml` from current working directory (if exists) or otherwise
+`~/.config/kde-builder.yaml`.
 
 ## Setup
 
@@ -473,7 +473,7 @@ software to run.
 This includes:
 
 - Installing known dependencies (on supported Linux distributions)
-- Generating kdesrc-buildrc config
+- Generating kde-builder.yaml config
 
 This option is exactly equivalent to using `--install-distro-packages`
 and `--generate-config` at the same time.

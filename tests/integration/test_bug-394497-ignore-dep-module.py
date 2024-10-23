@@ -71,7 +71,7 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     app = Application(args)
     module_list = app.modules
 
-    assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-modules)"
+    assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-projects)"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[1].name == "setmod3", "mod list[1] == setmod3"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

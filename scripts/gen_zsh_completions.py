@@ -42,13 +42,13 @@ short_descriptions = {  # contains one of the options (the first one if it has v
     "--disable-agent-check": "Prevent ssh from asking for your pass phrase for every module",
     "--do-not-compile": "Select a specific set of directories not to be built in a module",
     "--generate-clion-project-config": "Generate a clion project config",
-    "--generate-config": "Installs a base kdesrc-buildrc",
+    "--generate-config": "Installs a base config file",
     "--generate-qtcreator-project-config": "Generate a qtcreator project config",
     "--generate-vscode-project-config": "Generate a vscode project config",
     "--help": "Displays help on commandline options",
-    "--ignore-modules": "Do not include specified modules in the update/build process",
+    "--ignore-projects": "Do not include specified projects in the update/build process",
     "--include-dependencies": "Builds/Skip KDE-based dependencies",
-    "--initial-setup": "Installs Plasma env vars (~/.bashrc), required system pkgs, and a base kdesrc-buildrc",
+    "--initial-setup": "Installs Plasma env vars (~/.bashrc), required system pkgs, and a base config file",
     "--install-dir": "Where to install the module after it is built",
     "--install-distro-packages": "Installs required system pkgs",
     "--install-login-session": "Install a login session",
@@ -181,7 +181,7 @@ def prepare_data(specifiers: list, data: dict) -> None:
             else:
                 expl_str = "\":argument:\""
         else:  # infinite
-            if any(option for option in ["--ignore-modules"] if option in dashed_parts):
+            if any(option for option in ["--ignore-projects"] if option in dashed_parts):
                 expl_str = "\":::_kde-builder_modules\""
             else:
                 expl_str = "\":arguments:\""

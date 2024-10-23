@@ -1,5 +1,5 @@
 # This file controls options to apply when configuring/building projects, and controls which projects are built in the first place.
-# List of all options: https://kde-builder.kde.org/en/kdesrc-buildrc/conf-options-table.html
+# List of all options: https://kde-builder.kde.org/en/configuration/conf-options-table.html
 
 config-version: 2
 global:

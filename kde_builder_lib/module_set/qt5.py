@@ -36,7 +36,7 @@ class ModuleSetQt5(ModuleSet):
         new_module.set_scm_type("qt5")
         new_module.set_build_system(BuildSystemQt5(new_module))
 
-        # Convert the use-modules/ignore-modules entries into a form appropriate
+        # Convert the use-projects/ignore-projects entries into a form appropriate
         # for init-repository's module-subset option.
         mod_entries = list(self.modules_to_find()) + ["-" + i for i in self.modules_to_ignore()]
         new_module.set_option({"use-qt5-modules": " ".join(mod_entries)})

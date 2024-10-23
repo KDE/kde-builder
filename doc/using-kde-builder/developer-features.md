@@ -21,8 +21,7 @@ agent check, set the `disable-agent-check` option to `true`.
 
 Disabling the SSH agent check:
 
-```text
-global
-  disable-agent-check true
-end global
+```yaml
+global:
+  disable-agent-check: true
 ```

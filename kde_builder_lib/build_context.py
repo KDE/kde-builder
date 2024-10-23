@@ -60,7 +60,7 @@ class BuildContext(Module):
 
          ctx = BuildContext.BuildContext()
 
-         ctx.set_rc_file("/path/to/kdesrc-buildrc")
+         ctx.set_rc_file("/path/to/kde-builder.yaml")
          fh = ctx.detect_config_file()
 
          ...
@@ -555,9 +555,9 @@ class BuildContext(Module):
                 kde-builder requires a configuration file to select which KDE software modules
                 to build, what options to build them with, the path to install to, etc.
 
-                When run, kde-builder will use `kdesrc-buildrc` config file located in the
+                When run, kde-builder will use `kde-builder.yaml` config file located in the
                 current working directory. If no such file exists, kde-builder will use
-                `{BuildContext.xdg_config_home_short}/kdesrc-buildrc` instead.
+                `{BuildContext.xdg_config_home_short}/kde-builder.yaml` instead.
 
                 You can generate config with b[--generate-config].
                 """))
@@ -663,7 +663,7 @@ class BuildContext(Module):
 
         # Our immediate parent class Module overrides this, but we actually
         # want the OptionsBase version to be used instead, because Module's version specifically checks for
-        # some options prohibited for it (such as "ignore-modules") but we may want such for BuildContext.
+        # some options prohibited for it (such as "ignore-projects") but we may want such for BuildContext.
         OptionsBase.set_option(self, options)
 
         # Automatically respond to various global option changes.

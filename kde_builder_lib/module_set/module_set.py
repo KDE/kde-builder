@@ -48,7 +48,7 @@ class ModuleSet(OptionsBase):
     5. A PhaseList describing what phases of the build a module should
     participate in by default.
 
-    See also: git-repository-base, ModuleSetKDEProjects, use-modules
+    See also: git-repository-base, ModuleSetKDEProjects, use-projects
     """
 
     def __init__(self, ctx: BuildContext, name: str):
@@ -80,7 +80,7 @@ class ModuleSet(OptionsBase):
         Get module names to find.
 
         Same as modules_to_find, but strips away any path components to leave just module names.
-        E.g. a "use-modules kde/kdelibs juk.git" would give (kdelibs, juk) as the result list.
+        E.g. a "use-projects kde/kdelibs juk.git" would give (kdelibs, juk) as the result list.
         """
         ret = [re.sub(r"([^/]+)$", r"\1", re.sub(r"\.git$", "", module)) for module in self.modules_to_find()]
         return ret
@@ -103,7 +103,7 @@ class ModuleSet(OptionsBase):
         new_module.merge_options_from(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based
-        # on order the user declared modules in use-modules, especially for third
+        # on order the user declared modules in use-projects, especially for third
         # party modules. Indirect deps won't have an entry and are given the max value
         # to sort at the end within the module-set.
         start_order = self.create_id if self.create_id else 0

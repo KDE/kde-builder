@@ -101,7 +101,7 @@ We do not specify variant settings.
 
 The order in which they are determined is described [here](https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/configure.md#the-cmake-tools-configure-step).
 
-We inject variables used at cmake configure from kde-builder (including set-env variables from global and from module).
+We inject variables used at cmake configure from kde-builder (including set-env variables from global and from project node).
 
 Despite documentation says cmake.environment is applied to launch/debug, this actually is wrong. See
 [this](https://github.com/microsoft/vscode-cmake-tools/pull/3926) mr.
@@ -112,7 +112,7 @@ So we use cmake.environment instead of cmake.configureEnvironment with cmake.bui
 
 [VS Code cmake build documentation](https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/build.md#the-build-environment)
 
-We inject variables used at cmake build from kde-builder (including set-env variables from global and from module).
+We inject variables used at cmake build from kde-builder (including set-env variables from global and from project node).
 
 ### Run/Debug environment
 

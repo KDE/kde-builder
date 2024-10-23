@@ -28,22 +28,22 @@ for your latest run, called `latest`. So the logs for the most recent
 kde-builder run should always be under `${log-dir}/latest`.
 
 Now, each directory for a kde-builder run will itself contain a set of
-directories, one for every KDE module that kde-builder tries to build.
+directories, one for every KDE project that kde-builder tries to build.
 Also, a file called `build-status` will be contained in the directory,
-which will allow you to determine which modules built and which failed.
+which will allow you to determine which projects built and which failed.
 
 ```{note}
-If a module itself has a submodule (such as extragear/multimedia,
+If a project itself has a subproject (such as extragear/multimedia,
 playground/utils), then there would actually be a
 matching layout in the log directory. For example, the logs for
 playground/utils after the last kde-builder run would be found in
 `${log-dir}/latest/playground/utils`, and not under `${log-dir}/latest/utils`.
 ```
 
-In each module log directory, you will find a set of files for each
-operation that kde-builder performs. If kde-builder updates a module,
-you may see filenames such as `git-checkout-update.log` (for a module
-checkout or when updating a module that has already been checked out).
+In each project log directory, you will find a set of files for each
+operation that kde-builder performs. If kde-builder updates a project,
+you may see filenames such as `git-checkout-update.log` (for a project
+checkout or when updating a project that has already been checked out).
 If the `configure` command was run, then you would expect to see a
 `configure.log` in that directory.
 
@@ -52,9 +52,9 @@ one of the files. To help you determine which file contains the error,
 kde-builder will create a link from the file containing the error (such
 as `build-1.log` to a file called `error.log`).
 
-The upshot to all of this is that to see why a module failed to build
+The upshot to all of this is that to see why a project failed to build
 after your last kde-builder invocation, the file you should look at first is
-`${log-dir}/latest/module-name/error.log`.
+`${log-dir}/latest/project-name/error.log`.
 
 ```{tip}
 If the file `error.log` is empty (especially after an installation),

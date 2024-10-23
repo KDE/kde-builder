@@ -119,7 +119,7 @@ class KDEProjectsReader:
 
         # Wildcard matches happen as specified if asked for.
         # Non-wildcard matches have an implicit "$proj/*" search as well for
-        # compatibility with previous use-modules
+        # compatibility with previous use-projects
         # Project specifiers ending in .git are forced to be non-wildcarded.
         if not re.search(r"\*", proj) and not re.search(r"\.git$", proj):
             # We have to do a search to account for over-specified module names

@@ -20,7 +20,7 @@ loggers:
 ```
 
 The order of loggers configs are read is the following:  
-1. kde-builder applies the default configuration from `data/kde-builder-logging.yaml` (from project root).  
+1. kde-builder applies the default configuration from `data/kde-builder-logging.yaml` (located in the kde-builder root directory).  
 2. If the `./kde-builder-logging.yaml` file is found (from the current working directory), it overrides the default configuration.  
 3. If the file was not found in previous step, then if the `~/.config/kde-builder-logging.yaml` file is found, it overrides the default configuration.
 
@@ -51,10 +51,9 @@ by setting the [colorful-output](#conf-colorful-output) option in the
 
 Disabling color output in the configuration file:
 
-```text
-global
-  colorful-output false
-end global
+```yaml
+global:
+  colorful-output: false
 ```
 
 (deleting-build-dir)=
@@ -70,9 +69,9 @@ major space-using pieces when using kde-builder:
 ```
 
 1.  The actual source checkout can take up a fair amount of space. The
-    default modules take up about 1.6 gigabytes of on-disk space. You
+    default projects take up about 1.6 gigabytes of on-disk space. You
     can reduce this amount by making sure that you are only building as
-    many modules as you actually want. kde-builder will not delete
+    many projects as you actually want. kde-builder will not delete
     source code from disk even if you delete the entry from the
     [configuration file](../getting-started/configure-data), so make sure that you go and
     delete unused source checkouts from the source directory. Note that
@@ -82,11 +81,11 @@ major space-using pieces when using kde-builder:
 
     Also, if you already have a Qt installed by your distribution (and
     the odds are good that you do), you probably do not need to install
-    the qt6-set module set. That will shave about 200 megabytes off of the
+    the qt6-set group. That will shave about 200 megabytes off of the
     on-disk source size.
 
 ```{note}
-Outdated info. Mentions the size for the kdebase module.
+Todo: Outdated info. Mentions the size for the kdebase module. And check the statements about "fake build dir".
 ```
 
 2.  kde-builder will create a separate build directory to build the
@@ -94,13 +93,13 @@ Outdated info. Mentions the size for the kdebase module.
     directory to create a fake build directory. When this happens,
     space-saving symlinks are used, so this should not be a hassle on
     disk space. The build directory will typically be much larger than
-    the source directory for a module. For example, the build directory
+    the source directory for a project. For example, the build directory
     for kdebase is about 1050 megabytes, whereas kdebase's source is
     only around 550 megabytes.
 
-    Luckily, the build directory is not required after a module has
+    Luckily, the build directory is not required after a project has
     successfully been built and installed. kde-builder can
-    automatically remove the build directory after installing a module,
+    automatically remove the build directory after installing a project,
     see the examples below for more information. Note that taking this
     step will make it impossible for kde-builder to perform the
     time-saving incremental builds.
@@ -129,20 +128,18 @@ fix the crash. So, remove debugging information at your own risk!
 Removing the build directory after installation of a module. The source
 directory is still kept, and debugging is enabled:
 
-```text
-global
-  configure-flags      --enable-debug
-  remove-after-install builddir        # Remove build directory after install
-end global
+```yaml
+global:
+  configure-flags: --enable-debug
+  remove-after-install: builddir # Remove build directory after install
 ```
 
 Removing the build directory after installation, without debugging
 information, with size optimization.
 
-```text
-global
-  cxxflags             -Os             # Optimize for size
-  configure-flags      --disable-debug
-  remove-after-install builddir        # Remove build directory after install
-end global
+```yaml
+global:
+  cxxflags: -Os # Optimize for size
+  configure-flags: --disable-debug
+  remove-after-install: builddir # Remove build directory after install
 ```

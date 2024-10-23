@@ -3,5 +3,4 @@
 __pycache__/
 *.py[cod]
 .kdesrc-build-data
-kdesrc-buildrc
 Pipfile.lock

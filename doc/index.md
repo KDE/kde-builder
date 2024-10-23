@@ -9,7 +9,7 @@ nosearch:
 :numbered:
 introduction/index
 getting-started/index
-kdesrc-buildrc/index
+configuration/index
 cmdline/index
 using-kde-builder/index
 developer/index

@@ -48,7 +48,7 @@ If for some reason you want to make installation differently, consult [](#altern
 ### Prepare the configuration file
 
 KDE Builder uses a [configuration file](./configure-data) to control
-which modules are built, where they are installed to, etc.
+which projects are built, where they are installed to, etc.
 
 Run this command to generate configuration file:
 
@@ -56,15 +56,15 @@ Run this command to generate configuration file:
 kde-builder --generate-config
 ```
 
-The config file will be located at `~/.config/kdesrc-buildrc`
-(or `$XDG_CONFIG_HOME/kdesrc-buildrc`, if `$XDG_CONFIG_HOME` is set).
+The config file will be located at `~/.config/kde-builder.yaml`
+(or `$XDG_CONFIG_HOME/kde-builder.yaml`, if `$XDG_CONFIG_HOME` is set).
 
-You can then edit the `~/.config/kdesrc-buildrc` configuration file to make any changes you see fit.
+You can then edit the `~/.config/kde-builder.yaml` configuration file to make any changes you see fit.
 
 (initial-install-distro-packages)=
-### Install the dependencies for modules
+### Install the dependencies for projects
 
-Building of modules requires some packages from your distribution to be installed.
+Building of projects requires some packages from your distribution to be installed.
 
 Run this command to install needed dependencies:
 

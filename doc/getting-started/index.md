@@ -10,5 +10,5 @@ before-building
 alternative-installation
 configure-data
 building-and-troubleshooting
-kde-modules-and-selection
+kde-projects-and-selection
 ```
