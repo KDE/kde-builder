@@ -40,7 +40,7 @@ _arguments \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
-  "(-! --ignore-projects)"{-!,--ignore-projects}"[]"":arguments:" \
+  "(-! --ignore-projects)"{-!,--ignore-projects}"[Do not include specified projects in the update/build process]"":::_kde-builder_modules" \
   "(--include-dependencies --no-include-dependencies -D -d)"{--include-dependencies,--no-include-dependencies,-D,-d}"[Builds/Skip KDE-based dependencies]" \
   --initial-setup"[Installs Plasma env vars (~/.bashrc), required system pkgs, and a base config file]" \
   --install-dir"[Where to install the module after it is built]"":argument:" \
