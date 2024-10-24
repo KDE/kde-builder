@@ -87,7 +87,7 @@ short_descriptions = {  # contains one of the options (the first one if it has v
     "--resume-refresh-build-first": "Resume after a build failure and start the build from scratch of first project",
     "--revision": "Checkout a specific numbered revision",
     "--run-tests": "Built the modules with support for running their test suite",
-    "--set-module-option-value": "Override an option in your configuration file for a specific module",
+    "--set-project-option-value": "Override an option in your configuration file for a specific project",
     "--show-info": "Show tool information",
     "--show-options-specifiers": "Show options information",
     "--source-dir": "Directory that stores the KDE sources",

@@ -51,7 +51,7 @@ class Cmdline:
     At the command line, the user can specify things like:
         * Modules or module-sets to build (by name)
         * Command line options (such as ``--pretend`` or ``--no-src``), which normally apply globally (i.e. overriding module-specific options in the config file)
-        * Command line options that apply to specific modules (using ``--set-module-option-value``)
+        * Command line options that apply to specific projects (using ``--set-project-option-value``)
         * Build modes (install, build only, query)
         * Modules to *ignore* building, using ``--ignore-projects``, which gobbles up all remaining options.
     """
@@ -161,8 +161,8 @@ class Cmdline:
                 logger_app.error("You need to specify a module with the --run option")
                 exit(1)  # Do not continue
 
-        supported_options.remove("set-module-option-value=s")  # specify differently, allowing it to be repeated in cmdline
-        parser.add_argument("--set-module-option-value", type=lambda x: x.split(",", 2), action="append")
+        supported_options.remove("set-project-option-value=s")  # specify differently, allowing it to be repeated in cmdline
+        parser.add_argument("--set-project-option-value", type=lambda x: x.split(",", 2), action="append")
 
         # Generate the code as a string with `parser.add_argument(...) ...`.
         # This is done by parsing supported_options and extracting option variants (long, alias, short ...), parameter numbers and default values.
@@ -275,9 +275,9 @@ class Cmdline:
             # resume list requires such modules).
             found_options["include-dependencies"] = False
 
-        # Hack to set module options
-        if args.set_module_option_value:
-            for module, option, value in args.set_module_option_value:
+        # Hack to set project options
+        if args.set_project_option_value:
+            for module, option, value in args.set_project_option_value:
                 if module and option:
                     if module not in opts["opts"]:
                         opts["opts"][module] = {}
@@ -518,7 +518,7 @@ class Cmdline:
             "resume-after|after|a=s",
             "resume-from|from|f=s",
             "resume-refresh-build-first|R",
-            "set-module-option-value=s",
+            "set-project-option-value=s",
             "show-info",
             "show-options-specifiers",
             "stop-after|to=s",

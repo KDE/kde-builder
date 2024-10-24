@@ -120,8 +120,8 @@ has specific [--async](#cmdline-async) and [--no-async](#cmdline-async)
 command line options that are preferred by kde-builder.
 ```
 
-(cmdline-set-module-option-value)=
-[`--set-module-option-value`](cmdline-set-module-option-value) \<module-name\>,\<option-name\>,\<option-value\>  
+(cmdline-set-project-option-value)=
+[`--set-project-option-value`](cmdline-set-project-option-value) \<project-name\>,\<option-name\>,\<option-value\>  
 You can use this option to override an option in your [configuration
 file](../getting-started/configure-data) for a specific project.
 
