@@ -115,7 +115,7 @@ class ModuleSetKDEProjects(ModuleSet):
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.
         active_results = all_module_results
-        if not ctx.get_option("use-inactive-modules"):
+        if not ctx.get_option("use-inactive-projects"):
             active_results = [module for module in all_module_results if module.get("active")]
 
         if not active_results:

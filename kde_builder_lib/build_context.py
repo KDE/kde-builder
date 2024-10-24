@@ -143,7 +143,7 @@ class BuildContext(Module):
             "stop-on-failure": True,
             "use-clean-install": False,
             "use-idle-io-priority": False,
-            "use-inactive-modules": False,
+            "use-inactive-projects": False,
         }
 
         # These options are exposed as cmdline options that require some parameter

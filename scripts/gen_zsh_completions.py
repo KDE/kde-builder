@@ -100,7 +100,7 @@ short_descriptions = {  # contains one of the options (the first one if it has v
     "--uninstall": "Uninstalls the module",
     "--use-clean-install": "Run make uninstall directly before running make install",
     "--use-idle-io-priority": "Use lower priority for disk and other I/O",
-    "--use-inactive-modules": "Allow kde-builder to also clone and pull from repositories marked as inactive",
+    "--use-inactive-projects": "Allow kde-builder to also clone and pull from repositories marked as inactive",
     "--verbose": "Change the level of verbosity",
     "--version": "Script information",
     # "--run": "A program to run with kde-builder",  # Todo Needs to be added separately
