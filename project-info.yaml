@@ -1,0 +1,7945 @@
+akonadi:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kiconthemes
+  - kitemmodels
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi.git
+akonadi-calendar:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kcontacts
+  - kcrash
+  - kdbusaddons
+  - kidentitymanagement
+  - kmailtransport
+  - knotifications
+  - messagelib
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-calendar
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-calendar.git
+akonadi-calendar-tools:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi
+  - calendarsupport
+  - extra-cmake-modules
+  - kcalendarcore
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-calendar-tools
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-calendar-tools.git
+akonadi-contacts:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - grantleetheme
+  - kcodecs
+  - kcontacts
+  - kmime
+  - ktextaddons
+  - ktexttemplate
+  - prison
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-contacts
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-contacts.git
+akonadi-import-wizard:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - kcontacts
+  - kidentitymanagement
+  - kmailtransport
+  - mailcommon
+  - mailimporter
+  - messagelib
+  - pimcommon
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-import-wizard
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-import-wizard.git
+akonadi-mime:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - kio
+  - kmime
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-mime
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-mime.git
+akonadi-notes:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - kmime
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-notes
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-notes.git
+akonadi-search:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-mime
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcmutils
+  - kcontacts
+  - kmime
+  - krunner
+  - ktextaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadi-search
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadi-search.git
+akonadiconsole:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi-search
+  - akonadi
+  - calendarsupport
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcontacts
+  - kimap
+  - kmime
+  - libkdepim
+  - messagelib
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akonadiconsole
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akonadiconsole.git
+akregator:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - grantleetheme
+  - kcodecs
+  - kontactinterface
+  - kstatusnotifieritem
+  - ktextaddons
+  - kuserfeedback
+  - libkdepim
+  - messagelib
+  - pimcommon
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/akregator
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/akregator.git
+analitza:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/analitza
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/analitza.git
+appstream:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+    meson-options: -Dqt=true -Dcompose=true
+  path: third-party/appstream
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/ximion/appstream
+ark:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kfilemetadata
+  - ki18n
+  - kiconthemes
+  - kio
+  - kparts
+  - kpty
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/ark
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/ark.git
+attica:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/attica
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/attica.git
+audiocd-kio:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kdoctools
+  - ki18n
+  - kio
+  - libkcddb
+  - libkcompactdisc
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/audiocd-kio
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/audiocd-kio.git
+aura-browser:
+  branch: master
+  build: true
+  dependencies:
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdeclarative
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kpackage
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  - plasma-workspace
+  - solid
+  options: {}
+  path: kde/workspace/aura-browser
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/aura-browser.git
+baloo:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kfilemetadata
+  - ki18n
+  - kidletime
+  - kio
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/baloo
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/baloo.git
+baloo-widgets:
+  branch: master
+  build: true
+  dependencies:
+  - baloo
+  - extra-cmake-modules
+  - kconfig
+  - kfilemetadata
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/baloo-widgets
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/baloo-widgets.git
+blinken:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kxmlgui
+  - phonon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/blinken
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/blinken.git
+bluedevil:
+  branch: master
+  build: true
+  dependencies:
+  - bluez-qt
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kitemviews
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libplasma
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/bluedevil
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/bluedevil.git
+bluez-qt:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/bluez-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/bluez-qt.git
+bomber:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/bomber
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/bomber.git
+bovo:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/bovo
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/bovo.git
+breeze:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - frameworkintegration
+  - kcmutils
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kdecoration
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kirigami
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/breeze
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/breeze.git
+breeze-gtk:
+  branch: master
+  build: true
+  dependencies:
+  - breeze
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/breeze-gtk
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/breeze-gtk.git
+breeze-icons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/breeze-icons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/breeze-icons.git
+calendarsupport:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi-notes
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kholidays
+  - kidentitymanagement
+  - kmime
+  - ktextaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/calendarsupport
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/calendarsupport.git
+cmark:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+  path: third-party/cmark
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/commonmark/cmark.git
+discover:
+  branch: master
+  build: true
+  dependencies:
+  - appstream
+  - attica
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kidletime
+  - kio
+  - kirigami-addons
+  - kitemmodels
+  - knewstuff
+  - knotifications
+  - kservice
+  - kstatusnotifieritem
+  - kuserfeedback
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - packagekit-qt
+  - purpose
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/discover
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/discover.git
+dolphin:
+  branch: master
+  build: true
+  dependencies:
+  - baloo-widgets
+  - baloo
+  - extra-cmake-modules
+  - kbookmarks
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kfilemetadata
+  - ki18n
+  - kiconthemes
+  - kio-extras
+  - kio
+  - knewstuff
+  - knotifications
+  - kparts
+  - ktextwidgets
+  - kuserfeedback
+  - kwindowsystem
+  - packagekit-qt
+  - phonon
+  - selenium-webdriver-at-spi
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/dolphin
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/dolphin.git
+dolphin-plugins:
+  branch: master
+  build: true
+  dependencies:
+  - dolphin
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kservice
+  - ktexteditor
+  - ktextwidgets
+  - kxmlgui
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/dolphin-plugins
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/dolphin-plugins.git
+dragon:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kparts
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - phonon
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/dragon
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/dragon.git
+drkonqi:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kidletime
+  - kio
+  - kitemmodels
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kstatusnotifieritem
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - solid
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_TESTING=OFF
+  path: kde/workspace/drkonqi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/drkonqi.git
+elisa:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - kfilemetadata
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami-addons
+  - kirigami
+  - kxmlgui
+  - qqc2-desktop-style
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/elisa
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/elisa.git
+eventviews:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi
+  - calendarsupport
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kconfigwidgets
+  - kdiagram
+  - kmime
+  - libkdepim
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/eventviews
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/eventviews.git
+extra-cmake-modules:
+  branch: null
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/extra-cmake-modules
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/extra-cmake-modules.git
+ffmpegthumbs:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/ffmpegthumbs
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/ffmpegthumbs.git
+filelight:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/filelight
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/filelight.git
+flatpak-kcm:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kitemmodels
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/flatpak-kcm
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/flatpak-kcm.git
+frameworkintegration:
+  branch: master
+  build: true
+  dependencies:
+  - appstream
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kconfigwidgets
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemviews
+  - knewstuff
+  - knotifications
+  - kpackage
+  - kwidgetsaddons
+  - oxygen-icons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/frameworkintegration
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/frameworkintegration.git
+futuresql:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kdesupport/futuresql
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/futuresql.git
+gpgme:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+  path: third-party/gpgme
+  phases:
+  - update
+  - build
+  - install
+  repository: https://dev.gnupg.org/source/gpgme.git
+granatier:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/granatier
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/granatier.git
+grantlee-editor:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - extra-cmake-modules
+  - grantleetheme
+  - kimap
+  - ktextaddons
+  - ktexttemplate
+  - messagelib
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/grantlee-editor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/grantlee-editor.git
+grantleetheme:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - knewstuff
+  - ktexttemplate
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/grantleetheme
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/grantleetheme.git
+gwenview:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemmodels
+  - knewstuff
+  - knotifications
+  - kparts
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libkdcraw
+  - phonon
+  - plasma-activities
+  - purpose
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/gwenview
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/gwenview.git
+haruna:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kfilemetadata
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami
+  - mpvqt
+  - qqc2-desktop-style
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/haruna
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/haruna.git
+heaptrack:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfigwidgets
+  - kcoreaddons
+  - kdiagram
+  - ki18n
+  - kiconthemes
+  - kio
+  - threadweaver
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DHEAPTRACK_USE_QT6=ON
+  path: extragear/sdk/heaptrack
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/heaptrack.git
+incidenceeditor:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-mime
+  - akonadi
+  - calendarsupport
+  - eventviews
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kdiagram
+  - kguiaddons
+  - kidentitymanagement
+  - kldap
+  - kmime
+  - kpimtextedit
+  - libkdepim
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/incidenceeditor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/incidenceeditor.git
+itinerary:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcolorscheme
+  - kconfig
+  - kcontacts
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kfilemetadata
+  - khealthcertificate
+  - kholidays
+  - ki18n
+  - kio
+  - kirigami-addons
+  - kirigami
+  - kitemmodels
+  - kitinerary
+  - knotifications
+  - kosmindoormap
+  - kpkpass
+  - kpublictransport
+  - kunitconversion
+  - kwindowsystem
+  - libquotient
+  - networkmanager-qt
+  - plasma-integration
+  - prison
+  - qqc2-breeze-style
+  - qqc2-desktop-style
+  - qtkeychain
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/itinerary
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/itinerary.git
+k3b:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - kdoctools
+  - kfilemetadata
+  - ki18n
+  - kiconthemes
+  - kio
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kwidgetsaddons
+  - kxmlgui
+  - libkcddb
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/k3b
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/k3b.git
+kaccounts-integration:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kio
+  - kwallet
+  - libaccounts-qt
+  - qcoro
+  - signond
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kaccounts-integration
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kaccounts-integration.git
+kactivitymanagerd:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kglobalaccel
+  - ki18n
+  - kio
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kactivitymanagerd
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kactivitymanagerd.git
+kaddressbook:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-search
+  - akonadi
+  - extra-cmake-modules
+  - grantleetheme
+  - kiconthemes
+  - kontactinterface
+  - kuserfeedback
+  - libkdepim
+  - pimcommon
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kaddressbook
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kaddressbook.git
+kajongg:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdoctools
+  - ki18n
+  - libkmahjongg
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kajongg
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kajongg.git
+kalarm:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcontacts
+  - kcrash
+  - kdbusaddons
+  - kglobalaccel
+  - kguiaddons
+  - kholidays
+  - ki18n
+  - kiconthemes
+  - kidentitymanagement
+  - kio
+  - kitemmodels
+  - kjobwidgets
+  - kmailtransport
+  - kmime
+  - knotifications
+  - knotifyconfig
+  - kservice
+  - kstatusnotifieritem
+  - ktextaddons
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kalarm
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kalarm.git
+kalgebra:
+  branch: master
+  build: true
+  dependencies:
+  - analitza
+  - extra-cmake-modules
+  - kconfigwidgets
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kalgebra
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kalgebra.git
+kalzium:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kitemviews
+  - knewstuff
+  - kplotting
+  - ktextwidgets
+  - kunitconversion
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kalzium
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kalzium.git
+kamera:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kdoctools
+  - ki18n
+  - kio
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kamera
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kamera.git
+kanagram:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - kxmlgui
+  - libkeduvocdocument
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kanagram
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kanagram.git
+kapidox:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kapidox
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kapidox.git
+kapman:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kapman
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kapman.git
+karchive:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/karchive
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/karchive.git
+kate:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - knewstuff
+  - ktexteditor
+  - ktextwidgets
+  - kuserfeedback
+  - qtkeychain
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/kate
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kate.git
+katomic:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - knewstuff
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/katomic
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/katomic.git
+kauth:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kwindowsystem
+  - polkit-qt-1
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kauth
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kauth.git
+kbackup:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - knotifications
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kbackup
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kbackup.git
+kblackbox:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kblackbox
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kblackbox.git
+kblocks:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kblocks
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kblocks.git
+kbookmarks:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kbookmarks
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kbookmarks.git
+kbounce:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kbounce
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kbounce.git
+kbreakout:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kbreakout
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kbreakout.git
+kbruch:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kbruch
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kbruch.git
+kcachegrind:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/kcachegrind
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/kcachegrind.git
+kcalc:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kguiaddons
+  - ki18n
+  - knotifications
+  - kxmlgui
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kcalc
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kcalc.git
+kcalendarcore:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcalendarcore
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcalendarcore.git
+kcalutils:
+  branch: null
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - kcalendarcore
+  - kidentitymanagement
+  - ktexttemplate
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kcalutils
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kcalutils.git
+kcgroups:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kdereview/kcgroups
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kcgroups.git
+kcharselect:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kbookmarks
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kcharselect
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kcharselect.git
+kclock:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kirigami-addons
+  - kirigami
+  - knotifications
+  - kstatusnotifieritem
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/utils/kclock
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kclock.git
+kcmutils:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kirigami
+  - kitemviews
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcmutils
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcmutils.git
+kcodecs:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcodecs
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcodecs.git
+kcolorchooser:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kcolorchooser
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kcolorchooser.git
+kcolorpicker:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_SHARED_LIBS=ON -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+  path: third-party/kcolorpicker
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/ksnip/kColorPicker
+kcolorscheme:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kguiaddons
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcolorscheme
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcolorscheme.git
+kcompletion:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kconfig
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcompletion
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcompletion.git
+kconfig:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kconfig
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kconfig.git
+kconfigwidgets:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kguiaddons
+  - ki18n
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kconfigwidgets
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kconfigwidgets.git
+kcontacts:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcontacts
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcontacts.git
+kcoreaddons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcoreaddons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcoreaddons.git
+kcrash:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kcrash
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kcrash.git
+kcron:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfigwidgets
+  - kdoctools
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeadmin/kcron
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/kcron.git
+kdav:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdav
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdav.git
+kdbusaddons:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdbusaddons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdbusaddons.git
+kde-cli-tools:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdesu
+  - ki18n
+  - kiconthemes
+  - kio
+  - kjobwidgets
+  - kparts
+  - kpty
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kde-cli-tools
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kde-cli-tools.git
+kde-dev-scripts:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdoctools
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/kde-dev-scripts
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/kde-dev-scripts.git
+kde-gtk-config:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcodecs
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - kdecoration
+  - kguiaddons
+  - kwidgetsaddons
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kde-gtk-config
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kde-gtk-config.git
+kdebugsettings:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kiconthemes
+  - kitemviews
+  - kwidgetsaddons
+  - kxmlgui
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kdebugsettings
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kdebugsettings.git
+kdeclarative:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdeclarative
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdeclarative.git
+kdeconnect-kde:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcontacts
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami-addons
+  - kirigami
+  - kitemmodels
+  - knotifications
+  - kpackage
+  - kpeople
+  - kservice
+  - kstatusnotifieritem
+  - kwindowsystem
+  - modemmanager-qt
+  - plasma-wayland-protocols
+  - pulseaudio-qt
+  - qqc2-desktop-style
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kdeconnect-kde
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kdeconnect-kde.git
+kdecoration:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kdecoration
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kdecoration.git
+kded:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kservice
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kded
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kded.git
+kdeedu-data:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kdeedu-data
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kdeedu-data.git
+kdegraphics-mobipocket:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kdegraphics-mobipocket
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kdegraphics-mobipocket.git
+kdegraphics-thumbnailers:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kdegraphics-mobipocket
+  - kio
+  - libkdcraw
+  - libkexiv2
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kdegraphics-thumbnailers
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kdegraphics-thumbnailers.git
+kdenetwork-filesharing:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - packagekit-qt
+  - qcoro
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kdenetwork-filesharing
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kdenetwork-filesharing.git
+kdenlive:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - karchive
+  - kbookmarks
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kfilemetadata
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemviews
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kplotting
+  - kservice
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - purpose
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/kdenlive
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/kdenlive.git
+kdepim-addons:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi-contacts
+  - akonadi-import-wizard
+  - akonadi
+  - calendarsupport
+  - extra-cmake-modules
+  - grantleetheme
+  - incidenceeditor
+  - kaddressbook
+  - kcalendarcore
+  - kcalutils
+  - kconfig
+  - kcontacts
+  - kdbusaddons
+  - kdeclarative
+  - kguiaddons
+  - kholidays
+  - kiconthemes
+  - kidentitymanagement
+  - kimap
+  - kio
+  - kitinerary
+  - kmailtransport
+  - kparts
+  - kpimtextedit
+  - kpkpass
+  - ktextaddons
+  - ktexttemplate
+  - ktnef
+  - kxmlgui
+  - libgravatar
+  - libkdepim
+  - libkleo
+  - libksieve
+  - mailcommon
+  - mailimporter
+  - messagelib
+  - pimcommon
+  - prison
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kdepim-addons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kdepim-addons.git
+kdepim-runtime:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi-notes
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcontacts
+  - kdav
+  - kidentitymanagement
+  - kimap
+  - kio
+  - kitemmodels
+  - kldap
+  - kmailtransport
+  - kmbox
+  - kmime
+  - knotifications
+  - knotifyconfig
+  - ktextaddons
+  - ktextwidgets
+  - kwindowsystem
+  - libkgapi
+  - libkolabxml
+  - plasma-activities
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kdepim-runtime
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kdepim-runtime.git
+kdeplasma-addons:
+  branch: master
+  build: true
+  dependencies:
+  - attica
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kglobalaccel
+  - kholidays
+  - ki18n
+  - kio
+  - kirigami-addons
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - kpackage
+  - krunner
+  - kservice
+  - kunitconversion
+  - kwidgetsaddons
+  - kxmlgui
+  - libplasma
+  - plasma-desktop
+  - plasma-nano
+  - plasma-workspace
+  - plasma5support
+  - selenium-webdriver-at-spi
+  - solid
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kdeplasma-addons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kdeplasma-addons.git
+kdesdk-kio:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/kdesdk-kio
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/kdesdk-kio.git
+kdesdk-thumbnailers:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/kdesdk-thumbnailers
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/kdesdk-thumbnailers.git
+kdesu:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kpty
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdesu
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdesu.git
+kdf:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - kdoctools
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kdf
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kdf.git
+kdiagram:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/graphics/kdiagram
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kdiagram.git
+kdialog:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdbusaddons
+  - kguiaddons
+  - kiconthemes
+  - kio
+  - knotifications
+  - ktextwidgets
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/kdialog
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kdialog.git
+kdiamond:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - knotifications
+  - knotifyconfig
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kdiamond
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kdiamond.git
+kdnssd:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdnssd
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdnssd.git
+kdoctools:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kdoctools
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kdoctools.git
+kdsoap:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DKDSoap_QT6=true
+  path: third-party/kdsoap
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/KDAB/KDSoap
+kdsoap-ws-discovery-client:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdsoap
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: playground/libs/kdsoap-ws-discovery-client
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kdsoap-ws-discovery-client.git
+keditbookmarks:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kbookmarks
+  - kcodecs
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kio
+  - kparts
+  - kwidgetsaddons
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/keditbookmarks
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/keditbookmarks.git
+keysmith:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kdbusaddons
+  - kguiaddons
+  - ki18n
+  - kirigami
+  - kwidgetsaddons
+  - kwindowsystem
+  - qqc2-desktop-style
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/utils/keysmith
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/keysmith.git
+kfilemetadata:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcodecs
+  - kcoreaddons
+  - ki18n
+  - poppler
+  - taglib
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kfilemetadata
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kfilemetadata.git
+kfind:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - kfilemetadata
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/kfind
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kfind.git
+kfloppy:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kfloppy
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kfloppy.git
+kfourinline:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdnssd
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kfourinline
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kfourinline.git
+kgamma:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kdoctools
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kgamma
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kgamma.git
+kgeography:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kitemviews
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kgeography
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kgeography.git
+kget:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemviews
+  - knotifications
+  - knotifyconfig
+  - kservice
+  - kstatusnotifieritem
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libktorrent
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kget
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kget.git
+kglobalaccel:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kglobalaccel
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kglobalaccel.git
+kglobalacceld:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kglobalaccel
+  - kio
+  - kjobwidgets
+  - kservice
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: playground/base/kglobalacceld
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kglobalacceld.git
+kgoldrunner:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kgoldrunner
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kgoldrunner.git
+kgpg:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - extra-cmake-modules
+  - karchive
+  - kcodecs
+  - kconfigwidgets
+  - kcontacts
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kstatusnotifieritem
+  - ktextwidgets
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kgpg
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kgpg.git
+kguiaddons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kguiaddons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kguiaddons.git
+khangman:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - knotifications
+  - libkeduvocdocument
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/khangman
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/khangman.git
+khealthcertificate:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcodecs
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/pim/khealthcertificate
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/khealthcertificate.git
+kholidays:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kholidays
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kholidays.git
+ki18n:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/ki18n
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/ki18n.git
+kiconthemes:
+  branch: null
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - karchive
+  - kcolorscheme
+  - kconfigwidgets
+  - ki18n
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kiconthemes
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kiconthemes.git
+kidentitymanagement:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kirigami-addons
+  - kpimtextedit
+  - ktextaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kidentitymanagement
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kidentitymanagement.git
+kidletime:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-wayland-protocols
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kidletime
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kidletime.git
+kigo:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kigo
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kigo.git
+killbots:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/killbots
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/killbots.git
+kimageannotator:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_SHARED_LIBS=ON -DBUILD_WITH_QT6=ON -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=TRUE
+  path: third-party/kimageannotator
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/ksnip/kImageAnnotator
+kimageformats:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kimageformats
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kimageformats.git
+kimagemapeditor:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kparts
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdewebdev/kimagemapeditor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kimagemapeditor.git
+kimap:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kmime
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kimap
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kimap.git
+kinfocenter:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kservice
+  - kwindowsystem
+  - plasma-systemmonitor
+  - selenium-webdriver-at-spi
+  - solid
+  - systemsettings
+  - xdg-desktop-portal-kde
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kinfocenter
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kinfocenter.git
+kio:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kbookmarks
+  - kcolorscheme
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kitemviews
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kio
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kio.git
+kio-extras:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - kdnssd
+  - kdoctools
+  - kdsoap-ws-discovery-client
+  - kdsoap
+  - kguiaddons
+  - ki18n
+  - kio
+  - libkexiv2
+  - phonon
+  - plasma-activities-stats
+  - plasma-activities
+  - qcoro
+  - solid
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kio-extras
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kio-extras.git
+kio-gdrive:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdoctools
+  - ki18n
+  - kio
+  - libkgapi
+  - purpose
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kio-gdrive
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kio-gdrive.git
+kio-zeroconf:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdbusaddons
+  - kdnssd
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/kio-zeroconf
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/kio-zeroconf.git
+kirigami:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kirigami
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kirigami.git
+kirigami-addons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kirigami
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/libs/kirigami-addons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kirigami-addons.git
+kiriki:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kiriki
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kiriki.git
+kitemmodels:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kitemmodels
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kitemmodels.git
+kitemviews:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kitemviews
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kitemviews.git
+kiten:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kiten
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kiten.git
+kitinerary:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcodecs
+  - kcontacts
+  - ki18n
+  - kmime
+  - kpkpass
+  - zxing-cpp
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kitinerary
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kitinerary.git
+kjobwidgets:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - knotifications
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kjobwidgets
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kjobwidgets.git
+kjumpingcube:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kjumpingcube
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kjumpingcube.git
+kldap:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdoctools
+  - ki18n
+  - kio
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kldap
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kldap.git
+kleopatra:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kcodecs
+  - kcolorscheme
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kiconthemes
+  - kidentitymanagement
+  - kio
+  - kitemmodels
+  - kmailtransport
+  - kmime
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libkleo
+  - mimetreeparser
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kleopatra
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kleopatra.git
+klettres:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - knewstuff
+  - kwidgetsaddons
+  - kxmlgui
+  - phonon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/klettres
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/klettres.git
+klickety:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/klickety
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/klickety.git
+klines:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/klines
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/klines.git
+kmag:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kdoctools
+  - ki18n
+  - kio
+  - kxmlgui
+  - libqaccessibilityclient
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeaccessibility/kmag
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:accessibility/kmag.git
+kmahjongg:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - knewstuff
+  - kxmlgui
+  - libkdegames
+  - libkmahjongg
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kmahjongg
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kmahjongg.git
+kmail:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi-search
+  - akonadi
+  - extra-cmake-modules
+  - kbookmarks
+  - kcalendarcore
+  - kcalutils
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcontacts
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kidentitymanagement
+  - kio
+  - kitemviews
+  - kjobwidgets
+  - kldap
+  - kmailtransport
+  - kmime
+  - knotifications
+  - knotifyconfig
+  - kontactinterface
+  - kparts
+  - kpimtextedit
+  - kservice
+  - kstatusnotifieritem
+  - ktextaddons
+  - ktextwidgets
+  - ktnef
+  - kuserfeedback
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libgravatar
+  - libkdepim
+  - libkleo
+  - libksieve
+  - mailcommon
+  - messagelib
+  - pimcommon
+  - plasma-activities
+  - qtkeychain
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kmail
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kmail.git
+kmail-account-wizard:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kidentitymanagement
+  - kmailtransport
+  - kmime
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kmail-account-wizard
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kmail-account-wizard.git
+kmailtransport:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ksmtp
+  - libkgapi
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kmailtransport
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kmailtransport.git
+kmbox:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kmime
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kmbox
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kmbox.git
+kmenuedit:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kglobalaccel
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemviews
+  - kwindowsystem
+  - kxmlgui
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kmenuedit
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kmenuedit.git
+kmime:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kmime
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kmime.git
+kmines:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kmines
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kmines.git
+kmousetool:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - phonon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeaccessibility/kmousetool
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:accessibility/kmousetool.git
+kmouth:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeaccessibility/kmouth
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:accessibility/kmouth.git
+kmplot:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kparts
+  - ktextwidgets
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kmplot
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kmplot.git
+knavalbattle:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdnssd
+  - kdoctools
+  - ki18n
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/knavalbattle
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/knavalbattle.git
+knetwalk:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/knetwalk
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/knetwalk.git
+knewstuff:
+  branch: null
+  build: true
+  dependencies:
+  - attica
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kirigami
+  - kpackage
+  - kwidgetsaddons
+  - syndication
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/knewstuff
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/knewstuff.git
+knights:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kplotting
+  - ksvg
+  - ktextwidgets
+  - kwallet
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/knights
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/knights.git
+knotifications:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/knotifications
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/knotifications.git
+knotifyconfig:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - kio
+  - knotifications
+  - kxmlgui
+  - phonon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/knotifyconfig
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/knotifyconfig.git
+kolf:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kolf
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kolf.git
+kollision:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kollision
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kollision.git
+kolourpaint:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcrash
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libksane
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kolourpaint
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kolourpaint.git
+kompare:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kconfig
+  - kcoreaddons
+  - kdoctools
+  - kiconthemes
+  - kjobwidgets
+  - kparts
+  - ktexteditor
+  - kwidgetsaddons
+  - libkomparediff2
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/kompare
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/kompare.git
+konqueror:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcmutils
+  - kcrash
+  - kdbusaddons
+  - kdesu
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kparts
+  - kwindowsystem
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/konqueror
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/konqueror.git
+konquest:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/konquest
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/konquest.git
+konsole:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kbookmarks
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kparts
+  - kpty
+  - kservice
+  - ktextwidgets
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/konsole
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/konsole.git
+kontact:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - grantleetheme
+  - kiconthemes
+  - kontactinterface
+  - ktexttemplate
+  - libkdepim
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kontact
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kontact.git
+kontactinterface:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kparts
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kontactinterface
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kontactinterface.git
+kontrast:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - futuresql
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kirigami-addons
+  - kirigami
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeaccessibility/kontrast
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:accessibility/kontrast.git
+kopeninghours:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kholidays
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kopeninghours
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kopeninghours.git
+korganizer:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi-contacts
+  - akonadi-notes
+  - akonadi
+  - calendarsupport
+  - eventviews
+  - extra-cmake-modules
+  - incidenceeditor
+  - kcalendarcore
+  - kcalutils
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcontacts
+  - kcoreaddons
+  - kcrash
+  - kdiagram
+  - kdoctools
+  - kholidays
+  - ki18n
+  - kiconthemes
+  - kidentitymanagement
+  - kitemviews
+  - kjobwidgets
+  - kldap
+  - kmailtransport
+  - kmime
+  - knewstuff
+  - kontactinterface
+  - kparts
+  - kuserfeedback
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libkdepim
+  - pimcommon
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/korganizer
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/korganizer.git
+kosmindoormap:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - kirigami-addons
+  - kirigami
+  - kopeninghours
+  - kpublictransport
+  - kservice
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kosmindoormap
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kosmindoormap.git
+kpackage:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kpackage
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kpackage.git
+kparts:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kio
+  - knotifications
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kparts
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kparts.git
+kpat:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kio
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kpat
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kpat.git
+kpeople:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcontacts
+  - kcoreaddons
+  - ki18n
+  - kitemviews
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kpeople
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kpeople.git
+kpeoplevcard:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcontacts
+  - kcoreaddons
+  - ki18n
+  - kpeople
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kdereview/kpeoplevcard
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kpeoplevcard.git
+kpimtextedit:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - ktextaddons
+  - kwidgetsaddons
+  - kxmlgui
+  - sonnet
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kpimtextedit
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kpimtextedit.git
+kpipewire:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - plasma-wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kpipewire
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kpipewire.git
+kpkpass:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kpkpass
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/kpkpass.git
+kplotting:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kplotting
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kplotting.git
+kpmcore:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kwidgetsaddons
+  - polkit-qt-1
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeadmin/kpmcore
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/kpmcore.git
+kpty:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kpty
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kpty.git
+kpublictransport:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - networkmanager-qt
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/kpublictransport
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kpublictransport.git
+kquickcharts:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kquickcharts
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kquickcharts.git
+kquickimageeditor:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/libs/kquickimageeditor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kquickimageeditor.git
+krdc:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kbookmarks
+  - kcmutils
+  - kcompletion
+  - kconfig
+  - kcrash
+  - kdnssd
+  - ki18n
+  - kiconthemes
+  - knotifications
+  - knotifyconfig
+  - kstatusnotifieritem
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/krdc
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/krdc.git
+krdp:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcrash
+  - kdbusaddons
+  - kpipewire
+  - kstatusnotifieritem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/krdp
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/krdp.git
+kreversi:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kreversi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kreversi.git
+krfb:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdnssd
+  - kdoctools
+  - ki18n
+  - knotifications
+  - kpipewire
+  - kstatusnotifieritem
+  - kwallet
+  - kwayland
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - plasma-wayland-protocols
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/krfb
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/krfb.git
+kruler:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcrash
+  - kdoctools
+  - ki18n
+  - knotifications
+  - kstatusnotifieritem
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/kruler
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/kruler.git
+krunner:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kitemmodels
+  - threadweaver
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/krunner
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/krunner.git
+ksanecore:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: libraries/ksanecore
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/ksanecore.git
+kscreen:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kpackage
+  - kservice
+  - ksvg
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - layer-shell-qt
+  - libkscreen
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kscreen
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kscreen.git
+kscreenlocker:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdeclarative
+  - kglobalaccel
+  - ki18n
+  - kidletime
+  - knotifications
+  - kservice
+  - ksvg
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - layer-shell-qt
+  - libkscreen
+  - libplasma
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kscreenlocker
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kscreenlocker.git
+kservice:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kservice
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kservice.git
+kshisen:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kxmlgui
+  - libkdegames
+  - libkmahjongg
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kshisen
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kshisen.git
+ksirk:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - kwallet
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/ksirk
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/ksirk.git
+ksmtp:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/ksmtp
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/ksmtp.git
+ksnakeduel:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/ksnakeduel
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/ksnakeduel.git
+kspaceduel:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kspaceduel
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kspaceduel.git
+ksquares:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/ksquares
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/ksquares.git
+ksshaskpass:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  - kwallet
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/ksshaskpass
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/ksshaskpass.git
+kstatusnotifieritem:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kstatusnotifieritem
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kstatusnotifieritem.git
+ksudoku:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kjobwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/ksudoku
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/ksudoku.git
+ksvg:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kguiaddons
+  - kirigami
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/ksvg
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/ksvg.git
+ksystemlog:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcompletion
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - kitemviews
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeadmin/ksystemlog
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/ksystemlog.git
+ksystemstats:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kio
+  - libksysguard
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/ksystemstats
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/ksystemstats.git
+kteatime:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - knotifications
+  - knotifyconfig
+  - ktextwidgets
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kteatime
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kteatime.git
+ktextaddons:
+  branch: null
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kio
+  - qtkeychain
+  - sonnet
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: playground/libs/ktextaddons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/ktextaddons.git
+ktexteditor:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kconfig
+  - kguiaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kparts
+  - ktextwidgets
+  - kxmlgui
+  - sonnet
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/ktexteditor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/ktexteditor.git
+ktexttemplate:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/ktexttemplate
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/ktexttemplate.git
+ktextwidgets:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - ki18n
+  - kwidgetsaddons
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/ktextwidgets
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/ktextwidgets.git
+ktimer:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - knotifications
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/ktimer
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/ktimer.git
+ktnef:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kcontacts
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/ktnef
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/ktnef.git
+ktuberling:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/ktuberling
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/ktuberling.git
+kturtle:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - ktextwidgets
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kturtle
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kturtle.git
+kubrick:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/kubrick
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/kubrick.git
+kunitconversion:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kunitconversion
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kunitconversion.git
+kuserfeedback:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kuserfeedback
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kuserfeedback.git
+kwallet:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - gpgme
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kiconthemes
+  - knotifications
+  - kwidgetsaddons
+  - kwindowsystem
+  - qca
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kwallet
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kwallet.git
+kwallet-pam:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kwallet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kwallet-pam
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kwallet-pam.git
+kwalletmanager:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kservice
+  - kstatusnotifieritem
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/kwalletmanager
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kwalletmanager.git
+kwave:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kio
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/kwave
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/kwave.git
+kwayland:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-wayland-protocols
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kwayland
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kwayland.git
+kweather:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kirigami-addons
+  - kirigami
+  - knotifications
+  - kweathercore
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/utils/kweather
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/kweather.git
+kweathercore:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kholidays
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/libs/kweathercore
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/kweathercore.git
+kwidgetsaddons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kwidgetsaddons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kwidgetsaddons.git
+kwin:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - breeze
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdeclarative
+  - kdecoration
+  - kdoctools
+  - kglobalaccel
+  - kglobalacceld
+  - ki18n
+  - kidletime
+  - kirigami
+  - knewstuff
+  - knotifications
+  - kpackage
+  - kpipewire
+  - kscreenlocker
+  - kservice
+  - ksvg
+  - kwayland
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libplasma
+  - libqaccessibilityclient
+  - plasma-activities
+  - plasma-wayland-protocols
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kwin
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kwin.git
+kwindowsystem:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-wayland-protocols
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kwindowsystem
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kwindowsystem.git
+kwordquiz:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kirigami-addons
+  - knewstuff
+  - libkeduvocdocument
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/kwordquiz
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/kwordquiz.git
+kwrited:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - knotifications
+  - kpty
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/kwrited
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/kwrited.git
+kxmlgui:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kglobalaccel
+  - ki18n
+  - kiconthemes
+  - kitemviews
+  - ktextwidgets
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/kxmlgui
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/kxmlgui.git
+layer-shell-qt:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/layer-shell-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/layer-shell-qt.git
+libaccounts-qt:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+    qmake-options: PREFIX=/home/fernie/kde/usr
+  path: third-party/libaccounts-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: https://gitlab.com/accounts-sso/libaccounts-qt.git
+libgpg-error:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+  path: third-party/libgpg-error
+  phases:
+  - update
+  - build
+  - install
+  repository: https://dev.gnupg.org/source/libgpg-error.git
+libgravatar:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/libgravatar
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/libgravatar.git
+libkcddb:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kdoctools
+  - ki18n
+  - kio
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/libkcddb
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/libkcddb.git
+libkcompactdisc:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - phonon
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/libkcompactdisc
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/libkcompactdisc.git
+libkdcraw:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/libs/libkdcraw
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/libkdcraw.git
+libkdegames:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcolorscheme
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kdnssd
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - knewstuff
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/libkdegames
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/libkdegames.git
+libkdepim:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcompletion
+  - ki18n
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/libkdepim
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/libkdepim.git
+libkeduvocdocument:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - ki18n
+  - kio
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/libkeduvocdocument
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/libkeduvocdocument.git
+libkexiv2:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/libs/libkexiv2
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/libkexiv2.git
+libkgapi:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcontacts
+  - kwallet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/libkgapi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/libkgapi.git
+libkleo:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kcolorscheme
+  - kcompletion
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kitemmodels
+  - ktextaddons
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/libkleo
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/libkleo.git
+libkmahjongg:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/libkmahjongg
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/libkmahjongg.git
+libkomparediff2:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdesdk/libkomparediff2
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/libkomparediff2.git
+libksane:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - ksanecore
+  - ktextwidgets
+  - kwallet
+  - kwidgetsaddons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/libs/libksane
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/libksane.git
+libkscreen:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/libkscreen
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/libkscreen.git
+libksieve:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kidentitymanagement
+  - kimap
+  - kmailtransport
+  - kmime
+  - ktextaddons
+  - libkdepim
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/libksieve
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/libksieve.git
+libksysguard:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - knewstuff
+  - kpackage
+  - kservice
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/libksysguard
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/libksysguard.git
+libktorrent:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcrash
+  - ki18n
+  - kio
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdenetwork/libktorrent
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/libktorrent.git
+libplasma:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami
+  - knotifications
+  - kpackage
+  - kparts
+  - ksvg
+  - kwidgetsaddons
+  - kwindowsystem
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/libplasma
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/libplasma.git
+libqaccessibilityclient:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/libs/libqaccessibilityclient
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/libqaccessibilityclient.git
+libquotient:
+  branch: dev
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_SHARED_LIBS=ON -DBUILD_WITH_QT6=ON -DQuotient_ENABLE_E2EE=on
+  path: third-party/libquotient
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/quotient-im/libQuotient
+lskat:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/lskat
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/lskat.git
+mailcommon:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-mime
+  - akonadi
+  - extra-cmake-modules
+  - karchive
+  - kcodecs
+  - kmailtransport
+  - kmime
+  - libkdepim
+  - mailimporter
+  - messagelib
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/mailcommon
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/mailcommon.git
+mailimporter:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-mime
+  - akonadi
+  - extra-cmake-modules
+  - kmime
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/mailimporter
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/mailimporter.git
+markdownpart:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - ki18n
+  - kparts
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/markdownpart
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/markdownpart.git
+mbox-importer:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi
+  - extra-cmake-modules
+  - kiconthemes
+  - mailcommon
+  - mailimporter
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/mbox-importer
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/mbox-importer.git
+merkuro:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcalutils
+  - kconfigwidgets
+  - kcontacts
+  - kcrash
+  - kdepim-runtime
+  - kirigami-addons
+  - kirigami
+  - kmime
+  - kwindowsystem
+  - kxmlgui
+  - mailcommon
+  - mimetreeparser
+  - qqc2-desktop-style
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/merkuro
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/merkuro.git
+messagelib:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-mime
+  - akonadi-search
+  - akonadi
+  - extra-cmake-modules
+  - grantleetheme
+  - kcolorscheme
+  - kcontacts
+  - kidentitymanagement
+  - kmailtransport
+  - kmbox
+  - kmime
+  - kpimtextedit
+  - kservice
+  - ktextaddons
+  - ktexttemplate
+  - libgravatar
+  - libkdepim
+  - libkleo
+  - pimcommon
+  - qca
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/messagelib
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/messagelib.git
+milou:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - ki18n
+  - krunner
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/milou
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/milou.git
+mimetreeparser:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcalendarcore
+  - kmbox
+  - kmime
+  - kwidgetsaddons
+  - libkleo
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/mimetreeparser
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/mimetreeparser.git
+modemmanager-qt:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/modemmanager-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/modemmanager-qt.git
+mpvqt:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/mpvqt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/mpvqt.git
+neochat:
+  branch: master
+  build: true
+  dependencies:
+  - cmark
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kio
+  - kirigami-addons
+  - kirigami
+  - kitemmodels
+  - knotifications
+  - kquickcharts
+  - kquickimageeditor
+  - kstatusnotifieritem
+  - kwindowsystem
+  - libquotient
+  - prison
+  - purpose
+  - qcoro
+  - qqc2-desktop-style
+  - qtkeychain
+  - selenium-webdriver-at-spi
+  - sonnet
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/network/neochat
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:network/neochat.git
+networkmanager-qt:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/networkmanager-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/networkmanager-qt.git
+ocean-sound-theme:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/ocean-sound-theme
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/ocean-sound-theme.git
+okular:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - karchive
+  - kbookmarks
+  - kcolorscheme
+  - kdegraphics-mobipocket
+  - ki18n
+  - kio
+  - kitemviews
+  - kparts
+  - kpty
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - libkexiv2
+  - phonon
+  - plasma-activities
+  - purpose
+  - threadweaver
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/okular
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/okular.git
+oxygen:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - frameworkintegration
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdecoration
+  - kguiaddons
+  - ki18n
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/oxygen
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/oxygen.git
+oxygen-icons:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/oxygen-icons
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/oxygen-icons.git
+oxygen-sounds:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/oxygen-sounds
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/oxygen-sounds.git
+packagekit-qt:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: third-party/packagekit-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/PackageKit/PackageKit-Qt.git
+palapeli:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kitemviews
+  - knotifications
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/palapeli
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/palapeli.git
+parley:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kio
+  - knewstuff
+  - knotifications
+  - ktextwidgets
+  - kxmlgui
+  - libkeduvocdocument
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/parley
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/parley.git
+partitionmanager:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kjobwidgets
+  - kpmcore
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeadmin/partitionmanager
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/partitionmanager.git
+phonon:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DPHONON_BUILD_QT6=ON -DPHONON_BUILD_QT5=OFF
+  path: kdesupport/phonon
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/phonon.git
+phonon-vlc:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - phonon
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DPHONON_BUILD_QT6=ON -DPHONON_BUILD_QT5=OFF
+  path: kdesupport/phonon-vlc
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/phonon-vlc.git
+picmi:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - ki18n
+  - knewstuff
+  - kwidgetsaddons
+  - kxmlgui
+  - libkdegames
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegames/picmi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:games/picmi.git
+pim-data-exporter:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-notes
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcontacts
+  - kdbusaddons
+  - kiconthemes
+  - kidentitymanagement
+  - kmailtransport
+  - kmime
+  - kstatusnotifieritem
+  - ktextaddons
+  - kuserfeedback
+  - mailcommon
+  - pimcommon
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/pim-data-exporter
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/pim-data-exporter.git
+pim-sieve-editor:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kiconthemes
+  - kimap
+  - kmailtransport
+  - kuserfeedback
+  - kxmlgui
+  - libksieve
+  - pimcommon
+  - qtkeychain
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/pim-sieve-editor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/pim-sieve-editor.git
+pimcommon:
+  branch: null
+  build: true
+  dependencies:
+  - akonadi-contacts
+  - akonadi-search
+  - akonadi
+  - extra-cmake-modules
+  - kcalendarcore
+  - kcmutils
+  - kconfig
+  - kcontacts
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kimap
+  - kio
+  - kitemviews
+  - kjobwidgets
+  - kldap
+  - knotifications
+  - knotifyconfig
+  - kparts
+  - kservice
+  - ktextaddons
+  - ktextwidgets
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libkdepim
+  - plasma-activities
+  - purpose
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/pimcommon
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/pimcommon.git
+plank-player:
+  branch: master
+  build: true
+  dependencies:
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdeclarative
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  - plasma-workspace
+  - solid
+  options: {}
+  path: kde/workspace/plank-player
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plank-player.git
+plasma-activities:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-activities
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-activities.git
+plasma-activities-stats:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-activities-stats
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-activities-stats.git
+plasma-bigscreen:
+  branch: master
+  build: true
+  dependencies:
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kpackage
+  - kservice
+  - ksvg
+  - kwayland
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  - plasma-activities-stats
+  - plasma-activities
+  - plasma-workspace
+  - plasma5support
+  - solid
+  options: {}
+  path: kde/workspace/plasma-bigscreen
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-bigscreen.git
+plasma-browser-integration:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kfilemetadata
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - krunner
+  - kservice
+  - kstatusnotifieritem
+  - plasma-activities
+  - plasma-workspace
+  - purpose
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-browser-integration
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-browser-integration.git
+plasma-desktop:
+  branch: master
+  build: true
+  dependencies:
+  - attica
+  - baloo
+  - breeze
+  - extra-cmake-modules
+  - kactivitymanagerd
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kded
+  - kfilemetadata
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio-extras
+  - kio
+  - kirigami-addons
+  - kitemmodels
+  - kitemviews
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kpackage
+  - kparts
+  - krunner
+  - kservice
+  - ktextwidgets
+  - kunitconversion
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libksysguard
+  - libplasma
+  - packagekit-qt
+  - plasma-activities-stats
+  - plasma-activities
+  - plasma-integration
+  - plasma-workspace
+  - powerdevil
+  - qqc2-desktop-style
+  - selenium-webdriver-at-spi
+  - solid
+  - sonnet
+  - systemsettings
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-desktop
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-desktop.git
+plasma-disks:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kio
+  - knotifications
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-disks
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-disks.git
+plasma-firewall:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-firewall
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-firewall.git
+plasma-integration:
+  branch: null
+  build: true
+  dependencies:
+  - breeze
+  - extra-cmake-modules
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-integration
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-integration.git
+plasma-mobile:
+  branch: master
+  build: true
+  dependencies:
+  - bluedevil
+  - bluez-qt
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kirigami-addons
+  - kitemmodels
+  - kjobwidgets
+  - knotifications
+  - kpackage
+  - kservice
+  - kwayland
+  - kwin
+  - kwindowsystem
+  - libkscreen
+  - libplasma
+  - milou
+  - modemmanager-qt
+  - networkmanager-qt
+  - plasma-nm
+  - plasma-pa
+  - plasma-workspace
+  - qqc2-breeze-style
+  options: {}
+  path: kde/workspace/plasma-mobile
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-mobile.git
+plasma-nano:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kitemmodels
+  - kservice
+  - ksvg
+  - kwayland
+  - kwindowsystem
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-nano
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-nano.git
+plasma-nm:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kpackage
+  - kservice
+  - ksvg
+  - kwallet
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  - modemmanager-qt
+  - networkmanager-qt
+  - qcoro
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-nm
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-nm.git
+plasma-pa:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - kdeclarative
+  - kglobalaccel
+  - ki18n
+  - kirigami-addons
+  - kpackage
+  - kstatusnotifieritem
+  - ksvg
+  - libplasma
+  - plasma-workspace
+  - pulseaudio-qt
+  - selenium-webdriver-at-spi
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-pa
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-pa.git
+plasma-remotecontrollers:
+  branch: master
+  build: true
+  dependencies:
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kpackage
+  - kservice
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  - plasma-workspace
+  - solid
+  - wayland
+  options: {}
+  path: kde/workspace/plasma-remotecontrollers
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma-bigscreen/plasma-remotecontrollers.git
+plasma-sdk:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kitemmodels
+  - kjobwidgets
+  - kpackage
+  - kparts
+  - ksvg
+  - ktexteditor
+  - ktextwidgets
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libplasma
+  - plasma5support
+  - solid
+  - sonnet
+  - syntax-highlighting
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-sdk
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-sdk.git
+plasma-settings:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kirigami-addons
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/base/plasma-settings
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma-mobile/plasma-settings.git
+plasma-systemmonitor:
+  branch: null
+  build: true
+  dependencies:
+  - attica
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - kdeclarative
+  - kglobalaccel
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami-addons
+  - kitemmodels
+  - knewstuff
+  - kpackage
+  - kservice
+  - kwindowsystem
+  - libksysguard
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-systemmonitor
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-systemmonitor.git
+plasma-thunderbolt:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - knotifications
+  - kservice
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-thunderbolt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-thunderbolt.git
+plasma-vault:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kio
+  - kitemmodels
+  - kjobwidgets
+  - kpackage
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - libksysguard
+  - libplasma
+  - networkmanager-qt
+  - plasma-activities
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-vault
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-vault.git
+plasma-wayland-protocols:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DBUILD_WITH_QT6=ON
+  path: kdesupport/plasma-wayland-protocols
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/plasma-wayland-protocols.git
+plasma-welcome:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kio
+  - kirigami-addons
+  - kirigami
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - ksvg
+  - kuserfeedback
+  - kwindowsystem
+  - libplasma
+  - milou
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-welcome
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-welcome.git
+plasma-workspace:
+  branch: null
+  build: true
+  dependencies:
+  - appstream
+  - attica
+  - baloo
+  - extra-cmake-modules
+  - kauth
+  - kbookmarks
+  - kcmutils
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdeclarative
+  - kded
+  - kdesu
+  - kfilemetadata
+  - kglobalaccel
+  - kglobalacceld
+  - kguiaddons
+  - kholidays
+  - ki18n
+  - kiconthemes
+  - kio-extras
+  - kio
+  - kirigami-addons
+  - kitemmodels
+  - kitemviews
+  - kjobwidgets
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kpackage
+  - kparts
+  - kpipewire
+  - kquickcharts
+  - krunner
+  - kscreenlocker
+  - kservice
+  - kstatusnotifieritem
+  - ktexteditor
+  - ktextwidgets
+  - kunitconversion
+  - kuserfeedback
+  - kwallet
+  - kwayland
+  - kwidgetsaddons
+  - kwin
+  - kwindowsystem
+  - kxmlgui
+  - layer-shell-qt
+  - libkexiv2
+  - libkscreen
+  - libksysguard
+  - libplasma
+  - milou
+  - networkmanager-qt
+  - packagekit-qt
+  - phonon
+  - plasma-activities-stats
+  - plasma-activities
+  - plasma-nano
+  - plasma-wayland-protocols
+  - plasma5support
+  - polkit-qt-1
+  - prison
+  - qcoro
+  - qqc2-desktop-style
+  - selenium-webdriver-at-spi
+  - solid
+  - sonnet
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-workspace
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-workspace.git
+plasma-workspace-wallpapers:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma-workspace-wallpapers
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma-workspace-wallpapers.git
+plasma5support:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kguiaddons
+  - ki18n
+  - knotifications
+  - libksysguard
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plasma5support
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plasma5support.git
+plymouth-kcm:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kio
+  - knewstuff
+  - kservice
+  - kwidgetsaddons
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/plymouth-kcm
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/plymouth-kcm.git
+polkit-kde-agent-1:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - ki18n
+  - kwindowsystem
+  - polkit-qt-1
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/polkit-kde-agent-1
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/polkit-kde-agent-1.git
+polkit-qt-1:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DBUILD_WITH_QT6=ON
+  path: kdesupport/polkit-qt-1
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/polkit-qt-1.git
+poppler:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DWITH_GLIB=OFF -DENABLE_UNSTABLE_API_ABI_HEADERS=1 -DENABLE_QT5=OFF
+      -DENABLE_QT6=ON
+  path: third-party/poppler
+  phases:
+  - update
+  - build
+  - install
+  repository: https://gitlab.freedesktop.org/poppler/poppler.git
+powerdevil:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcmutils
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kglobalaccel
+  - ki18n
+  - kidletime
+  - kio
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kwindowsystem
+  - kxmlgui
+  - libkscreen
+  - plasma-activities
+  - plasma-workspace
+  - selenium-webdriver-at-spi
+  - solid
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/powerdevil
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/powerdevil.git
+print-manager:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kdbusaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami
+  - knotifications
+  - kwidgetsaddons
+  - kwindowsystem
+  - libplasma
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/print-manager
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/print-manager.git
+prison:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - zxing-cpp
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/prison
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/prison.git
+pulseaudio-qt:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: extragear/libs/pulseaudio-qt
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/pulseaudio-qt.git
+purpose:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kirigami
+  - kservice
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/purpose
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/purpose.git
+qca:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DQT_MAJOR_VERSION=6 -DBUILD_WITH_QT6=ON
+  path: kdesupport/qca
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:libraries/qca.git
+qcoro:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DUSE_QT_VERSION=6 -DBUILD_SHARED_LIBS=ON
+  path: third-party/qcoro
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/danvratil/qcoro
+qmltermwidget:
+  branch: master
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_SHARED_LIBS=ON -DBUILD_WITH_QT6=ON
+  path: third-party/qmltermwidget
+  phases:
+  - update
+  - build
+  - install
+  repository: https://invent.kde.org/jbbgameich/qmltermwidget
+qqc2-breeze-style:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  - kcolorscheme
+  - kconfig
+  - kcoreaddons
+  - kguiaddons
+  - kiconthemes
+  - kirigami
+  - kquickcharts
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/qqc2-breeze-style
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/qqc2-breeze-style.git
+qqc2-desktop-style:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcolorscheme
+  - kiconthemes
+  - kirigami
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/qqc2-desktop-style
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/qqc2-desktop-style.git
+qrca:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcontacts
+  - kcoreaddons
+  - ki18n
+  - kio
+  - kirigami
+  - knotifications
+  - kservice
+  - networkmanager-qt
+  - prison
+  - purpose
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kdereview/utilities/qrca
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/qrca.git
+qtkeychain:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: third-party/qtkeychain
+  phases:
+  - update
+  - build
+  - install
+  repository: https://github.com/frankosterfeld/qtkeychain.git
+sddm-kcm:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kauth
+  - kcmutils
+  - kcoreaddons
+  - ki18n
+  - kio
+  - knewstuff
+  - kservice
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/sddm-kcm
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/sddm-kcm.git
+selenium-webdriver-at-spi:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kpipewire
+  - kwayland
+  - kwindowsystem
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: playground/sdk/selenium-webdriver-at-spi
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:sdk/selenium-webdriver-at-spi.git
+signond:
+  branch: qt6
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+    qmake-options: PREFIX=/home/fernie/kde/usr CONFIG+=no_etc
+  path: third-party/signond
+  phases:
+  - update
+  - build
+  - install
+  repository: https://gitlab.com/nicolasfella/signond.git
+skanlite:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - kdoctools
+  - ki18n
+  - kio
+  - kxmlgui
+  - libksane
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/skanlite
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/skanlite.git
+skanpage:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kirigami
+  - kquickimageeditor
+  - ksanecore
+  - kxmlgui
+  - purpose
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/skanpage
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/skanpage.git
+solid:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/solid
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/solid.git
+sonnet:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/sonnet
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/sonnet.git
+spectacle:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kglobalaccel
+  - kguiaddons
+  - ki18n
+  - kio
+  - kirigami
+  - knotifications
+  - kpipewire
+  - kstatusnotifieritem
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - layer-shell-qt
+  - prison
+  - purpose
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/spectacle
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/spectacle.git
+step:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kconfig
+  - kcrash
+  - kdoctools
+  - ki18n
+  - kiconthemes
+  - kio
+  - knewstuff
+  - kplotting
+  - ktextwidgets
+  - kxmlgui
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeedu/step
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:education/step.git
+subtitlecomposer:
+  branch: master
+  build: true
+  dependencies:
+  - breeze-icons
+  - extra-cmake-modules
+  - kcodecs
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - ki18n
+  - kio
+  - ktextwidgets
+  - kwidgetsaddons
+  - kxmlgui
+  - sonnet
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdemultimedia/subtitlecomposer
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:multimedia/subtitlecomposer.git
+svgpart:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - kparts
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdegraphics/svgpart
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:graphics/svgpart.git
+sweeper:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kbookmarks
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - kdoctools
+  - ki18n
+  - ktextwidgets
+  - kxmlgui
+  - plasma-activities-stats
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/kdeutils/sweeper
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/sweeper.git
+syndication:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcodecs
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/syndication
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/syndication.git
+syntax-highlighting:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/syntax-highlighting
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/syntax-highlighting.git
+systemsettings:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcrash
+  - kdbusaddons
+  - kdoctools
+  - kguiaddons
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami
+  - kitemmodels
+  - kitemviews
+  - knotifications
+  - krunner
+  - kservice
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - plasma-activities
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/systemsettings
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/systemsettings.git
+threadweaver:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: frameworks/threadweaver
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:frameworks/threadweaver.git
+wacomtablet:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcmutils
+  - kconfig
+  - kcoreaddons
+  - kdbusaddons
+  - kdoctools
+  - kglobalaccel
+  - ki18n
+  - kio
+  - knotifications
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - libplasma
+  - plasma5support
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/wacomtablet
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/wacomtablet.git
+wayland:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+  path: third-party/wayland
+  phases:
+  - update
+  - build
+  - install
+  repository: https://gitlab.freedesktop.org/wayland/wayland
+wayland-protocols:
+  branch: main
+  build: true
+  dependencies: []
+  options:
+    cmake-options: ''
+  path: third-party/wayland-protocols
+  phases:
+  - update
+  - build
+  - install
+  repository: https://gitlab.freedesktop.org/wayland/wayland-protocols
+xdg-desktop-portal-kde:
+  branch: null
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kauth
+  - kcodecs
+  - kcompletion
+  - kconfig
+  - kconfigwidgets
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kiconthemes
+  - kio
+  - kirigami
+  - kitemviews
+  - kjobwidgets
+  - knotifications
+  - kservice
+  - kstatusnotifieritem
+  - kwayland
+  - kwidgetsaddons
+  - kwindowsystem
+  - kxmlgui
+  - solid
+  - wayland-protocols
+  - wayland
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON -DBUILD_QT5=OFF
+  path: kde/workspace/xdg-desktop-portal-kde
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:plasma/xdg-desktop-portal-kde.git
+xwaylandvideobridge:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - kcoreaddons
+  - ki18n
+  - knotifications
+  - kpipewire
+  - kstatusnotifieritem
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: system/xwaylandvideobridge
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:system/xwaylandvideobridge.git
+yakuake:
+  branch: master
+  build: true
+  dependencies:
+  - extra-cmake-modules
+  - karchive
+  - kconfig
+  - kcoreaddons
+  - kcrash
+  - kdbusaddons
+  - kglobalaccel
+  - ki18n
+  - kiconthemes
+  - kio
+  - knewstuff
+  - knotifications
+  - knotifyconfig
+  - kparts
+  - kstatusnotifieritem
+  - kwayland
+  - kwidgetsaddons
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/applications/yakuake
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:utilities/yakuake.git
+zanshin:
+  branch: master
+  build: true
+  dependencies:
+  - akonadi-calendar
+  - akonadi
+  - extra-cmake-modules
+  - kcoreaddons
+  - kcrash
+  - ki18n
+  - kontactinterface
+  - krunner
+  - kwindowsystem
+  options:
+    cmake-options: -DBUILD_WITH_QT6=ON
+  path: kde/pim/zanshin
+  phases:
+  - update
+  - build
+  - install
+  repository: kde:pim/zanshin.git
+

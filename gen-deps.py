@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
 import os
-import re
 import sys
 import requests
 import yaml
+
+from srcinfo.parse import parse_srcinfo
 
 IGNORE_LIST = {
     "kfloppy",
@@ -92,33 +93,48 @@ for kde_package, package in packages_map.items():
     else:
         print(f"Failed to download {src_info_url}", file=sys.stderr)
 
-# read all the files into memeory so we can search them multiple times
-srcinfo_files = {
-    package: open(f"{package}.SRCINFO").read()
-    for package in packages_map.values()
-    if package
+
+def read_parse_srcinfo(package):
+    with open(f"{ package}.SRCINFO") as f:
+        srcinfo, errors = parse_srcinfo(f.read())
+
+        if errors:
+            raise Exception(f"Failed to parse {package}.SRCINFO: {errors}")
+
+        return srcinfo
+
+
+# parse all the SRCINFO files
+srcinfos = {package: read_parse_srcinfo(package) for package in packages_map.values()}
+
+
+split_package_names = {
+    package: list(srcinfo["packages"].keys())
+    for package, srcinfo in srcinfos.items()
+    if len(srcinfo["packages"]) > 1
 }
 
-# Packages that have more than one instance of pkgname are split packages
-split_package_names = {
-    package: [
-        line.split(" = ")[1]
-        for line in srcinfo_files[package].splitlines()
-        if "pkgname =" in line
-    ]
-    for package in packages_map.values()
-}
-split_package_names = {
-    package: pkgnames
-    for package, pkgnames in split_package_names.items()
-    if len(pkgnames) > 1
-}
+packages_to_use = {}
+for package, pkgnames in split_package_names.items():
+# if one package has a `5` and the other has no number, we can assume the one without the number kf6
+    if len(pkgnames) == 2:
+        if "5" in pkgnames[0] and not "5" in pkgnames[1]:
+            packages_to_use[package] = pkgnames[1]
+        elif "5" in pkgnames[1] and not "5" in pkgnames[0]:
+            packages_to_use[package] = pkgnames[0]
+
+    if not any(("5" in pkgs or "6" in pkgs) for pkgs in pkgnames):
+        kf6_packages.add(package)
+
 
 if len(split_package_names) > 0:
     print("Ignoring split packages:", file=sys.stderr)
     for package, pkgnames in split_package_names.items():
-        if len(pkgnames) > 1:
+        if len(pkgnames) > 1 and package not in kf6_packages:
             print(f"  {package}: {pkgnames}", file=sys.stderr)
+
+print("Using split packages:")
+print(yaml.dump(packages_to_use, default_flow_style=False, indent=2))
 
 # Remove split packages so we don't have to worry about them going forward
 packages_map = {

@@ -1,0 +1,3795 @@
+akonadi-calendar:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - libakonadi
+  - qgpgme-qt6
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+akonadi-calendar-tools:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends: []
+  optdepends: []
+akonadi-contacts:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+akonadi-import-wizard:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  - qtkeychain-qt6
+  makedepends: []
+  optdepends:
+  - 'kdepim-addons: additional import plugins'
+akonadi-mime:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - kdoctools5
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+akonadi-notes:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+akonadi-search:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  - xapian-core
+  makedepends:
+  - corrosion
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+akonadiconsole:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  - xapian-core
+  makedepends: []
+  optdepends: []
+akregator:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - qt6-base
+  - qt6-webengine
+  makedepends: []
+  optdepends:
+  - 'kdepim-addons: additional plugins'
+analitza:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-svg
+  makedepends:
+  - eigen
+  - qt6-tools
+  optdepends: []
+ark:
+  depends:
+  - gcc-libs
+  - glibc
+  - libarchive
+  - libzip
+  - qt6-base
+  - sh
+  - zlib
+  makedepends: []
+  optdepends:
+  - 'arj: ARJ format support'
+  - 'lrzip: LRZ format support'
+  - 'lzop: LZO format support'
+  - 'p7zip: 7Z format support'
+  - 'unarchiver: RAR format support'
+  - 'unrar: RAR decompression support'
+attica:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+audiocd-kio:
+  depends:
+  - cdparanoia
+  - flac
+  - gcc-libs
+  - glibc
+  - lame
+  - libogg
+  - libvorbis
+  - qt6-base
+  makedepends: []
+  optdepends:
+  - 'opus-tools: encoding to opus format'
+baloo:
+  depends:
+  - gcc-libs
+  - glibc
+  - lmdb
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+baloo-widgets:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+blinken:
+  depends:
+  - gcc-libs
+  - glibc
+  - phonon-qt6
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+bluedevil:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends:
+  - 'bluez-obex: file transfer'
+  - 'pulseaudio-bluetooth: to connect to A2DP profile'
+bluez-qt:
+  depends:
+  - bluez
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+bomber:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+bovo:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+breeze-gtk:
+  depends: []
+  makedepends:
+  - breeze
+  - python-cairo
+  - sassc
+  optdepends: []
+breeze-icons:
+  depends:
+  - glibc
+  - qt6-base
+  makedepends:
+  - python-lxml
+  optdepends: []
+calendarsupport:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+cmark:
+  depends:
+  - glibc
+  makedepends:
+  - cmake
+  - git
+  - python
+  optdepends: []
+discover:
+  depends:
+  - appstream-qt
+  - archlinux-appstream-data
+  - discount
+  - gcc-libs
+  - glib2
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-webview
+  makedepends:
+  - flatpak
+  - fwupd
+  - packagekit-qt6
+  optdepends:
+  - 'flatpak: Flatpak packages support'
+  - 'fwupd: firmware update support'
+  - 'packagekit-qt6: to manage packages from Arch Linux repositories (not recommended,
+    use at your own risk)'
+dolphin:
+  depends:
+  - gcc-libs
+  - glibc
+  - phonon-qt6
+  - qt6-base
+  makedepends: []
+  optdepends:
+  - 'ffmpegthumbs: video thumbnails'
+  - 'kde-cli-tools: for editing file type options'
+  - 'kdegraphics-thumbnailers: PDF and PS thumbnails'
+  - 'kdenetwork-filesharing: samba usershare properties menu'
+  - 'kio-admin: for managing files as administrator'
+  - 'konsole: terminal panel'
+  - 'purpose: share context menu'
+dolphin-plugins:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+dragon:
+  depends:
+  - gcc-libs
+  - glibc
+  - phonon-qt6
+  - qt6-base
+  makedepends: []
+  optdepends: []
+drkonqi:
+  depends:
+  - gcc-libs
+  - gdb
+  - glibc
+  - polkit-qt6
+  - python
+  - python-psutil
+  - python-pygdbmi
+  - python-sentry_sdk
+  - qt6-base
+  - qt6-declarative
+  - systemd-libs
+  makedepends: []
+  optdepends: []
+elisa:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  - vlc
+  makedepends: []
+  optdepends: []
+eventviews:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+extra-cmake-modules:
+  depends:
+  - cmake
+  makedepends:
+  - python-requests
+  - python-sphinx
+  - qt6-tools
+  optdepends:
+  - 'python-pyxdg: to generate fastlane metadata for Android apps'
+  - 'python-requests: to generate fastlane metadata for Android apps'
+  - 'python-yaml: to generate fastlane metadata for Android apps'
+ffmpegthumbs:
+  depends:
+  - ffmpeg
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+filelight:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+flatpak-kcm:
+  depends:
+  - flatpak
+  - gcc-libs
+  - glib2
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+frameworkintegration:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - appstream-qt
+  - packagekit-qt6
+  optdepends:
+  - 'appstream-qt: dependency resolving via AppStream'
+  - 'packagekit-qt6: dependency resolving via AppStream'
+futuresql:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+granatier:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+grantlee-editor:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - qt6-base
+  - qt6-webengine
+  makedepends: []
+  optdepends: []
+grantleetheme:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+gwenview:
+  depends:
+  - cfitsio
+  - exiv2
+  - gcc-libs
+  - glibc
+  - kimageannotator
+  - lcms2
+  - libjpeg-turbo
+  - libkdcraw
+  - libpng
+  - libtiff
+  - libx11
+  - phonon-qt6
+  - qt6-base
+  - qt6-svg
+  - qt6-wayland
+  - wayland
+  makedepends: []
+  optdepends:
+  - 'kamera: import pictures from gphoto2 cameras'
+  - 'kimageformats: support for xcf, exr, psd, and more image formats'
+  - 'qt6-imageformats: support for tiff, webp, and more image formats'
+haruna:
+  depends:
+  - ffmpeg
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends:
+  - 'yt-dlp: YouTube support'
+heaptrack:
+  depends:
+  - boost-libs
+  - gcc-libs
+  - glibc
+  - libelf
+  - libunwind
+  - qt6-base
+  - qt6-svg
+  - sh
+  makedepends:
+  - boost
+  optdepends: []
+incidenceeditor:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+itinerary:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-location
+  - qt6-multimedia
+  - qt6-positioning
+  - qtkeychain-qt6
+  - zlib
+  makedepends:
+  - python
+  optdepends: []
+k3b:
+  depends:
+  - ffmpeg
+  - flac
+  - gcc-libs
+  - glibc
+  - lame
+  - libburn
+  - libdvdread
+  - libmad
+  - libmpcdec
+  - libogg
+  - libsamplerate
+  - libsndfile
+  - libvorbis
+  - qt6-base
+  - qt6-webengine
+  - taglib
+  makedepends: []
+  optdepends:
+  - 'cdparanoia: for CD ripping support'
+  - 'cdrdao: for disk-at-once (DAO) mode support'
+  - 'cdrtools: for CD burning with cdrecord'
+  - 'dvd+rw-tools: for DVD burning support'
+  - 'emovix: for bootable multimedia CD/DVD support'
+  - 'vcdimager: for VCD burning support'
+kaccounts-integration:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - signon-kwallet-extension
+  - signon-plugin-oauth2
+  - signon-ui
+  makedepends: []
+  optdepends:
+  - 'qt6-declarative: QML plugin'
+kactivitymanagerd:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - boost
+  optdepends: []
+kaddressbook:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kajongg:
+  depends:
+  - python
+  - python-qtpy
+  - python-twisted
+  - python-zope-interface
+  - qt6-python-bindings
+  makedepends: []
+  optdepends:
+  - 'vorbis-tools: for playing sounds'
+kalarm:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  - vlc
+  makedepends: []
+  optdepends: []
+kalgebra:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-webengine
+  - readline
+  makedepends: []
+  optdepends:
+  - 'kirigami: for KAlgebra Mobile'
+kalzium:
+  depends:
+  - avogadrolibs
+  - avogadrolibs-qt5
+  - gcc-libs
+  - glibc
+  - kcompletion5
+  - kconfig5
+  - kconfigwidgets5
+  - kcoreaddons5
+  - ki18n5
+  - kio5
+  - kitemviews5
+  - knewstuff5
+  - kplotting5
+  - ktextwidgets5
+  - kwidgetsaddons5
+  - kxmlgui5
+  - kunitconversion5
+  - openbabel
+  - qt5-base
+  - qt5-script
+  - qt5-svg
+  makedepends:
+  - eigen
+  - facile
+  - kdoctools5
+  - ocaml
+  - python
+  optdepends: []
+kamera:
+  depends:
+  - gcc-libs
+  - glibc
+  - libgphoto2
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kanagram:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  - qt6-speech
+  makedepends: []
+  optdepends: []
+kapidox:
+  depends:
+  - python-jinja
+  - python-yaml
+  makedepends:
+  - python-build
+  - python-installer
+  - python-wheel
+  - python-setuptools
+  - qt6-base
+  optdepends: []
+kapman:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+karchive:
+  depends:
+  - bzip2
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - xz
+  - zlib
+  - zstd
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kate:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - qtkeychain-qt6
+  optdepends:
+  - 'clang: C and C++ LSP support'
+  - 'git: git-blame plugin'
+  - 'konsole: open a terminal in Kate'
+  - 'python-lsp-server: Python LSP support'
+  - 'qt6-declarative: RBQL plugin'
+  - 'qtkeychain-qt6: SQL plugin'
+  - 'rust: Rust LSP support'
+  - 'texlab: LaTeX LSP support'
+katomic:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kauth:
+  depends:
+  - gcc-libs
+  - glibc
+  - polkit-qt6
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kbackup:
+  depends:
+  - gcc-libs
+  - glibc
+  - libarchive
+  - qt6-5compat
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kblackbox:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kblocks:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kbookmarks:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kbounce:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kbreakout:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+kbruch:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kcalc:
+  depends:
+  - gcc-libs
+  - glibc
+  - gmp
+  - mpfr
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kcalendarcore:
+  depends:
+  - gcc-libs
+  - glibc
+  - libical
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kcalutils:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kcharselect:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kclock:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kcmutils:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kcodecs:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - gperf
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kcolorchooser:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kcolorscheme:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kcompletion:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kconfig:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kconfigwidgets:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kcontacts:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kcoreaddons:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - systemd-libs
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kcrash:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'drkonqi: KDE crash handler application'
+kcron:
+  depends:
+  - cron
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdav:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kdbusaddons:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kde-cli-tools:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  - sh
+  makedepends: []
+  optdepends: []
+kde-dev-scripts:
+  depends:
+  - perl
+  - python
+  - sh
+  makedepends:
+  - kdoctools5
+  optdepends: []
+kde-gtk-config:
+  depends:
+  - gcc-libs
+  - glib2
+  - glibc
+  - qt6-base
+  - qt6-svg
+  - sh
+  - xsettingsd
+  makedepends:
+  - gtk3
+  - sassc
+  optdepends:
+  - 'gtk3: GTK3 apps support'
+kdebugsettings:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdeclarative:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-shadertools
+  - qt6-tools
+  optdepends: []
+kdeconnect:
+  depends:
+  - dbus
+  - gcc-libs
+  - glibc
+  - libfakekey
+  - libx11
+  - libxkbcommon
+  - libxtst
+  - openssl
+  - qt6-base
+  - qt6-connectivity
+  - qt6-declarative
+  - qt6-multimedia
+  - qt6-wayland
+  - wayland
+  makedepends: []
+  optdepends:
+  - 'python-nautilus: Nautilus integration'
+  - 'qt6-tools: for some runcommand plugin actions'
+  - 'sshfs: remote filesystem browser'
+kdecoration:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kded:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdeedu-data:
+  depends:
+  - hicolor-icon-theme
+  makedepends:
+  - qt6-base
+  optdepends: []
+kdegraphics-mobipocket:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdegraphics-thumbnailers:
+  depends:
+  - gcc-libs
+  - ghostscript
+  - glibc
+  - libkdcraw
+  - libkexiv2
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdenetwork-filesharing:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - samba
+  makedepends: []
+  optdepends: []
+kdenlive:
+  depends:
+  - frei0r-plugins
+  - gcc-libs
+  - glibc
+  - mlt
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  - qt6-networkauth
+  - qt6-svg
+  makedepends:
+  - doxygen
+  - qt6-tools
+  optdepends:
+  - 'bigsh0t: VR360 effects'
+  - 'dvgrab: for firewire capture'
+  - 'ffmpeg: for FFmpeg plugin'
+  - 'kimageformats: support for dds, xcf, exr, psd, and more image formats'
+  - 'mediainfo: for technical clip information'
+  - 'noise-suppression-for-voice: noise suppression effect'
+  - 'opencv: for motion tracking'
+  - 'opentimelineio: timeline export/import'
+  - 'plasma-desktop: theme configuration'
+  - 'python-openai-whisper: speech to text (Whisper engine)'
+  - 'python-srt_equalizer: speech to text (Whisper engine)'
+  - 'python-vosk: speech to text (VOSK engine)'
+  - 'qt6-imageformats: support for tiff, webp, and more image formats'
+  - 'recordmydesktop: for screen capture'
+kdepim-addons:
+  depends:
+  - discount
+  - gcc-libs
+  - glibc
+  - gpgme
+  - ktextaddons
+  - libakonadi
+  - qgpgme-qt6
+  - qt6-base
+  - qt6-declarative
+  - qt6-webengine
+  - sh
+  makedepends:
+  - corrosion
+  optdepends: []
+kdepim-runtime:
+  depends:
+  - akonadi
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - libkolabxml
+  - libsasl
+  - qca-qt6
+  - qt6-base
+  - qt6-networkauth
+  - qt6-speech
+  - qt6-webengine
+  - qtkeychain-qt6
+  makedepends:
+  - boost
+  - libetebase
+  optdepends:
+  - 'libetebase: EteSync resource'
+kdeplasma-addons:
+  depends:
+  - gcc-libs
+  - glibc
+  - icu
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-quick3d
+  makedepends:
+  - qt6-webengine
+  optdepends:
+  - 'networkmanager-qt: POTD wallpaper'
+  - 'qt6-webengine: dictionary and webbrowser applets'
+  - 'quota-tools: disk quota applet'
+kdesdk-kio:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - perl
+  makedepends: []
+  optdepends: []
+kdesdk-thumbnailers:
+  depends:
+  - gcc-libs
+  - gettext
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdesu:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kdf:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdiagram:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kdialog:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdiamond:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kdnssd:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kdoctools:
+  depends:
+  - docbook-xsl
+  - gcc-libs
+  - glibc
+  - libxml2
+  - libxslt
+  - qt6-base
+  makedepends:
+  - doxygen
+  - perl-uri
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kdsoap-ws-discovery-client:
+  depends:
+  - gcc-libs
+  - glibc
+  - kdsoap-qt6
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+keditbookmarks:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+keysmith:
+  depends:
+  - gcc-libs
+  - glibc
+  - libsodium
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - python
+  optdepends: []
+kfilemetadata:
+  depends:
+  - gcc-libs
+  - glibc
+  - ebook-tools
+  - exiv2
+  - ffmpeg
+  - poppler-qt6
+  - qt6-base
+  - taglib
+  makedepends:
+  - catdoc
+  - doxygen
+  - libappimage
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'catdoc: Extract text from Office 98 files'
+  - 'kdegraphics-mobipocket: MOBI extractor'
+  - 'libappimage: AppImage extractor'
+kfind:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  makedepends: []
+  optdepends:
+  - 'mlocate: search using mlocate index'
+kfourinline:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kgamma:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxxf86vm
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kgeography:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - python
+  optdepends: []
+kget:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - qgpgme-qt6
+  - qt6-base
+  makedepends:
+  - boost
+  - libmms
+  optdepends:
+  - 'libktorrent: torrent support'
+  - 'libmms: MMS support'
+kglobalaccel:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kglobalacceld:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxcb
+  - qt6-base
+  - xcb-util-keysyms
+  makedepends: []
+  optdepends: []
+kgoldrunner:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kgpg:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kguiaddons:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+khangman:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  makedepends: []
+  optdepends: []
+khealthcertificate:
+  depends:
+  - gcc-libs
+  - glibc
+  - openssl
+  - qt6-base
+  - zlib
+  makedepends:
+  - qt6-declarative
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kholidays:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+ki18n:
+  depends:
+  - gcc-libs
+  - glibc
+  - iso-codes
+  - qt6-base
+  makedepends:
+  - doxygen
+  - python
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'python: to compile .ts files'
+  - 'qt6-declarative: ktranscript plugin and QML bindings'
+kiconthemes:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kidentitymanagement:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'kirigami-addons: QML bindings'
+  - 'qt6-declarative: QML bindings'
+kidletime:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - libxss
+  - qt6-doc
+  - qt6-tools
+  - qt6-wayland
+  optdepends:
+  - 'libx11: XCB plugin'
+  - 'libxcb: XCB plugin'
+  - 'libxext: XCB plugin'
+  - 'libxss: XCB plugin'
+  - 'qt6-wayland: Wayland plugin'
+  - 'wayland: Wayland plugin'
+kigo:
+  depends:
+  - gcc-libs
+  - glibc
+  - gnugo
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+killbots:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kimageformats:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - jxrlib
+  - libavif
+  - libheif
+  - libjxl
+  - libraw
+  - openexr
+  optdepends:
+  - 'imath: EXR format support'
+  - 'jxrlib: JXR format support'
+  - 'karchive: plugin for Krita and OpenRaster images'
+  - 'libavif: AVIF format support'
+  - 'libheif: HEIF format support'
+  - 'libjxl: JPEG-XL format support'
+  - 'libraw: RAW format support'
+  - 'openexr: EXR format support'
+kimagemapeditor:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-webengine
+  makedepends: []
+  optdepends: []
+kimap:
+  depends:
+  - gcc-libs
+  - glibc
+  - libsasl
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kinfocenter:
+  depends:
+  - aha
+  - clinfo
+  - dmidecode
+  - gcc-libs
+  - glibc
+  - glu
+  - iproute2
+  - libpulse
+  - libusb
+  - mesa-utils
+  - qt6-base
+  - qt6-declarative
+  - sh
+  - vulkan-tools
+  - wayland-utils
+  - xorg-xdpyinfo
+  makedepends:
+  - fwupd
+  optdepends:
+  - 'fwupd: firmware security module'
+kio:
+  depends:
+  - acl
+  - gcc-libs
+  - glibc
+  - libxml2
+  - libxslt
+  - qt6-5compat
+  - qt6-base
+  - util-linux-libs
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'kded: proxy management and cookie storage'
+  - 'kdoctools: for the help kioslave'
+  - 'kio-extras: extra protocols support (sftp, fish and more)'
+  - 'kio-fuse: to mount remote filesystems via FUSE'
+  - 'switcheroo-control: hybrid GPU support'
+kio-extras:
+  depends:
+  - gcc-libs
+  - glibc
+  - kdsoap-qt6
+  - libimobiledevice
+  - libkexiv2
+  - libmtp
+  - libplist
+  - libssh
+  - libxcursor
+  - phonon-qt6
+  - qt6-5compat
+  - qt6-base
+  - qt6-svg
+  - smbclient
+  makedepends:
+  - gperf
+  - libappimage
+  - openexr
+  - taglib
+  optdepends:
+  - 'icoutils: Windows executable thumbnails'
+  - 'kimageformats: thumbnails for additional image formats'
+  - 'libappimage: AppImage thumbnails'
+  - 'openexr: EXR format thumbnails'
+  - 'perl: info kioslave'
+  - 'plasma-activities-stats: recently used kioslave'
+  - 'qt6-imageformats: thumbnails for additional image formats'
+  - 'taglib: audio file thumbnails'
+kio-gdrive:
+  depends:
+  - gcc-libs
+  - glibc
+  - kaccounts-providers
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - intltool
+  optdepends:
+  - 'purpose: to use the share plugin'
+kio-zeroconf:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kirigami:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-svg
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-shadertools
+  - qt6-tools
+  optdepends: []
+kirigami-addons:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  makedepends: []
+  optdepends: []
+kiriki:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kitemmodels:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kitemviews:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kiten:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kitinerary:
+  depends:
+  - gcc-libs
+  - glibc
+  - libphonenumber
+  - libxml2
+  - openssl
+  - poppler
+  - qt6-base
+  - qt6-declarative
+  - zlib
+  - zxing-cpp
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kjobwidgets:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kjumpingcube:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kldap:
+  depends:
+  - gcc-libs
+  - glibc
+  - libldap
+  - libsasl
+  - qt6-base
+  - qtkeychain-qt6
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kleopatra:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - libassuan
+  - qgpgme-qt6
+  - qt6-base
+  makedepends: []
+  optdepends: []
+klettres:
+  depends:
+  - gcc-libs
+  - glibc
+  - phonon-qt6
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+klickety:
+  depends:
+  - gcc-libs
+  - glibc
+  - perl
+  - qt6-base
+  makedepends: []
+  optdepends: []
+klines:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kmag:
+  depends:
+  - gcc-libs
+  - glibc
+  - libqaccessibilityclient-qt6
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kmahjongg:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kmail:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - ktextaddons
+  - libakonadi
+  - qgpgme-qt6
+  - qt6-base
+  - qt6-webengine
+  - qtkeychain-qt6
+  makedepends: []
+  optdepends:
+  - 'kdepim-addons: additional plugins'
+  - 'kleopatra: mail encryption support'
+kmail-account-wizard:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+kmailtransport:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qtkeychain-qt6
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kmbox:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kmenuedit:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kmime:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kmines:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kmousetool:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxtst
+  - qt6-base
+  - qt6-multimedia
+  makedepends: []
+  optdepends: []
+kmouth:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-speech
+  makedepends: []
+  optdepends: []
+kmplot:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+knavalbattle:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+knetwalk:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+knewstuff:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'kirigami: QML components'
+  - 'qt6-declarative: QML components'
+knights:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-speech
+  makedepends: []
+  optdepends:
+  - 'gnuchess: for playing against the computer'
+knotifications:
+  depends:
+  - gcc-libs
+  - glibc
+  - libcanberra
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+knotifyconfig:
+  depends:
+  - gcc-libs
+  - glibc
+  - libcanberra
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kolf:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kollision:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kolourpaint:
+  depends:
+  - gcc-libs
+  - glibc
+  - libksane
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kompare:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+konqueror:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-webengine
+  - zlib
+  makedepends: []
+  optdepends:
+  - 'kdesu: shell command plugin'
+konquest:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-scxml
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+konsole:
+  depends:
+  - glibc
+  - gcc-libs
+  - icu
+  - qt6-5compat
+  - qt6-base
+  - qt6-multimedia
+  - sh
+  makedepends: []
+  optdepends:
+  - 'keditbookmarks: to manage bookmarks'
+kontact:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-webengine
+  makedepends: []
+  optdepends:
+  - kjots
+  - knotes
+kontactinterface:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kontrast:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - python
+  optdepends: []
+kopeninghours:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - boost
+  - doxygen
+  - python
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'boost-libs: Python bindings'
+  - 'python: Python bindings'
+  - 'qt6-declarative: QML bindings'
+korganizer:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - qt6-tools
+  optdepends:
+  - 'kdepim-addons: additional plugins'
+kosmindoormap:
+  depends:
+  - abseil-cpp
+  - gcc-libs
+  - glibc
+  - protobuf
+  - qt6-base
+  - recastnavigation
+  - zlib
+  makedepends:
+  - python
+  optdepends:
+  - 'kcontacts: QML bindings'
+  - 'qt6-declarative: QML bindings'
+kpackage:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kparts:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kpat:
+  depends:
+  - black-hole-solver
+  - freecell-solver
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kpeople:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kpimtextedit:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kpipewire:
+  depends:
+  - ffmpeg
+  - gcc-libs
+  - glibc
+  - libdrm
+  - libepoxy
+  - libpipewire
+  - libva
+  - mesa
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+kpkpass:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kplotting:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kpmcore:
+  depends:
+  - gcc-libs
+  - glibc
+  - polkit-qt6
+  - qt6-base
+  - smartmontools
+  - util-linux-libs
+  makedepends: []
+  optdepends:
+  - 'bcachefs-tools: BCacheFS support'
+  - 'dosfstools: FAT32 support'
+  - 'e2fsprogs: ext2/3/4 support'
+  - 'exfat-utils: exFAT support'
+  - 'exfatprogs: exFAT support (alternative to exfat-utils)'
+  - 'f2fs-tools: F2FS support'
+  - 'fatresize: FAT resize support'
+  - 'jfsutils: JFS support'
+  - 'nilfs-utils: nilfs support'
+  - 'ntfs-3g: NTFS support'
+  - 'udftools: UDF support'
+  - 'xfsprogs: XFS support'
+kpty:
+  depends:
+  - gcc-libs
+  - glibc
+  - libutempter
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kpublictransport:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - zlib
+  makedepends:
+  - doxygen
+  - protobuf
+  - qt6-tools
+  optdepends:
+  - 'kirigami: QML bindings'
+kquickcharts:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - qt6-shadertools
+  optdepends: []
+kquickimageeditor:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+krdc:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  makedepends:
+  - freerdp2
+  - libvncserver
+  optdepends:
+  - 'libvncserver: VNC support'
+  - 'libssh: VNC support'
+  - 'freerdp2: RDP support'
+  - 'keditbookmarks: to edit bookmarks'
+krdp:
+  depends:
+  - freerdp2
+  - gcc-libs
+  - glibc
+  - libxkbcommon
+  - qt6-base
+  - qt6-declarative
+  - qt6-wayland
+  - qtkeychain-qt6
+  - wayland
+  makedepends: []
+  optdepends: []
+kreversi:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+krfb:
+  depends:
+  - gcc-libs
+  - glibc
+  - libvncserver
+  - libx11
+  - libxcb
+  - libxtst
+  - qt6-base
+  - wayland
+  - xcb-util-image
+  - xdg-desktop-portal
+  makedepends:
+  - libxdamage
+  optdepends: []
+kruler:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+krunner:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kscreen:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxcb
+  - libxi
+  - qt6-base
+  - qt6-declarative
+  - qt6-sensors
+  makedepends: []
+  optdepends: []
+kscreenlocker:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxcb
+  - libxi
+  - pam
+  - qt6-base
+  - qt6-declarative
+  - wayland
+  - xcb-util-keysyms
+  makedepends: []
+  optdepends:
+  - 'kcmutils: configuration module'
+kservice:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kshisen:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+ksirk:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  - qt6-multimedia
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+ksmtp:
+  depends:
+  - gcc-libs
+  - glibc
+  - libsasl
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+ksnakeduel:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kspaceduel:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+ksquares:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+ksshaskpass:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kstatusnotifieritem:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+ksudoku:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+ksvg:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'kirigami: QML bindings'
+  - 'qt6-declarative: QML bindings'
+ksystemlog:
+  depends:
+  - audit
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - systemd-libs
+  makedepends: []
+  optdepends: []
+ksystemstats:
+  depends:
+  - gcc-libs
+  - glibc
+  - lm_sensors
+  - qt6-base
+  makedepends:
+  - libnl
+  optdepends:
+  - 'libnl: network usage monitor'
+  - 'networkmanager-qt: network usage monitor'
+  - 'systemd-libs: GPU monitor'
+kteatime:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+ktexteditor:
+  depends:
+  - editorconfig-core-c
+  - gcc-libs
+  - glibc
+  - qt6-declarative
+  - qt6-base
+  - qt6-speech
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'git: git integration'
+ktexttemplate:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+ktextwidgets:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-speech
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+ktimer:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+ktnef:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+ktuberling:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-multimedia
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kturtle:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kubrick:
+  depends:
+  - gcc-libs
+  - glibc
+  - glu
+  - libglvnd
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+kunitconversion:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kuserfeedback:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - clang
+  - qt6-charts
+  - qt6-declarative
+  - qt6-svg
+  - qt6-tools
+  optdepends:
+  - 'qt6-charts: Feedback console'
+  - 'qt6-declarative: QML bindings'
+  - 'qt6-svg: Feedback console'
+kwallet:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - libgcrypt
+  - qca-qt6
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'kwalletmanager: Configuration GUI'
+kwallet-pam:
+  depends:
+  - glibc
+  - libgcrypt
+  - pam
+  - sh
+  - socat
+  makedepends: []
+  optdepends: []
+kwalletmanager:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kwave:
+  depends:
+  - alsa-lib
+  - audiofile
+  - flac
+  - fftw
+  - gcc-libs
+  - glibc
+  - id3lib
+  - karchive5
+  - kcompletion5
+  - kconfig5
+  - kconfigwidgets5
+  - kcoreaddons5
+  - kcrash5
+  - kdbusaddons5
+  - ki18n5
+  - kiconthemes5
+  - kio5
+  - ktextwidgets5
+  - kwidgetsaddons5
+  - kxmlgui5
+  - libmad
+  - libogg
+  - libpulse
+  - libsamplerate
+  - libvorbis
+  - qt5-base
+  - qt5-multimedia
+  makedepends:
+  - doxygen
+  - kdoctools5
+  - librsvg
+  - opus
+  optdepends:
+  - 'opus: OGG plugin'
+kwayland:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kweather:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-charts
+  - qt6-declarative
+  makedepends:
+  - python
+  optdepends: []
+kweathercore:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-positioning
+  makedepends:
+  - doxygen
+  - qt6-tools
+  optdepends: []
+kwidgetsaddons:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+kwin:
+  depends:
+  - breeze
+  - gcc-libs
+  - glibc
+  - lcms2
+  - libcanberra
+  - libdisplay-info
+  - libdrm
+  - libei
+  - libepoxy
+  - libinput
+  - libpipewire
+  - libqaccessibilityclient-qt6
+  - libx11
+  - libxcb
+  - libxcvt
+  - libxi
+  - libxkbcommon
+  - libxkbcommon-x11
+  - mesa
+  - pipewire-session-manager
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  - qt6-sensors
+  - qt6-svg
+  - qt6-tools
+  - qt6-wayland
+  - systemd-libs
+  - wayland
+  - xcb-util-cursor
+  - xcb-util-keysyms
+  - xcb-util-wm
+  makedepends:
+  - python
+  - xorg-xwayland
+  optdepends:
+  - 'maliit-keyboard: virtual keyboard for kwin-wayland'
+kwindowsystem:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - libxcb
+  - libxfixes
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  - xcb-util-keysyms
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+kwordquiz:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-multimedia
+  makedepends: []
+  optdepends: []
+kwrited:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+kxmlgui:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+layer-shell-qt:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  makedepends: []
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+libaccounts-qt:
+  depends:
+  - gcc-libs
+  - glib2
+  - glibc
+  - libaccounts-glib
+  - qt6-base
+  makedepends:
+  - doxygen
+  - git
+  optdepends: []
+libgpg-error:
+  depends:
+  - glibc
+  - sh
+  makedepends: []
+  optdepends: []
+libgravatar:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libkcddb:
+  depends:
+  - gcc-libs
+  - glibc
+  - libmusicbrainz5
+  - qt6-base
+  makedepends: []
+  optdepends: []
+libkcompactdisc:
+  depends:
+  - alsa-lib
+  - gcc-libs
+  - glibc
+  - phonon-qt6
+  - qt6-base
+  makedepends: []
+  optdepends: []
+libkdegames:
+  depends:
+  - gcc-libs
+  - glibc
+  - libsndfile
+  - openal
+  - qt6-base
+  - qt6-declarative
+  - qt6-svg
+  makedepends:
+  - svgcleaner
+  optdepends: []
+libkdepim:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libkeduvocdocument:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+libkgapi:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libkleo:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - qgpgme-qt6
+  - qt6-base
+  makedepends:
+  - boost
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libkmahjongg:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends:
+  - svgcleaner
+  optdepends: []
+libkomparediff2:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+libkscreen:
+  depends:
+  - gcc-libs
+  - glibc
+  - libxcb
+  - qt6-base
+  - qt6-wayland
+  - wayland
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libksieve:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libsasl
+  - qt6-base
+  - qt6-webengine
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libksysguard:
+  depends:
+  - gcc-libs
+  - glibc
+  - libnl
+  - libpcap
+  - lm_sensors
+  - qt6-base
+  - qt6-declarative
+  - zlib
+  makedepends:
+  - qt6-tools
+  optdepends: []
+libktorrent:
+  depends:
+  - gcc-libs
+  - glibc
+  - gmp
+  - libgcrypt
+  - qt6-5compat
+  - qt6-base
+  makedepends:
+  - boost
+  - doxygen
+  optdepends: []
+libplasma:
+  depends:
+  - gcc-libs
+  - glibc
+  - libglvnd
+  - libx11
+  - libxcb
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-wayland
+  - wayland
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+libquotient:
+  depends:
+  - gcc-libs
+  - glibc
+  - libolm
+  - openssl
+  - qt6-base
+  - qtkeychain-qt6
+  makedepends:
+  - cmake
+  - git
+  optdepends: []
+lskat:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+mailcommon:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - ktextaddons
+  - libakonadi
+  - phonon-qt6
+  - qgpgme-qt6
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+mailimporter:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+markdownpart:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+mbox-importer:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends: []
+  optdepends: []
+merkuro:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - libakonadi
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-location
+  - qt6-positioning
+  makedepends: []
+  optdepends: []
+messagelib:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - ktextaddons
+  - libakonadi
+  - qca-qt6
+  - qgpgme-qt6
+  - qt6-base
+  - qt6-webengine
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+milou:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+mimetreeparser:
+  depends:
+  - gcc-libs
+  - glibc
+  - gpgme
+  - qgpgme-qt6
+  - qt6-base
+  - qt6-declarative
+  - qt6-webengine
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+modemmanager-qt:
+  depends:
+  - gcc-libs
+  - glibc
+  - modemmanager
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+mpvqt:
+  depends:
+  - gcc-libs
+  - glibc
+  - libglvnd
+  - mpv
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+neochat:
+  depends:
+  - gcc-libs
+  - glibc
+  - icu
+  - kunifiedpush
+  - qt6-base
+  - qt6-declarative
+  - qt6-location
+  - qt6-multimedia
+  - qt6-positioning
+  - qt6-webview
+  - qtkeychain-qt6
+  makedepends:
+  - python
+  optdepends: []
+networkmanager-qt:
+  depends:
+  - gcc-libs
+  - glibc
+  - networkmanager
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+ocean-sound-theme:
+  depends: []
+  makedepends:
+  - qt6-base
+  optdepends: []
+okular:
+  depends:
+  - discount
+  - djvulibre
+  - freetype2
+  - gcc-libs
+  - glibc
+  - libkexiv2
+  - libspectre
+  - libtiff
+  - phonon-qt6
+  - poppler-qt6
+  - qt6-base
+  - qt6-declarative
+  - qt6-speech
+  - qt6-svg
+  - zlib
+  makedepends:
+  - ebook-tools
+  optdepends:
+  - 'ebook-tools: mobi and epub support'
+  - 'kdegraphics-mobipocket: mobi support'
+  - 'unarchiver: Comic Book Archive support (alternative)'
+  - 'unrar: Comic Book Archive support'
+oxygen-sounds:
+  depends: []
+  makedepends: []
+  optdepends: []
+palapeli:
+  depends:
+  - gcc-libs
+  - glibc
+  - qhull
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+parley:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-multimedia
+  - qt6-svg
+  - qt6-webengine
+  makedepends: []
+  optdepends:
+  - 'translate-shell: Google Translate integration'
+partitionmanager:
+  depends:
+  - gcc-libs
+  - glibc
+  - polkit-qt6
+  - qt6-base
+  makedepends: []
+  optdepends: []
+picmi:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+pim-data-exporter:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  makedepends: []
+  optdepends: []
+pim-sieve-editor:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qtkeychain-qt6
+  makedepends: []
+  optdepends: []
+pimcommon:
+  depends:
+  - gcc-libs
+  - glibc
+  - ktextaddons
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+plasma-activities:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - boost
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+plasma-activities-stats:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+plasma-browser-integration:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+plasma-desktop:
+  depends:
+  - emoji-font
+  - gcc-libs
+  - glibc
+  - icu
+  - libcanberra
+  - libx11
+  - libxcb
+  - libxcursor
+  - libxi
+  - libxkbcommon
+  - libxkbfile
+  - polkit-kde-agent
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-wayland
+  - sdl2
+  - wayland
+  - xcb-util-keysyms
+  - xdg-user-dirs
+  makedepends:
+  - intltool
+  - libibus
+  - packagekit-qt6
+  - scim
+  - xf86-input-libinput
+  - xorg-server-devel
+  optdepends:
+  - 'bluedevil: Bluetooth applet'
+  - 'glib2: kimpanel IBUS support'
+  - 'ibus: kimpanel IBUS support'
+  - 'kaccounts-integration: OpenDesktop integration plugin'
+  - 'kscreen: screen management'
+  - 'libaccounts-qt: OpenDesktop integration plugin'
+  - 'packagekit-qt6: to install new krunner plugins'
+  - 'plasma-nm: Network manager applet'
+  - 'plasma-pa: Audio volume applet'
+  - 'scim: kimpanel SCIM support'
+plasma-disks:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - smartmontools
+  makedepends: []
+  optdepends: []
+plasma-firewall:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - python
+  optdepends:
+  - 'firewalld: firewalld backend'
+  - 'iproute2: netstat backend'
+  - 'python: ufw backend'
+  - 'ufw: ufw backend'
+plasma-nm:
+  depends:
+  - gcc-libs
+  - glib2
+  - glibc
+  - libnm
+  - qca-qt6
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - openconnect
+  - qt6-webengine
+  optdepends:
+  - 'openconnect: Cisco AnyConnect VPN plugin'
+  - 'qt6-webengine: Cisco AnyConnect VPN plugin'
+plasma-pa:
+  depends:
+  - gcc-libs
+  - glib2
+  - glibc
+  - libcanberra
+  - libpulse
+  - pulse-native-provider
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+plasma-sdk:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - sh
+  makedepends: []
+  optdepends: []
+plasma-systemmonitor:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+plasma-thunderbolt:
+  depends:
+  - bolt
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+plasma-vault:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends:
+  - 'cryfs: to use cryFS for encryption'
+  - 'encfs: to use encFS for encryption'
+  - 'gocryptfs: to use gocryptfs for encryption'
+plasma-wayland-protocols:
+  depends: []
+  makedepends:
+  - qt6-base
+  optdepends: []
+plasma-welcome:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+plasma-workspace:
+  depends:
+  - accountsservice
+  - appstream-qt
+  - dbus
+  - fontconfig
+  - freetype2
+  - gcc-libs
+  - glibc
+  - icu
+  - kio-fuse
+  - libcanberra
+  - libice
+  - libkexiv2
+  - libqalculate
+  - libsm
+  - libx11
+  - libxau
+  - libxcb
+  - libxcrypt
+  - libxcursor
+  - libxfixes
+  - libxft
+  - libxtst
+  - phonon-qt6
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-positioning
+  - qt6-svg
+  - qt6-tools
+  - qt6-virtualkeyboard
+  - qt6-wayland
+  - sh
+  - systemd-libs
+  - wayland
+  - xcb-util
+  - xcb-util-image
+  - xorg-xmessage
+  - xorg-xrdb
+  - xorg-xsetroot
+  - xorg-xwayland
+  - zlib
+  - accountsservice
+  - appstream-qt
+  - dbus
+  - fontconfig
+  - freetype2
+  - gcc-libs
+  - glibc
+  - icu
+  - kio-fuse
+  - libcanberra
+  - libice
+  - libkexiv2
+  - libqalculate
+  - libsm
+  - libx11
+  - libxau
+  - libxcb
+  - libxcrypt
+  - libxcursor
+  - libxfixes
+  - libxft
+  - libxtst
+  - phonon-qt6
+  - qt6-5compat
+  - qt6-base
+  - qt6-declarative
+  - qt6-positioning
+  - qt6-svg
+  - qt6-tools
+  - qt6-virtualkeyboard
+  - qt6-wayland
+  - sh
+  - systemd-libs
+  - wayland
+  - xcb-util
+  - xcb-util-image
+  - xorg-xmessage
+  - xorg-xrdb
+  - xorg-xsetroot
+  - xorg-xwayland
+  - zlib
+  - plasma-integration
+  makedepends:
+  - gpsd
+  optdepends:
+  - 'appmenu-gtk-module: global menu support for GTK2 and some GTK3 applications'
+  - 'baloo: Baloo search runner'
+  - 'discover: manage applications installation from the launcher'
+  - 'gpsd: GPS based geolocation'
+  - 'kdepim-addons: displaying PIM events in the calendar'
+  - 'kwayland-integration: Wayland integration for Qt5 applications'
+  - 'networkmanager-qt: IP based geolocation'
+  - 'plasma-workspace-wallpapers: additional wallpapers'
+  - 'plasma5-integration: use Plasma settings in Qt5 applications'
+  - 'xdg-desktop-portal-gtk: sync font settings to Flatpak apps'
+plasma-workspace-wallpapers:
+  depends: []
+  makedepends:
+  - qt5-base
+  optdepends: []
+plasma5support:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - doxygen
+  - qt6-tools
+  optdepends: []
+plymouth-kcm:
+  depends:
+  - gcc-libs
+  - glibc
+  - plymouth
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+powerdevil:
+  depends:
+  - ddcutil
+  - gcc-libs
+  - glibc
+  - libxcb
+  - qt6-base
+  - qt6-declarative
+  - qt6-wayland
+  - systemd-libs
+  - wayland
+  makedepends: []
+  optdepends:
+  - 'kinfocenter: for the Energy Information KCM'
+  - 'power-profiles-daemon: power profiles support'
+  - 'tlp: alternative power profiles support'
+print-manager:
+  depends:
+  - gcc-libs
+  - glibc
+  - libcups
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends:
+  - 'system-config-printer: auto-detect the printer driver'
+prison:
+  depends:
+  - gcc-libs
+  - glibc
+  - libdmtx
+  - qrencode
+  - qt6-base
+  - qt6-multimedia
+  - zxing-cpp
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+pulseaudio-qt:
+  depends:
+  - gcc-libs
+  - glibc
+  - libpulse
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+purpose:
+  depends:
+  - accounts-qml-module
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - intltool
+  optdepends:
+  - 'bluedevil: sharing via Bluetooth'
+  - 'kdeclarative: Nextcloud and YouTube plugins'
+  - 'kdeconnect: sharing to smartphone via KDE Connect'
+  - 'prison: QR code plugin'
+  - 'telegram-desktop: sharing via Telegram'
+qcoro:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - qt6-websockets
+  makedepends:
+  - cmake
+  - git
+  optdepends: []
+qmltermwidget:
+  depends:
+  - qt5-declarative
+  makedepends:
+  - git
+  optdepends: []
+qqc2-breeze-style:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+qqc2-desktop-style:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends:
+  - qt6-tools
+  optdepends: []
+sddm-kcm:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  - sddm
+  makedepends: []
+  optdepends: []
+signond:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - git
+  - graphviz
+  - qt6-tools
+  - ttf-font
+  optdepends: []
+skanlite:
+  depends:
+  - gcc-libs
+  - glibc
+  - kconfig5
+  - kconfigwidgets5
+  - kcoreaddons5
+  - ki18n5
+  - kio5
+  - kjobwidgets5
+  - kxmlgui5
+  - kwidgetsaddons5
+  - libksane5
+  - qt5-base
+  makedepends:
+  - kdoctools5
+  optdepends: []
+skanpage:
+  depends:
+  - gcc-libs
+  - glibc
+  - ksanecore
+  - leptonica
+  - qt6-base
+  - qt6-declarative
+  - qt6-webengine
+  - tesseract
+  makedepends: []
+  optdepends: []
+solid:
+  depends:
+  - gcc-libs
+  - glibc
+  - libimobiledevice
+  - libplist
+  - media-player-info
+  - qt6-base
+  - systemd-libs
+  - udisks2
+  - upower
+  - util-linux-libs
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt5-declarative: QML bindings'
+sonnet:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - aspell
+  - doxygen
+  - hspell
+  - hunspell
+  - libvoikko
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'aspell: spell checking via aspell'
+  - 'hspell: spell checking for Hebrew'
+  - 'hunspell: spell checking via hunspell'
+  - 'libvoikko: Finnish support via Voikko'
+  - 'qt6-declarative: QML bindings'
+spectacle:
+  depends:
+  - gcc-libs
+  - glibc
+  - libxcb
+  - opencv
+  - qt6-base
+  - qt6-declarative
+  - qt6-imageformats
+  - qt6-multimedia
+  - qt6-wayland
+  - wayland
+  - xcb-util
+  - xcb-util-cursor
+  - xcb-util-image
+  makedepends: []
+  optdepends: []
+step:
+  depends:
+  - gcc-libs
+  - glibc
+  - gsl
+  - kcompletion5
+  - kconfig5
+  - kconfigwidgets5
+  - kcoreaddons5
+  - kcrash5
+  - ki18n5
+  - kiconthemes5
+  - kio5
+  - kjobwidgets5
+  - knewstuff5
+  - kplotting5
+  - ktextwidgets5
+  - kwidgetsaddons5
+  - kxmlgui5
+  - libqalculate
+  - qt5-base
+  makedepends:
+  - eigen
+  - kdoctools5
+  - python
+  - qt5-tools
+  optdepends: []
+svgpart:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-svg
+  makedepends: []
+  optdepends: []
+sweeper:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends: []
+  optdepends: []
+syndication:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+syntax-highlighting:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-declarative
+  - qt6-doc
+  - qt6-tools
+  optdepends:
+  - 'qt6-declarative: QML bindings'
+systemsettings:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  - qt6-declarative
+  makedepends: []
+  optdepends: []
+threadweaver:
+  depends:
+  - gcc-libs
+  - glibc
+  - qt6-base
+  makedepends:
+  - doxygen
+  - qt6-doc
+  - qt6-tools
+  optdepends: []
+wacomtablet:
+  depends:
+  - gcc-libs
+  - glibc
+  - libwacom
+  - libxcb
+  - libxi
+  - qt6-base
+  - qt6-declarative
+  - xf86-input-wacom
+  makedepends: []
+  optdepends: []
+wayland-protocols:
+  depends: []
+  makedepends:
+  - wayland
+  - meson
+  optdepends: []
+xdg-desktop-portal-kde:
+  depends:
+  - gcc-libs
+  - glibc
+  - kio-fuse
+  - libxkbcommon
+  - qt6-base
+  - qt6-declarative
+  - qt6-wayland
+  - wayland
+  - xdg-desktop-portal
+  makedepends: []
+  optdepends: []
+xwaylandvideobridge:
+  depends:
+  - glibc
+  - gcc-libs
+  - qt6-base
+  - qt6-declarative
+  - libxcb
+  makedepends: []
+  optdepends: []
+yakuake:
+  depends:
+  - gcc-libs
+  - glibc
+  - libx11
+  - qt6-base
+  makedepends: []
+  optdepends: []
+zanshin:
+  depends:
+  - gcc-libs
+  - glibc
+  - libakonadi
+  - qt6-base
+  makedepends:
+  - boost
+  optdepends: []
+

@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "kde builder",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/kde-builder",
+            "console": "integratedTerminal",
+            "args": [
+                "--dependency-tree-yaml"
+            ]
+        },
+        {
+            "name": "kde builder query",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/kde-builder",
+            "console": "integratedTerminal",
+            "args": [
+                "--query",
+                "project-info",
+                // "kdesupport/phonon"
+            ]
+        },
+        {
+            "name": "gen-deps",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/gen-deps.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/repos",
+            "args": [
+                "/tmp/pacman-list",
+                "/tmp/kde-builder-list"
+            ]
+        }
+    ]
+}
