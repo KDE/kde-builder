@@ -2,6 +2,7 @@
 
 import os
 import sys
+from typing import Literal
 import requests
 import yaml
 
@@ -29,6 +30,33 @@ META_PACKAGES = {
     "qtkeychain",
 }
 
+SPLIT_PACKGE_OVERRIDES = {
+    "appstream": ["appstream", "appstream-qt"],
+    "gpgme": ["gpgme", "qgpgme-qt6"],
+    "poppler": ["poppler", "poppler-qt6"],
+}
+
+LIMIT_PACKAGES = {
+    "appstream",
+    "cmark",
+    "gpgme",
+    "grantlee",
+    "kdsoap",
+    "libaccounts-qt",
+    "libdbusmenu-qt",
+    "libkolabxml",
+    "libqalculate",
+    "libquotient",
+    "packagekit-qt",
+    "poppler",
+    "qcoro",
+    "qtkeychain",
+    "signond",
+    "taglib",
+    "wayland",
+    "wayland-protocols",
+    "zxing-cpp",
+}
 
 [pacman_list_path, kde_buidler_list_path] = sys.argv[1:]
 
@@ -107,71 +135,75 @@ def read_parse_srcinfo(package):
 # parse all the SRCINFO files
 srcinfos = {package: read_parse_srcinfo(package) for package in packages_map.values()}
 
-
-split_package_names = {
-    package: list(srcinfo["packages"].keys())
-    for package, srcinfo in srcinfos.items()
-    if len(srcinfo["packages"]) > 1
-}
-
+ignored_split_packages = {}
 packages_to_use = {}
-for package, pkgnames in split_package_names.items():
-# if one package has a `5` and the other has no number, we can assume the one without the number kf6
+for package, srcinfo in srcinfos.items():
+
+    if package in SPLIT_PACKGE_OVERRIDES:
+        packages_to_use[package] = SPLIT_PACKGE_OVERRIDES[package]
+        continue
+
+    pkgnames = list(srcinfo["packages"].keys())
+
+    if len(pkgnames) == 1:
+        packages_to_use[package] = [pkgnames[0]]
+        continue
+
+    # if one package has a `5` and the other has no number,
+    # we can assume the one without the number is the kf6
     if len(pkgnames) == 2:
         if "5" in pkgnames[0] and not "5" in pkgnames[1]:
-            packages_to_use[package] = pkgnames[1]
+            packages_to_use[package] = [pkgnames[1]]
+            continue
         elif "5" in pkgnames[1] and not "5" in pkgnames[0]:
-            packages_to_use[package] = pkgnames[0]
+            packages_to_use[package] = [pkgnames[0]]
+            continue
 
     if not any(("5" in pkgs or "6" in pkgs) for pkgs in pkgnames):
-        kf6_packages.add(package)
+        packages_to_use[package] = pkgnames
+        continue
+
+    ignored_split_packages[package] = pkgnames
 
 
-if len(split_package_names) > 0:
+if len(ignored_split_packages) > 0:
     print("Ignoring split packages:", file=sys.stderr)
-    for package, pkgnames in split_package_names.items():
-        if len(pkgnames) > 1 and package not in kf6_packages:
-            print(f"  {package}: {pkgnames}", file=sys.stderr)
+    for package, pkgnames in ignored_split_packages.items():
+        print(f"  {package}: {pkgnames}", file=sys.stderr)
 
-print("Using split packages:")
-print(yaml.dump(packages_to_use, default_flow_style=False, indent=2))
 
-# Remove split packages so we don't have to worry about them going forward
-packages_map = {
-    kde_package: package
-    for kde_package, package in packages_map.items()
-    if package not in split_package_names
-}
+def get_depends(
+    dependstype: Literal["optdepends", "makedepends", "depends"], packageName: str
+):
+    pkgs = packages_to_use[packageName]
+    basedeps = (
+        set(srcinfos[packageName][dependstype])
+        if dependstype in srcinfos[packageName]
+        else set()
+    )
+    for pkg in pkgs:
+        if dependstype in srcinfos[packageName]["packages"][pkg]:
+            basedeps.update(srcinfos[packageName]["packages"][pkg][dependstype])
+    return basedeps
+
 
 # Find the dependencies for each package
 dependencies = {
     package: {
-        "optdepends": [
-            line.split(" = ")[1]
-            for line in srcinfo_files[package].splitlines()
-            if "optdepends =" in line
-        ],
-        "makedepends": [
-            line.split(" = ")[1]
-            for line in srcinfo_files[package].splitlines()
-            if "makedepends =" in line
-        ],
-        "depends": [
-            line.split(" = ")[1]
-            for line in srcinfo_files[package].splitlines()
-            if "\tdepends =" in line
-        ],
+        "optdepends": get_depends("optdepends", package),
+        "makedepends": get_depends("makedepends", package),
+        "depends": get_depends("depends", package),
     }
-    for package in packages_map.values()
+    for package in srcinfos.keys()
 }
 
 # Since we are only interested external dependencies, remove the ones that are in the packages_map
 dependencies = {
     package: {
-        dep_type: [dep for dep in deps if dep not in packages_map.values()]
-        for dep_type, deps in dep_types.items()
+        dependstype: [dep for dep in deps if dep not in packages_map.values()]
+        for dependstype, deps in deps.items()
     }
-    for package, dep_types in dependencies.items()
+    for package, deps in dependencies.items() if package in LIMIT_PACKAGES
 }
 
 print()
