@@ -17,6 +17,7 @@ IGNORE_LIST = {
 OVERRIDES = {
     "kdeconnect-kde": "kdeconnect",
     "polkit-qt-1": "polkit-qt",
+    "polkit-kde-agent-1": "polkit-kde-agent",
 }
 
 # There's no easy way to get these out of pacman
@@ -36,7 +37,7 @@ SPLIT_PACKGE_OVERRIDES = {
     "poppler": ["poppler", "poppler-qt6"],
 }
 
-LIMIT_PACKAGES = {
+THIRD_PARTY_PACKAGES = {
     "appstream",
     "cmark",
     "gpgme",
@@ -98,7 +99,6 @@ packages_map = {
 
 packages_count = len(packages_map) - len(missing_packages)
 packages_done = 0
-print()
 for kde_package, package in packages_map.items():
 
     src_info_url = f"https://gitlab.archlinux.org/archlinux/packaging/packages/{package}/-/raw/main/.SRCINFO"
@@ -146,7 +146,7 @@ for package, srcinfo in srcinfos.items():
     pkgnames = list(srcinfo["packages"].keys())
 
     if len(pkgnames) == 1:
-        packages_to_use[package] = [pkgnames[0]]
+        packages_to_use[package] = pkgnames
         continue
 
     # if one package has a `5` and the other has no number,
@@ -171,6 +171,8 @@ if len(ignored_split_packages) > 0:
     for package, pkgnames in ignored_split_packages.items():
         print(f"  {package}: {pkgnames}", file=sys.stderr)
 
+    exit(1)
+
 
 def get_depends(
     dependstype: Literal["optdepends", "makedepends", "depends"], packageName: str
@@ -184,7 +186,7 @@ def get_depends(
     for pkg in pkgs:
         if dependstype in srcinfos[packageName]["packages"][pkg]:
             basedeps.update(srcinfos[packageName]["packages"][pkg][dependstype])
-    return basedeps
+    return sorted(basedeps)
 
 
 # Find the dependencies for each package
@@ -203,9 +205,42 @@ dependencies = {
         dependstype: [dep for dep in deps if dep not in packages_map.values()]
         for dependstype, deps in deps.items()
     }
-    for package, deps in dependencies.items() if package in LIMIT_PACKAGES
+    for package, deps in dependencies.items()
+    # if package in THIRD_PARTY_PACKAGES
 }
 
+for package in dependencies.keys():
+    dependencies[package]["replaces"] = packages_to_use[package]
+    new_optdepends = []
+    for optdepend in dependencies[package]["optdepends"]:
+        if ":" in optdepend:
+            dep, reason = optdepend.split(":", maxsplit=1)
+            new_optdepends += [{"dep": dep, "reason": reason.strip()}]
+        else:
+            new_optdepends += [{"dep": optdepend, "reason": ""}]
+    dependencies[package]["optdepends"] = new_optdepends
+
+
+dep_count = {}
+for name, deps in dependencies.items():
+    all_deps = (
+        deps["depends"] + deps["makedepends"] + [d["dep"] for d in deps["optdepends"]]
+    )
+    for dep in all_deps:
+        dep_count[dep] = dep_count.get(dep, 0) + 1
+
+print("common:")
+total_targets = len(dependencies)
+for dep, count in sorted(dep_count.items(), key=lambda x: x[1], reverse=True):
+    percentage = count / total_targets * 100
+    if percentage > 90:
+        # remove them from individual packages to avoid duplication
+        for package in dependencies.keys():
+            for dependstype in dependencies[package].keys():
+                if dep in dependencies[package][dependstype]:
+                    dependencies[package][dependstype].remove(dep)
+
+        print(f"- {dep} # Required by {percentage:.2f}% of projects")
+
 print()
-print("Dependencies:")
-print(yaml.dump(dependencies, default_flow_style=False, indent=2))
+print(yaml.dump({"projects": dependencies}, default_flow_style=False, indent=2), end="")
