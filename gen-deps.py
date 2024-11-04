@@ -37,27 +37,6 @@ SPLIT_PACKGE_OVERRIDES = {
     "poppler": ["poppler", "poppler-qt6"],
 }
 
-THIRD_PARTY_PACKAGES = {
-    "appstream",
-    "cmark",
-    "gpgme",
-    "grantlee",
-    "kdsoap",
-    "libaccounts-qt",
-    "libdbusmenu-qt",
-    "libkolabxml",
-    "libqalculate",
-    "libquotient",
-    "packagekit-qt",
-    "poppler",
-    "qcoro",
-    "qtkeychain",
-    "signond",
-    "taglib",
-    "wayland",
-    "wayland-protocols",
-    "zxing-cpp",
-}
 
 [pacman_list_path, kde_buidler_list_path] = sys.argv[1:]
 
@@ -88,7 +67,7 @@ missing_packages = {
 }
 if missing_packages:
     print("Ignoring missing packages:", file=sys.stderr)
-    for kde_package, package in missing_packages.items():
+    for kde_package, kde_packge in missing_packages.items():
         candidates = [p for p in pacman_list if kde_package in p]
         print(f"  {kde_package} -> {candidates}", file=sys.stderr)
 
@@ -99,10 +78,10 @@ packages_map = {
 
 packages_count = len(packages_map) - len(missing_packages)
 packages_done = 0
-for kde_package, package in packages_map.items():
+for kde_package, kde_packge in packages_map.items():
 
-    src_info_url = f"https://gitlab.archlinux.org/archlinux/packaging/packages/{package}/-/raw/main/.SRCINFO"
-    src_info_file = f"{package}.SRCINFO"
+    src_info_url = f"https://gitlab.archlinux.org/archlinux/packaging/packages/{kde_packge}/-/raw/main/.SRCINFO"
+    src_info_file = f"{kde_packge}.SRCINFO"
 
     packages_done += 1
 
@@ -110,11 +89,11 @@ for kde_package, package in packages_map.items():
         continue
 
     sys.stdout.write(
-        f"[{packages_done}/{packages_count}] Downloading SRCINFO for {package}... "
+        f"[{packages_done}/{packages_count}] Downloading SRCINFO for {kde_packge}... "
     )
 
     response = requests.get(src_info_url)
-    if response.status_code == 200 and f"pkgbase = {package}" in response.text:
+    if response.status_code == 200 and f"pkgbase = {kde_packge}" in response.text:
         with open(src_info_file, "wb") as file:
             file.write(response.content)
         print("OK")
@@ -137,39 +116,41 @@ srcinfos = {package: read_parse_srcinfo(package) for package in packages_map.val
 
 ignored_split_packages = {}
 packages_to_use = {}
-for package, srcinfo in srcinfos.items():
+for kde_package, arch_package in packages_map.items():
+    kde_packge = arch_package
+    srcinfo = srcinfos[kde_packge]
 
-    if package in SPLIT_PACKGE_OVERRIDES:
-        packages_to_use[package] = SPLIT_PACKGE_OVERRIDES[package]
+    if kde_packge in SPLIT_PACKGE_OVERRIDES:
+        packages_to_use[kde_packge] = SPLIT_PACKGE_OVERRIDES[kde_packge]
         continue
 
     pkgnames = list(srcinfo["packages"].keys())
 
     if len(pkgnames) == 1:
-        packages_to_use[package] = pkgnames
+        packages_to_use[kde_packge] = pkgnames
         continue
 
     # if one package has a `5` and the other has no number,
     # we can assume the one without the number is the kf6
     if len(pkgnames) == 2:
         if "5" in pkgnames[0] and not "5" in pkgnames[1]:
-            packages_to_use[package] = [pkgnames[1]]
+            packages_to_use[kde_packge] = [pkgnames[1]]
             continue
         elif "5" in pkgnames[1] and not "5" in pkgnames[0]:
-            packages_to_use[package] = [pkgnames[0]]
+            packages_to_use[kde_packge] = [pkgnames[0]]
             continue
 
     if not any(("5" in pkgs or "6" in pkgs) for pkgs in pkgnames):
-        packages_to_use[package] = pkgnames
+        packages_to_use[kde_packge] = pkgnames
         continue
 
-    ignored_split_packages[package] = pkgnames
+    ignored_split_packages[kde_packge] = pkgnames
 
 
 if len(ignored_split_packages) > 0:
     print("Ignoring split packages:", file=sys.stderr)
-    for package, pkgnames in ignored_split_packages.items():
-        print(f"  {package}: {pkgnames}", file=sys.stderr)
+    for kde_packge, pkgnames in ignored_split_packages.items():
+        print(f"  {kde_packge}: {pkgnames}", file=sys.stderr)
 
     exit(1)
 
@@ -191,34 +172,33 @@ def get_depends(
 
 # Find the dependencies for each package
 dependencies = {
-    package: {
-        "optdepends": get_depends("optdepends", package),
-        "makedepends": get_depends("makedepends", package),
-        "depends": get_depends("depends", package),
+    kde_package: {
+        "optdepends": get_depends("optdepends", packages_map[kde_package]),
+        "makedepends": get_depends("makedepends", packages_map[kde_package]),
+        "depends": get_depends("depends", packages_map[kde_package]),
     }
-    for package in srcinfos.keys()
+    for kde_package in packages_map.keys()
 }
 
 # Since we are only interested external dependencies, remove the ones that are in the packages_map
 dependencies = {
-    package: {
+    kde_packge: {
         dependstype: [dep for dep in deps if dep not in packages_map.values()]
         for dependstype, deps in deps.items()
     }
-    for package, deps in dependencies.items()
-    # if package in THIRD_PARTY_PACKAGES
+    for kde_packge, deps in dependencies.items()
 }
 
-for package in dependencies.keys():
-    dependencies[package]["replaces"] = packages_to_use[package]
+for kde_packge in dependencies.keys():
+    dependencies[kde_packge]["replaces"] = packages_to_use[packages_map[kde_packge]]
     new_optdepends = []
-    for optdepend in dependencies[package]["optdepends"]:
+    for optdepend in dependencies[kde_packge]["optdepends"]:
         if ":" in optdepend:
             dep, reason = optdepend.split(":", maxsplit=1)
             new_optdepends += [{"dep": dep, "reason": reason.strip()}]
         else:
             new_optdepends += [{"dep": optdepend, "reason": ""}]
-    dependencies[package]["optdepends"] = new_optdepends
+    dependencies[kde_packge]["optdepends"] = new_optdepends
 
 
 dep_count = {}
@@ -235,10 +215,10 @@ for dep, count in sorted(dep_count.items(), key=lambda x: x[1], reverse=True):
     percentage = count / total_targets * 100
     if percentage > 90:
         # remove them from individual packages to avoid duplication
-        for package in dependencies.keys():
-            for dependstype in dependencies[package].keys():
-                if dep in dependencies[package][dependstype]:
-                    dependencies[package][dependstype].remove(dep)
+        for kde_packge in dependencies.keys():
+            for dependstype in dependencies[kde_packge].keys():
+                if dep in dependencies[kde_packge][dependstype]:
+                    dependencies[kde_packge][dependstype].remove(dep)
 
         print(f"- {dep} # Required by {percentage:.2f}% of projects")
 
