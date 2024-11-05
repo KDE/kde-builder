@@ -20,6 +20,7 @@ KDE_BUILDER_TARGET=(
     "kdenetwork-filesharing"
 
     "kaccounts-providers"
+    "signon-kwallet-extension"
 )
 
 ./kde-builder --generate-config
