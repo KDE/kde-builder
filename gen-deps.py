@@ -40,6 +40,7 @@ SPLIT_PACKGE_OVERRIDES = {
 
 MAKE_DEPENDS_OVERRIDES = {
     "phonon-vlc": ["phonon-qt6", "qt6-tools"],
+    "breeze": []
 }
 
 [pacman_list_path, kde_buidler_list_path] = sys.argv[1:]
