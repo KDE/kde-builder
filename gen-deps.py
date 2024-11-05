@@ -88,7 +88,7 @@ for kde_package, arch_package in packages_map.items():
     if os.path.exists(src_info_file):
         continue
 
-    sys.stdout.write(
+    sys.stderr.write(
         f"[{packages_done}/{packages_count}] Downloading SRCINFO for {arch_package}... "
     )
 
@@ -96,7 +96,7 @@ for kde_package, arch_package in packages_map.items():
     if response.status_code == 200 and f"pkgbase = {arch_package}" in response.text:
         with open(src_info_file, "wb") as file:
             file.write(response.content)
-        print("OK")
+        print("OK", file=sys.stderr)
     else:
         print(f"Failed to download {src_info_url}", file=sys.stderr)
 
