@@ -18,6 +18,8 @@ KDE_BUILDER_TARGET=(
     "kde-inotify-survey"
     "kdeconnect-kde"
     "kdenetwork-filesharing"
+
+    "kaccounts-providers"
 )
 
 ./kde-builder --generate-config
@@ -28,4 +30,4 @@ KDE_BUILDER_TARGET=(
 cat /tmp/kde-builder-list-noargs /tmp/kde-builder-list-args | sort | uniq > /tmp/kde-builder-list
 
 cd repos
-../gen-deps.py /tmp/pacman-list /tmp/kde-builder-list
+../gen-deps.py /tmp/pacman-list /tmp/kde-builder-list > deps.yaml
