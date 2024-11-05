@@ -35,8 +35,12 @@ SPLIT_PACKGE_OVERRIDES = {
     "appstream": ["appstream", "appstream-qt"],
     "gpgme": ["gpgme", "qgpgme-qt6"],
     "poppler": ["poppler", "poppler-qt6"],
+    "phonon-vlc": ["phonon-qt6-vlc"],
 }
 
+MAKE_DEPENDS_OVERRIDES = {
+    "phonon-vlc": ["phonon-qt6", "qt6-tools"],
+}
 
 [pacman_list_path, kde_buidler_list_path] = sys.argv[1:]
 
@@ -157,6 +161,10 @@ if len(ignored_split_packages) > 0:
 def get_depends(
     dependstype: Literal["optdepends", "makedepends", "depends"], packageName: str
 ):
+    if packageName in MAKE_DEPENDS_OVERRIDES:
+        if dependstype == "makedepends":
+            return MAKE_DEPENDS_OVERRIDES[packageName]
+
     pkgs = packages_to_use[packageName]
     basedeps = (
         set(srcinfos[packageName][dependstype])

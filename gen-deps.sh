@@ -19,6 +19,7 @@ KDE_BUILDER_TARGET=(
     "kdeconnect-kde"
     "kdenetwork-filesharing"
 
+    "phonon-vlc"
     "kaccounts-providers"
     "signon-kwallet-extension"
 )
