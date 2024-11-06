@@ -38,15 +38,25 @@ SPLIT_PACKGE_OVERRIDES = {
     "phonon-vlc": ["phonon-qt6-vlc"],
 }
 
-MAKE_DEPENDS_OVERRIDES = {
-    "phonon-vlc": ["phonon-qt6", "qt6-tools"],
-    "breeze": []
-}
+MAKE_DEPENDS_OVERRIDES = {"phonon-vlc": ["phonon-qt6", "qt6-tools"], "breeze": []}
 
-[pacman_list_path, kde_buidler_list_path] = sys.argv[1:]
+[pacman_list_path, kde_buidler_list_path, kde_builder_kf5_list_path] = sys.argv[1:]
 
 pacman_list = set(open(pacman_list_path).read().splitlines())
+
+# lists are of the form `package-name: branch`
 kde_buidler_list = set(open(kde_buidler_list_path).read().splitlines())
+kde_buidler_list_kf5 = set(open(kde_builder_kf5_list_path).read().splitlines())
+
+# If the branch is the same between the two lists, the package hasn't been ported to qt6
+kf5_packages = [
+    p.split(":")[0] for p in kde_buidler_list.intersection(kde_buidler_list_kf5)
+]
+
+print(yaml.dump(kf5_packages, default_flow_style=False, indent=2), file=sys.stderr)
+
+# now strip the branches
+kde_buidler_list = [p.split(":")[0] for p in kde_buidler_list]
 
 
 def match_package(package: str):
@@ -162,9 +172,6 @@ if len(ignored_split_packages) > 0:
 def get_depends(
     dependstype: Literal["optdepends", "makedepends", "depends"], packageName: str
 ):
-    if packageName in MAKE_DEPENDS_OVERRIDES:
-        if dependstype == "makedepends":
-            return MAKE_DEPENDS_OVERRIDES[packageName]
 
     pkgs = packages_to_use[packageName]
     basedeps = (
@@ -175,6 +182,16 @@ def get_depends(
     for pkg in pkgs:
         if dependstype in srcinfos[packageName]["packages"][pkg]:
             basedeps.update(srcinfos[packageName]["packages"][pkg][dependstype])
+
+    if dependstype == "makedepends":
+        if packageName in MAKE_DEPENDS_OVERRIDES:
+            return MAKE_DEPENDS_OVERRIDES[packageName]
+
+        # Arch packages tend to build both the kf5 and kf6 versions, so they have
+        # kf5 dependencies in makedepends. We're only interested in the kf6 ones.
+        if not packageName in kf5_packages:
+            basedeps = {dep for dep in basedeps if "5" not in dep}
+
     return sorted(basedeps)
 
 
@@ -196,7 +213,11 @@ dependencies = {
             dep
             for dep in deps
             if dep
-            not in [pkg for sublist in packages_to_use.values() for pkg in sublist]
+            not in [
+                pkg
+                for sublist in srcinfos.values()
+                for pkg in sublist["packages"].keys()
+            ]
         ]
         for dependstype, deps in deps.items()
     }
