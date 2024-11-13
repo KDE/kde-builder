@@ -252,6 +252,9 @@ following:
    to debug build system auto-detection problems, or when developing tests for specific
    build systems.
 
+- `project-info` - the full project information, including its path, branch, repository,
+   build options, and dependencies.
+
 - Any option name that is valid for modules in the [configuration
   file](../configuration/conf-options-table).
 

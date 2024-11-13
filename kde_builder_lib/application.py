@@ -569,6 +569,28 @@ class Application:
         if run_mode == "query":
             query_mode = ctx.get_option("query")
 
+            if query_mode == "project-info":
+                dependency_graph = self.work_load["dependency_info"]
+                results = {
+                    project: {
+                        "path": info["path"],
+                        "branch": info["branch"],
+                        "build": info["build"],
+                        "repository": info["module"].options["repository"],
+                        "options": {
+                            key: value
+                            for key, value in info["module"].options.items()
+                            if key.endswith("-options")
+                        },
+                        "phases": list(info["module"].phases.phaselist),
+                        "dependencies": list(info["deps"].keys()),
+                    }
+                    for project, info in dependency_graph["graph"].items()
+                    if info["module"]
+                }
+                print(yaml.dump(results, default_flow_style=False, indent=2))
+                return 0
+
             if query_mode == "source-dir":
                 def query(x):
                     return x.fullpath("source")
