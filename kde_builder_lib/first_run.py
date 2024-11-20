@@ -35,7 +35,7 @@ class FirstRun:
         self.oss = OSSupport()
         self.base_dir = None
         self.supported_distros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
-        self.supported_other_os = ["freebsd"]
+        self.supported_other_os = ["freebsd", "openbsd"]
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
     def setup_user_system(self, base_dir, setup_steps: list[str]) -> NoReturn:
@@ -284,6 +284,7 @@ class FirstRun:
             "cmd/install/debian/unknown": "apt-get -q -y --no-install-recommends install",
             "cmd/install/fedora/unknown": "dnf -y install --skip-broken",
             "cmd/install/freebsd/unknown": "pkg install -y",
+            "cmd/install/openbsd/unknown": "pkg_add -I",
             "cmd/install/gentoo/unknown": "emerge -v --noreplace",
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
         }

@@ -97,10 +97,9 @@ class OSSupport:
             mem_total_KiB = os.detect_total_memory()
         """
         mem_total = None
-        if sys.platform == "freebsd":
+        if sys.platform == "freebsd" or sys.platform == "openbsd":
             mem_total = subprocess.check_output(["sysctl", "-n", "hw.physmem"]).decode().strip()
-            # FreeBSD reports memory in Bytes, not KiB. Convert to KiB so logic
-            # below still works
+            # FreeBSD, OpenBSD reports memory in Bytes, not KiB. Convert to KiB so logic below still works
             mem_total = int(float(mem_total) / 1024)
         elif sys.platform == "linux" or os.path.exists("/proc/meminfo"):
             # linux or potentially linux-compatible

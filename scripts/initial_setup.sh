@@ -46,6 +46,12 @@ install_runtime_packages() {
     (set -x; sudo zypper install git python311-pyaml python311-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
     (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus)
+  elif [ "$ID" = "openbsd" ]; then
+    VNAME=${VNAME:-$(sysctl -n kern.osrelease)}
+    VTYPE=$( sed -n "/^OpenBSD $VNAME\([^ ]*\).*$/s//\1/p" \
+    /var/run/dmesg.boot | sed '$!d' )
+    [ "$VTYPE" = -current ] && PKG_SNAP=-Dsnap
+    (set -x; doas pkg_add $PKG_SNAP python%3 py3-yaml py3-setproctitle py3-dbus)
   else
     echo -e "${Yellow}Warning: Unsupported OS: $ID, skipping installation of runtime packages.${Color_Off}" 1>&2
 
@@ -171,6 +177,8 @@ if [ -f /etc/os-release ]; then
   source /etc/os-release
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   ID="macOS"
+elif [[ "$OSTYPE" == "openbsd"* ]]; then
+  ID="openbsd"
 else
   echo "${Red}Unable to detect operating system.${Color_Off}" 1>&2
   exit 1
