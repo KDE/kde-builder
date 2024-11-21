@@ -285,7 +285,7 @@ class Module(OptionsBase):
             "meson": BuildSystemMeson,
         }
 
-        class_name = build_system_classes[name.lower()] or None
+        class_name = build_system_classes.get(name.lower())
         if not class_name:
             raise KBRuntimeError(f"Invalid build system {name} requested")
         return class_name(self)

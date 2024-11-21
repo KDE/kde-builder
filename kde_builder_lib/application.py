@@ -530,10 +530,10 @@ class Application:
             logger_app.warning(f" r[b[*] {e}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
 
-            traceback.print_exc()
+            # traceback.print_exc()
 
             graph = {
-                "graph": None,
+                "graph": {},
                 "syntax_errors": 0,
                 "cycles": 0,
                 "trivial_cycles": 0,
