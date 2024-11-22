@@ -750,10 +750,7 @@ class Application:
         value = re.sub(r"\s+", " ", unresolved_value)
 
         # Replace reference to global option with their value.
-        if re.findall(option_re, value):
-            sub_var_name = re.findall(option_re, value)[0]
-        else:
-            sub_var_name = None
+        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
 
         while sub_var_name:
             sub_var_value = ctx.get_option(sub_var_name) or ""
@@ -765,7 +762,7 @@ class Application:
             value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
 
             # Replace other references as well. Keep this RE up to date with the other one.
-            sub_var_name = re.findall(option_re, value)[0] if re.findall(option_re, value) else None
+            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
 
         # Replace tildes with home directory.
         while re.search(r"(^|:|=)~/", value):

@@ -66,10 +66,7 @@ class RecursiveConfigNodesIterator:
                     ctx = self.ctx
 
                     # Replace reference to global option with their value.
-                    if re.findall(option_re, filename):
-                        sub_var_name = re.findall(option_re, filename)[0]
-                    else:
-                        sub_var_name = None
+                    sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None
 
                     while sub_var_name:
                         sub_var_value = ctx.get_option(sub_var_name) or ""
@@ -80,8 +77,8 @@ class RecursiveConfigNodesIterator:
 
                         filename = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, filename)
 
-                        # Replace other references as well.  Keep this RE up to date with the other one.
-                        sub_var_name = re.findall(option_re, filename)[0] if re.findall(option_re, filename) else None
+                        # Replace other references as well. Keep this RE up to date with the other one.
+                        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None
 
                     prefix = self.stack_base_path[-1]
 
