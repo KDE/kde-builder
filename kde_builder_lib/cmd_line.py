@@ -108,6 +108,7 @@ class Cmdline:
             "phases": [],
             "run_mode": "build",
             "selectors": [],
+            "special-selectors": [],
             "ignore-projects": [],
             "start-program": [],
         }
@@ -300,6 +301,9 @@ class Cmdline:
                 del found_options[key]
 
         # <editor-fold desc="all other args handlers">
+        if args.all_config_projects:
+            opts["special-selectors"].append("all-config-projects")
+
         if args.build_system_only:
             found_options["build-system-only"] = True
 
@@ -509,6 +513,7 @@ class Cmdline:
         # See https://perldoc.perl.org/5.005/Getopt::Long for options specification format
 
         non_context_options = [
+            "all-config-projects",
             "dependency-tree",
             "dependency-tree-fullpath",
             "help|h",

@@ -106,6 +106,10 @@ deleted and re-cloned.
 This option is used to let kde-builder overwrite existing files which
 may contain user data.
 
+(cmdline-all-config-projects)=
+[`--all-config-projects`](cmdline-all-config-projects)  
+This option is used to select all projects defined in user config for kde-builder to operate on.
+
 (cmdline-option-name)=
 [`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration

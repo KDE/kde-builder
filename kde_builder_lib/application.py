@@ -322,11 +322,17 @@ class Application:
 
         self._define_new_module_factory(module_resolver)
 
+        modules: list[Module] = []
+        if not cmdline_selectors_len and not opts["special-selectors"]:
+            logger_app.warning(" y[*] No projects selected in command line!")
+
+        if opts["special-selectors"]:
+            if "all-config-projects" in opts["special-selectors"]:
+                # Build everything in the rc-file, in the order specified.
+                modules = module_resolver.expand_module_sets(option_modules_and_sets)
+
         if cmdline_selectors_len:
-            modules = module_resolver.resolve_selectors_into_modules(cmdline_selectors)
-        else:
-            # Build everything in the rc-file, in the order specified.
-            modules = module_resolver.expand_module_sets(option_modules_and_sets)
+            modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
         # TODO: Verify this does anything still
         metadata_module = ctx.get_kde_projects_metadata_module()

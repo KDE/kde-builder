@@ -7,6 +7,7 @@
 # See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html for description of options.
 
 _arguments \
+  --all-config-projects"[Select all projects defined in user config]" \
   "(--async --no-async)"{--async,--no-async}"[Perform source update and build process in parallel]" \
   --binpath"[Set the environment variable PATH while building]"":argument:" \
   --branch-group"[General group from which you want projects to be chosen]"":argument:" \

@@ -1,5 +1,8 @@
 # Changelog
 
+2024-11-24
+: Added `--all-config-projects` option.
+
 2024-10-27
 : Added `meson-options` option.
 
