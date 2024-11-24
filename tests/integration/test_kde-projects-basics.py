@@ -13,7 +13,7 @@ def test_kde_projects():
     """
     # The file has a module-set that only refers to juk but should expand to
     # kcalc juk in that order
-    args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-with-deps.yaml".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-with-deps.yaml --all-config-projects".split(" ")
     app = Application(args)
     module_list = app.modules
 

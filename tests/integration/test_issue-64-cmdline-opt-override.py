@@ -19,7 +19,7 @@ from kde_builder_lib.debug import Debug
 def test_no_cmdline_override():
     # The issue used num-cores as an example, but should work just as well with make-options
 
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects".split(" ")
     app = Application(args)
     module_list = app.modules
 
@@ -36,7 +36,7 @@ def test_no_cmdline_override():
 
 def test_cmdline_makeoption():
     # We can't seem to assign -j3 as Getopt::Long will try to understand the option and fail
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --make-options j3".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --make-options j3".split(" ")
 
     app = Application(args)
     module_list = app.modules
@@ -57,7 +57,7 @@ def test_cmdline_makeoption():
 
 def test_cmdline_numcores():
     # add another test of indirect option value setting
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --num-cores=5".split(" ")  # 4 is default, 8 is in rc-file, use something different
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --num-cores=5".split(" ")  # 4 is default, 8 is in rc-file, use something different
 
     app = Application(args)
     module_list = app.modules

@@ -81,7 +81,7 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
     """
     Verify that --include-dependencies on a module_set name filters out the whole set.
     """
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --ignore-projects set1".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --ignore-projects set1".split(" ")
 
     app = Application(args)
     module_list = app.modules

@@ -37,7 +37,7 @@ def test_option_reading(monkeypatch):
 
     monkeypatch.setattr(UtilLoggedSubprocess, "start", mock_start)
 
-    app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml".split(" "))
+    app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects".split(" "))
     module_list = app.modules
 
     assert len(module_list) == 4, "Right number of modules"
