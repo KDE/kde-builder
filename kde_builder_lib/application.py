@@ -191,12 +191,12 @@ class Application:
 
     def generate_module_list(self, options: list[str]) -> dict:
         """
-        Generate the build context and module list based on the command line options and module selectors provided.
+        Generate the build context and module list based on the command line options and module command line selectors provided.
 
         Resolves dependencies on those modules if needed,
         filters out ignored or skipped modules, and sets up the module factory.
 
-        After this function is called all module set selectors will have been
+        After this function is called all module set command line selectors will have been
         expanded, and we will have downloaded kde-projects metadata.
 
         Returns:
@@ -219,7 +219,7 @@ class Application:
         c = Cmdline()
         opts: dict = c.read_command_line_options_and_selectors(argv)
 
-        selectors: list[str] = opts["selectors"]
+        cmdline_selectors: list[str] = opts["selectors"]
         cmdline_options: dict = opts["opts"]
         cmdline_global_options: dict = cmdline_options["global"]
         ctx.phases.reset_to(opts["phases"])
@@ -273,9 +273,9 @@ class Application:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 raise KBRuntimeError("Invalid --resume flag")
-            if selectors:
-                logger_app.debug("Some selectors were presented alongside with --resume, ignoring them.")
-            selectors = module_list.split(", ")
+            if cmdline_selectors:
+                logger_app.debug("Some command line selectors were presented alongside with --resume, ignoring them.")
+            cmdline_selectors = module_list.split(", ")
 
         if "rebuild-failures" in cmdline_global_options:
             module_list = ctx.get_persistent_option("global", "last-failed-module-list")
@@ -283,9 +283,9 @@ class Application:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which modules have previously failed to build.")
                 raise KBRuntimeError("Invalid --rebuild-failures flag")
-            if selectors:
-                logger_app.debug("Some selectors were presented alongside with --rebuild-failures, ignoring them.")
-            selectors = re.split(r",\s*", module_list)
+            if cmdline_selectors:
+                logger_app.debug("Some command line selectors were presented alongside with --rebuild-failures, ignoring them.")
+            cmdline_selectors = re.split(r",\s*", module_list)
 
         if "list-installed" in cmdline_global_options:
             for key in ctx.persistent_options.keys():
@@ -312,7 +312,7 @@ class Application:
         # We also might have cmdline "selectors" to determine which modules or
         # module-sets to choose. First let's select module sets, and expand them.
 
-        command_line_modules = len(selectors)
+        cmdline_selectors_len = len(cmdline_selectors)
 
         module_resolver = ModuleResolver(ctx)
         module_resolver.cmdline_options = cmdline_options
@@ -322,8 +322,8 @@ class Application:
 
         self._define_new_module_factory(module_resolver)
 
-        if command_line_modules:
-            modules = module_resolver.resolve_selectors_into_modules(selectors)
+        if cmdline_selectors_len:
+            modules = module_resolver.resolve_selectors_into_modules(cmdline_selectors)
         else:
             # Build everything in the rc-file, in the order specified.
             modules = module_resolver.expand_module_sets(option_modules_and_sets)
