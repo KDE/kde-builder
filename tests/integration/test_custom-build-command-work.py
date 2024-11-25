@@ -55,7 +55,7 @@ def test_build_internal(monkeypatch):
     monkeypatch.setattr(BuildSystem, "create_build_system", mock_create_build_system)
     monkeypatch.setattr(BuildSystem, "configure_internal", mock_configure_internal)
 
-    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --no-metadata --custom-build-command echo --override-build-system generic".split(" ")
+    args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --no-metadata --custom-build-command echo --override-build-system generic".split(" ")
     app = Application(args)
     module_list = app.modules
 
