@@ -6,7 +6,7 @@
 
 KDE Builder supports building the Qt toolkit used by KDE software as a
 convenience to users. This support is handled by a special group
-named `qt6-set`.
+named `qt6-set`. It is defined [here](https://invent.kde.org/sysadmin/repo-metadata/-/blob/master/build-configs/qt6.yaml?ref_type=heads).
 
 ```{note}
 Qt is developed under a separate repository from KDE software located at
@@ -41,8 +41,7 @@ clone of the official source). This is highly recommended due to
 occasional issues with cloning the full Qt module from its official
 repository.
 
-You can set the `repository` option for the qt6-set to `kde:qt` to
-use this option.
+You can find out available branches [here](https://invent.kde.org/qt/qt/qtbase/-/branches).
 
 (kde-builder-std-flags)=
 ## Standard flags added by kde-builder
