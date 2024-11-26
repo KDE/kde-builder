@@ -480,6 +480,12 @@ class Updater:
 
         Util.p_chdir((module.fullpath("source")))
 
+        if module.get_option("hold-work-branches"):
+            current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True).stdout.strip()
+            if current_branch.startswith("work/") or current_branch.startswith("mr/"):
+                logger_updater.warning(f"Holding g[{module}] at branch b[{current_branch}]")
+                return 0
+
         # Try to save the user if they are doing a merge or rebase
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
             raise KBRuntimeError(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")

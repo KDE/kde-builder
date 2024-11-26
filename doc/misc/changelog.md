@@ -1,5 +1,8 @@
 # Changelog
 
+2024-11-26
+: Added `--hold-work-branches` option.
+
 2024-11-24
 : Added `--all-config-projects` option.
 

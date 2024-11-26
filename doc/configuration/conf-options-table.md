@@ -647,6 +647,22 @@ See the documentation on develop.kde.org on how to configure the Qt Creator manu
 
 Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config)
 
+(conf-hold-work-branches)=
+[`--hold-work-branches`](cmdline-hold-work-branches)
+
+Type: Boolean, Default value: True
+
+Project setting overrides global
+
+This option allows you to skip updating sources for projects that have current branch which name starts with
+`work/*` or `mr/*` (for example, `work/your-username/my-awesome-feature`).
+
+This simplifies workflow when you want to work on specific project. If you checkout someone's mr
+(see [wiki documentation](https://community.kde.org/Infrastructure/GitLab)), the
+branch will be called something like "mr/80", and kde-builder will behave like if you have specified a "no-src" option for that project in the config.
+
+Related command-line option: [--hold-work-branches](#cmdline-hold-work-branches)
+
 (conf-include-dependencies)=
 [`include-dependencies`](conf-include-dependencies)
 

@@ -136,6 +136,7 @@ class BuildContext(Module):
             "generate-clion-project-config": False,
             "generate-vscode-project-config": False,
             "generate-qtcreator-project-config": False,
+            "hold-work-branches": True,
             "include-dependencies": True,
             "install-login-session": True,
             "purge-old-logs": True,

@@ -106,6 +106,15 @@ deleted and re-cloned.
 This option is used to let kde-builder overwrite existing files which
 may contain user data.
 
+(cmdline-hold-work-branches)=
+[`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
+This option allows you to skip updating sources for projects that have current branch which name starts with
+`work/*` or `mr/*` (for example, `work/your-username/my-awesome-feature`).
+
+This simplifies workflow when you want to work on specific project. If you checkout someone's mr
+(see [wiki documentation](https://community.kde.org/Infrastructure/GitLab)), the
+branch will be called something like "mr/80", and kde-builder will behave like if you have specified a "no-src" option for that project in the config.
+
 (cmdline-all-config-projects)=
 [`--all-config-projects`](cmdline-all-config-projects)  
 This option is used to select all projects defined in user config for kde-builder to operate on.
