@@ -324,7 +324,8 @@ class Application:
 
         modules: list[Module] = []
         if not cmdline_selectors_len and not opts["special-selectors"]:
-            logger_app.warning(" y[*] No projects selected in command line!")
+            logger_app.warning(" y[*] No projects selected in command line!\n"
+                               "   b[*] To select all projects mentioned in config, use y[--all-config-projects].")
 
         if opts["special-selectors"]:
             if "all-config-projects" in opts["special-selectors"]:
