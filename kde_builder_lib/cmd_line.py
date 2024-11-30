@@ -191,7 +191,7 @@ class Cmdline:
                 line = line.removesuffix("=i")
             elif line.endswith(":10"):  # for --nice
                 nargs = "\"?\""
-                nargs += ", default=10"
+                nargs += ", default=\"10\""
                 line = line.removesuffix(":10")
             else:  # for example, for "-p" to not eat selector.
                 action = "\"store_true\""
