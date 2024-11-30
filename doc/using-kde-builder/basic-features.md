@@ -23,17 +23,12 @@ Now check if you are using default build configs. This is done by this config li
 include ${build-configs-dir}/kde6.yaml: ""
 ```
 
-If this is the case, you are on a safe side. You can just run the following command:
-
-```bash
-kde-builder qt6-set
-```
+If this is the case, you are on a safe side.
 
 If for some reason you are not using default build configs, then you should ensure that
 the `qt6-set` group is added to your `kde-builder.yaml` _before_ any other projects in the file.
-
-Now you should verify that the [repository](#conf-repository) option and
-[branch](#conf-branch) options are set appropriately:
+Then you should verify that the [repository](#conf-repository) option and
+[branch](#conf-branch) options are set appropriately.
 
 The `repository` option if set to "qt6-copy", is to build Qt using a mirror maintained on the KDE
 source repositories (no other changes are applied, it is simply a
@@ -42,6 +37,21 @@ occasional issues with cloning the full Qt module from its official
 repository.
 
 You can find out available branches [here](https://invent.kde.org/qt/qt/qtbase/-/branches).
+
+Most likely, you would want to exclude qtwebengine from building, as it has significant build requirements.
+To do this, add it to "ignore-projects" in your config:
+
+```yaml
+global:
+  ignore-projects:
+    - qtwebengine
+```
+
+Now you can just run the following command:
+
+```bash
+kde-builder qt6-set
+```
 
 (kde-builder-std-flags)=
 ## Standard flags added by kde-builder
