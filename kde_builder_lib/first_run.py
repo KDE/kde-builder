@@ -184,7 +184,8 @@ class FirstRun:
                 logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
             logger_fr.info(" b[*] b[g[Packages were successfully installed!]")
 
-    def _setup_base_configuration(self) -> None:
+    @staticmethod
+    def _setup_base_configuration() -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
         xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
@@ -208,14 +209,8 @@ class FirstRun:
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kde-builder.yaml.in", "r") as data_file:
             sample_rc = data_file.read()
 
-        num_cores = os.cpu_count()
-        if not num_cores:
-            num_cores = 4
-
-        num_cores_low = self._get_num_cores_for_low_memory(num_cores)
-
-        sample_rc = sample_rc.replace("%{num_cores}", "\"" + str(num_cores) + "\"")
-        sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + str(num_cores_low) + "\"")
+        sample_rc = sample_rc.replace("%{num_cores}", "\"" + "auto" + "\"")
+        sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + "auto" + "\"")
 
         gl = BuildContext().build_options["global"]  # real global defaults
 

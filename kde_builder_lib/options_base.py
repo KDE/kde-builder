@@ -105,6 +105,13 @@ class OptionsBase:
                 self.options[repo_option] = dictionary
                 return
 
+        if opt_name == "num-cores-low-mem":
+            try:
+                int(opt_val)  # any value that can be cast to int.
+            except ValueError:  # some string like "auto" is set.
+                from .os_support import CoresAndMemorySupport
+                opt_val = str(CoresAndMemorySupport.get_num_cores_for_low_memory())
+
         # Everything else can be dumped straight into our dict.
         self.verify_option_value_type(opt_name, opt_val)
         self.options[opt_name] = opt_val
