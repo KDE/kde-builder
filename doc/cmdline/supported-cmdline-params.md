@@ -119,6 +119,10 @@ branch will be called something like "mr/80", and kde-builder will behave like i
 [`--all-config-projects`](cmdline-all-config-projects)  
 This option is used to select all projects defined in user config for kde-builder to operate on.
 
+(cmdline-all-kde-projects)=
+[`--all-kde-projects`](cmdline-all-kde-projects)  
+This option is used to select all known projects defined in metadata for kde-builder to operate on.
+
 (cmdline-option-name)=
 [`--<option-name>`](cmdline-option-name) \<value\>  
 You can use this option to override an option in your [configuration

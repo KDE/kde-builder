@@ -648,7 +648,7 @@ See the documentation on develop.kde.org on how to configure the Qt Creator manu
 Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config)
 
 (conf-hold-work-branches)=
-[`--hold-work-branches`](cmdline-hold-work-branches)
+[`hold-work-branches`](cmdline-hold-work-branches)
 
 Type: Boolean, Default value: True
 

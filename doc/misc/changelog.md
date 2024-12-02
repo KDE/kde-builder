@@ -1,5 +1,8 @@
 # Changelog
 
+2024-12-02
+: Added `--all-kde-projects` option.
+
 2024-11-26
 : Added `--hold-work-branches` option.
 

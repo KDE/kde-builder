@@ -69,6 +69,7 @@ class KDEProjectsReader:
                 "name": project,
                 "active": True,
                 "found_by": "direct",
+                "kind": "software",
             }
 
             self.repositories[project] = repo_data
@@ -91,7 +92,8 @@ class KDEProjectsReader:
             "repo": f"kde:{repo_path}.git",
             "name": repo_name,
             "active": bool(proj_data["repoactive"]),
-            "found_by": "direct"  # can be changed in get_modules_for_project
+            "found_by": "direct",  # can be changed in get_modules_for_project
+            "kind": proj_data["kind"],
         }
 
         self.repositories[repo_name] = cur_repository

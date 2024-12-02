@@ -8,6 +8,7 @@
 
 _arguments \
   --all-config-projects"[Select all projects defined in user config]" \
+  --all-kde-projects"[Select all known kde projects defined in metadata]" \
   "(--async --no-async)"{--async,--no-async}"[Perform source update and build process in parallel]" \
   --binpath"[Set the environment variable PATH while building]"":argument:" \
   --branch-group"[General group from which you want projects to be chosen]"":argument:" \

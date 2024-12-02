@@ -325,13 +325,21 @@ class Application:
         modules: list[Module] = []
         if not cmdline_selectors_len and not opts["special-selectors"]:
             logger_app.warning(" y[*] No projects selected in command line!\n"
-                               "   b[*] To select all projects mentioned in config, use y[--all-config-projects].")
+                               "   b[*] To select all projects mentioned in config, use y[--all-config-projects].\n"
+                               "   b[*] To select all kde projects, use y[--all-kde-projects].")
 
         if opts["special-selectors"]:
             if "all-config-projects" in opts["special-selectors"]:
                 # Build everything in the rc-file, in the order specified.
                 modules = module_resolver.expand_module_sets(option_modules_and_sets)
 
+            if "all-kde-projects" in opts["special-selectors"]:
+                repos = self.context.get_project_data_reader().repositories
+                active_kde_projects: list[str] = []
+                for pr in repos:
+                    if repos[pr]["active"] and repos[pr]["kind"] not in ["packaging", "infrastructure", "website"]:
+                        active_kde_projects.append(repos[pr]["name"])
+                modules = module_resolver.resolve_selectors_into_modules(active_kde_projects)
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 

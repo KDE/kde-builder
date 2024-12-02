@@ -304,6 +304,9 @@ class Cmdline:
         if args.all_config_projects:
             opts["special-selectors"].append("all-config-projects")
 
+        if args.all_kde_projects:
+            opts["special-selectors"].append("all-kde-projects")
+
         if args.build_system_only:
             found_options["build-system-only"] = True
 
@@ -514,6 +517,7 @@ class Cmdline:
 
         non_context_options = [
             "all-config-projects",
+            "all-kde-projects",
             "dependency-tree",
             "dependency-tree-fullpath",
             "help|h",
