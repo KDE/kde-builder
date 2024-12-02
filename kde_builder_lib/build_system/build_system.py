@@ -109,11 +109,8 @@ class BuildSystem:
             max_cores = 1
 
         if cores == "auto":
-            # If the build_system can manage it and the user doesn't care, that's OK too
-            if self.supports_auto_parallelism():
-                return {}
             if max_cores > 1:
-                cores = max_cores
+                cores = max_cores - 1
 
         # If user sets cores to something silly, set it to a failsafe.
         if int(cores) <= 0:
