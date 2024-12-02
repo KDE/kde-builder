@@ -101,19 +101,19 @@ class BuildSystem:
         cores = self.module.get_option("num-cores")
 
         # If set to empty, accept user's decision
-        if not cores:
-            return {}
-
-        # If the build_system can manage it and the user doesn't care, that's OK too
-        if self.supports_auto_parallelism() and cores == "auto":
+        if cores == "":
             return {}
 
         max_cores = os.cpu_count()
         if not max_cores:
             max_cores = 1
 
-        if cores == "auto" and max_cores > 1:
-            cores = max_cores
+        if cores == "auto":
+            # If the build_system can manage it and the user doesn't care, that's OK too
+            if self.supports_auto_parallelism():
+                return {}
+            if max_cores > 1:
+                cores = max_cores
 
         # If user sets cores to something silly, set it to a failsafe.
         if int(cores) <= 0:
@@ -223,8 +223,7 @@ class BuildSystem:
         build_options = option_val.split(" ")
         build_options = [el for el in build_options if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
-        # Look for CPU core limits to enforce. This handles core limits for all
-        # current build systems.
+        # Look for CPU core limits to enforce. This handles core limits for all current build systems.
         build_constraints = self.build_constraints()
         num_cores = build_constraints.get("compute", None)
 
