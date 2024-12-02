@@ -21,12 +21,10 @@ from kde_builder_lib.kb_exception import SetOptionError
 from ..kb_exception import ProgramError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
-from ..build_system.cmake_bootstrap import BuildSystemCMakeBootstrap
 from ..build_system.kde_cmake import BuildSystemKDECMake
 from ..build_system.meson import BuildSystemMeson
 from ..build_system.qmake5 import BuildSystemQMake5
 from ..build_system.qmake6 import BuildSystemQMake6
-from ..build_system.qt4 import BuildSystemQt4
 from ..build_system.qt5 import BuildSystemQt5
 from ..debug import Debug
 from ..debug import KBLogger
@@ -277,9 +275,7 @@ class Module(OptionsBase):
             "generic": BuildSystem,
             "qmake": BuildSystemQMake5,
             "qmake6": BuildSystemQMake6,
-            "cmake-bootstrap": BuildSystemCMakeBootstrap,
             "kde": BuildSystemKDECMake,
-            "qt": BuildSystemQt4,
             "qt5": BuildSystemQt5,
             "autotools": BuildSystemAutotools,
             "meson": BuildSystemMeson,
@@ -304,11 +300,6 @@ class Module(OptionsBase):
         # If not set, let's guess.
         build_type = None
         source_dir = self.fullpath("source")
-
-        # This test must come before the KDE build_system's as cmake's own
-        # bootstrap system also has CMakeLists.txt
-        if not build_type and os.path.exists(f"{source_dir}/CMakeLists.txt") and os.path.exists(f"{source_dir}/bootstrap"):
-            build_type = BuildSystemCMakeBootstrap(self)
 
         if not build_type and (os.path.exists(f"{source_dir}/CMakeLists.txt") or self.is_kde_project()):
             build_type = BuildSystemKDECMake(self)
