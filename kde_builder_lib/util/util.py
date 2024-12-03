@@ -380,7 +380,7 @@ class Util:
             # being read from (to avoid waiting forever for e.g. a password prompt
             # that the user can't see.
 
-            if "KDESRC_BUILD_USE_TTY" not in os.environ:
+            if "KDE_BUILDER_USE_TTY" not in os.environ:
                 with open("/dev/null", "r") as dev_null:
                     os.dup2(dev_null.fileno(), 0)
 
