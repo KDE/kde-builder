@@ -482,6 +482,19 @@ options, there is a generic way to set this from the command line).
 Path to the configuration file to use by kde-builder. The default is `kde-builder.yaml` from current working directory (if exists) or otherwise
 `~/.config/kde-builder.yaml`.
 
+(cmdline-log-level)=
+[`--log-level`](cmdline-log-level) logger-name=LEVEL  
+Set the verbosity level of some internal logger. This can be used in order to conveniently debug behavior of kde-builder itself.
+Name of the logger should be followed by equal sign, and then followed by name of the level.
+Can be used several times in one command.
+
+Example:
+```shell
+kde-builder wayland --log-level logged-command=INFO --log-level ide_project_configs=DEBUG
+```
+Available logger names can be seen in the `data/kde-builder-logging.yaml`
+file. Level names can be one of "ERROR", "WARNING", "INFO", "DEBUG". See also [](../developer/adding-logger.md).
+
 ## Setup
 
 (cmdline-initial-setup)=

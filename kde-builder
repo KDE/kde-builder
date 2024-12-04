@@ -72,6 +72,7 @@ parser.add_argument("--install-distro-packages", action="store_true")
 parser.add_argument("--generate-config", action="store_true")
 parser.add_argument("--prompt-answer",  nargs=1)
 parser.add_argument("--debug", action="store_true")
+parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append")  # allowing repeating several times
 
 args, unknown = parser.parse_known_args()
 
@@ -90,6 +91,29 @@ if os.path.exists(os.getcwd() + "/kde-builder-logging.yaml"):
 elif os.path.exists(os.path.expanduser("~/.config/kde-builder-logging.yaml")):
     with open(os.path.expanduser("~/.config/kde-builder-logging.yaml"), "r") as f:
         override_config = yaml.safe_load(f.read())
+
+# Overriding logger levels by cmdline
+if args.log_level:
+    if override_config.get("loggers", None) is None:
+        override_config["loggers"] = {}
+    for logger_name, level_name in args.log_level:
+        if override_config["loggers"].get(logger_name, None) is None:
+            override_config["loggers"][logger_name] = {}
+        override_config["loggers"][logger_name]["level"] = level_name
+
+    # remove them, so we can pass sys.argv to Application
+    indices_to_remove = []
+    for i, arg in enumerate(sys.argv):
+        if i in indices_to_remove:
+            continue  # prevent analyzing the value of log-level argument (as users may try to do something like `kde-builder --log-level --log-level`)
+
+        if arg == "--log-level":
+            indices_to_remove.append(i)
+            indices_to_remove.append(i + 1)
+        elif arg.startswith("--log-level="):
+            indices_to_remove.append(i)
+    for i in reversed(indices_to_remove):
+        sys.argv.pop(i)
 
 
 # Merges dict "b" into dict "a", overwriting existing entries. Mutates dict "a". Also, returns "a".
