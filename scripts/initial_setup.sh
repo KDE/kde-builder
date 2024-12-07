@@ -45,7 +45,12 @@ install_runtime_packages() {
     (set -x; sudo zypper refresh)
     (set -x; sudo zypper install git python311-pyaml python311-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
-    (set -x; sudo pkg install python3 py39-yaml py39-setproctitle py39-dbus)
+    FREEBSD_OSVERSION=$(uname -U)
+    if [ $FREEBSD_OSVERSION -ge 1402000 ]; then
+      (set -x; sudo pkg install git python3 py311-pyyaml py311-setproctitle py311-dbus)
+    else
+      (set -x; sudo pkg install git python3 py39-yaml py39-setproctitle py39-dbus)
+    fi
   elif [ "$ID" = "openbsd" ]; then
     VNAME=${VNAME:-$(sysctl -n kern.osrelease)}
     VTYPE=$( sed -n "/^OpenBSD $VNAME\([^ ]*\).*$/s//\1/p" \
