@@ -378,6 +378,11 @@ the `make` command would have been run. This is supported for
 compatibility with older versions only, this effect is not helpful for
 the current KDE build system.
 
+(cmdline-install-login-session-only)=
+[`--install-login-session-only`](cmdline-install-login-session-only)  
+Can be used to only invoke the session installation script, so you can bypass any project update/build phases. 
+See [](#installing-login-session) for more information.
+
 ## Build behavior
 
 (cmdline-build-when-unchanged)=

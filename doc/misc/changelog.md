@@ -1,5 +1,11 @@
 # Changelog
 
+2024-12-24
+: Added `--install-login-session-only` option.
+
+2024-12-04
+: Added `--log-level` option.
+
 2024-12-02
 : Added `--all-kde-projects` option.
 

@@ -47,6 +47,7 @@ _arguments \
   --install-dir"[Where to install the project after it is built]"":argument:" \
   --install-distro-packages"[Installs required system pkgs]" \
   "(--install-login-session --no-install-login-session)"{--install-login-session,--no-install-login-session}"[Install a login session]" \
+  --install-login-session-only"[Skip updating and building everything and only install a login session]" \
   "(--install-only --no-install)"--install-only"[Only perform the install process]" \
   --libname"[Default name of the installed library directory]"":argument:" \
   --libpath"[Set the environment variable LD_LIBRARY_PATH while building]"":argument:" \

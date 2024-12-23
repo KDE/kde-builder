@@ -323,7 +323,7 @@ class Application:
         self._define_new_module_factory(module_resolver)
 
         modules: list[Module] = []
-        if not cmdline_selectors_len and not opts["special-selectors"]:
+        if not cmdline_selectors_len and not opts["special-selectors"] and self.run_mode != "install-login-session-only":
             logger_app.warning(" y[*] No projects selected in command line!\n"
                                "   b[*] To select all projects mentioned in config, use y[--all-config-projects].\n"
                                "   b[*] To select all kde projects, use y[--all-kde-projects].")
@@ -558,7 +558,7 @@ class Application:
             }
 
         else:
-            if not graph["graph"]:
+            if not graph["graph"] and self.run_mode != "install-login-session-only":
                 logger_app.warning(" r[b[*] Unable to determine correct module graph")
                 logger_app.warning(" r[b[*] Will attempt to continue.")
 
@@ -677,8 +677,10 @@ class Application:
             # --rebuild-failures
             ctx.set_persistent_option("global", "last-failed-module-list", failed_modules)
 
-        if ctx.get_option("install-login-session") and not Debug().pretending():
-            self.install_login_session()
+        if (ctx.get_option("install-login-session") or run_mode == "install-login-session-only") and not Debug().pretending():
+            res = self.install_login_session()
+            if res and not result:
+                result = res
 
         # Check for post-build messages and list them here
         for m in modules:
@@ -1537,7 +1539,7 @@ class Application:
             Application._install_templated_file(source_file_path, dest_file_path, ctx)
             ctx.set_persistent_option("/digests", md5_key_name, hashlib.md5(open(dest_file_path, "rb").read()).hexdigest())
 
-    def install_login_session(self) -> None:
+    def install_login_session(self) -> int:
         """
         Make an entire built-from-source Plasma session accessible from the SDDM login screen.
 
@@ -1608,10 +1610,16 @@ class Application:
                 msg += f"\n     {k} -> {new_files_map[k]}"
             logger_app.info(msg)
             logger_app.info(f" b[*] Running script: {install_sessions_script}")
-            subprocess.run([install_sessions_script])
-            logger_app.warning(" b[*] Install login sessions script finished.")
+            p = subprocess.run([install_sessions_script])
+            if p.returncode != 0:
+                logger_app.error(" r[*] Install login sessions script failed. Please run kde-builder with y[--install-login-session-only] option to rerun it.")
+                return p.returncode
+            else:
+                logger_app.warning(" b[*] Install login sessions script finished.")
+                return 0
         else:
             logger_app.debug(" b[*] No need to run install-sessions.sh, all files are already installed and up to date.")
+            return 0
 
     def _check_for_essential_build_programs(self) -> bool:
         """

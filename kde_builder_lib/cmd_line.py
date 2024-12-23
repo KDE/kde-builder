@@ -406,6 +406,10 @@ class Cmdline:
         if args.do_not_compile is not None:
             found_options["do-not-compile"] = args.do_not_compile[0]
 
+        if args.install_login_session_only:
+            opts["run_mode"] = "install-login-session-only"
+            phases.clear()
+
         if args.libname is not None:
             found_options["libname"] = args.libname[0]
 
@@ -521,6 +525,7 @@ class Cmdline:
             "dependency-tree",
             "dependency-tree-fullpath",
             "help|h",
+            "install-login-session-only",
             "list-installed",
             "no-metadata|M",
             "query=s",

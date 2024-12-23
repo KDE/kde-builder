@@ -308,6 +308,11 @@ After that, you can log out, and select the Development session in SDDM session 
 
 ![Select the development session in SDDM](/_static/sddm_dev_session_select.png)
 
-Kde-builder will keep track of when it needs to rerun the session installation script. This happens when some of the
+KDE Builder will keep track of when it needs to rerun the session installation script. This happens when some of the
 files that are handled by installation script are changed. When installation is not needed, it is not run, so it will
 not bother you to enter sudo password.
+
+```{tip}
+You can use `--install-login-session-only` command line option in case you want to keep the [install-login-session](#conf-install-login-session)
+config option disabled, or if you missed the timeout of sudo command when the installation script was called.
+```
