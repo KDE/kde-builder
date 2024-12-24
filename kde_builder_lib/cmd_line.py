@@ -163,7 +163,16 @@ class Cmdline:
                 exit(1)  # Do not continue
 
         supported_options.remove("set-project-option-value=s")  # specify differently, allowing it to be repeated in cmdline
-        parser.add_argument("--set-project-option-value", type=lambda x: x.split(",", 2), action="append")
+
+        def validate_set_project_option_value(inp_str: str):
+            try:
+                project_name, option_name, option_value = inp_str.split(",", 2)
+                return project_name, option_name, option_value
+            except ValueError:
+                logger_app.error(f" r[*] Invalid value in --set-project-option-value option. See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html#cmdline-set-project-option-value.")
+                exit(1)  # Do not continue
+
+        parser.add_argument("--set-project-option-value", type=validate_set_project_option_value, action="append")
 
         # Generate the code as a string with `parser.add_argument(...) ...`.
         # This is done by parsing supported_options and extracting option variants (long, alias, short ...), parameter numbers and default values.
