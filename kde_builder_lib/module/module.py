@@ -1038,7 +1038,8 @@ class Module(OptionsBase):
         # We want the build process to use system installed package rather than installed in virtual environment.
         # We remove the current virtual environment path from PATH, because Cmake FindPython3 module always considers PATH,
         # see https://cmake.org/cmake/help/latest/module/FindPython3.html
-        # But note that user still needs to provide these cmake options: -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
+        # If user did not provide cmake options -DPython3_FIND_VIRTUALENV=STANDARD and -DPython3_FIND_UNVERSIONED_NAMES=FIRST,
+        # they will be automatically added (see get_final_cmake_options()).
         if sys.prefix != sys.base_prefix and env_name == "PATH":
             if f"{sys.prefix}/bin" in cur_paths:
                 logger_module.debug(f"\tRemoving python virtual environment path y[{sys.prefix}/bin] from y[PATH], to allow build process to find system python packages outside virtual environment.")

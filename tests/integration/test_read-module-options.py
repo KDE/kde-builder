@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+import sys
 
 # Now we can load `Application`, which will load a bunch more modules all
 # using log_command and run_logged_p from `Util`
@@ -70,7 +71,10 @@ def test_option_reading(monkeypatch):
     assert module_list[1].setup_build_system(), "setup fake build system"
 
     assert cmd, "run_logged_p cmake was called"
-    assert len(cmd) == 12
+    if sys.prefix != sys.base_prefix:
+        assert len(cmd) == 14
+    else:
+        assert len(cmd) == 12
 
     assert cmd[0] == "cmake", "CMake command should start with cmake"
     assert cmd[1] == "-B",    "Passed build dir to cmake"
@@ -84,6 +88,9 @@ def test_option_reading(monkeypatch):
     assert cmd[9] == "bar=c", "CMake option quoting does not eat all options"
     assert cmd[10] == "baz", "Plain CMake options are preserved correctly"
     assert cmd[11] == f"""-DCMAKE_INSTALL_PREFIX={os.environ.get("HOME")}/kde/usr""", "Prefix is passed to cmake"
+    if sys.prefix != sys.base_prefix:
+        assert cmd[12] == "-DPython3_FIND_VIRTUALENV=STANDARD", "If in venv, Python3_FIND_VIRTUALENV is appended"
+        assert cmd[13] == "-DPython3_FIND_UNVERSIONED_NAMES=FIRST", "If in venv, Python3_FIND_UNVERSIONED_NAMES is appended"
 
     # See https://phabricator.kde.org/D18165
     assert module_list[0].get_option("cxxflags") == "", "empty cxxflags renders with no whitespace in module"
