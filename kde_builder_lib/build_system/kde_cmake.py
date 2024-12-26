@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os.path
 import re
+import sys
 
 from .build_system import BuildSystem
 from ..kb_exception import ProgramError
@@ -402,6 +403,19 @@ class BuildSystemKDECMake(BuildSystem):
             else:
                 logger_buildsystem.debug("\tOverriding BUILD_TESTING variable with ON value.")
                 commands[found_build_testing_index] = "-DBUILD_TESTING:BOOL=ON"
+
+        if sys.prefix != sys.base_prefix:
+            # We are in virtual environment.
+            # Some projects require python modules (for example, breeze-gtk requires python-cairo).
+            # We will append (if missing) cmake options so that those python modules are searched in system environment rather than in virtual environment.
+            # See https://cmake.org/cmake/help/latest/module/FindPython3.html for options description.
+            # The path of virtual environment was removed in prepend_environment_value().
+            if not [command for command in commands if re.match(r"^-DPython3_FIND_VIRTUALENV(:\w+)?=", command)]:
+                logger_buildsystem.debug("\tAdding -DPython3_FIND_VIRTUALENV cmake option, because we are in virtual environment.")
+                commands.append(f"-DPython3_FIND_VIRTUALENV=STANDARD")
+            if not [command for command in commands if re.match(r"^-DPython3_FIND_UNVERSIONED_NAMES(:\w+)?=", command)]:
+                logger_buildsystem.debug("\tAdding -DPython3_FIND_UNVERSIONED_NAMES cmake option, because we are in virtual environment.")
+                commands.append(f"-DPython3_FIND_UNVERSIONED_NAMES=FIRST")
 
         return commands
 
