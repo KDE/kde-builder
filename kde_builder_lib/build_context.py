@@ -670,11 +670,9 @@ class BuildContext(Module):
 
         # Automatically respond to various global option changes.
         for key, value in options.items():
-            normalized_key = key
-            normalized_key = normalized_key.lstrip("#")  # Remove sticky key modifier.
-            if normalized_key == "colorful-output":
+            if key == "colorful-output":
                 Debug().set_colorful_output(value)
-            elif normalized_key == "pretend":
+            elif key == "pretend":
                 Debug().set_pretending(value)
 
     # Persistent option handling

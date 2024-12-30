@@ -23,11 +23,6 @@ class OptionsBase:
     Used to implement common functions within :class:`BuildContext`, :class:`Module`, and
     :class:`ModuleSet`.
 
-    There is some internal trickery to ensure that program code can override
-    user-selected options in certain situations, which is why we don't simply
-    use a dict directly. These are the so-called "sticky" options, seen
-    internally as options with a name starting with #.
-
     This class is mostly used to encapsulate common code for handling module and
     module-set options, for use by major subclasses.
 
@@ -42,18 +37,6 @@ class OptionsBase:
         self.options = {"set-env": {}}
         self.ctx = ctx
 
-    def has_sticky_option(self, key: str) -> bool:
-        """
-        Return true if the given option has been overridden by a "sticky" option.
-
-        Use `get_option` to return the actual value in this case.
-        """
-        key = key.removeprefix("#")  # Remove sticky marker.
-
-        if key in ["pretend", "disable-agent-check"]:
-            return True
-        return True if f"#{key}" in self.options.keys() else False
-
     def has_option(self, key: str) -> bool:
         """
         Return true if the given option has been set for this module.
@@ -64,17 +47,10 @@ class OptionsBase:
 
     def get_option(self, key: str) -> str | dict | list | bool:
         """
-        Return the value of the given option.
-
-        "Sticky" options are returned in
-        preference to this object's own option (this allows you to temporarily
-        override an option with a sticky option without overwriting the option
-        value). If no such option is present, returns an empty string.
+        Return the value of the given option. If no such option is present, returns an empty string.
 
         Note that :class:`Module` has its own, much more involved override of this
-        method. Note further that although `None` is not returned directly by
-        this method, that it's possible for sticky options to be set to `None` (if
-        you're setting sticky option values, it's probably best not to do that).
+        method.
 
         May return type - example which uses this type:
          list - "#defined-at"
@@ -82,9 +58,8 @@ class OptionsBase:
          bool - "include-dependencies"
          str - almost everything else
         """
-        for el in [f"#{key}", key]:
-            if self.has_option(el):
-                return self.options[el]
+        if self.has_option(key):
+            return self.options[key]
         return ""
 
     def set_option(self, options: dict) -> None:

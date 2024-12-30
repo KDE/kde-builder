@@ -801,7 +801,7 @@ class Module(OptionsBase):
                   - allow-inherit: Module value is used if present (with exceptions),
                     otherwise global is used.
                   - module: Only module value is used (if you want only global then use the
-                    buildContext) NOTE: This overrides global "sticky" options as well!
+                    buildContext).
 
         Returned type - for example used in
           bool - "#guessed-kde-project"
@@ -823,10 +823,6 @@ class Module(OptionsBase):
             return self.options[key] if key in self.options else None
 
         ctx_value = ctx.get_option(key)  # we'll use this a lot from here
-
-        # Some global options always override module options.
-        if ctx.has_sticky_option(key):
-            return ctx_value
 
         # Some options append to the global (e.g. conf flags)
         conf_flags = ["cmake-options", "configure-flags", "cxxflags", "meson-options"]
@@ -1079,7 +1075,7 @@ class Module(OptionsBase):
 
         logdir = self.get_log_dir()
 
-        if self.has_sticky_option("error-log-file"):
+        if self.has_option("#error-log-file"):
             logger_module.error(f"{self} already has error log set, tried to set to r[b[{logfile}]")
             return
 
