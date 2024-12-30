@@ -213,7 +213,7 @@ class Application:
         # doing.
 
         ctx = self.context
-        deferred_options = []  # "options" blocks
+        deferred_options = []  # "override" nodes
 
         # Process --help, etc. first.
         c = Cmdline()
@@ -954,8 +954,8 @@ class Application:
             cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
             deferred_options: A list containing dicts mapping module names to options
-                set by any "options" blocks read in by this function.
-                Each key (identified by the name of the "options" block) will point to a
+                set by any "override" nodes read in by this function.
+                Each key (identified by the name of the "override" node) will point to a
                 dict value holding the options to apply.
 
         Returns:

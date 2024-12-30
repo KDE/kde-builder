@@ -52,7 +52,7 @@ class ModuleResolver:
         #  }
         self.cmdline_options = {}
 
-        # Holds options from "options" blocks for modules
+        # Holds options from "override" nodes for modules
         self.deferred_options = {}
 
         # Holds Modules defined in course of expanding module-sets
@@ -63,12 +63,12 @@ class ModuleResolver:
 
     def set_deferred_options(self, deferred_options: list[dict]) -> None:
         """
-        Set options to apply later if a module set resolves to a named module, used for "options" blocks.
+        Set options to apply later if a module set resolves to a named module, used for "override" nodes.
 
         Each object in the dict can be either options for a later :class:`Module`,
         or options for an entire set of :class:`Module` (as determined by use of
         repository/use-module items). We want to handle the latter first, since
-        we assume single "options" blocks should still be able to override these.
+        we assume single "override" nodes should still be able to override these.
         """
         proj_db: KDEProjectsReader = self.context.get_project_data_reader()
         set_indices = []
@@ -79,7 +79,7 @@ class ModuleResolver:
             repo = opts["repository"] if "repository" in opts else None
             referenced_modules = opts.get("use-projects", None)
 
-            # Skip options blocks that don't reference module-sets
+            # Skip "override" nodes that don't reference module-sets
             if not referenced_modules or repo != "kde-projects":
                 continue
 
@@ -96,7 +96,7 @@ class ModuleResolver:
                         final_opts[name] = copy.deepcopy(opts)
 
         # Delete options for module sets, so we don't accidentally process them now
-        # that use-projects/repository keys are gone.  Must be done back-to-front so
+        # that use-projects/repository keys are gone. Must be done back-to-front so
         # indices don't change.
         set_indices.reverse()
         for index in set_indices:
