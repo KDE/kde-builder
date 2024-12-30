@@ -2,8 +2,8 @@
     "recommendations": [
         "ms-vscode.cpptools-extension-pack", // Debug & build support for C/C++ and CMake
         "llvm-vs-code-extensions.vscode-clangd", // C/C++ LSP
-        "tonka3000.qtvsctools", // Qt
-        "bbenoist.QML", // QML
+        "theqtcompany.qt", // Qt and QML support
+        "knv.qt6renderer", // Qt pretty printer
         "deerawan.vscode-dash", // Docs
     ]
 }
