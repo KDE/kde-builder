@@ -110,6 +110,7 @@ class ModuleResolver:
             opts = deferred_entry["opts"]
 
             if name in final_opts:
+                # todo Check that we are not overwriting the defined-at in case of several "overrides" nodes in different files
                 final_opts[name].update(opts)
             else:
                 final_opts[name] = opts
@@ -140,6 +141,12 @@ class ModuleResolver:
                 for key in m.options:
                     if key in opts:
                         del opts[key]
+
+            # Merging override's defined-at to the project's defined-at
+            if "#defined-at" in opts:
+                from .application import Application
+                Application._mark_module_source(m, *opts["#defined-at"])  # todo - move this function from Application
+                del opts["#defined-at"]
 
             for opt_name, opt_val in opts.items():
                 m.set_option(opt_name, opt_val)
