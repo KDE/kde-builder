@@ -145,7 +145,7 @@ class ModuleResolver:
             # Merging override's defined-at to the project's defined-at
             if "#defined-at" in opts:
                 from .application import Application
-                Application._mark_module_source(m, *opts["#defined-at"])  # todo - move this function from Application
+                Application._mark_module_source(m, *opts["#defined-at"], "WHAT?")  # todo - move this function from Application
                 del opts["#defined-at"]
 
             for opt_name, opt_val in opts.items():

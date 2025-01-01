@@ -839,7 +839,7 @@ class Application:
 
             raise ConfigError("Unknown repository base")
 
-    def _process_module_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module: OptionsBaseT) -> OptionsBaseT:
+    def _process_module_options(self, ctx: BuildContext, node_opts: dict, file_name: str, node_name: str, module: OptionsBaseT) -> OptionsBaseT:
         """
         Read in the options from the config file and add them to the option store.
 
@@ -857,7 +857,7 @@ class Application:
         if not hasattr(Application, "moduleID"):
             Application.moduleID = 0
 
-        self._mark_module_source(module, file_name)
+        self._mark_module_source(module, file_name, node_name)
         module.set_option("#entry_num", Application.moduleID)
         Application.moduleID += 1
 
@@ -897,7 +897,7 @@ class Application:
         return module
 
     @staticmethod
-    def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
+    def _mark_module_source(options_base: OptionsBase, config_source: str, node_name: str = "unknown node") -> None:
         """
         Mark the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being read in from the given string (filename:line).
 
@@ -906,9 +906,6 @@ class Application:
         key = "#defined-at"
         sources = options_base.get_option(key) if options_base.has_option(key) else []
 
-        node_name = "unknown"
-        if hasattr(options_base, "name"):
-            node_name = options_base.name
         sources.append(config_source + " (" + node_name + ")")
         options_base.set_option(key, sources)
 
@@ -921,7 +918,7 @@ class Application:
         sources = options_base.get_option(key) or []
         return ", ".join(sources)
 
-    def _process_module_set_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module_set: ModuleSet) -> ModuleSet:
+    def _process_module_set_options(self, ctx: BuildContext, node_opts: dict, file_name: str, node_name: str, module_set: ModuleSet) -> ModuleSet:
         """
         Read in a "module_set".
 
@@ -935,7 +932,7 @@ class Application:
             The :class:`ModuleSet` passed in with read-in options set, which may need
             to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
         """
-        module_set = self._process_module_options(ctx, node_opts, file_name, module_set)
+        module_set = self._process_module_options(ctx, node_opts, file_name, node_name, module_set)
 
         # Perl-specific note! re-blessing the module set into the right "class"
         # You'd probably have to construct an entirely new object and copy the
@@ -993,7 +990,7 @@ class Application:
             logger_app.error(f"Expecting global settings node!")
             raise ConfigError("Missing global section")
         else:
-            global_opts = self._process_module_options(ctx, first_node_content, rcfile, OptionsBase())
+            global_opts = self._process_module_options(ctx, first_node_content, rcfile, "global_opts",OptionsBase(None, "global_options"))
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
             for key in cmdline_global_options.keys():
                 global_opts.options.pop(key, None)
@@ -1025,7 +1022,7 @@ class Application:
                     raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
-                new_module_set = self._process_module_set_options(ctx, node, config_filename, ModuleSet(ctx, module_set_name))
+                new_module_set = self._process_module_set_options(ctx, node, config_filename, node_name, ModuleSet(ctx, module_set_name))
                 creation_order += 1
                 new_module_set.create_id = creation_order
 
@@ -1051,7 +1048,7 @@ class Application:
                     logger_app.error(f"Name {module_name} for module in {config_filename} is already in use on a module-set")
                     raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
 
-                new_module = self._process_module_options(ctx, node, config_filename, Module(ctx, module_name))
+                new_module = self._process_module_options(ctx, node, config_filename, node_name, Module(ctx, module_name))
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
@@ -1062,7 +1059,7 @@ class Application:
             if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))
+                options = self._process_module_options(ctx, node, config_filename, node_name, OptionsBase(ctx, options_name))
 
                 deferred_options.append({
                     "name": options_name,

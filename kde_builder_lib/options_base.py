@@ -30,12 +30,13 @@ class OptionsBase:
     what options to set, see :class:`Application` and its friends.
     """
 
-    def __init__(self, ctx: BuildContext | None = None):
+    def __init__(self, ctx: BuildContext | None = None, name: str = "unnamed_options_base"):
         # We don't directly bless the options dict so that subclasses can
         # use this base dict directly (as long as they don't overwrite
         # "options", of course).
         self.options = {"set-env": {}}
         self.ctx = ctx
+        self.name = name
 
     def has_option(self, key: str) -> bool:
         """
