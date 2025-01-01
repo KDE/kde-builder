@@ -906,7 +906,10 @@ class Application:
         key = "#defined-at"
         sources = options_base.get_option(key) if options_base.has_option(key) else []
 
-        sources.append(config_source)
+        node_name = "unknown"
+        if hasattr(options_base, "name"):
+            node_name = options_base.name
+        sources.append(config_source + " (" + node_name + ")")
         options_base.set_option(key, sources)
 
     @staticmethod
