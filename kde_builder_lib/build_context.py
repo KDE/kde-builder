@@ -655,25 +655,24 @@ class BuildContext(Module):
         return OptionsBase.get_option(self, key)
 
     # @override
-    def set_option(self, options: dict) -> None:
+    def set_option(self, opt_name: str, opt_val) -> None:
 
         # Special case handling.
-        if "filter-out-phases" in options:
-            for phase in options["filter-out-phases"].split(" "):
+        if opt_name == "filter-out-phases":
+            for phase in opt_val.split(" "):
                 self.phases.filter_out_phase(phase)
-            del options["filter-out-phases"]
+            return
 
         # Our immediate parent class Module overrides this, but we actually
         # want the OptionsBase version to be used instead, because Module's version specifically checks for
         # some options prohibited for it (such as "ignore-projects") but we may want such for BuildContext.
-        OptionsBase.set_option(self, options)
+        OptionsBase.set_option(self, opt_name, opt_val)
 
         # Automatically respond to various global option changes.
-        for key, value in options.items():
-            if key == "colorful-output":
-                Debug().set_colorful_output(value)
-            elif key == "pretend":
-                Debug().set_pretending(value)
+        if opt_name == "colorful-output":
+            Debug().set_colorful_output(opt_val)
+        elif opt_name == "pretend":
+            Debug().set_pretending(opt_val)
 
     # Persistent option handling
 
@@ -720,7 +719,7 @@ class BuildContext(Module):
                 The b[global data file] is stored in the old location. It will still be
                 processed correctly, however, it's recommended to move it to the new location.
                 Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdg_state_home_short}/kdesrc-build-data]"""))
-                self.set_option({"#warned-legacy-data-location": True})
+                self.set_option("#warned-legacy-data-location", True)
         return file
 
     def load_persistent_options(self) -> None:

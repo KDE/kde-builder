@@ -141,7 +141,8 @@ class ModuleResolver:
                     if key in opts:
                         del opts[key]
 
-            m.set_option(opts)
+            for opt_name, opt_val in opts.items():
+                m.set_option(opt_name, opt_val)
 
             # Most of the time cmdline options will be empty
             if self.cmdline_options:
@@ -158,7 +159,8 @@ class ModuleResolver:
                         del m.options[key]
 
                 # Reapply module-specific cmdline options
-                m.set_option(module_cmdline_args)
+                for opt_name, opt_val in module_cmdline_args.items():
+                    m.set_option(opt_name, opt_val)
         return
 
     @staticmethod
@@ -191,7 +193,7 @@ class ModuleResolver:
             raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of modules!")
 
         for module_result in module_results:
-            module_result.set_option({"#selected-by": selected_reason})
+            module_result.set_option("#selected-by", selected_reason)
 
         # Copy entries into the lookup dict, especially in case they're
         # from case 3
@@ -246,7 +248,7 @@ class ModuleResolver:
 
             if not including_deps:
                 for module_result in module_results:
-                    module_result.set_option({"include-dependencies": False})
+                    module_result.set_option("include-dependencies", False)
 
             # Now lookup dict should be updated with expanded modules.
             selector = self.defined_modules.get(selector_name, None)
@@ -258,39 +260,39 @@ class ModuleResolver:
             if not selector:
                 results.extend(module_results)
             else:
-                selector.set_option({"#selected-by": "name"})
+                selector.set_option("#selected-by", "name")
 
         # Case 1
         elif selector_name in self.defined_modules:
             selector = self.defined_modules[selector_name]
             if not isinstance(selector, ModuleSet):
-                selector.set_option({"#selected-by": "name"})
+                selector.set_option("#selected-by", "name")
 
             if not isinstance(selector, ModuleSet) and not including_deps:
                 # modules were manually selected on cmdline, so ignore
                 # module-based include-dependencies, unless
                 # include-dependencies also set on cmdline.
-                selector.set_option({"#include-dependencies": False})
+                selector.set_option("#include-dependencies", False)
 
         elif isinstance(selector, Module):
             # We couldn't find anything better than what we were provided,
             # just use it.
-            selector.set_option({"#selected-by": "best-guess-after-full-search"})
+            selector.set_option("#selected-by", "best-guess-after-full-search")
 
         elif forced_to_kde_project:
             # Just assume it's a kde-projects module and expand away...
             selector = ModuleSetKDEProjects(ctx, "forced_to_kde_project")
             selector.set_modules_to_find([selector_name])
-            selector.set_option({"#include-dependencies": including_deps})
+            selector.set_option("#include-dependencies", including_deps)
         else:
             # Case 3?
             selector = Module(ctx, selector_name)
             selector.phases.reset_to(ctx.phases.phaselist)
 
             selector.set_scm_type("proj")
-            selector.set_option({"#guessed-kde-project": True})
-            selector.set_option({"#selected-by": "initial-guess"})
-            selector.set_option({"#include-dependencies": including_deps})
+            selector.set_option("#guessed-kde-project", True)
+            selector.set_option("#selected-by", "initial-guess")
+            selector.set_option("#include-dependencies", including_deps)
 
         if not results:
             results.append(selector)

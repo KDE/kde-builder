@@ -112,35 +112,35 @@ class ModuleSet(OptionsBase):
         new_module.create_id = start_order + order_in_list
 
     # @override
-    def set_option(self, options: dict) -> None:
+    def set_option(self, opt_name: str, opt_val) -> None:
         """
         Handle module-set specific options for OptionsBase's set_option.
         """
         # Special-case handling
-        if "use-projects" in options:
-            assert isinstance(options["use-projects"], list)
-            modules = options["use-projects"]
+        if opt_name == "use-projects":
+            assert isinstance(opt_val, list)
+            modules = opt_val
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[use-projects] entry.")
                 raise SetOptionError("use-projects", "Invalid use-projects")
 
             self.set_modules_to_find(modules)
-            del options["use-projects"]
+            return
 
-        if "ignore-projects" in options:
-            assert isinstance(options["ignore-projects"], list)
-            modules = options["ignore-projects"]
+        if opt_name == "ignore-projects":
+            assert isinstance(opt_val, list)
+            modules = opt_val
             if not modules:
                 logger_moduleset.error("No modules were selected for module-set " + self.name)
                 logger_moduleset.error("in the y[ignore-projects] entry.")
                 raise SetOptionError("ignore-projects", "Invalid ignore-projects")
 
             self.add_modules_to_ignore(modules)
-            del options["ignore-projects"]
+            return
 
         # Actually set options.
-        OptionsBase.set_option(self, options)
+        OptionsBase.set_option(self, opt_name, opt_val)
 
     def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
         """
@@ -173,7 +173,7 @@ class ModuleSet(OptionsBase):
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
             selected_repo = repo_set[options["repository"]]
-            new_module.set_option({"repository": selected_repo + module_item})
+            new_module.set_option("repository", selected_repo + module_item)
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")

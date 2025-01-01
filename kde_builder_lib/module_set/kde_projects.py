@@ -46,13 +46,13 @@ class ModuleSetKDEProjects(ModuleSet):
         metadata_module = Module(ctx, re.sub("/", "-", module_name))
 
         # Hardcode the results instead of expanding out the project info
-        metadata_module.set_option({"repository": f"kde:{module_name}"})  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
+        metadata_module.set_option("repository", f"kde:{module_name}")  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
-        metadata_module.set_option({"#kde-project-path": module_name})
+        metadata_module.set_option("#kde-project-path", module_name)
         metadata_module.set_scm_type("metadata")
-        metadata_module.set_option({"branch": "master"})
-        metadata_module.set_option({"source-dir":  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state")})
-        metadata_module.set_option({"log-dir": "log"})  # overwrite default value, because user may store his directories not under "~/kde"
+        metadata_module.set_option("branch", "master")
+        metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))
+        metadata_module.set_option("log-dir", "log")  # overwrite default value, because user may store his directories not under "~/kde"
 
         module_set = ModuleSetKDEProjects(ctx, "<kde-projects dependencies>")
         metadata_module.set_module_set(module_set)
@@ -134,10 +134,10 @@ class ModuleSetKDEProjects(ModuleSet):
             self._initialize_new_module(new_module)
 
             # Copy metadata from KDE project YAML file
-            new_module.set_option({"repository": result["repo"]})
-            new_module.set_option({"#kde-project-path": result["full_name"]})
-            new_module.set_option({"#kde-repo-path": result.get("invent_name", None)})
-            new_module.set_option({"#found-by": result["found_by"]})
+            new_module.set_option("repository", result["repo"])
+            new_module.set_option("#kde-project-path", result["full_name"])
+            new_module.set_option("#kde-repo-path", result.get("invent_name", None))
+            new_module.set_option("#found-by", result["found_by"])
 
             new_module.set_scm_type("proj")
 

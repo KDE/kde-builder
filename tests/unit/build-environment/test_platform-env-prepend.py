@@ -27,8 +27,8 @@ def test_environment_prepend():
     new_path = re.sub(r":/bin:", "", new_path)
     os.environ["PATH"] = new_path
 
-    ctx.set_option({"install-dir": ""})  # must be set but empty
-    ctx.set_option({"qt-install-dir": "/dev/null"})
+    ctx.set_option("install-dir", "")  # must be set but empty
+    ctx.set_option("qt-install-dir", "/dev/null")
 
     mod.setup_environment()
 
@@ -46,8 +46,8 @@ def test_environment_prepend():
     new_path = re.sub(r":/bin:", "", new_path)
     os.environ["PATH"] = new_path
 
-    ctx.set_option({"qt-install-dir": ""})  # must be set but empty
-    ctx.set_option({"install-dir": "/dev/null"})
+    ctx.set_option("qt-install-dir", "")  # must be set but empty
+    ctx.set_option("install-dir", "/dev/null")
 
     mod.setup_environment()
 
@@ -65,8 +65,8 @@ def test_environment_prepend():
     new_path = re.sub(r":/bin:", "", new_path)
     os.environ["PATH"] = new_path
 
-    ctx.set_option({"qt-install-dir": "/dev/null"})
-    ctx.set_option({"install-dir": "/dev/null"})
+    ctx.set_option("qt-install-dir", "/dev/null")
+    ctx.set_option("install-dir", "/dev/null")
 
     mod.setup_environment()
 
@@ -82,8 +82,8 @@ def test_environment_prepend():
     mod = Module(ctx, "test")
     os.environ["PATH"] = "/bin:/usr/bin"
 
-    ctx.set_option({"binpath": "/tmp/fake/bin"})
-    ctx.set_option({"libpath": "/tmp/fake/lib:/tmp/fake/lib64"})
+    ctx.set_option("binpath", "/tmp/fake/bin")
+    ctx.set_option("libpath", "/tmp/fake/lib:/tmp/fake/lib64")
 
     mod.setup_environment()
 
