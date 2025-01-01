@@ -64,7 +64,7 @@ def test_option_reading(monkeypatch):
     # into build system.
 
     # Override auto-detection since no source is downloaded
-    module_list[1].set_option({"override-build-system": "kde"})
+    module_list[1].set_option("override-build-system", "kde")
 
     # Should do nothing in --pretend
     assert module_list[1].setup_build_system(), "setup fake build system"

@@ -25,7 +25,7 @@ def test_logged_subprocess():
     assert m.name == "test", "Module has a name"
 
     tmp = tempfile.mkdtemp()
-    ctx.set_option({"log-dir": f"{tmp}/kde-builder-test"})
+    ctx.set_option("log-dir", f"{tmp}/kde-builder-test")
 
     def func(mod):
         print(f"Calculating stuff for {mod}")

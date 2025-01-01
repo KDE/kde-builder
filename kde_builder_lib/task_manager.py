@@ -80,7 +80,7 @@ class TaskManager:
             # There were reports that macOS does not play well with async mode. See https://invent.kde.org/sdk/kde-builder/-/issues/79
             if ctx.get_option("async"):
                 logger_ipc.warning("Disabling async mode due to macOS detected.")
-                ctx.set_option({"async": False})
+                ctx.set_option("async", False)
 
         if ctx.uses_concurrent_phases() and ctx.get_option("async"):
             ipc = IPCPipe()
@@ -253,7 +253,7 @@ class TaskManager:
             return 0
 
         if ctx.get_option("refresh-build-first"):
-            modules[0].set_option({"refresh-build": True})
+            modules[0].set_option("refresh-build", True)
 
         # IPC queue should have a message saying whether or not to bother with the
         # build.

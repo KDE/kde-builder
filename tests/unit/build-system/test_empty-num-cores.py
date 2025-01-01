@@ -55,11 +55,11 @@ def test_empty_numcores(mock_buildsystem):
 
     for item in test_matrix:
         test_string, result, test_name = item
-        module.set_option({test_option: test_string})
+        module.set_option(test_option, test_string)
         build_system.build_internal()
         assert BuildSystem.made_arguments == result, test_name
 
-        module.set_option({"num-cores": str(max_cores - 1)})
+        module.set_option("num-cores", str(max_cores - 1))
         build_system.build_internal()
         assert BuildSystem.made_arguments == ["-j", str(max_cores - 1), *result], f"{test_name} with num-cores set"
-        module.set_option({"num-cores": ""})
+        module.set_option("num-cores", "")

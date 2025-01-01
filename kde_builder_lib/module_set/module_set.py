@@ -173,7 +173,7 @@ class ModuleSet(OptionsBase):
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
             selected_repo = repo_set[options["repository"]]
-            new_module.set_option({"repository": selected_repo + module_item})
+            new_module.set_option("repository", selected_repo + module_item)
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")

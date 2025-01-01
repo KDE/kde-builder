@@ -456,7 +456,7 @@ class Application:
             update_needed = (not os.path.exists(module_source)) or (not os.listdir(module_source))
 
             if not update_desired and not update_needed:
-                ctx.set_option({"metadata-update-skipped": 1})
+                ctx.set_option("metadata-update-skipped", 1)
 
             if update_needed:
                 if Debug().pretending():
@@ -855,7 +855,7 @@ class Application:
             Application.moduleID = 0
 
         self._mark_module_source(module, file_name)
-        module.set_option({"#entry_num": Application.moduleID})
+        module.set_option("#entry_num", Application.moduleID)
         Application.moduleID += 1
 
         phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
@@ -863,7 +863,7 @@ class Application:
 
         for option, value in node_opts.items():
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
-                ctx.set_option({option: value})  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
+                ctx.set_option(option, value)  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
             elif option not in all_possible_options:
                 if option == "git-desired-protocol":  # todo This message is temporary. Remove it after 19.07.2024.
                     logger_app.error("y[Please edit your config. Replace \"r[git-desired-protocol]y[\" with \"g[git-push-protocol]y[\".")
@@ -882,7 +882,7 @@ class Application:
                 value = False
 
             try:
-                module.set_option({option: value})
+                module.set_option(option, value)
             except SetOptionError as err:
                 msg = f"{file_name}: " + err.message
                 explanation = err.option_usage_explanation()
@@ -904,7 +904,7 @@ class Application:
         sources = options_base.get_option(key) if options_base.has_option(key) else []
 
         sources.append(config_source)
-        options_base.set_option({key: sources})
+        options_base.set_option(key, sources)
 
     @staticmethod
     def _get_module_sources(options_base: ModuleSet) -> str:

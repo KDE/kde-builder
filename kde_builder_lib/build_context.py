@@ -719,7 +719,7 @@ class BuildContext(Module):
                 The b[global data file] is stored in the old location. It will still be
                 processed correctly, however, it's recommended to move it to the new location.
                 Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdg_state_home_short}/kdesrc-build-data]"""))
-                self.set_option({"#warned-legacy-data-location": True})
+                self.set_option("#warned-legacy-data-location", True)
         return file
 
     def load_persistent_options(self) -> None:

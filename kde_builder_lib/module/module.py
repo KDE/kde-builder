@@ -101,8 +101,8 @@ class Module(OptionsBase):
 
             # Record current values of what would be last source/build dir, if present,
             # before they are potentially reset during the module build.
-            self.set_option({"#last-source-dir": self.get_persistent_option("source-dir") or ""})
-            self.set_option({"#last-build-dir": self.get_persistent_option("build-dir") or ""})
+            self.set_option("#last-source-dir", self.get_persistent_option("source-dir") or "")
+            self.set_option("#last-build-dir", self.get_persistent_option("build-dir") or "")
 
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
@@ -926,7 +926,7 @@ class Module(OptionsBase):
         else:
             if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
                 logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
-                self.set_option({"#warned-invalid-directory-layout": True})
+                self.set_option("#warned-invalid-directory-layout", True)
             base_path = self.name
 
         # Note the default dest-dir option is "${MODULE}" so this normally is used
@@ -1079,7 +1079,7 @@ class Module(OptionsBase):
             logger_module.error(f"{self} already has error log set, tried to set to r[b[{logfile}]")
             return
 
-        self.set_option({"#error-log-file": f"{logdir}/{logfile}"})
+        self.set_option("#error-log-file", f"{logdir}/{logfile}")
         logger_module.debug(f"Logfile for {self} is {logfile}")
 
         # Setup symlink in the module log directory pointing to the appropriate

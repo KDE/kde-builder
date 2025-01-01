@@ -703,7 +703,7 @@ class Updater:
         # mark that we applied a stash so that $updateSub (_update_to_remote_head or
         # _update_to_detached_head) can know not to do dumb things
         if new_stash_count != old_stash_count:
-            module.set_option({"#git-was-stashed": True})
+            module.set_option("#git-was-stashed", True)
 
         # finally, update to remote head
         if commit_type == "branch":
