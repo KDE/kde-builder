@@ -266,7 +266,7 @@ class Cmdline:
         if args.query:
             arg = args.query[0]
 
-            valid_mode = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_-]*$")
+            valid_mode = re.compile(r"^[a-zA-Z0-9_#][a-zA-Z0-9_-]*$")
             if not valid_mode.match(arg):
                 raise ValueError(f"Invalid query mode {arg}")
 

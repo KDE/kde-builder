@@ -633,7 +633,10 @@ class Application:
                     return x.get_option(query_mode)
 
             for m in modules:
-                print(f"{m}: " + query(m))
+                res = query(m)
+                if not isinstance(res, str):
+                    res = str(res)
+                print(f"{m}: " + res)
 
             return 0
 
