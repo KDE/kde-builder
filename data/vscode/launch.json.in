@@ -28,6 +28,30 @@
             ]
         },
         {
+            // Debug an executable set as the build target in CMake.
+            "name": "Debug CMake Build Target",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "%{install_dir}/bin/${command:cmake.buildTargetName}",
+            "args": [],
+            "preLaunchTask": "KDE Builder pre-launch task",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+%{launch_env_entries}
+            ],
+            "envFile": "%{envFile}", // cannot be a script, see https://github.com/microsoft/vscode-cpptools/issues/9329 feature request.
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             // Debug a KCM.
             "name": "kcm",
             "type": "cppdbg",
