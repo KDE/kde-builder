@@ -717,7 +717,7 @@ class Module(OptionsBase):
         return return_value
 
     # @override
-    def set_option(self, options: dict) -> None:
+    def set_option(self, opt_name: str, opt_val) -> None:
         """
         Set a configuration option that can be checked later using :meth:`get_option()`.
 
@@ -727,50 +727,50 @@ class Module(OptionsBase):
         """
         # Ensure we don't accidentally get fed module-set options
         for mso in ["use-projects", "ignore-projects"]:
-            if mso in options:
+            if opt_name == mso:
                 logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
                 raise SetOptionError(mso, f"Option {mso} can only be used in module-set")
 
         # Special case handling.
-        if "filter-out-phases" in options:
-            for phase in options["filter-out-phases"].split(" "):
+        if opt_name == "filter-out-phases":
+            for phase in opt_val.split(" "):
                 self.phases.filter_out_phase(phase)
-            del options["filter-out-phases"]
+            return
 
         # Phases changes handling
         #
         # The context phases were handled by cmdline. The module-sets will eventually be expanded to modules. For module, we will handle its phases.
-        if "no-src" in options:
+        if opt_name == "no-src":
             self.phases.filter_out_phase("update")
-            del options["no-src"]
-        if "no-install" in options:
+            return
+        if opt_name == "no-install":
             self.phases.filter_out_phase("install")
-            del options["no-install"]
-        if "no-build" in options:
+            return
+        if opt_name == "no-build":
             self.phases.filter_out_phase("build")
-            del options["no-build"]
-        if "uninstall" in options:
+            return
+        if opt_name == "uninstall":
             # Not useful yet. Currently only may be useful to disable uninstallation when uninstalling with cmdline ("uninstall" run_mode)
             if self.phases.has("uninstall"):
                 self.phases.reset_to(["uninstall"])
             else:
                 self.phases.clear()
-            del options["uninstall"]
-        if "build-only" in options:
+            return
+        if opt_name == "build-only":
             if self.phases.has("build"):
                 self.phases.reset_to(["build"])
             else:
                 self.phases.clear()
-            del options["build-only"]
-        if "install-only" in options:
+            return
+        if opt_name == "install-only":
             # Not useful yet, because install is invoked by run_mode or in the end of building function. See a todo with text "Likewise this should be a phase to run."
             if self.phases.has("install"):
                 self.phases.reset_to(["install"])
             else:
                 self.phases.clear()
-            del options["install-only"]
+            return
 
-        OptionsBase.set_option(self, options)
+        OptionsBase.set_option(self,  opt_name, opt_val)
 
     # @override(check_signature=False)
     def get_option(self, key: str, level_limit="allow-inherit") -> str | bool | dict | None:

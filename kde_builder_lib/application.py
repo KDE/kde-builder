@@ -240,7 +240,8 @@ class Application:
         #   if len(ctx.phases.phaselist) == 1:
         #     cmdline_global_options["async"] = 0
 
-        ctx.set_option(cmdline_global_options)
+        for opt_name, opt_val in cmdline_global_options.items():
+            ctx.set_option(opt_name, opt_val)
 
         # We download repo-metadata before reading config, because config already includes the module-definitions from it.
         self._download_kde_project_metadata()  # Uses test data automatically

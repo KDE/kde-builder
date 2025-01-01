@@ -141,7 +141,8 @@ class ModuleResolver:
                     if key in opts:
                         del opts[key]
 
-            m.set_option(opts)
+            for opt_name, opt_val in opts.items():
+                m.set_option(opt_name, opt_val)
 
             # Most of the time cmdline options will be empty
             if self.cmdline_options:
@@ -158,7 +159,8 @@ class ModuleResolver:
                         del m.options[key]
 
                 # Reapply module-specific cmdline options
-                m.set_option(module_cmdline_args)
+                for opt_name, opt_val in module_cmdline_args.items():
+                    m.set_option(opt_name, opt_val)
         return
 
     @staticmethod

@@ -35,7 +35,8 @@ class Cmdline:
         # may exit! for things like --help, --version
         opts = Cmdline.read_command_line_options_and_selectors()
 
-        ctx.set_option(**opts["opts"]["global"])
+        for opt_name, opt_val in **opts["opts"]["global"].items():
+            ctx.set_option(opt_name, opt_val)
 
         module_list = lookForModSelectors(*opts["selectors"])
 
@@ -46,7 +47,8 @@ class Cmdline:
         # ... let's build
         for module in module_list:
         # override module options from rc-file
-        module.set_option(**opts["opts"][module.name])
+        for opt_name, opt_val in **opts["opts"][module.name].items():
+            module.set_option(opt_name, opt_val)
 
     At the command line, the user can specify things like:
         * Modules or module-sets to build (by name)

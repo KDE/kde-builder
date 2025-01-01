@@ -62,7 +62,7 @@ class OptionsBase:
             return self.options[key]
         return ""
 
-    def set_option(self, options: dict) -> None:
+    def set_option(self, opt_name: str, opt_val) -> None:
         """
         Set the given option(s) to the given values.
 
@@ -75,20 +75,20 @@ class OptionsBase:
         set of options (if any are left to set).
         """
         # Special case handling.
-        if "set-env" in options.keys():
-            self._process_set_env_option(options["set-env"])
-            del options["set-env"]
+        if opt_name == "set-env":
+            self._process_set_env_option(opt_val)
+            return
 
         # Special-case handling
         repo_option = "git-repository-base"
-        if repo_option in options:
-            value = options[repo_option]
+        if opt_name == repo_option:
+            value = opt_val
 
             if isinstance(value, dict):
                 # The case when we merge the constructed OptionBase module (from the config) into the BuildContext. The type of value is a dict.
                 for key in value.keys():
                     self.options[repo_option][key] = value[key]
-                del options[repo_option]
+                return
             else:
                 match = re.match(r"^([a-zA-Z0-9_-]+)\s+(.+)$", value)
                 repo, url = None, None
@@ -106,9 +106,8 @@ class OptionsBase:
                 return
 
         # Everything else can be dumped straight into our dict.
-        for option in options:
-            self.verify_option_value_type(option, options[option])
-            self.options[option] = options[option]
+        self.verify_option_value_type(opt_name, opt_val)
+        self.options[opt_name] = opt_val
 
     def delete_option(self, key: str) -> None:
         """
@@ -127,7 +126,8 @@ class OptionsBase:
         """
         Util.assert_isa(other, OptionsBase)
         new_opts = copy.deepcopy(other.options)
-        self.set_option(new_opts)
+        for opt_name, opt_val in new_opts.items():
+            self.set_option(opt_name, opt_val)
 
     def _process_set_env_option(self, value) -> None:
         """
