@@ -342,20 +342,16 @@ class BuildSystemKDECMake(BuildSystem):
         options_name = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
         return options_name
 
-    def _safe_run_cmake(self) -> int:
+    def get_final_cmake_options(self) -> list[str]:
         """
-        Run CMake to create the build directory for a module.
+        Return the cmake options that will finally be used when running cmake.
 
-        CMake is not actually run if pretend mode is enabled.
-
-        Returns:
-            The shell return value as returned by log_command(). i.e.
-            0 for success, non-zero for failure.
+        "Final" means that it will contain all extra options that kde-builder inserts automatically, in addition to those options that are
+        read from user's config.
         """
         module = self.module
-        generator = self.get_cmake_generator()
         toolchain = self.get_cmake_toolchain()
-        srcdir = module.fullpath("source")
+
         commands = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
 
         # grep out empty fields
@@ -406,6 +402,23 @@ class BuildSystemKDECMake(BuildSystem):
             else:
                 logger_buildsystem.debug("\tOverriding BUILD_TESTING variable with ON value.")
                 commands[found_build_testing_index] = "-DBUILD_TESTING:BOOL=ON"
+
+        return commands
+
+    def _safe_run_cmake(self) -> int:
+        """
+        Run CMake to create the build directory for a module.
+
+        CMake is not actually run if pretend mode is enabled.
+
+        Returns:
+            The shell return value as returned by log_command(). i.e.
+            0 for success, non-zero for failure.
+        """
+        module = self.module
+        generator = self.get_cmake_generator()
+        srcdir = module.fullpath("source")
+        commands = self.get_final_cmake_options()
 
         commands = ["cmake", "-B", ".", "-S", srcdir, "-G", generator] + commands  # Add to beginning of list.
 

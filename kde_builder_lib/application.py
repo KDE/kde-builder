@@ -628,6 +628,13 @@ class Application:
             elif query_mode == "build-system":
                 def query(x):
                     return x.build_system().name()
+            elif query_mode == "cmake-options":
+                def query(x):
+                    if x.build_system().name() == "KDE CMake":
+                        out_res = x.build_system().get_final_cmake_options()
+                        return " ".join(out_res)
+                    else:
+                        return "<not a cmake build system>"
             else:  # Default to .get_option() as query method.
                 def query(x):
                     return x.get_option(query_mode)
