@@ -153,9 +153,6 @@ class ModuleSet(OptionsBase):
         module_list = []  # module names converted to `Module` objects.
         options = self.options
 
-        # Note: This returns a dict, not a string.
-        repo_set = ctx.get_option("git-repository-base")
-
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no "search" or "ignore" to
@@ -168,11 +165,6 @@ class ModuleSet(OptionsBase):
             self._initialize_new_module(new_module)
 
             module_list.append(new_module)
-
-            # Set up the only feature actually specific to a module-set, which is
-            # the repository handling.
-            selected_repo = repo_set[options["repository"]]
-            new_module.set_option("repository", selected_repo + module_name)
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")

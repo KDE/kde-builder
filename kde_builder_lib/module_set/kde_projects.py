@@ -134,7 +134,6 @@ class ModuleSetKDEProjects(ModuleSet):
             self._initialize_new_module(new_module)
 
             # Copy metadata from KDE project YAML file
-            new_module.set_option("repository", result["repo"])
             new_module.set_option("#kde-project-path", result["full_name"])
             new_module.set_option("#kde-repo-path", result.get("invent_name", None))
             new_module.set_option("#found-by", result["found_by"])

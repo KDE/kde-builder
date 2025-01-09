@@ -770,6 +770,15 @@ class Module(OptionsBase):
                 self.phases.clear()
             return
 
+        if opt_name == "repository":
+            if opt_val == "kde-projects":
+                pr_db = self.ctx.get_project_data_reader().repositories
+                if self.name in pr_db:
+                    opt_val = pr_db[self.name]["repo"]
+            elif opt_val in (repo_bases := self.ctx.get_option("git-repository-base")):
+                selected_repo = repo_bases[opt_val]
+                opt_val = selected_repo + self.name
+
         OptionsBase.set_option(self,  opt_name, opt_val)
 
     # @override(check_signature=False)
