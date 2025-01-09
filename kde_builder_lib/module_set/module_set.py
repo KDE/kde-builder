@@ -160,8 +160,7 @@ class ModuleSet(OptionsBase):
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no "search" or "ignore" to
         # handle, just create `Module` and dump options into them.
-        for module_item in self.modules_to_find():
-            module_name = module_item
+        for module_name in self.modules_to_find():
             module_name = re.sub(r"\.git$", "", module_name)
 
             new_module = Module(ctx, module_name)
@@ -173,7 +172,7 @@ class ModuleSet(OptionsBase):
             # Set up the only feature actually specific to a module-set, which is
             # the repository handling.
             selected_repo = repo_set[options["repository"]]
-            new_module.set_option("repository", selected_repo + module_item)
+            new_module.set_option("repository", selected_repo + module_name)
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
