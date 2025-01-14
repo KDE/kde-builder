@@ -163,12 +163,11 @@ Related command-line option: [--nice](#cmdline-nice)
 (conf-num-cores)=
 [`num-cores`](conf-num-cores)
 
-Type: Integer, Default value: Depends on system
+Type: Integer, Valid values: `1` - `<maximum on your system>`, `auto` Default value: auto
 
-This option is defined by kde-builder (when using
-`kde-builder --generate-config`), set to be the number of
-available CPUs. If kde-builder cannot detect the number of CPUs, this
-value is set to 4.
+This option defines a number of CPU cores that will be used when compiling projects. If set to "auto", and kde-builder cannot detect the number of CPUs,
+and build system does not support detecting number of cores to use automatically, this value will be set to maximum number of available cores,
+multiplied by 0.8.
 
 See [](#make-options-example) for an example of this
 option's usage.
@@ -178,22 +177,20 @@ Related command-line option: --num-cores \<value\>
 (conf-num-cores-low-mem)=
 [`num-cores-low-mem`](conf-num-cores-low-mem)
 
-Type: Integer, Default value: Depends on system
+Type: Integer, Valid values: `1` - `<maximum on your system>`, `auto`, Default value: auto
 
-This option is defined by kde-builder (when using
-`kde-builder --generate-config`), set to be the number of
-CPUs that is deemed safe for heavyweight or other highly-intensive
-projects, such as `qtwebengine`, to avoid running out of
-memory during the build.
+This option defines a number of CPUs that is deemed safe for heavyweight or other highly-intensive
+projects, such as `qtwebengine`, to avoid running out of memory during the build.
 
 The typical calculation is one CPU core for every 2 gigabytes (GiB)
-of total memory. At least 1 core will be specified, and no more than
-`num-cores` cores will be specified.
+of total memory. If set to "auto", at least 1 core will be specified, and no more than
+number of actually available cores will be specified.
 
-Although this option is intended to support Qt projects (modules), you can use
+Although this option is intended to support Qt projects (modules) (it is used in build configs in
+[repo-metadata](https://invent.kde.org/sysadmin/repo-metadata)), you can use
 it for any of project in the same way that `num-cores` is used.
 
-If kde-builder cannot detect available memory then this value will be set to 2.
+If kde-builder cannot detect available memory then this value will be set to 4.
 
 Related command-line option: --num-cores-low-mem \<value\>
 
