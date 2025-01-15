@@ -184,35 +184,8 @@ class FirstRun:
                 logger_fr.warning(" y[*] Some packages were not found in repositories and were removed from installation list:\n\t" + "\n\t".join(not_found_in_repo_packages))
             logger_fr.info(" b[*] b[g[Packages were successfully installed!]")
 
-    def suggested_num_cores_for_low_memory(self) -> int:
-        """
-        Return the suggested number of cores to use for make jobs for build jobs where memory is a bottleneck, such as qtwebengine.
-
-            num_cores = FirstRun.suggested_num_cores_for_low_memory()
-        """
-        # Try to detect the amount of total memory for a corresponding option for
-        # heavyweight modules
-        mem_total = None
-        try:
-            mem_total = self.oss.detect_total_memory()
-        except KBException as e:
-            logger_fr.warning(str(e))
-
-        if not mem_total:
-            # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
-            mem_total = 4 * 1024 * 1024
-            logger_fr.warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
-
-        rounded_mem = int(mem_total / 1024000.0)
-        return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
-
-    def _get_num_cores_for_low_memory(self, num_cores: int) -> int:
-        """
-        Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available.
-        """
-        return min(self.suggested_num_cores_for_low_memory(), num_cores)
-
-    def _setup_base_configuration(self) -> None:
+    @staticmethod
+    def _setup_base_configuration() -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
         xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
@@ -236,14 +209,8 @@ class FirstRun:
         with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kde-builder.yaml.in", "r") as data_file:
             sample_rc = data_file.read()
 
-        num_cores = os.cpu_count()
-        if not num_cores:
-            num_cores = 4
-
-        num_cores_low = self._get_num_cores_for_low_memory(num_cores)
-
-        sample_rc = sample_rc.replace("%{num_cores}", "\"" + str(num_cores) + "\"")
-        sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + str(num_cores_low) + "\"")
+        sample_rc = sample_rc.replace("%{num_cores}", "\"" + "auto" + "\"")
+        sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + "auto" + "\"")
 
         gl = BuildContext().build_options["global"]  # real global defaults
 

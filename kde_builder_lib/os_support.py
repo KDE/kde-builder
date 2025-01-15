@@ -10,7 +10,10 @@ import re
 import subprocess
 import sys
 
+from .debug import KBLogger
 from .kb_exception import KBRuntimeError
+
+logger_app = KBLogger.getLogger("application")
 
 
 class OSSupport:
@@ -89,31 +92,6 @@ class OSSupport:
                 return True
         return False
 
-    def detect_total_memory(self) -> int:
-        """
-        Return the amount of installed memory, in kilobytes. Linux and FreeBSD are supported.
-
-        Throws a runtime exception if unable to autodetect memory capacity.
-            mem_total_KiB = os.detect_total_memory()
-        """
-        mem_total = None
-        if sys.platform == "freebsd" or sys.platform == "openbsd":
-            mem_total = subprocess.check_output(["sysctl", "-n", "hw.physmem"]).decode().strip()
-            # FreeBSD, OpenBSD reports memory in Bytes, not KiB. Convert to KiB so logic below still works
-            mem_total = int(float(mem_total) / 1024)
-        elif sys.platform == "linux" or os.path.exists("/proc/meminfo"):
-            # linux or potentially linux-compatible
-            p = subprocess.run("cat /proc/meminfo", shell=True, capture_output=True)
-            total_mem_line = next(line for line in p.stdout.decode().split("\n") if "MemTotal" in line)
-
-            if total_mem_line and p.returncode == 0:
-                mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
-                mem_total = int(mem_total)
-        else:
-            raise KBRuntimeError(f"Unable to detect total memory. OS: {sys.platform}, detected vendor: {self.vendor_id()}")
-
-        return mem_total
-
     def best_distro_match(self, distros: list[str]) -> str:
         """
         Use the ID (and if needed, ID_LIKE) parameter in /etc/os-release to find the best possible match amongst the provided distro IDs.
@@ -167,6 +145,69 @@ class OSSupport:
             value = backslash_decode(value.removeprefix("\"").removesuffix("\""))  # possibly also quoted in single quotes
             result[key] = value
         return result
+
+
+class CoresAndMemorySupport:
+    """
+    Provides support code for detecting available CPU cores/memory.
+    """
+
+    @staticmethod
+    def _detect_total_memory() -> int:
+        """
+        Return the amount of installed memory, in kilobytes. Linux and FreeBSD are supported.
+
+        Throws a runtime exception if unable to autodetect memory capacity.
+            mem_total_KiB = c_and_m_sup.detect_total_memory()
+        """
+        mem_total = None
+        if sys.platform == "freebsd" or sys.platform == "openbsd":
+            mem_total = subprocess.check_output(["sysctl", "-n", "hw.physmem"]).decode().strip()
+            # FreeBSD, OpenBSD reports memory in Bytes, not KiB. Convert to KiB so logic below still works
+            mem_total = int(float(mem_total) / 1024)
+        elif sys.platform == "linux" or os.path.exists("/proc/meminfo"):
+            # linux or potentially linux-compatible
+            p = subprocess.run("cat /proc/meminfo", shell=True, capture_output=True)
+            total_mem_line = next(line for line in p.stdout.decode().split("\n") if "MemTotal" in line)
+
+            if total_mem_line and p.returncode == 0:
+                mem_total = re.search(r"^MemTotal:\s*([0-9]+)", total_mem_line).group(1)  # Value in KiB
+                mem_total = int(mem_total)
+        else:
+            raise KBRuntimeError(f"Unable to detect total memory. OS: {sys.platform}")
+
+        return mem_total
+
+    @staticmethod
+    def _suggested_num_cores_for_low_memory() -> int:
+        """
+        Return the suggested number of cores to use for make jobs for build jobs where memory is a bottleneck, such as qtwebengine.
+
+            num_cores = FirstRun.suggested_num_cores_for_low_memory()
+        """
+        # Try to detect the amount of total memory for a corresponding option for
+        # heavyweight modules
+        mem_total = None
+        try:
+            mem_total = CoresAndMemorySupport._detect_total_memory()
+        except KBRuntimeError as e:
+            logger_app.warning(str(e))
+
+        if not mem_total:
+            # 4 GiB is assumed if no info on memory is available, as this will calculate to 2 cores.
+            mem_total = 4 * 1024 * 1024
+            logger_app.warning(f"y[*] Will assume the total memory amount is {mem_total} bytes.")
+
+        rounded_mem = int(mem_total / 1024000.0)
+        return max(1, int(rounded_mem / 2))  # Assume 2 GiB per core
+
+    @staticmethod
+    def get_num_cores_for_low_memory() -> int:
+        """
+        Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available.
+        """
+        num_cores = os.cpu_count() or 4
+        return min(CoresAndMemorySupport._suggested_num_cores_for_low_memory(), num_cores)
 
 
 def backslash_decode(src):
