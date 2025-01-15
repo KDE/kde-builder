@@ -341,10 +341,6 @@ class BuildSystem:
             return 0
         return 1
 
-    @staticmethod
-    def needs_builddir_hack() -> bool:
-        return False  # By default all build systems are assumed to be sane
-
     def create_build_system(self) -> int:
         """
         Create the build directory for the associated module, and handle pre-configure setup.
@@ -356,17 +352,10 @@ class BuildSystem:
         """
         module = self.module
         builddir = module.fullpath("build")
-        srcdir = module.fullpath("source")
 
         if not os.path.exists(f"{builddir}") and not Util.super_mkdir(f"{builddir}"):
             logger_buildsystem.error(f"\tUnable to create build directory for r[{module}]!!")
             return 0
-
-        if builddir != srcdir and self.needs_builddir_hack():
-            result = Util.safe_lndir(srcdir, builddir)
-            if not result:
-                logger_buildsystem.error(f"\tUnable to setup symlinked build directory for r[{module}]!!")
-            return result
 
         return 1
 

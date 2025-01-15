@@ -32,20 +32,6 @@ class BuildSystemQMake6(BuildSystem):
     def required_programs() -> list[str]:
         return ["qmake"]
 
-    # @override(check_signature=False)
-    def needs_builddir_hack(self) -> bool:
-        """
-        Indicate if build dir hack is needed.
-
-        I've never had problems with modern QMake-using modules being built in a
-        specific build directory, until I tried using QMake to build Qt5 modules
-        (past qtbase). Many seem fail with builddir != srcdir
-        """
-        module = self.module
-
-        # Assume code.qt.io modules all need hack for now
-        return bool(re.search(r"qt\.io", module.get_option("repository")))
-
     @classmethod
     def abs_path_to_qmake(cls) -> str:
         """
@@ -62,7 +48,7 @@ class BuildSystemQMake6(BuildSystem):
     def configure_internal(self) -> bool:
         module = self.module
         builddir = module.fullpath("build")
-        sourcedir = builddir if self.needs_builddir_hack() else module.fullpath("source")
+        sourcedir = module.fullpath("source")
 
         qmake_opts = module.get_option("qmake-options").split(" ")
         qmake_opts = [el for el in qmake_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
