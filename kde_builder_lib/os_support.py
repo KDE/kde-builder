@@ -64,12 +64,11 @@ class OSSupport:
 
     def vendor_version(self) -> str:
         """
-            vendor = os.vendor_version  # "xenial", "17", etc.
-
         Returns the vendor Version from the `os-release` specification.
-        The first available value from `VERSION_ID` and then
-        `VERSION_CODENAME` is used, and "unknown" is returned if neither
-        are set.
+
+        The first available value from `VERSION_ID` and then `VERSION_CODENAME` is used, and "unknown" is returned if neither are set.
+
+            vendor = os.vendor_version()  # "xenial", "17", etc.
         """
         if self.VERSION_ID:
             return self.VERSION_ID

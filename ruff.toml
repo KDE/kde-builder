@@ -26,7 +26,6 @@ ignore = ["D100", "D102", "D103", "D105", "D107", "D200", "D203", "D212", "D406"
 # D413 https://docs.astral.sh/ruff/rules/blank-line-after-last-section/. Just to be explicit. Already disabled by following google pydocstyle convention.
 
 # Enable rules on top of google pydocstyle convention.
-extend-select = ["D204", "D401", "D404"]
+extend-select = ["D204", "D404"]
 # D204 https://docs.astral.sh/ruff/rules/one-blank-line-after-class/. Follow pep257 convention: add blank line after _class_ docstring.
-# D401 https://docs.astral.sh/ruff/rules/non-imperative-mood/. Follow pep257 convention: write the first line in the imperative mood.
 # D404 https://docs.astral.sh/ruff/rules/docstring-starts-with-this/. Follow pep257 convention: do not start docstring with "this" word.
