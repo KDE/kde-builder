@@ -1318,16 +1318,16 @@ class Application:
         for module in fail_list:
             logfile = module.get_option("#error-log-file")
 
-            if re.match(r"/cmake\.log$", logfile) or re.match(r"/meson-setup\.log$", logfile):
+            if re.search(r"/cmake\.log$", logfile) or re.search(r"/meson-setup\.log$", logfile):
                 module_names.append(module.name)
 
         if len(module_names) > 0:
-            names = ", ".join(fail_list)
+            names = ", ".join(module_names)
             logger_app.warning(textwrap.dedent(f"""
             Possible solution: Install the build dependencies for the modules:
             {names}
             You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
-            See https://community.kde.org/Get_Involved/development/Install_the_dependencies"""))
+            See https://develop.kde.org/docs/getting-started/building/help-dependencies"""))
 
     @staticmethod
     def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list[Module]) -> None:
