@@ -85,7 +85,7 @@ class BuildContext(Module):
     rcfiles = ["./kde-builder.yaml",
                f"{xdg_config_home}/kde-builder.yaml"]
     LOCKFILE_NAME = ".kdesrc-lock"
-    PERSISTENT_FILE_NAME = "kdesrc-build-data"
+    PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
     SCRIPT_VERSION = Version.script_version()
 
     def __init__(self):
@@ -676,6 +676,26 @@ class BuildContext(Module):
 
     # Persistent option handling
 
+    # TODO Temporary here. Remove after 28.04.2025.
+    @staticmethod
+    def rename_legacy_state_file(modern_state_file_path: str):
+        """
+        Rename old ".kdesrc-build-data" or "kdesrc-build-data" file to "kde-builder-persistent-data.json" file.
+
+        Args:
+            modern_state_file_path: The path of "modern" (named as kde-builder-persistent-data.yaml) file.
+        """
+        legacy_hidden_state_file = os.path.dirname(modern_state_file_path) + "/." + "kdesrc-build-data"
+        legacy_visible_state_file = os.path.dirname(modern_state_file_path) + "/" + "kdesrc-build-data"
+
+        if not os.path.isfile(modern_state_file_path):
+            if os.path.isfile(legacy_hidden_state_file):
+                logger_buildcontext.warning(f" y[*] Renaming legacy state file {legacy_hidden_state_file} to {modern_state_file_path}")
+                os.rename(legacy_hidden_state_file, modern_state_file_path)
+            elif os.path.isfile(legacy_visible_state_file):
+                logger_buildcontext.warning(f" y[*] Renaming legacy state file {legacy_visible_state_file} to {modern_state_file_path}")
+                os.rename(legacy_visible_state_file, modern_state_file_path)
+
     def persistent_option_file_name(self) -> str:
         """
         Return the name of the file to use for persistent data.
@@ -691,7 +711,8 @@ class BuildContext(Module):
                 file = BuildContext.xdg_state_home + "/" + BuildContext.PERSISTENT_FILE_NAME
             else:
                 # Local config is used. Store the data file in the same directory.
-                file = config_dir + "/." + BuildContext.PERSISTENT_FILE_NAME
+                file = config_dir + "/" + BuildContext.PERSISTENT_FILE_NAME
+            self.rename_legacy_state_file(file)
 
             rc_files = self.rc_files
             if len(rc_files) == 1:
@@ -707,24 +728,11 @@ class BuildContext(Module):
                 else:
                     rc_file_name = os.path.basename(rc_file_path)
                     file = f"{file}-{rc_file_name}"
-
-            # Fallback to legacy data file if it exists and the new one doesn't.
-            legacy_data_file = os.getenv("HOME") + "/.kdesrc-build-data"
-
-            if not os.path.exists(file) and os.path.exists(legacy_data_file):
-                file = legacy_data_file
-
-            if file == legacy_data_file and not self.get_option("#warned-legacy-data-location"):
-                logger_buildcontext.warning(textwrap.dedent(f"""\
-                The b[global data file] is stored in the old location. It will still be
-                processed correctly, however, it's recommended to move it to the new location.
-                Please move b[~/.kdesrc-build-data] to b[{BuildContext.xdg_state_home_short}/kdesrc-build-data]"""))
-                self.set_option("#warned-legacy-data-location", True)
         return file
 
     def load_persistent_options(self) -> None:
         """
-        Read in all persistent options from the file where they are kept (kdesrc-build-data) for use in the program.
+        Read in all persistent options from the file where they are kept (kde-builder-persistent-data.json) for use in the program.
 
         The directory used is the same directory that contains the rc file in use.
         """
@@ -761,7 +769,7 @@ class BuildContext(Module):
 
     def store_persistent_options(self) -> None:
         """
-        Write out persistent options to the kdesrc-build-data file.
+        Write out persistent options to the kde-builder-persistent-data.json file.
 
         The directory used is the same directory that contains the rc file in use.
         """

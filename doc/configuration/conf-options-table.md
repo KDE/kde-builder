@@ -202,8 +202,8 @@ Type: String
 Use this option to change where kde-builder stores its persistent data.
 
 By default, the location for this data is determined as follows: in case the used config file was from the current working directory, then file for this data 
-will be called `.kdesrc-build-data`, placed in the same directory as the configuration file; in case the config from
-`~/.config/kde-builder.yaml` was used, then file for this data will be `~/.local/state/kdesrc-build-data`.
+will be called `kde-builder-persistent-data.json`, placed in the same directory as the configuration file; in case the config from
+`~/.config/kde-builder.yaml` was used, then file for this data will be `~/.local/state/kde-builder-persistent-data.json`.
 
 If you have multiple available configurations in the same directory, you may want to manually set this
 option, so that different configurations do not end up with conflicting
