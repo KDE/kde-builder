@@ -130,8 +130,8 @@ chosen for each.
 - Ensures that the repository metadata is available (containing
 dependency information and the virtual project path hierarchy)
 - If project selectors are available from the cmdline, creates the build list by
-expanding those selectors into the appropriate projects from the rc-file. If no
-selectors, uses all groups and projects from the rc-file.
+expanding those selectors into the appropriate projects from the rc-file. If
+`--all-config-projects` was specified, uses all groups and projects from the rc-file.
   * Either mode can involve resolving dependencies for KDE-based projects.
 - Forks additional children to serve as a way to perform updates and build in
 separate processes so that they may proceed concurrently. Once ready, performs
