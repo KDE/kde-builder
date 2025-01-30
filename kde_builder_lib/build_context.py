@@ -271,7 +271,7 @@ class BuildContext(Module):
                 logger_buildcontext.warning(" b[y[*] Unable to lower I/O priority, continuing...")
 
         # Get ready for logged output.
-        Debug().set_log_file(self.get_log_dir_for(self) + "/build-log")
+        Debug().set_log_file(self.get_log_dir_for(self) + "/screen.log")
 
     def take_lock(self) -> bool:
         """

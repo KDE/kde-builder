@@ -23,13 +23,9 @@ number. For instance, the second time that kde-builder is run on
 31 July 2024, it would create a directory named `2024-07-31_02`, where the
 2024-07-31 is for the date, and the 02 is the run number.
 
-For your convenience, kde-builder will also create a link to the logs
-for your latest run, called `latest`. So the logs for the most recent
-kde-builder run should always be under `${log-dir}/latest`.
-
-Now, each directory for a kde-builder run will itself contain a set of
+Now, each such directory will itself contain a set of
 directories, one for every KDE project that kde-builder tries to build.
-Also, a file called `build-status` will be contained in the directory,
+Also, a file called `status-list.log` will be contained in the directory,
 which will allow you to determine which projects built and which failed.
 
 ```{note}
@@ -51,6 +47,10 @@ If an error occurred, you should be able to see an explanation of why in
 one of the files. To help you determine which file contains the error,
 kde-builder will create a link from the file containing the error (such
 as `build-1.log` to a file called `error.log`).
+
+For your convenience, kde-builder will also create a link to the logs
+for your latest run, called `latest`. So the logs for the most recent
+kde-builder run should always be under `${log-dir}/latest`.
 
 The upshot to all of this is that to see why a project failed to build
 after your last kde-builder invocation, the file you should look at first is

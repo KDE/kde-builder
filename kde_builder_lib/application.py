@@ -651,6 +651,7 @@ class Application:
 
         # If power-profiles-daemon is in use, request switching to performance mode.
         self._hold_performance_power_profile_if_possible()
+        self._cleanup_latest_log_dir(ctx)
 
         if run_mode == "build":
             # build and (by default) install.  This will involve two simultaneous
@@ -671,7 +672,7 @@ class Application:
             result = Application._handle_uninstall(ctx)
 
         if ctx.get_option("purge-old-logs"):
-            self._cleanup_log_directory(ctx)
+            self._delete_unreferenced_log_directories(ctx)
 
         work_load = self.work_load
         dependency_graph = work_load["dependency_info"]["graph"]
@@ -1262,7 +1263,7 @@ class Application:
         # would throw errors if the name did not exist). But, the resolver
         # handles that fine as well.
 
-    def _cleanup_log_directory(self, ctx: BuildContext) -> None:
+    def _delete_unreferenced_log_directories(self, ctx: BuildContext) -> None:
         """
         Remove log directories from previous kde-builder runs.
 
@@ -1288,6 +1289,44 @@ class Application:
         for dir_id in found_dirs:
             if dir_id not in keep_dirs:
                 Util.safe_rmtree(logdir + "/" + dir_id)
+
+    @staticmethod
+    def _cleanup_latest_log_dir(ctx) -> None:
+        """
+        Delete all symlinks to specific (YYYY-MM-DD_XX) log directories in latest log directory.
+
+        You may be interested why we do not just make the "latest" as a symlink to YYYY-MM-DD_XX dir
+        or why we just do not remove the "latest" dir entirely to clean it up.
+        One reason is because user may override `log-dir` for individual project (so there would be several log dirs
+        locations, but we must present all logs in that single "latest" dir).
+        Another reason is because we want to support a situation when user has an "IDE project" in this "latest" dir.
+        For example when they want to conveniently filter for specific errors in all log files from last run.
+        In other words, we allow user to store directories like ".idea" or ".vscode" in "latest", and
+        such files/folders will not be removed.
+        """
+        if Debug().pretending():
+            return
+
+        Util.assert_isa(ctx, BuildContext)
+        logdir = ctx.get_subdir_path("log-dir")
+        logdir_latest = f"{logdir}/latest"
+
+        if not os.path.exists(logdir_latest):
+            return
+
+        dir_els = os.listdir(logdir_latest)
+        for el in dir_els:
+            if os.path.islink(logdir_latest + "/" + el):
+                readlink = os.readlink(logdir_latest + "/" + el)
+                # check if it is a symlink to some actual YYYY-MM-DD_XX log dir, not a random one user's symlink
+                if re.search(logdir + "/" + r"(\d{4}-\d{2}-\d{2}[-_]\d+)" + "/" + el, readlink):
+                    os.unlink(logdir_latest + "/" + el)
+
+        if os.path.islink(logdir_latest + "/" + "status-list.log"):
+            os.unlink(logdir_latest + "/" + "status-list.log")
+
+        if os.path.islink(logdir_latest + "/" + "screen.log"):
+            os.unlink(logdir_latest + "/" + "screen.log")
 
     @staticmethod
     def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:

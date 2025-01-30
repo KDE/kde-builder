@@ -355,7 +355,7 @@ performed if applicable, but this will change in a future release).
 (cmdline-install-only)=
 [`--install-only`](cmdline-install-only)  
 If this is the only command-line option, it tries to install all the
-projects contained in `log/latest/build-status`. If command-line options
+projects contained in `log/latest/status-list.log`. If command-line options
 are specified after this option, they are all assumed to be projects to
 install (even if they did not successfully build on the last run).
 

@@ -259,11 +259,12 @@ class TaskManager:
         # build.
         ipc.wait_for_stream_start()
         ctx.unset_persistent_option("global", "resume-list")
+        ctx_logdir = ctx.get_log_dir()
 
         if Debug().pretending():
             outfile = "/dev/null"
         else:
-            outfile = ctx.get_log_dir() + "/build-status"
+            outfile = ctx_logdir + "/status-list.log"
 
         try:
             status_fh = open(outfile, "w")
@@ -337,7 +338,7 @@ class TaskManager:
 
             # Update the symlink in latest to point to this file.
             logdir = ctx.get_subdir_path("log-dir")
-            status_file_loc = f"{logdir}/latest/build-status"
+            status_file_loc = f"{logdir}/latest/status-list.log"
             if os.path.islink(status_file_loc):
                 Util.safe_unlink(status_file_loc)
 
@@ -348,8 +349,19 @@ class TaskManager:
                     # pl2py: In perl they just ignore the case when the symlink was not successfully created.
                     # This case may happen when you do not have a source directory (the log directory that will contain a symlink),
                     # and do pretending. In pretending, the real log file is /dev/null.
-                    # So os.symlink will try to symlink "/home/username/kde/src/log/latest/build-status" to "/dev/null" when "/home/username/kde" dir does not exist.
+                    # So os.symlink will try to symlink "/home/username/kde/src/log/latest/status-list.log" to "/dev/null" when "/home/username/kde" dir does not exist.
                     # We also will ignore that.
+                    pass
+
+            screenlog_file_loc = f"{logdir}/latest/screen.log"
+            if os.path.islink(screenlog_file_loc):
+                Util.safe_unlink(screenlog_file_loc)
+
+            if not os.path.exists(screenlog_file_loc):
+                try:
+                    realfile = ctx_logdir + "/screen.log"
+                    os.symlink(realfile, screenlog_file_loc)
+                except FileNotFoundError:
                     pass
 
         if len(build_done) > 0:

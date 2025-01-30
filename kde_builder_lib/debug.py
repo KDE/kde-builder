@@ -138,7 +138,9 @@ class KBLogger(logging.Logger):
     @staticmethod
     def print_clr(logger_name: str, message_level: str, msg: str) -> None:
         """
-        Subroutine used to actually display the data, calls :meth:`Debug.colorize` on each entry first.
+        Actually display the data.
+
+        Calls :meth:`Debug.colorize` on each entry first.
         """
         d = Debug()
         # If we have an IPC object that means there's multiple procs trying to
