@@ -353,6 +353,10 @@ class Util:
             except OSError as e:
                 raise ProgramError(f"syscall failed waiting on log_command to finish: {e}")
 
+            # Append the line with exit code to the log file that child process created
+            with open(logpath, "a") as f:
+                f.write(f"\n# exit code was: {return_code}\n")
+
             # kernel stuff went OK but the child gave a failing exit code
             if return_code != 0:
                 logger_util.debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
