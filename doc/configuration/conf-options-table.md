@@ -896,9 +896,17 @@ Related command-line option: [--revision](#cmdline-revision)
 
 Type: Boolean, Default value: False
 
-If set to `true`, then the project will be built with
-support for running its test suite, and the test suite will be executed
-as part of the build process. kde-builder will show a simple report of
+This option only has effect on the projects using CMake.
+
+Most KDE projects use [KDECmakeSettings](https://invent.kde.org/frameworks/extra-cmake-modules/-/blob/e5682c5ca2e3b73e8829cdb81c056070c60efd42/kde-modules/KDECMakeSettings.cmake#L184),
+which enables building the tests by default (`BUILD_TESTING` cmake option is set to `ON`).
+Running tests still needs to be done manually or by kde-builder with `run-tests` config option enabled.
+
+If set to `true`, kde-builder will ensure the project is configured with
+`BUILD_TESTING` option set to `ON`, and after building the project,
+test suite will be executed (by running `<make|ninja> test`).
+
+KDE Builder will show a simple report of
 the test results. This is useful for developers or those who want to
 ensure their system is set up correctly.
 
