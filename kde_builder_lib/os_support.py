@@ -46,6 +46,10 @@ class OSSupport:
         self.VERSION_CODENAME = None
         self.VERSION_ID = None
 
+        # OpenBSD does not have a file like os-release.
+        if sys.platform.startswith("openbsd"):
+            self.ID = "openbsd"
+
         # file might be None
         kv_list = self._read_os_release(file)
         for key in kv_list.keys():
