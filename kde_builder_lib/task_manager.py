@@ -375,14 +375,13 @@ class TaskManager:
 
         if not Debug().pretending():
             # Print out results, and output to a file
-            kdesrc = ctx.get_source_dir()
+            logdir = ctx.get_log_dir()
 
-            built = open(f"{kdesrc}/successfully-built", "w")
-            for module in build_done:
-                if successes <= 10:
-                    logger_taskmanager.info(f"{module}")
-                print(f"{module}", file=built)
-            built.close()
+            with open(f"{logdir}/successfully-built", "w") as built:
+                for module in build_done:
+                    if successes <= 10:
+                        logger_taskmanager.info(f"{module}")
+                    print(f"{module}", file=built)
 
             if successes > 10:
                 logger_taskmanager.info(f"Built g[{successes}] {mods}")
