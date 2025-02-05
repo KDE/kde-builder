@@ -1,6 +1,6 @@
 # IPC Notes
 
-To support the [async](https://docs.kde.org/trunk5/en/kdesrc-build/kdesrc-build/conf-options-table.html#conf-async)
+To support the [async](https://kde-builder.kde.org/en/configuration/conf-options-table.html#conf-async)
 parameter, which permits network updates to be run in parallel with the build process, kde-builder implements
 some limited inter-process communication (IPC).
 

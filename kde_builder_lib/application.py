@@ -824,7 +824,7 @@ class Application:
             A repository is needed to determine where to download the source code from.
 
             Most will want to use the b[g[kde-projects] repository. See also
-            https://docs.kde.org/?application=kdesrc-build&branch=trunk5&path=kde-modules-and-selection.html#module-sets
+            https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
             """))
             raise ConfigError("Missing repository option")
 
