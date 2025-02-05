@@ -876,12 +876,6 @@ class Application:
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
                 ctx.set_option(option, value)  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
             elif option not in all_possible_options:
-                if option == "git-desired-protocol":  # todo This message is temporary. Remove it after 19.07.2024.
-                    logger_app.error("y[Please edit your config. Replace \"r[git-desired-protocol]y[\" with \"g[git-push-protocol]y[\".")
-                if option == "install-session-driver":  # todo This message is temporary. Remove it after 24.08.2024.
-                    logger_app.error("y[Please edit your config. Replace \"r[install-session-driver]y[\" with \"g[install-login-session]y[\".")
-                if option == "install-environment-driver":  # todo This message is temporary. Remove it after 24.08.2024.
-                    logger_app.error("y[Please edit your config. Replace \"r[install-environment-driver]y[\" with \"g[install-login-session]y[\".")
                 logger_app.error(f"Unrecognized option \"{option}\" found in {file_name}")
 
             value = Application.substitute_value(ctx, value, file_name)

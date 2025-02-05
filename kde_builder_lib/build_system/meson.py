@@ -33,13 +33,6 @@ class BuildSystemMeson(BuildSystem):
         builddir = module.fullpath("build")
         installdir = module.installation_path()
 
-        # Previously, the "configure-flags" option was used also for meson projects. Later we introduced "meson-options" option.
-        # Ensure that user is not trying to use the old option to control meson setup.
-        # TODO remove this check after 18.01.2025.
-        if module.get_option("configure-flags", "module"):
-            logger_buildsystem.error("\t  Config error: \"configure-flags\" option was used for project with meson build system. Use \"meson-options\" instead.")
-            return False
-
         setup_options = Util.split_quoted_on_whitespace(module.get_option("meson-options"))
 
         exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", builddir, "--prefix", installdir, *setup_options])
