@@ -25,4 +25,4 @@ def test_ossupport():
     assert os.best_distro_match(["arch", "kde-builder", "sabayon"]) == "kde-builder", "ID preferred"
     assert os.best_distro_match(["ubuntu", "fedora", "gentoo"]) == "gentoo", "ID_LIKE respected"
     assert os.best_distro_match(["fedora", "gentoo", "gentoo-hardened", "sabayon"]) == "sabayon", "ID_LIKE preference order proper"
-    assert os.vendor_id() == "kde-builder", "Right ID"
+    assert os.ID == "kde-builder", "Right ID"

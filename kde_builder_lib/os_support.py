@@ -41,7 +41,7 @@ class OSSupport:
 
             os = OSSupport("/usr/lib/os-release")
         """
-        self.ID = None
+        self.ID = "unknown"  # ID from the `os-release` specification. "gentoo", "debian", etc.
         self.ID_LIKE = None
         self.VERSION_CODENAME = None
         self.VERSION_ID = None
@@ -50,17 +50,6 @@ class OSSupport:
         kv_list = self._read_os_release(file)
         for key in kv_list.keys():
             setattr(self, key, kv_list[key])
-
-    def vendor_id(self) -> str:
-        """
-        Return the vendor ID from the `os-release` specification, or "unknown" if /etc/os-release could not be read.
-
-        ::
-
-            vendor = os.vendor_id  # "gentoo", "debian", etc.
-        N.B., this is **not the same as the operating system**!
-        """
-        return self.ID or "unknown"
 
     def vendor_version(self) -> str:
         """
@@ -103,7 +92,7 @@ class OSSupport:
         If no match is found, returns a generic os string (**not** None, "", or
         similar): "linux" or "freebsd" as the case may be.
         """
-        ids = [self.vendor_id()]
+        ids = [self.ID]
         like_distros = self.ID_LIKE or ""
         if like_distros:
             for like_distro in like_distros.split(" "):

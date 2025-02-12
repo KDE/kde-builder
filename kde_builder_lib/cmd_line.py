@@ -494,7 +494,7 @@ class Cmdline:
 
     @staticmethod
     def _show_info_and_exit() -> NoReturn:
-        os_vendor = OSSupport().vendor_id()
+        os_vendor = OSSupport().ID
         version = "kde-builder " + Version.script_version()
         print(textwrap.dedent(f"""\
             {version}
