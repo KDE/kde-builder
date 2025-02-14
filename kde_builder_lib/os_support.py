@@ -149,7 +149,7 @@ class CoresAndMemorySupport:
             mem_total_KiB = c_and_m_sup.detect_total_memory()
         """
         mem_total = None
-        if sys.platform == "freebsd" or sys.platform == "openbsd":
+        if sys.platform.startswith("freebsd") or sys.platform.startswith("openbsd"):
             mem_total = subprocess.check_output(["sysctl", "-n", "hw.physmem"]).decode().strip()
             # FreeBSD, OpenBSD reports memory in Bytes, not KiB. Convert to KiB so logic below still works
             mem_total = int(float(mem_total) / 1024)
