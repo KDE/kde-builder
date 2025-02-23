@@ -360,7 +360,12 @@ class TaskManager:
             if not os.path.exists(screenlog_file_loc):
                 try:
                     realfile = ctx_logdir + "/screen.log"
-                    os.symlink(realfile, screenlog_file_loc)
+                    # After first launching in pretending mode, the symlink becomes broken (points to the log dir, which is not actually created).
+                    # And at second launching in pretending mode, we get here (because os.path.exists returns False in case of broken symlink).
+                    # And this causes a FileAlreadyExists exception.
+                    # So, we will only symlink if not pretending.
+                    if not Debug().pretending():
+                        os.symlink(realfile, screenlog_file_loc)
                 except FileNotFoundError:
                     pass
 
