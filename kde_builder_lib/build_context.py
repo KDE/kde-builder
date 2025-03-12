@@ -480,27 +480,6 @@ class BuildContext(Module):
                 self.rc_file = os.path.abspath(file)
                 return
 
-        # Now, as we did not found any kde-builder configs, in case we find legacy ksb format config, hint user to convert it.
-        # We keep the search order as was used for legacy configs.
-        legacy_configs = [
-            "./kdesrc-buildrc",
-            f"{BuildContext.xdg_config_home}/kdesrc-buildrc",
-            f"""{os.getenv("HOME")}/.kdesrc-buildrc"""
-        ]
-
-        for file in legacy_configs:
-            if os.path.exists(file):
-                legacy_config_full_path = os.path.abspath(file)
-                dirname_config_path = os.path.dirname(legacy_config_full_path)
-                modern_config_full_path = dirname_config_path + "/kde-builder.yaml"
-                real_bin_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
-                logger_buildcontext.error(textwrap.dedent(f"""\
-                     r[*] The y[{modern_config_full_path}] config was not found, but the legacy ksb config y[{legacy_config_full_path}] was found.
-                       Please, convert your legacy config to the new format with the following command:
-                        {real_bin_dir}/scripts/convert_ksb_config.py y[{legacy_config_full_path} {modern_config_full_path}]
-                    """))
-                raise KBRuntimeError(f"Missing config.")
-
         # No rc found, check if we can use default.
         if len(rc_files) == 1:
             # This can only happen if the user uses --rc-file, so if we fail to
