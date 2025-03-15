@@ -14,9 +14,7 @@ class Version:
 
     # It is expected that future git tags will be in the form "YY.MM" and will
     # be time-based instead of event-based as with previous releases.
-    VERSION = "22.07"
     SCRIPT_PATH = ""  # For auto git-versioning
-    SCRIPT_VERSION = VERSION
 
     @staticmethod
     def set_base_path(new_path: str) -> None:
@@ -26,7 +24,7 @@ class Version:
         Should be called before using ``script_version`` to set the base path for the script.
         This is needed to auto-detect the version in git for kde-builder instances running from a git repo.
         """
-        Version.SCRIPT_PATH = new_path if new_path else Version.SCRIPT_PATH
+        Version.SCRIPT_PATH = new_path
 
     @staticmethod
     def script_version() -> str:
@@ -49,4 +47,4 @@ class Version:
             ok = result.returncode == 0
             if ok and output:
                 return f"{output}"
-        return Version.SCRIPT_VERSION
+        return "Unknown version"

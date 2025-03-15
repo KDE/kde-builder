@@ -29,7 +29,6 @@ from .options_base import OptionsBase
 from .phase_list import PhaseList
 from .status_view import StatusView
 from .util.util import Util
-from .version import Version
 
 logger_buildcontext = KBLogger.getLogger("build-context")
 
@@ -86,7 +85,6 @@ class BuildContext(Module):
                f"{xdg_config_home}/kde-builder.yaml"]
     LOCKFILE_NAME = ".kdesrc-lock"
     PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
-    SCRIPT_VERSION = Version.script_version()
 
     def __init__(self):
         Module.__init__(self, None, "global")
