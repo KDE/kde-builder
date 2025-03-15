@@ -239,6 +239,9 @@ class Cmdline:
             self._show_options_specifiers_and_exit()
         if args.help:
             self._show_help_and_exit()
+        if args.self_update:
+            found_options["self-update"] = True
+            found_options["no-metadata"] = True  # Implied --no-metadata
         if args.d:
             found_options["include-dependencies"] = True
         if args.D:
@@ -546,6 +549,7 @@ class Cmdline:
             "resume-after|after|a=s",
             "resume-from|from|f=s",
             "resume-refresh-build-first|R",
+            "self-update",
             "set-project-option-value=s",
             "show-info",
             "show-options-specifiers",

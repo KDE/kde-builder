@@ -46,6 +46,7 @@ from .start_program import StartProgram
 from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
+from .version import Version
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
 logger_app = KBLogger.getLogger("application")
@@ -262,6 +263,9 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
+
+        if "self-update" in cmdline_global_options.keys():
+            Version.self_update()
 
         # The user might only want metadata to update to allow for a later
         # --pretend run, check for that here.

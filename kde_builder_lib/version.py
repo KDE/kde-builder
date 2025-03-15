@@ -5,6 +5,11 @@
 
 import os
 import subprocess
+from typing import NoReturn
+
+from .debug import KBLogger
+
+logger_app = KBLogger.getLogger("application")
 
 
 class Version:
@@ -48,3 +53,9 @@ class Version:
             if ok and output:
                 return f"{output}"
         return "Unknown version"
+
+    @staticmethod
+    def self_update() -> NoReturn:
+        logger_app.info("b[*] Running g[git pull] in the " + Version.SCRIPT_PATH)
+        subprocess.run("git pull", shell=True, cwd=Version.SCRIPT_PATH)
+        exit()

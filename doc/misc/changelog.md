@@ -1,5 +1,8 @@
 # Changelog
 
+2025-03-16
+: Added `--self-update` option.
+
 2024-12-24
 : Added `--install-login-session-only` option.
 

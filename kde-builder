@@ -181,8 +181,6 @@ Version.set_base_path(RealBinDir)
 
 # Script starts.
 
-# pl2py: Here there was a check if caller is "test" and if yes, it printed script version and returned 1. It was never used.
-
 app = None
 try:
     app = Application(sys.argv[1:])  # the 0 element is script name

@@ -143,3 +143,12 @@ global:
   configure-flags: --disable-debug
   remove-after-install: builddir # Remove build directory after install
 ```
+
+## Updating kde-builder
+
+Once in a while you will want to update kde-builder to get its latest changes.
+To do so, just run:
+
+```bash
+kde-builder --self-update
+```

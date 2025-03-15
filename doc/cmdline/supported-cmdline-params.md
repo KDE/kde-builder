@@ -534,6 +534,11 @@ See also `--initial-setup`
 [`--prompt-answer`](cmdline-prompt-answer) \<value\>  
 Prevent the interactive prompts, and use the _value_ as the prompt answer. Such prompts can be seen in install-distro-packages step.
 
+(cmdline-self-update)=
+[`--self-update`](cmdline-self-update)  
+Convenience shortcut for updating kde-builder to the latest revision.
+Performs a `git pull` command in the kde-builder installation directory.
+
 ## Script information
 
 (cmdline-version)=

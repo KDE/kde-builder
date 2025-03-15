@@ -84,6 +84,7 @@ _arguments \
   "(--resume-refresh-build-first -R)"{--resume-refresh-build-first,-R}"[Resume after a build failure and start the build from scratch of first project]" \
   --revision"[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the projects with support for running their test suite]" \
+  --self-update"[Update kde-builder itself]" \
   --set-project-option-value"[Override an option in your configuration file for a specific project]"":argument:" \
   --show-info"[Show tool information]" \
   --show-options-specifiers"[Show options information]" \
