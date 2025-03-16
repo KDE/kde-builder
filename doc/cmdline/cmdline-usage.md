@@ -54,7 +54,7 @@ without actually executing them. This can be useful to make
 sure that the projects you think you are building will actually get
 built.
 
-`--no-src`  
+`--no-src` (or `-S`)  
 This option skips the source update process. You might use it if you
 have very recently updated the source code (perhaps you did it manually
 or recently ran kde-builder) but still want to rebuild some projects.
