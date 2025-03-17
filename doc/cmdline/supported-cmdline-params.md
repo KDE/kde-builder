@@ -500,6 +500,14 @@ kde-builder wayland --log-level logged-command=INFO --log-level ide_project_conf
 Available logger names can be seen in the `data/kde-builder-logging.yaml`
 file. Level names can be one of "ERROR", "WARNING", "INFO", "DEBUG". See also [](../developer/adding-logger.md).
 
+(cmdline-check-self-updates)=
+[`--check-self-updates`](cmdline-check-self-updates), `--no-check-self-updates`  
+Controls if kde-builder will perform a check (only once a week)
+if its version is outdated compared to the version available in its repository.
+
+The corresponding configuration file option is
+[check-self-updates](#conf-check-self-updates).
+
 ## Setup
 
 (cmdline-initial-setup)=

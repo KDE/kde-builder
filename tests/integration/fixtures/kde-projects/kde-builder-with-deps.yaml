@@ -16,6 +16,8 @@ global:
     # To prevent "global" flags from being stripped in modules
     override-build-system: kde
 
+    check-self-updates: false
+
 group set1:
     branch: fake-branch2
     repository: kde-projects

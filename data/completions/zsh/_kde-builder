@@ -17,6 +17,7 @@ _arguments \
   "(--build-only --no-build)"--build-only"[Only perform the build process]" \
   --build-system-only"[Abort building a project just before the make command]" \
   "(--build-when-unchanged --no-build-when-unchanged --force-build --no-force-build)"{--build-when-unchanged,--no-build-when-unchanged,--force-build,--no-force-build}"[Disable skipping the build process.]" \
+  "(--check-self-updates --no-check-self-updates)"{--check-self-updates,--no-check-self-updates}"[Show a message when kde-builder detects it is outdated]" \
   --cmake-generator"[Which generator to use with CMake]"":argument:" \
   --cmake-options"[Flags to pass to CMake when creating the build system for the project]"":argument:" \
   --cmake-toolchain"[Specify a toolchain file to use with CMake]"":argument:" \

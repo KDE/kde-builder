@@ -27,6 +27,17 @@ the build process.
 
 Related command-line option: [--async](#cmdline-async)
 
+(conf-check-self-updates)=
+[`check-self-updates`](conf-check-self-updates)
+
+Type: Boolean, Default value: True
+
+If this option is enabled, kde-builder will periodically (once a week) check
+if its version is outdated compared to the version available in its repository.
+If it is, the warning message will be shown in the terminal.
+
+Related command-line option: [--check-self-updates](#cmdline-check-self-updates)
+
 (conf-colorful-output)=
 [`colorful-output`](conf-colorful-output)
 

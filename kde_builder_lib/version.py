@@ -44,3 +44,15 @@ class Version:
         logger_app.info("b[*] Running g[git pull] in the " + Version.KB_REPO_DIR)
         subprocess.run("git pull", shell=True, cwd=Version.KB_REPO_DIR)
         exit()
+
+    @staticmethod
+    def check_for_updates() -> None:
+        logger_app.info("b[*] Checking for kde-builder updates.")
+        subprocess.run("git fetch origin master:origin/master", shell=True, cwd=Version.SCRIPT_PATH)
+        local_master_head = subprocess.run("git rev-parse --short=7 refs/heads/master", shell=True, capture_output=True, check=False, cwd=Version.SCRIPT_PATH).stdout.decode("utf-8").removesuffix("\n")
+        remote_master_head = subprocess.run("git rev-parse --short=7 refs/remotes/origin/master", shell=True, capture_output=True, check=False, cwd=Version.SCRIPT_PATH).stdout.decode("utf-8").removesuffix("\n")
+
+        if local_master_head != remote_master_head:
+            logger_app.warning("y[*] Your kde-builder version seems to be outdated. To update, run g[kde-builder --self-update].")
+        else:
+            logger_app.info("g[*] Your kde-builder version is up-to-date.")

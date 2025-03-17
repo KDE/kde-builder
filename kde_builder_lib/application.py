@@ -267,6 +267,17 @@ class Application:
         if "self-update" in cmdline_global_options.keys():
             Version.self_update()
 
+        if ctx.get_option("check-self-updates"):
+            last_self_updates_check = ctx.get_persistent_option("global", "last-self-updates-check") or 0
+            try:
+                last_self_updates_check = int(last_self_updates_check)
+            except ValueError:
+                last_self_updates_check = 0
+
+            if last_self_updates_check + 604800 <= int(time()):  # 604800 - number of seconds in one week
+                Version.check_for_updates()
+                ctx.set_persistent_option("global", "last-self-updates-check", int(time()))
+
         # The user might only want metadata to update to allow for a later
         # --pretend run, check for that here.
         if "metadata-only" in cmdline_global_options:

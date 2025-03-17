@@ -19,6 +19,8 @@ global:
     # Used to test indirect options expansion
     num-cores: "8"
 
+    check-self-updates: false
+
 group set1:
     repository: fake
     use-projects:

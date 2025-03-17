@@ -1,5 +1,8 @@
 # Changelog
 
+2025-03-19
+: Added `--check-self-updates` option.
+
 2025-03-16
 : Added `--self-update` option.
 

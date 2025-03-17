@@ -126,6 +126,7 @@ class BuildContext(Module):
         # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
         self.global_options_with_negatable_form = {
             "async": True,
+            "check-self-updates": True,
             "compile-commands-export": True,
             "compile-commands-linking": True,
             "delete-my-patches": False,  # Should only be set from cmdline

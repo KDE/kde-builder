@@ -3,6 +3,7 @@ global:
     source-dir: /tmp
     git-repository-base: "kde kde:"
     _bisect-tag: master@{3 weeks ago}
+    check-self-updates: false
 
 group pim:
     repository: kde
