@@ -97,9 +97,6 @@ covered below.
 A signal was received that killed `kde-builder`, but it attempted to
 perform normal closedown.
 
-**8**  
-Unknown option was passed on the command line.
-
 **99**  
 An exception was raised that forced `kde-builder` to abort early.
 
