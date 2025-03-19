@@ -48,7 +48,7 @@ class Version:
     @staticmethod
     def check_for_updates() -> None:
         logger_app.info("b[*] Checking for kde-builder updates.")
-        subprocess.run("git fetch origin master:origin/master", shell=True, cwd=Version.KB_REPO_DIR)
+        subprocess.run("git fetch origin master:refs/remotes/origin/master", shell=True, cwd=Version.KB_REPO_DIR)
         local_master_head = subprocess.run("git rev-parse --short=7 refs/heads/master", shell=True, capture_output=True, check=False, cwd=Version.KB_REPO_DIR).stdout.decode("utf-8").removesuffix("\n")
         remote_master_head = subprocess.run("git rev-parse --short=7 refs/remotes/origin/master", shell=True, capture_output=True, check=False, cwd=Version.KB_REPO_DIR).stdout.decode("utf-8").removesuffix("\n")
 
