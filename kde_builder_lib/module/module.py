@@ -840,9 +840,6 @@ class Module(OptionsBase):
              key: The name of the option to lookup.
 
         None is returned if the option is not set, although even if the option is set, the value returned might be empty.
-        Note that `BuildContext` also has this function, with a slightly
-        different signature, which OVERRIDEs this function since Perl does not
-        have parameter-based method overloading.
 
         Return types: the same as :meth:`BuildContext.get_persistent_option()`
         """

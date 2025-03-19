@@ -784,12 +784,10 @@ class BuildContext(Module):
         """
         persistent_opts = self.persistent_options if hasattr(self, "persistent_options") else []
 
-        # We must check at each level of indirection to avoid
-        # "autovivification"
         if module_name not in persistent_opts:
-            return
+            return None
         if key not in persistent_opts[module_name]:
-            return
+            return None
         return persistent_opts[module_name][key]
 
     # @override(check_signature=False)
