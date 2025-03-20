@@ -11,6 +11,7 @@ import yaml
 
 from .kb_exception import KBRuntimeError
 from .debug import Debug
+from .module.module import Module
 
 
 class KDEProjectsReader:
@@ -18,20 +19,17 @@ class KDEProjectsReader:
     Enumerates and provides basic metadata of KDE projects, based on the YAML metadata included in sysadmin/repo-management.
     """
 
-    def __init__(self, project_metadata_module):
+    def __init__(self, project_metadata_module: Module):
         """
         Construct a new KDEProjectsReader. This doesn't contradict any part of the class documentation which claims this class is a singleton.
 
         Args:
             project_metadata_module: :class:`Module` that is the repo-metadata module.
         """
-        # pl2py: no need to check _verifyYAMLModuleLoaded()
-
         self.repositories = {}  # Maps short names to repo info blocks
-
         self._read_project_data(project_metadata_module)
 
-    def _read_project_data(self, project_metadata_module) -> None:
+    def _read_project_data(self, project_metadata_module: Module) -> None:
         # The "main" method for this class. Reads in *all* KDE projects and notes
         # their details for later queries.
         # Be careful, can throw exceptions.
@@ -45,11 +43,7 @@ class KDEProjectsReader:
         if not os.path.isdir(srcdir):
             raise KBRuntimeError(f"No such source directory {srcdir}!")
 
-        # NOTE: This is approx 1280 entries as of Feb 2023.  Need to memoize this
-        # so that only entries that are used end up being read.
-        # The obvious thing of using path info to guess module name doesn't work
-        # (e.g. maui-booth has a disk path of maui/booth in repo-metadata, not maui/maui-booth)
-        repo_meta_files = list(Path(f"{srcdir}/projects").resolve().rglob("metadata.yaml"))  # resolve /projects symlink first, then recurse through dir tree
+        repo_meta_files: list[str] = list(map(str, Path(f"{srcdir}/projects").resolve().rglob("metadata.yaml")))  # resolve /projects symlink first, then recurse through dir tree
 
         for metadata_path in repo_meta_files:
             self._read_yaml(metadata_path)
@@ -74,7 +68,7 @@ class KDEProjectsReader:
 
             self.repositories[project] = repo_data
 
-    def _read_yaml(self, filename) -> None:
+    def _read_yaml(self, filename: str) -> None:
         with open(filename, "r") as file:
             proj_data = yaml.safe_load(file)
 
@@ -83,7 +77,7 @@ class KDEProjectsReader:
             return
 
         repo_path = proj_data["repopath"]
-        repo_name = proj_data["identifier"] if proj_data["identifier"] else repo_path
+        repo_name = proj_data["identifier"]
 
         # Keep in sync with _load_mock_project_data
         cur_repository = {
