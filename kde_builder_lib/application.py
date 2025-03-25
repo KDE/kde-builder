@@ -334,17 +334,25 @@ class Application:
                                "   b[*] To select all kde projects, use y[--all-kde-projects].")
 
         if opts["special-selectors"]:
-            if "all-config-projects" in opts["special-selectors"]:
-                # Build everything in the rc-file, in the order specified.
-                modules = module_resolver.expand_module_sets(option_modules_and_sets)
+            sp_sels = opts["special-selectors"]
+            if "all-kde-projects" in sp_sels or "all-config-projects" in sp_sels:
+                all_config_projects: list[Module] = []
+                all_kde_projects: list[Module] = []
 
-            if "all-kde-projects" in opts["special-selectors"]:
-                repos = self.context.get_project_data_reader().repositories
-                active_kde_projects: list[str] = []
-                for pr in repos:
-                    if repos[pr]["active"] and repos[pr]["kind"] == "software":
-                        active_kde_projects.append(repos[pr]["name"])
-                modules = module_resolver.resolve_selectors_into_modules(active_kde_projects)
+                if "all-config-projects" in sp_sels:
+                    # Build everything in the rc-file, in the order specified.
+                    all_config_projects: list[Module] = module_resolver.expand_module_sets(option_modules_and_sets)
+
+                if "all-kde-projects" in sp_sels:
+                    repos = self.context.get_project_data_reader().repositories
+                    active_kde_projects: list[str] = []
+                    for pr in repos:
+                        if repos[pr]["active"] and repos[pr]["kind"] == "software":
+                            active_kde_projects.append(repos[pr]["name"])
+                    all_kde_projects: list[Module] = module_resolver.resolve_selectors_into_modules(active_kde_projects)
+
+                modules: list[Module] = all_config_projects + all_kde_projects
+
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
