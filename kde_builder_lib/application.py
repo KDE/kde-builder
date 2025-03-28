@@ -992,7 +992,11 @@ class Application:
             SetOptionError
         """
         with open(ctx.rc_file, "r") as f:
-            config_content = yaml.safe_load(f)
+            try:
+                config_content = yaml.safe_load(f)
+            except yaml.YAMLError as exc:
+                exc_msgs = "\n  " + "\n  ".join(str(x) for x in exc.args)
+                raise ConfigError("Error parsing yaml configuration file:" + exc_msgs)
         module_and_module_set_list = []
         rcfile = ctx.rc_file
 
