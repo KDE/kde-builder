@@ -7,7 +7,7 @@
 
 local -aU kde_builder_projects
 
-# The output of `kde-builder -M --query module-set` is in the format:
+# The output of `kde-builder -M --query group` is in the format:
 # extra-cmake-modules: frameworks
 # Where "extra-cmake-modules" is project name,
 # ": " is output separator,
@@ -18,7 +18,7 @@ if _cache_invalid kde_builder_projects || ! _retrieve_cache kde_builder_projects
   # (@) array Expansion Flags are needed because we need to operate on each element separately.
   kde_builder_projects=( "${(@)${(f)"$(
     _call_program kde-builder-projects \
-      kde-builder -M --query module-set --all-kde-projects --all-config-projects
+      kde-builder -M --query group --all-kde-projects --all-config-projects
     )"}%%:*}" )
   _store_cache kde_builder_projects kde_builder_projects
 fi
@@ -34,7 +34,7 @@ if _cache_invalid kde_builder_groups || ! _retrieve_cache kde_builder_groups; th
   # (@) array Expansion Flags are needed because we need to operate on each element separately.
   kde_builder_groups=( "${(@)${(f)"$(
     _call_program kde-builder-groups \
-      kde-builder -M --query module-set --all-kde-projects --all-config-projects
+      kde-builder -M --query group --all-kde-projects --all-config-projects
     )"}#*: }" )
   _store_cache kde_builder_groups kde_builder_groups
 fi

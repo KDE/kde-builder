@@ -262,7 +262,7 @@ following:
 - `branch` - the resolved git branch that will be used for each project, based
    on the [tag](#conf-tag), [branch](#conf-branch) and [branch-group](#conf-branch-group) settings in effect.
 
-- `module-set` - the name of group which contains the project. This can be used
+- `group` - the name of group which contains the project. This can be used
    to generate zsh autocompletion cache.
 
 - `build-system` - the name of build system detected for the project. This can be used

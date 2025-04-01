@@ -634,9 +634,9 @@ class Application:
             elif query_mode == "branch":
                 def query(x):
                     return x.scm().determine_preferred_checkout_source()[0] or ""
-            elif query_mode == "module-set":
+            elif query_mode == "group":
                 def query(x):
-                    return x.module_set.name or "undefined_module-set"
+                    return x.module_set.name or "undefined_group"
             elif query_mode == "build-system":
                 def query(x):
                     return x.build_system().name()
