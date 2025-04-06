@@ -772,7 +772,7 @@ class Module(OptionsBase):
 
         OptionsBase.set_option(self,  opt_name, opt_val)
 
-    # @override(check_signature=False)
+    # @override
     def get_option(self, key: str, level_limit="allow-inherit") -> str | bool | dict | None:
         """
         Return an option value for a given module.

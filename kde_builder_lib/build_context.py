@@ -618,8 +618,8 @@ class BuildContext(Module):
         modules = [module for module in modules if module.name in self.errors]
         return modules
 
-    # @override(check_signature=False)
-    def get_option(self, key: str) -> str | dict | list | bool:
+    # @override
+    def get_option(self, key: str, level_limit="") -> str | dict | list | bool:
         """
         Get context option.
 

@@ -45,7 +45,7 @@ class OptionsBase:
         """
         return key in self.options.keys()
 
-    def get_option(self, key: str) -> str | dict | list | bool:
+    def get_option(self, key: str, level_limit="") -> str | dict | list | bool:
         """
         Return the value of the given option. If no such option is present, returns an empty string.
 
