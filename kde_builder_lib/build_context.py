@@ -654,26 +654,6 @@ class BuildContext(Module):
 
     # Persistent option handling
 
-    # TODO Temporary here. Remove after 28.04.2025.
-    @staticmethod
-    def rename_legacy_state_file(modern_state_file_path: str):
-        """
-        Rename old ".kdesrc-build-data" or "kdesrc-build-data" file to "kde-builder-persistent-data.json" file.
-
-        Args:
-            modern_state_file_path: The path of "modern" (named as kde-builder-persistent-data.yaml) file.
-        """
-        legacy_hidden_state_file = os.path.dirname(modern_state_file_path) + "/." + "kdesrc-build-data"
-        legacy_visible_state_file = os.path.dirname(modern_state_file_path) + "/" + "kdesrc-build-data"
-
-        if not os.path.isfile(modern_state_file_path):
-            if os.path.isfile(legacy_hidden_state_file):
-                logger_buildcontext.warning(f" y[*] Renaming legacy state file {legacy_hidden_state_file} to {modern_state_file_path}")
-                os.rename(legacy_hidden_state_file, modern_state_file_path)
-            elif os.path.isfile(legacy_visible_state_file):
-                logger_buildcontext.warning(f" y[*] Renaming legacy state file {legacy_visible_state_file} to {modern_state_file_path}")
-                os.rename(legacy_visible_state_file, modern_state_file_path)
-
     def persistent_option_file_name(self) -> str:
         """
         Return the name of the file to use for persistent data.
@@ -690,7 +670,6 @@ class BuildContext(Module):
             else:
                 # Local config is used. Store the data file in the same directory.
                 file = config_dir + "/" + BuildContext.PERSISTENT_FILE_NAME
-            self.rename_legacy_state_file(file)
 
             rc_files = self.rc_files
             if len(rc_files) == 1:
