@@ -35,7 +35,7 @@ class OptionsBase:
         # use this base dict directly (as long as they don't overwrite
         # "options", of course).
         self.options = {"set-env": {}}
-        self.ctx = ctx
+        self.context = ctx
 
     def has_option(self, key: str) -> bool:
         """
@@ -160,7 +160,7 @@ class OptionsBase:
         if option_name == "ignore-projects":  # when reading the ignore-projects from global node from the config
             if not isinstance(option_value, list):
                 raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid value type \"{option_value.__class__.__name__}\", but \"list\" is expected.")
-        if self.ctx:
-            self.ctx.verify_option_value_type(option_name, option_value)
+        if self.context:
+            self.context.verify_option_value_type(option_name, option_value)
         else:
             return

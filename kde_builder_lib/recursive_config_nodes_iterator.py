@@ -26,7 +26,7 @@ class RecursiveConfigNodesIterator:
     """
 
     def __init__(self, initial_dictionary: dict, rcfile: str, ctx: BuildContext):
-        self.ctx = ctx
+        self.context = ctx
         assert os.path.isabs(rcfile)
 
         self.stack_dictionaries: list[dict] = []
@@ -63,7 +63,7 @@ class RecursiveConfigNodesIterator:
                         raise ConfigError(f"Unable to handle file include \"{node_name}\" from {self.current_filename}")
 
                     option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
-                    ctx = self.ctx
+                    ctx = self.context
 
                     # Replace reference to global option with their value.
                     sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None

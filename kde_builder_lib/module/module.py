@@ -67,7 +67,6 @@ class Module(OptionsBase):
 
     def __init__(self, ctx: BuildContext, name: str):
         OptionsBase.__init__(self)
-        self.ctx = ctx
         self.name = name
 
         if not self.name:
@@ -388,7 +387,7 @@ class Module(OptionsBase):
             logger_module.info("\tSkipping install due to disabled install phase.")
             return True
 
-        self.ctx.status_view.__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().
+        self.context.status_view.__init__()  # Clear the progress values after build process, so they do not influence on initial progress of install process. This is needed because currently the install() is invoked from build().
         # TODO: this should be a phase to run.
         return self.install()
 
@@ -1098,4 +1097,4 @@ class Module(OptionsBase):
         """
         Ensure we are setting the correct type for value of option.
         """
-        self.ctx.verify_option_value_type(option_name, option_value)
+        self.context.verify_option_value_type(option_name, option_value)
