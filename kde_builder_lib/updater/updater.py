@@ -473,7 +473,7 @@ class Updater:
         Update an already existing git checkout by running git pull.
 
         Throws an exception on error.
-        Returns the number of affected *commits*.
+        Returns the number of affected *commits*. Or -1 if holding work branches.
         """
         module = self.module
         cur_repo = module.get_option("repository")
@@ -484,7 +484,7 @@ class Updater:
             current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True).stdout.strip()
             if current_branch.startswith("work/") or current_branch.startswith("mr/"):
                 logger_updater.warning(f"Holding g[{module}] at branch b[{current_branch}]")
-                return 0
+                return -1
 
         # Try to save the user if they are doing a merge or rebase
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
