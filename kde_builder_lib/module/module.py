@@ -692,8 +692,9 @@ class Module(OptionsBase):
             if count:
                 if count == 1:
                     message = "1 commit pulled."
-                if count != 1:
+                elif count > 1:
                     message = f"{count} commits pulled."
+                # else count==-1 when holding work branch
                 ipc.notify_update_success(module_name, message)
             else:
                 message = "0 commits pulled."
