@@ -43,7 +43,7 @@ install_runtime_packages() {
     (set -x; sudo zypper install cmake gcc libdbus-c++-devel libglib-testing-devel python311-devel)
   elif [[ "$ID_LIKE" == *"opensuse-tumbleweed"* || "$ID" = "opensuse-tumbleweed" ]]; then
     (set -x; sudo zypper refresh)
-    (set -x; sudo zypper install git python311-pyaml python311-setproctitle)
+    (set -x; sudo zypper install git python3-dbus-python python3-pyaml python3-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
     FREEBSD_OSVERSION=$(uname -U)
     if [ $FREEBSD_OSVERSION -ge 1402000 ]; then
