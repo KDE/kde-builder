@@ -673,8 +673,6 @@ class Module(OptionsBase):
                 # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
                 traceback.print_exc()
 
-            reason = IPC.MODULE_FAILURE
-
             ctx.mark_module_phase_failed("build", self)
             if e.__class__.__name__ == "KBException":
                 # noinspection PyUnresolvedReferences
@@ -685,7 +683,7 @@ class Module(OptionsBase):
             logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
             logger_module.error(f" > y[{e_str}]")
 
-            ipc.send_ipc_message(reason, module_name)
+            ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
             self.phases.filter_out_phase("build")
             return_value = False
         else:  # executed if there were no exceptions in try block

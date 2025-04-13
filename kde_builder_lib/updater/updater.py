@@ -638,14 +638,14 @@ class Updater:
             logger_updater.debug(f"\tIt appears there is no stash for b[{module}]")
             return 0
 
-    def _notify_post_build_message(self, *args: str) -> None:
+    def _notify_post_build_message(self, mesg: str) -> None:
         """
         Send a post-build (warning) message via the IPC object.
 
         This just takes care of the boilerplate to forward its arguments as message.
         """
         module = self.module
-        self.ipc.notify_new_post_build_message(module.name, *args)
+        self.ipc.notify_new_post_build_message(module.name, mesg)
 
     def stash_and_update(self, commit_type: str, remote_name: str, commit_id: str) -> int:
         """

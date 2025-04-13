@@ -68,7 +68,7 @@ class IPC:
         """
         self.send_ipc_message(IPC.MODULE_PERSIST_OPT, f"{module_name},{opt_name},{opt_value}")
 
-    def notify_new_post_build_message(self, module_name: str, msg) -> None:
+    def notify_new_post_build_message(self, module_name: str, msg: str) -> None:
         """
         Send a message to the main/build process that a given message should be shown to the user at the end of the build.
         """
@@ -101,7 +101,7 @@ class IPC:
             msg = f"\t{msg}"
         KBLogger.print_clr(logger_name, message_level, msg)
 
-    def _update_seen_modules_from_message(self, ipc_type, buffer) -> str | None:
+    def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str | None:
         """
         Update seen modules.
 
@@ -283,7 +283,6 @@ class IPC:
         if IPC.waited:
             return
 
-        buffer = ""
         ipc_type = 0
         IPC.waited = 1
 
@@ -306,7 +305,7 @@ class IPC:
             elif ipc_type != IPC.ALL_UPDATING:
                 raise KBRuntimeError(f"IPC failure while expecting an update status: Incorrect type: {ipc_type}")
 
-    def send_ipc_message(self, ipc_type, msg: str) -> bool:
+    def send_ipc_message(self, ipc_type: int, msg: str) -> bool:
         """
         Send an IPC message along with some IPC type information.
 
@@ -316,11 +315,11 @@ class IPC:
         All remaining parameters are sent to the object's send_message()
          procedure.
         """
-        encoded_msg = struct.pack("!l", ipc_type) + msg.encode("utf-8")
+        encoded_msg: bytes = struct.pack("!l", ipc_type) + msg.encode("utf-8")
         return self.send_message(encoded_msg)
 
     @staticmethod
-    def unpack_msg(msg: bytes) -> tuple:
+    def unpack_msg(msg: bytes) -> tuple[int, str]:
         """
         Unpack a message.
 
@@ -333,17 +332,17 @@ class IPC:
         return_type, out_buffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
         return return_type, out_buffer
 
-    def receive_ipc_message(self) -> tuple:
+    def receive_ipc_message(self) -> tuple[int, str]:
         """
         Receive an IPC message and decodes it into the message and its associated type information.
 
         Returns:
-             The list with IPC type and message content, or list with two None on failure.
+             The tuple with IPC type and message content, or tuple with 0 and empty string on failure.
         """
         if self.updates_done:
             raise ProgramError("Trying to pull message from closed IPC channel!")
-        msg = self.receive_message()
-        return self.unpack_msg(msg) if msg else (None, None)
+        msg: bytes = self.receive_message()
+        return self.unpack_msg(msg) if msg else (0, "")
 
     # These must be reimplemented.  They must be able to handle scalars without
     # any extra frills.
