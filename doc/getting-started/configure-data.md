@@ -46,7 +46,7 @@ global:
   # This environment variable is automatically used by make, including
   # make commands not run by KDE Builder directly, such as Qt's configure
   set-env:
-    - MAKEFLAGS: -j${num-cores}
+    MAKEFLAGS: -j${num-cores}
   …
 
 …

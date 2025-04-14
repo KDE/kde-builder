@@ -180,20 +180,14 @@ instance, to set up any required environment variables when running
 kde-builder on a timer such as Cron. This is possible with the
 [set-env](#conf-set-env) option.
 
-Unlike most options, it can be set more than once, and it accepts two
-entries, separated by a space. The first one is the name of the
-environment variable to set, and the remainder of the line is the value.
-
-Set `DISTRO=BSD` for all projects:
+For example, to set the variable `SOME_VAR` to "helloworld",
+and `SOME_VAR2` to "helloworld2",
+you would put this construction in the appropriate node:
 
 ```yaml
-global:
   set-env:
-    - DISTRO: BSD
-```
-
-```{note}
-Todo: Check the words about setting it more than once.
+    SOME_VAR: "helloworld"
+    SOME_VAR2: "helloworld2"
 ```
 
 (resuming)=

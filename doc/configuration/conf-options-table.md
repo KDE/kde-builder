@@ -926,27 +926,12 @@ Related command-line option: --run-tests, --no-run-tests
 (conf-set-env)=
 [`set-env`](conf-set-env)
 
-Type: String
+Type: Dictionary
 
-This option accepts a space-separated set of values, where the first
-value is the environment variable to set, and the rest of the values is
-what you want the variable set to. For example, to set the variable
-`MYTEXT` to "helloworld", you would put in the appropriate
-section this line:
+This option accepts a dictionary, where the key is the environment variable to set, and the value is
+what you want the variable to be set to.
 
-```yaml
-set-env:
-  - MYTEXT: helloworld
-```
-
-This option is special in that it can be repeated without overriding
-earlier set-env settings in the same section of the
-[configuration file](../getting-started/configure-data). This way you can set more
-than one environment variable per module (or globally).
-
-```{note}
-Todo: Update wording when saying it can be used twice.
-```
+See [](changing-environment) for more information.
 
 (conf-source-dir)=
 [`source-dir`](conf-source-dir)

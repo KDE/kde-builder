@@ -486,7 +486,7 @@ the way kde-builder handles options. Consider a simple kde-builder.yaml:
 
  override framework1:
    set-env:
-     - BUILD_DEBUG: 1
+     BUILD_DEBUG: 1
 
  project taglib:
    repository: git://...
