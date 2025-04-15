@@ -62,7 +62,7 @@ class TaskManager:
         self.ksb_app = app
         self.DO_STOP = 0
 
-    def run_all_tasks(self):
+    def run_all_tasks(self) -> int:
         """
         Return shell-style result code.
         """
@@ -176,12 +176,12 @@ class TaskManager:
         return had_error
 
     @staticmethod
-    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str | int:
+    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str:
         """
         Build the given module.
 
         Returns:
-             The failure phase, or 0 on success.
+             The failure phase, or empty string on success.
         """
         module.reset_environment()
         module.setup_environment()
@@ -222,7 +222,7 @@ class TaskManager:
 
         if module.build():
             module.set_persistent_option("failure-count", 0)
-            return 0
+            return ""
         return "build"  # phase failed at
 
     def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
@@ -558,7 +558,7 @@ class TaskManager:
         return result
 
     @staticmethod
-    def _check_for_ssh_agent(ctx: BuildContext):
+    def _check_for_ssh_agent(ctx: BuildContext) -> bool:
         """
         Check if we are supposed to use ssh agent by examining the environment, and if so, checks if ssh-agent has a list of identities.
 
