@@ -76,7 +76,7 @@ class UpdaterQt5(Updater):
     # @override(check_signature=False)
     def update_checkout(self) -> int:
         """
-        Either performs the initial checkout or updates the current git checkout for git-using modules, as appropriate.
+        Either performs the initial checkout or updates the current git checkout as appropriate.
 
         If errors are encountered, an exception is raised.
 

@@ -630,7 +630,10 @@ class Module(OptionsBase):
 
     def update(self, ipc, ctx) -> bool:
         """
-        Execute the update (or pretends to do so) using the appropriate source control system and returns a True/False value reflecting success.
+        Execute the update (or pretends to do so) using the appropriate source control system.
+
+        Returns:
+             False on failure, True on success.
         """
         module_name = self.name
         module_src_dir = self.get_source_dir()
@@ -688,12 +691,12 @@ class Module(OptionsBase):
             message = ""
             if count:
                 if count == 1:
-                    message = "1 file affected."
+                    message = "1 commit pulled."
                 if count != 1:
-                    message = f"{count} files affected."
+                    message = f"{count} commits pulled."
                 ipc.notify_update_success(module_name, message)
             else:
-                message = "0 files affected."
+                message = "0 commits pulled."
                 refresh_reason = self.build_system().needs_refreshed()
                 ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{module_name},{refresh_reason}")
 

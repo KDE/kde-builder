@@ -163,7 +163,7 @@ class TaskManager:
             ipc.set_logged_module(module.name)
 
             # Note that this must be in this order to avoid accidentally not
-            # running ->update() from short-circuiting if an error is noted.
+            # running update() from short-circuiting if an error is noted.
             had_error = not module.update(ipc, ctx) or had_error
 
             # Cache module directories, e.g. to be consumed in kde-builder --run

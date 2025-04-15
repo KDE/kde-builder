@@ -48,6 +48,9 @@ class Updater:
         scm-specific update procedure.
 
         May change the current directory as necessary.
+
+        Returns:
+             Number of commits pulled.
         """
         self.ipc = ipc
         num_commits = self.update_checkout()
@@ -113,10 +116,14 @@ class Updater:
         """
         Perform a git clone to checkout the latest branch of a given git module.
 
-        First parameter is the repository (typically URL) to use.
+        Args:
+            git_repo: The repository (typically URL) to use.
 
         Returns:
-             1, or raises exception if an error occurs.
+            int: 1
+
+        Raises:
+             Exception: If an error occurs.
         """
         module = self.module
         srcdir = module.fullpath("source")
@@ -151,7 +158,7 @@ class Updater:
             username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
             if not username or not email:
                 raise KBRuntimeError(f"Invalid username or email for git-user option: {name}" +
-                                             " (should be in format 'User Name <username@example.net>'")
+                                     " (should be in format 'User Name <username@example.net>'")
 
             logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
             result = Util.safe_system(["git", "config", "--local", "user.name", username]) == 0
@@ -198,10 +205,15 @@ class Updater:
 
     def update_checkout(self) -> int:
         """
-        Either performs the initial checkout or updates the current git checkout for git-using modules, as appropriate.
+        Either performs the initial checkout or updates the current git checkout as appropriate.
 
-        Returns the number of *commits* affected, or
-        throws exception on an update error.
+        Returns:
+             Number of commits pulled.
+             If not cloned yet, and in pretending mode, pretends that 1 commit was pulled.
+             If already cloned, and in pretending mode, pretends that 0 commits were pulled.
+
+        Raises:
+             Exception: On an update error.
         """
         module = self.module
         srcdir = module.fullpath("source")
@@ -224,11 +236,12 @@ class Updater:
                 else:
                     raise KBRuntimeError("The required git branch does not exist at the source repository")
 
-            self._clone(git_repo)
+            self._clone(git_repo)  # can handle pretending mode
             if Debug().pretending():
-                return 1
+                return 1  # pretend like there was 1 commit pulled
             else:
-                return Updater.count_command_output("git", "--git-dir", f"{srcdir}/.git", "ls-files")
+                ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
+                return ret
 
     @staticmethod
     def _module_is_needed() -> bool:
@@ -511,7 +524,7 @@ class Updater:
         start_commit = self.commit_id("HEAD")
 
         self.stash_and_update(commit_type, remote_name, commit_id)
-        ret = Updater.count_command_output("git", "rev-list", f"{start_commit}..HEAD")
+        ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"]).decode().strip())
         return ret
 
     @staticmethod
@@ -882,29 +895,6 @@ class Updater:
                 return possible_branch
 
         raise KBRuntimeError(f"Unable to find good branch name for {module} branch name {branch}")
-
-    @staticmethod
-    def count_command_output(*args: str) -> int:
-        """
-        Return the number of lines in the output of the given command.
-
-        The command and all required arguments should be passed as a normal list, and the current
-        directory should already be set as appropriate.
-
-        Return value is the number of lines of output.
-        Exceptions are raised if the command could not be run.
-        """
-        # Don't call with $self->, all args are passed to filter_program_output
-
-        count = 0
-
-        def func(x):
-            nonlocal count
-            if x:
-                count += 1
-
-        Util.filter_program_output(func, *args)
-        return count
 
     @staticmethod
     def slurp_git_config_output(args: list[str]) -> list[str]:
