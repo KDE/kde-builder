@@ -13,7 +13,7 @@ class IPCNull(IPC):
 
     def __init__(self):
         IPC.__init__(self)
-        self.msgList = []  # List of messages.
+        self.msgList: list[bytes] = []  # List of messages.
 
     # @override(check_signature=False)
     def send_message(self, msg: bytes) -> bool:

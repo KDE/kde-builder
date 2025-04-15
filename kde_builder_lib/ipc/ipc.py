@@ -101,7 +101,7 @@ class IPC:
             msg = f"\t{msg}"
         KBLogger.print_clr(logger_name, message_level, msg)
 
-    def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str | None:
+    def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str:
         """
         Update seen modules.
 
@@ -113,7 +113,7 @@ class IPC:
         """
         updated = self.updated
         messages = self.messages
-        message = None
+        message = ""
 
         if not ipc_type:
             raise KBRuntimeError("IPC failure: no IPC mechanism defined")
@@ -190,11 +190,11 @@ class IPC:
             # We ignore the return value in favor of ->{updates_done}
             self._update_seen_modules_from_message(ipc_type, buffer)
 
-    def wait_for_module(self, module: Module) -> tuple:
+    def wait_for_module(self, module: Module) -> tuple[str, str]:
         """
         Wait for an update for a module with the given name.
 
-        Returns a list containing whether the module was successfully updated,
+        Returns a tuple containing whether the module was successfully updated,
         and any specific string message (e.g. for module update success you get
         number of files affected)
         Will throw an exception for an IPC failure or if the module should not be
@@ -211,7 +211,7 @@ class IPC:
             updated[module_name] = "success"
             return "success", "Skipped"
 
-        message = None
+        message = ""
         while updated.get(module_name) is None and not self.updates_done:
             ipc_type, buffer = self.receive_ipc_message()
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
