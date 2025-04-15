@@ -660,8 +660,6 @@ class Module(OptionsBase):
                     y[b[*]
                     y[b[*] Will proceed, generating a new source dir.
                     """))
-        count = None
-        return_value = None
 
         self.current_phase = "update"
 
@@ -688,10 +686,7 @@ class Module(OptionsBase):
             return_value = False
         else:  # executed if there were no exceptions in try block
             message = ""
-            if count is None:
-                message = Debug().colorize("b[y[Unknown changes].")
-                ipc.notify_update_success(module_name, message)
-            elif count:
+            if count:
                 if count == 1:
                     message = "1 file affected."
                 if count != 1:
