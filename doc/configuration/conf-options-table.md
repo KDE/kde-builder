@@ -564,7 +564,7 @@ Related command-line option: --do-not-compile \<value\>
 
 Type: String
 
-This option is intended for KDE developers. If set, it will be used
+If set, it will be used
 to automatically setup identity information for the git config
 for _newly downloaded_ projects.
 

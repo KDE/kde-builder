@@ -161,6 +161,7 @@ class BuildContext(Module):
             "directory-layout": "flat",
             "dest-dir": '${MODULE}',  # single quotes used on purpose!
             "do-not-compile": "",
+            "git-user": "",
             "install-dir": os.getenv("HOME") + "/kde/usr",
             "libname": self.libname,
             "libpath": "",
