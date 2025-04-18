@@ -51,14 +51,14 @@ class IPC:
     MODULE_POSTBUILD_MSG = 12  # A message to print after all work done
 
     def __init__(self):
-        self.no_update = 0
-        self.updated = {}
+        self.no_update: bool = False
+        self.updated: dict[str, str] = {}
         self.logged_module: str = "global"
-        self.messages = {}  # Holds log output from update process
-        self.postbuild_msg = {}  # Like above but for post-build msgs
-        self.why_refresh = {}  # If module should build despite not being updated, why?
-        self.updates_done = 0
-        self.opt_update_handler = None  # Callback for persistent option changes
+        self.messages: dict[str, list[str]] = {}  # Holds log output from update process
+        self.postbuild_msg: dict[str, list[str]] = {}  # Like above but for post-build msgs
+        self.why_refresh: dict[str, str] = {}  # If module should build despite not being updated, why?
+        self.updates_done: bool = False
+        self.opt_update_handler: Callable | None = None  # Callback for persistent option changes
 
     def notify_persistent_option_change(self, module_name: str, opt_name: str, opt_value: str) -> None:
         """
@@ -157,7 +157,7 @@ class IPC:
                 messages[ipc_module_name] = []
             messages[ipc_module_name].append(log_message)
         elif ipc_type == IPC.ALL_DONE:
-            self.updates_done = 1
+            self.updates_done = True
         elif ipc_type == IPC.MODULE_POSTBUILD_MSG:
             ipc_module_name, post_build_msg = buffer.split(",", maxsplit=1)
 
@@ -295,8 +295,8 @@ class IPC:
             if ipc_type == IPC.ALL_FAILURE:
                 raise KBRuntimeError(f"Unable to perform source update for any module:\n\t{buffer}")
             elif ipc_type == IPC.ALL_SKIPPED:
-                self.no_update = 1
-                self.updates_done = 1
+                self.no_update = True
+                self.updates_done = True
             elif ipc_type == IPC.MODULE_LOGMSG:
                 ipc_module_name, log_message = buffer.split(",", maxsplit=1)
                 if ipc_module_name not in self.messages:
