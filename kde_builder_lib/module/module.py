@@ -12,7 +12,6 @@ import os
 import re
 import shutil
 import sys
-import textwrap
 import traceback
 from typing import TYPE_CHECKING
 
@@ -35,6 +34,7 @@ from ..updater.kde_project_metadata import UpdaterKDEProjectMetadata
 from ..updater.qt5 import UpdaterQt5
 from ..updater.updater import Updater
 from ..util.util import Util
+from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext

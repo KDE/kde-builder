@@ -9,12 +9,12 @@ import argparse
 import logging.config
 import os
 import sys
-import textwrap
 import traceback
 
 from kde_builder_lib.kb_exception import ProgramError
 from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
+from kde_builder_lib.util.textwrap_mod import textwrap
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 

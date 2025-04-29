@@ -19,7 +19,6 @@ import shutil
 import signal
 import subprocess
 import sys
-import textwrap
 from typing import Callable
 from typing import TYPE_CHECKING
 
@@ -29,6 +28,7 @@ from kde_builder_lib.kb_exception import KBRuntimeError
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.debug import KBLogger
 from ..kb_exception import ProgramError
+from .textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from ..module.module import Module

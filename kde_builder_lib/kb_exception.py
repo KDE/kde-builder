@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-import textwrap
+from .util.textwrap_mod import textwrap
 from typing import NoReturn
 
 

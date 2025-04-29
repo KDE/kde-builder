@@ -5,12 +5,12 @@
 
 import os.path
 import re
-import textwrap
 
 from .build_system import BuildSystem
 from ..debug import Debug
 from ..debug import KBLogger
 from ..util.util import Util
+from ..util.textwrap_mod import textwrap
 
 logger_buildsystem = KBLogger.getLogger("build-system")
 

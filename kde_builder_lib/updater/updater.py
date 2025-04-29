@@ -10,7 +10,6 @@ import inspect
 import os.path
 import re
 import subprocess
-import textwrap
 import time
 from typing import TYPE_CHECKING
 
@@ -21,6 +20,7 @@ from ..debug import KBLogger
 from ..ipc.null import IPCNull
 from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
+from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from typing import NoReturn

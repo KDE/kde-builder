@@ -5,7 +5,6 @@
 
 import argparse
 import re
-import textwrap
 from typing import NoReturn
 
 from .build_context import BuildContext
@@ -13,6 +12,7 @@ from .debug import KBLogger
 from .os_support import OSSupport
 from .phase_list import PhaseList
 from .version import Version
+from .util.textwrap_mod import textwrap
 
 logger_app = KBLogger.getLogger("application")
 

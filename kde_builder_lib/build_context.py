@@ -13,7 +13,6 @@ from pathlib import Path
 import re
 import sys
 import tempfile
-import textwrap
 import traceback
 
 from .kb_exception import KBRuntimeError
@@ -29,6 +28,7 @@ from .options_base import OptionsBase
 from .phase_list import PhaseList
 from .status_view import StatusView
 from .util.util import Util
+from .util.textwrap_mod import textwrap
 
 logger_buildcontext = KBLogger.getLogger("build-context")
 

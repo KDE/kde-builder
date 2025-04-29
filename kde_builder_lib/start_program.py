@@ -5,12 +5,12 @@
 from __future__ import annotations
 
 import os
-import textwrap
 from typing import NoReturn
 from typing import TYPE_CHECKING
 
 from .debug import Debug
 from .debug import KBLogger
+from .util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from .build_context import BuildContext

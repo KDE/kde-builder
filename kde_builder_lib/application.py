@@ -16,7 +16,6 @@ import shutil
 import signal
 import subprocess
 import sys
-import textwrap
 from time import sleep
 from time import time
 import traceback
@@ -46,6 +45,7 @@ from .start_program import StartProgram
 from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
+from .util.textwrap_mod import textwrap
 from .version import Version
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
