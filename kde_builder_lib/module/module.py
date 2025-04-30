@@ -644,6 +644,9 @@ class Module(OptionsBase):
             if not Util.super_mkdir(module_src_dir):
                 logger_module.error(f"\tUnable to create separate source directory for r[{self}]: {module_src_dir}")
                 ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
+                self.current_phase = None
+                logger_module.info("")  # Print empty line.
+                return False
 
         # Check for whether path to source dir has changed due to directory-layout
         # option or changes to metadata.

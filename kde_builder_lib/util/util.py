@@ -163,7 +163,10 @@ class Util:
             Util.createdPaths[pathname] = True
             return True
         else:
-            Path(pathname).mkdir(parents=True, exist_ok=True)
+            try:
+                Path(pathname).mkdir(parents=True, exist_ok=True)
+            except Exception as e:
+                print(e)
             return True if os.path.exists(pathname) else False
 
     @staticmethod
