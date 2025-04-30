@@ -133,7 +133,7 @@ class Updater:
             raise ProgramError("Missing IPC object")
         ipc = self.ipc
 
-        logger_updater.warning(f"Cloning g[{module}]")
+        logger_updater.warning(f"\tCloning g[{module}]")
 
         Util.p_chdir(module.get_source_dir())
 
@@ -166,7 +166,7 @@ class Updater:
             result = Util.safe_system(["git", "config", "--local", "user.email", email]) == 0 or result
 
             if not result:
-                logger_updater.warning(f"Unable to set user.name and user.email git config for y[b[{module}]!")
+                logger_updater.warning(f"\tUnable to set user.name and user.email git config for y[b[{module}]!")
         return 1  # success
 
     @staticmethod
@@ -496,7 +496,7 @@ class Updater:
         if module.get_option("hold-work-branches"):
             current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True).stdout.strip()
             if current_branch.startswith("work/") or current_branch.startswith("mr/"):
-                logger_updater.warning(f"Holding g[{module}] at branch b[{current_branch}]")
+                logger_updater.warning(f"\tHolding g[{module}] at branch b[{current_branch}]")
                 return 0
 
         # Try to save the user if they are doing a merge or rebase
@@ -504,7 +504,7 @@ class Updater:
             raise KBRuntimeError(f"Aborting git update for {module}, you appear to have a rebase or merge in progress!")
 
         remote_name = self._setup_best_remote()
-        logger_updater.info(f"Fetching remote changes to g[{module}]")
+        logger_updater.info(f"\tFetching remote changes to g[{module}]")
         exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "-f", "--tags", remote_name])
 
         # Download updated objects. This also updates remote heads so do this
@@ -520,7 +520,7 @@ class Updater:
             commit_type = "branch"
             commit_id = self._detect_default_remote_head(remote_name)
 
-        logger_updater.warning(f"Merging g[{module}] changes from {commit_type} b[{commit_id}]")
+        logger_updater.warning(f"\tMerging g[{module}] changes from {commit_type} b[{commit_id}]")
         start_commit = self.commit_id("HEAD")
 
         self.stash_and_update(commit_type, remote_name, commit_id)
@@ -596,7 +596,7 @@ class Updater:
         # In this case it's unclear which convention source modules will use between
         # "master", "main", or something entirely different.  So just don't guess...
         if not source_type:
-            logger_updater.debug(f"No branch specified for {module}, will use whatever git gives us")
+            logger_updater.debug(f"\tNo branch specified for {module}, will use whatever git gives us")
             return "none", "none"
 
         # Likewise branch-group requires special handling. checkout_source is
@@ -607,7 +607,7 @@ class Updater:
 
             if not checkout_source:
                 branch_group = module.get_option("branch-group")
-                logger_updater.debug(f"No specific branch set for {module} and {branch_group}, using master!")
+                logger_updater.debug(f"\tNo specific branch set for {module} and {branch_group}, using master!")
                 checkout_source = "master"
 
         if source_type[0] == "tag" and not checkout_source.startswith("^refs/tags/"):

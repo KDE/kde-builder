@@ -143,10 +143,13 @@ class TaskManager:
 
         kdesrc = ctx.get_source_dir()
         if not os.path.exists(kdesrc):
-            logger_taskmanager.debug("KDE source download directory doesn't exist, creating.\n")
+            if not ipc.supports_concurrency():
+                logger_taskmanager.warning(f"Creating global source directory")
+
+            logger_taskmanager.debug("\tKDE source download directory doesn't exist, creating.\n")
 
             if not Util.super_mkdir(kdesrc):
-                logger_taskmanager.error(f"Unable to make directory r[{kdesrc}]!")
+                logger_taskmanager.error(f"\tUnable to make directory r[{kdesrc}]!")
                 ipc.send_ipc_message(IPC.ALL_FAILURE, "no-source-dir")
                 return 1
 
@@ -155,12 +158,18 @@ class TaskManager:
         ipc.send_ipc_message(IPC.ALL_UPDATING, "starting-updates")
 
         had_error = 0
+        cur_module = 1
+        num_modules = len(update_list)
+
         for module in update_list:
             if self.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
                 break
 
             ipc.set_logged_module(module.name)
+
+            if not ipc.supports_concurrency():
+                logger_taskmanager.warning(f"Updating g[{module.name}] ({cur_module}/{num_modules})")
 
             # Note that this must be in this order to avoid accidentally not
             # running update() from short-circuiting if an error is noted.
@@ -171,6 +180,7 @@ class TaskManager:
             # But the other one is needed for --async mode since persistent options
             # only work from within the build process
             module.set_persistent_option("source-dir", module.fullpath("source"))
+            cur_module += 1
 
         ipc.send_ipc_message(IPC.ALL_DONE, f"had_errors: {had_error}")
         return had_error

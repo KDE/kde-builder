@@ -642,7 +642,7 @@ class Module(OptionsBase):
         if kdesrc != module_src_dir:
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
-                logger_module.error(f"Unable to create separate source directory for r[{self}]: {module_src_dir}")
+                logger_module.error(f"\tUnable to create separate source directory for r[{self}]: {module_src_dir}")
                 ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
 
         # Check for whether path to source dir has changed due to directory-layout
@@ -650,19 +650,18 @@ class Module(OptionsBase):
         fullpath = self.fullpath("source")
         old_source_dir = self.get_option("#last-source-dir")
         if not Debug().pretending() and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
-            logger_module.warning(f" y[b[*] Source directory setting has changed to {fullpath}.")
-            logger_module.warning(f" y[b[*] Moving old source directory at {old_source_dir} to the new location.")
+            logger_module.warning(f"""\
+                \ty[b[*] Source directory setting has changed to {fullpath}.
+                \ty[b[*] Moving old source directory at {old_source_dir} to the new location.""")
 
             try:
                 shutil.move(old_source_dir, fullpath)
             except Exception as e:
-                logger_module.warning(textwrap.dedent(f"""
-                    r[b[*] Unable to move {old_source_dir}
-                    r[b[*] to {fullpath}
-                    r[b[*] Error: {e}
-                    y[b[*]
-                    y[b[*] Will proceed, generating a new source dir.
-                    """))
+                logger_module.warning(textwrap.dedent(f"""\
+                    \tr[b[*] Unable to move {old_source_dir}
+                    \tr[b[*] to {fullpath}
+                    \tr[b[*] Error: {e}
+                    \ty[b[*] Will proceed, generating a new source dir."""))
 
         self.current_phase = "update"
 
