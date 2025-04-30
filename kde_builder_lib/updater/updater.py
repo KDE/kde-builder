@@ -155,18 +155,20 @@ class Updater:
 
         # Setup user configuration
         if name := module.get_option("git-user"):
-            username, email = re.match(r"^([^<]+) +<([^>]+)>$", name)
+            username, email = None, None
+            match = re.match(r"^([^<]+) +<([^>]+)>$", name)
+            if match:
+                username, email = match.groups()
+
             if not username or not email:
                 raise KBRuntimeError(f"Invalid username or email for git-user option: {name}" +
                                      " (should be in format 'User Name <username@example.net>'")
 
             logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
-            result = Util.safe_system(["git", "config", "--local", "user.name", username]) == 0
-
-            result = Util.safe_system(["git", "config", "--local", "user.email", email]) == 0 or result
-
-            if not result:
-                logger_updater.warning(f"\tUnable to set user.name and user.email git config for y[b[{module}]!")
+            result = Util.safe_system(["git", "config", "--local", "user.name", username])
+            result = Util.safe_system(["git", "config", "--local", "user.email", email]) or result
+            if result:
+                logger_updater.warning(f"\tUnable to set user.name and/or user.email git config for y[b[{module}]!")
         return 1  # success
 
     @staticmethod

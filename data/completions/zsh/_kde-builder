@@ -40,6 +40,7 @@ _arguments \
   --generate-config"[Installs a base config file]" \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
+  --git-user"[Specify user identity for newly cloned projects]"":argument:" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
   "(--hold-work-branches --no-hold-work-branches)"{--hold-work-branches,--no-hold-work-branches}"[Skip updating projects which are currently at work/* or mr/* branch]" \
   "(-! --ignore-projects)"{-!,--ignore-projects}"[Do not include specified projects in the update/build process]"":::_kde-builder_projects_and_groups" \
