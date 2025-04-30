@@ -715,7 +715,8 @@ class Application:
             except ValueError:
                 last_self_updates_check = 0
 
-            if last_self_updates_check + 604800 <= int(time()):  # 604800 - number of seconds in one week
+            check_period = 604800  # 604800 - number of seconds in one week
+            if last_self_updates_check + check_period <= int(time()) and not Debug().pretending():
                 Version.check_for_updates()
                 ctx.set_persistent_option("global", "last-self-updates-check", int(time()))
 
