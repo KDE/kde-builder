@@ -467,8 +467,7 @@ class DependencyResolver:
         return errors
 
     def resolve_to_module_graph(self, modules: list[Module]) -> dict:
-        graph = {}
-        module_graph = graph
+        module_graph = {}
 
         result = {
             "graph": module_graph,

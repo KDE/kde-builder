@@ -212,6 +212,7 @@ class IPC:
             return "success", "Skipped"
 
         message = ""
+        messages = self.messages
         while updated.get(module_name) is None and not self.updates_done:
             ipc_type, buffer = self.receive_ipc_message()
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
@@ -220,7 +221,6 @@ class IPC:
             # If we have "global" messages they are probably for the first module and
             # include standard setup messages, etc. Print first and then print module's
             # messages.
-            messages = self.messages
             for item in ["global", module_name]:
                 if item in messages:  # pl2py: we specifically check if there is such a key
                     for msg in messages[item]:
@@ -252,7 +252,7 @@ class IPC:
                     if not re.match(r"^\s+", msg):
                         msg = f"\t{msg}"
                     KBLogger.print_clr(logger_name, message_level, msg)
-        self.messages = {}
+        self.messages.clear()
 
     def forget_module(self, module: Module) -> None:
         """
