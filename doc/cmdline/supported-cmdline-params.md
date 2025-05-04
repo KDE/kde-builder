@@ -82,6 +82,11 @@ these projects.
 This option is likely not a good idea, and is only supported for
 compatibility with older scripts.
 
+(cmdline-taskset-cpu-list)=
+[`--taskset-cpu-list`](cmdline-taskset-cpu-list) \<value\>  
+This option is used to limit the number of cpu cores used in build/install process.
+For more info about value format, see corresponding config option [taskset-cpu-list](#conf-taskset-cpu-list).
+
 (cmdline-hold-work-branches)=
 [`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
 This option allows you to skip updating sources for projects that have current branch which name starts with

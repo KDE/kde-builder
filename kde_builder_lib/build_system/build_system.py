@@ -436,13 +436,24 @@ class BuildSystem:
 
         prefix_opts = opts["prefix-options"]
 
+        taskset_args = []
+        taskset_opt = module.get_option("taskset-cpu-list")
+
+        if taskset_opt:
+            arg_str = taskset_opt
+            if taskset_opt == "auto":
+                auto_num = self.auto_cores_number()
+                arg_str = f"0-{auto_num}"
+
+            taskset_args = ["taskset", "--cpu-list", arg_str]
+
         # If using sudo ensure that it doesn't wait on tty, but tries to read from
         # stdin (which should fail as we redirect that from /dev/null)
         if prefix_opts and prefix_opts[0] == "sudo" and [opt for opt in prefix_opts if opt != "-S"]:
             prefix_opts.insert(1, "-S")  # Add -S right after "sudo"
 
         # Assemble arguments
-        args = [*prefix_opts, build_command, *build_command_line]
+        args = [*prefix_opts, *taskset_args, build_command, *build_command_line]
         if opts["target"]:
             args.append(opts["target"])
         args.extend(opts["make-options"])

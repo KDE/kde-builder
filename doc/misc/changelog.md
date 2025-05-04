@@ -1,5 +1,8 @@
 # Changelog
 
+2025-05-05
+: Added `--taskset-cpu-list` option.
+
 2025-03-19
 : Added `--check-self-updates` option.
 

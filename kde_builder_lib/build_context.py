@@ -179,6 +179,7 @@ class BuildContext(Module):
             "source-dir": os.getenv("HOME") + "/kde/src",
             "source-when-start-program": "/dev/null",
             "tag": "",
+            "taskset-cpu-list": "",
         }
 
         # These options are exposed as cmdline options without parameters

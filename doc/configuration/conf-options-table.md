@@ -968,6 +968,24 @@ to use this option. KDE releases are available in tarball form from the
 
 Related command-line option: --tag \<value\>
 
+(conf-taskset-cpu-list)=
+[`taskset-cpu-list`](conf-taskset-cpu-list)
+
+Type: String
+
+This option is used to limit the number of cpu cores used in build/install process.
+It is similar to [num-cores](#conf-num-cores), but is more reliable.
+The problem with num-cores is that ninja has an issue to ignore it.
+See [this ninja issue](https://github.com/ninja-build/ninja/issues/1441) and 
+[this discussion on kde forum](https://discuss.kde.org/t/cmake-builds-of-some-kde-projects-make-the-system-unresponsive-by-queuing-way-too-many-jobs/28091).
+
+- If set to empty string, taskset is not used.
+- If set to non-empty string, it is treated as an argument string for `taskset --cpu-list`, for example "0-6"
+to restrict builds to using the first 6 CPU threads on your machine.
+- If set to "auto", it will automatically prepare an argument string. It will reserve some cores for the
+system to stay responsive while building. It is convenient if you often change host machine
+(or number of processors of virtual machine), because it does not require changing config in that case.
+
 (conf-use-clean-install)=
 [`use-clean-install`](conf-use-clean-install)
 
