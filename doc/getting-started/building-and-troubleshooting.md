@@ -47,25 +47,27 @@ to that in [example_title](#example-build-sequence):
 :caption: Example output of a kde-builder run
 
 $ kde-builder kcalc
-Fetching remote changes to sysadmin-repo-metadata
-Merging sysadmin-repo-metadata changes from branch master
+Updating repo-metadata
+         Fetching remote changes to sysadmin-repo-metadata
+         Merging sysadmin-repo-metadata changes from branch master
+
 Holding performance profile
 
-Building extra-cmake-modules from frameworks (1/26)
+Building frameworks/extra-cmake-modules (1/26)
         Fetching remote changes to extra-cmake-modules
         Merging extra-cmake-modules changes from branch master
         No changes to extra-cmake-modules source code, but proceeding to build anyway.
         Compiling... succeeded (after 2 seconds)
         Installing extra-cmake-modules succeeded (after 2 seconds)
 
-Building plasma-wayland-protocols from kf6-support (2/26)
+Building libraries/plasma-wayland-protocols (2/26)
         Fetching remote changes to plasma-wayland-protocols
         Merging plasma-wayland-protocols changes from branch master
         No changes to plasma-wayland-protocols source code, but proceeding to build anyway.
         Compiling... succeeded (after 0 seconds)
         Installing plasma-wayland-protocols succeeded (after 2 seconds)
 
-Building kconfig from frameworks (3/26)
+Building frameworks/kconfig (3/26)
         Fetching remote changes to kconfig
         Merging kconfig changes from branch master
         Source update complete for kconfig: 1 file affected.
@@ -75,7 +77,7 @@ Building kconfig from frameworks (3/26)
 
         ...
 
-Building kcalc from kdeutils (26/26)
+Building utilities/kcalc (26/26)
         Fetching remote changes to kcalc
         Merging kcalc changes from branch master
         No changes to kcalc source code, but proceeding to build anyway.

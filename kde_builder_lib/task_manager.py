@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from .module.module import Module
 
 logger_ipc = KBLogger.getLogger("ipc")
-logger_buildsystem = KBLogger.getLogger("build-system")
 logger_taskmanager = KBLogger.getLogger("taskmanager")
 
 
@@ -169,7 +168,8 @@ class TaskManager:
             ipc.set_logged_module(module.name)
 
             if not ipc.supports_concurrency():
-                logger_taskmanager.warning(f"Updating g[{module.name}] ({cur_module}/{num_modules})")
+                block_substr = self._form_block_substring(module)
+                logger_taskmanager.warning(f"Updating {block_substr} ({cur_module}/{num_modules})")
 
             # Note that this must be in this order to avoid accidentally not
             # running update() from short-circuiting if an error is noted.
@@ -300,17 +300,8 @@ class TaskManager:
                 break
 
             module_name = module.name
-            module_set = module.get_module_set().name
-            mod_output = module_name
-
-            if logger_buildsystem.isEnabledFor(logging.DEBUG):
-                sys_type = module.build_system_type()
-                mod_output += f" (build system {sys_type})"
-
-            if module_set:
-                module_set = f" from g[{module_set}]"
-
-            logger_taskmanager.warning(f"Building g[{mod_output}]{module_set} ({cur_module}/{num_modules})")
+            block_substr = self._form_block_substring(module)
+            logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
             failed_phase = TaskManager._build_single_module(ipc, ctx, module, start_time)
@@ -728,3 +719,15 @@ class TaskManager:
                 logger_taskmanager.error("r[mon]: Build process stopped too soon!")
                 return 1
         return 0
+
+    @staticmethod
+    def _form_block_substring(module: Module) -> str:
+        if module.is_kde_project():
+            proj_metadata = module.context.projects_db.repositories[module.name]
+            invent_path_list = proj_metadata["invent_name"].split("/")
+            legacy_path = proj_metadata["full_name"]
+            mod_output = "g[" + invent_path_list[0] + "]/g[" + invent_path_list[1] + "]" + f" ({legacy_path})"
+        else:
+            mod_output = "g[third-party]/g[" + module.name + "]"
+
+        return mod_output
