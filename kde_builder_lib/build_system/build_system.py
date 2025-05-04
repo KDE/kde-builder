@@ -85,6 +85,16 @@ class BuildSystem:
         """
         return False
 
+    @staticmethod
+    def auto_cores_number() -> int:
+        """
+        Get the number of cores to use if user set their num-cores or taskset-cpu-list to auto.
+        """
+        max_cores = os.cpu_count()
+        if max_cores is None or max_cores <= 1:
+            return 1
+        return int(max_cores * 0.8)
+
     def build_constraints(self) -> dict:
         """
         Return a dict holding the resource constraints to try to apply during the build.
@@ -104,16 +114,12 @@ class BuildSystem:
         if cores == "":
             return {}
 
-        max_cores = os.cpu_count()
-        if not max_cores:
-            max_cores = 1
-
         if cores == "auto":
             # If the build_system can manage it and the user doesn't care, that's OK too
             if self.supports_auto_parallelism():
                 return {}
-            if max_cores > 1:
-                cores = int(max_cores * 0.8)
+            else:
+                cores = self.auto_cores_number()
 
         # If user sets cores to something silly, set it to a failsafe.
         if int(cores) <= 0:
