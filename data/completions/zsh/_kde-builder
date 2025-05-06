@@ -28,7 +28,6 @@ _arguments \
   --custom-build-command"[Run a different command in order to perform the build process]"":argument:" \
   --cxxflags"[Flags to use for building the project]"":argument:" \
   --debug"[Enable debug mode]" \
-  "(--delete-my-patches --no-delete-my-patches)"{--delete-my-patches,--no-delete-my-patches}"[Let kde-builder delete source directories that may contain user data]" \
   "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree"[Print out dependency information on the projects that would be built]" \
   "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the projects that would be built]" \
   --dest-dir"[The name a project is given on disk]"":argument:" \

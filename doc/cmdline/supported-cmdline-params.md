@@ -84,23 +84,6 @@ these projects.
 This option is likely not a good idea, and is only supported for
 compatibility with older scripts.
 
-(cmdline-delete-my-patches)=
-[`--delete-my-patches`](cmdline-delete-my-patches), `--no-delete-my-patches`  
-This option is used to let kde-builder delete source directories that
-may contain user data, so that the project can be re-downloaded. This
-would normally only be useful for KDE developers (who might have local
-changes that would be deleted).
-
-You should not use this option normally, kde-builder will prompt to be
-re-run with it if it is needed.
-
-This option must be passed to allow `kde-builder` to remove conflicting
-source directories. Currently even this only happens when trying to
-git clone a project if an existing source directory is present.
-Never specify this option unless it is suggested by `kde-builder`, and
-only if you don't mind the source directories that are referenced being
-deleted and re-cloned.
-
 (cmdline-hold-work-branches)=
 [`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
 This option allows you to skip updating sources for projects that have current branch which name starts with

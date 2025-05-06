@@ -178,32 +178,11 @@ class Updater:
 
         Throws an exception if that's not true.
         """
-        if os.path.exists(f"{srcdir}") and not os.listdir(srcdir):
-            if module.get_option("#delete-my-patches"):
-                logger_updater.warning("\tRemoving conflicting source directory " + "as allowed by --delete-my-patches")
-                logger_updater.warning(f"\tRemoving b[{srcdir}]")
-                if not Util.safe_rmtree(srcdir):
-                    raise ProgramError(f"Unable to delete {srcdir}!")
-            else:
-                logger_updater.error(textwrap.dedent(f"""\
-                The source directory for b[{module}] does not exist. kde-builder would download
-                it, except there is already a file or directory present in the desired source
-                directory:
-                \ty[b[{srcdir}]
-
-                Please either remove the source directory yourself and re-run this script, or
-                pass the b[--delete-my-patches] option to kde-builder and kde-builder will
-                try to do so for you.
-
-                DO NOT FORGET TO VERIFY THERE ARE NO UNCOMMITTED CHANGES OR OTHER VALUABLE
-                FILES IN THE DIRECTORY.
-
-                """))
-
-                if os.path.exists(f"{srcdir}/.git"):
-                    logger_updater.error(f"git status of {srcdir}:")
-                    print(subprocess.check_output(["git", "status", srcdir]))
-                raise KBRuntimeError("Conflicting source-dir present")
+        if os.path.exists(f"{srcdir}") and os.listdir(srcdir):
+            logger_updater.error(textwrap.dedent(f"""\
+            \tr[*] The desired source directory for b[{module}] is: y[b[{srcdir}]
+            \tr[*] This directory already exists, but it is not empty, and it is not a git repository."""))
+            raise KBRuntimeError("Unrecognised content in source-dir present")
 
     def update_checkout(self) -> int:
         """
