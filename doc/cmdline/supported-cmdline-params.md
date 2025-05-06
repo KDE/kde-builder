@@ -101,11 +101,6 @@ Never specify this option unless it is suggested by `kde-builder`, and
 only if you don't mind the source directories that are referenced being
 deleted and re-cloned.
 
-(cmdline-delete-my-settings)=
-[`--delete-my-settings`](cmdline-delete-my-settings), `--no-delete-my-settings`  
-This option is used to let kde-builder overwrite existing files which
-may contain user data.
-
 (cmdline-hold-work-branches)=
 [`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
 This option allows you to skip updating sources for projects that have current branch which name starts with

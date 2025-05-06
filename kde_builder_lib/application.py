@@ -1597,16 +1597,7 @@ class Application:
             existing_md5 = ctx.get_persistent_option("/digests", md5_key_name) or ""
 
             if hashlib.md5(open(dest_file_path, "rb").read()).hexdigest() != existing_md5:
-                if not ctx.get_option("#delete-my-settings"):
-                    logger_app.error(textwrap.dedent(f"""\
-                        \tr[*] Installing \"b[{base_name}]\" would overwrite an existing file:
-                        \tr[*]  y[b[{dest_file_path}]
-                        \tr[*] If this is acceptable, please delete the existing file and re-run,
-                        \tr[*] or pass b[--delete-my-settings] and re-run.
-                        """))
-
-                    return
-                elif not Debug().pretending():
+                if not Debug().pretending():
                     shutil.copy(dest_file_path, f"{dest_file_path}.kde-builder-backup")
 
         if not Debug().pretending():
