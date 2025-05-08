@@ -217,9 +217,6 @@ class Module(OptionsBase):
         """
         Autodetects the appropriate scm plugin if not already done (or manually set), and then returns the `Updater` plugin.
         """
-        if self.scm_obj:
-            return self.scm_obj
-
         if not self.scm_obj:
             self.scm_obj = Updater(self)
         return self.scm_obj

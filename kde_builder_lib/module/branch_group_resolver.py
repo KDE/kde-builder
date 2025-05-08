@@ -34,19 +34,16 @@ class ModuleBranchGroupResolver:
 
         self.wildcarded_groups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
 
-    def _find_logical_group(self, module: str, logical_group: str) -> str | None:
+    def find_module_branch(self, entry_name: str, logical_group: str) -> str | None:
         """
-        Return the branch for the given logical group and module specifier.
+        Return the branch for the given logical group and entry_name.
 
-        This function should not be called if the module specifier does not actually exist.
+        Args:
+            entry_name: full key name from lms groups (may contain "*")
+            logical_group: value of logical group
         """
-        # Using defined-or and still returning None is on purpose, silences
-        # warning about use of undefined value.
-        return self.groups[module].get(logical_group, None)
-
-    def find_module_branch(self, module: str, logical_group: str) -> str | None:
-        if module in self.groups:
-            return self._find_logical_group(module, logical_group)
+        if entry_name in self.groups:
+            return self.groups[entry_name].get(logical_group, None)
 
         # Map module search spec to prefix string that is required for a match
         catch_all_group_stats = {key: key[:-1] for key in self.wildcarded_groups.keys()}
@@ -55,12 +52,12 @@ class ModuleBranchGroupResolver:
         # then also be the right match.
         ordered_candidates = sorted(catch_all_group_stats.keys(), key=lambda x: catch_all_group_stats[x], reverse=True)
 
-        match = next((candidate for candidate in ordered_candidates if module[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
+        match = next((candidate for candidate in ordered_candidates if entry_name[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
 
         if match:
-            return self._find_logical_group(match, logical_group)
+            return self.groups[match].get(logical_group, None)
 
         if "*" in self.groups:
-            return self._find_logical_group("*", logical_group)
+            return self.groups["*"].get(logical_group, None)
 
-        return
+        return None
