@@ -157,7 +157,7 @@ class BuildContext(Module):
             "custom-build-command": "",
             "cxxflags": "-pipe",
             "directory-layout": "flat",
-            "dest-dir": '${MODULE}',  # single quotes used on purpose!
+            "dest-dir": "${MODULE}",
             "do-not-compile": "",
             "git-user": "",
             "install-dir": os.getenv("HOME") + "/kde/usr",

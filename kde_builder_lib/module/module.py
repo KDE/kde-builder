@@ -906,25 +906,26 @@ class Module(OptionsBase):
         paths. Supports expanding "$MODULE" or "${MODULE}" sequences to what otherwise would have been the dest-dir.
         """
         dest_dir = self.get_option("dest-dir")
-        base_path = None
 
-        layout = self.get_option("directory-layout")
-        if layout == "flat":
-            base_path = self.name
-        elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
-            base_path = self.get_option("#kde-repo-path", "module")
-            base_path = base_path or self.name  # Default if not provided in repo-metadata
-        elif layout == "metadata":
-            base_path = self.get_option("#kde-project-path", "module")
-            base_path = base_path or self.name  # Default if not provided in repo-metadata
-        else:
-            if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
-                logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
-                self.set_option("#warned-invalid-directory-layout", True)
-            base_path = self.name
+        # Note the default dest-dir option is "${MODULE}"
+        if "${MODULE}" in dest_dir or "$MODULE" in dest_dir:
+            layout = self.get_option("directory-layout")
+            if layout == "flat":
+                base_path = self.name
+            elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
+                base_path = self.get_option("#kde-repo-path", "module")
+                base_path = base_path or self.name  # Default if not provided in repo-metadata
+            elif layout == "metadata":
+                base_path = self.get_option("#kde-project-path", "module")
+                base_path = base_path or self.name  # Default if not provided in repo-metadata
+            else:
+                if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
+                    logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
+                    self.set_option("#warned-invalid-directory-layout", True)
+                base_path = self.name
 
-        # Note the default dest-dir option is "${MODULE}" so this normally is used
-        dest_dir = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", base_path, dest_dir)
+            dest_dir = dest_dir.replace("$MODULE", base_path)
+            dest_dir = dest_dir.replace("${MODULE}", base_path)
 
         return dest_dir
 
