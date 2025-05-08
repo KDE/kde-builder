@@ -50,6 +50,7 @@ class ModuleSetKDEProjects(ModuleSet):
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
         metadata_module.set_option("#kde-project-path", module_name)
         metadata_module.set_scm_type("metadata")
+        metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
         metadata_module.set_option("branch", "master")
         metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))
         metadata_module.set_option("log-dir", "log")  # overwrite default value, because user may store his directories not under "~/kde"
