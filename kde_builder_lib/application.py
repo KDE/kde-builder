@@ -245,7 +245,7 @@ class Application:
             ctx.set_option(opt_name, opt_val)
 
         # We download repo-metadata before reading config, because config already includes the module-definitions from it.
-        self._download_kde_project_metadata()  # Uses test data automatically
+        self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
         # _process_configs_content will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
@@ -483,7 +483,7 @@ class Application:
                 orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
-                metadata_module.scm().update_internal()
+                metadata_module.scm().update_internal()  # Skipped automatically in testing mode
                 logger_app.warning("")  # Prints empty line to space it from next messages
                 metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
@@ -544,7 +544,7 @@ class Application:
 
                 dependency_file = f"{srcdir}/dependencies/dependency-data-{branch_group}"
                 try:
-                    dependencies = Util.pretend_open(dependency_file)
+                    dependencies = Util.open_or_fail(dependency_file)
                 except Exception as e:
                     print(f"Unable to open {dependency_file}: {e}")
 

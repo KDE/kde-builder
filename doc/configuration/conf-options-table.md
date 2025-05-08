@@ -306,7 +306,7 @@ Set this option to a general group from which you want projects to be chosen.
 For projects that are kde-projects, kde-builder will determine the
 actual branch to use automatically based on rules encoded by the KDE
 developers (these rules may be viewed in the
-`sysadmin/repo-metadata` repository. After a branch is determined that branch is used as if you
+`sysadmin/repo-metadata` repository). After a branch is determined that branch is used as if you
 had specified it yourself using the [branch](#conf-branch)
 option.
 

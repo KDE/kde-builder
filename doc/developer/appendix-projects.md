@@ -86,7 +86,7 @@ group name:
   repository: kde-projects
 
   # branch-group is inherited from the one set globally, but could
-  # specified here.
+  # be specified here.
 
   use-projects:
     - kdelibs
@@ -100,7 +100,7 @@ In this case the same `branch-group` gives different branch names for
 each module.
 
 This feature requires some data maintained by the KDE developers in a
-git repository named `kde-build-metadata`, however this project will be
+git repository named `repo-metadata`, however this project will be
 included automatically by kde-builder (though you may see it appear in
 the script output).
 

@@ -9,9 +9,7 @@ Operate in a "dry run" mode. No network accesses are made, no log files
 are created, no projects are built, and no other permanent changes to
 disk are made. One *important exception* is that if you try to build a
 project that comes from the KDE projects, and the repo-metadata hasn't
-been downloaded yet, the repo-metadata will be downloaded since the
-pretend-mode output may change significantly based on the repo-metadata
-results.
+been downloaded yet, the repo-metadata will be downloaded.
 
 Simple read-only commands (such as reading file information) may still
 be run to make the output more relevant (such as correctly simulating

@@ -5,6 +5,7 @@
 
 import json
 import re
+import textwrap
 
 from .kde_project import UpdaterKDEProject
 from ..kb_exception import KBException
@@ -37,7 +38,15 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
         # Now that we in theory have up-to-date source code, read in the
         # ignore file and propagate that information to our context object.
 
-        fh = Util.pretend_open(path)
+        if Debug().is_testing():
+            from io import StringIO
+            mock_build_script_ignore = textwrap.dedent("""\
+                sdk/kde-ruleset  # example ignoring
+                """)
+            fh = StringIO(mock_build_script_ignore)
+        else:
+            fh = Util.open_or_fail(path)
+
         if not fh:
             raise ProgramError(f"Unable to read ignore data from {path}")
 
@@ -67,8 +76,17 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
         """
         path = self.module.fullpath("source") + "/dependencies/logical-module-structure.json"
 
-        # The {} is an empty JSON obj to support pretend mode
-        fh = Util.pretend_open(path, "{}")
+        if Debug().is_testing():
+            from io import StringIO
+            mock_lms_json = textwrap.dedent("""\
+                {
+                    "groups": {}
+                }
+                """)
+            fh = StringIO(mock_lms_json)
+        else:
+            fh = Util.open_or_fail(path)
+
         if not fh:
             raise ProgramError("Unable to read logical module structure")
 

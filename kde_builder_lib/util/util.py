@@ -9,9 +9,9 @@ from __future__ import annotations
 import base64
 import codecs
 import hashlib
-from io import StringIO
 import logging
 import os.path
+from io import TextIOWrapper
 from pathlib import Path
 import re
 import shlex
@@ -565,31 +565,21 @@ class Util:
         return shlex.split(line.strip())
 
     @staticmethod
-    def pretend_open(path, default_text: str = ""):
+    def open_or_fail(path) -> TextIOWrapper | False:
         """
-        Open the given file and return a filehandle to it if the file actually exists or the script is not in pretend mode.
-
-        If the script is in pretend mode and the file is not already present then an open filehandle to an empty string is returned.
+        Open the given file and return a filehandle to it, or False on error.
 
         Args:
             path: Path to the file to open.
-            default_text: String to use if the file doesn't exist in pretend mode
 
         Returns:
-            filehandle on success (supports readline() and eof()), can return boolean
-            false if there is an error opening an existing file (or if the file doesn't
-            exist when not in pretend mode)
+            filehandle on success (supports readline() and eof())
+            can return boolean False if there is an error opening file
         """
-        if Debug().pretending() and not os.path.exists(path):
-            try:
-                fh = StringIO(default_text)
-            except IOError:
-                return False
-        else:
-            try:
-                fh = open(path, "r")
-            except IOError:
-                return False
+        try:
+            fh = open(path, "r")
+        except IOError:
+            return False
 
         return fh
 

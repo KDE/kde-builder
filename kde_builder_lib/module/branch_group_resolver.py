@@ -19,7 +19,7 @@ class ModuleBranchGroupResolver:
 
         # Copy just the objects we want over.
         self.layers = json_data.get("layers", [])
-        self.groups = json_data.get("groups", [])
+        self.groups = json_data.get("groups", {})
 
         # For layers and groups, remove anything beginning with a "_" as that is
         # defined in the spec to be a comment of some sort.

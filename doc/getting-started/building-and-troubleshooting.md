@@ -16,8 +16,7 @@ kde-builder --metadata-only
 
 This command will set up the source directory and download special repository
 from invent.kde.org containing data about all KDE projects, their dependencies between each other and from third party projects.
-No other changes will be made. It is useful to run this separately as this metadata is useful for other
-kde-builder commands.
+No other changes will be made.
 
 (pretend-mode)=
 ## Previewing what will happen when kde-builder runs
