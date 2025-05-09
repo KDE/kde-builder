@@ -76,8 +76,8 @@ branch-group can be used in the configuration file as follows:
 :caption: Example of using branch-group
 
 global:
-  # Select KDE Frameworks 5 and other Qt5-based apps
-  branch-group: kf5-qt5
+  # Select KDE Frameworks 6 and other Qt6-based apps
+  branch-group: kf6-qt6
 
   # Other global options here ...
 

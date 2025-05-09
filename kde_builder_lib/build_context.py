@@ -148,7 +148,7 @@ class BuildContext(Module):
         self.global_options_with_parameter = {
             "binpath": "",
             "branch": "",
-            "branch-group": "",  # Overrides branch, uses JSON data.
+            "branch-group": "kf6-qt6",
             "build-dir": os.getenv("HOME") + "/kde/build",
             "cmake-generator": "",
             "cmake-options": "",
@@ -808,10 +808,6 @@ class BuildContext(Module):
     def get_kde_projects_metadata_module(self) -> Module:
         """
         Return the :class:`Module` (which has a "metadata" scm type) that is used for kde-project metadata, so that other modules that need it can call into it if necessary.
-
-        Also, may return None if the metadata is unavailable or has not yet
-        been set by setKDEProjectsMetadataModule (this method does not
-        automatically create the needed module).
         """
         # Initialize if not set
         if not self.kde_projects_metadata:
@@ -839,11 +835,8 @@ class BuildContext(Module):
     def effective_branch_group(self) -> str:
         """
         Return the effective branch group to use for modules.
-
-        You should not call this unless KDE project metadata is available (see
-        setKDEProjectsMetadataModule and module_branch_group_resolver).
         """
-        branch_group = self.get_option("branch-group") or "kf5-qt5"
+        branch_group = self.get_option("branch-group")
         return branch_group
 
     def module_branch_group_resolver(self) -> ModuleBranchGroupResolver:
