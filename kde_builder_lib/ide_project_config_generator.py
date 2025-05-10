@@ -37,7 +37,7 @@ class IdeProjectConfigGenerator:
         such as C++ support, correct build directory, and LSP / IntelliSense.
         """
         if Debug().pretending():
-            logger_ide_proj.pretend("\tWould have generated .vscode directory")
+            logger_ide_proj.debug("\tWould have generated .vscode directory")
             return False
 
         module: Module = self.module
@@ -141,7 +141,7 @@ class IdeProjectConfigGenerator:
 
     def _generate_clion_config(self) -> bool:
         if Debug().pretending():
-            logger_ide_proj.pretend("\tWould have generated .idea directory")
+            logger_ide_proj.debug("\tWould have generated .idea directory")
             return False
 
         branch_group = self.module.context.get_option("branch-group")
@@ -234,7 +234,7 @@ class IdeProjectConfigGenerator:
         See developers documentation for more info.
         """
         if Debug().pretending():
-            logger_ide_proj.pretend("\tWould have generated .qtcreator directory")
+            logger_ide_proj.debug("\tWould have generated .qtcreator directory")
             return False
 
         module: Module = self.module

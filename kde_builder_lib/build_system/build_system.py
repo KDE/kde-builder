@@ -321,7 +321,7 @@ class BuildSystem:
         builddir = module.fullpath("build")
 
         if Debug().pretending():
-            logger_buildsystem.pretend(f"\tWould have cleaned build system for g[{module}]")
+            logger_buildsystem.debug(f"\tWould have cleaned build system for g[{module}]")
             return 1
 
         # Use an existing directory

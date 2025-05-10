@@ -56,9 +56,7 @@ logger_res_deps.error(f"r[Invalid dependency declaration: b[{dep}]]")
 Note that colorizing (the elements like `r[` and `]`) still can be used.
 
 The `Debug().note()` statements were considered as `Debug().warning()`,  
-and the `Debug().whisper()` statements were considered as `Debug().debug()`.
-
-The `pretend()` method was also ported and can still be used. 
+and the `Debug().whisper()` and `Debug().pretend()` statements were considered as `Debug().debug()`.
 
 This is a table of log levels that was used with that conversion: 
 

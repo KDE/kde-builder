@@ -184,7 +184,3 @@ class KBLogger(logging.Logger):
 
     def error(self, msg: str, *args, **kwargs) -> None:
         KBLogger.print_clr(self.name, "error", msg)
-
-    def pretend(self, msg: str) -> None:
-        if Debug().pretending():
-            KBLogger.print_clr(self.name, "debug", msg)

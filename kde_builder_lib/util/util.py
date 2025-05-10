@@ -111,7 +111,7 @@ class Util:
         Unlink the given symlink if global-pretend isn't set.
         """
         if Debug().pretending():
-            logger_util.pretend(f"\tWould have unlinked {path}.")
+            logger_util.debug(f"\tWould have unlinked {path}.")
             return
         os.unlink(path)
 
@@ -127,7 +127,7 @@ class Util:
             logger_util.debug("\tExecuting g['" + "' '".join(cmd_list) + "'")
             return subprocess.run(cmd_list).returncode
 
-        logger_util.pretend("\tWould have run g['" + "' '".join(cmd_list) + "'")
+        logger_util.debug("\tWould have run g['" + "' '".join(cmd_list) + "'")
         return 0  # Return true (success code)
 
     @staticmethod
@@ -159,7 +159,7 @@ class Util:
 
         if Debug().pretending():
             if pathname not in Util.createdPaths and not os.path.exists(pathname):
-                logger_util.pretend(f"\tWould have created g[{pathname}]")
+                logger_util.debug(f"\tWould have created g[{pathname}]")
             Util.createdPaths[pathname] = True
             return True
         else:
@@ -493,7 +493,7 @@ class Util:
         callback_func = options.get("callback", None)
 
         if Debug().pretending():
-            logger_logged_cmd.pretend("\tWould have run g['" + "' '".join(command) + "'")
+            logger_logged_cmd.debug("\tWould have run g['" + "' '".join(command) + "'")
             return 0
         return Util.run_logged_command(module, filename, callback_func, args)
 
@@ -516,7 +516,7 @@ class Util:
             directory = ""
         if Debug().pretending():
             args_str = "', '".join(args)
-            logger_logged_cmd.pretend(f"\tWould have run] (g['{args_str}'])")
+            logger_logged_cmd.debug(f"\tWould have run] (g['{args_str}'])")
             return 0
 
         # Do this before we fork so the path is finalized to prevent auto-detection
@@ -600,7 +600,7 @@ class Util:
         user_path = re.sub(r"^" + os.environ["HOME"], "~", user_path)
 
         if Debug().pretending():
-            logger_util.pretend(f"Would have removed all files/folders in {user_path}")
+            logger_util.debug(f"Would have removed all files/folders in {user_path}")
             return True
 
         # Error out because we probably have a logic error even though it would

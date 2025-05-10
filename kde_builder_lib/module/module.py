@@ -495,7 +495,7 @@ class Module(OptionsBase):
             return False
 
         if Debug().pretending():
-            logger_module.pretend(f"\tWould have installed g[{self}]")
+            logger_module.debug(f"\tWould have installed g[{self}]")
             return True
 
         # Past this point we know we've successfully installed, for real.
@@ -549,7 +549,7 @@ class Module(OptionsBase):
             return False
 
         if Debug().pretending():
-            logger_module.pretend(f"\tWould have uninstalled g[{self}]")
+            logger_module.debug(f"\tWould have uninstalled g[{self}]")
             return True
 
         self.unset_persistent_option("last-install-rev")
