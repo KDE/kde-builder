@@ -543,7 +543,7 @@ class Util:
             retval.value = Util.log_command(module, filename, args, {"callback": callback_func})
 
         exitcode = subprocess_run(func)
-        logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. d[Log file: {module.get_log_path(filename + ".log")}\n""")
+        logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename + ".log")}\n""")
         if not exitcode == 0:
             module.set_error_logfile(f"{filename}.log")
         return exitcode

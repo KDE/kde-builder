@@ -61,7 +61,6 @@ class Debug:
         text = text.replace("y[", self.YELLOW)
         text = text.replace("r[", self.RED)
         text = text.replace("b[", self.BOLD)
-        text = text.replace("d[", self.DIM)
         return text
 
     def pretending(self) -> bool:
@@ -89,13 +88,12 @@ class Debug:
             self.YELLOW = "\033[33m"
             self.NORMAL = "\033[0m"
             self.BOLD = "\033[1m"
-            self.DIM = "\033[34m"  # Really blue since dim doesn't work on konsole
-
-            # But konsole does support xterm-256color...
-            if "TERM" in os.environ and os.getenv("TERM").endswith("-256color"):
-                self.DIM = "\033[38;5;8m"
         else:
-            self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD, self.DIM = [""] * 6
+            self.RED = ""
+            self.GREEN = ""
+            self.YELLOW = ""
+            self.NORMAL = ""
+            self.BOLD = ""
 
     def set_log_file(self, file_name) -> None:
         if self.pretending():
@@ -189,5 +187,4 @@ class KBLogger(logging.Logger):
 
     def pretend(self, msg: str) -> None:
         if Debug().pretending():
-            msg = re.sub(r"(\w)", r"d[\1", msg, 1)  # Add dim prefix. Clear suffix is actually implicit
             KBLogger.print_clr(self.name, "debug", msg)

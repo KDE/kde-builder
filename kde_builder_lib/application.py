@@ -1809,7 +1809,7 @@ class Application:
                 system_bus = dbus.SystemBus()
 
                 if Debug().pretending():
-                    logger_app.info("d[Would hold performance profile")
+                    logger_app.info("Would hold performance profile")
                     return
 
                 logger_app.info("Holding performance profile")
