@@ -51,15 +51,22 @@ class Debug:
             self.ipc = None  # Set only if we should forward log messages over IPC.
 
             # Colors
-            self.RED, self.GREEN, self.YELLOW, self.NORMAL, self.BOLD, self.DIM = [""] * 6
+            self.RED = ""
+            self.GREEN = ""
+            self.YELLOW = ""
+            # Other
+            self.NORMAL = ""
+            self.BOLD = ""
 
     # Subroutine definitions
 
     def colorize(self, text: str) -> str:
-        text = text.replace("g[", self.GREEN)
-        text = text.replace("]", self.NORMAL)
-        text = text.replace("y[", self.YELLOW)
+        # Colors
         text = text.replace("r[", self.RED)
+        text = text.replace("g[", self.GREEN)
+        text = text.replace("y[", self.YELLOW)
+        # Other
+        text = text.replace("]", self.NORMAL)
         text = text.replace("b[", self.BOLD)
         return text
 
@@ -83,15 +90,19 @@ class Debug:
             return
 
         if use_color:
-            self.RED = "\033[31m"
-            self.GREEN = "\033[32m"
-            self.YELLOW = "\033[33m"
-            self.NORMAL = "\033[0m"
-            self.BOLD = "\033[1m"
+            # Colors
+            self.RED = "\033[31m"  # "r["
+            self.GREEN = "\033[32m"  # "g["
+            self.YELLOW = "\033[33m"  # "y["
+            # Other
+            self.NORMAL = "\033[0m"  # "]"
+            self.BOLD = "\033[1m"  # "b["
         else:
+            # Colors
             self.RED = ""
             self.GREEN = ""
             self.YELLOW = ""
+            # Other
             self.NORMAL = ""
             self.BOLD = ""
 
