@@ -664,8 +664,8 @@ class DependencyResolver:
             # simply sort by the order contained within the configuration file (if
             # present), which would be setup as the rc-file is read.
 
-            a_rc_order = module_graph[a]["module"].create_id or 0
-            b_rc_order = module_graph[b]["module"].create_id or 0
+            a_rc_order: int = module_graph[a]["module"].create_id
+            b_rc_order: int = module_graph[b]["module"].create_id
             config_order = (a_rc_order > b_rc_order) - (a_rc_order < b_rc_order)
 
             if config_order:

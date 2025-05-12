@@ -72,6 +72,11 @@ class Module(OptionsBase):
         if not self.name:
             raise ProgramError("Empty Module constructed")
 
+        # Think of it as a runtime serial number for the created module.
+        # The assigned number depends on the position the module was appeared in the build configs.
+        # It is used in _compare_build_order_depends() as a pre-last way of ordering modules for building.
+        self.create_id = 0
+
         # If building a BuildContext instead of a `Module`, then the context
         # can't have been set up yet...
         if self.__class__.__name__ != "BuildContext" and ctx.__class__.__name__ != "BuildContext":

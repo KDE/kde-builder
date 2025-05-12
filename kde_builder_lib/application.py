@@ -1080,7 +1080,7 @@ class Application:
                     logger_app.error(f"Name {module_name} for module in {config_filename} is already in use on a module-set")
                     raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
 
-                new_module = self._process_module_options(ctx, node, config_filename, Module(ctx, module_name))
+                new_module: Module = self._process_module_options(ctx, node, config_filename, Module(ctx, module_name))
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module

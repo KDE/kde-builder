@@ -14,7 +14,7 @@ from kde_builder_lib.module.module import Module
 def mock_module_from_attrs(monkeypatch):
     def mock__init__(self, **kwargs):
         self.name = kwargs.get("name", None)
-        self.create_id = kwargs.get("create_id", None)
+        self.create_id = kwargs.get("create_id", 0)
 
     monkeypatch.setattr(Module, "__init__", mock__init__)
 
