@@ -1054,9 +1054,9 @@ class Application:
                     raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
-                new_module_set = self._process_module_set_options(ctx, node, config_filename, ModuleSet(ctx, module_set_name))
+                new_module_set: ModuleSet = self._process_module_set_options(ctx, node, config_filename, ModuleSet(ctx, module_set_name))
                 creation_order += 1
-                new_module_set.create_id = creation_order
+                new_module_set.start_for_create_id = creation_order
 
                 # Save "use-projects" entries, so we can see if later module decls
                 # are overriding/overlaying their options.

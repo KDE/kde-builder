@@ -53,7 +53,7 @@ class ModuleSet(OptionsBase):
 
     def __init__(self, ctx: BuildContext, name: str):
         OptionsBase.__init__(self)
-        self.create_id = None
+        self.start_for_create_id: int = 0
 
         # newOptions:
         self.name: str = name or ""
@@ -106,7 +106,7 @@ class ModuleSet(OptionsBase):
         # on order the user declared modules in use-projects, especially for third
         # party modules. Indirect deps won't have an entry and are given the max value
         # to sort at the end within the module-set.
-        start_order = self.create_id if self.create_id else 0
+        start_order = self.start_for_create_id
 
         order_in_list: int = self.module_order.get(f"{new_module}", len(self.module_search_decls))
         new_module.create_id = start_order + order_in_list
