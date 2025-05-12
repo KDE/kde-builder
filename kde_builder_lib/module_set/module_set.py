@@ -56,12 +56,12 @@ class ModuleSet(OptionsBase):
         self.create_id = None
 
         # newOptions:
-        self.name = name or ""
-        self.module_search_decls = []
-        self.module_ignore_decls = []
-        self.module_order = {}  # maps module names to position in list
+        self.name: str = name or ""
+        self.module_search_decls: list[str] = []
+        self.module_ignore_decls: list[str] = []
+        self.module_order: dict[str, int] = {}  # maps module names to position in list
         self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
-        self.context = ctx
+        self.context: BuildContext = ctx
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
@@ -70,7 +70,7 @@ class ModuleSet(OptionsBase):
         return self.module_search_decls
 
     def set_modules_to_find(self, module_decls: list[str]) -> None:
-        decl_order = {module_decls[i]: i for i in range(len(module_decls))}
+        decl_order: dict[str, int] = {module_decls[i]: i for i in range(len(module_decls))}
 
         self.module_search_decls = module_decls
         self.module_order = decl_order
@@ -108,7 +108,7 @@ class ModuleSet(OptionsBase):
         # to sort at the end within the module-set.
         start_order = self.create_id if self.create_id else 0
 
-        order_in_list = self.module_order.get(f"{new_module}", len(self.module_search_decls))
+        order_in_list: int = self.module_order.get(f"{new_module}", len(self.module_search_decls))
         new_module.create_id = start_order + order_in_list
 
     # @override
