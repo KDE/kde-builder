@@ -214,7 +214,7 @@ class Application:
         # doing.
 
         ctx = self.context
-        deferred_options = []  # "override" nodes
+        deferred_options: list[dict[str, str | dict]] = []  # "override" nodes. It will be filled by _process_configs_content().
 
         # Process --help, etc. first.
         c = Cmdline()
