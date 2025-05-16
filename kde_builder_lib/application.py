@@ -21,7 +21,6 @@ from time import time
 import traceback
 from typing import Callable
 from typing import NoReturn
-from typing import TypeVar
 import yaml
 
 from kde_builder_lib.kb_exception import ConfigError
@@ -50,8 +49,6 @@ from .version import Version
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
 logger_app = KBLogger.getLogger("application")
-
-OptionsBaseT = TypeVar("OptionsBaseT", bound=OptionsBase)
 
 
 class Application:
@@ -874,18 +871,15 @@ class Application:
 
             raise ConfigError("Unknown repository base")
 
-    def _process_module_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module: OptionsBaseT) -> OptionsBaseT:
+    def _process_module_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module: OptionsBase) -> None:
         """
-        Read in the options from the config file and add them to the option store.
+        Read in the options from the config node and set them in the provided :class:`OptionsBase`.
 
         Args:
             ctx: A BuildContext object to use for creating the returned :class:`Module` under.
             node_opts: A dict of options read from one node from config.
             file_name: A full path for file name that is read.
             module: The :class:`OptionsBase` to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.
-
-        Returns:
-            The provided :class:`OptionsBase`, with options set as given in the configuration file section being processed.
         """
         Util.assert_isa(module, OptionsBase)
 
@@ -922,8 +916,7 @@ class Application:
                     msg = msg + "\n" + explanation
                 err.message = msg
                 raise  # re-throw
-
-        return module
+        pass
 
     @staticmethod
     def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
@@ -961,7 +954,7 @@ class Application:
             The :class:`ModuleSet` passed in with read-in options set, which may need
             to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
         """
-        module_set = self._process_module_options(ctx, node_opts, file_name, module_set)
+        self._process_module_options(ctx, node_opts, file_name, module_set)
 
         # Perl-specific note! re-blessing the module set into the right "class"
         # You'd probably have to construct an entirely new object and copy the
@@ -1026,7 +1019,8 @@ class Application:
             logger_app.error(f"Expecting global settings node!")
             raise ConfigError("Missing global section")
         else:
-            global_opts = self._process_module_options(ctx, first_node_content, rcfile, OptionsBase())
+            global_opts = OptionsBase()
+            self._process_module_options(ctx, first_node_content, rcfile, global_opts)
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
             for key in cmdline_global_options.keys():
                 global_opts.options.pop(key, None)
@@ -1085,7 +1079,8 @@ class Application:
                     logger_app.error(f"Name {module_name} for module in {config_filename} is already in use on a module-set")
                     raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
 
-                new_module: Module = self._process_module_options(ctx, node, config_filename, Module(ctx, module_name))
+                new_module: Module = Module(ctx, module_name)
+                self._process_module_options(ctx, node, config_filename, new_module)
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
@@ -1096,7 +1091,8 @@ class Application:
             if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options: OptionsBase = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))
+                options: OptionsBase = OptionsBase(ctx)
+                self._process_module_options(ctx, node, config_filename, options)
 
                 deferred_options.append({
                     "name": options_name,
