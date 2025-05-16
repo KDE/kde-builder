@@ -250,9 +250,9 @@ class Application:
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         ctx.detect_config_file()
-        option_modules_and_sets: list[Module | ModuleSet]
-        deferred_options: list[dict[str, str | dict]]  # "override" nodes.
-        option_modules_and_sets, deferred_options = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
+        modules_and_sets_from_userconfig: list[Module | ModuleSet]
+        overrides_from_userconfig: list[dict[str, str | dict]]  # "override" nodes.
+        modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
 
         ctx.load_persistent_options()
 
@@ -322,8 +322,8 @@ class Application:
 
         module_resolver = ModuleResolver(ctx)
         module_resolver.cmdline_options = cmdline_options
-        module_resolver.set_deferred_options(deferred_options)
-        module_resolver.set_input_modules_and_options(option_modules_and_sets)
+        module_resolver.set_deferred_options(overrides_from_userconfig)
+        module_resolver.set_input_modules_and_options(modules_and_sets_from_userconfig)
         module_resolver.ignored_selectors = list(ignored_selectors.keys())
 
         self._define_new_module_factory(module_resolver)
@@ -342,7 +342,7 @@ class Application:
 
                 if "all-config-projects" in sp_sels:
                     # Build everything in the rc-file, in the order specified.
-                    all_config_projects: list[Module] = module_resolver.expand_module_sets(option_modules_and_sets)
+                    all_config_projects: list[Module] = module_resolver.expand_module_sets(modules_and_sets_from_userconfig)
 
                 if "all-kde-projects" in sp_sels:
                     repos = self.context.get_project_data_reader().repositories
