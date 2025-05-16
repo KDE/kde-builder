@@ -940,19 +940,15 @@ class Application:
         sources = options_base.get_option(key) or []
         return ", ".join(sources)
 
-    def _process_module_set_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module_set: ModuleSet) -> ModuleSet:
+    def _process_module_set_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module_set: ModuleSet) -> None:
         """
-        Read in a "module_set".
+        Read in a "module_set" and set options, which may need to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
 
         Args:
             ctx: The build context.
             node_opts: A dict of options read from one node from config.
             file_name: A full path to file name that is read.
             module_set: The :class:`ModuleSet` to use.
-
-        Returns:
-            The :class:`ModuleSet` passed in with read-in options set, which may need
-            to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
         """
         self._process_module_options(ctx, node_opts, file_name, module_set)
 
@@ -963,7 +959,7 @@ class Application:
             module_set.__class__ = ModuleSetKDEProjects
         elif module_set.get_option("repository") == Application.QT_PROJECT_ID:
             module_set.__class__ = ModuleSetQt5
-        return module_set
+        pass
 
     def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
         """
@@ -1053,7 +1049,8 @@ class Application:
                     raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
-                new_module_set: ModuleSet = self._process_module_set_options(ctx, node, config_filename, ModuleSet(ctx, module_set_name))
+                new_module_set: ModuleSet = ModuleSet(ctx, module_set_name)
+                self._process_module_set_options(ctx, node, config_filename, new_module_set)
                 creation_order += 1
                 new_module_set.start_for_create_id = creation_order
 
