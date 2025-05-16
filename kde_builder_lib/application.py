@@ -214,7 +214,6 @@ class Application:
         # doing.
 
         ctx = self.context
-        deferred_options: list[dict[str, str | dict]] = []  # "override" nodes. It will be filled by _process_configs_content().
 
         # Process --help, etc. first.
         c = Cmdline()
@@ -251,7 +250,9 @@ class Application:
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         ctx.detect_config_file()
-        option_modules_and_sets: list[Module | ModuleSet] = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options, deferred_options)
+        option_modules_and_sets: list[Module | ModuleSet]
+        deferred_options: list[dict[str, str | dict]]  # "override" nodes.
+        option_modules_and_sets, deferred_options = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
 
         ctx.load_persistent_options()
 
@@ -971,7 +972,7 @@ class Application:
             module_set.__class__ = ModuleSetQt5
         return module_set
 
-    def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict, deferred_options: list) -> list[Module | ModuleSet]:
+    def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
         """
         Read in the settings from the configuration.
 
@@ -981,15 +982,18 @@ class Application:
             config_path: Full path of the config file to read from.
             cmdline_global_options: An input dict mapping command line options to their
                 values (if any), so that these may override conflicting entries in the rc-file.
-            deferred_options: A list containing dicts mapping module names to options
+
+        Returns:
+            A tuple consisting of:
+            - module_and_module_set_list:
+                Heterogeneous list of :class:`Module` and :class:`ModuleSet` defined in the
+                configuration file. No module sets will have been expanded out (either
+                kde-projects or standard sets).
+            - deferred_options:
+                A list containing dicts mapping module names to options
                 set by any "override" nodes read in by this function.
                 Each key (identified by the name of the "override" node) will point to a
                 dict value holding the options to apply.
-
-        Returns:
-            Heterogeneous list of :class:`Module` and :class:`ModuleSet` defined in the
-            configuration file. No module sets will have been expanded out (either
-            kde-projects or standard sets).
 
         Raises:
             SetOptionError
@@ -1040,6 +1044,7 @@ class Application:
         seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
         seen_module_sets = {}  # and vice versa
         # seen_module_set_items = {}  # To track option override modules.
+        deferred_options: list[dict[str, str | dict]] = []
 
         for node_name, node, config_filename in config_nodes_list:
             if node_name.startswith("group "):
@@ -1091,7 +1096,7 @@ class Application:
             if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))
+                options: OptionsBase = self._process_module_options(ctx, node, config_filename, OptionsBase(ctx))
 
                 deferred_options.append({
                     "name": options_name,
@@ -1110,7 +1115,7 @@ class Application:
         if nothing_defined:
             logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
 
-        return module_and_module_set_list
+        return module_and_module_set_list, deferred_options
 
     @staticmethod
     def _handle_install(ctx: BuildContext) -> bool:
