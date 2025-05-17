@@ -940,27 +940,6 @@ class Application:
         sources = options_base.get_option(key) or []
         return ", ".join(sources)
 
-    def _process_module_set_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module_set: ModuleSet) -> None:
-        """
-        Read in a "module_set" and set options, which may need to be further expanded (see :meth:`ModuleSet.convert_to_modules`).
-
-        Args:
-            ctx: The build context.
-            node_opts: A dict of options read from one node from config.
-            file_name: A full path to file name that is read.
-            module_set: The :class:`ModuleSet` to use.
-        """
-        self._process_module_options(ctx, node_opts, file_name, module_set)
-
-        # Perl-specific note! re-blessing the module set into the right "class"
-        # You'd probably have to construct an entirely new object and copy the
-        # members over in other languages.
-        if module_set.get_option("repository") == Application.KDE_PROJECT_ID:
-            module_set.__class__ = ModuleSetKDEProjects
-        elif module_set.get_option("repository") == Application.QT_PROJECT_ID:
-            module_set.__class__ = ModuleSetQt5
-        pass
-
     def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
         """
         Read in the settings from the configuration.
@@ -1050,7 +1029,16 @@ class Application:
 
                 # A module_set can give us more than one module to add.
                 new_module_set: ModuleSet = ModuleSet(ctx, module_set_name)
-                self._process_module_set_options(ctx, node, config_filename, new_module_set)
+                self._process_module_options(ctx, node, config_filename, new_module_set)
+
+                # Transforming the new_module_set into the right "class".
+                # Possibly it is better to construct an entirely new object and copy the members over.
+                # But we will do it this way for now.
+                if new_module_set.get_option("repository") == Application.KDE_PROJECT_ID:
+                    new_module_set.__class__ = ModuleSetKDEProjects
+                elif new_module_set.get_option("repository") == Application.QT_PROJECT_ID:
+                    new_module_set.__class__ = ModuleSetQt5
+
                 creation_order += 1
                 new_module_set.start_for_create_id = creation_order
 
