@@ -8,11 +8,13 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from ..kb_exception import ConfigError
 from ..kb_exception import SetOptionError
 from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
 from ..phase_list import PhaseList
+from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
@@ -187,3 +189,45 @@ class ModuleSet(OptionsBase):
         Ensure we are setting the correct type for value of option.
         """
         self.context.verify_option_value_type(option_name, option_value)
+
+    def validate(self, ctx: BuildContext) -> None:
+        """
+        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-projects setting based on the given BuildContext.
+        """
+        name = self.name if self.name else "unnamed"
+        rc_sources = self.get_config_sources()
+
+        # re-read option from module set since it may be pre-set
+        selected_repo = self.get_option("repository")
+        if not selected_repo:
+            logger_moduleset.error(textwrap.dedent(f"""\
+
+            There was no repository selected for the y[b[{name}] module-set declared at
+                {rc_sources}
+
+            A repository is needed to determine where to download the source code from.
+
+            Most will want to use the b[g[kde-projects] repository. See also
+            https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
+            """))
+            raise ConfigError("Missing repository option")
+
+        from ..application import Application
+        repo_set = ctx.get_option("git-repository-base")
+        if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
+            project_id = Application.KDE_PROJECT_ID
+            module_set_name = self.name
+            module_set_id = f"module-set ({module_set_name})" if module_set_name else "module-set"
+
+            logger_moduleset.error(textwrap.dedent(f"""\
+            There is no repository assigned to y[b[{selected_repo}] when assigning a
+            {module_set_id} at {rc_sources}.
+
+            These repositories are defined by g[b[git-repository-base] in the global
+            section of your configuration.
+
+            Make sure you spelled your repository name right, but you probably meant
+            to use the magic b[{project_id}] repository for your module-set instead.
+            """))
+
+            raise ConfigError("Unknown repository base")

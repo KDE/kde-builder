@@ -6,14 +6,19 @@
 from __future__ import annotations
 
 import copy
+import os
 import re
 from typing import TYPE_CHECKING
 
+from .debug import KBLogger
 from .kb_exception import SetOptionError
 from .util.util import Util
 
 if TYPE_CHECKING:
     from .build_context import BuildContext
+
+logger_optbase = KBLogger.getLogger("options-base")
+logger_var_subst = KBLogger.getLogger("variables_substitution")
 
 
 class OptionsBase:
@@ -164,3 +169,132 @@ class OptionsBase:
             self.context.verify_option_value_type(option_name, option_value)
         else:
             return
+
+    @staticmethod
+    def _substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | None, file_name: str) -> str | bool | list | dict:
+        """
+        Take an option value read from config, and resolve it.
+
+        The value has "false" converted to False, white space simplified (like in Qt),
+        tildes (~) in what appear to be path-like entries are converted to the home directory path,
+        and reference to global option is substituted with its value.
+
+        Args:
+            ctx: The build context (used for translating option values).
+            unresolved_value: The value to substitute.
+            file_name: A full path of file that is read.
+
+        Returns:
+             option-value
+        """
+        if isinstance(unresolved_value, bool):
+            return unresolved_value
+        if isinstance(unresolved_value, list):
+            return unresolved_value
+        if isinstance(unresolved_value, dict):
+            return unresolved_value
+        if unresolved_value is None:  # in tests, there is a config that does not specify value
+            return ""
+
+        from .build_context import BuildContext
+        Util.assert_isa(ctx, BuildContext)
+        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+
+        # Simplify whitespace.
+        value = re.sub(r"\s+", " ", unresolved_value)
+
+        # Replace reference to global option with their value.
+        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
+
+        while sub_var_name:
+            sub_var_value = ctx.get_option(sub_var_name) or ""
+            if not ctx.has_option(sub_var_name):
+                logger_optbase.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{file_name}\n *")
+
+            logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
+
+            value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
+
+            # Replace other references as well. Keep this RE up to date with the other one.
+            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
+
+        # Replace tildes with home directory.
+        while re.search(r"(^|:|=)~/", value):
+            value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.getenv("HOME") + "/", value)
+
+        # Check for false keyword and convert it to Python False.
+        # pl2py: in perl this is done a bit before, but we do this here. This is because value can be of type bool, and perl automatically compares int (they do not have bool) as a string.
+        # If we did that conversion there, we would need to convert it back to string in checks above.
+        if value.lower() == "false":
+            value = False
+
+        return value
+
+    def apply_config_options(self, ctx: BuildContext, node_opts: dict, file_name: str) -> None:
+        """
+        Read in the options from the config node and set them in self.
+
+        Note that self can be a :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`).
+
+        Args:
+            ctx: A BuildContext object to use for creating the returned :class:`Module` under.
+            node_opts: A dict of options read from one node from config.
+            file_name: A full path for file name that is read.
+        """
+        if not hasattr(OptionsBase, "moduleID"):
+            OptionsBase.moduleID = 0
+
+        self._mark_config_source(file_name)
+        self.set_option("#entry_num", OptionsBase.moduleID)
+        OptionsBase.moduleID += 1
+
+        from .cmd_line import Cmdline
+        phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
+        all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
+
+        for option, value in node_opts.items():
+            if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
+                ctx.set_option(option, value)  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
+            elif option not in all_possible_options:
+                logger_optbase.error(f"Unrecognized option \"{option}\" found in {file_name}")
+
+            value = self._substitute_value(ctx, value, file_name)
+
+            # This is addition of python version
+            if value == "true":
+                value = True
+            if value == "false":
+                value = False
+
+            try:
+                self.set_option(option, value)
+            except SetOptionError as err:
+                msg = f"{file_name}: " + err.message
+                explanation = err.option_usage_explanation()
+                if explanation:
+                    msg = msg + "\n" + explanation
+                err.message = msg
+                raise  # re-throw
+        pass
+
+    def _mark_config_source(self, config_source: str) -> None:
+        """
+        Mark self as being read in from the given string (filename:line).
+
+        Note that self can be a :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`).
+
+        An OptionsBase can be tagged under multiple files.
+        """
+        key = "#defined-at"
+        sources = self.get_option(key) if self.has_option(key) else []
+
+        sources.append(config_source)
+        self.set_option(key, sources)
+
+    def get_config_sources(self) -> str:
+        """
+        Return rcfile sources (comma-separated).
+        """
+        key = "#defined-at"
+        sources = self.get_option(key) or []
+        return ", ".join(sources)

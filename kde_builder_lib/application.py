@@ -25,7 +25,6 @@ import yaml
 
 from kde_builder_lib.kb_exception import ConfigError
 from kde_builder_lib.kb_exception import KBRuntimeError
-from kde_builder_lib.kb_exception import SetOptionError
 from .build_context import BuildContext
 from .build_system.qmake5 import BuildSystemQMake5
 from .cmd_line import Cmdline
@@ -47,7 +46,6 @@ from .util.util import Util
 from .util.textwrap_mod import textwrap
 from .version import Version
 
-logger_var_subst = KBLogger.getLogger("variables_substitution")
 logger_app = KBLogger.getLogger("application")
 
 
@@ -768,179 +766,8 @@ class Application:
 
         exit(exitcode)
 
-    # internal helper functions
-
     @staticmethod
-    def substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | None, file_name: str) -> str | bool | list | dict:
-        """
-        Take an option value read from config, and resolve it.
-
-        The value has "false" converted to False, white space simplified (like in
-        Qt), tildes (~) in what appear to be path-like entries are converted to
-        the home directory path, and reference to global option is substituted with its value.
-
-        Args:
-            ctx: The build context (used for translating option values).
-            unresolved_value: The value to substitute.
-            file_name: A full path of file that is read.
-
-        Returns:
-             Tuple (option-name, option-value)
-        """
-        if isinstance(unresolved_value, bool):
-            return unresolved_value
-        if isinstance(unresolved_value, list):
-            return unresolved_value
-        if isinstance(unresolved_value, dict):
-            return unresolved_value
-        if unresolved_value is None:  # in tests, there is a config that does not specify value
-            return ""
-
-        Util.assert_isa(ctx, BuildContext)
-        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
-
-        # Simplify whitespace.
-        value = re.sub(r"\s+", " ", unresolved_value)
-
-        # Replace reference to global option with their value.
-        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
-
-        while sub_var_name:
-            sub_var_value = ctx.get_option(sub_var_name) or ""
-            if not ctx.has_option(sub_var_name):
-                logger_app.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{file_name}\n *")
-
-            logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
-
-            value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
-
-            # Replace other references as well. Keep this RE up to date with the other one.
-            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
-
-        # Replace tildes with home directory.
-        while re.search(r"(^|:|=)~/", value):
-            value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.getenv("HOME") + "/", value)
-
-        # Check for false keyword and convert it to Python False.
-        # pl2py: in perl this is done a bit before, but we do this here. This is because value can be of type bool, and perl automatically compares int (they do not have bool) as a string.
-        # If we did that conversion there, we would need to convert it back to string in checks above.
-        if value.lower() == "false":
-            value = False
-
-        return value
-
-    @staticmethod
-    def _validate_module_set(ctx: BuildContext, module_set: ModuleSet) -> None:
-        """
-        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-projects setting based on the given BuildContext.
-        """
-        name = module_set.name if module_set.name else "unnamed"
-        rc_sources = Application._get_module_sources(module_set)
-
-        # re-read option from module set since it may be pre-set
-        selected_repo = module_set.get_option("repository")
-        if not selected_repo:
-            logger_app.error(textwrap.dedent(f"""\
-
-            There was no repository selected for the y[b[{name}] module-set declared at
-                {rc_sources}
-
-            A repository is needed to determine where to download the source code from.
-
-            Most will want to use the b[g[kde-projects] repository. See also
-            https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
-            """))
-            raise ConfigError("Missing repository option")
-
-        repo_set = ctx.get_option("git-repository-base")
-        if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
-            project_id = Application.KDE_PROJECT_ID
-            module_set_name = module_set.name
-            module_set_id = f"module-set ({module_set_name})" if module_set_name else "module-set"
-
-            logger_app.error(textwrap.dedent(f"""\
-            There is no repository assigned to y[b[{selected_repo}] when assigning a
-            {module_set_id} at {rc_sources}.
-
-            These repositories are defined by g[b[git-repository-base] in the global
-            section of your configuration.
-
-            Make sure you spelled your repository name right, but you probably meant
-            to use the magic b[{project_id}] repository for your module-set instead.
-            """))
-
-            raise ConfigError("Unknown repository base")
-
-    def _process_module_options(self, ctx: BuildContext, node_opts: dict, file_name: str, module: OptionsBase) -> None:
-        """
-        Read in the options from the config node and set them in the provided :class:`OptionsBase`.
-
-        Args:
-            ctx: A BuildContext object to use for creating the returned :class:`Module` under.
-            node_opts: A dict of options read from one node from config.
-            file_name: A full path for file name that is read.
-            module: The :class:`OptionsBase` to use (module, module-set, ctx, etc.) For global options, just pass in the BuildContext for this param.
-        """
-        Util.assert_isa(module, OptionsBase)
-
-        if not hasattr(Application, "moduleID"):
-            Application.moduleID = 0
-
-        self._mark_module_source(module, file_name)
-        module.set_option("#entry_num", Application.moduleID)
-        Application.moduleID += 1
-
-        phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
-        all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
-
-        for option, value in node_opts.items():
-            if option.startswith("_"):  # option names starting with underscore are treated as user custom variables
-                ctx.set_option(option, value)  # merge the option to the build context right now, so we could already (while parsing global section) use this variable in other global options values.
-            elif option not in all_possible_options:
-                logger_app.error(f"Unrecognized option \"{option}\" found in {file_name}")
-
-            value = Application.substitute_value(ctx, value, file_name)
-
-            # This is addition of python version
-            if value == "true":
-                value = True
-            if value == "false":
-                value = False
-
-            try:
-                module.set_option(option, value)
-            except SetOptionError as err:
-                msg = f"{file_name}: " + err.message
-                explanation = err.option_usage_explanation()
-                if explanation:
-                    msg = msg + "\n" + explanation
-                err.message = msg
-                raise  # re-throw
-        pass
-
-    @staticmethod
-    def _mark_module_source(options_base: OptionsBase, config_source: str) -> None:
-        """
-        Mark the given :class:`OptionsBase` subclass (i.e. :class:`Module` or :class:`ModuleSet`) as being read in from the given string (filename:line).
-
-        An OptionsBase can be tagged under multiple files.
-        """
-        key = "#defined-at"
-        sources = options_base.get_option(key) if options_base.has_option(key) else []
-
-        sources.append(config_source)
-        options_base.set_option(key, sources)
-
-    @staticmethod
-    def _get_module_sources(options_base: ModuleSet) -> str:
-        """
-        Return rcfile sources for given OptionsBase (comma-separated).
-        """
-        key = "#defined-at"
-        sources = options_base.get_option(key) or []
-        return ", ".join(sources)
-
-    def _process_configs_content(self, ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
+    def _process_configs_content(ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
         """
         Read in the settings from the configuration.
 
@@ -995,7 +822,7 @@ class Application:
             raise ConfigError("Missing global section")
         else:
             global_opts = OptionsBase()
-            self._process_module_options(ctx, first_node_content, rcfile, global_opts)
+            global_opts.apply_config_options(ctx, first_node_content, rcfile)
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
             for key in cmdline_global_options.keys():
                 global_opts.options.pop(key, None)
@@ -1029,7 +856,7 @@ class Application:
 
                 # A module_set can give us more than one module to add.
                 new_module_set: ModuleSet = ModuleSet(ctx, module_set_name)
-                self._process_module_options(ctx, node, config_filename, new_module_set)
+                new_module_set.apply_config_options(ctx, node, config_filename)
 
                 # Transforming the new_module_set into the right "class".
                 # Possibly it is better to construct an entirely new object and copy the members over.
@@ -1065,7 +892,7 @@ class Application:
                     raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
 
                 new_module: Module = Module(ctx, module_name)
-                self._process_module_options(ctx, node, config_filename, new_module)
+                new_module.apply_config_options(ctx, node, config_filename)
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
@@ -1077,7 +904,7 @@ class Application:
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
                 options: OptionsBase = OptionsBase(ctx)
-                self._process_module_options(ctx, node, config_filename, options)
+                options.apply_config_options(ctx, node, config_filename)
 
                 deferred_options.append({
                     "name": options_name,
@@ -1089,7 +916,7 @@ class Application:
                 continue  # Don't add to module list
 
         for name, module_set in seen_module_sets.items():
-            Application._validate_module_set(ctx, module_set)
+            module_set.validate(ctx)
 
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.

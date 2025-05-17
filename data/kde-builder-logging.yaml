@@ -88,6 +88,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  options-base:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   updater:
     level: INFO
 #    level: DEBUG
