@@ -15,9 +15,10 @@ import sys
 import traceback
 from typing import TYPE_CHECKING
 
-from kde_builder_lib.kb_exception import KBRuntimeError
-from kde_builder_lib.kb_exception import SetOptionError
+from ..kb_exception import KBException
+from ..kb_exception import KBRuntimeError
 from ..kb_exception import ProgramError
+from ..kb_exception import SetOptionError
 from ..build_system.autotools import BuildSystemAutotools
 from ..build_system.build_system import BuildSystem
 from ..build_system.kde_cmake import BuildSystemKDECMake
@@ -673,20 +674,21 @@ class Module(OptionsBase):
         try:
             count = self.scm().update_internal(ipc)
         except Exception as e:
-            if e.__class__.__name__ != "KBException":
+            if not isinstance(e, KBException):
                 # Do not print traceback for our KBException type exceptions, as we want just a short error message in the output.
                 # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
                 traceback.print_exc()
 
             ctx.mark_module_phase_failed("build", self)
-            if e.__class__.__name__ == "KBException":
-                # noinspection PyUnresolvedReferences
+
+            if isinstance(e, KBException):
                 e_str = e.message
             else:
                 e_str = str(e)
 
-            logger_module.error(f"Error updating r[{self}], removing from list of packages to build.")
-            logger_module.error(f" > y[{e_str}]")
+            logger_module.error(f"{e_str}")
+            if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
+                logger_module.error(f"\tError updating r[{self.name}], removing from list of packages to build.")
 
             ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
             self.phases.filter_out_phase("build")
