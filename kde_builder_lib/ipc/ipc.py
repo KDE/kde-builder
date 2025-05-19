@@ -98,7 +98,7 @@ class IPC:
         """
         logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
         if not re.match(r"^\s+", msg):
-            msg = f"\t{msg}"
+            msg = f"\t{msg}"  # Automatically adds tabulation if message misses it. Note that this is in main process (kde-builder-build).
         KBLogger.print_clr(logger_name, message_level, msg)
 
     def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str:
@@ -250,7 +250,7 @@ class IPC:
                 for combined_msg in non_empty_messages:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
-                        msg = f"\t{msg}"
+                        msg = f"\t{msg}"  # Automatically adds tabulation if message misses it.
                     KBLogger.print_clr(logger_name, message_level, msg)
         self.messages.clear()
 
