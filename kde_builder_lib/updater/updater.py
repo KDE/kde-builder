@@ -25,6 +25,7 @@ from ..util.textwrap_mod import textwrap
 if TYPE_CHECKING:
     from typing import NoReturn
     from ..build_context import BuildContext
+    from ..ipc.ipc import IPC
     from ..module.module import Module
 
 logger_updater = KBLogger.getLogger("updater")
@@ -39,9 +40,9 @@ class Updater:
 
     DEFAULT_GIT_REMOTE = "origin"
 
-    def __init__(self, module):
+    def __init__(self, module: Module):
         self.module = module
-        self.ipc = None
+        self.ipc: IPC | None = None
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
@@ -612,7 +613,7 @@ class Updater:
         return len(config_lines) > 0
 
     @staticmethod
-    def _split_uri(uri) -> tuple:
+    def _split_uri(uri) -> tuple[str, str, str, str, str]:
         match = re.match(r"(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?", uri)
         scheme, authority, path, query, fragment = match.groups()
         return scheme, authority, path, query, fragment

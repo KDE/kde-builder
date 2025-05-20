@@ -263,7 +263,7 @@ class IPC:
         modulename = module.name
         del self.updated[modulename]
 
-    def unacknowledged_modules(self) -> dict:
+    def unacknowledged_modules(self) -> dict[str, str]:
         """
         Return a dict mapping module *names* to update statuses, for modules that have not already been marked as ignorable using forget_module().
         """

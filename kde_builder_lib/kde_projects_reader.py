@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from __future__ import annotations
+
 import os.path
 from pathlib import Path
 import re
@@ -26,7 +28,7 @@ class KDEProjectsReader:
         Args:
             project_metadata_module: :class:`Module` that is the repo-metadata module.
         """
-        self.repositories = {}  # Maps short names to repo info blocks
+        self.repositories: dict[str, dict[str, str | bool]] = {}  # Maps short names to repo info blocks
         self._read_project_data(project_metadata_module)
 
     def _read_project_data(self, project_metadata_module: Module) -> None:
@@ -92,7 +94,7 @@ class KDEProjectsReader:
 
         self.repositories[repo_name] = cur_repository
 
-    def get_modules_for_project(self, proj: str) -> list[dict]:
+    def get_modules_for_project(self, proj: str) -> list[dict[str, str | bool]]:
         """
         Get modules for project.
 
@@ -102,10 +104,10 @@ class KDEProjectsReader:
         "kdebase/kde-runtime" or simply "kde-runtime".
         """
         repositories = self.repositories
-        results = []
+        results: list[str] = []
 
         def find_results():
-            match_list = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
+            match_list: list[str] = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
 
             if re.search(r"\*", proj):
                 for key in match_list:
@@ -162,8 +164,8 @@ class KDEProjectsReader:
         Returns:
              True if they match, False otherwise.
         """
-        search_parts = search_item.split("/")
-        name_stack = project_path.split("/")
+        search_parts: list[str] = search_item.split("/")
+        name_stack: list[str] = project_path.split("/")
 
         if len(name_stack) >= len(search_parts):
             size_difference = len(name_stack) - len(search_parts)

@@ -89,14 +89,14 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
 
         # newOptions:
-        self.scm_obj = None
-        self.build_obj = None
+        self.scm_obj: Updater | None = None
+        self.build_obj: BuildSystem | None = None
         self.phases: PhaseList = phases
         self.context = ctx
-        self.module_set = None  # in perl it was called module-set (i.e. via "-")
-        self.post_build_msgs = []
-        self.env = {}
-        self.current_phase = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
+        self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
+        self.post_build_msgs: list[str] = []
+        self.env: dict[str, str] = {}
+        self.current_phase: str | None = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
 
         if self.__class__.__name__ != "BuildContext":
             # Avoid setting this for BuildContext, because it has its own option value type verification code, which needs BuildContext to be already initialized
@@ -631,7 +631,7 @@ class Module(OptionsBase):
         """
         return self.context.get_log_path_for(self, path)
 
-    def update(self, ipc, ctx) -> bool:
+    def update(self, ipc: IPC, ctx: BuildContext) -> bool:
         """
         Execute the update (or pretends to do so) using the appropriate source control system.
 

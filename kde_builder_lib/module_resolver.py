@@ -71,8 +71,8 @@ class ModuleResolver:
         we assume single "override" nodes should still be able to override these.
         """
         proj_db: KDEProjectsReader = self.context.get_project_data_reader()
-        set_indices = []
-        final_opts = {}
+        set_indices: list[int] = []
+        final_opts: dict[str, dict] = {}
 
         for idx, deferred_entry in enumerate(deferred_options):
             opts = deferred_entry["opts"]
@@ -89,7 +89,7 @@ class ModuleResolver:
 
             # Use KDE project database to pull list of matching `Module`s
             for m in referenced_modules:
-                mods = proj_db.get_modules_for_project(m)
+                mods: list[dict[str, str | bool]] = proj_db.get_modules_for_project(m)
                 for mod in mods:
                     name = mod["name"]
                     if name not in final_opts:
@@ -201,7 +201,7 @@ class ModuleResolver:
 
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
         # in the lookup dict if it uniquely matches a module at all).
-        module_set_referents = [key for key, value in self.referenced_modules.items() if value == needed_module_set]
+        module_set_referents: list[str] = [key for key, value in self.referenced_modules.items() if value == needed_module_set]
 
         for key in module_set_referents:
             del self.referenced_modules[key]
@@ -227,7 +227,7 @@ class ModuleResolver:
         # Module selectors beginning with "+" force treatment as a kde-projects
         # module, which means they won't be matched here (we're only looking for
         # sets).
-        forced_to_kde_project = selector_name[:1] == "+"
+        forced_to_kde_project: bool = selector_name[:1] == "+"
 
         if forced_to_kde_project:
             selector_name = selector_name[1:]
@@ -236,8 +236,8 @@ class ModuleResolver:
         # --no-include-dependencies suppress the action of include-dependencies in
         # the config file so make the absence of the flag imply
         # include-dependencies for now.
-        def_including = ctx.get_option("include-dependencies")
-        including_deps = self.cmdline_options["global"].get("include-dependencies", def_including)
+        def_including: bool = ctx.get_option("include-dependencies")
+        including_deps: bool = self.cmdline_options["global"].get("include-dependencies", def_including)
 
         # See resolve_selectors_into_modules for what the 3 "cases" mentioned below are.
 
@@ -338,7 +338,7 @@ class ModuleResolver:
                 mod_set.set_modules_to_find([guessed_module.name])
 
                 set_results: list[Module] = self.expand_module_sets([mod_set])
-                search_item = guessed_module.name
+                search_item: str = guessed_module.name
                 if not set_results:
                     raise KBRuntimeError(f"{search_item} doesn't match any modules.")
                 results.extend(set_results)

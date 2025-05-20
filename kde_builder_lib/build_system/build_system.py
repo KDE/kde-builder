@@ -95,7 +95,7 @@ class BuildSystem:
             return 1
         return int(max_cores * 0.8)
 
-    def build_constraints(self) -> dict:
+    def build_constraints(self) -> dict[str, int]:
         """
         Return a dict holding the resource constraints to try to apply during the build.
 

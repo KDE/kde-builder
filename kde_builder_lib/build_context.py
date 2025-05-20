@@ -219,7 +219,7 @@ class BuildContext(Module):
         self.rc_files = BuildContext.rcfiles
         self.rc_file = None
         self.persistent_options = {}  # These are kept across multiple script runs
-        self.ignore_list = []  # List of KDE project paths to ignore completely
+        self.ignore_list: list[str] = []  # List of KDE project paths to ignore completely
         self.kde_projects_metadata = None  # Enumeration of kde-projects
         self.logical_module_resolver = None  # For branch-group option
         self.status_view: StatusView = StatusView()
@@ -577,7 +577,7 @@ class BuildContext(Module):
                 return True
         return False
 
-    def lookup_module(self, module_name: str):
+    def lookup_module(self, module_name: str) -> Module | None:
         """
         Search for a module with a name that matches the provided parameter, and return its :class:`Module` object.
 

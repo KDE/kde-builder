@@ -18,8 +18,8 @@ class ModuleBranchGroupResolver:
     def __init__(self, json_data: dict):
 
         # Copy just the objects we want over.
-        self.layers = json_data.get("layers", [])
-        self.groups = json_data.get("groups", {})
+        self.layers: list[str] = json_data.get("layers", [])
+        self.groups: dict[str, dict[str, str]] = json_data.get("groups", {})
 
         # For layers and groups, remove anything beginning with a "_" as that is
         # defined in the spec to be a comment of some sort.
@@ -32,7 +32,7 @@ class ModuleBranchGroupResolver:
         # later. Note that the specific catch-all group "*" is itself handled
         # as a special case in find_module_branch.
 
-        self.wildcarded_groups = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
+        self.wildcarded_groups: dict[str, dict[str, str]] = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
 
     def find_module_branch(self, entry_name: str, logical_group: str) -> str | None:
         """
@@ -46,13 +46,13 @@ class ModuleBranchGroupResolver:
             return self.groups[entry_name].get(logical_group, None)
 
         # Map module search spec to prefix string that is required for a match
-        catch_all_group_stats = {key: key[:-1] for key in self.wildcarded_groups.keys()}
+        catch_all_group_stats: dict[str, str] = {key: key[:-1] for key in self.wildcarded_groups.keys()}
 
         # Sort longest required-prefix to the top... first match that is valid will
         # then also be the right match.
-        ordered_candidates = sorted(catch_all_group_stats.keys(), key=lambda x: catch_all_group_stats[x], reverse=True)
+        ordered_candidates: list[str] = sorted(catch_all_group_stats.keys(), key=lambda x: catch_all_group_stats[x], reverse=True)
 
-        match = next((candidate for candidate in ordered_candidates if entry_name[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
+        match: str | None = next((candidate for candidate in ordered_candidates if entry_name[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
 
         if match:
             return self.groups[match].get(logical_group, None)

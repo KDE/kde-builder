@@ -104,10 +104,10 @@ class TaskManager:
             signal.signal(signal.SIGHUP, handle_sighup)
 
             logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
-            result = self._handle_updates(ipc, ctx)
+            result: int = self._handle_updates(ipc, ctx)
 
             logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
-            result = self._handle_build(ipc, ctx) or result
+            result: int = self._handle_build(ipc, ctx) or result
 
         return result
 
@@ -128,7 +128,7 @@ class TaskManager:
         Returns:
              0 on success, non-zero on error.
         """
-        update_list = ctx.modules_in_phase("update")
+        update_list: list[Module] = ctx.modules_in_phase("update")
 
         # No reason to print out the text if we're not doing anything.
         if not update_list:
@@ -201,7 +201,9 @@ class TaskManager:
         module.set_persistent_option("build-dir", module.fullpath("build"))
         module.set_persistent_option("install-dir", module.installation_path())
 
-        fail_count = module.get_persistent_option("failure-count") or 0
+        fail_count: int = module.get_persistent_option("failure-count") or 0
+        result_status: str
+        message: str
         result_status, message = ipc.wait_for_module(module)
         ipc.forget_module(module)
 
@@ -255,7 +257,7 @@ class TaskManager:
         Returns:
              0 for success, non-zero for failure.
         """
-        modules = ctx.modules_in_phase("build")
+        modules: list[Module] = ctx.modules_in_phase("build")
 
         # No reason to print building messages if we're not building.
         if not modules:
@@ -284,7 +286,7 @@ class TaskManager:
             """))
             outfile = None
 
-        build_done = []
+        build_done: list[str] = []
         result = 0
 
         cur_module = 1
@@ -304,8 +306,8 @@ class TaskManager:
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
-            failed_phase = TaskManager._build_single_module(ipc, ctx, module, start_time)
-            elapsed = Util.prettify_seconds(int(time.time()) - start_time)
+            failed_phase: str = TaskManager._build_single_module(ipc, ctx, module, start_time)
+            elapsed: str = Util.prettify_seconds(int(time.time()) - start_time)
 
             if failed_phase:
                 # FAILURE
@@ -525,7 +527,7 @@ class TaskManager:
 
             setproctitle.setproctitle("kde-builder-build")
             monitor_to_build_ipc.set_receiver()
-            result = self._handle_build(monitor_to_build_ipc, ctx)
+            result: int = self._handle_build(monitor_to_build_ipc, ctx)
 
             if result and ctx.get_option("stop-on-failure"):
                 # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
@@ -539,7 +541,7 @@ class TaskManager:
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseen_modules = monitor_to_build_ipc.unacknowledged_modules()
+        unseen_modules: dict[str, str] = monitor_to_build_ipc.unacknowledged_modules()
         if unseen_modules:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
@@ -575,9 +577,9 @@ class TaskManager:
         if ctx.get_option("disable-agent-check"):
             return True
 
-        git_servers = [module for module in ctx.modules_in_phase("update") if module.scm_type() == "git"]
+        git_servers: list[Module] = [module for module in ctx.modules_in_phase("update") if module.scm_type() == "git"]
 
-        ssh_servers = []
+        ssh_servers: list[Module] = []
         for gitserver in git_servers:
             if url := urlparse(gitserver.get_option("repository")):  # Check for git+ssh:// or git@git.kde.org:/path/etc.
                 if url.scheme == "git+ssh" or url.username == "git" and url.hostname == "git.kde.org":
@@ -665,7 +667,7 @@ class TaskManager:
         Returns:
              0 on success, non-zero on failure.
         """
-        msgs = []  # Message queue.
+        msgs: list[bytes] = []  # Message queue.
 
         # We will write to the build process and read from the update process.
 

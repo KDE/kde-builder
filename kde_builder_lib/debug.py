@@ -7,6 +7,10 @@ import logging
 import os
 import re
 import sys
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .ipc.pipe import IPCPipe
 
 
 class Debug:
@@ -48,7 +52,7 @@ class Debug:
             self.is_pretending = False
             self.debug_level = Debug.INFO
 
-            self.ipc = None  # Set only if we should forward log messages over IPC.
+            self.ipc: IPCPipe | None = None  # Set only if we should forward log messages over IPC.
 
             # Colors
             self.RED = ""

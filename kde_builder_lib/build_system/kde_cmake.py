@@ -61,8 +61,8 @@ class BuildSystemKDECMake(BuildSystem):
 
     def __init__(self, module):
         BuildSystem.__init__(self, module)
-        self.cmake_generator = None
-        self.cmake_toolchain = None
+        self.cmake_generator: str | None = None
+        self.cmake_toolchain: str | None = None
 
     @staticmethod
     def _check_generator_is_whitelisted(generator: str) -> bool:

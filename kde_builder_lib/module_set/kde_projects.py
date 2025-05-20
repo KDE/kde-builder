@@ -106,7 +106,7 @@ class ModuleSetKDEProjects(ModuleSet):
             Runtime: if the git-push-protocol is unsupported.
             UnknownKdeProjectException: if an "assumed" kde-projects module was not actually one.
         """
-        all_module_results = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
+        all_module_results: list[dict[str, str | bool]] = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
 
         if not all_module_results:
             # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
@@ -115,7 +115,7 @@ class ModuleSetKDEProjects(ModuleSet):
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.
-        active_results = all_module_results
+        active_results: list[dict[str, str | bool]] = all_module_results
         if not ctx.get_option("use-inactive-projects"):
             active_results = [module for module in all_module_results if module.get("active")]
 
@@ -127,8 +127,8 @@ class ModuleSetKDEProjects(ModuleSet):
                 logger_moduleset.warning("\tAlthough no active modules are available, there were\n" + f"\t{count} inactive modules. Perhaps the git modules are not ready?")
 
         # Setup module options.
-        module_list = []
-        ignore_list = self.modules_to_ignore()
+        module_list: list[Module] = []
+        ignore_list: list[str] = self.modules_to_ignore()
 
         for result in active_results:
             new_module = Module(ctx, result["name"])
@@ -168,9 +168,9 @@ class ModuleSetKDEProjects(ModuleSet):
             if module_item in found_modules:
                 continue
 
-            candidate_modules = self._expand_module_candidates(ctx, module_item)
-            module_names = [item.name for item in candidate_modules]
-            found_modules = {module: 1 for module in module_names}
+            candidate_modules: list[Module] = self._expand_module_candidates(ctx, module_item)
+            module_names: list[str] = [item.name for item in candidate_modules]
+            found_modules: dict[str, int] = {module: 1 for module in module_names}
             module_list.extend(candidate_modules)
 
         if not len(module_list):
