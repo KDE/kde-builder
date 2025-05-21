@@ -136,7 +136,7 @@ class IPC:
         elif ipc_type == IPC.MODULE_UPTODATE:
             # Although the module source hasn't changed, the user might be forcing a
             # rebuild, so our message should reflect what's actually going to happen.
-            message = "no files affected"
+            message = "no commits pulled"
             ipc_module_name, refresh_reason = buffer.split(",")
 
             if refresh_reason:
@@ -194,11 +194,13 @@ class IPC:
         """
         Wait for an update for a module with the given name.
 
-        Returns a tuple containing whether the module was successfully updated,
-        and any specific string message (e.g. for module update success you get
-        number of files affected)
-        Will throw an exception for an IPC failure or if the module should not be
-        built.
+        Returns:
+            Tuple containing whether the module was successfully updated,
+            and any specific string message (e.g. for module update success you get
+            number of pulled commits).
+
+        Raises:
+            Exception: For an IPC failure or if the module should not be built.
         """
         module_name = module.name
         updated = self.updated

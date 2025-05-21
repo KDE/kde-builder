@@ -70,7 +70,7 @@ Building libraries/plasma-wayland-protocols (2/26)
 Building frameworks/kconfig (3/26)
         Fetching remote changes to kconfig
         Merging kconfig changes from branch master
-        Source update complete for kconfig: 1 file affected.
+        Source update complete for kconfig: 1 commit pulled.
         Compiling... succeeded (after 2 seconds)
         Note: -- 3 -- compile warnings
         Installing kconfig succeeded (after 2 seconds)

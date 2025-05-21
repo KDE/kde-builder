@@ -30,7 +30,8 @@ class UpdaterQt5(Updater):
         """
         Handle calling init-repository to clone or update the appropriate Qt 5 submodules.
 
-        Returns number of commits updated (or rather, will...)
+        Returns:
+             Number of pulled commits (not implemented currently, will always return 1).
         """
         module = self.module
         srcdir = module.fullpath("source")
@@ -63,7 +64,11 @@ class UpdaterQt5(Updater):
         """
         Update an existing Qt5 super module checkout.
 
-        Throws exceptions on failure, otherwise returns number of commits updated
+        Returns:
+             Number of pulled commits.
+
+        Raises:
+             Exception: On failure.
         """
         # Update init-repository and the shell of the super module itself.
         result = super().update_existing_clone()
@@ -78,10 +83,11 @@ class UpdaterQt5(Updater):
         """
         Either performs the initial checkout or updates the current git checkout as appropriate.
 
-        If errors are encountered, an exception is raised.
-
         Returns:
-             The number of *commits* affected.
+             Number of pulled commits.
+
+        Raises:
+            Exception: If errors are encountered.
         """
         module = self.module
         srcdir = module.fullpath("source")

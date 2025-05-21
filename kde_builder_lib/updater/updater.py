@@ -467,8 +467,11 @@ class Updater:
         """
         Update an already existing git checkout by running git pull.
 
-        Throws an exception on error.
-        Returns the number of affected *commits*.
+        Returns:
+             Number of pulled commits.
+
+        Raises:
+            Exception: On an error.
         """
         module = self.module
         cur_repo = module.get_option("repository")
