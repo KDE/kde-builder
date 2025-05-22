@@ -32,7 +32,6 @@ class ModuleSetQt5(ModuleSet):
         # Repo URL to the Qt5 "supermodule" that contains the documented
         # init-repository script.
         # See https://wiki.qt.io/Building_Qt_5_from_Git
-        new_module.set_option("repository", "https://invent.kde.org/qt/qt/qt5.git")
         new_module.set_scm_type("qt5")
         new_module.set_build_system(BuildSystemQt5(new_module))
 

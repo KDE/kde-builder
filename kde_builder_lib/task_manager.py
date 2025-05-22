@@ -581,7 +581,7 @@ class TaskManager:
 
         ssh_servers: list[Module] = []
         for gitserver in git_servers:
-            if url := urlparse(gitserver.get_option("repository")):  # Check for git+ssh:// or git@git.kde.org:/path/etc.
+            if url := urlparse(gitserver.get_option("#resolved-repository")):  # Check for git+ssh:// or git@git.kde.org:/path/etc.
                 if url.scheme == "git+ssh" or url.username == "git" and url.hostname == "git.kde.org":
                     ssh_servers.append(gitserver)
 

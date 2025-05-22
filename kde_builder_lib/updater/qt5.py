@@ -98,7 +98,7 @@ class UpdaterQt5(Updater):
         else:
             self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
-            self._clone(module.get_option("repository"))
+            self._clone(module.get_option("#resolved-repository"))
 
             logger_updater.warning("\tQt update script is installed, downloading remainder of Qt")
             logger_updater.warning("\tb[y[THIS WILL TAKE SOME TIME]")

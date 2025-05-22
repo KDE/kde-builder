@@ -432,6 +432,9 @@ class Application:
                    (module.get_module_set().name if module.get_module_set().name else "") not in ignored_selectors
                    ]
 
+        for module in modules:
+            module.set_resolved_repository()
+
         result = {
             "dependency_info": module_graph,
             "selected_modules": modules,
@@ -603,7 +606,7 @@ class Application:
                         "path": info["path"],
                         "branch": info["branch"],
                         "build": info["build"],
-                        "repository": info["module"].options["repository"],
+                        "repository": info["module"].options["#resolved-repository"],
                         "options": {
                             key: value
                             for key, value in info["module"].options.items()
@@ -917,7 +920,7 @@ class Application:
                 continue  # Don't add to module list
 
         for name, module_set in seen_module_sets.items():
-            module_set.validate(ctx)
+            pass
 
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.

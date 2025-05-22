@@ -56,6 +56,7 @@ class ModuleSet(OptionsBase):
     def __init__(self, ctx: BuildContext, name: str):
         OptionsBase.__init__(self)
         self.start_for_create_id: int = 0
+        self.options["repository"] = "kde-projects"
 
         # newOptions:
         self.name: str = name or ""
@@ -153,10 +154,6 @@ class ModuleSet(OptionsBase):
         The modules returned have not been added to the build context.
         """
         module_list = []  # module names converted to `Module` objects.
-        options = self.options
-
-        # Note: This returns a dict, not a string.
-        repo_set = ctx.get_option("git-repository-base")
 
         # Setup default options for each module
         # If we're in this method, we must be using the git-repository-base method
@@ -172,11 +169,6 @@ class ModuleSet(OptionsBase):
 
             module_list.append(new_module)
 
-            # Set up the only feature actually specific to a module-set, which is
-            # the repository handling.
-            selected_repo = repo_set[options["repository"]]
-            new_module.set_option("repository", selected_repo + module_item)
-
         if not self.modules_to_find():
             logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
             logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
@@ -189,45 +181,3 @@ class ModuleSet(OptionsBase):
         Ensure we are setting the correct type for value of option.
         """
         self.context.verify_option_value_type(option_name, option_value)
-
-    def validate(self, ctx: BuildContext) -> None:
-        """
-        Ensure that the given :class:`ModuleSet` has at least a valid repository and use-projects setting based on the given BuildContext.
-        """
-        name = self.name if self.name else "unnamed"
-        rc_sources = self.get_config_sources()
-
-        # re-read option from module set since it may be pre-set
-        selected_repo = self.get_option("repository")
-        if not selected_repo:
-            logger_moduleset.error(textwrap.dedent(f"""\
-
-            There was no repository selected for the y[b[{name}] module-set declared at
-                {rc_sources}
-
-            A repository is needed to determine where to download the source code from.
-
-            Most will want to use the b[g[kde-projects] repository. See also
-            https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
-            """))
-            raise ConfigError("Missing repository option")
-
-        from ..application import Application
-        repo_set = ctx.get_option("git-repository-base")
-        if selected_repo != Application.KDE_PROJECT_ID and selected_repo != Application.QT_PROJECT_ID and selected_repo not in repo_set:
-            project_id = Application.KDE_PROJECT_ID
-            module_set_name = self.name
-            module_set_id = f"module-set ({module_set_name})" if module_set_name else "module-set"
-
-            logger_moduleset.error(textwrap.dedent(f"""\
-            There is no repository assigned to y[b[{selected_repo}] when assigning a
-            {module_set_id} at {rc_sources}.
-
-            These repositories are defined by g[b[git-repository-base] in the global
-            section of your configuration.
-
-            Make sure you spelled your repository name right, but you probably meant
-            to use the magic b[{project_id}] repository for your module-set instead.
-            """))
-
-            raise ConfigError("Unknown repository base")

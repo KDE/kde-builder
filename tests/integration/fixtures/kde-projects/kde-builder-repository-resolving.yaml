@@ -1,0 +1,71 @@
+# Test config with different variations of "repository" option usage.
+
+config-version: 2
+global:
+    check-self-updates: false
+    git-repository-base: "custom-gh https://github.com/torvalds/"
+
+# ---
+
+# First party project, and implicitly using "kde-projects" magic value
+project juk:
+    branch: fake-branch
+
+# First party project, and explicitly using "kde-projects" magic value
+project kcalc:
+    repository: kde-projects
+    branch: fake-branch
+
+# First party project, but using one of defined git-repository-bases
+project konsole:
+    repository: custom-gh
+    branch: fake-branch
+
+# First party project, but set empty repository
+project dolphin:
+    repository: ""
+    branch: fake-branch
+
+# First party project, and set to non-empty, but not magic, and not from git-repository-base
+project kde-builder:
+    repository: https://example.com/kde-builder-fork
+    branch: fake-branch
+
+# ---
+
+# Third party project, but implicitly using "kde-projects" magic value
+project gnome-calc:
+    branch: fake-branch
+
+# Third party project, but explicitly using "kde-projects" magic value
+project gnome-texteditor:
+    repository: kde-projects
+    branch: fake-branch
+
+# Third party project, and using one of defined git-repository-bases
+project gnome-imageeditor:
+    repository: custom-gh
+    branch: fake-branch
+
+# Third party project, but set empty repository
+project gnome-audioeditor:
+    repository: ""
+    branch: fake-branch
+
+# Third party project, and set to non-empty, but not magic and not from git-repository-base - assumed full url
+project gnome-videoeditor:
+    repository: https://example.com/gnome-text-editor
+    branch: fake-branch
+
+# Third party project, and set to non-empty, but not magic and not from git-repository-base - assumed repository base, but not defined
+project gnome-binaryeditor:
+    repository: gnome-gh # <- not defined in git-repository-base prefix value
+    branch: fake-branch
+
+# ---
+
+# Group which is implicitly using "kde-projects" magic value
+group elisa-grp:
+    branch: fake-branch
+    use-projects:
+        - elisa

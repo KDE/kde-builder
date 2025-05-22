@@ -959,6 +959,44 @@ class Module(OptionsBase):
         """
         return self.post_build_msgs
 
+    def set_resolved_repository(self) -> None:
+        """
+        Resolves any magic values (such as "kde-projects") and git-repository-base in "repository" option and sets the "#resolved-repository" internal option.
+
+        Resolved value is either a full url like "https://invent.kde.org/sysadmin/dummy.git" or an aliased shortened url like "kde:sysadmin/dummy.git".
+        """
+        selected_repo = self.get_option("repository")
+        repo_set: dict = self.context.get_option("git-repository-base")
+
+        if not selected_repo:
+            # Empty repository ("") does not immediately mean error. For example, user may want to work on their new/tutorial project,
+            # and the local project does not have a remote url. Users could additionally specify no-src option for such projects.
+            # The error however will happen in case they _attempt_ to update sources when "repository" is empty.
+            self.set_option("#resolved-repository", "")
+
+        elif selected_repo == "kde-projects":
+            proj_db = self.context.get_project_data_reader().repositories
+            if self.name in proj_db:
+                value = proj_db[self.name]["repo"]
+                self.set_option("#resolved-repository", value)
+            else:
+                logger_module.debug(f"Project y[{self.name}] is not recognized as KDE project, but it has y[repository] set as kde-projects. Cannot resolve it.")
+                self.set_option("#resolved-repository", "")
+
+        elif selected_repo in repo_set:
+            base_path = repo_set[selected_repo]
+            resolved = base_path + self.name
+            logger_module.debug(f"Resolving {self.name} repository option with using git-repository-base to {resolved}")
+            self.set_option("#resolved-repository", resolved)
+
+        elif selected_repo == "qt-projects":
+            self.set_option("#resolved-repository", "https://invent.kde.org/qt/qt/qt5.git")
+
+        else:
+            self.set_option("#resolved-repository", selected_repo)
+
+        return
+
     def add_post_build_message(self, new_msg: str) -> None:
         """
         Add the given message to the list of post-build messages to show to the user.

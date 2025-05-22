@@ -105,7 +105,7 @@ class BuildContext(Module):
             "filter-out-phases": "",
             "git-push-protocol": "git",
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
-            "repository": "",  # module's git repo
+            "repository": "kde-projects",
             "set-env": {},  # dict of environment vars to set
             "ssh-identity-file": "",  # If set, is passed to ssh-add.
             "use-projects": ""

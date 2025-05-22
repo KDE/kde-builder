@@ -14,6 +14,7 @@ import time
 from typing import TYPE_CHECKING
 
 from ..kb_exception import KBRuntimeError
+from ..kb_exception import ConfigError
 from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
@@ -200,6 +201,14 @@ class Updater:
         module = self.module
         srcdir = module.fullpath("source")
 
+        git_repo: str = module.get_option("#resolved-repository")
+        if not git_repo:
+            msg = textwrap.dedent(f"""\
+                \tThere was no y[b[repository] specified for the {module.name}.
+                \tSee https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups\
+                """)
+            raise ConfigError(msg)
+
         # While .git is usually a directory, it can also be a file in case of a
         # worktree checkout (https://git-scm.com/docs/gitrepository-layout)
         if os.path.exists(f"{srcdir}/.git"):
@@ -207,10 +216,6 @@ class Updater:
             return self.update_existing_clone()
         else:
             self._verify_safe_to_clone_into_source_dir(module, srcdir)
-
-            git_repo = module.get_option("repository")
-            if not git_repo:
-                raise ProgramError(f"\tUnable to checkout {module}, you must specify a repository to use.")
 
             if not self._verify_ref_present(module, git_repo):
                 if self._module_is_needed():
@@ -251,7 +256,7 @@ class Updater:
         Returns 1 or raises exception on an error.
         """
         module = self.module
-        repo = module.get_option("repository")
+        repo = module.get_option("#resolved-repository")
         has_old_remote = self.has_remote(remote)
 
         if has_old_remote:
@@ -300,7 +305,7 @@ class Updater:
         See also the "repository" module option.
         """
         module = self.module
-        cur_repo = module.get_option("repository")
+        cur_repo = module.get_option("#resolved-repository")
         if not self.ipc:
             raise ProgramError("\tMissing IPC object")
         ipc = self.ipc
@@ -474,7 +479,7 @@ class Updater:
             Exception: On an error.
         """
         module = self.module
-        cur_repo = module.get_option("repository")
+        cur_repo = module.get_option("#resolved-repository")
 
         Util.p_chdir((module.fullpath("source")))
 
@@ -810,7 +815,7 @@ class Updater:
             will be empty if no remote names were found.
         """
         module = self.module
-        configured_url = module.get_option("repository")
+        configured_url = module.get_option("#resolved-repository")
         outputs = []
 
         # The Repo URL isn't much good, let's find a remote name to use it with.
