@@ -58,20 +58,20 @@ list of projects to build. An example entry for a project is shown below:
 :name: conf-project-example
 :caption:  Example project entry in the configuration file
 
-project kde-builder-git:
-  # Options for this module go here, example:
-  repository: kde:kde-builder
+project dummy-project:
+  repository: kde:sysadmin/dummy
   make-options: -j4 # Run 4 compiles at a time
 ```
 
 ```{note}
 In practice, this project construct is not usually used directly. Instead
-most projects are specified viagroups as described below.
+most projects are specified via groups as described below.
 ```
 
-When using only `project` entries, KDE Builder builds them in the order
-you list, and does not attempt to download any other repositories other
-than what you specify directly.
+Note that the order in which `project` entries are appeared in config does matter.
+If KDE Builder cannot understand project dependencies, for example, when projects are third-party and not described,
+and you select several such projects in the command line, KDE Builder will build them in the order
+you list them in config.
 
 (groups)=
 ## Groups
@@ -85,11 +85,8 @@ as a "group".
 (group-concept)=
 ### The basic group concept
 
-By using a group, you can quickly declare many git projects to be
-downloaded and built, as if you'd typed out a separate project
-nodes for each one. The [repository](#conf-repository) option is
-handled specially to set up where each project is downloaded from, and
-every other option contained in the group is copied to every project
+By using a group, you can quickly declare many projects, as if you'd typed out a separate project
+nodes for each one. Every option contained in the group is copied to every project
 generated in this fashion.
 
 ```{code-block} yaml
@@ -117,8 +114,7 @@ project kdesupport:
 In the example above, a brief group is
 shown. When KDE Builder encounters this group, it acts as if, for
 every project given in `use-projects`, that an individual project has been
-declared, with its `repository` equal to the group's `repository`
-followed immediately by the given project name.
+declared.
 
 In addition, other options can be passed in a group, which are
 copied to every new project that is created this way. By using group,
@@ -127,17 +123,18 @@ the same repository URL. In addition, it is possible to give groups
 a name (as shown in the example), which allows you to quickly refer to
 the entire group of projects from the command line.
 
+See also [git-repository-base](#conf-git-repository-base) option.
+
 (groups-kde)=
 ### Special Support for KDE groups
 
 The group support described so far is general to any
 projects. For the KDE repositories, KDE Builder includes additional
-features to make things easier for users and developers. This support is
-enabled by specifying `kde-projects` as the `repository` for the group.
+features to make things easier for users and developers. This support is enabled
+by not overriding `repository` option - when its default value `kde-projects`
+is applied.
 
-KDE Builder normally only builds the projects you have listed in your
-configuration file, in the order you list them. But with a
-`kde-projects` group, KDE Builder can do dependency resolution of
+With that value, KDE Builder can do dependency resolution of
 KDE-specific projects, and in addition automatically include modules into
 the build even if only indirectly specified.
 
@@ -145,23 +142,22 @@ the build even if only indirectly specified.
 :name: example-using-kde-groups
 :caption: Using kde-projects groups
 
+# When not specified, `repository: kde-projects` is used
+
 # Only adds a project for juk (the kde/kdemultimedia/juk repo)
 group juk-set:
-  repository: kde-projects
   use-projects:
     - juk
 
 # Adds all projects that are in kde/multimedia/*, including juk,
 # but no other dependencies
 group multimedia-set:
-  repository: kde-projects
   use-projects:
     - kde/multimedia
 
 # Adds all projects that are in kde/multimedia/*, and all kde-projects
 # dependencies from outside of kde/kdemultimedia
 group multimedia-deps-set:
-  repository: kde-projects
   use-projects:
     - kde/multimedia
   include-dependencies: true
@@ -170,16 +166,7 @@ group multimedia-deps-set:
 # proper dependency order, regardless of the setting for include-dependencies
 ```
 
-```{tip}
-This `kde-projects` group construct is the main method of declaring
-which projects you want to build.
-```
-
-All groups use the [repository](#conf-repository) and
-[use-projects](#conf-use-projects) options.
-[`kde-projects`](#kde-projects-groups) groups have a
-predefined `repository` value, but other types of groups also will
-use the [git-repository-base](#conf-git-repository-base) option.
+All groups use [use-projects](#conf-use-projects) option.
 
 (kde-projects-groups)=
 ## The official KDE module database
@@ -279,8 +266,6 @@ in case you want to [ignore](#ignoring-projects) some projects just once.
 :caption: Example for ignoring a kde-project project in a group
 
 group utils:
-  repository: kde-projects
-
   # This option chooses what projects to look for in the database.
   use-projects:
     - kdeutils
@@ -290,8 +275,6 @@ group utils:
     - kremotecontrol
 
 group graphics:
-  repository kde-projects
-
   # This option chooses what projects to look for in the database.
   use-projects:
     - extragear/graphics

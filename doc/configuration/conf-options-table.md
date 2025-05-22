@@ -89,7 +89,7 @@ Type: String
 This option is used to create a short name to reference a specific
 repository base URL in later [group](#groups)
 declarations, which is useful for quickly declaring many projects to
-build.
+build. Only useful if you want to declare your own group of projects, not hosted on invent.kde.org.
 
 You must specify two things (separated by a space): the name to
 assign to the base URL, and the actual base URL itself. For example:
@@ -97,32 +97,36 @@ assign to the base URL, and the actual base URL itself. For example:
 ```{code-block} yaml
 global:
   # other options
-  # This is the common path to all kde repositories
-  git-repository-base: kde-git kde:
+  # This is the common path to all Linus Torvald's repositories on GitHub
+  git-repository-base: torv-gh https://github.com/torvalds/
 
 # Project declarations
 
-group some-name:
-  # Now you can use the alias you defined earlier, but only in a group.
-  repository: kde-git
+group torvalds-group1:
+  # Now you can use the alias you defined earlier
+  repository: torv-gh
   use-projects:
-    - project1.git
-    - project2.git
+    - uemacs
+    - libgit2
 ```
 
 The group's `use-projects` option created two projects
 internally, with kde-builder behaving as if it had read:
 
 ```{code-block} yaml
-project project1:
-  repository: kde:project1.git
+project uemacs:
+  repository: https://github.com/torvalds/uemacs
 
-project project2:
-  repository: kde:project2.git
+project libgit2:
+  repository: https://github.com/torvalds/libgit2
 ```
 
-The `kde:` git repository prefix used above is a shortcut
-which will be set up by kde-builder automatically. Note that unlike most other
+```{Tip}
+If your personal project is hosted on invent.kde.org, you do not need to add any git repository bases.
+Use the `kde:` git repository prefix. It is a shortcut which will be set up by kde-builder automatically.
+```
+
+Note that unlike most other
 options, this option can be specified multiple times in order to create
 as many aliases as necessary.
 
@@ -135,6 +139,8 @@ It is not required to use this option to take advantage of
 group, this option exists to make it easy to use the same
 repository across many different groups.
 ```
+
+See also [repository](#conf-repository) option.
 
 (conf-install-login-session)=
 [`install-login-session`](conf-install-login-session)
@@ -885,8 +891,15 @@ Related command-line option: --remove-after-install \<value\>
 
 Type: String
 
-This option is used to specify the git repository to download the
-source code for the project.
+This option is used to specify the git repository to download the source code for the project.
+
+By default, it has magic value `kde-projects`, which can be automatically resolved (based on project name)
+to the correct url for any project that is presented in KDE Projects Database (a.k.a. repo-metadata).
+
+For all other projects, you need to specify the correct url in this option yourself. 
+
+If using [git-repository-base](conf-git-repository-base), the url is resolved as a prefix name,
+followed immediately by the given project name.
 
 (conf-revision)=
 [`revision`](conf-revision)
