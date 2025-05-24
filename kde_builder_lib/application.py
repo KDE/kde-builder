@@ -363,6 +363,13 @@ class Application:
         resolver = ctx.module_branch_group_resolver()
         branch_group = ctx.effective_branch_group()
 
+        explicit_kdeproject_selectors: list[str] = []
+        proj_db = self.context.get_project_data_reader().repositories
+        for el in cmdline_selectors:
+            leaf = el.split("/")[-1]
+            if leaf in proj_db:
+                explicit_kdeproject_selectors.append(leaf)
+
         filtered_modules: list[Module] = []
         for module in modules:
             if module.get_module_set().name in ["qt5-set", "qt6-set"]:
@@ -372,17 +379,20 @@ class Application:
                     # by building all when not specifying any). We should not allow building qt modules in such case.
                     # Otherwise, as their real "install-dir" is empty, their CMAKE_INSTALL_PREFIX will be incorrect (set to empty), and such
                     # modules could not pass cmake configure.
-                    logger_app.debug(f"Removing {module.full_project_path()} due to qt-install-dir")
+                    logger_app.warning(f" y[*] Removing y[third-party]/y[{module.name}] due to qt-install-dir")
                     continue
 
             if module.is_kde_project():
                 branch = resolver.find_module_branch(module.full_project_path(), branch_group)
-            else:
-                branch = True  # Just a placeholder truthy value
-
-            if branch is not None and not branch:  # i.e. the branch is explicitly specified as empty string
-                logger_app.debug(f"Removing {module.full_project_path()} due to branch-group")
-                continue
+                if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
+                    printpath = module.get_option("#kde-repo-path")
+                    printpath = "y[" + printpath.replace("/", "]/y[") + "]"
+                    message = f" y[*] Removing {printpath} due to branch-group"
+                    if module.name in explicit_kdeproject_selectors:
+                        logger_app.warning(message)
+                    else:
+                        logger_app.debug(message)
+                    continue
 
             filtered_modules.append(module)
 
