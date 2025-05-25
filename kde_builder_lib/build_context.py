@@ -212,7 +212,7 @@ class BuildContext(Module):
         }
         self.log_paths = {
             # Holds a dict of log path bases as expanded by
-            # get_subdir_path (e.g. [source-dir]/log) to the actual log dir
+            # get_absolute_path() (e.g. [source-dir]/log) to the actual log dir
             # *this run*, with the date and unique id added. You must still
             # add the module name to use.
         }
@@ -392,7 +392,7 @@ class BuildContext(Module):
         "latest" symlink will also be set up to point to the returned log
         directory.
         """
-        base_log_path = module.get_subdir_path("log-dir")
+        base_log_path = module.get_absolute_path("log-dir")
         if base_log_path not in self.log_paths:
             # No log dir made for this base, do so now.
             date = datetime.datetime.now().strftime("%F")  # ISO 8601 date (example: "2024-01-31")
@@ -424,7 +424,7 @@ class BuildContext(Module):
         Use this instead of get_log_dir_for when you actually intend to create a log, as this function will also adjust the
         "latest" symlink properly (which can trigger clean up of old log dirs after all modules are built).
         """
-        base_log_path = module.get_subdir_path("log-dir")
+        base_log_path = module.get_absolute_path("log-dir")
         log_dir = self.get_log_dir_for(module)
 
         # We create this here to avoid needless empty module directories everywhere

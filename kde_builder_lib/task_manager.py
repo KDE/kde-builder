@@ -339,7 +339,7 @@ class TaskManager:
             status_fh.close()
 
             # Update the symlink in latest to point to this file.
-            logdir = ctx.get_subdir_path("log-dir")
+            logdir = ctx.get_absolute_path("log-dir")
             status_file_loc = f"{logdir}/latest/status-list.log"
             if os.path.islink(status_file_loc):
                 Util.safe_unlink(status_file_loc)

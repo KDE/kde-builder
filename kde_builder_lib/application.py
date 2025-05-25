@@ -769,7 +769,7 @@ class Application:
         # modules in different source dirs may have different log dirs. If there
         # are multiple, show them all.
 
-        global_log_base = ctx.get_subdir_path("log-dir")
+        global_log_base = ctx.get_absolute_path("log-dir")
         global_log_dir = ctx.get_log_dir()
         # global first
         logger_app.warning(f"Your logs are saved in y[{global_log_dir}]")

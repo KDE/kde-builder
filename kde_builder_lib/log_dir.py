@@ -27,7 +27,7 @@ class LogDir:
         All log directories that are not referenced by log_dir/latest somehow are made to go away.
         """
         Util.assert_isa(ctx, BuildContext)
-        logdir = ctx.get_subdir_path("log-dir")
+        logdir = ctx.get_absolute_path("log-dir")
 
         if not os.path.exists(f"{logdir}/latest"):  # Could happen for error on first run...
             return
@@ -65,7 +65,7 @@ class LogDir:
             return
 
         Util.assert_isa(ctx, BuildContext)
-        logdir = ctx.get_subdir_path("log-dir")
+        logdir = ctx.get_absolute_path("log-dir")
         logdir_latest = f"{logdir}/latest"
 
         if not os.path.exists(logdir_latest):

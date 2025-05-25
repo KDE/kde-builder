@@ -129,16 +129,16 @@ class Module(OptionsBase):
         Util.assert_isa(module_set, ModuleSet)
         self.module_set = module_set
 
-    def get_subdir_path(self, subdir_option: str) -> str:
+    def get_absolute_path(self, option_name: str) -> str:
         """
-        Return a subdirectory path from the rc-file (based on the option-name) as an absolute path.
+        Converts the value of path-like option to an absolute path. Non-absolute paths in option values are treated as subdirs of source-dir.
 
         Handles tilde expansion and relative paths.
 
         Args:
-            subdir_option: The option key (e.g. "build-dir" or "log-dir") to read and interpret.
+            option_name: The option key (e.g. "build-dir" or "log-dir") to read and interpret.
         """
-        directory = self.get_option(subdir_option)
+        directory = self.get_option(option_name)
 
         # If build-dir starts with a slash, it is an absolute path.
         if directory.startswith("/"):
@@ -146,7 +146,7 @@ class Module(OptionsBase):
 
         # Make sure we got a valid option result.
         if not directory:
-            raise ValueError(f"Reading option for {subdir_option} gave empty directory!")
+            raise ValueError(f"Reading option for {option_name} gave empty directory!")
 
         # If it starts with a tilde, expand it out.
         if directory.startswith("~"):
@@ -194,7 +194,7 @@ class Module(OptionsBase):
         destdir = module.dest_dir()
         srcbase = module.get_source_dir()
         if dirtype == "build":
-            srcbase = module.get_subdir_path("build-dir")
+            srcbase = module.get_absolute_path("build-dir")
 
         combined = f"{srcbase}/{destdir}"
 
@@ -217,7 +217,7 @@ class Module(OptionsBase):
         Do note that this returns the *base* path to the source directory,
         without the module name or kde_projects stuff appended. If you want that, use :meth:`fullpath()`.
         """
-        return self.get_subdir_path("source-dir")
+        return self.get_absolute_path("source-dir")
 
     def scm(self):
         """
