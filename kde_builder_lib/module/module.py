@@ -221,10 +221,8 @@ class Module(OptionsBase):
 
     def scm(self):
         """
-        Autodetects the appropriate scm plugin if not already done (or manually set), and then returns the `Updater` plugin.
+        Returns the `Updater` plugin.
         """
-        if not self.scm_obj:
-            self.scm_obj = Updater(self)
         return self.scm_obj
 
     def set_scm_type(self, scm_type: str) -> None:

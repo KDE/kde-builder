@@ -101,7 +101,6 @@ class ModuleSet(OptionsBase):
         Should be called for each new ``Module`` created in order to set up common module options.
         """
         new_module.set_module_set(self)
-        new_module.set_scm_type("git")
         new_module.phases.reset_to(self.phase_list.phaselist)
         new_module.merge_options_from(self)
 
@@ -166,7 +165,7 @@ class ModuleSet(OptionsBase):
             new_module = Module(ctx, module_name)
 
             self._initialize_new_module(new_module)
-
+            new_module.set_scm_type("git")
             module_list.append(new_module)
 
         if not self.modules_to_find():

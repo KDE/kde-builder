@@ -21,6 +21,7 @@ def test_environment_prepend():
         return not any(x == "/bin" for x in elem)
 
     mod = Module(ctx, "test")
+    mod.set_scm_type("git")
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -40,6 +41,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
+    mod.set_scm_type("git")
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -59,6 +61,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
+    mod.set_scm_type("git")
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -80,6 +83,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
+    mod.set_scm_type("git")
     os.environ["PATH"] = "/bin:/usr/bin"
 
     ctx.set_option("binpath", "/tmp/fake/bin")
