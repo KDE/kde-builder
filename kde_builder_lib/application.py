@@ -907,6 +907,10 @@ class Application:
 
                 new_module: Module = Module(ctx, module_name)
                 new_module.apply_config_options(ctx, node, config_filename)
+                if new_module.get_option("repository") == Application.KDE_PROJECT_ID:
+                    new_module.set_scm_type("proj")
+                else:
+                    new_module.set_scm_type("git")
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
