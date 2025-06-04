@@ -218,10 +218,7 @@ class Updater:
             self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
             if not self._verify_ref_present(module, git_repo):
-                if self._module_is_needed():
-                    raise KBRuntimeError(f"\t{module} build was requested, but it has no source code at the requested git branch")
-                else:
-                    raise KBRuntimeError("\tThe required git branch does not exist at the source repository")
+                raise KBRuntimeError(f"\t{module} build was requested, but it has no source code at the requested git branch")
 
             self._clone(git_repo)  # can handle pretending mode
             if Debug().pretending():
@@ -229,10 +226,6 @@ class Updater:
             else:
                 ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
                 return ret
-
-    @staticmethod
-    def _module_is_needed() -> bool:
-        return True
 
     @staticmethod
     def is_push_url_managed() -> bool:

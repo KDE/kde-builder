@@ -64,7 +64,6 @@ class KDEProjectsReader:
                 "repo": f"kde:{project}.git",
                 "name": project,
                 "active": True,
-                "found_by": "direct",
                 "kind": "software",
             }
 
@@ -88,7 +87,6 @@ class KDEProjectsReader:
             "repo": f"kde:{repo_path}.git",
             "name": repo_name,
             "active": bool(proj_data["repoactive"]),
-            "found_by": "direct",  # can be changed in get_modules_for_project
             "kind": proj_data["kind"],
         }
 
@@ -108,10 +106,6 @@ class KDEProjectsReader:
 
         def find_results():
             match_list: list[str] = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
-
-            if re.search(r"\*", proj):
-                for key in match_list:
-                    repositories[key]["found_by"] = "wildcard"
 
             results.extend(match_list)
 

@@ -183,15 +183,10 @@ class ModuleResolver:
 
         Returns the list of created Modules.
         """
-        selected_reason = "partial-expansion:" + needed_module_set.name
-
         # expand_module_sets applies pending/cmdline options already.
         module_results: list[Module] = self.expand_module_sets([needed_module_set])
         if not module_results:
             raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of modules!")
-
-        for module_result in module_results:
-            module_result.set_option("#selected-by", selected_reason)
 
         # Copy entries into the lookup dict, especially in case they're
         # from case 3
@@ -258,14 +253,10 @@ class ModuleResolver:
             if not selector:
                 # In _expand_single_module_set() it is ensured module_results is not empty.
                 results.extend(module_results)
-            else:
-                selector.set_option("#selected-by", "name")
 
         # Case 1
         elif selector_name in self.defined_modules:
             selector: Module | ModuleSet = self.defined_modules[selector_name]
-            if not isinstance(selector, ModuleSet):
-                selector.set_option("#selected-by", "name")
 
             if not isinstance(selector, ModuleSet) and not including_deps:
                 # modules were manually selected on cmdline, so ignore
@@ -285,7 +276,6 @@ class ModuleResolver:
 
             selector.set_scm_type("proj")
             selector.set_option("#guessed-kde-project", True)
-            selector.set_option("#selected-by", "initial-guess")
             selector.set_option("#include-dependencies", including_deps)
 
         # In case selector is None (may happen in case 2), results list for sure becomes non-empty,
