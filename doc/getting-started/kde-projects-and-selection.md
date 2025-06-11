@@ -18,7 +18,7 @@ properly select the projects that you want built.
     software to work. Some of these libraries are not considered part of
     KDE itself due to their generic nature, but are still essential to
     the KDE Platform. These libraries are collected under a `kf6-support`
-    module grouping but are not considered part of the "Frameworks"
+    project grouping but are not considered part of the "Frameworks"
     libraries.
 
 3.  On top of these essential libraries come the [KDE
@@ -106,7 +106,7 @@ group kde-support-libs:
     - attica
     - akonadi
 
-# Other modules as necessary...
+# Other projects as necessary...
 project kdesupport:
   ...
 ```
@@ -135,7 +135,7 @@ by not overriding `repository` option - when its default value `kde-projects`
 is applied.
 
 With that value, KDE Builder can do dependency resolution of
-KDE-specific projects, and in addition automatically include modules into
+KDE-specific projects, and in addition automatically include projects into
 the build even if only indirectly specified.
 
 ```{code-block} yaml
@@ -169,7 +169,7 @@ group multimedia-deps-set:
 All groups use [use-projects](#conf-use-projects) option.
 
 (kde-projects-groups)=
-## The official KDE module database
+## The official KDE project database
 
 KDE projects in invent.kde.org are placed in groups, for example kdegraphics.
 KDE Builder can understand these groups, using [groups](#groups)
@@ -190,7 +190,7 @@ other things, KDE Builder will:
   exists and is active for the branch group, KDE Builder will
   automatically use that to download or update the source code.
 
-The following example shows how to use the KDE module database to
+The following example shows how to use the KDE project database to
 install the Phonon multimedia library.
 
 ```{code-block} yaml

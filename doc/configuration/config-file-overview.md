@@ -32,7 +32,7 @@ project project-name:
 group group-name:
   repository: kde-projects # or git://host.org/path/to/repo.git
   use-projects:
-    - module-names
+    - project-names
 
   # Other options may also be set
   option-name: option-value

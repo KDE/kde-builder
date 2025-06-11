@@ -4,7 +4,7 @@
 (project-concept)=
 ## The Project
 
-KDE groups its software into "modules" of various size. This was
+KDE groups its software into "projects" of various size. This was
 initially a loose grouping of a few large projects, but with the
 introduction of the [git](https://git-scm.com/)-based [source code
 repositories](https://commits.kde.org/), these large projects were
@@ -97,7 +97,7 @@ group name:
 ```
 
 In this case the same `branch-group` gives different branch names for
-each module.
+each project.
 
 This feature requires some data maintained by the KDE developers in a
 git repository named `repo-metadata`, however this project will be

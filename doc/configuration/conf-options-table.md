@@ -233,7 +233,7 @@ Related command-line option: --persistent-data-file \<file\>
 
 Type: String
 
-With this option, you can specify a path to shell file, which will be sourced before the module is launched with `--run` option.
+With this option, you can specify a path to shell file, which will be sourced before the project is launched with `--run` option.
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
 Related command line option: [--source-when-start-program](cmdline-source-when-start-program)
@@ -482,7 +482,7 @@ Appends to global options for the default buildsystem, overrides
 global for other buildsystems.
 
 Use this option to specify what flags to pass to ./configure when
-creating the build system for the module. When this is used as a
+creating the build system for the project. When this is used as a
 global option, it is applied to all projects that this script builds.
 
 To change configuration settings for KDE projects, see [cmake-options](#conf-cmake-options).
@@ -595,7 +595,7 @@ projectpath: kde/kdeutils/kcalc
 repopath: utilities/kcalc
 ```
 
-If you use `flat` layout, the KCalc source directory will be created in the source-dir in the subfolder, named as a module: `~/kde/src/kcalc`.
+If you use `flat` layout, the KCalc source directory will be created in the source-dir in the subfolder, named as a project: `~/kde/src/kcalc`.
 
 If you use `invent` layout, the source directory will be created in the source-dir in the subfolders, as seen in the repository path in
 [invent.kde.org](https://invent.kde.org/) (corresponds to the repopath field in metadata): `~/kde/src/utilities/kcalc`.
@@ -848,7 +848,7 @@ Type: String
 Any options specified here are passed to the `qmake`
 command, for projects that use the `qmake` build system. For
 instance, you can use the `PREFIX=/path/to/qt` option to
-qmake to override where it installs the module.
+qmake to override where it installs the project.
 
 Related command-line option: --qmake-options \<value\>
 
@@ -907,9 +907,9 @@ followed immediately by the given project name.
 Type: String
 
 If this option is set to a value other than 0 (zero), kde-builder
-will force the source update to bring the module to the exact revision
+will force the source update to bring the project to the exact revision
 given, even if options like [branch](#conf-branch) are in
-effect. If the module is already at the given revision then it will not
+effect. If the project is already at the given revision then it will not
 be updated further unless this option is changed or removed from the
 configuration.
 
@@ -1097,8 +1097,8 @@ skipped entirely. Use this option when you want to build an entire
 _except for_ some specific projects.
 
 The option value does not necessarily have to name the project
-directly. Any module that has full consecutive parts of its
-[KDE projects module path](#kde-projects-groups) match one
+directly. Any project that has full consecutive parts of its
+[KDE projects project path](#kde-projects-groups) match one
 of the option values will be ignored, so you can ignore multiple projects
 this way.
 
@@ -1139,7 +1139,7 @@ moves to the next project after the group.
 If you need to change the options for a generated project, simply
 declare the project again after it is defined in the group, and set
 your options as needed. Although you will change the options set for the
-module this way, the project will still be updated and built in the order
+project this way, the project will still be updated and built in the order
 set by the group (i.e. you can't reorder the build sequence doing
 this).
 

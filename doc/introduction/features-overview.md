@@ -26,7 +26,7 @@ KDE Builder features include:
   them yourself.
 
 - KDE Builder can checkout a specific branch or tag
-  of a module. You can also ensure that a specific
+  of a project. You can also ensure that a specific
   [revision](#conf-revision) is checked out of a project.
 
 - KDE Builder can [checkout only portions of a

@@ -23,7 +23,7 @@ option.
 ```{important}
 This option requires at least that the build system for the project is
 reconfigured after changing it. This is done using the
-`kde-builder --reconfigure module` command.
+`kde-builder --reconfigure project` command.
 ```
 
 ```{note}
@@ -88,7 +88,7 @@ kde-builder is installing a project.
 ### Stopping kde-builder gracefully when stop-on-failure is false
 
 As mentioned above, it is possible to cause kde-builder to gracefully
-shutdown early once it has completed the module it is currently working
+shutdown early once it has completed the project it is currently working
 on. To do this, you need to send the POSIX `HUP` signal to kde-builder.
 
 You can do this with a command such as `pkill` (on Linux systems) as
@@ -136,14 +136,14 @@ rebuild the project:
   it) then kde-builder will automatically re-create it. This is useful
   to allow for performing a full
   [--refresh-build](#cmdline-refresh-build) for a specific project
-  without having that performed on other modules.
+  without having that performed on other projects.
 
 (manual-rebuilds)=
 ### Manually rebuilding a project
 
 If you make a change to a project's option settings, or the project's
 source code changes in a way kde-builder does not recognize, you may
-need to manually rebuild the module.
+need to manually rebuild the project.
 
 You can do this by simply running `kde-builder --refresh-build project`.
 

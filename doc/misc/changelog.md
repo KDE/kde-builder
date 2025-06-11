@@ -40,7 +40,7 @@
 : Added option `generate-clion-project-config` for the CLion IDE project generation.
 
 2024-05-29
-: Launching the built binaries which names are different from their module name no longer require specifying --exec in --run.
+: Launching the built binaries with names which are different from their project name no longer requires specifying --exec in --run.
 
 2024-05-24
 : Added option `install-login-session`. Removed options `install-session-driver` and `install-environment-driver`.

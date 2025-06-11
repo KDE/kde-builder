@@ -62,7 +62,7 @@ Launch kate with "-l 5 file1.txt" arguments, and detach its process from current
 kde-builder --run -f kate -l 5 file1.txt
 ```
 
-Launch kate-syntax-highlighter executable (installed by "kate" module) with "--list-themes" argument:
+Launch kate-syntax-highlighter executable (installed by "kate" project) with "--list-themes" argument:
 ```bash
 kde-builder --run kate-syntax-highlighter --list-themes
 ```
@@ -181,7 +181,7 @@ This option is used to stop the normal build process just *before* a
 project would ordinarily be built.
 
 For example, if the normal build list was projectA, projectB, projectC,
-then `--stop-before moduleB` would cause kde-builder to only build
+then `--stop-before projectB` would cause kde-builder to only build
 `projectA`.
 
 (cmdline-stop-after)=
@@ -190,7 +190,7 @@ This option is used to stop the normal build process just *after* a
 project would ordinarily be built.
 
 For example, if the normal build list was projectA, projectB, projectC,
-then `--stop-after moduleB` would cause kde-builder to build `projectA`
+then `--stop-after projectB` would cause kde-builder to build `projectA`
 and `projectB`.
 
 (cmdline-stop-on-failure)=
@@ -218,7 +218,7 @@ reset by a completely successful build, so you can successfully rebuild
 a project or two and this flag will still work.
 ```
 
-## Modules information
+## Projects information
 
 (cmdline-query)=
 [`--query`](cmdline-query) mode  
@@ -253,7 +253,7 @@ following:
 - `project-info` - the full project information, including its path, branch, repository,
    build options, and dependencies.
 
-- Any option name that is valid for modules in the [configuration
+- Any option name that is valid for projects in the [configuration
   file](../configuration/conf-options-table).
 
 For example, the command

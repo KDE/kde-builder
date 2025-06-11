@@ -85,7 +85,7 @@ major space-using pieces when using kde-builder:
     on-disk source size.
 
 ```{note}
-Todo: Outdated info. Mentions the size for the kdebase module. And check the statements about "fake build dir".
+Todo: Outdated info. Mentions the size for the kdebase project. And check the statements about "fake build dir".
 ```
 
 2.  kde-builder will create a separate build directory to build the
@@ -125,7 +125,7 @@ information for the affected application and rebuild to help a developer
 fix the crash. So, remove debugging information at your own risk!
 ```
 
-Removing the build directory after installation of a module. The source
+Removing the build directory after installation of a project. The source
 directory is still kept, and debugging is enabled:
 
 ```yaml

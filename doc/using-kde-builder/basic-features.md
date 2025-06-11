@@ -163,7 +163,7 @@ To use [make-install-prefix](#conf-make-install-prefix) for only a
 single project, this would work:
 
 ```yaml
-project some-module-name:
+project some-project-name:
   make-install-prefix: sudo
 ```
 

@@ -8,7 +8,7 @@ The default settings should be appropriate to perform a KDE build. Some
 settings that you may wish to alter include:
 
 - [branch-group](#conf-branch-group), which can be used to choose the
-  appropriate branch of development for the KDE modules as a whole.
+  appropriate branch of development for the KDE projects as a whole.
   There are many supported build configurations, but you will likely want
   to choose `kf6-qt6` so that KDE Builder downloads the latest code
   based on Qt 6 and KDE Frameworks 6.
@@ -63,7 +63,7 @@ Some very large Git repositories may swamp your system if you try to
 compile with a too many build jobs at one time, especially
 repositories like the Qt WebEngine repository. To
 maintain system interactivity you may have to reduce the number of
-build jobs for specific modules.
+build jobs for specific projects.
 
 [](#make-options-example) gives an example of how to do
 this.
