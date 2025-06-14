@@ -101,7 +101,7 @@ class StartProgram:
         else
             echo "PID:                $$"
             printf '%.0s#' {{1..80}}; printf "\n\n"
-            exec "{exec_path}" $@
+            exec "{exec_path}" "$@"
         fi
         """)
 
