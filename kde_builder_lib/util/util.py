@@ -477,7 +477,7 @@ class Util:
         argument reference is "kde-builder", then log_command will, when it forks,
         execute the function named by the second parameter rather than executing a
         child process. The function should include the full python module name as well
-        (otherwise the package containing log_command's implementation is used). The
+        (otherwise the class containing log_command's implementation is used). The
         remaining arguments in the list are passed to the function that is called.
 
         Pretend handling:

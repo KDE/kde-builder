@@ -272,7 +272,7 @@ class UtilLoggedSubprocess:
         Send the given data to the parent process.
 
         Our calling code and this
-        package must share the same single channel (over the "progress" event).
+        class must share the same single channel (over the "progress" event).
         Although we only support handling for the calling
         code (to send line-by-line output back to the parent), to support future
         expansion we send a dict which we can add different keys to if we need to

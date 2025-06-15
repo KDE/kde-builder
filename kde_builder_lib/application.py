@@ -1164,9 +1164,9 @@ class Application:
         Print out an error message, and a list of modules that match that error message.
 
         It will also display the log file name if one can be determined.
-        The message will be displayed all in uppercase, with PACKAGES prepended, so
+        The message will be displayed all in uppercase, with PROJECTS prepended, so
         all you have to do is give a descriptive message of what this list of
-        packages failed at doing.
+        projects failed at doing.
 
         No message is printed out if the list of failed modules is empty, so this
         function can be called unconditionally.
@@ -1188,7 +1188,7 @@ class Application:
         logger_app.debug(f"Message is {message}")
         logger_app.debug("\tfor " + ", ".join([str(m) for m in fail_list]))
 
-        logger_app.warning(f"\nr[b[<<<  PACKAGES {message}  >>>]")
+        logger_app.warning(f"\nr[b[<<<  PROJECTS {message}  >>>]")
 
         for module in fail_list:
             logfile = module.get_option("#error-log-file")

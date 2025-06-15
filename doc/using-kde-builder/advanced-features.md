@@ -50,7 +50,7 @@ projects. Therefore it may not work for all programs.
 
 KDE Builder can update, build and install all projects in the
 specified list of projects to build, even if a project fails to build.
-This is usually a convenience to allow you to update software packages
+This is usually a convenience to allow you to update projects
 even if a simple mistake is made in one of the source repositories
 during development that causes the build to break.
 

@@ -743,7 +743,7 @@ Type: String
 
 Set this variable to a space-separated list, which is interpreted as
 a command and its options to precede the `make install`
-command used to install projects. This is useful for installing packages
+command used to install projects. This is useful for installing projects
 with sudo for example, but please be careful while dealing with root
 privileges.
 

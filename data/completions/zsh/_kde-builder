@@ -79,8 +79,8 @@ _arguments \
   "(--refresh-build -r)"{--refresh-build,-r}"[Start the build from scratch]" \
   --remove-after-install"[Delete the source and/or build directory after the project is successfully installed]"":argument:" \
   --resume"[Resume after a build failure]" \
-  "(--after --from --resume-after --resume-from -a -f)"{--after,--resume-after,-a}"[Skips modules until just after the given package, then operates as normal]"":::_kde-builder_projects_and_groups" \
-  "(--after --from --resume-after --resume-from -a -f)"{--from,--resume-from,-f}"[Skips modules until just before the given package, then operates as normal]"":::_kde-builder_projects_and_groups" \
+  "(--after --from --resume-after --resume-from -a -f)"{--after,--resume-after,-a}"[Skips modules until just after the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
+  "(--after --from --resume-after --resume-from -a -f)"{--from,--resume-from,-f}"[Skips modules until just before the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
   "(--resume-refresh-build-first -R)"{--resume-refresh-build-first,-R}"[Resume after a build failure and start the build from scratch of first project]" \
   --revision"[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the projects with support for running their test suite]" \
@@ -91,9 +91,9 @@ _arguments \
   --source-dir"[Directory that stores the KDE sources]"":argument:" \
   --source-when-start-program"[Source a file before starting the project]"":argument:" \
   "(--src-only -S -s --no-src)"{--src-only,-s}"[Only perform update source code]" \
-  "(--stop-after --stop-before --to --until)"{--stop-after,--to}"[Stops just after the given package is reached]"":argument:" \
-  "(--stop-after --stop-before --to --until)"{--stop-before,--until}"[Stops just before the given package is reached]"":::_kde-builder_projects_and_groups" \
-  "(--stop-on-failure --no-stop-on-failure)"{--stop-on-failure,--no-stop-on-failure}"[Stops/Does not stop the build as soon as a package fails to build]" \
+  "(--stop-after --stop-before --to --until)"{--stop-after,--to}"[Stops just after the given project is reached]"":argument:" \
+  "(--stop-after --stop-before --to --until)"{--stop-before,--until}"[Stops just before the given project is reached]"":::_kde-builder_projects_and_groups" \
+  "(--stop-on-failure --no-stop-on-failure)"{--stop-on-failure,--no-stop-on-failure}"[Stops/Does not stop the build as soon as a project fails to build]" \
   --tag"[Download a specific release of a project]"":argument:" \
   --taskset-cpu-list"[Limit the build/install process to certain CPU cores]"":argument:" \
   --uninstall"[Uninstalls the project]" \

@@ -244,7 +244,7 @@ class TaskManager:
             ipc: IPC object to receive results from.
             ctx: Build Context, which is used to determine list of modules to build.
 
-        If the packages are not already checked-out and/or updated, this
+        If projects are not already checked-out and/or updated, this
         function WILL NOT do so for you.
 
         This function assumes that the source directory has already been set up.
@@ -372,7 +372,7 @@ class TaskManager:
                     pass
 
         if len(build_done) > 0:
-            logger_taskmanager.info("<<<  g[PACKAGES SUCCESSFULLY BUILT]  >>>")
+            logger_taskmanager.info("<<<  g[PROJECTS SUCCESSFULLY BUILT]  >>>")
 
         successes = len(build_done)
         if successes == 1:

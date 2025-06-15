@@ -29,7 +29,7 @@ kde-builder will do when launched. This can be done with the
 kde-builder kcalc --pretend
 ```
 
-You should see a message saying that some packages were successfully
+You should see a message saying that some projects were successfully
 built (although nothing was actually built). If there were no
 significant problems shown, you can proceed to actually running the
 script.
@@ -84,7 +84,7 @@ Building utilities/kcalc (26/26)
         Compiling... succeeded (after 1 minute and 34 seconds)
         Installing kcalc succeeded (after 2 seconds)
 
-<<<  PACKAGES SUCCESSFULLY BUILT  >>>
+<<<  PROJECTS SUCCESSFULLY BUILT  >>>
 Built 26 modules
 
 :-)
