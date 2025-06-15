@@ -93,14 +93,16 @@ class StartProgram:
         . "{prefix_sh_path}"
         . "{extra_run_env}"
 
-        if [ "{int(opt_fork)}" = 1 ]; then
-            nohup {exec_path} "$@" >/dev/null 2>&1 &
+        if [ "{opt_fork}" = "1" ]; then
+            nohup "{exec_path}" "$@" >/dev/null 2>&1 &
             disown
             echo "PID:                $!"
-            printf '%.0s#' {{1..80}}; printf "\n\n"
+            printf "%.0s#" {{1..80}}
+            printf "\\n\\n"
         else
             echo "PID:                $$"
-            printf '%.0s#' {{1..80}}; printf "\n\n"
+            printf "%.0s#" {{1..80}}
+            printf "\\n\\n"
             exec "{exec_path}" "$@"
         fi
         """)
