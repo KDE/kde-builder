@@ -233,7 +233,7 @@ Related command-line option: --persistent-data-file \<file\>
 
 Type: String
 
-With this option, you can specify a path to shell file, which will be sourced before the project is launched with `--run` option.
+With this option, you can specify a path to shell file, which will be sourced before the project binary is launched with `--run` option.
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
 Related command line option: [--source-when-start-program](cmdline-source-when-start-program)
@@ -1098,7 +1098,7 @@ _except for_ some specific projects.
 
 The option value does not necessarily have to name the project
 directly. Any project that has full consecutive parts of its
-[KDE projects project path](#kde-projects-groups) match one
+[KDE projects projectpath](#kde-projects-groups) match one
 of the option values will be ignored, so you can ignore multiple projects
 this way.
 

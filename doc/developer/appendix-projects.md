@@ -1,20 +1,8 @@
 (appendix-projects)=
 # KDE projects and source code organization
 
-(project-concept)=
-## The Project
-
-KDE groups its software into "projects" of various size. This was
-initially a loose grouping of a few large projects, but with the
-introduction of the [git](https://git-scm.com/)-based [source code
-repositories](https://commits.kde.org/), these large projects were
-further split into many smaller projects.
-
-kde-builder uses this project concept as well. In essence, a "project" is
-a grouping of code that can be downloaded, built, tested, and installed.
-
 (single-projects)=
-### Individual projects
+## Individual projects
 
 It is easy to set kde-builder to build a single project. The following
 listing is an example of what a declaration for a project would
@@ -32,7 +20,7 @@ is listed as an example only, it is not required.
 ```
 
 (project-groups)=
-### Groups of related projects
+## Groups of related projects
 
 Now most KDE source projects are git-based KDE, and are normally combined
 into groups of projects.
@@ -58,7 +46,7 @@ kde-builder will automatically include any projects that are grouped
 under the projects you list (in the KDE Project database).
 
 (project-branch-groups)=
-### Project "branch groups"
+## Project "branch groups"
 
 Taking the concept of a [group of projects](#project-groups) further, the
 KDE developers eventually found that synchronizing the names of the git

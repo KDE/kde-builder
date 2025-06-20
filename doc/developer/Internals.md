@@ -53,7 +53,7 @@ to projects from the command line.
 > nameA/??, nameB/git, nameC/proj, nameD/??
 
 Following this we run a filter pass to remove whole groups that we don't
-care about (as the applyModuleFilters function cares only about
+care about (as the _apply_module_filters() function cares only about
 `module.name`. In this example nameA happened to match a group name
 only.
 

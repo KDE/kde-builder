@@ -30,7 +30,7 @@ KDE Builder is run, the following sequence is followed:
     compile options to use, where to install, etc.
 
 2.  KDE Builder performs a source update for each
-    [project](#project-concept). The update continues until all projects
+    project. The update continues until all projects
     have been updated. Projects that fail to update normally do not stop
     the build – you will be notified at the end which projects did not
     update.

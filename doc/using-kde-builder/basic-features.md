@@ -33,7 +33,7 @@ Then you should verify that the [repository](#conf-repository) option and
 The `repository` option if set to "qt6-copy", is to build Qt using a mirror maintained on the KDE
 source repositories (no other changes are applied, it is simply a
 clone of the official source). This is highly recommended due to
-occasional issues with cloning the full Qt module from its official
+occasional issues with cloning the full Qt framework from its official
 repository.
 
 You can find out available branches [here](https://invent.kde.org/qt/qt/qtbase/-/branches).
