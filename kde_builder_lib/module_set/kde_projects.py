@@ -120,11 +120,11 @@ class ModuleSetKDEProjects(ModuleSet):
             active_results = [module for module in all_module_results if module.get("active")]
 
         if not active_results:
-            logger_moduleset.warning(f" y[b[*] Module y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active modules to build!")
+            logger_moduleset.warning(f" y[b[*] Selector y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active projects to build!")
 
             if all_module_results:
                 count = len(all_module_results)
-                logger_moduleset.warning("\tAlthough no active modules are available, there were\n" + f"\t{count} inactive modules. Perhaps the git modules are not ready?")
+                logger_moduleset.warning("\tAlthough no active projects are available, there were\n" + f"\t{count} inactive projects.")
 
         # Setup module options.
         module_list: list[Module] = []
@@ -143,7 +143,7 @@ class ModuleSetKDEProjects(ModuleSet):
             if self.none_true([KDEProjectsReader.project_path_matches_wildcard_search(result["full_name"], element) for element in ignore_list]):
                 module_list.append(new_module)
             else:
-                logger_moduleset.debug(f"--- Ignoring matched active module {new_module} in module set " + self.name)
+                logger_moduleset.debug(f"--- Ignoring matched active project {new_module} in group " + self.name)
         return module_list
 
     # @override
@@ -172,7 +172,7 @@ class ModuleSetKDEProjects(ModuleSet):
             module_list.extend(candidate_modules)
 
         if not len(module_list):
-            logger_moduleset.warning("No modules were defined for the module-set " + self.name)
-            logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
+            logger_moduleset.warning("No projects were defined for the group " + self.name)
+            logger_moduleset.warning("You should use the g[b[use-projects] option to make the group useful.")
 
         return module_list

@@ -88,7 +88,7 @@ class Application:
             if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
                 return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
                 # Todo: Currently we still need to exit when normal use like `kde-builder --metadata-only`, because otherwise script tries to proceed with "result = app.run_all_module_phases()". Fix it.
-            print("No modules to build, exiting.\n")
+            print("No projects to build, exiting.\n")
             exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
         self.modules: list[Module] = work_load["selected_modules"]
@@ -283,7 +283,7 @@ class Application:
             module_list = ctx.get_persistent_option("global", "last-failed-module-list")
             if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
-                logger_app.error("which modules have previously failed to build.")
+                logger_app.error("which projects have previously failed to build.")
                 raise KBRuntimeError("Invalid --rebuild-failures flag")
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --rebuild-failures, ignoring them.")
@@ -566,7 +566,7 @@ class Application:
             graph = dependency_resolver.resolve_to_module_graph(modules)
 
         except Exception as e:
-            logger_app.warning(" r[b[*] Problems encountered trying to determing correct module graph:")
+            logger_app.warning(" r[b[*] Problems encountered trying to determine correct project graph:")
             logger_app.warning(f" r[b[*] {e}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
 
@@ -584,7 +584,7 @@ class Application:
 
         else:
             if not graph["graph"] and self.run_mode != "install-login-session-only":
-                logger_app.warning(" r[b[*] Unable to determine correct module graph")
+                logger_app.warning(" r[b[*] Unable to determine correct project graph")
                 logger_app.warning(" r[b[*] Will attempt to continue.")
 
         graph["exception"] = None
@@ -861,12 +861,12 @@ class Application:
                 module_set_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_set_name  # ensure the module-set has some name
                 if module_set_name in seen_module_sets.keys():
-                    logger_app.error(f"Duplicate module-set {module_set_name} in {rcfile}.")
-                    raise ConfigError(f"Duplicate module-set {module_set_name} defined in {rcfile}")
+                    logger_app.error(f"Duplicate group {module_set_name} in {rcfile}.")
+                    raise ConfigError(f"Duplicate group {module_set_name} defined in {rcfile}")
 
                 if module_set_name in seen_modules.keys():
-                    logger_app.error(f"Name {module_set_name} for module-set in {rcfile} is already in use on a module")
-                    raise ConfigError(f"Can't re-use name {module_set_name} for module-set defined in {rcfile}")
+                    logger_app.error(f"Name {module_set_name} for group in {rcfile} is already in use on a project")
+                    raise ConfigError(f"Can't re-use name {module_set_name} for group defined in {rcfile}")
 
                 # A module_set can give us more than one module to add.
                 new_module_set: ModuleSet = ModuleSet(ctx, module_set_name)
@@ -899,11 +899,11 @@ class Application:
                 module_name = node_name.split(" ", maxsplit=1)[1]
                 assert module_name  # ensure the module has some name
                 if module_name in seen_modules:
-                    logger_app.error(f"Duplicate module declaration b[r[{module_name}] in {config_filename}")
-                    raise ConfigError(f"Duplicate module {module_name} declared in {config_filename}")
+                    logger_app.error(f"Duplicate project declaration b[r[{module_name}] in {config_filename}")
+                    raise ConfigError(f"Duplicate project {module_name} declared in {config_filename}")
                 if module_name in seen_module_sets:
-                    logger_app.error(f"Name {module_name} for module in {config_filename} is already in use on a module-set")
-                    raise ConfigError(f"Can't re-use name {module_name} for module defined in {config_filename}")
+                    logger_app.error(f"Name {module_name} for project in {config_filename} is already in use on a group")
+                    raise ConfigError(f"Can't re-use name {module_name} for project defined in {config_filename}")
 
                 new_module: Module = Module(ctx, module_name)
                 new_module.apply_config_options(ctx, node, config_filename)
@@ -939,7 +939,7 @@ class Application:
         # If the user doesn't ask to build any modules, build a default set.
         # The good question is what exactly should be built, but oh well.
         if nothing_defined:
-            logger_app.warning(" b[y[*] There do not seem to be any modules to build in your configuration.")
+            logger_app.warning(" b[y[*] There do not seem to be any projects to build in your configuration.")
 
         return module_and_module_set_list, deferred_options
 
@@ -1153,7 +1153,7 @@ class Application:
         if len(module_names) > 0:
             names = ", ".join(module_names)
             logger_app.warning(textwrap.dedent(f"""
-            Possible solution: Install the build dependencies for the modules:
+            Possible solution: Install the build dependencies for the projects:
             {names}
             You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
             See https://develop.kde.org/docs/getting-started/building/help-dependencies"""))
@@ -1510,7 +1510,7 @@ class Application:
                 logger_app.error(textwrap.dedent(f"""\
 
                 Unable to find r[b[{prog}]. This program is absolutely essential for building
-                the modules: y[{", ".join(modules_needing)}].
+                the projects: y[{", ".join(modules_needing)}].
 
                 Please ensure the development packages for
                 {req_package} are installed by using your distribution's package manager.
@@ -1552,14 +1552,14 @@ class Application:
                 ppd = dbus.Interface(service, "org.freedesktop.UPower.PowerProfiles")
 
                 # The hold will be automatically released once kde-builder exits
-                ppd.HoldProfile("performance", f"building modules (pid: {self._base_pid})", "kde-builder")
+                ppd.HoldProfile("performance", f"building projects (pid: {self._base_pid})", "kde-builder")
 
                 session_bus = dbus.SessionBus()
                 proxy = session_bus.get_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
                 iface = dbus.Interface(proxy, "org.freedesktop.PowerManagement.Inhibit")
 
                 # The inhibition will be automatically released once kde-builder exits
-                iface.Inhibit("kde-builder", "Building modules")
+                iface.Inhibit("kde-builder", "Building projects")
 
             except dbus.DBusException as e:
                 logger_app.warning(f"Error accessing dbus: {e}")

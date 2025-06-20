@@ -88,14 +88,14 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
             fh = Util.open_or_fail(path)
 
         if not fh:
-            raise ProgramError("Unable to read logical module structure")
+            raise ProgramError("Unable to read logical-module-structure")
 
         try:
             json_string = fh.read()  # slurps the whole file
             json_dict = json.loads(json_string)
             fh.close()
         except KBException as e:
-            raise KBRuntimeError(f"Unable to load module group data from {path}! :(\n\t{e}")
+            raise KBRuntimeError(f"Unable to load logical-module-structure from {path}! :(\n\t{e}")
         return json_dict
 
     # @override(check_signature=False)

@@ -171,7 +171,7 @@ class DependencyResolver:
 
             # Ignore "catch-all" dependencies where the source is the catch-all
             if source_item.endswith("*"):
-                logger_depres.warning("\tIgnoring dependency on wildcard module grouping " + f"on line {fh.filelineno()} of repo-metadata/dependencies/dependency-data")
+                logger_depres.warning("\tIgnoring dependency on wildcard project grouping " + f"on line {fh.filelineno()} of repo-metadata/dependencies/dependency-data")
                 continue
 
             dependent_branch = dependent_branch or "*"  # If no branch, apply catch-all flag
@@ -397,7 +397,7 @@ class DependencyResolver:
             "branch_errors": 0
         }
 
-        logger_depres.debug(f"Resolving dependencies for module: b[{item}]")
+        logger_depres.debug(f"Resolving dependencies for project: b[{item}]")
 
         for dep_item in sorted(module_graph[item]["deps"].keys()):
             dep_info = module_graph[item]["deps"][dep_item]
@@ -424,7 +424,7 @@ class DependencyResolver:
                 resolved_path = DependencyResolver._get_dependency_path_of(dep_module, dep_item, dep_path)
                 # May not exist, e.g. misspellings or "virtual" dependencies like kf5umbrella.
                 if not dep_module:
-                    logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined module: b[{dep_item}]\n")
+                    logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined project: b[{dep_item}]\n")
 
                 dep_lookup_result = self._lookup_direct_dependencies(resolved_path, dep_branch)
 
@@ -451,14 +451,14 @@ class DependencyResolver:
                 }
 
                 if not module_graph[dep_item]["build"]:
-                    logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but no module builds {dep_item} for this run.]")
+                    logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but no project builds {dep_item} for this run.]")
 
                 if dep_module and dep_branch and (self._get_branch_of(dep_module) or "") != dep_branch:
                     wrong_branch = self._get_branch_of(dep_module) or "?"
                     logger_depres.error(f" r[b[*] {item} needs {dep_item}:{pretty_dep_branch}, not {dep_item}:{wrong_branch}]")
                     errors["branch_errors"] += 1
 
-                logger_depres.debug(f"Resolving transitive dependencies for module: b[{item}] (via: b[{dep_item}:{pretty_dep_branch}])")
+                logger_depres.debug(f"Resolving transitive dependencies for project: b[{item}] (via: b[{dep_item}:{pretty_dep_branch}])")
                 resolv_errors = self._resolve_dependencies_for_module_description(module_graph, dep_module_desc)
 
                 errors["branch_errors"] += resolv_errors["branch_errors"]
@@ -487,12 +487,12 @@ class DependencyResolver:
             path = DependencyResolver._get_dependency_path_of(module, item, "")
 
             if not path:
-                logger_depres.error(f"r[Unable to determine project/dependency path of module: {item}]")
+                logger_depres.error(f"r[Unable to determine project/dependency path of project: {item}]")
                 errors["path_errors"] += 1
                 continue
 
             if item in module_graph and module_graph[item]:
-                logger_depres.debug(f"Module pulled in previously through (transitive) dependencies: {item}")
+                logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {item}")
                 previously_selected_branch = self._detect_branch_conflict(module_graph, item, branch)
                 if previously_selected_branch:
                     logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{item}]! :(")

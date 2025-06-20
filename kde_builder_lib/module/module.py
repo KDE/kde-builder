@@ -382,7 +382,7 @@ class Module(OptionsBase):
             self.build_system().run_testsuite()
 
         if not build_results.get("work_done", None) and not self.get_option("refresh-build") and self.get_persistent_option("last-install-rev") is not None:
-            logger_module.info("\tNo changes from build, skipping install (--refresh-build this module to force install)")
+            logger_module.info("\tNo changes from build, skipping install (--refresh-build this project to force install)")
             return True
         elif not self.phases.has("install"):
             logger_module.info("\tSkipping install due to disabled install phase.")
@@ -727,8 +727,8 @@ class Module(OptionsBase):
         # Ensure we don't accidentally get fed module-set options
         for mso in ["use-projects", "ignore-projects"]:
             if opt_name == mso:
-                logger_module.error(f" r[b[*] module b[{self}] should be declared as module-set to use b[{mso}]")
-                raise SetOptionError(mso, f"Option {mso} can only be used in module-set")
+                logger_module.error(f" r[b[*] project b[{self}] should be declared as group to use b[{mso}]")
+                raise SetOptionError(mso, f"Option {mso} can only be used in group")
 
         # Special case handling.
         if opt_name == "filter-out-phases":

@@ -98,7 +98,7 @@ class TaskManager:
             # If the user sends SIGHUP during the build, we should allow the
             # current module to complete and then exit early.
             def handle_sighup(signum, frame):
-                print("[noasync] recv SIGHUP, will end after this module")
+                print("[noasync] recv SIGHUP, will end after this project")
                 self.DO_STOP = 1
 
             signal.signal(signal.SIGHUP, handle_sighup)
@@ -298,7 +298,7 @@ class TaskManager:
         while modules:
             module = modules.pop(0)
             if self.DO_STOP:
-                logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further modules.")
+                logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further projects.")
                 break
 
             module_name = module.name
@@ -376,9 +376,9 @@ class TaskManager:
 
         successes = len(build_done)
         if successes == 1:
-            mods = "module"
+            mods = "project"
         else:
-            mods = "modules"
+            mods = "projects"
 
         if not Debug().pretending():
             # Print out results, and output to a file
@@ -459,7 +459,7 @@ class TaskManager:
                 # If the user sends SIGHUP during the build, we should allow the
                 # current module to complete and then exit early.
                 def sighup_handler(signum, frame):
-                    print(f"[updater process] recv SIGHUP, will end after updating {updater_to_monitor_ipc.logged_module} module.")
+                    print(f"[updater process] recv SIGHUP, will end after updating {updater_to_monitor_ipc.logged_module} project.")
                     self.DO_STOP = 1
 
                 signal.signal(signal.SIGHUP, sighup_handler)
@@ -515,7 +515,7 @@ class TaskManager:
             # If the user sends SIGHUP during the build, we should allow the current
             # module to complete and then exit early.
             def signal_handler(signum, frame):
-                print("[build process] recv SIGHUP, will end after this module")
+                print("[build process] recv SIGHUP, will end after this project")
 
                 # If we haven't recv'd yet, forward to monitor in case user didn't
                 # send to process group
@@ -550,7 +550,7 @@ class TaskManager:
             # If an update fails the message will still be printed to the user, so
             # we don't need to note it separately here, and there's no need to list
             # one-by-one the modules that successfully updated.
-            logger_taskmanager.debug("Some modules were updated but not built")
+            logger_taskmanager.debug("Some projects were updated but not built")
 
         pid, status = os.waitpid(monitor_pid, 0)
         if os.WEXITSTATUS(status) != 0:
@@ -602,7 +602,7 @@ class TaskManager:
 
             logger_taskmanager.warning(textwrap.dedent(f"""\
                 y[b[ *] SSH Agent is enabled, but y[doesn't seem to be running].
-                y[b[ *] The agent is needed for these modules:
+                y[b[ *] The agent is needed for these projects:
                 y[b[ *]   b[{ssh_servers}]
                 y[b[ *] Please check that the agent is running and its environment variables defined
                 """))
@@ -624,7 +624,7 @@ class TaskManager:
 
         print(Debug().colorize(textwrap.dedent("""\
             b[y[*] SSH Agent does not appear to be managing any keys.  This will lead to you
-            being prompted for every module update for your SSH passphrase.  So, we're
+            being prompted for every project update for your SSH passphrase.  So, we're
             running g[ssh-add] for you.  Please type your passphrase at the prompt when
             requested, (or simply Ctrl-C to abort the script).
             """)))

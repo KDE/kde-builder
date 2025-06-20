@@ -91,7 +91,7 @@ class StatusView:
 
         if mod_total > 1:
             # Build up message in reverse order
-            msg = f"{mod_total} modules"
+            msg = f"{mod_total} projects"
             if mod_failed:
                 msg = Debug().colorize(f"r[b[{mod_failed}] failed, ") + msg
             if mod_success:

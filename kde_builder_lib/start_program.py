@@ -75,8 +75,8 @@ class StartProgram:
 
         if not os.path.exists(prefix_sh_path):
             # Try to use prefix.sh from build dir if we can guess module (the case when executable is identical to module name, which is not always)
-            msg = (f" r[*] Not found y[{install_dir}/prefix.sh] file. Please copy prefix.sh manually from build directory of any kde module or "
-                   "add the \"-DKDE_INSTALL_PREFIX_SCRIPT=ON\" to cmake-options of any kde module and (re)build it.")
+            msg = (f" r[*] Not found y[{install_dir}/prefix.sh] file. Please copy prefix.sh manually from build directory of any kde project or "
+                   "add the \"-DKDE_INSTALL_PREFIX_SCRIPT=ON\" to cmake-options of any kde project and (re)build it.")
             if executable in pers_opts:
                 prefix_sh_path = pers_opts[executable].get("build-dir", "/dev/null") + "/prefix.sh"
                 if os.path.exists(prefix_sh_path):

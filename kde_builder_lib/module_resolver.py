@@ -186,7 +186,7 @@ class ModuleResolver:
         # expand_module_sets applies pending/cmdline options already.
         module_results: list[Module] = self.expand_module_sets([needed_module_set])
         if not module_results:
-            raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of modules!")
+            raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of projects!")
 
         # Copy entries into the lookup dict, especially in case they're
         # from case 3
@@ -328,7 +328,7 @@ class ModuleResolver:
                 set_results: list[Module] = self.expand_module_sets([mod_set])
                 search_item: str = guessed_module.name
                 if not set_results:
-                    raise KBRuntimeError(f"{search_item} doesn't match any modules.")
+                    raise KBRuntimeError(f"{search_item} doesn't match any projects.")
                 results.extend(set_results)
 
         return results
@@ -482,55 +482,55 @@ the way kde-builder handles options. Consider a simple kde-builder.yaml:
    cxxflags: -g3 -Og
    custom-build-command: ninja
 
-In this case we'd expect that a module like taglib ends up with its
-``cmake-options`` derived from the global section directly, while all modules
-included from module set ``ms-foo`` use the ``cmake-options`` defined in the
-module-set.
+In this case we'd expect that a project like taglib ends up with its
+``cmake-options`` derived from the global section directly, while all projects
+included from group ``ms-foo`` use the ``cmake-options`` defined in the
+group.
 
 At the same time we'd expect that juk has all the options listed in ms-foo, but
 also the specific ``cxxflags`` and ``custom-build-command`` options shown,
-`no matter how` the juk module had been referenced during the build.
+`no matter how` the juk project had been referenced during the build.
 
-There are many ways to convince kde-builder to add a module into its build list:
+There are many ways to convince kde-builder to add a project into its build list:
 
 1. Mention it directly on the command line.
 
-2. Include it in the kde-builder.yaml file, either as a new ``module`` block or
-in a ``use-projects`` of a ``module-set``.
+2. Include it in the kde-builder.yaml file, either as a new ``project`` block or
+in a ``use-projects`` of a ``group``.
 
-3. For KDE modules, mention a component of its project path in a
-``use-projects`` declaration within a ``kde-projects``-based module set. E.g. the
-"kde/kdemultimedia" entry above, which will pull in the juk module even though
+3. For KDE projects, mention a component of its project path in a
+``use-projects`` declaration within a ``kde-projects``-based group. E.g. the
+"kde/kdemultimedia" entry above, which will pull in the juk project even though
 "juk" is not named directly.
 
-4. For KDE modules, by being a dependency of a module included from a
-``module-set`` where the ``include-dependencies`` option is set to ``true``. This
-wouldn't apply to juk, but might apply to modules such as phonon. Note that
+4. For KDE projects, by being a dependency of a project included from a
+``group`` where the ``include-dependencies`` option is set to ``true``. This
+wouldn't apply to juk, but might apply to projects such as phonon. Note that
 "taglib" in this example would **not** be a dependency of juk according to
-kde-builder (although it is in reality), since taglib is not a KDE module.
+kde-builder (although it is in reality), since taglib is not a KDE project.
 
 
-This mission of this class is to ensure that, no matter `how` a module ended
+This mission of this class is to ensure that, no matter `how` a project ended
 up being selected by the user for the build list, that the same options are
-registered into the module, the module uses the same build and scm types, is
+registered into the project, the project uses the same build and scm types, is
 defaulted to the right build phases, etc.
 
-To do this, this class takes the read-in options, modules, and module sets from
+To do this, this class takes the read-in options, projects, and groups from
 the rc-file, the list of "selectors" requested by the user (via cmdline), any
 changes to the options from the cmdline, and then takes pains to ensure that
-any requested modules are returned via the appropriate module-set (and if no
-module-set can source the module, via default options).
+any requested projects are returned via the appropriate group (and if no
+group can source the project, via default options).
 
-In doing so, the class must keep track of module sets, the modules included
-into each module set, and modules that were mentioned somehow but not
-already present in the known list of modules (or module sets).
+In doing so, the class must keep track of groups, the projects included
+into each group, and modules that were mentioned somehow but not
+already present in the known list of projects (or groups).
 
-Since module sets can cause modules to be defined that are not mentioned
+Since project sets can cause projects to be defined that are not mentioned
 anywhere within an rc-file, it may be required to completely expand all
-module sets in order to verify that a referenced :class:`Module` is **not**
+groups in order to verify that a referenced :class:`Module` is **not**
 already known.
 
-From the perspective of calling code, the "outputs" of this module are
+From the perspective of calling code, the "outputs" of this project are
 lists of :class:`Module` objects, in the order they were selected (or mentioned
 in the rc-file). See expand_module_sets() and resolve_selectors_into_modules().
 
@@ -538,6 +538,6 @@ Each object so returned should already have the appropriate options
 included (based on the cmdline_options member, which should be constructed
 as the union of rc-file and cmdline options).
 
-Note that dependency resolution is **not** handled by this module, see
+Note that dependency resolution is **not** handled by this class, see
 :class:`DependencyResolver` for that.
 """

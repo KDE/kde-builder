@@ -248,7 +248,7 @@ class IPC:
         for module, log_messages in messages.items():
             non_empty_messages = [logMessage for logMessage in log_messages if logMessage.split(",", maxsplit=2)[2]]
             if non_empty_messages:
-                logger_ipc.debug(f"\nUnhandled messages for module {module}:")
+                logger_ipc.debug(f"\nUnhandled messages for project {module}:")
                 for combined_msg in non_empty_messages:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
@@ -295,7 +295,7 @@ class IPC:
             if not ipc_type:
                 raise ProgramError("IPC Failure waiting for stream start :(")
             if ipc_type == IPC.ALL_FAILURE:
-                raise KBRuntimeError(f"Unable to perform source update for any module:\n\t{buffer}")
+                raise KBRuntimeError(f"Unable to perform source update for any project:\n\t{buffer}")
             elif ipc_type == IPC.ALL_SKIPPED:
                 self.no_update = True
                 self.updates_done = True

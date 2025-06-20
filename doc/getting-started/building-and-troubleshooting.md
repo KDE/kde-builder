@@ -85,7 +85,7 @@ Building utilities/kcalc (26/26)
         Installing kcalc succeeded (after 2 seconds)
 
 <<<  PROJECTS SUCCESSFULLY BUILT  >>>
-Built 26 modules
+Built 26 projects
 
 :-)
 Your logs are saved in /home/username/kde/log/2024-10-20_07

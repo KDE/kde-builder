@@ -338,17 +338,17 @@ class IdeProjectConfigGenerator:
         if module.get_option("generate-vscode-project-config"):
             self._generate_vs_code_config()
         else:
-            logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this module")
+            logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this project")
 
         if module.get_option("generate-clion-project-config"):
             self._generate_clion_config()
         else:
-            logger_ide_proj.debug("\tGenerating .idea directory - disabled for this module")
+            logger_ide_proj.debug("\tGenerating .idea directory - disabled for this project")
 
         if module.get_option("generate-qtcreator-project-config"):
             self._generate_qtcreator_config()
         else:
-            logger_ide_proj.debug("\tGenerating qtcreator configs - disabled for this module")
+            logger_ide_proj.debug("\tGenerating qtcreator configs - disabled for this project")
 
         if module.get_option("generate-vscode-project-config"):
             self._convert_prefixsh_to_env()

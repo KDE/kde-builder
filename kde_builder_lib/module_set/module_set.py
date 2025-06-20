@@ -123,7 +123,7 @@ class ModuleSet(OptionsBase):
             assert isinstance(opt_val, list)
             modules = opt_val
             if not modules:
-                logger_moduleset.error("No modules were selected for module-set " + self.name)
+                logger_moduleset.error("No projects were selected for group " + self.name)
                 logger_moduleset.error("in the y[use-projects] entry.")
                 raise SetOptionError("use-projects", "Invalid use-projects")
 
@@ -134,7 +134,7 @@ class ModuleSet(OptionsBase):
             assert isinstance(opt_val, list)
             modules = opt_val
             if not modules:
-                logger_moduleset.error("No modules were selected for module-set " + self.name)
+                logger_moduleset.error("No projects were selected for group " + self.name)
                 logger_moduleset.error("in the y[ignore-projects] entry.")
                 raise SetOptionError("ignore-projects", "Invalid ignore-projects")
 
@@ -169,8 +169,8 @@ class ModuleSet(OptionsBase):
             module_list.append(new_module)
 
         if not self.modules_to_find():
-            logger_moduleset.warning(f"No modules were defined for the module-set {self.name}")
-            logger_moduleset.warning("You should use the g[b[use-projects] option to make the module-set useful.")
+            logger_moduleset.warning(f"No projects were defined for the group {self.name}")
+            logger_moduleset.warning("You should use the g[b[use-projects] option to make the group useful.")
 
         return module_list
 

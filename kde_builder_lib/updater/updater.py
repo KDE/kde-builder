@@ -149,7 +149,7 @@ class Updater:
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
         if not exitcode == 0:
-            raise KBRuntimeError("\tFailed to make initial clone of module")
+            raise KBRuntimeError("\tFailed to make initial clone of project")
 
         ipc.notify_persistent_option_change(module.name, "git-cloned-repository", git_repo)
 
@@ -166,7 +166,7 @@ class Updater:
                 raise KBRuntimeError(f"\tInvalid username or email for git-user option: {name}" +
                                      " (should be in format 'User Name <username@example.net>'")
 
-            logger_updater.debug(f"\tAdding git identity {name} for new git module {module}")
+            logger_updater.debug(f"\tAdding git identity {name} for project {module}")
             result = Util.safe_system(["git", "config", "--local", "user.name", username])
             result = Util.safe_system(["git", "config", "--local", "user.email", email]) or result
             if result:
@@ -346,7 +346,7 @@ class Updater:
                 branch_name = f"New branch to point to {remote_name}/{branch}"
 
             logger_updater.info(textwrap.dedent(f"""\
-                \ty[b[*] The module y[b[{module}] had local changes from a different branch than expected:
+                \ty[b[*] The project y[b[{module}] had local changes from a different branch than expected:
                 \ty[b[*]   Expected branch: b[{branch_name}]
                 \ty[b[*]   Actual branch:   b[{existing_branch}]
                 \ty[b[*]
@@ -685,7 +685,7 @@ class Updater:
             # We could mark everything as resolved using git add . before stashing,
             # but that might not always be appreciated by people having to figure
             # out what the original merge conflicts were afterwards.
-            self._notify_post_build_message(f"\tb[{module}] may have local changes that we couldn't handle, so the module was left alone.")
+            self._notify_post_build_message(f"\tb[{module}] may have local changes that we couldn't handle, so the project was left alone.")
 
             result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
             raise KBRuntimeError(f"\tUnable to stash local changes (if any) for {module}, aborting update.")

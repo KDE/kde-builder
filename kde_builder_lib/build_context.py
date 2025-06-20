@@ -232,18 +232,18 @@ class BuildContext(Module):
     def add_module(self, module: Module) -> None:
         if not module:
             traceback.print_exc()
-            raise Exception("No module to push")
+            raise Exception("No project to push")
 
         path = None
         if module in self.modules:
-            logger_buildcontext.debug("Skipping duplicate module " + module.name)
+            logger_buildcontext.debug("Skipping duplicate project " + module.name)
         elif ((path := module.full_project_path()) and
               any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
             # See if the name matches any given in the ignore list.
 
-            logger_buildcontext.debug(f"Skipping ignored module {module}")
+            logger_buildcontext.debug(f"Skipping ignored project {module}")
         else:
-            logger_buildcontext.debug(f"Adding {module} to module list")
+            logger_buildcontext.debug(f"Adding {module} to project list")
             self.modules.append(module)
 
     def add_to_ignore_list(self, moduleslist: list[str]) -> None:
@@ -514,7 +514,7 @@ class BuildContext(Module):
                 global:
                   persistent-data-file: /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
 
-                # To suppress warning about no modules in configuration.
+                # To suppress warning about no projects in configuration.
                 project fake:
                   branch: fake
                 """)
@@ -532,7 +532,7 @@ class BuildContext(Module):
             logger_buildcontext.error(textwrap.dedent(f"""\
                 b[No configuration file is present.]
 
-                kde-builder requires a configuration file to select which KDE software modules
+                kde-builder requires a configuration file to select which KDE projects
                 to build, what options to build them with, the path to install to, etc.
 
                 When run, kde-builder will use `kde-builder.yaml` config file located in the
@@ -720,7 +720,7 @@ class BuildContext(Module):
         persistent_options = json.loads(persistent_data)
         e = "json exception"
         if not isinstance(persistent_options, dict):
-            logger_buildcontext.error(f"Failed to read persistent module data: r[b[{e}]")
+            logger_buildcontext.error(f"Failed to read persistent data: r[b[{e}]")
             return
         self.persistent_options = persistent_options
 
@@ -743,7 +743,7 @@ class BuildContext(Module):
             encoded_json = json.dumps(self.persistent_options, indent=3)
             Path(file_name).write_text(encoded_json)
         except Exception as e:
-            logger_buildcontext.error(f"Unable to save persistent module data: b[r[{e}]")
+            logger_buildcontext.error(f"Unable to save persistent data: b[r[{e}]")
             return
 
     # @override(check_signature=False)

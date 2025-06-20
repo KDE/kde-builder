@@ -314,7 +314,7 @@ class Util:
 
         Common code for log_command and UtilLoggedSubprocess.
         """
-        logger_logged_cmd.info(f"run_logged_command(): Module {module}, Command: " + " ".join(command))
+        logger_logged_cmd.info(f"run_logged_command(): Project {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             raise ProgramError(f"Pass only base filename for {module}/{filename}")

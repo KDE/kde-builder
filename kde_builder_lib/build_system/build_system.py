@@ -28,7 +28,7 @@ logger_buildsystem = KBLogger.getLogger("build-system")
 
 class BuildSystem:
     """
-    Abstract base module for the various build systems.
+    Base class for the various build systems.
 
     Includes built-in implementations of generic functions and supports hooks for subclasses to
     provide needed detailed functionality.
@@ -140,7 +140,7 @@ class BuildSystem:
         if not os.path.exists(f"{builddir}"):
             return "the build directory doesn't exist"
         if os.path.exists(f"{builddir}/.refresh-me"):
-            return "the last configure failed"  # see Module.pm
+            return "the last configure failed"  # see module.py
         if module.get_option("refresh-build"):
             return "the option refresh-build was set"
         if not os.path.exists(f"{builddir}/{conf_file_key}"):

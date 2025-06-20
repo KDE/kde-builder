@@ -161,7 +161,7 @@ class Cmdline:
             options = options[0:run_index]  # remove all after --run, and the --run itself # pl2py: in python the stop index is not included, so we add +1
 
             if not opts["start-program"]:  # check this here, because later the empty list will be treated as not wanting to start program
-                logger_app.error("You need to specify a module with the --run option")
+                logger_app.error("You need to specify a project binary with the --run option")
                 exit(1)  # Do not continue
 
         supported_options.remove("set-project-option-value=s")  # specify differently, allowing it to be repeated in cmdline
