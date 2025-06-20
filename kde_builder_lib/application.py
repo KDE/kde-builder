@@ -256,7 +256,11 @@ class Application:
         if ctx.get_option("metadata-update-skipped"):
             last_update = ctx.get_persistent_option("global", "last-metadata-update") or 0
             if (int(time()) - last_update) >= 7200:
-                logger_app.warning(" r[b[*] Skipped metadata update, but it hasn't been updated recently!")
+                # Do not increase the level of this message, keep it at "debug" level.
+                # By default, metadata is updated automatically anyway. And if it is not, user knows what they are doing.
+                # Having this message shown with a higher logger level is problematic, because
+                # this message is unwanted in many cases, for example, when querying project options.
+                logger_app.debug(" r[b[*] Skipped metadata update, but it hasn't been updated recently!")
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
