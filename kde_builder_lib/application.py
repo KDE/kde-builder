@@ -225,6 +225,12 @@ class Application:
         ignored_in_cmdline = {selector: True for selector in opts["ignore-projects"]}
         start_program_and_args: list[str] = opts["start-program"]
 
+        # Self-update should be done early. At least before we read config.
+        # This is to minimize situations of trying to read a not yet supported version of repo-metadata by outdated kde-builder installation.
+        # Otherwise, manual intervention would be required to update kde-builder.
+        if "self-update" in cmdline_global_options.keys():
+            Version.self_update()
+
         # rc-file needs special handling.
         rc_file = cmdline_global_options["rc-file"] if "rc-file" in cmdline_global_options.keys() else ""
         rc_file = re.sub(r"^~", os.environ.get("HOME"), rc_file)
@@ -264,9 +270,6 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
-
-        if "self-update" in cmdline_global_options.keys():
-            Version.self_update()
 
         # The user might only want metadata to update to allow for a later
         # --pretend run, check for that here.
