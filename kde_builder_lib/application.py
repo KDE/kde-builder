@@ -245,10 +245,18 @@ class Application:
         for opt_name, opt_val in cmdline_global_options.items():
             ctx.set_option(opt_name, opt_val)
 
-        # We download repo-metadata before reading config, because config already includes the module-definitions from it.
+        # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
-        # _process_configs_content will add pending global opts to ctx while ensuring
+        # The user might only want metadata to update to allow for a later --pretend run, check for that here.
+        # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
+        if "metadata-only" in cmdline_global_options:
+            return {}
+
+        # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of repo-metadata-format).
+        self._check_metadata_format_version()  # Skipped automatically in testing mode
+
+        # _process_configs_content() will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         ctx.detect_config_file()
@@ -270,11 +278,6 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
-
-        # The user might only want metadata to update to allow for a later
-        # --pretend run, check for that here.
-        if "metadata-only" in cmdline_global_options:
-            return {}
 
         if "resume" in cmdline_global_options:
             module_list = ctx.get_persistent_option("global", "resume-list")
@@ -521,6 +524,43 @@ class Application:
             logger_app.warning(f" b[r[*] Exception message: {err}")
 
             traceback.print_exc()
+
+    def _check_metadata_format_version(self) -> None:
+        """
+        Compare the number of "repo-metadata-format" in version.yaml with the one expected by kde-builder.
+
+        This is used to gracefully exit with a helpful message in case there were incompatible changes.
+        """
+        expected_repo_metadata_format = 1  # Change this simultaneously with the repo-metadata corresponding change.
+
+        if Debug().is_testing():
+            return
+
+        metadata_module = self.context.get_kde_projects_metadata_module()
+        metadata_dir = metadata_module.fullpath("source")
+
+        try:
+            with open(f"{metadata_dir}/version.yaml", "r") as f:
+                version_yaml = yaml.safe_load(f.read())
+        except FileNotFoundError:
+            msg = textwrap.dedent(f"""\
+                ] r[b[*] Cannot check repo-metadata format version, because r[version.yaml] is missing in repo-metadata.
+                  r[*] It is possible that either kde-builder or repo-metadata are out of date.
+                  r[*] To update kde-builder, use y[--self-update].
+                  r[*] To update repo-metadata, use y[--metadata-only].""")
+            logger_app.error(msg)
+            exit()
+
+        repo_metadata_format = version_yaml["repo-metadata-format"]
+
+        if repo_metadata_format != expected_repo_metadata_format:
+            msg = textwrap.dedent(f"""\
+            ] r[b[*] Unsupported format of repo-metadata detected.
+              r[*] The repo-metadata format version has changed and currently is: {repo_metadata_format}
+              r[*] But your kde-builder installation only supports repo-metadata format version: {expected_repo_metadata_format}
+              r[*] Please update kde-builder with y[--self-update].""")
+            logger_app.error(msg)
+            exit()
 
     def _resolve_module_dependency_graph(self, modules: list[Module]) -> dict:
         """
