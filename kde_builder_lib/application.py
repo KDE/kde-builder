@@ -248,6 +248,11 @@ class Application:
         # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
+        # The user might only want metadata to update to allow for a later --pretend run, check for that here.
+        # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
+        if "metadata-only" in cmdline_global_options:
+            return {}
+
         # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
         self._check_metadata_format_version()  # Skipped automatically in testing mode
 
@@ -273,11 +278,6 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))
         else:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
-
-        # The user might only want metadata to update to allow for a later
-        # --pretend run, check for that here.
-        if "metadata-only" in cmdline_global_options:
-            return {}
 
         if "resume" in cmdline_global_options:
             module_list = ctx.get_persistent_option("global", "resume-list")
