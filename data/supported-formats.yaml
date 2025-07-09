@@ -1,0 +1,4 @@
+# This file defines formats that current KDE Builder installation supports.
+
+# This is used to prevent out-of-date kde-builder installations from crashing in case of format changes in sysadmin/repo-metadata.
+kde-builder-format: 1

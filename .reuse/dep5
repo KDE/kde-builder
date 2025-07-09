@@ -9,6 +9,7 @@ Files:  .gitignore
         data/kde-builder-logging.yaml
         data/kde-builder.desktop.in
         data/kde-builder.yaml.in
+        data/supported-formats.yaml
         data/vscode/*
         data/qtcreator/*
         doc/_static/*.png

@@ -245,10 +245,13 @@ class Application:
         for opt_name, opt_val in cmdline_global_options.items():
             ctx.set_option(opt_name, opt_val)
 
-        # We download repo-metadata before reading config, because config already includes the module-definitions from it.
+        # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
-        # _process_configs_content will add pending global opts to ctx while ensuring
+        # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
+        self._check_metadata_format_version()  # Skipped automatically in testing mode
+
+        # _process_configs_content() will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         ctx.detect_config_file()
@@ -521,6 +524,47 @@ class Application:
             logger_app.warning(f" b[r[*] Exception message: {err}")
 
             traceback.print_exc()
+
+    def _check_metadata_format_version(self) -> None:
+        """
+        Compare the number of "kde-builder-format" in repo-metadata-format.yaml from repo-metadata with the value expected by kde-builder.
+
+        This is used to gracefully exit with a helpful message in case there were incompatible changes.
+        """
+        if Debug().is_testing():
+            return
+
+        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
+        with open(real_bin_dir + "/data/supported-formats.yaml", "r") as f:
+            supported_formats = yaml.safe_load(f)
+        current_installation_format = supported_formats["kde-builder-format"]
+
+        metadata_module = self.context.get_kde_projects_metadata_module()
+        metadata_dir = metadata_module.fullpath("source")
+
+        try:
+            with open(f"{metadata_dir}/config/repo-metadata-format.yaml", "r") as f:
+                repo_metadata_format_yaml = yaml.safe_load(f.read())
+        except FileNotFoundError:
+            msg = textwrap.dedent(f"""\
+                ] r[b[*] Cannot check kde-builder-format in repo-metadata, because r[repo-metadata-format.yaml] is missing in repo-metadata.
+                  r[*] It is possible that either kde-builder or repo-metadata are out of date.
+                  r[*] To update kde-builder, use y[--self-update].
+                  r[*] To update repo-metadata, use y[--metadata-only].""")
+            logger_app.error(msg)
+            exit()
+
+        repo_metadata_format = repo_metadata_format_yaml["kde-builder-format"]
+
+        if repo_metadata_format != current_installation_format:
+            msg = textwrap.dedent(f"""\
+            ] r[b[*] Repo-metadata format has changed. Please update kde-builder.
+              r[*] kde-builder-format currently supported: b[{current_installation_format}]
+              r[*] kde-builder-format from repo-metadata: b[{repo_metadata_format}]
+              r[*] To update kde-builder, use y[--self-update].
+              r[*] To update repo-metadata, use y[--metadata-only].""")
+            logger_app.error(msg)
+            exit()
 
     def _resolve_module_dependency_graph(self, modules: list[Module]) -> dict:
         """
