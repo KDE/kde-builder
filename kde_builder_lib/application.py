@@ -1295,9 +1295,9 @@ class Application:
             Application._output_failed_module_list(ctx, f"failed to {phase}", failures)
 
         # See if any modules fail continuously and warn specifically for them.
-        super_fail = [module for module in ctx.modules if (module.get_persistent_option("failure-count") or 0) > 3]
+        recurring_build_fails_modules = [module for module in ctx.modules if (module.get_persistent_option("failure-count") or 0) > 3 and module.phases.has("build")]
 
-        for m in super_fail:
+        for m in recurring_build_fails_modules:
             # These messages will print immediately after this function completes.
             num_failures = m.get_persistent_option("failure-count")
             m.add_post_build_message(f"y[{m}] has failed to build b[{num_failures}] times.")
