@@ -753,7 +753,7 @@ class Application:
         dependency_graph = work_load["dependency_info"]["graph"]
         ctx = self.context
 
-        Application._output_failed_module_lists(ctx, dependency_graph)
+        Application._print_failed_modules_in_each_phase(ctx, dependency_graph)
 
         # Record all failed modules. Unlike the "resume-list" option this doesn't
         # include any successfully-built modules in between failures.
@@ -1210,62 +1210,18 @@ class Application:
             See https://develop.kde.org/docs/getting-started/building/help-dependencies"""))
 
     @staticmethod
-    def _output_failed_module_list(ctx: BuildContext, message: str, fail_list: list[Module]) -> None:
+    def _print_failed_modules_in_each_phase(ctx: BuildContext, module_graph: dict) -> None:
         """
-        Print out an error message, and a list of modules that match that error message.
+        Print the list of failed modules for each phase.
 
         It will also display the log file name if one can be determined.
-        The message will be displayed all in uppercase, with PROJECTS prepended, so
-        all you have to do is give a descriptive message of what this list of
-        projects failed at doing.
 
-        No message is printed out if the list of failed modules is empty, so this
+        No message is printed out if the list of failed modules for the phase is empty, so this
         function can be called unconditionally.
-
-        Args:
-            ctx: Build Context
-            message: Message to print (e.g. "failed to foo")
-            fail_list: List of :class:`Module` that had failed to foo
-        """
-        Util.assert_isa(ctx, BuildContext)
-        message = message.upper()  # Be annoying
-
-        if not fail_list:
-            return
-
-        logger_app.debug(f"Message is {message}")
-        logger_app.debug("\tfor " + ", ".join([str(m) for m in fail_list]))
-
-        logger_app.warning(f"\nr[b[<<<  PROJECTS {message}  >>>]")
-
-        for module in fail_list:
-            out_str = f"r[{module}]"
-            if not Debug().pretending():
-                logfile = module.get_option("#error-log-file")
-
-                # async updates may cause us not to have an error log file stored. There is only
-                # one place it should be though, take advantage of side-effect of log_command() to find it.
-                if not logfile:
-                    logdir = module.get_log_dir() + "/error.log"
-                    if os.path.exists(logdir):
-                        logfile = logdir
-                    else:
-                        logfile = "No log file"
-                out_str += f" - g[{logfile}]"
-
-            logger_app.warning(out_str)
-
-    @staticmethod
-    def _output_failed_module_lists(ctx: BuildContext, module_graph: dict) -> None:
-        """
-        Read the list of failed modules for each phase in the build context and call _output_failed_module_list for all the module failures.
 
         Args:
             ctx: Build context
             module_graph: The module graph.
-
-        Return value:
-            None
         """
         Util.assert_isa(ctx, BuildContext)
 
@@ -1287,7 +1243,28 @@ class Application:
 
                 extra_debug_info["phases"][failure] = phase
                 actual_failures.append(failure)
-            Application._output_failed_module_list(ctx, f"failed to {phase}", failures)
+
+            if not failures:
+                continue
+
+            logger_app.warning(f"\nr[b[<<<  PROJECTS FAILED TO {phase.upper()}  >>>]")
+
+            for module in failures:
+                out_str = f"r[{module}]"
+                if not Debug().pretending():
+                    logfile = module.get_option("#error-log-file")
+
+                    # async updates may cause us not to have an error log file stored. There is only
+                    # one place it should be though, take advantage of side-effect of log_command() to find it.
+                    if not logfile:
+                        logdir = module.get_log_dir() + "/error.log"
+                        if os.path.exists(logdir):
+                            logfile = logdir
+                        else:
+                            logfile = "No log file"
+                    out_str += f" - g[{logfile}]"
+
+                logger_app.warning(out_str)
 
         # See if any modules fail continuously and warn specifically for them.
         recurring_build_fails_modules = [module for module in ctx.modules if (module.get_persistent_option("failure-count") or 0) > 3 and module.phases.has("build")]
