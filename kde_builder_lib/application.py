@@ -1226,9 +1226,6 @@ class Application:
             ctx: Build Context
             message: Message to print (e.g. "failed to foo")
             fail_list: List of :class:`Module` that had failed to foo
-
-        Returns:
-            None
         """
         Util.assert_isa(ctx, BuildContext)
         message = message.upper()  # Be annoying
@@ -1242,23 +1239,21 @@ class Application:
         logger_app.warning(f"\nr[b[<<<  PROJECTS {message}  >>>]")
 
         for module in fail_list:
-            logfile = module.get_option("#error-log-file")
-
-            # async updates may cause us not to have a error log file stored.  There's only
-            # one place it should be though, take advantage of side-effect of log_command()
-            # to find it.
-            if not logfile:
-                logdir = module.get_log_dir() + "/error.log"
-                if os.path.exists(logdir):
-                    logfile = logdir
-
-            if not logfile:
-                logfile = "No log file"
-
-            if Debug().pretending():
-                logger_app.warning(f"r[{module}]")
+            out_str = f"r[{module}]"
             if not Debug().pretending():
-                logger_app.warning(f"r[{module}] - g[{logfile}]")
+                logfile = module.get_option("#error-log-file")
+
+                # async updates may cause us not to have an error log file stored. There is only
+                # one place it should be though, take advantage of side-effect of log_command() to find it.
+                if not logfile:
+                    logdir = module.get_log_dir() + "/error.log"
+                    if os.path.exists(logdir):
+                        logfile = logdir
+                    else:
+                        logfile = "No log file"
+                out_str += f" - g[{logfile}]"
+
+            logger_app.warning(out_str)
 
     @staticmethod
     def _output_failed_module_lists(ctx: BuildContext, module_graph: dict) -> None:
