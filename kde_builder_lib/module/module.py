@@ -549,7 +549,7 @@ class Module(OptionsBase):
 
         if not self.build_system().uninstall_internal(make_install_opts):
             logger_module.error(f"\tUnable to uninstall r[{self}]!")
-            self.context.mark_module_phase_failed("install", self)
+            self.context.mark_module_phase_failed("uninstall", self)
             return False
 
         if Debug().pretending():
@@ -677,7 +677,7 @@ class Module(OptionsBase):
                 # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
                 traceback.print_exc()
 
-            ctx.mark_module_phase_failed("build", self)
+            ctx.mark_module_phase_failed("update", self)
 
             if isinstance(e, KBException):
                 e_str = e.message
