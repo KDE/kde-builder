@@ -96,7 +96,7 @@ class Module(OptionsBase):
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []
         self.env: dict[str, str] = {}
-        self.current_phase: str | None = None  # Currently used only for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
+        self.current_phase: str | None = None  # for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
 
         if self.__class__.__name__ != "BuildContext":
             # Avoid setting this for BuildContext, because it has its own option value type verification code, which needs BuildContext to be already initialized
@@ -1030,6 +1030,11 @@ class Module(OptionsBase):
             os.environ[key] = value
 
         if self.name == "sysadmin-repo-metadata":
+            return
+
+        if self.current_phase == "update":
+            # Skip creating build dir in the update phase, to not confuse user if they just update sources.
+            # And in the update phase, we do not set environment variables anyway.
             return
 
         build_dir = self.fullpath("build")
