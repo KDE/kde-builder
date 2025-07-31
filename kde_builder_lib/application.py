@@ -667,7 +667,7 @@ class Application:
                         "path": info["path"],
                         "branch": info["branch"],
                         "build": info["build"],
-                        "repository": info["module"].options["#resolved-repository"],
+                        "repository": info["module"].options.get("#resolved-repository", ""),
                         "options": {
                             key: value
                             for key, value in info["module"].options.items()
