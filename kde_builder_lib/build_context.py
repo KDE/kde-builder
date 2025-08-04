@@ -237,7 +237,7 @@ class BuildContext(Module):
         path = None
         if module in self.modules:
             logger_buildcontext.debug("Skipping duplicate project " + module.name)
-        elif ((path := module.full_project_path()) and
+        elif ((path := module.get_option("#kde-project-path") or module.name) and
               any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
             # See if the name matches any given in the ignore list.
 

@@ -370,7 +370,7 @@ class DependencyResolver:
     @staticmethod
     def _get_dependency_path_of(module: Module, item: str, path: str) -> str:
         if module:
-            project_path = module.full_project_path()
+            project_path = module.get_option("#kde-project-path") or module.name
 
             if not module.is_kde_project():
                 project_path = f"third-party/{project_path}"

@@ -878,17 +878,6 @@ class Module(OptionsBase):
         pathinfo = self.get_install_path_components(dirtype)
         return pathinfo["fullpath"]
 
-    def full_project_path(self) -> str:
-        """
-        Return the "legacy kde project path" for the module.
-
-        E.g. for the "juk" module, would return "kde/kdemultimedia/juk".
-        This only works for modules with scm type that is a
-        :class:`UpdaterKDEProject` (or its subclasses), but modules that don't fall into this
-        hierarchy will just return the module name (with no path components) anyway.
-        """
-        return self.get_option("#kde-project-path", "module") or self.name
-
     def is_kde_project(self) -> bool:
         """
         Return true if this module is (or was derived from) a kde-projects module.
@@ -918,7 +907,7 @@ class Module(OptionsBase):
                 base_path = self.get_option("#kde-repo-path", "module")
                 base_path = base_path or self.name  # Default if not provided in repo-metadata
             elif layout == "metadata":
-                base_path = self.get_option("#kde-project-path", "module")
+                base_path = self.get_option("#kde-project-path")
                 base_path = base_path or self.name  # Default if not provided in repo-metadata
             else:
                 if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming

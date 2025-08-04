@@ -30,7 +30,7 @@ class UpdaterKDEProject(Updater):
         # to resolve it.
         ctx = module.context
         resolver = ctx.module_branch_group_resolver()
-        module_path = module.full_project_path()
+        module_path = module.get_option("#kde-project-path") or module.name
         return resolver.find_module_branch(module_path, branch_group)
 
     @staticmethod

@@ -21,14 +21,14 @@ def mock_module_fullproject(monkeypatch):
     def mock_is_kde_project(self):
         return self.kde
 
-    # Redefine `Module` to stub full_project_path() results
-    def mock_full_project_path(self):
+    def mock_get_option(self, key: str):
+        assert key == "#kde-project-path"  # We redefine get_option only for this option
         return self.projectPath
 
     monkeypatch.setattr(Module, "__init__", mock__init__)
     monkeypatch.setattr(Module, "__str__", mock__str__)
     monkeypatch.setattr(Module, "is_kde_project", mock_is_kde_project)
-    monkeypatch.setattr(Module, "full_project_path", mock_full_project_path)
+    monkeypatch.setattr(Module, "get_option", mock_get_option)
 
 
 def test_dependency_path(mock_module_fullproject):

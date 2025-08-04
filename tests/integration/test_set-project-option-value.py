@@ -29,5 +29,4 @@ def test_set_project_option():
     assert sourcetype == "tag", "cmdline options block came back as tag"
 
     assert not module.is_kde_project(), "setmod2 is *not* a \"KDE\" project"
-    assert module.full_project_path() == "setmod2", "full_project_path on non-KDE modules returns name"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

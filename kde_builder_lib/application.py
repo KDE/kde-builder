@@ -393,7 +393,7 @@ class Application:
                     continue
 
             if module.is_kde_project():
-                branch = resolver.find_module_branch(module.full_project_path(), branch_group)
+                branch = resolver.find_module_branch(module.get_option("#kde-project-path") or module.name, branch_group)
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
                     printpath = module.get_option("#kde-repo-path")
                     printpath = "y[" + printpath.replace("/", "]/y[") + "]"
@@ -693,7 +693,7 @@ class Application:
                     return x.installation_path()
             elif query_mode == "project-path":
                 def query(x):
-                    return x.full_project_path()
+                    return x.get_option("#kde-project-path")
             elif query_mode == "branch":
                 def query(x):
                     return x.scm().determine_preferred_checkout_source()[0] or ""
