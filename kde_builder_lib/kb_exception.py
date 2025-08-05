@@ -66,6 +66,19 @@ class SetOptionError(KBException):
                 - kde-dev-scripts
                 - clazy
             """)
+
+        if option_name == "set-env":
+            result = textwrap.dedent("""\
+            The y[set-env] option should be declared as a dictionary with variable-name - variable-value pairs.
+            Example:
+
+              override kcalc:
+                set-env:
+                  SOME_VAR: "helloworld"
+                  SOME_VAR2: "helloworld2"
+
+            See documentation: https://kde-builder.kde.org/en/using-kde-builder/advanced-features.html#changing-environment
+            """)
         return result
 
 

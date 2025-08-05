@@ -81,7 +81,11 @@ class OptionsBase:
         """
         # Special case handling.
         if opt_name == "set-env":
-            self._process_set_env_option(opt_val)
+            if not isinstance(opt_val, dict):
+                raise SetOptionError(opt_name, f"Error parsing set-env option. Expected \"dict\" type, got \"{type(opt_val).__name__}\" instead.")
+
+            for key in opt_val:
+                self.options["set-env"][key] = opt_val[key]
             return
 
         # Special-case handling
@@ -140,23 +144,6 @@ class OptionsBase:
         new_opts = copy.deepcopy(other.options)
         for opt_name, opt_val in new_opts.items():
             self.set_option(opt_name, opt_val)
-
-    def _process_set_env_option(self, value) -> None:
-        """
-        Handle setting set-env options.
-
-        Args:
-            value: Either a dict (in which case it is simply merged into our
-                existing options) or a string value of the option as read from the
-                rc-file (which will have the env-var to set as the first item, the
-                value for the env-var to take as the rest of the value).
-        """
-        if isinstance(value, dict):
-            for key in value:
-                self.options["set-env"][key] = value[key]
-        else:
-            var, env_value = value.split(" ", maxsplit=1)
-            self.options["set-env"][var] = env_value
 
     def verify_option_value_type(self, option_name, option_value) -> None:
         """
