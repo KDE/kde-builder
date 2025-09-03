@@ -158,9 +158,8 @@ class ModuleSet(OptionsBase):
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no "search" or "ignore" to
         # handle, just create `Module` and dump options into them.
-        for module_item in self.modules_to_find():
-            module_name = module_item
-            module_name = re.sub(r"\.git$", "", module_name)
+        for module_name in self.modules_to_find():
+            module_name = module_name.removesuffix(".git")
 
             new_module = Module(ctx, module_name)
 
