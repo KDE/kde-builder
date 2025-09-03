@@ -733,8 +733,11 @@ class Application:
             # processes performing update and build at the same time by default.
 
             # Check for absolutely essential programs now.
-            if not self._check_for_essential_build_programs() and not os.environ.get("KDE_BUILDER_IGNORE_MISSING_PROGRAMS"):
-                logger_app.error(" r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.")
+            if self._have_missing_build_tools():
+                logger_app.error(textwrap.dedent("""\
+                ] r[*] Please ensure the development packages are installed by using your distribution's package manager.
+                ] r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
+                ] r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway."""))
                 result = 1
             else:
                 runner = TaskManager(self)
@@ -1475,20 +1478,23 @@ class Application:
             logger_app.debug(" b[*] No need to run install-sessions.sh, all files are already installed and up to date.")
             return 0
 
-    def _check_for_essential_build_programs(self) -> bool:
+    def _have_missing_build_tools(self) -> bool:
         """
         Check if programs which are absolutely essential to the *build* process are available. The check is made for modules that are actually present in the build context.
 
         Returns:
-            False if not all required programs are present. True otherwise.
+            False if all required programs are present. True otherwise.
         """
+        if os.environ.get("KDE_BUILDER_IGNORE_MISSING_PROGRAMS"):
+            return False
+
         ctx = self.context
         installdir = ctx.get_option("install-dir")
         qt_installdir = ctx.get_option("qt-install-dir")
         preferred_paths = [f"{installdir}/bin", f"{qt_installdir}/bin"]
 
         if Debug().pretending():
-            return True
+            return False
 
         build_modules = ctx.modules_in_phase("build")
         required_programs = {}
@@ -1506,12 +1512,6 @@ class Application:
 
         was_error = False
         for prog in required_programs.keys():
-            required_packages = {
-                "qmake": "Qt",
-                "cmake": "CMake",
-                "meson": "Meson",
-                "ninja": "Ninja",
-            }
 
             preferred_path = Util.locate_exe(prog, preferred_paths)
             program_path = preferred_path or Util.locate_exe(prog)
@@ -1526,19 +1526,13 @@ class Application:
                     continue
 
                 was_error = True
-                req_package = required_packages.get(prog) or prog
 
                 modules_needing = modules_requiring_program[prog].keys()
 
                 logger_app.error(textwrap.dedent(f"""\
-
-                Unable to find r[b[{prog}]. This program is absolutely essential for building
-                the projects: y[{", ".join(modules_needing)}].
-
-                Please ensure the development packages for
-                {req_package} are installed by using your distribution's package manager.
+                ] r[*] Unable to find r[b[{prog}]. This program is absolutely essential for building the projects: y[{", ".join(modules_needing)}].
                 """))
-        return not was_error
+        return was_error
 
     @staticmethod
     def _install_signal_handlers(handler_func: Callable) -> None:
