@@ -40,12 +40,6 @@ variables:
     WEBSITE_LANGUAGES: en
     DOC_ROOT: doc
 
-build_sphinx_app_docs:
-  before_script:
-    - python3 -m pip install sphinx myst-parser sphinx-book-theme
-    - git clone https://invent.kde.org/sysadmin/ci-utilities.git
-    - git clone https://invent.kde.org/sysadmin/ci-notary-service.git
-
 reuse:
   stage: lint
 
