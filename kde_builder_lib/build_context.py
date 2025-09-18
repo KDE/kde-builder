@@ -59,8 +59,7 @@ class BuildContext(Module):
 
          ctx = BuildContext.BuildContext()
 
-         ctx.set_rc_file("/path/to/kde-builder.yaml")
-         fh = ctx.detect_config_file()
+         fh = ctx.absolutize_config_file_path_and_ensure_it_exists()
 
          ...
 
@@ -455,93 +454,78 @@ class BuildContext(Module):
 
         return f"{log_dir}/{path}"
 
-    def set_rc_file(self, file: str) -> None:
+    def absolutize_config_file_path_and_ensure_it_exists(self) -> None:
         """
-        Force the rc file to be read from the path given.
+        Changes the self.rc_file value to a config absolute path, and checks if it exists.
+
+        If a config file was not set via command line, we will search in the default path.
+        If unable to find or open the file, an exception is raised.
+        Empty config files are supported.
         """
-        self.rc_files = [file]
-        self.rc_file = None
+        config_file = self.rc_file
 
-    def detect_config_file(self) -> None:
-        """
-        Determine a full path to the user's chosen rc file and set it to self.rc_file.
+        if not config_file:
+            # If we are here, user did not specify the --rc-file in the command line.
 
-        Use set_rc_file to choose a file to load before calling this function, otherwise
-        detect_config_file will search the default search path.
+            # So we try to find a config in the default location.
+            default_config_file_locations = self.rc_files
+            for file in default_config_file_locations:
+                if os.path.exists(file):
+                    self.rc_file = os.path.abspath(file)
+                    return
 
-        If unable to find or open the rc file an exception is raised. Empty rc
-        files are supported, however.
-        """
-        rc_files = self.rc_files
+            if self.get_option("metadata-only"):
+                # If configuration file in default location was not found, and no --rc-file option was used, and metadata-only option was used.
 
-        for file in rc_files:
-            if os.path.exists(file):
-                self.rc_file = os.path.abspath(file)
+                # In FirstRun user may decide to use --install-distro-packages before --generate-config.
+                # --install-distro-packages requires the metadata to be downloaded to read the "disrto-dependencies" from it.
+                # After downloading metadata, we normally should change "last-metadata-update" persistent option value.
+                # To store persistent option, we should know persistent-data-file value, and it is read from config.
+                # At this moment we know that there is no config at default location, and user did not specified the --rc-file option.
+                # And because we do not want to _require_ the config to be available yet, we just will provide dummy config.
+                # This way the --metadata-only option could work in both cases: when user has config and when he has not.
+                # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process, it will be stored in persistent file.
+                # When he has no config (the current case), we will let the _process_configs_content() function do its work on fake config, then we will return.
+                dummy_config = textwrap.dedent("""\
+                    config-version: 2
+                    global:
+                      persistent-data-file: /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
+
+                    # To suppress warning about no projects in configuration.
+                    project fake:
+                      branch: fake
+                    """)
+
+                temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
+                temp_file.write(dummy_config)
+                temp_file_path = temp_file.name
+                temp_file.close()
+
+                self.rc_file = temp_file_path
                 return
 
-        # No rc found, check if we can use default.
-        if len(rc_files) == 1:
-            # This can only happen if the user uses --rc-file, so if we fail to
-            # load the file, we need to fail to load at all.
-            failed_file = rc_files[0]
-
+            # If not found anything in the default location, and user did not specify the --rc-file in the command line, warn the user and fail.
             logger_buildcontext.error(textwrap.dedent(f"""\
-            Unable to open config file {failed_file}
-
-            Script stopping here since you specified --rc-file on the command line to
-            load {failed_file} manually.  If you wish to run the script with no configuration
-            file, leave the --rc-file option out of the command line.
-
-            If you want to force an empty rc file, use --rc-file /dev/null
-
-            """))
-            raise KBRuntimeError(f"Missing {failed_file}")
-
-        if self.get_option("metadata-only"):
-            # If configuration file in default location was not found, and no --rc-file option was used, and metadata-only option was used.
-
-            # In FirstRun user may decide to use --install-distro-packages before --generate-config.
-            # --install-distro-packages requires the metadata to be downloaded to read the "disrto-dependencies" from it.
-            # After downloading metadata, we normally should change "last-metadata-update" persistent option value.
-            # To store persistent option, we should know persistent-data-file value, and it is read from config.
-            # At this moment we know that there is no config at default location, and user did not specified the --rc-file option.
-            # And because we do not want to _require_ the config to be available yet, we just will provide dummy config.
-            # This way the --metadata-only option could work in both cases: when user has config and when he has not.
-            # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process, it will be stored in persistent file.
-            # When he has no config (the current case), we will let the _process_configs_content() function do its work on fake config, then we will return.
-            dummy_config = textwrap.dedent("""\
-                config-version: 2
-                global:
-                  persistent-data-file: /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
-
-                # To suppress warning about no projects in configuration.
-                project fake:
-                  branch: fake
-                """)
-
-            temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
-            temp_file.write(dummy_config)
-            temp_file_path = temp_file.name
-            temp_file.close()
-
-            self.rc_file = temp_file_path
-            return
-        else:
-            # If no configuration and no --rc-file option was used, warn the user and fail.
-
-            logger_buildcontext.error(textwrap.dedent(f"""\
-                b[No configuration file is present.]
-
-                kde-builder requires a configuration file to select which KDE projects
-                to build, what options to build them with, the path to install to, etc.
-
-                When run, kde-builder will use `kde-builder.yaml` config file located in the
-                current working directory. If no such file exists, kde-builder will use
-                `{BuildContext.xdg_config_home_short}/kde-builder.yaml` instead.
-
+                b[r[*] No configuration file is present.
+                When run, KDE Builder will use kde-builder.yaml config file located in the current working directory.
+                If no such file exists, KDE Builder will use {BuildContext.xdg_config_home_short}/kde-builder.yaml instead.
                 You can generate config with b[--generate-config].
+                Or you can specify the path to the config file with --rc-file option.
                 """))
             raise KBRuntimeError("No configuration available")
+
+        config_file = re.sub(r"^~", os.environ.get("HOME"), config_file)
+        config_file = os.path.abspath(config_file)
+
+        if not os.path.exists(config_file):
+            logger_buildcontext.error(textwrap.dedent(f"""\
+            b[r[*] Unable to open config file {config_file}
+            KDE Builder is stopping here since you specified --rc-file on the command line to load {config_file} manually.
+            If you wish to run KDE Builder with config file from default location, leave the --rc-file option out of the command line.
+            If you want to force an empty rc file, use --rc-file /dev/null
+            """))
+            raise KBRuntimeError(f"Missing {config_file}")
+        self.rc_file = config_file
 
     def base_config_directory(self) -> str:
         """
@@ -554,7 +538,7 @@ class BuildContext(Module):
         """
         rcfile = self.rc_file
         if not rcfile:
-            raise ProgramError("Call to base_config_directory before detect_config_file")
+            raise ProgramError("Call to base_config_directory() before absolutize_config_file_path_and_ensure_it_exists().")
         return os.path.dirname(rcfile)
 
     def modules_in_phase(self, phase: str) -> list[Module]:
@@ -671,20 +655,12 @@ class BuildContext(Module):
                 # Local config is used. Store the data file in the same directory.
                 file = config_dir + "/" + BuildContext.PERSISTENT_FILE_NAME
 
-            rc_files = self.rc_files
-            if len(rc_files) == 1:
-                # This can only mean that the user specified an rcfile on the command
-                # line and did not set persistent-data-file in their config file. In
-                # this case, append the name of the rcfile to the persistent build
-                # data file to associate it with that specific rcfile.
-                rc_file_path = rc_files[0]
-                # ...But only if the specified rcfile isn't one of the default ones,
-                # to prevent the user from making an oopsie
-                if rc_file_path in BuildContext.rcfiles:
-                    logger_buildcontext.warning("The specified rc file is one of the default ones. Ignoring it.")
-                else:
-                    rc_file_name = os.path.basename(rc_file_path)
-                    file = f"{file}-{rc_file_name}"
+            if self.rc_file not in BuildContext.rcfiles:
+                # If the used config file isn't one of the default ones, and persistent-data-file is not set.
+                # In this case, append the name of the config file to the persistent data file name, to associate it with that specific config file.
+                rc_file_name = os.path.basename(self.rc_file)
+                file = f"{file}-{rc_file_name}"
+
         return file
 
     def load_persistent_options(self) -> None:

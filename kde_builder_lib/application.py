@@ -231,11 +231,9 @@ class Application:
         if "self-update" in cmdline_global_options.keys():
             Version.self_update()
 
-        # rc-file needs special handling.
-        rc_file = cmdline_global_options["rc-file"] if "rc-file" in cmdline_global_options.keys() else ""
-        rc_file = re.sub(r"^~", os.environ.get("HOME"), rc_file)
-        if rc_file:
-            ctx.set_rc_file(rc_file)
+        cmdline_rc_file = cmdline_global_options.get("rc-file", "")
+        if cmdline_rc_file:
+            ctx.rc_file = cmdline_rc_file
 
         # pl2py: this was commented there in perl.
         # disable async if only running a single phase.
@@ -259,7 +257,7 @@ class Application:
         # _process_configs_content() will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
-        ctx.detect_config_file()
+        ctx.absolutize_config_file_path_and_ensure_it_exists()
         modules_and_sets_from_userconfig: list[Module | ModuleSet]
         overrides_from_userconfig: list[dict[str, str | dict]]  # "override" nodes.
         modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
