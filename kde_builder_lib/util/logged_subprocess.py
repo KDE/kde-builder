@@ -63,7 +63,6 @@ class UtilLoggedSubprocess:
             resultRef = {
              "was_successful": exitcode == 0,
              "warnings"      : warnings,
-             "work_done"     : workDoneFlag,
             }
 
         # once ready, call .start() to obtain a result of

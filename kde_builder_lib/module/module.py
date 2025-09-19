@@ -381,10 +381,7 @@ class Module(OptionsBase):
         if self.get_option("run-tests"):
             self.build_system().run_testsuite()
 
-        if not build_results.get("work_done", None) and not self.get_option("refresh-build") and self.get_persistent_option("last-install-rev") is not None:
-            logger_module.info("\tNo changes from build, skipping install (--refresh-build this project to force install)")
-            return True
-        elif not self.phases.has("install"):
+        if not self.phases.has("install"):
             logger_module.info("\tSkipping install due to disabled install phase.")
             return True
 

@@ -401,7 +401,6 @@ class BuildSystem:
             {
               was_successful : bool  # if successful
               warnings       : int  # num of warnings
-              work_done      : bool  # true if the make command had work to do, may be needlessly set
             }
         """
         module = self.module
@@ -496,13 +495,6 @@ class BuildSystem:
 
             result["was_successful"] = Util.good_exitcode(Util.run_logged(module, filename, builddir, args))
 
-            # pl2py: this was not in kdesrc-build, but without it, the behavior is different when debugging vs when not debugging.
-            # When the module was built successfully, and you were using --debug, then you will get the message:
-            #  "No changes from build, skipping install"
-            # from Module.build() method. This is due to "work_done" key was missing in returned dict when debugging.
-            # So I (Andrew Shark) will make these scenarios behave similarly disregarding if debugging or not.
-            result["work_done"] = 1
-
             return result
 
         a_time = int(time.time())
@@ -521,7 +513,6 @@ class BuildSystem:
 
         # TODO More details
         warnings = 0
-        work_done_flag = 1
 
         def log_command_callback(input_line):
             if input_line is None:
@@ -546,11 +537,6 @@ class BuildSystem:
                     status_viewer.set_progress_total(y)
                     status_viewer.set_progress(x)
 
-            # pl2py: was commented there
-            # see sdk/kdesrc-build#107
-            # breaks compile if there is nothing to build but just stuff to install after changes
-            # $work_done_flag = 0 if $input =~ /^ninja: no work to do/;
-
             if "warning: " in input_line:
                 nonlocal warnings
                 warnings += 1
@@ -568,7 +554,6 @@ class BuildSystem:
             result = {
                 "was_successful": exitcode == 0,
                 "warnings": warnings,
-                "work_done": work_done_flag,
             }
         except Exception as err:
             logger_buildsystem.error(f" r[b[*] Hit error building {module}: b[{err}]")
