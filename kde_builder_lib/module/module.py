@@ -991,13 +991,18 @@ class Module(OptionsBase):
         """
         Add an environment variable and value to the list of environment variables to apply for the next subprocess execution.
 
-        Note that these changes are /not/ reflected in the current environment,
-        so if you are doing something that requires that kind of update you
-        should do that yourself (but remember to have some way to restore the old
-        value if necessary).
+        Note that these changes are NOT reflected in the current environment.
         """
-        logger_module.debug(f"\tQueueing g[{key}] to be set to y[{value}]")
-        self.env[key] = value
+        # Resolving environment variables and "~" in the value
+        parts_list = []
+        for el in value.split(":"):
+            el = os.path.expanduser(el)  # resolve "~"
+            el = os.path.expandvars(el)  # resolve variables (substrings of the form $name or ${name})
+            parts_list.append(el)
+        resolved_value = ":".join(parts_list)
+
+        logger_module.debug(f"\tQueueing g[{key}] to be set to y[{resolved_value}]")
+        self.env[key] = resolved_value
 
     def reset_environment(self) -> None:
         """

@@ -170,12 +170,12 @@ instead of `~/kde/build`.
 (changing-environment)=
 ## Changing environment variable settings
 
-Normally kde-builder uses the environment that is present when starting
+Normally, KDE Builder uses the environment that is present when starting
 up when running programs to perform updates and builds. This is useful
 for when you are running kde-builder from the command line.
 
 However, you may want to change the setting for environment variables
-that kde-builder does not provide an option for directly. For
+that KDE Builder does not provide an option for directly. For
 instance, to set up any required environment variables when running
 kde-builder on a timer such as Cron. This is possible with the
 [set-env](#conf-set-env) option.
@@ -188,6 +188,17 @@ you would put this construction in the appropriate node:
   set-env:
     SOME_VAR: "helloworld"
     SOME_VAR2: "helloworld2"
+```
+
+In the value, you can reference existing variables. They are represented
+as substrings of the form `$name` or `${name}`.
+Also, `~` will be automatically resolved (as a `$HOME` shortcut).
+For example:
+
+```yaml
+  set-env:
+    DESTDIR: "~/kde"
+    PATH: "~/additional_dir:$PATH"
 ```
 
 (resuming)=
