@@ -73,6 +73,15 @@ class FirstRun:
         """
         packages = {}
         cur_key = ""
+
+        if vendor == "unknown":
+            print(" r[b[*] List of packages could not be read, because kde-builder does not know your distribution.")
+            return packages
+
+        if not os.path.exists(f"{deps_data_path}/{vendor}.ini"):
+            logger_fr.error(f" r[b[*] Not found y[{deps_data_path}/{vendor}.ini]. Possibly, kde-builder and/or metadata are outdated?")
+            return packages
+
         with open(f"{deps_data_path}/{vendor}.ini", "r") as file:
             while line := file.readline():
                 line = line.removesuffix("\n")
@@ -116,7 +125,7 @@ class FirstRun:
                 break
 
         if not packages:
-            logger_fr.error(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})")
+            logger_fr.error(f" r[b[*] List of packages is empty.")
             return
 
         install_cmd = self._find_best_install_cmd()

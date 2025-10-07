@@ -85,11 +85,7 @@ class OSSupport:
             if any(user_os_id_or_like_id == supported_distro_id for supported_distro_id in supported_distro_ids):
                 return user_os_id_or_like_id
 
-        # Special cases that aren't linux
-        if user_os_id_and_like_ids[0] == "freebsd":
-            return user_os_id_and_like_ids[0]
-        # .. everything else is generic linux
-        return "linux"
+        return "unknown"
 
     @staticmethod
     def _read_os_release(path_to_file: str = "") -> dict[str, str]:
