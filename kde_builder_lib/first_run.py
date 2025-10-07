@@ -34,8 +34,6 @@ class FirstRun:
     def __init__(self, prefilled_prompt_answer: str | None = None):
         self.oss = OSSupport()
         self.base_dir = None
-        self.supported_distros = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"]  # Debian handles Ubuntu also
-        self.supported_other_os = ["freebsd", "openbsd"]
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
     def setup_user_system(self, base_dir, setup_steps: list[str]) -> NoReturn:
@@ -69,7 +67,7 @@ class FirstRun:
     # Internal functions
 
     @staticmethod
-    def _read_packages(vendor, version, deps_data_path) -> dict:
+    def _read_packages(vendor, deps_data_path) -> dict:
         """
         Read from the files from data/pkg and dump the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
         """
@@ -99,13 +97,24 @@ class FirstRun:
         else:
             return False
 
-    def _install_system_packages(self, deps_data_path) -> None:
+    def _install_system_packages(self, deps_data_path: str) -> None:
 
         vendor = self.oss.ID
+        version = self.oss.VERSION_ID
+        best_vendor = self.oss.best_distro_match
 
-        logger_fr.info(f" b[-] Installing b[system packages] for b[{vendor}]...")
+        logger_fr.info(f"Your OS ID: b[{vendor}]")
+        logger_fr.info(f"Your OS VERSION_ID: b[{version}]")
+        logger_fr.info(f"Best match: {best_vendor}")
 
-        packages = self._find_best_vendor_package_list(deps_data_path)
+        packages: list[str] = []
+        packages_collections: dict = self._read_packages(best_vendor, deps_data_path)
+        for opt in [f"pkg/{best_vendor}/{version}", f"pkg/{best_vendor}/unknown"]:
+            if opt in packages_collections.keys():
+                logger_fr.info(f"Using collection of packages: {opt.removeprefix('pkg/')}")
+                packages = packages_collections[opt]
+                break
+
         if not packages:
             logger_fr.error(f" r[b[*] Packages could not be installed, because kde-builder does not know your distribution ({vendor})")
             return
@@ -257,17 +266,14 @@ class FirstRun:
             "cmd/install/opensuse/unknown": "zypper install -y --no-recommends",
         }
 
-        supported_distros = [cmddist.removeprefix("cmd/install/").removesuffix("/unknown") for cmddist in cmds.keys()]
-
-        best_vendor = self.oss.best_distro_match(supported_distros)
-        logger_fr.info(f"    Using installer for b[{best_vendor}]")
-
-        version = self.oss.vendor_version()
+        best_vendor = self.oss.best_distro_match
+        version = self.oss.VERSION_ID
         cmd = []
 
         for opt in [f"{best_vendor}/{version}", f"{best_vendor}/unknown"]:
             key = f"cmd/install/{opt}"
             if key in cmds.keys():
+                logger_fr.info(f"Using install command for: {opt}")
                 cmd = cmds[key].split(" ")
                 break
 
@@ -283,16 +289,3 @@ class FirstRun:
                 logger_fr.error("r[*] You are missing g[sudo]! Cannot continue.")
                 exit(1)
         return cmd
-
-    def _find_best_vendor_package_list(self, deps_data_path) -> list[str]:
-        best_vendor = self.oss.best_distro_match(self.supported_distros + self.supported_other_os)
-        version = self.oss.vendor_version()
-        logger_fr.info(f"    Installing packages for b[{best_vendor}]/b[{version}]")
-        return self._packages_for_vendor(best_vendor, version, deps_data_path)
-
-    def _packages_for_vendor(self, vendor, version, deps_data_path) -> list[str]:
-        packages = self._read_packages(vendor, version, deps_data_path)
-        for opt in [f"pkg/{vendor}/{version}", f"pkg/{vendor}/unknown"]:
-            if opt in packages.keys():
-                return packages[opt]
-        return []

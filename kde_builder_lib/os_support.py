@@ -30,41 +30,23 @@ class OSSupport:
         print("Current OS is: " + os.vendor_id)
     """
 
-    def __init__(self, file: str | None = None):
+    def __init__(self, os_release_file: str = ""):
         """
         Initialize OSSupport.
 
-            os = OSSupport()
-
-        Manually point to os-release:
-        ::
-
-            os = OSSupport("/usr/lib/os-release")
+        Args:
+            os_release_file: Force use specific os-release file path instead of relying on default location.
         """
-        self.ID = "unknown"  # ID from the `os-release` specification. "gentoo", "debian", etc.
-        self.ID_LIKE = None
-        self.VERSION_CODENAME = None
-        self.VERSION_ID = None
+        self.ID = "unknown"  # Just initial value. Intended to be overridden.
+        self.ID_LIKE = ""  # Just initial value. Can be overridden.
+        self.VERSION_ID = "unknown"  # Just initial value. Can be overridden.
 
-        # file might be None
-        kv_list = self._read_os_release(file)
+        kv_list = self._read_os_release(os_release_file)
         for key in kv_list.keys():
             setattr(self, key, kv_list[key])
 
-    def vendor_version(self) -> str:
-        """
-        Returns the vendor Version from the `os-release` specification.
-
-        The first available value from `VERSION_ID` and then `VERSION_CODENAME` is used, and "unknown" is returned if neither are set.
-
-            vendor = os.vendor_version()  # "xenial", "17", etc.
-        """
-        if self.VERSION_ID:
-            return self.VERSION_ID
-        elif self.VERSION_CODENAME:
-            return self.VERSION_CODENAME
-        else:
-            return "unknown"
+        self.supported_os_ids = ["alpine", "arch", "debian", "fedora", "gentoo", "mageia", "opensuse"] + ["freebsd", "openbsd"]
+        self.best_distro_match = self._find_best_distro_match()
 
     def is_based_on(self, id_str: str) -> bool:
         """
@@ -73,57 +55,58 @@ class OSSupport:
         if self.ID == id_str:
             return True
 
-        like_distros = self.ID_LIKE or ""
+        like_distros = self.ID_LIKE
         if like_distros:
             like_distros_list = like_distros.split(" ")
             if id_str in like_distros_list:
                 return True
         return False
 
-    def best_distro_match(self, distros: list[str]) -> str:
+    def _find_best_distro_match(self) -> str:
         """
         Use the ID (and if needed, ID_LIKE) parameter in /etc/os-release to find the best possible match amongst the provided distro IDs.
 
         The list of distros should be ordered with most specific distro first.
 
             # Might return "fedora" if running on Scientific Linux
-            distro = os.best_distro_match(["ubuntu", "fedora", "arch", "debian"]);
+            os.supported_os_ids = ["ubuntu", "fedora", "arch", "debian"]
+            distro = os._find_best_distro_match()
 
-        If no match is found, returns a generic os string (**not** None, "", or
-        similar): "linux" or "freebsd" as the case may be.
+        If no match is found, returns a generic os string (**not** None, "", or similar): "linux" or "freebsd" as the case may be.
         """
-        ids = [self.ID]
-        like_distros = self.ID_LIKE or ""
+        supported_distro_ids: list[str] = self.supported_os_ids
+        user_os_id_and_like_ids = [self.ID]
+        like_distros = self.ID_LIKE
         if like_distros:
             for like_distro in like_distros.split(" "):
-                ids.append(like_distro)
+                user_os_id_and_like_ids.append(like_distro)
 
-        for an_id in ids:
-            if any(an_id == distro for distro in distros):
-                return an_id
+        for user_os_id_or_like_id in user_os_id_and_like_ids:
+            if any(user_os_id_or_like_id == supported_distro_id for supported_distro_id in supported_distro_ids):
+                return user_os_id_or_like_id
 
         # Special cases that aren't linux
-        if ids[0] == "freebsd":
-            return ids[0]
+        if user_os_id_and_like_ids[0] == "freebsd":
+            return user_os_id_and_like_ids[0]
         # .. everything else is generic linux
         return "linux"
 
     @staticmethod
-    def _read_os_release(file_name: str | None) -> dict:
-        files = [file_name] if file_name else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
-        file = None
+    def _read_os_release(path_to_file: str = "") -> dict[str, str]:
+        select_from_files = [path_to_file] if path_to_file else ["/etc/os-release", "/usr/lib/os-release", "/usr/local/etc/os-release"]
+        selected_file = ""
 
-        while files:
-            f = files.pop(0)
+        while select_from_files:
+            f = select_from_files.pop(0)
             if os.path.exists(f):
-                file = f
+                selected_file = f
                 break
 
-        if not file:
+        if not selected_file:
             return {}
 
         lines = None
-        with open(file, "r") as fh:
+        with open(selected_file, "r") as fh:
             # skip comments and blank lines, and whitespace-only lines
             lines = [line.strip() for line in fh.readlines() if line.strip() and not line.strip().startswith("#")]
 

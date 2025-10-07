@@ -22,7 +22,14 @@ def test_ossupport():
     # Use tests
     os = OSSupport("tests/integration/fixtures/os-release")
     assert isinstance(os, OSSupport)
-    assert os.best_distro_match(["arch", "kde-builder", "sabayon"]) == "kde-builder", "ID preferred"
-    assert os.best_distro_match(["ubuntu", "fedora", "gentoo"]) == "gentoo", "ID_LIKE respected"
-    assert os.best_distro_match(["fedora", "gentoo", "gentoo-hardened", "sabayon"]) == "sabayon", "ID_LIKE preference order proper"
+
+    os.supported_os_ids = ["arch", "kde-builder", "sabayon"]
+    assert os._find_best_distro_match() == "kde-builder", "ID preferred"
+
+    os.supported_os_ids = ["ubuntu", "fedora", "gentoo"]
+    assert os._find_best_distro_match() == "gentoo", "ID_LIKE respected"
+
+    os.supported_os_ids = ["fedora", "gentoo", "gentoo-hardened", "sabayon"]
+    assert os._find_best_distro_match() == "sabayon", "ID_LIKE preference order proper"
+
     assert os.ID == "kde-builder", "Right ID"
