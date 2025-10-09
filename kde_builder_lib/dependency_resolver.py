@@ -661,7 +661,7 @@ class DependencyResolver:
             if votes:
                 return votes
 
-            # If there is no good reason to perfer one module over another,
+            # If there is no good reason to prefer one module over another,
             # simply sort by the order contained within the configuration file (if
             # present), which would be setup as the rc-file is read.
 
@@ -679,7 +679,7 @@ class DependencyResolver:
         return _compare_build_order_depends
 
     @staticmethod
-    def sort_modules_into_build_order(module_graph: dict) -> list[Module]:
+    def sort_modules_into_build_order(module_graph: dict) -> list[Module]: ### !!!
         resolved = list(module_graph.keys())
         built = [el for el in resolved if module_graph[el]["build"] and module_graph[el]["module"]]
         prioritised = sorted(built, key=cmp_to_key(DependencyResolver.make_comparison_func(module_graph)))

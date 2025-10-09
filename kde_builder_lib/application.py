@@ -11,6 +11,7 @@ import fileinput
 import glob
 import hashlib
 import os
+import pprint
 import re
 import shutil
 import signal
@@ -86,7 +87,7 @@ class Application:
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
-        work_load = self.generate_module_list(options)
+        work_load = self.generate_module_list(options) ### !!! - generate_module_list calls sort_modules_into_build_order
         if not work_load.get("build", None):
             if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
                 return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
@@ -410,6 +411,12 @@ class Application:
         modules = filtered_modules
 
         module_graph = self._resolve_module_dependency_graph(modules)
+
+        if False:
+            print("module_graph.keys():", module_graph.keys())
+            print("module_graph is:")
+            pprint.pp(module_graph, indent=4, compact=True)
+            exit()
 
         if not module_graph or "graph" not in module_graph:
             raise KBRuntimeError("Failed to resolve dependency graph")
@@ -742,13 +749,15 @@ class Application:
                 result = 1
             else:
                 runner = TaskManager(self)
-                result = runner.run_all_tasks()
+                result = runner.run_all_tasks(self.work_load["dependency_info"]["graph"]) ###
         elif run_mode == "install":
             # install but do not build (... unless the build_system does that but
             # hey, we tried)
             result = Application._handle_install(ctx)
         elif run_mode == "uninstall":
             result = Application._handle_uninstall(ctx)
+
+        # we're post build now - print final stats etc
 
         if ctx.get_option("purge-old-logs"):
             LogDir.delete_unreferenced_log_directories(ctx)

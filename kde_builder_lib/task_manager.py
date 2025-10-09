@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import os.path
+import pprint
 import selectors
 import signal
 import sys
@@ -64,7 +65,7 @@ class TaskManager:
         self.ksb_app = app
         self.DO_STOP = 0
 
-    def run_all_tasks(self) -> int:
+    def run_all_tasks(self, dep_graph) -> int:
         """
         Return shell-style result code.
 
@@ -94,7 +95,7 @@ class TaskManager:
         ipc.set_persistent_option_handler(update_opts_sub)
 
         if ipc.supports_concurrency():
-            result = self._handle_async_build(ipc, ctx)
+            result = self._handle_async_build(ipc, ctx, dep_graph)
             if logger_ipc.level == logging.DEBUG:
                 ipc.output_pending_logged_messages()
         else:
@@ -112,7 +113,7 @@ class TaskManager:
             result: int = self._handle_updates(ipc, ctx)
 
             logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
-            result: int = self._handle_build(ipc, ctx) or result
+            result: int = self._handle_build(ipc, ctx, dep_graph) or result
 
         return result
 
@@ -249,7 +250,7 @@ class TaskManager:
             return ""
         return "build"  # phase failed at
 
-    def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
+    def _handle_build(self, ipc: IPC, ctx: BuildContext, dep_graph) -> int: ###
         """
         Handle the build process.
 
@@ -310,8 +311,28 @@ class TaskManager:
         status_viewer = ctx.status_view
         status_viewer.number_modules_total(num_modules)
 
-        while modules:
-            module = modules.pop(0)
+        # mark "no-build" dependencies as built - otherwise, their (including indirect) dependees would go unbuilt
+        for name, entries in dep_graph.items():
+            if not entries["build"]:
+                for dependee, _ in entries["votes"].items():
+                    if name not in dep_graph[dependee]["deps"]:
+                        # there must have been a reason for the vote to exist, so the assertion should hold
+                        assert(name in dep_graph[dependee]["all_deps"]["items"])
+                        continue
+                    del dep_graph[dependee]["deps"][name]
+
+        # enqueue modules that are already buildable (no unbuilt dependencies)
+        modules_queue = []
+        for module in modules:
+            if not dep_graph[module.name]["deps"]:
+                modules_queue.append(module)
+
+        print("initial queue:", *(mod.name for mod in modules_queue))
+
+        built_module_names = []
+
+        while modules_queue:
+            module = modules_queue.pop(0)
             if self.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further projects.")
                 break
@@ -321,7 +342,8 @@ class TaskManager:
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
-            failed_phase: str = TaskManager._build_single_module(ipc, module)
+            failed_phase: str = "" ############ TaskManager._build_single_module(ipc, module)
+            #failed_phase: str = TaskManager._build_single_module(ipc, module)
             elapsed: str = Util.prettify_seconds(int(time.time()) - start_time)
 
             if failed_phase:
@@ -347,8 +369,44 @@ class TaskManager:
                 print(f"{module}: Succeeded after {elapsed}.", file=status_fh)
                 build_done.append(module_name)  # Make it show up as a success
                 status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
+
+            # remove this modules from dependency list of dependees, enqueue modules where we just removed
+            # the last unbuilt dependency
+            newly_buildable = {}
+            for dependee, _ in dep_graph[module.name]["votes"].items():
+                if module.name not in dep_graph[dependee]["deps"]:
+                    # there must have been a reason for the vote to exist, so the assertion should hold
+                    assert(module.name in dep_graph[dependee]["all_deps"]["items"])
+                    continue
+                del dep_graph[dependee]["deps"][module.name]
+                if not dep_graph[dependee]["deps"]:
+                    newly_buildable[dependee] = 1
+
+            if newly_buildable:
+                # add entries in their order in modules to keep them in their sorted order
+                for queue_candidate in modules:
+                    if queue_candidate.name in newly_buildable:
+                        modules_queue.append(queue_candidate)
+
+                built_module_names.append(module.name)
+
+                # if necessary, restore the property that modules with more votes (dependees) are built earlier
+                def num_votes(module) -> int:
+                    return len(dep_graph[module.name]["votes"])
+
+                modules_queue.sort(key=num_votes, reverse=True)
+
+            print("queue after building", module.name + ":", *(mod.name for mod in modules_queue))
+
+
             cur_module += 1
+
             print()  # Space things out
+
+        for n, d in dep_graph.items():
+            if n not in built_module_names:
+                print("unbuilt", n)
+                pprint.pp(d, indent=4, compact=True)
 
         if outfile:
             status_fh.close()
@@ -416,7 +474,7 @@ class TaskManager:
                     logger_taskmanager.info(f"Built g[{successes}] {mods}")
         return result
 
-    def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext, dep_graph) -> int:
         """
         Special-cases the handling of the update and build phases, by performing them concurrently (where possible), using forked processes.
 
@@ -544,7 +602,7 @@ class TaskManager:
 
             setproctitle.setproctitle("kde-builder-build")
             monitor_to_build_ipc.set_receiver()
-            result: int = self._handle_build(monitor_to_build_ipc, ctx)
+            result: int = self._handle_build(monitor_to_build_ipc, ctx, dep_graph)
 
             if result and ctx.get_option("stop-on-failure"):
                 # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
