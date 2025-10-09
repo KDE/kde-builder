@@ -33,22 +33,41 @@ class IPC:
 
     # IPC message types
 
-    MODULE_SUCCESS = 1  # Used for a successful src checkout
-    MODULE_FAILURE = 2  # Used for a failed src checkout
-    MODULE_SKIPPED = 3  # Used for a skipped src checkout (i.e. build anyways)
-    MODULE_UPTODATE = 4  # Used to skip building a module when had no code updates
+    MODULE_SUCCESS = 1
+    """Used for a successful src checkout (if one or more commits pulled)."""
+
+    MODULE_FAILURE = 2
+    """Used for a failed src checkout (if failed to create source dir, or exception happened in update_internal())."""
+
+    MODULE_SKIPPED = 3
+    """Used for a skipped src checkout (i.e. build anyways) (is never actually used)."""
+
+    MODULE_UPTODATE = 4
+    """Used to skip building a module when had no code updates (if zero commits pulled)."""
+
 
     # One of these messages should be the first message placed on the queue.
-    ALL_SKIPPED = 5  # Used to indicate a skipped update process (i.e. build anyways)
-    ALL_FAILURE = 6  # Used to indicate a major update failure (don't build)
-    ALL_UPDATING = 7  # Informational message, feel free to start the build.
+    ALL_SKIPPED = 5
+    """Used to indicate a skipped update process (i.e. build anyways) (is never actually used)."""
 
-    MODULE_LOGMSG = 9  # Tagged message should be put to TTY for module.
-    MODULE_PERSIST_OPT = 10  # Change to a persistent module option
+    ALL_FAILURE = 6
+    """Used to indicate a major update failure (don't build) (if could not check ssh agent, or could not create source dir)."""
 
-    ALL_DONE = 11  # Affirmatively flags that all updates are done
+    ALL_UPDATING = 7
+    """Informational message, feel free to start the build. (if no ALL_FAILURE happened, sent before starting updates)."""
 
-    MODULE_POSTBUILD_MSG = 12  # A message to print after all work done
+
+    MODULE_LOGMSG = 9
+    """Tagged message should be put to TTY for module. (for passing messages via ipc, see Debug.print_clr())."""
+
+    MODULE_PERSIST_OPT = 10
+    """Change to a persistent module option (when cloning and updating remote address, for setting "git-cloned-repository" persistent option)."""
+
+    ALL_DONE = 11
+    """Affirmatively flags that all updates are done (sent when update list ended or was empty)."""
+
+    MODULE_POSTBUILD_MSG = 12
+    """A message to print after all work done (sent when could not stash or unstash changes)."""
 
     def __init__(self):
         self.no_update: bool = False
