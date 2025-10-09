@@ -639,7 +639,7 @@ class DependencyResolver:
             if votes:
                 return votes
 
-            # If there is no good reason to perfer one module over another,
+            # If there is no good reason to prefer one module over another,
             # simply sort by the order contained within the configuration file (if
             # present), which would be setup as the rc-file is read.
 
