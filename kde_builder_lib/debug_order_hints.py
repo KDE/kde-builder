@@ -141,7 +141,7 @@ class DebugOrderHints:
             if fail_count:
                 return fail_count
 
-            # If there is no good reason to perfer one module over another,
+            # If there is no good reason to prefer one module over another,
             # simply sort by name to get a reproducible order.
             # That simplifies autotesting and/or reproducible builds.
             # (The items to sort are supplied as a dict so the order of keys is by
