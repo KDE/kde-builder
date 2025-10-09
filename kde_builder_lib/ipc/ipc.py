@@ -39,16 +39,11 @@ class IPC:
     MODULE_FAILURE = 2
     """Used for a failed src checkout (if failed to create source dir, or exception happened in update_internal())."""
 
-    MODULE_SKIPPED = 3
-    """Used for a skipped src checkout (i.e. build anyways) (is never actually used)."""
-
     MODULE_UPTODATE = 4
     """Used to skip building a module when had no code updates (if zero commits pulled)."""
 
 
     # One of these messages should be the first message placed on the queue.
-    ALL_SKIPPED = 5
-    """Used to indicate a skipped update process (i.e. build anyways) (is never actually used)."""
 
     ALL_FAILURE = 6
     """Used to indicate a major update failure (don't build) (if could not check ssh agent, or could not create source dir)."""
@@ -70,7 +65,6 @@ class IPC:
     """A message to print after all work done (sent when could not stash or unstash changes)."""
 
     def __init__(self):
-        self.no_update: bool = False
         self.updated: dict[str, str] = {}
         self.logged_module: str = "global"
         self.messages: dict[str, list[str]] = {}  # Holds log output from update process
@@ -141,14 +135,6 @@ class IPC:
             ipc_module_name, msg = buffer.split(",")
             message = msg
             updated[ipc_module_name] = "success"
-        elif ipc_type == IPC.MODULE_SKIPPED:
-            # The difference between success here and "skipped" below
-            # is that success means we should build even though we
-            # didn't perform an update, while "skipped" means the
-            # *build* should be skipped even though there was no
-            # failure.
-            message = "skipped"
-            updated[buffer] = "success"
         elif ipc_type == IPC.MODULE_FAILURE:
             message = "update failed"
             updated[buffer] = "failed"
@@ -203,7 +189,7 @@ class IPC:
 
     def wait_for_end(self) -> None:
         self.wait_for_stream_start()
-        while not self.no_update and not self.updates_done:
+        while not self.updates_done:
             ipc_type, buffer = self.receive_ipc_message()
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
             # We ignore the return value in favor of ->{updates_done}
@@ -228,7 +214,7 @@ class IPC:
         self.wait_for_stream_start()
 
         # No update? Just mark as successful
-        if self.no_update or not module.phases.has("update"):
+        if not module.phases.has("update"):
             updated[module_name] = "success"
             return "success", "Skipped"
 
@@ -294,7 +280,6 @@ class IPC:
         """
         Wait on the IPC connection until one of the ALL_* IPC codes is returned.
 
-        If IPC.ALL_SKIPPED is returned then the "no_update" entry will be set in self to flag that you shouldn't wait.
         If IPC.ALL_FAILURE is returned then an exception will be thrown due to the fatal error.
         This method can be called multiple times, but only the first time will result in a wait.
         """
@@ -315,9 +300,6 @@ class IPC:
                 raise ProgramError("IPC Failure waiting for stream start :(")
             if ipc_type == IPC.ALL_FAILURE:
                 raise KBRuntimeError(f"Unable to perform source update for any project:\n\t{buffer}")
-            elif ipc_type == IPC.ALL_SKIPPED:
-                self.no_update = True
-                self.updates_done = True
             elif ipc_type == IPC.MODULE_LOGMSG:
                 ipc_module_name, log_message = buffer.split(",", maxsplit=1)
                 if ipc_module_name not in self.messages:
@@ -398,9 +380,7 @@ class MsgType(IntEnum):
 
     MODULE_SUCCESS = IPC.MODULE_SUCCESS
     MODULE_FAILURE = IPC.MODULE_FAILURE
-    MODULE_SKIPPED = IPC.MODULE_SKIPPED
     MODULE_UPTODATE = IPC.MODULE_UPTODATE
-    ALL_SKIPPED = IPC.ALL_SKIPPED
     ALL_FAILURE = IPC.ALL_FAILURE
     ALL_UPDATING = IPC.ALL_UPDATING
     MODULE_LOGMSG = IPC.MODULE_LOGMSG
