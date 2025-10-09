@@ -656,7 +656,7 @@ class DependencyResolver:
             # so it is probably a good idea to build that one earlier to help
             # maximise the duration of time for which builds can be run in parallel
 
-            votes = len(b_votes.keys()) - len(a_votes.keys())
+            votes = len(b_votes) - len(a_votes)
 
             if votes:
                 return votes
