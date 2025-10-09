@@ -36,11 +36,14 @@ logger_taskmanager = KBLogger.getLogger("taskmanager")
 
 class TaskManager:
     """
-    Consolidates the actual orchestration of all the module update, build_system setup, configure, build, and install jobs once the :class:`Application` has set up the :class:`BuildContext` for the current build.
+    Orchestrates source update, build, and install tasks described in :class:`BuildContext`.
 
-    In particular, the concurrent portion of the build is concentrated more-or-less
-    entirely within "run_all_tasks", although other parts of the script have to be
-    aware of concurrency.
+    The detailed list of tasks includes module update, build_system setup, configure, build, and
+    install jobs. The :class:`Application` sets up a :class:`BuildContext` for the current build.
+
+    A notable aspect handled by TaskManager is that the concurrent portion of the build is
+    concentrated more-or-less entirely within "run_all_tasks", although other parts of the tool
+    have to be aware of concurrency.
 
     Examples:
     ::
