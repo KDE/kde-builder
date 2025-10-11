@@ -67,11 +67,20 @@ class IPC:
     def __init__(self):
         self.updated: dict[str, str] = {}
         self.logged_module: str = "global"
-        self.messages: dict[str, list[str]] = {}  # Holds log output from update process
-        self.postbuild_msg: dict[str, list[str]] = {}  # Like above but for post-build msgs
-        self.why_refresh: dict[str, str] = {}  # If module should build despite not being updated, why?
+
+        self.messages: dict[str, list[str]] = {}
+        """Holds log output from update process."""
+
+        self.postbuild_msg: dict[str, list[str]] = {}
+        """Holds log output for post-build msgs."""
+
+        self.why_refresh: dict[str, str] = {}
+        """If module should build despite not being updated, why?"""
+
         self.updates_done: bool = False
-        self.opt_update_handler: Callable | None = None  # Callback for persistent option changes
+
+        self.opt_update_handler: Callable | None = None
+        """Callback for persistent option changes."""
 
     def notify_persistent_option_change(self, module_name: str, opt_name: str, opt_value: str) -> None:
         """

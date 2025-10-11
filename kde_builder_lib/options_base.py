@@ -36,9 +36,6 @@ class OptionsBase:
     """
 
     def __init__(self, ctx: BuildContext | None = None):
-        # We don't directly bless the options dict so that subclasses can
-        # use this base dict directly (as long as they don't overwrite
-        # "options", of course).
         self.options = {"set-env": {}}
         self.context = ctx
 

@@ -37,9 +37,14 @@ class OSSupport:
         Args:
             os_release_file: Force use specific os-release file path instead of relying on default location.
         """
-        self.ID = "unknown"  # Just initial value. Intended to be overridden.
-        self.ID_LIKE = ""  # Just initial value. Can be overridden.
-        self.VERSION_ID = "unknown"  # Just initial value. Can be overridden.
+        self.ID = "unknown"
+        """Just initial value. Intended to be overridden."""
+
+        self.ID_LIKE = ""
+        """Just initial value. Can be overridden."""
+
+        self.VERSION_ID = "unknown"
+        """Just initial value. Can be overridden."""
 
         kv_list = self._read_os_release(os_release_file)
         for key in kv_list.keys():

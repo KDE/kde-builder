@@ -54,22 +54,23 @@ class DependencyResolver:
             resolver.read_dependency_data(fh)
             resolver.resolveDependencies(modules)
         """
-        # dict mapping short module names (m) to a dict key by branch
-        # name, the value of which is yet another dict (see
-        # read_dependency_data). Note that this assumes KDE git infrastructure
-        # ensures that all full module names (e.g.
-        # kde/workspace/plasma-workspace) map to a *unique* short name (e.g.
-        # plasma-workspace) by stripping leading path components
         self.dependencies_of = {}
+        """
+        Dict mapping short module names (m) to a dict key by branch name, the value of which is yet another dict (see read_dependency_data()).
+        Note that this assumes KDE git infrastructure ensures that all full module names (e.g. kde/workspace/plasma-workspace) map to a *unique*
+        short name (e.g. plasma-workspace) by stripping leading path components dict mapping a wildcarded module name with no branch to a
+        list of module:branch dependencies.
+        """
 
-        # dict mapping a wildcarded module name with no branch to a
-        # list of module:branch dependencies.
         self.catch_all_dependencies = {}
+        """
+        Dict mapping a wildcarded module name with no branch to a list of module:branch dependencies.
+        """
 
-        # function that will properly create a `Module` from a
-        # given kde-project module name. Used to support automatically adding
-        # dependencies to a build.
         self.module_factory = module_factory
+        """
+        Function that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
+        """
 
     @staticmethod
     def _shorten_module_name(name: str) -> str:

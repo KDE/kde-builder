@@ -33,7 +33,8 @@ class RecursiveConfigNodesIterator:
         self.stack_filenames: list[str] = []
         self.stack_indexes: list[int] = []
         self.stack_keys_lists: list[list[str]] = []
-        self.stack_base_path: list[str] = [os.path.dirname(rcfile)]  # Base directory path for relative includes.
+        self.stack_base_path: list[str] = [os.path.dirname(rcfile)]
+        """Base directory path for relative includes."""
 
         self.current_dictionary: dict = initial_dictionary
         self.current_filename: str = rcfile

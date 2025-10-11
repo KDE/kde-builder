@@ -68,8 +68,10 @@ class Application:
     """
 
     # We use a named remote to make some git commands work that don't accept the full path.
-    KDE_PROJECT_ID = "kde-projects"  # git-repository-base for sysadmin/repo-metadata. The value is determined as "kde:$repoPath.git", where $repoParh is read from yaml metadata file for each module.
-    QT_PROJECT_ID = "qt-projects"  # git-repository-base for qt.io Git repo. The value is set as "https://invent.kde.org/qt/qt/qt5.git" when the module set transforms to qt5 super module.
+    KDE_PROJECT_ID = "kde-projects"
+    """git-repository-base for sysadmin/repo-metadata. The value is determined as "kde:$repoPath.git", where $repoParh is read from yaml metadata file for each module."""
+    QT_PROJECT_ID = "qt-projects"
+    """git-repository-base for qt.io Git repo. The value is set as "https://invent.kde.org/qt/qt/qt5.git" when the module set transforms to qt5 super module."""
 
     def __init__(self, options: list[str]):
         self.context = BuildContext()
@@ -77,7 +79,8 @@ class Application:
         self.metadata_module = None
         self.run_mode = "build"
         self.modules = None
-        self.module_factory = None  # function that makes a new Module. See generate_module_list
+        self.module_factory = None
+        """Function that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
 
         # Default to colorized output if sending to TTY

@@ -70,14 +70,10 @@ class BuildContext(Module):
          module_list = ctx.modules
     """
 
-    # According to XDG spec, if XDG_STATE_HOME is not set, then we should
-    # default to ~/.local/state
-    xdg_state_home = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")
+    xdg_state_home = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")  # If XDG_STATE_HOME is not set, defaults to ~/.local/state
     xdg_state_home_short = xdg_state_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
 
-    # According to XDG spec, if XDG_CONFIG_HOME is not set, then we should
-    # default to ~/.config
-    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")
+    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")  # If XDG_CONFIG_HOME is not set, defaults to ~/.config
     xdg_config_home_short = xdg_config_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
 
     rcfiles = ["./kde-builder.yaml",
@@ -88,8 +84,8 @@ class BuildContext(Module):
     def __init__(self):
         Module.__init__(self, None, "global")
 
-        # There doesn't seem to be a great way to get this from CMake easily but we can
-        # reason that if there's a /usr/lib64 (and it's not just a compat symlink),
+        # There doesn't seem to be a great way to get this from CMake easily, but we can
+        # reason that if there is a /usr/lib64 (and it's not just a compat symlink),
         # there will likely end up being a ${install-dir}/lib64 once kde-builder gets
         # done installing it
         self.libname = "lib"
@@ -190,7 +186,9 @@ class BuildContext(Module):
         }
 
         # newOpts
-        self.modules: list[Module] = []  # list of modules to build
+        self.modules: list[Module] = []
+        """List of modules to build."""
+
         self.context = self  # Fix link to buildContext (i.e. self)
         self.build_options = {
             "global": {
@@ -202,27 +200,37 @@ class BuildContext(Module):
             },
             # Module options are stored under here as well, keyed by module.name
         }
-        # This one replaces `Module` {phases}
         self.phases = PhaseList()
+        """Replaces Module.phases"""
 
-        self.errors = {
-            # A map from module *names* (as in modules[] above) to the
-            # phase name at which they failed.
-        }
-        self.log_paths = {
-            # Holds a dict of log path bases as expanded by
-            # get_absolute_path() (e.g. [source-dir]/log) to the actual log dir
-            # *this run*, with the date and unique id added. You must still
-            # add the module name to use.
-        }
+        self.errors = {}
+        """A map from module *names* to the phase name at which they failed."""
+
+        self.log_paths = {}
+        """
+        Holds a dict of log path bases as expanded by get_absolute_path() (e.g. [source-dir]/log) to the actual log dir *this run*,
+        with the date and unique id added. You must still add the module name to use.
+        """
+
         self.rc_files = BuildContext.rcfiles
         self.rc_file = None
-        self.persistent_options = {}  # These are kept across multiple script runs
-        self.ignore_list: list[str] = []  # List of KDE project paths to ignore completely
-        self.kde_projects_metadata = None  # Enumeration of kde-projects
-        self.logical_module_resolver = None  # For branch-group option
+
+        self.persistent_options = {}
+        """These are kept across multiple script runs."""
+
+        self.ignore_list: list[str] = []
+        """List of KDE project paths to ignore completely."""
+
+        self.kde_projects_metadata = None
+        """Enumeration of kde-projects."""
+
+        self.logical_module_resolver = None
+        """For branch-group option."""
+
         self.status_view: StatusView = StatusView()
-        self.projects_db = None  # See get_project_data_reader
+
+        self.projects_db = None
+        """See get_project_data_reader()."""
 
         self.options = self.build_options["global"]
         boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]

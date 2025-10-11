@@ -17,8 +17,8 @@ class Version:
     A place to put the kde-builder version number in one spot, so it only needs changed in one place for a version bump.
     """
 
-    # The root directory of kde-builder repo. Used for git-versioning.
     KB_REPO_DIR = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/..")
+    """The root directory of kde-builder repo. Used for git-versioning."""
 
     @staticmethod
     def script_version() -> str:

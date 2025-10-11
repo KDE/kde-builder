@@ -48,11 +48,13 @@ class Debug:
     def __init__(self):
         if not self.__initialized:
             self.__initialized = True
-            self.screen_log = None  # Filehandle pointing to the "build log".
+            self.screen_log = None
+            """Filehandle pointing to the "build log"."""
             self.is_pretending = False
             self.debug_level = Debug.INFO
 
-            self.ipc: IPCPipe | None = None  # Set only if we should forward log messages over IPC.
+            self.ipc: IPCPipe | None = None
+            """Set only if we should forward log messages over IPC."""
 
             # Colors
             self.RED = ""

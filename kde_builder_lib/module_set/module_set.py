@@ -62,7 +62,10 @@ class ModuleSet(OptionsBase):
         self.name: str = name or ""
         self.module_search_decls: list[str] = []
         self.module_ignore_decls: list[str] = []
-        self.module_order: dict[str, int] = {}  # maps module names to position in list
+
+        self.module_order: dict[str, int] = {}
+        """Maps module names to position in list."""
+
         self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
         self.context: BuildContext = ctx
 

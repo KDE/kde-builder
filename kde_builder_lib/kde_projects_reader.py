@@ -28,7 +28,9 @@ class KDEProjectsReader:
         Args:
             project_metadata_module: :class:`Module` that is the repo-metadata module.
         """
-        self.repositories: dict[str, dict[str, str | bool]] = {}  # Maps short names to repo info blocks
+        self.repositories: dict[str, dict[str, str | bool]] = {}
+        """Maps short names to repo info blocks."""
+
         self._read_project_data(project_metadata_module)
 
     def _read_project_data(self, project_metadata_module: Module) -> None:

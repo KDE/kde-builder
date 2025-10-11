@@ -73,10 +73,12 @@ class Module(OptionsBase):
         if not self.name:
             raise ProgramError("Empty Module constructed")
 
-        # Think of it as a runtime serial number for the created module.
-        # The assigned number depends on the position the module was appeared in the build configs.
-        # It is used in _compare_build_order_depends() as a pre-last way of ordering modules for building.
         self.create_id = 0
+        """
+        Think of it as a runtime serial number for the created module.
+        The assigned number depends on the position the module was appeared in the build configs.
+        It is used in _compare_build_order_depends() as a pre-last way of ordering modules for building.
+        """
 
         # If building a BuildContext instead of a `Module`, then the context
         # can't have been set up yet...
@@ -96,7 +98,9 @@ class Module(OptionsBase):
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []
         self.env: dict[str, str] = {}
-        self.current_phase: str | None = None  # for disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands
+
+        self.current_phase: str | None = None
+        """For disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands."""
 
         if self.__class__.__name__ != "BuildContext":
             # Avoid setting this for BuildContext, because it has its own option value type verification code, which needs BuildContext to be already initialized

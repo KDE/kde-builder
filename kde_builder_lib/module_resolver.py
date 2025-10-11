@@ -32,34 +32,35 @@ class ModuleResolver:
     def __init__(self, ctx: BuildContext):
         self.context = ctx
 
-        # Declares all selectors that should be ignored by default in the process of
-        # expanding module sets. Any modules matching these selectors would be elided
-        # from any expanded module sets by default.
         self.ignored_selectors: list[str] = []
+        """
+        Declares all selectors that should be ignored by default in the process of expanding module sets.
+        Any modules matching these selectors would be elided from any expanded module sets by default.
+        """
 
-        # Read in from rc-file
         self.input_modules_and_options: list[Module | ModuleSet] = []
+        """Read in from rc-file."""
 
-        # The options that should be applied to modules when they are created.
-        # No special handling for global options is performed here (but see
-        # :meth:`OptionsBase.get_option` and its friends).
-        #
-        # A dict, where module-names are keys to values which
-        # are themselves dicts of option-name: value pairs:
-        #
-        #  { mod1: {"cmake-options": "foo", ... },
-        #    mod2: {}
-        #  }
         self.cmdline_options = {}
+        """
+        The options that should be applied to modules when they are created.
+        No special handling for global options is performed here (but see :meth:`OptionsBase.get_option()` and its friends).
 
-        # Holds options from "override" nodes for modules
+        A dict, where module-names are keys to values which are themselves dicts of option-name: value pairs:
+
+          { mod1: {"cmake-options": "foo", ... },
+            mod2: {}
+          }
+        """
+
         self.deferred_options: dict[str, dict] = {}
+        """Holds options from "override" nodes for modules."""
 
-        # Holds Modules defined in course of expanding module-sets
         self.defined_modules: dict[str, Module | ModuleSet] = {}
+        """Holds Modules defined in course of expanding module-sets."""
 
-        # Holds use-module mentions with their source module-set
         self.referenced_modules: dict[str, ModuleSet] = {}
+        """Holds use-module mentions with their source module-set."""
 
     def set_deferred_options(self, deferred_options: list[dict[str, str | dict]]) -> None:
         """
