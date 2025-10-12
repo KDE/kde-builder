@@ -40,7 +40,7 @@ class IPC:
     """Used for a failed src checkout (if failed to create source dir, or exception happened in update_internal())."""
 
     MODULE_UPTODATE = 4
-    """Used to skip building a module when had no code updates (if zero commits pulled)."""
+    """Used for successful sources checkout (if zero commits pulled)."""
 
 
     # One of these messages should be the first message placed on the queue.
@@ -73,9 +73,6 @@ class IPC:
 
         self.postbuild_msg: dict[str, list[str]] = {}
         """Holds log output for post-build msgs."""
-
-        self.why_refresh: dict[str, str] = {}
-        """If module should build despite not being updated, why?"""
 
         self.updates_done: bool = False
 
@@ -148,16 +145,9 @@ class IPC:
             message = "update failed"
             updated[buffer] = "failed"
         elif ipc_type == IPC.MODULE_UPTODATE:
-            # Although the module source hasn't changed, the user might be forcing a
-            # rebuild, so our message should reflect what's actually going to happen.
             message = "no commits pulled"
-            ipc_module_name, refresh_reason = buffer.split(",")
-
-            if refresh_reason:
-                updated[ipc_module_name] = "success"
-                self.why_refresh[ipc_module_name] = refresh_reason
-            else:
-                updated[ipc_module_name] = "skipped"
+            ipc_module_name = buffer
+            updated[ipc_module_name] = "skipped"
         elif ipc_type == IPC.MODULE_PERSIST_OPT:
             ipc_module_name, opt_name, value = buffer.split(",")
             if self.opt_update_handler:
@@ -189,12 +179,6 @@ class IPC:
         The function should itself take a key and value pair.
         """
         self.opt_update_handler = handler
-
-    def refresh_reason_for(self, module: str) -> str:
-        """
-        Return a text reason to refresh a non-updated module, or an empty string if the module has been updated or has not yet been seen.
-        """
-        return self.why_refresh.get(module, "")
 
     def wait_for_end(self) -> None:
         self.wait_for_stream_start()

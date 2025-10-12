@@ -702,8 +702,7 @@ class Module(OptionsBase):
                 ipc.notify_update_success(module_name, message)
             else:
                 message = "0 commits pulled."
-                refresh_reason = self.build_system().needs_refreshed()
-                ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{module_name},{refresh_reason}")
+                ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{module_name}")
 
             # We doing e.g. --src-only, the build phase that normally outputs
             # number of files updated doesn't get run, so manually mention it

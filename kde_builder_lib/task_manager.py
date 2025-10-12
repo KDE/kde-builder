@@ -214,17 +214,21 @@ class TaskManager:
             return "update"
         elif result_status == "success":
             logger_taskmanager.warning(f"\tSource update complete for g[{module}]: {message}")
-            why_refresh = ipc.refresh_reason_for(module.name)
-            if why_refresh:
-                logger_taskmanager.info(f"\t  Rebuilding because {why_refresh}")
         elif result_status == "skipped":
-            # Skip actually building a module if the user has selected to skip
-            # builds when the source code was not actually updated. But, don't skip
-            # if we didn't successfully build last time.
-            if not module.get_option("build-when-unchanged") and fail_count == 0:
-                logger_taskmanager.warning(f"\tSkipping g[{module}] because its source code has not changed.")
-                return ""
-            logger_taskmanager.warning(f"\tNo changes to g[{module}] source code, but proceeding to build anyway.")
+            logger_taskmanager.warning(f"\tNo changes to g[{module}] source code.")
+            refresh_reason = module.build_system().needs_refreshed()
+
+            if refresh_reason:
+                logger_taskmanager.info(f"\tRebuilding because {refresh_reason}.")
+            elif fail_count != 0:
+                refresh_reason = "failed to build or update last time"
+                logger_taskmanager.info(f"\tRebuilding because {refresh_reason}.")
+            else:
+                if module.get_option("build-when-unchanged"):
+                    logger_taskmanager.warning(f"\tProceeding to build g[{module}], because build-when-unchanged was set.")
+                else:
+                    logger_taskmanager.warning(f"\tSkipping build of g[{module}], because sources did not change.")
+                    return ""
 
         # If the build gets interrupted, ensure the persistent options that are
         # written reflect that the build failed by preemptively setting the future
