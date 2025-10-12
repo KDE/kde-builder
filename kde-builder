@@ -6,8 +6,12 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import argparse
+import cProfile
+import io
 import logging.config
 import os
+import pstats
+from pstats import SortKey
 import sys
 import traceback
 
@@ -179,11 +183,26 @@ from kde_builder_lib.kb_exception import KBException  # noqa: E402
 
 # Script starts.
 
+if False:
+    pr = cProfile.Profile()
+    pr.enable()
+
 app = None
 try:
     app = Application(sys.argv[1:])  # the 0 element is script name
     result = app.run_all_module_phases()
     app.finish(result)
+
+    if False:
+        pr.disable()
+        s = io.StringIO()
+        sortby = SortKey.CUMULATIVE
+        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+        ps.print_stats()
+        print(s.getvalue())
+
+        exit()
+
 except UnknownKdeProjectException as err:
     logger_app = KBLogger.getLogger("application")
     logger_app.error(f" r[*] y[{err.unknown_project_name}] is not found in KDE projects, and there is no defined project with such name in the config.")
