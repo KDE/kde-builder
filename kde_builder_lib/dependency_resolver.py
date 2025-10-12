@@ -704,5 +704,5 @@ class DependencyResolver:
         if not isinstance(scm, Updater):
             return None
 
-        branch, sourcetype = scm.determine_preferred_checkout_source(module)
+        branch, sourcetype = scm.determine_preferred_checkout_source()
         return branch if sourcetype == "branch" else None

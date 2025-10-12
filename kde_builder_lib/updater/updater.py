@@ -89,8 +89,8 @@ class Updater:
 
         return an_id
 
-    def _verify_ref_present(self, module: Module, repo: str) -> bool:
-        ref, commit_type = self.determine_preferred_checkout_source(module)
+    def _verify_ref_present(self, repo: str) -> bool:
+        ref, commit_type = self.determine_preferred_checkout_source()
 
         if Debug().pretending():
             return True
@@ -139,7 +139,7 @@ class Updater:
 
         Util.p_chdir(module.get_source_dir())
 
-        commit_id, commit_type = self.determine_preferred_checkout_source(module)
+        commit_id, commit_type = self.determine_preferred_checkout_source()
 
         if commit_type != "none":
             commit_id = re.sub(r"^refs/tags/", "", commit_id)  # git-clone -b doesn't like refs/tags/
@@ -217,7 +217,7 @@ class Updater:
         else:
             self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
-            if not self._verify_ref_present(module, git_repo):
+            if not self._verify_ref_present(git_repo):
                 raise KBRuntimeError(f"\t{module} build was requested, but it has no source code at the requested git branch")
 
             self._clone(git_repo)  # can handle pretending mode
@@ -498,7 +498,7 @@ class Updater:
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
-        commit_id, commit_type = self.determine_preferred_checkout_source(module)
+        commit_id, commit_type = self.determine_preferred_checkout_source()
         if commit_type == "none":
             commit_type = "branch"
             commit_id = self._detect_default_remote_head(remote_name)
@@ -538,17 +538,16 @@ class Updater:
         head = head.removesuffix("\n")
         return head
 
-    def determine_preferred_checkout_source(self, module: Module | None = None) -> tuple:
+    def determine_preferred_checkout_source(self) -> tuple:
         """
         Goes through all the various combination of git checkout selection options in various orders of priority.
 
-        Returns a *list* containing: (the resultant symbolic ref/or SHA1,"branch" or
-        "tag" (to determine if something like git-pull would be suitable or whether
-        you have a detached HEAD)). Since the sym-ref is returned first that should
-        be what you get in a scalar context, if that's all you want.
+        Returns:
+            Tuple containing:
+            1 - the resultant symbolic ref/or SHA1.
+            2 - "branch" or "tag" (to determine if something like git-pull would be suitable or whether you have a detached HEAD).
         """
-        if not module:
-            module = self.module
+        module = self.module
 
         priority_ordered_sources = [
             #   option-name    type   get_option-inheritance-flag
