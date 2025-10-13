@@ -94,11 +94,15 @@ class IPC:
         self.send_ipc_message(IPC.MODULE_POSTBUILD_MSG, f"{module_name},{msg}")
 
     def notify_update_success(self, module: str, msg: str) -> None:
+        """
+        Send message on successful update.
+        """
         self.send_ipc_message(IPC.MODULE_SUCCESS, f"{module},{msg}")
 
     def set_logged_module(self, module_name: str) -> None:
-        # Sets which module messages stored by send_log_message are supposed to be
-        # associated with.
+        """
+        Sets which module messages stored by send_log_message() are supposed to be associated with.
+        """
         self.logged_module = module_name
 
     def send_log_message(self, logger_name: str, message_level: str, msg: str) -> None:
@@ -181,6 +185,9 @@ class IPC:
         self.opt_update_handler = handler
 
     def wait_for_end(self) -> None:
+        """
+        Wait until updates are finished.
+        """
         self.wait_for_stream_start()
         while not self.updates_done:
             ipc_type, buffer = self.receive_ipc_message()
@@ -344,9 +351,18 @@ class IPC:
     # any extra frills.
 
     def send_message(self, msg: bytes) -> NoReturn:
-        # send_message should accept one parameter (the message to send) and return
-        # true on success, or false on failure.  $! should hold the error information
-        # if false is returned.
+        """
+        Send message.
+
+        Args:
+            msg: the message to send.
+
+        Returns:
+            True on success.
+
+        Raises:
+             KBRuntimeError: in case of failure.
+        """
         raise ProgramError("Unimplemented.")
 
     def receive_message(self) -> NoReturn:
