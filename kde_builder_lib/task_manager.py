@@ -330,57 +330,88 @@ class TaskManager:
         print("initial queue:", *(mod.name for mod in modules_queue))
 
         built_module_names = []
+        max_builders = 8
+        builder_pipes = []
+        sel = selectors.DefaultSelector()
 
-        while modules_queue:
-            module = modules_queue.pop(0)
+        while builder_pipes or modules_queue:
             if self.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further projects.")
                 break
 
-            module_name = module.name
-            block_substr = self._form_block_substring(module)
-            logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
+            # fill available "slots" with build jobs as far as buildable modules are available
+            while len(builder_pipes) < max_builders and modules_queue:
+                module = modules_queue.pop(0)
 
-            start_time = int(time.time())
-            failed_phase: str = "" ############ TaskManager._build_single_module(ipc, module)
-            #failed_phase: str = TaskManager._build_single_module(ipc, module)
-            elapsed: str = Util.prettify_seconds(int(time.time()) - start_time)
+                block_substr = self._form_block_substring(module)
+                logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
-            if failed_phase:
-                # FAILURE
-                ctx.mark_module_phase_failed(failed_phase, module)
-                print(f"{module}: Failed on {failed_phase} after {elapsed}.", file=status_fh)
+                builder_pid, builder_pipe = module.fork_build()
 
-                if result == 0:
-                    # No failures yet, mark this as resume point
-                    module_list = ", ".join([f"{elem}" for elem in [module] + modules])
-                    ctx.set_persistent_option("global", "resume-list", module_list)
-                result = 1
+                builder_pipes.append(builder_pipe)
+                sel.register(builder_pipe, selectors.EVENT_READ, data=(module, builder_pid))
 
-                if module.get_option("stop-on-failure"):
-                    logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
-                    return 1  # Error
+                cur_module += 1
 
-                logfile = module.get_option("#error-log-file")
-                logger_taskmanager.info("\tError log: r[" + logfile)
-                status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
-            else:
-                # Success
-                print(f"{module}: Succeeded after {elapsed}.", file=status_fh)
-                build_done.append(module_name)  # Make it show up as a success
-                status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
 
-            # remove this modules from dependency list of dependees, enqueue modules where we just removed
-            # the last unbuilt dependency
-            newly_buildable = {}
-            for dependee, _ in dep_graph[module.name]["votes"].items():
-                if module.name not in dep_graph[dependee]["deps"]:
-                    # there must have been a reason for the vote to exist, so the assertion should hold
-                    assert(module.name in dep_graph[dependee]["all_deps"]["items"])
-                    continue
-                del dep_graph[dependee]["deps"][module.name]
-                if not dep_graph[dependee]["deps"]:
-                    newly_buildable[dependee] = 1
+            newly_buildable = set()
+
+            # process finished build jobs and update dependecies, add newly buildable modules etc
+            for key, _ in sel.select(): # select() returns a list of tuples
+                assert(key.fileobj in builder_pipes)
+                builder_pipe = key.fileobj
+                builder_pipes.remove(builder_pipe)
+                # TODO actually read anything from the process?
+                sel.unregister(builder_pipe)
+                builder_pipe.close()
+
+                # garbage-collect child process
+                pid = key.data[1]
+                os.waitpid(pid, 0)
+
+                module = key.data[0]
+                built_module_names.append(module.name)
+
+                # PORTME start_time = int(time.time())
+                failed_phase: str = "" ############ TaskManager._build_single_module(ipc, module)
+
+
+                elapsed: str = "" # PORTME Util.prettify_seconds(int(time.time()) - start_time)
+
+                if failed_phase:
+                    # FAILURE
+                    ctx.mark_module_phase_failed(failed_phase, module)
+                    print(f"{module}: Failed on {failed_phase} after {elapsed}.", file=status_fh)
+
+                    if result == 0:
+                        # No failures yet, mark this as resume point
+                        module_list = ", ".join([f"{elem}" for elem in [module] + modules])
+                        ctx.set_persistent_option("global", "resume-list", module_list)
+                    result = 1
+
+                    if module.get_option("stop-on-failure"):
+                        logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
+                        return 1  # Error
+
+                    logfile = module.get_option("#error-log-file")
+                    logger_taskmanager.info("\tError log: r[" + logfile)
+                    status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
+                else:
+                    # Success
+                    print(f"{module}: Succeeded after {elapsed}.", file=status_fh)
+                    build_done.append(module.name)  # Make it show up as a success
+                    status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
+
+                # remove this modules from dependency list of dependees, enqueue modules where we just removed
+                # the last unbuilt dependency
+                for dependee, _ in dep_graph[module.name]["votes"].items():
+                    if module.name not in dep_graph[dependee]["deps"]:
+                        # there must have been a reason for the vote to exist, so the assertion should hold
+                        assert(module.name in dep_graph[dependee]["all_deps"]["items"])
+                        continue
+                    del dep_graph[dependee]["deps"][module.name]
+                    if not dep_graph[dependee]["deps"]:
+                        newly_buildable.add(dependee)
 
             if newly_buildable:
                 # add entries in their order in modules to keep them in their sorted order
@@ -388,18 +419,13 @@ class TaskManager:
                     if queue_candidate.name in newly_buildable:
                         modules_queue.append(queue_candidate)
 
-                built_module_names.append(module.name)
-
-                # if necessary, restore the property that modules with more votes (dependees) are built earlier
+                # maintain the property that modules with more votes (dependees) are built earlier
                 def num_votes(module) -> int:
                     return len(dep_graph[module.name]["votes"])
-
                 modules_queue.sort(key=num_votes, reverse=True)
 
             print("queue after building", module.name + ":", *(mod.name for mod in modules_queue))
 
-
-            cur_module += 1
 
             print()  # Space things out
 

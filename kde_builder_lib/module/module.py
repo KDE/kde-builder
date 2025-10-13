@@ -393,6 +393,20 @@ class Module(OptionsBase):
         # TODO: this should be a phase to run.
         return self.install()
 
+    def fork_build(self) -> (int, fileobject): # (pid of subprocess, read pipe to subprocess)
+        result_receiver_fd, result_sender_fd = os.pipe()
+        builder_pid = os.fork()
+        if builder_pid:
+            os.close(result_sender_fd)
+            return (builder_pid, os.fdopen(result_receiver_fd, "rb", 0))
+
+        # we're in the builder process, proceed with building and then report the outcome through the pipe
+        os.close(result_receiver_fd)
+        result_sender_pipe = os.fdopen(result_sender_fd, "wb", 0)
+        result = self.build()
+        result_sender_pipe.write(result.to_bytes())
+        sys.exit(result)
+
     def setup_build_system(self) -> bool:
         """
         Set up the build system for the module to permit :meth:`build()` to work, including creating build dir, running cmake/configure/etc.
