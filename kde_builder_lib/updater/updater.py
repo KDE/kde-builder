@@ -51,6 +51,8 @@ class Updater:
 
         May change the current directory as necessary.
 
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
         Returns:
              Number of commits pulled.
         """
@@ -189,6 +191,8 @@ class Updater:
     def update_checkout(self) -> int:
         """
         Either performs the initial checkout or updates the current git checkout as appropriate.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
 
         Returns:
              Number of commits pulled.
@@ -638,6 +642,8 @@ class Updater:
         Send a post-build (warning) message via the IPC object.
 
         This just takes care of the boilerplate to forward its arguments as message.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         module = self.module
         self.ipc.notify_new_post_build_message(module.name, mesg)

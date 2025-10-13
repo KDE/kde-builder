@@ -64,6 +64,8 @@ class TaskManager:
     def run_all_tasks(self) -> int:
         """
         Return shell-style result code.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         # What we're going to do is fork another child to perform the source
         # updates while we build.  Setup for this first by initializing some
@@ -124,6 +126,8 @@ class TaskManager:
         The ipc parameter contains an object that is responsible for communicating
         the status of building the modules. This function must account for every
         module in ctx's update phase to the ipc object before returning.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
 
         Returns:
              0 on success, non-zero on error.
@@ -189,6 +193,8 @@ class TaskManager:
     def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str:
         """
         Build the given module.
+
+        This function is running only in main kde-builder process (kde-builder-build).
 
         Returns:
              The failure phase, or empty string on success.
@@ -257,6 +263,8 @@ class TaskManager:
         If builddir/module/.refresh-me exists, the function will
         completely rebuild the module (as if --refresh-build were passed for that
         module).
+
+        This function is running only in main kde-builder process (kde-builder-build).
 
         Returns:
              0 for success, non-zero for failure.
@@ -416,6 +424,8 @@ class TaskManager:
         We also redirect :class:`Debug` output messages to be sent to a single process
         for display on the terminal instead of allowing them all to interrupt each
         other.
+
+        This function is running only in main kde-builder process (kde-builder-build).
 
         Args:
             monitor_to_build_ipc: IPC Object to use for sending/receiving update/build status. It must be
@@ -663,6 +673,8 @@ class TaskManager:
         This convoluted arrangement is required to allow the source update
         process to go from start to finish without undue interruption on it waiting
         to write out its status to the build process (which is usually busy).
+
+        This function is running only in monitor kde-builder process (kde-builder-monitor).
 
         Args:
             ipc_to_build: the IPC object to use to send to build process.

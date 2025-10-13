@@ -156,6 +156,8 @@ class KBLogger(logging.Logger):
         Actually display the data.
 
         Calls :meth:`Debug.colorize` on each entry first.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         d = Debug()
         # If we have an IPC object that means there's multiple procs trying to

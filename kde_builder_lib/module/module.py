@@ -634,6 +634,8 @@ class Module(OptionsBase):
         """
         Execute the update (or pretends to do so) using the appropriate source control system.
 
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
         Returns:
              False on failure, True on success.
         """

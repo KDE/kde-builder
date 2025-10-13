@@ -84,24 +84,33 @@ class IPC:
         Send a message to the main/build process that a persistent option for the given module name must be changed.
 
         For use by processes that do not control the persistent option store upon shutdown.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         self.send_ipc_message(IPC.MODULE_PERSIST_OPT, f"{module_name},{opt_name},{opt_value}")
 
     def notify_new_post_build_message(self, module_name: str, msg: str) -> None:
         """
         Send a message to the main/build process that a given message should be shown to the user at the end of the build.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         self.send_ipc_message(IPC.MODULE_POSTBUILD_MSG, f"{module_name},{msg}")
 
     def notify_update_success(self, module: str, msg: str) -> None:
         """
         Send message on successful update.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         self.send_ipc_message(IPC.MODULE_SUCCESS, f"{module},{msg}")
 
     def set_logged_module(self, module_name: str) -> None:
         """
         Sets which module messages stored by send_log_message() are supposed to be associated with.
+
+        This function could be run by all processes: main kde-builder process (kde-builder-build), updater process (kde-builder-updater),
+        and monitor process (kde-builder-monitor).
         """
         self.logged_module = module_name
 
@@ -110,6 +119,8 @@ class IPC:
         Send a message to be logged by the process holding the TTY.
 
         The logged message is associated with the module set by set_logged_module.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
         """
         logged_module = self.logged_module
         self.send_ipc_message(IPC.MODULE_LOGMSG, f"{logged_module},{logger_name},{message_level},{msg}")
@@ -118,10 +129,12 @@ class IPC:
     def _print_logged_message(combined_msg: str) -> None:
         """
         Print the given message out (adjusting to have proper whitespace if needed). For use with the log-message forwarding facility.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
         if not re.match(r"^\s+", msg):
-            msg = f"\t{msg}"  # Automatically adds tabulation if message misses it. Note that this is in main process (kde-builder-build).
+            msg = f"\t{msg}"  # Automatically adds tabulation if message misses it.
         KBLogger.print_clr(logger_name, message_level, msg)
 
     def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str:
@@ -133,6 +146,8 @@ class IPC:
         This can occur during a module build (waiting for messages from update process) or
         while we're near the end of the script execution. There is no way to tell
         which module we'll be about to receive messages for from the other end.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         updated = self.updated
         messages = self.messages
@@ -181,12 +196,16 @@ class IPC:
         Assign a callback / function to use for updating persistent options based on IPC update messages.
 
         The function should itself take a key and value pair.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         self.opt_update_handler = handler
 
     def wait_for_end(self) -> None:
         """
         Wait until updates are finished.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         self.wait_for_stream_start()
         while not self.updates_done:
@@ -206,6 +225,8 @@ class IPC:
 
         Raises:
             Exception: For an IPC failure or if the module should not be built.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         module_name = module.name
         updated = self.updated
@@ -247,6 +268,8 @@ class IPC:
         Show any available messages near the end of the script run.
 
         Just in case we somehow have messages to display after all modules are processed, we have this function.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         messages = self.messages
 
@@ -266,6 +289,8 @@ class IPC:
         Flag the given module as something that can be ignored from now on.
 
         For use after the module has been waited on.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         modulename = module.name
         del self.updated[modulename]
@@ -273,6 +298,8 @@ class IPC:
     def unacknowledged_modules(self) -> dict[str, str]:
         """
         Return a dict mapping module *names* to update statuses, for modules that have not already been marked as ignorable using forget_module().
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         return self.updated
 
@@ -282,6 +309,8 @@ class IPC:
 
         If IPC.ALL_FAILURE is returned then an exception will be thrown due to the fatal error.
         This method can be called multiple times, but only the first time will result in a wait.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         if not hasattr(IPC, "waited"):
             IPC.waited = 0
@@ -312,6 +341,8 @@ class IPC:
         """
         Send an IPC message along with some IPC type information.
 
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
         Args:
             ipc_type: The IPC type to send.
             msg: The actual message.
@@ -326,6 +357,8 @@ class IPC:
         """
         Unpack a message.
 
+        This function is running only in main kde-builder process (kde-builder-build).
+
         Args:
             msg: The message.
 
@@ -338,6 +371,8 @@ class IPC:
     def receive_ipc_message(self) -> tuple[int, str]:
         """
         Receive an IPC message and decodes it into the message and its associated type information.
+
+        This function is running only in main kde-builder process (kde-builder-build).
 
         Returns:
              The tuple with IPC type and message content, or tuple with 0 and empty string on failure.
@@ -354,6 +389,8 @@ class IPC:
         """
         Send message.
 
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
         Args:
             msg: the message to send.
 
@@ -368,6 +405,8 @@ class IPC:
     def receive_message(self) -> NoReturn:
         """
         Return a message received from the other side, or None for EOF or error.
+
+        This function is running only in main kde-builder process (kde-builder-build).
         """
         raise ProgramError("Unimplemented.")
 
