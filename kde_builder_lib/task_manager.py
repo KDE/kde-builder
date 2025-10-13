@@ -329,7 +329,6 @@ class TaskManager:
 
         print("initial queue:", *(mod.name for mod in modules_queue))
 
-        built_module_names = []
         max_builders = 8
         builder_pipes = []
         sel = selectors.DefaultSelector()
@@ -370,7 +369,6 @@ class TaskManager:
                 os.waitpid(pid, 0)
 
                 module = key.data[0]
-                built_module_names.append(module.name)
 
                 # PORTME start_time = int(time.time())
                 failed_phase: str = "" ############ TaskManager._build_single_module(ipc, module)
@@ -426,13 +424,7 @@ class TaskManager:
 
             print("queue after building", module.name + ":", *(mod.name for mod in modules_queue))
 
-
             print()  # Space things out
-
-        for n, d in dep_graph.items():
-            if n not in built_module_names:
-                print("unbuilt", n)
-                pprint.pp(d, indent=4, compact=True)
 
         if outfile:
             status_fh.close()
