@@ -193,7 +193,7 @@ class TaskManager:
         return had_error
 
     @staticmethod
-    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str:
+    def _build_single_module(ipc: IPC, module: Module) -> str:
         """
         Build the given module.
 
@@ -321,7 +321,7 @@ class TaskManager:
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
             start_time = int(time.time())
-            failed_phase: str = TaskManager._build_single_module(ipc, ctx, module, start_time)
+            failed_phase: str = TaskManager._build_single_module(ipc, module)
             elapsed: str = Util.prettify_seconds(int(time.time()) - start_time)
 
             if failed_phase:
