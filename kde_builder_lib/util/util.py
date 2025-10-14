@@ -743,47 +743,32 @@ class Util:
         print(f"starting delete of {target_dir}", file=log)
 
         try:
-            def subprocess_run(target: Callable):
-                retval = multiprocessing.Value("i", -1)
-                subproc = multiprocessing.Process(target=target, args=(retval,))
-                subproc.start()
-                # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-                subproc.join()
-                if subproc.exitcode != 0:  # This is exit code of running subprocess, but not the returned value of the function in subprocess.
-                    raise Exception(f"Subprocess failed with exitcode {subproc.exitcode}")
-                return retval.value
+            error_dict = {}
 
-            def func(retval):
-                error_dict = {}
+            with os.scandir(target_dir) as entries:
+                for entry in entries:
+                    if entry.is_dir() and not entry.is_symlink():
+                        try:
+                            shutil.rmtree(entry.path)
+                        except OSError as ex:
+                            error_dict[entry.path] = ex
+                    else:
+                        try:
+                            os.remove(entry.path)
+                        except OSError as ex:
+                            error_dict[entry.path] = ex
 
-                with os.scandir(target_dir) as entries:
-                    for entry in entries:
-                        if entry.is_dir() and not entry.is_symlink():
-                            try:
-                                shutil.rmtree(entry.path)
-                            except OSError as ex:
-                                error_dict[entry.path] = ex
-                        else:
-                            try:
-                                os.remove(entry.path)
-                            except OSError as ex:
-                                error_dict[entry.path] = ex
+            if error_dict:
+                for file in error_dict:
+                    msg = error_dict[file]
+                    if not file:
+                        file = "general error"
+                    print(f"{file}: error: {msg}", file=log)
+                result = 0
+            else:
+                result = 1
+            log.close()
 
-                if error_dict and len(error_dict):
-                    for file in error_dict:
-                        msg = error_dict[file]
-                        if not file:
-                            file = "general error"
-                        print(f"{file}: error: {msg}", file=log)
-
-                    retval.value = 0
-                else:
-                    retval.value = 1
-                log.close()
-                # pl2py: As we are in subprocess, we have "returned" the value via a shared variable.
-                # The actual (normal) return value cannot be read by the parent process.
-
-            result = subprocess_run(func)
             return result
 
         except Exception as e:
