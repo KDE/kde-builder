@@ -500,17 +500,22 @@ class Util:
     @staticmethod
     def run_logged(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
         """
-        Return the exit status of the sub-process.
+        Run the command, and log it.
 
-        This is similar to ``log_command`` in that this runs the given command and
-        arguments in a separate process.
-
-        ``directory`` parameter allows you to set the working directory to use in the *subprocess* it creates.
-        If the ``directory`` parameter is None then the directory is not changed.
         ::
 
             builddir = module.fullpath("build")  # need to pass dir to use
             result = run_logged(module, "build", builddir, ["make", "-j8"])
+
+        Args:
+            module: A Module object.
+            filename: A filename to use for log.
+            directory: Allows you to set the working directory to use. If it is None, then the directory is not changed.
+            args: The command itself.
+            callback_func: Optional. A function that will be passed to run_logged_command().
+
+        Returns:
+             Exit status of the command.
         """
         if not directory:
             directory = ""
@@ -524,25 +529,13 @@ class Util:
         # Todo Check if this is still needed.
         module.get_log_path(f"{filename}.log")
 
-        def subprocess_run(target: Callable) -> int:
-            retval = multiprocessing.Value("i", -1)
-            subproc = multiprocessing.Process(target=target, args=(retval,))
-            subproc.start()
-            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-            subproc.join()
-            return retval.value
+        orig_wd = os.getcwd()
+        if directory:
+            Util.p_chdir(directory)
+        exitcode = Util.log_command(module, filename, args, {"callback": callback_func})
+        logger_logged_cmd.debug("Return to the original working directory after running log_command().")
+        Util.p_chdir(orig_wd)
 
-        def func(retval):
-            # This happens in a CHILD PROCESS, not in the main process!
-            # This means that changes made by log_command or function calls made
-            # via log_command will not be saved or noted unless they are made part
-            # of the return value, or sent earlier via a "progress" event.
-            setproctitle.setproctitle("kde-builder " + " ".join(args))  # better indicate what is the process
-            if directory:
-                Util.p_chdir(directory)
-            retval.value = Util.log_command(module, filename, args, {"callback": callback_func})
-
-        exitcode = subprocess_run(func)
         logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename + ".log")}\n""")
         if not exitcode == 0:
             module.set_error_logfile(f"{filename}.log")
