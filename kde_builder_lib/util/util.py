@@ -33,11 +33,6 @@ from .textwrap_mod import textwrap
 if TYPE_CHECKING:
     from ..module.module import Module
 
-if sys.platform == "darwin":
-    import multiprocess as multiprocessing
-else:
-    import multiprocessing
-
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 logger_util = KBLogger.getLogger("util")
 
@@ -631,91 +626,6 @@ class Util:
         for arg in args:
             md5_hash.update(arg.encode())
         return base64.b64encode(md5_hash.digest()).decode().rstrip("=")
-
-    @staticmethod
-    def safe_lndir(from_path: str, to_path: str) -> int:
-        """
-        Recursively symlink a directory into another location, in a similar fashion to how the XFree/X.org lndir() program does it.
-
-        This is reimplemented here since some systems lndir doesn't seem to work right.
-
-        Use by passing two `absolute` paths, the first being where to symlink files
-        from, and the second being what directory to symlink them into.
-        ::
-
-            result = safe_lndir("/path/to/symlink", "/where/to/put/symlinks")
-            def func(result):
-                if result:
-                    print("success")
-
-            func(result)
-
-        All intervening directories will be created as needed. In addition, you may
-        safely run this function again if you only want to catch additional files in
-        the source directory.
-
-        Returns:
-            1 if successful, 0 if unsuccessful.
-        """
-        if Debug().pretending():
-            return 1
-
-        if not os.path.isabs(from_path) or not os.path.isabs(to_path):
-            raise ProgramError("Both paths to safe_lndir must be absolute paths!")
-
-        # Create destination directory.
-        if not Util.super_mkdir(to_path):
-            logger_util.error(f"Couldn't create directory r[{to_path}]")
-            return 0
-
-        # # Create closure callback subroutine.
-        # def wanted(root, dirs, files):
-        #
-        #     dir = re.sub(from_path, to_path, dir)
-        #
-        #     # Ignore version-control metadata
-        #     if re.search(r"/\.git", dir) :
-        #         return
-        #
-        #     if not Util.super_mkdir(dir):
-        #         raise KBRuntimeError(f"Couldn't create directory {dir}: $!")
-        #
-        #     # Symlink the file.  Check if it's a regular file because File::Find
-        #     # has no qualms about telling you you have a file called "foo/bar"
-        #     # before pointing out that it was really a directory.
-        #     if os.path.isfile(file) and not os.path.exists(f"{dir}/$_"):
-        #         if not os.symlink(file, f"{dir}/$_"):
-        #             raise KBRuntimeError(f"Couldn't create file {dir}/$_: $!")
-
-        def subprocess_run(target: Callable):
-            retval = multiprocessing.Value("i", -1)
-            subproc = multiprocessing.Process(target=target, args=(retval,))
-            subproc.start()
-            # LoggedSubprocess runs subprocess from event loop, while here it is not the case, so we allow blocking join
-            subproc.join()
-            return retval.value
-
-        def func(retval):
-            # Happens in child process
-            try:
-                for root, dirs, files in os.walk(from_path):
-                    # wanted(root, dirs, files)
-                    relative_path = os.path.relpath(root, from_path)
-                    target_dir = os.path.join(to_path, relative_path)
-
-                    os.makedirs(target_dir, exist_ok=True)
-
-                    for file in files:
-                        link_source = os.path.join(root, file)
-                        link_target = os.path.join(target_dir, file)
-                        os.symlink(link_source, link_target)
-            except Exception as e:
-                logger_util.error(f"Unable to symlink {from_path} to {to_path}: {e}")
-                retval.value = 0
-            retval.value = 1
-
-        result = subprocess_run(func)
-        return result
 
     @staticmethod
     def prune_under_directory(module: Module, target_dir: str) -> int:
