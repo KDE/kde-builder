@@ -196,6 +196,7 @@ class UtilLoggedSubprocess:
         succeeded = 0
 
         async def subprocess_run(target: Callable) -> int:
+            multiprocessing.set_start_method("fork", True)  # We use it currently, because we need to Pickle a function.
             retval = multiprocessing.Value("i", -1)
             subproc = multiprocessing.Process(target=target, args=(retval,))
             subproc.start()
@@ -247,13 +248,15 @@ class UtilLoggedSubprocess:
             exitcode = await subprocess_run(_begin)
             event.set()
 
-        # pl2py: Now we need to run the on_progress_handler and the subprocess at the same time.
+        # Now we need to run the on_progress_handler() and the subprocess at the same time.
         # so we create an async loop for this.
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         subproc_finished_event = asyncio.Event()
         task1 = loop.create_task(on_progress_handler(subproc_finished_event))
         task2 = loop.create_task(subprocess_waiter(subproc_finished_event))
         loop.run_until_complete(asyncio.gather(task1, task2))
+        loop.close()
 
         # Now we have our subprocess finished, and we can continue
 
