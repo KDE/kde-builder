@@ -289,7 +289,7 @@ class BuildSystemKDECMake(BuildSystem):
                 nonlocal num_tests
                 num_tests = match.group(1)
 
-        cmd.on({"child_output": on_child_output})  # pl2py: this is in testsuite
+        cmd.child_output_handler = on_child_output  # pl2py: this is in testsuite
 
         result = Util.good_exitcode(cmd.start())
 
@@ -498,7 +498,7 @@ class BuildSystemKDECMake(BuildSystem):
                     else:
                         reading_optional_packages_not_found = False
 
-            cmd.on({"child_output": on_child_output})
+            cmd.child_output_handler = on_child_output
 
             # just a result, not good_exitcode, to match return semantic
             result = cmd.start()

@@ -46,7 +46,7 @@ def test_logged_subprocess():
         output = line
         output = output.removesuffix("\n")
 
-    cmd.on({"child_output": func2})
+    cmd.child_output_handler = func2
 
     prog1_exit = cmd.start()
 

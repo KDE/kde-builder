@@ -21,15 +21,6 @@ else:
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 
-"""
-child_output event is called whenever a line of output is produced in the child.
-Use the ``on`` method to subscribe to the event.
-
-Any subscriptions to this event must be in place before ``start`` is called, as
-the child will not install a callback for this unless at least one subscriber
-is in place.
-"""
-
 
 class UtilLoggedSubprocess:
     """
@@ -52,12 +43,11 @@ class UtilLoggedSubprocess:
          .announcer(announ)  # optional
 
 
-        def child_outp(cmd, line):
-            # called in parent!
-            log_command_callback(line)
+        def on_child_output(line):
+            ...
 
         # optional, can have child output forwarded back to parent for processing
-        cmd.on(child_output: child_outp)
+        cmd.child_output_handler = on_child_output
 
         def func(exitcode):
             resultRef = {
@@ -88,7 +78,7 @@ class UtilLoggedSubprocess:
         self._announcer = None
         # end of attributes
 
-        self.subscribers = {}
+        self.child_output_handler: None | Callable = None
 
     def module(self, module):
         """
@@ -176,14 +166,14 @@ class UtilLoggedSubprocess:
 
         # Install callback handler to feed child output to parent if the parent has
         # a callback to filter through it.
-        needs_callback = self.has_subscribers("child_output")
+        needs_callback = bool(self.child_output_handler)
 
         if needs_callback:
             def func(data):
                 # pl2py: in perl they sent "child_data" here, we instead send just the line
                 line = data
                 if line:
-                    self.subscribers["child_output"](line)  # invoke the child_output subscriber
+                    self.child_output_handler(line)  # invoke the child_output handler
                     return
 
                 if isinstance(data, dict):
@@ -284,11 +274,3 @@ class UtilLoggedSubprocess:
         for line in data:
             if line:
                 queue.put(line)
-
-    def on(self, arg: dict):
-        key = list(arg.keys())[0]
-        val = arg[key]
-        self.subscribers[key] = val
-
-    def has_subscribers(self, arg):
-        return arg in self.subscribers.keys()

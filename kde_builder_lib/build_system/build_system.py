@@ -514,7 +514,8 @@ class BuildSystem:
         # TODO More details
         warnings = 0
 
-        def log_command_callback(input_line):
+        def on_child_output(input_line):
+            """Called in parent process."""
             if input_line is None:
                 return
 
@@ -543,11 +544,7 @@ class BuildSystem:
 
         cmd = UtilLoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(args)
 
-        def on_child_output(line):
-            # called in parent!
-            log_command_callback(line)
-
-        cmd.on({"child_output": on_child_output})
+        cmd.child_output_handler = on_child_output
 
         try:
             exitcode = cmd.start()
