@@ -168,21 +168,6 @@ class UtilLoggedSubprocess:
         # a callback to filter through it.
         needs_callback = bool(self.child_output_handler)
 
-        if needs_callback:
-            def func(data):
-                # pl2py: in perl they sent "child_data" here, we instead send just the line
-                line = data
-                if line:
-                    self.child_output_handler(line)  # invoke the child_output handler
-                    return
-
-                if isinstance(data, dict):
-                    raise Exception("unimplemented " + ", ".join(data.keys()))
-
-                raise Exception(f"unimplemented {data}")
-
-            # pl2py: we will run "on progress handler" later below, because we need it to be run simultaneously with the subprocess
-
         succeeded = 0
 
         async def subprocess_run(target: Callable) -> int:
@@ -228,7 +213,7 @@ class UtilLoggedSubprocess:
                 while not subp_finished.is_set() or not lines_queue.empty():
                     while not lines_queue.empty():
                         line = lines_queue.get()
-                        func(line)
+                        self.child_output_handler(line)
                     await asyncio.sleep(1)
             else:
                 return
