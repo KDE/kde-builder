@@ -175,9 +175,7 @@ class UtilLoggedSubprocess:
             retval = multiprocessing.Value("i", -1)
             subproc = multiprocessing.Process(target=target, args=(retval,))
             subproc.start()
-            while subproc.is_alive():
-                await asyncio.sleep(1)
-            subproc.join()
+            await asyncio.get_running_loop().run_in_executor(None, subproc.join)
             return retval.value
 
         lines_queue = multiprocessing.Queue()
