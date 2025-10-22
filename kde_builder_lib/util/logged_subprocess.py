@@ -210,7 +210,7 @@ class UtilLoggedSubprocess:
             result = Util.run_logged(module, filename, None, command, callback)
             retval.value = result
 
-        async def on_progress_handler():
+        async def subprocess_progress_handler():
             nonlocal lines_queue
             while True:
                 # multiprocessing.Queue is multi-process, but not awaitable. Need to shunt it off to
@@ -225,11 +225,11 @@ class UtilLoggedSubprocess:
                     return
                 self.child_output_handler(line)
 
-        # Now we need to run the on_progress_handler() and the subprocess at the same time.
+        # Now we need to run the subprocess_progress_handler() and the subprocess at the same time.
         # so we create an async loop for this.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        task1 = loop.create_task(on_progress_handler())
+        task1 = loop.create_task(subprocess_progress_handler())
         task2 = loop.create_task(subprocess_run(_begin))
         loop.run_until_complete(asyncio.gather(task1, task2))
         loop.close()
