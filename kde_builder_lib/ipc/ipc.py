@@ -244,8 +244,8 @@ class IPC:
         updated = self.updated
         # No update? Just mark as successful
         if not module.phases.has("update"):
-            updated[module_name] = "success"  # Needed, because forget_module() expects key to be presented.
-            return "success", "Skipped"
+            updated[module_name] = "skipped"  # Needed, because forget_module() expects key to be presented.
+            return "skipped", "Skipped"
 
         message = ""
         messages = self.messages
