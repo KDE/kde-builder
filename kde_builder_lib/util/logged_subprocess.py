@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import asyncio
+import queue
 import sys
 from typing import Callable
 
@@ -210,12 +211,17 @@ class UtilLoggedSubprocess:
         async def on_progress_handler():
             nonlocal lines_queue
             while True:
-                while not lines_queue.empty():
-                    line = lines_queue.get()
-                    if line is None: # end of data token
-                        return
-                    self.child_output_handler(line)
-                await asyncio.sleep(1)
+                # multiprocessing.Queue is multi-process, but not awaitable. Need to shunt it off to
+                # a worker thread to make it awaitable.
+                # The get() blocks process termination if the queue isn't fed (like during process
+                # termination...), so let it time out occasionally to relinquish control.
+                try:
+                    line = await asyncio.get_running_loop().run_in_executor(None, lines_queue.get, True, 0.3)
+                except queue.Empty:
+                    continue
+                if line is None: # end of data token
+                    return
+                self.child_output_handler(line)
 
         async def subprocess_waiter():
             nonlocal exitcode
