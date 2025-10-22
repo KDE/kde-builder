@@ -207,29 +207,27 @@ class UtilLoggedSubprocess:
 
         exitcode = -1
 
-        async def on_progress_handler(subp_finished: multiprocessing.Event):
-            if needs_callback:
-                nonlocal lines_queue
-                while not subp_finished.is_set() or not lines_queue.empty():
-                    while not lines_queue.empty():
-                        line = lines_queue.get()
-                        self.child_output_handler(line)
-                    await asyncio.sleep(1)
-            else:
-                return
+        async def on_progress_handler():
+            nonlocal lines_queue
+            while True:
+                while not lines_queue.empty():
+                    line = lines_queue.get()
+                    if line is None: # end of data token
+                        return
+                    self.child_output_handler(line)
+                await asyncio.sleep(1)
 
-        async def subprocess_waiter(event):
+        async def subprocess_waiter():
             nonlocal exitcode
             exitcode = await subprocess_run(_begin)
-            event.set()
+            lines_queue.put(None) # end of data token
 
         # Now we need to run the on_progress_handler() and the subprocess at the same time.
         # so we create an async loop for this.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        subproc_finished_event = asyncio.Event()
-        task1 = loop.create_task(on_progress_handler(subproc_finished_event))
-        task2 = loop.create_task(subprocess_waiter(subproc_finished_event))
+        task1 = loop.create_task(on_progress_handler())
+        task2 = loop.create_task(subprocess_waiter())
         loop.run_until_complete(asyncio.gather(task1, task2))
         loop.close()
 
