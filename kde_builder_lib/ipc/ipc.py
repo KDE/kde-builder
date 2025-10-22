@@ -77,6 +77,7 @@ class IPC:
         """Holds log output for post-build msgs."""
 
         self.updates_done: bool = False
+        """This flag is set after receiving IPC.ALL_DONE"""
 
         self.opt_update_handler: Callable | None = None
         """Callback for persistent option changes."""
@@ -218,7 +219,7 @@ class IPC:
         while not self.updates_done:
             ipc_type, buffer = self.receive_ipc_message()
             ipc_type = MsgType(ipc_type)  # pl2py: this was not in kdesrc-build
-            # We ignore the return value in favor of ->{updates_done}
+            # We ignore the return value in favor of self.updates_done
             self._update_seen_modules_from_message(ipc_type, buffer)
 
     def wait_for_module(self, module: Module) -> tuple[str, str]:
