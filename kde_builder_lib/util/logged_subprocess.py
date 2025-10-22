@@ -170,16 +170,20 @@ class UtilLoggedSubprocess:
         needs_callback = bool(self.child_output_handler)
 
         succeeded = 0
+        exitcode = -1
+        lines_queue = multiprocessing.Queue()
 
-        async def subprocess_run(target: Callable) -> int:
+        async def subprocess_run(target: Callable):
+            nonlocal exitcode
+
             multiprocessing.set_start_method("fork", True)  # We use it currently, because we need to Pickle a function.
             retval = multiprocessing.Value("i", -1)
             subproc = multiprocessing.Process(target=target, args=(retval,))
             subproc.start()
             await asyncio.get_running_loop().run_in_executor(None, subproc.join)
-            return retval.value
 
-        lines_queue = multiprocessing.Queue()
+            exitcode = retval.value
+            lines_queue.put(None) # end of data token
 
         def _begin(retval):
             # in a child process
@@ -206,8 +210,6 @@ class UtilLoggedSubprocess:
             result = Util.run_logged(module, filename, None, command, callback)
             retval.value = result
 
-        exitcode = -1
-
         async def on_progress_handler():
             nonlocal lines_queue
             while True:
@@ -223,17 +225,12 @@ class UtilLoggedSubprocess:
                     return
                 self.child_output_handler(line)
 
-        async def subprocess_waiter():
-            nonlocal exitcode
-            exitcode = await subprocess_run(_begin)
-            lines_queue.put(None) # end of data token
-
         # Now we need to run the on_progress_handler() and the subprocess at the same time.
         # so we create an async loop for this.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         task1 = loop.create_task(on_progress_handler())
-        task2 = loop.create_task(subprocess_waiter())
+        task2 = loop.create_task(subprocess_run(_begin))
         loop.run_until_complete(asyncio.gather(task1, task2))
         loop.close()
 
