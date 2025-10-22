@@ -208,19 +208,19 @@ class TaskManager:
         module.set_persistent_option("install-dir", module.installation_path())
 
         fail_count: int = module.get_persistent_option("failure-count") or 0
-        result_status: str
+        result_status_of_update: str
         message: str
-        result_status, message = ipc.wait_for_module(module)
+        result_status_of_update, message = ipc.wait_for_module(module)
         ipc.forget_module(module)
 
-        if result_status == "failed":
+        if result_status_of_update == "failed":
             logger_taskmanager.error(f"\tUnable to update r[{module}], build canceled.")
             fail_count += 1
             module.set_persistent_option("failure-count", fail_count)
             return "update"
-        elif result_status == "success":
+        elif result_status_of_update == "success":
             logger_taskmanager.warning(f"\tSource update complete for g[{module}]: {message}")
-        elif result_status == "skipped":
+        elif result_status_of_update == "skipped":
             logger_taskmanager.warning(f"\tNo changes to g[{module}] source code.")
             refresh_reason = module.build_system().needs_refreshed()
 
