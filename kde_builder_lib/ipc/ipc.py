@@ -66,6 +66,8 @@ class IPC:
 
     def __init__(self):
         self.updated: dict[str, str] = {}
+        """Holds update status ("skipped", "success", "failed") for the modules."""
+
         self.logged_module: str = "global"
 
         self.messages: dict[str, list[str]] = {}
@@ -148,6 +150,11 @@ class IPC:
         which module we'll be about to receive messages for from the other end.
 
         This function is running only in main kde-builder process (kde-builder-build).
+
+        Fills in the update status ("success", "failed", "skipped") for the module (goes to the self.updated).
+
+        Returns:
+            Any specific string message (e.g. for module update success you get number of pulled commits).
         """
         updated = self.updated
         messages = self.messages
@@ -219,9 +226,9 @@ class IPC:
         Wait for an update for a module with the given name.
 
         Returns:
-            Tuple containing whether the module was successfully updated,
-            and any specific string message (e.g. for module update success you get
-            number of pulled commits).
+            Tuple containing:
+            1 - the module update status ("skipped", "success", "failed").
+            2 - any specific string message (e.g. for module update success you get number of pulled commits).
 
         Raises:
             Exception: For an IPC failure or if the module should not be built.
@@ -229,14 +236,14 @@ class IPC:
         This function is running only in main kde-builder process (kde-builder-build).
         """
         module_name = module.name
-        updated = self.updated
 
         # Wait for the initial phase to complete, if it hasn't.
         self.wait_for_stream_start()
 
+        updated = self.updated
         # No update? Just mark as successful
         if not module.phases.has("update"):
-            updated[module_name] = "success"
+            updated[module_name] = "success"  # Needed, because forget_module() expects key to be presented.
             return "success", "Skipped"
 
         message = ""
