@@ -190,10 +190,12 @@ class UtilLoggedSubprocess:
 
             callback = None
             if needs_callback:
-                def clbk(line):
-                    if line is None:
+                def clbk(lines):
+                    if lines is None:
                         return
-                    self._send_to_parent(lines_queue, line.split("\n"))
+                    for line in lines.split("\n"):
+                        if line:
+                            lines_queue.put(line)
 
                 callback = clbk
 
@@ -240,20 +242,3 @@ class UtilLoggedSubprocess:
             module.set_error_logfile(f"{filename}.log")
 
         return exitcode
-
-    @staticmethod
-    def _send_to_parent(queue, data: list[str]):
-        """
-        Send the given data to the parent process.
-
-        Our calling code and this
-        class must share the same single channel (over the "progress" event).
-        Although we only support handling for the calling
-        code (to send line-by-line output back to the parent), to support future
-        expansion we send a dict which we can add different keys to if we need to
-        support other use cases.
-        """
-        # pl2py: In perl they sent progress event here with {"child_data": data}. We will not send progress event, instead the on_progress_handler will check for entries in queue in loop
-        for line in data:
-            if line:
-                queue.put(line)
