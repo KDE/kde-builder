@@ -103,4 +103,4 @@ _arguments \
   "(--version -v)"{--version,-v}"[Script information]" \
   --run"[Start a program built with kde-builder]" \
   \
-  "*:: :_kde-builder_projects_and_groups"
+  "*:project or group: _kde-builder_projects_and_groups"
