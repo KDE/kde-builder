@@ -31,6 +31,8 @@ if TYPE_CHECKING:
 
 logger_updater = KBLogger.getLogger("updater")
 
+def announcer_stub(_):
+    pass
 
 class Updater:
     """
@@ -405,7 +407,7 @@ class Updater:
 
             cmd.log_to("git-checkout-branch") \
                 .set_command(["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"]) \
-                .announcer(announcer_sub)
+                .announcer(announcer_stub)
 
             croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{branch} to a local branch of {new_name}"
             result = cmd.start()
@@ -416,7 +418,7 @@ class Updater:
 
             cmd.log_to("git-checkout-update") \
                 .set_command(["git", "checkout", branch_name]) \
-                .announcer(announcer_sub)
+                .announcer(announcer_stub)
 
             croak_reason = f"\tUnable to perform a git checkout to existing branch {branch_name}"
 

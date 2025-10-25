@@ -22,6 +22,32 @@ else:
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 
+# This needs to be a toplevel function in order to be picklable; being picklable is mandatory for
+# any arguments - including the "target" argument - to multiprocessing.Process()
+def subprocess_run_func(ulsSelf: UtilLoggedSubprocess, filename, command, retval):
+    # in a child process
+    if ulsSelf._chdir_to:
+        Util.p_chdir(ulsSelf._chdir_to)
+
+    if ulsSelf.disable_translations():
+        Util.disable_locale_message_translation()
+
+    callback = None
+    if ulsSelf.child_output_handler:
+        def callback_func(lines):
+            if lines is None:
+                return
+            for line in lines.split("\n"):
+                if line:
+                    lines_queue.put(line)
+        callback = callback_func
+
+    if ulsSelf._announcer:
+        ulsSelf._announcer(ulsSelf.module)
+
+    result = Util.run_logged(ulsSelf._module, filename, None, command, callback)
+    retval.value = result
+
 
 class UtilLoggedSubprocess:
     """
@@ -148,8 +174,7 @@ class UtilLoggedSubprocess:
         Exceptions may be thrown.
         """
         from ..module.module import Module
-        module = self._module
-        Util.assert_isa(module, Module)
+        Util.assert_isa(self._module, Module)
         if not (filename := self._log_to):
             raise ProgramError("Need to log somewhere")
         if not (args := self._set_command):
@@ -157,58 +182,28 @@ class UtilLoggedSubprocess:
         if not isinstance(args, list):
             raise ProgramError("Command list needs to be a listref!")
 
-        dir_to_run_from = self._chdir_to
-        announce_sub = self._announcer
         command = args
 
         if Debug().pretending():
             logger_logged_cmd.debug("\tWould have run] ('g[" + "]', 'g[".join(command) + "]')")
             return 0
 
-        # Install callback handler to feed child output to parent if the parent has
-        # a callback to filter through it.
-        needs_callback = bool(self.child_output_handler)
-
         succeeded = 0
         exitcode = -1
         lines_queue = multiprocessing.Queue()
 
-        async def subprocess_run(target: Callable):
+        async def subprocess_run():
             nonlocal exitcode
 
-            multiprocessing.set_start_method("fork", True)  # We use it currently, because we need to Pickle a function.
+            multiprocessing.set_start_method("forkserver", True)
             retval = multiprocessing.Value("i", -1)
-            subproc = multiprocessing.Process(target=target, args=(retval,))
+            subproc = multiprocessing.Process(target=subprocess_run_func,
+                                              args=(self, filename, command, retval))
             subproc.start()
             await asyncio.get_running_loop().run_in_executor(None, subproc.join)
 
             exitcode = retval.value
             lines_queue.put(None) # end of data token
-
-        def _begin(retval):
-            # in a child process
-            if dir_to_run_from:
-                Util.p_chdir(dir_to_run_from)
-
-            if self.disable_translations():
-                Util.disable_locale_message_translation()
-
-            callback = None
-            if needs_callback:
-                def clbk(lines):
-                    if lines is None:
-                        return
-                    for line in lines.split("\n"):
-                        if line:
-                            lines_queue.put(line)
-
-                callback = clbk
-
-            if announce_sub:
-                announce_sub(module)
-
-            result = Util.run_logged(module, filename, None, command, callback)
-            retval.value = result
 
         async def subprocess_progress_handler():
             nonlocal lines_queue
@@ -230,7 +225,7 @@ class UtilLoggedSubprocess:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         task1 = loop.create_task(subprocess_progress_handler())
-        task2 = loop.create_task(subprocess_run(_begin))
+        task2 = loop.create_task(subprocess_run())
         loop.run_until_complete(asyncio.gather(task1, task2))
         loop.close()
 
@@ -240,6 +235,6 @@ class UtilLoggedSubprocess:
 
         # If an exception was thrown or we didn't succeed, set error log
         if not succeeded:
-            module.set_error_logfile(f"{filename}.log")
+            self._module.set_error_logfile(f"{filename}.log")
 
         return exitcode
