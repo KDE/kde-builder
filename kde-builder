@@ -51,157 +51,154 @@ def ensure_runtime_pymodules_installed():
             f"\t{RealBinDir}/scripts/initial_setup.sh")
         exit(1)
 
-ensure_runtime_pymodules_installed()
+if __name__ == "__main__":
+    ensure_runtime_pymodules_installed()
 
-# ---
+    import setproctitle  # noqa: E402
+    setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
 
-import setproctitle  # noqa: E402
-setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
+    parser = argparse.ArgumentParser(prog="ProgramName",
+                                     description="What the program does",
+                                     epilog="Text at the bottom of help",
+                                     add_help=False)
+    parser.add_argument("--initial-setup", action="store_true")
+    parser.add_argument("--install-distro-packages", action="store_true")
+    parser.add_argument("--generate-config", action="store_true")
+    parser.add_argument("--prompt-answer",  nargs=1)
+    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append")  # allowing repeating several times
 
-parser = argparse.ArgumentParser(prog="ProgramName",
-                                 description="What the program does",
-                                 epilog="Text at the bottom of help",
-                                 add_help=False)
-parser.add_argument("--initial-setup", action="store_true")
-parser.add_argument("--install-distro-packages", action="store_true")
-parser.add_argument("--generate-config", action="store_true")
-parser.add_argument("--prompt-answer",  nargs=1)
-parser.add_argument("--debug", action="store_true")
-parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append")  # allowing repeating several times
+    args, unknown = parser.parse_known_args()
 
-args, unknown = parser.parse_known_args()
+    import yaml  # noqa: E402
 
-# ---
+    # <editor-fold desc="Applying loggers configuration">
+    with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
+        config = yaml.safe_load(f.read())
 
-import yaml  # noqa: E402
+    override_config = {}
+    if os.path.exists(os.getcwd() + "/kde-builder-logging.yaml"):
+        with open(os.getcwd() + "/kde-builder-logging.yaml", "r") as f:
+            override_config = yaml.safe_load(f.read())
+    elif os.path.exists(os.path.expanduser("~/.config/kde-builder-logging.yaml")):
+        with open(os.path.expanduser("~/.config/kde-builder-logging.yaml"), "r") as f:
+            override_config = yaml.safe_load(f.read())
 
-# <editor-fold desc="Applying loggers configuration">
-with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
-    config = yaml.safe_load(f.read())
+    # Overriding logger levels by cmdline
+    if args.log_level:
+        if override_config.get("loggers", None) is None:
+            override_config["loggers"] = {}
+        for logger_name, level_name in args.log_level:
+            if override_config["loggers"].get(logger_name, None) is None:
+                override_config["loggers"][logger_name] = {}
+            override_config["loggers"][logger_name]["level"] = level_name
 
-override_config = {}
-if os.path.exists(os.getcwd() + "/kde-builder-logging.yaml"):
-    with open(os.getcwd() + "/kde-builder-logging.yaml", "r") as f:
-        override_config = yaml.safe_load(f.read())
-elif os.path.exists(os.path.expanduser("~/.config/kde-builder-logging.yaml")):
-    with open(os.path.expanduser("~/.config/kde-builder-logging.yaml"), "r") as f:
-        override_config = yaml.safe_load(f.read())
+        # remove them, so we can pass sys.argv to Application
+        indices_to_remove = []
+        for i, arg in enumerate(sys.argv):
+            if i in indices_to_remove:
+                continue  # prevent analyzing the value of log-level argument (as users may try to do something like `kde-builder --log-level --log-level`)
 
-# Overriding logger levels by cmdline
-if args.log_level:
-    if override_config.get("loggers", None) is None:
-        override_config["loggers"] = {}
-    for logger_name, level_name in args.log_level:
-        if override_config["loggers"].get(logger_name, None) is None:
-            override_config["loggers"][logger_name] = {}
-        override_config["loggers"][logger_name]["level"] = level_name
-
-    # remove them, so we can pass sys.argv to Application
-    indices_to_remove = []
-    for i, arg in enumerate(sys.argv):
-        if i in indices_to_remove:
-            continue  # prevent analyzing the value of log-level argument (as users may try to do something like `kde-builder --log-level --log-level`)
-
-        if arg == "--log-level":
-            indices_to_remove.append(i)
-            indices_to_remove.append(i + 1)
-        elif arg.startswith("--log-level="):
-            indices_to_remove.append(i)
-    for i in reversed(indices_to_remove):
-        sys.argv.pop(i)
+            if arg == "--log-level":
+                indices_to_remove.append(i)
+                indices_to_remove.append(i + 1)
+            elif arg.startswith("--log-level="):
+                indices_to_remove.append(i)
+        for i in reversed(indices_to_remove):
+            sys.argv.pop(i)
 
 
-# Merges dict "b" into dict "a", overwriting existing entries. Mutates dict "a". Also, returns "a".
-def merge_dicts(a: dict, b: dict, path=None):
-    if path is None:
-        path = []
+    # Merges dict "b" into dict "a", overwriting existing entries. Mutates dict "a". Also, returns "a".
+    def merge_dicts(a: dict, b: dict, path=None):
+        if path is None:
+            path = []
 
-    for key in b:
-        if key in a:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                merge_dicts(a[key], b[key], path + [str(key)])
-            elif a[key] != b[key]:
+        for key in b:
+            if key in a:
+                if isinstance(a[key], dict) and isinstance(b[key], dict):
+                    merge_dicts(a[key], b[key], path + [str(key)])
+                elif a[key] != b[key]:
+                    a[key] = b[key]
+            else:
                 a[key] = b[key]
-        else:
-            a[key] = b[key]
-    return a
+        return a
 
 
-config = merge_dicts(config, override_config)
-logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
+    config = merge_dicts(config, override_config)
+    logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
 
-# Now will create our KBLogger loggers, set up their levels and handlers
-for logger_name, logger_config in config.get("loggers", {}).items():
-    level = logger_config.get("level", logging.NOTSET)  # get level from the config
-    handlers = logging.getLogger(logger_name).handlers  # get the object handlers that were set for standard logger (their formatters are already set)
+    # Now will create our KBLogger loggers, set up their levels and handlers
+    for logger_name, logger_config in config.get("loggers", {}).items():
+        level = logger_config.get("level", logging.NOTSET)  # get level from the config
+        handlers = logging.getLogger(logger_name).handlers  # get the object handlers that were set for standard logger (their formatters are already set)
 
-    kblogger = KBLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
-    for handler in handlers:
-        kblogger.addHandler(handler)
+        kblogger = KBLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
+        for handler in handlers:
+            kblogger.addHandler(handler)
 
-if args.debug:
-    # setting all loggers to logging.DEBUG level
-    for logger_name, _ in config.get("loggers", {}).items():
-        kblogger = KBLogger.getLogger(logger_name)
-        kblogger.setLevel(logging.DEBUG)
-    sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
-# </editor-fold>
+    if args.debug:
+        # setting all loggers to logging.DEBUG level
+        for logger_name, _ in config.get("loggers", {}).items():
+            kblogger = KBLogger.getLogger(logger_name)
+            kblogger.setLevel(logging.DEBUG)
+        sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
+    # </editor-fold>
 
-# ---
+    # ---
 
-setup_steps = []
-if args.initial_setup:
-    setup_steps = ["install-distro-packages", "generate-config"]
-else:
-    if args.install_distro_packages:
-        setup_steps.append("install-distro-packages")
-    if args.generate_config:
-        setup_steps.append("generate-config")
-
-if setup_steps:
-    from kde_builder_lib.first_run import FirstRun
-    from kde_builder_lib.debug import Debug
-
-    d = Debug()
-    d.set_colorful_output(True)
-    prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
-    fr = FirstRun(prompt_answer)
-    exit(fr.setup_user_system(RealBinDir, setup_steps))
-
-from kde_builder_lib.version import Version  # noqa: E402
-from kde_builder_lib.application import Application  # noqa: E402
-from kde_builder_lib.kb_exception import KBException  # noqa: E402
-
-# Script starts.
-
-app = None
-try:
-    app = Application(sys.argv[1:])  # the 0 element is script name
-    app.generate_module_list()
-    result = app.run_all_module_phases()
-    app.finish(result)
-except UnknownKdeProjectException as err:
-    logger_app = KBLogger.getLogger("application")
-    unrecognized_name = err.unknown_project_name
-    ctx = app.context
-    repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
-    active = repo_data.get("active", False)
-    msg = ""
-    if unrecognized_name.startswith("-"):
-        msg = f" r[*] Unrecognized option y[{unrecognized_name}] was used."
-    elif repo_data and not active:
-        msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
+    setup_steps = []
+    if args.initial_setup:
+        setup_steps = ["install-distro-packages", "generate-config"]
     else:
-        msg = dedent(f"""
-             r[*] y[{unrecognized_name}] is not found in KDE projects, and there is no defined third-party project with such name in the config.
-             r[*] Note that kde-builder only recognizes KDE projects that are marked in repo-metadata as "software" kind.
-             r[*] Such kinds as "website", "infrastructure", "packaging", "other" are ignored.
-            """, preserve_len=1)
+        if args.install_distro_packages:
+            setup_steps.append("install-distro-packages")
+        if args.generate_config:
+            setup_steps.append("generate-config")
 
-    logger_app.error(msg)
-    exit(99)
-except ProgramError as err:
-    print(dedent(f"""
+    if setup_steps:
+        from kde_builder_lib.first_run import FirstRun
+        from kde_builder_lib.debug import Debug
+
+        d = Debug()
+        d.set_colorful_output(True)
+        prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
+        fr = FirstRun(prompt_answer)
+        exit(fr.setup_user_system(RealBinDir, setup_steps))
+
+    from kde_builder_lib.version import Version  # noqa: E402
+    from kde_builder_lib.application import Application  # noqa: E402
+    from kde_builder_lib.kb_exception import KBException  # noqa: E402
+
+    # Script starts.
+
+    app = None
+    try:
+        app = Application(sys.argv[1:])  # the 0 element is script name
+        app.generate_module_list()
+        result = app.run_all_module_phases()
+        app.finish(result)
+    except UnknownKdeProjectException as err:
+        logger_app = KBLogger.getLogger("application")
+        unrecognized_name = err.unknown_project_name
+        ctx = app.context
+        repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
+        active = repo_data.get("active", False)
+        msg = ""
+        if unrecognized_name.startswith("-"):
+            msg = f" r[*] Unrecognized option y[{unrecognized_name}] was used."
+        elif repo_data and not active:
+            msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
+        else:
+            msg = dedent(f"""
+                r[*] y[{unrecognized_name}] is not found in KDE projects, and there is no defined third-party project with such name in the config.
+                r[*] Note that kde-builder only recognizes KDE projects that are marked in repo-metadata as "software" kind.
+                r[*] Such kinds as "website", "infrastructure", "packaging", "other" are ignored.
+                """, preserve_len=1)
+
+        logger_app.error(msg)
+        exit(99)
+    except ProgramError as err:
+        print(dedent(f"""
 
         kde-builder encountered an exceptional error condition:
         ========
@@ -212,30 +209,30 @@ except ProgramError as err:
 
         """))
 
-    print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
+        print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
-    traceback.print_exc()
-    if app:
-        app.finish(99)  # noreturn
-    exit(99)  # if app couldn't be created
+        traceback.print_exc()
+        if app:
+            app.finish(99)  # noreturn
+        exit(99)  # if app couldn't be created
 
-except KBException as err:
-    logger_app = KBLogger.getLogger("application")
-    logger_app.error(str(err))
-    if app:
-        app.finish(99)  # noreturn
-    exit(99)  # if app couldn't be created
+    except KBException as err:
+        logger_app = KBLogger.getLogger("application")
+        logger_app.error(str(err))
+        if app:
+            app.finish(99)  # noreturn
+        exit(99)  # if app couldn't be created
 
-except Exception as err:
-    # We encountered some other kind of error that didn't raise a `KBException`
-    print(dedent(f"""
+    except Exception as err:
+        # We encountered some other kind of error that didn't raise a `KBException`
+        print(dedent(f"""
         Encountered an error in the execution of the script.
         --> {err}
         Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
 
         """))
 
-    traceback.print_exc()
-    if app:
-        app.finish(99)  # noreturn
-    exit(99)  # if app couldn't be created
+        traceback.print_exc()
+        if app:
+            app.finish(99)  # noreturn
+        exit(99)  # if app couldn't be created
