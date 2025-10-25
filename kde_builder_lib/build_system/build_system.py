@@ -544,7 +544,7 @@ class BuildSystem:
 
         cmd = UtilLoggedSubprocess().module(module).log_to(filename).chdir_to(builddir).set_command(args)
 
-        cmd.child_output_handler = on_child_output
+        cmd.child_output_handler = None # H4X on_child_output
 
         try:
             exitcode = cmd.start()

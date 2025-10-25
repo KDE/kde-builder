@@ -5,6 +5,7 @@
 
 import os
 import struct
+import multiprocessing
 
 from .ipc import IPC
 from ..kb_exception import KBRuntimeError
@@ -20,19 +21,16 @@ class IPCPipe(IPC):
         IPC.__init__(self)
 
         # Define file handles.
-        self.pipe_read, self.pipe_write = os.pipe()
-        self.fh = None
+        self.queue = multiprocessing.Queue()
 
     def set_sender(self):
         """
         Call this to let the object know it will be the update process.
         """
-        os.close(self.pipe_read)
-        self.fh = os.fdopen(self.pipe_write, "wb", 0)  # Disable buffering and any possibility of IO "interpretation" of the bytes
+        pass
 
     def set_receiver(self):
-        os.close(self.pipe_write)
-        self.fh = os.fdopen(self.pipe_read, "rb", 0)  # Disable buffering and any possibility of IO "interpretation" of the bytes
+        pass
 
     @staticmethod
     # @override
@@ -49,32 +47,16 @@ class IPCPipe(IPC):
         """
         # Since streaming does not provide message boundaries, we will insert
         # ourselves, by sending a 2-byte unsigned length, then the message.
-        encoded_msg = struct.pack("H", len(msg)) + msg
-        written_length = self.fh.write(encoded_msg)
-
-        if not written_length or len(encoded_msg) != written_length:
-            raise KBRuntimeError("Unable to write full msg to pipe")
+        self.queue.put(msg)
 
         return True
-
-    def _read_number_of_bytes(self, length: int) -> bytes:
-        fh = self.fh
-        result = fh.read(length)
-        return result
 
     # @override(check_signature=False)
     def receive_message(self) -> bytes:
         # Read unsigned short with msg length, then the message
-        msg_length = self._read_number_of_bytes(2)
-        if not msg_length:
-            return b""
-
-        msg_length = struct.unpack("H", msg_length)[0]  # Decode to Perl type
-        if not msg_length:
-            raise ProgramError(f"Failed to read {msg_length} bytes as needed by earlier message!")
-
-        return self._read_number_of_bytes(msg_length)
+        msg = self.queue.get()
+        return msg
 
     # @override
     def close(self):
-        self.fh.close()
+        self.queue.close()

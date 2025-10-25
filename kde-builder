@@ -53,6 +53,9 @@ def check_pymodules_installed():
 if __name__ == '__main__':
     check_pymodules_installed()
 
+    import multiprocessing
+    multiprocessing.set_start_method("forkserver", True)
+
     import setproctitle  # noqa: E402
     setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
 

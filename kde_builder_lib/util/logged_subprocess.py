@@ -22,18 +22,21 @@ else:
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 
+#
 # This needs to be a toplevel function in order to be picklable; being picklable is mandatory for
 # any arguments - including the "target" argument - to multiprocessing.Process()
-def subprocess_run_func(ulsSelf: UtilLoggedSubprocess, filename, command, retval):
+def subprocess_run_func(chdirDir, disable_translations, forward_output,
+                        filename, announcer, module, command, retval):
+    print("\n\nsubprocess_run_func", command, chdirDir, filename, "\n\n")
     # in a child process
-    if ulsSelf._chdir_to:
-        Util.p_chdir(ulsSelf._chdir_to)
+    if chdirDir:
+        Util.p_chdir(chdirDir)
 
-    if ulsSelf.disable_translations():
+    if disable_translations:
         Util.disable_locale_message_translation()
 
     callback = None
-    if ulsSelf.child_output_handler:
+    if forward_output:
         def callback_func(lines):
             if lines is None:
                 return
@@ -42,10 +45,10 @@ def subprocess_run_func(ulsSelf: UtilLoggedSubprocess, filename, command, retval
                     lines_queue.put(line)
         callback = callback_func
 
-    if ulsSelf._announcer:
-        ulsSelf._announcer(ulsSelf.module)
+    if announcer:
+        announcer(module)
 
-    result = Util.run_logged(ulsSelf._module, filename, None, command, callback)
+    result = Util.run_logged(module, filename, None, command, callback)
     retval.value = result
 
 
@@ -195,10 +198,10 @@ class UtilLoggedSubprocess:
         async def subprocess_run():
             nonlocal exitcode
 
-            multiprocessing.set_start_method("forkserver", True)
             retval = multiprocessing.Value("i", -1)
             subproc = multiprocessing.Process(target=subprocess_run_func,
-                                              args=(self, filename, command, retval))
+                        args=(self._chdir_to, self.disable_translations(), bool(self.child_output_handler),
+                              filename, self._announcer, self._module, command, retval))
             subproc.start()
             await asyncio.get_running_loop().run_in_executor(None, subproc.join)
 

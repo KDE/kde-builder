@@ -394,8 +394,11 @@ class Updater:
         if self._warn_if_stashed_from_wrong_branch(remote_name, branch, branch_name):
             return 0
 
+        #return 1 #H4X
+
         croak_reason = None
         result = None
+        print("_update_to_remote_head: chdir_to =", module.fullpath("source"))
         cmd = UtilLoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
 
         if not branch_name:

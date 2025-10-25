@@ -289,7 +289,7 @@ class BuildSystemKDECMake(BuildSystem):
                 nonlocal num_tests
                 num_tests = match.group(1)
 
-        cmd.child_output_handler = on_child_output  # pl2py: this is in testsuite
+        cmd.child_output_handler = None # H4X on_child_output  # pl2py: this is in testsuite
 
         result = Util.good_exitcode(cmd.start())
 

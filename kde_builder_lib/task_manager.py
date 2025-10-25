@@ -88,7 +88,7 @@ class TaskManager:
         else:
             ipc = IPCNull()
 
-        ipc.set_persistent_option_handler(update_opts_sub)
+        #ipc.set_persistent_option_handler(update_opts_sub)
 
         if ipc.supports_concurrency():
             result = self._handle_async_build(ipc, ctx)
@@ -687,10 +687,10 @@ class TaskManager:
 
         # We will write to the build process and read from the update process.
 
-        send_fh = ipc_to_build.fh
+        send_fh = ipc_to_build.queue._writer
         if not send_fh:
             raise KBRuntimeError("??? missing pipe to build proc")
-        recv_fh = ipc_from_updater.fh
+        recv_fh = ipc_from_updater.queue._reader
         if not recv_fh:
             raise KBRuntimeError("??? missing pipe from monitor")
 
