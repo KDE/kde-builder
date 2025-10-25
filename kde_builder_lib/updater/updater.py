@@ -399,24 +399,14 @@ class Updater:
         if not branch_name:
             new_name = self.make_branchname(remote_name, branch)
 
-            def announcer_sub(_):
-                # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                logger_updater.debug(f"\tUpdating g[{module}] with new remote-tracking branch y[{new_name}]")
-
             cmd.log_to("git-checkout-branch") \
-                .set_command(["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"]) \
-                .announcer(announcer_sub)
+                .set_command(["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"])
 
             croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{branch} to a local branch of {new_name}"
             result = cmd.start()
         else:
-            def announcer_sub(_):
-                # pl2py: despite in perl this sub had no arguments, it is called with one argument, so we add unused argument here
-                logger_updater.debug(f"\tUpdating g[{module}] using existing branch g[{branch_name}]")
-
             cmd.log_to("git-checkout-update") \
-                .set_command(["git", "checkout", branch_name]) \
-                .announcer(announcer_sub)
+                .set_command(["git", "checkout", branch_name])
 
             croak_reason = f"\tUnable to perform a git checkout to existing branch {branch_name}"
 

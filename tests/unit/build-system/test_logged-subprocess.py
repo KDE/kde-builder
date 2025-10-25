@@ -27,15 +27,11 @@ def test_logged_subprocess():
     tmp = tempfile.mkdtemp()
     ctx.set_option("log-dir", f"{tmp}/kde-builder-test")
 
-    def func(mod):
-        print(f"Calculating stuff for {mod}")
-
     cmd = UtilLoggedSubprocess() \
         .module(m) \
         .log_to("test-suite-1") \
         .set_command(["perl", "-E", "my $x = 2 + 2; say qq($x);"]) \
-        .chdir_to(tmp) \
-        .announcer(func)
+        .chdir_to(tmp)
 
     assert isinstance(cmd, UtilLoggedSubprocess), "got the right type of cmd"
 

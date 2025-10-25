@@ -33,15 +33,11 @@ class UtilLoggedSubprocess:
     Examples:
     ::
 
-        def announ(mod):
-             logger.note(f"g[{mod}] starting update")
-
         cmd = UtilLoggedSubprocess()
          .module(module)           # required
          .log_to(filename)         # required
          .set_command(arg_ref)      # required
          .chdir_to(builddir)       # optional
-         .announcer(announ)  # optional
 
 
         def on_child_output(line):
@@ -76,7 +72,6 @@ class UtilLoggedSubprocess:
         self._chdir_to = None
         self._set_command = None
         self._disable_translations = 0
-        self._announcer = None
         # end of attributes
 
         self.child_output_handler: None | Callable = None
@@ -127,17 +122,6 @@ class UtilLoggedSubprocess:
             self._disable_translations = disable_translations
         return self
 
-    def announcer(self, announcer):
-        """
-        Set a function that will be called with a single parameter (the ``Module`` being built) in the child process just before the build starts.
-
-        Optional.
-        You can use this to make an announcement just before the command is run since
-        there's no way to guarantee the timing in a longer build.
-        """
-        self._announcer = announcer
-        return self
-
     def start(self) -> int:
         """
         Begins the execution, if possible.
@@ -158,7 +142,6 @@ class UtilLoggedSubprocess:
             raise ProgramError("Command list needs to be a listref!")
 
         dir_to_run_from = self._chdir_to
-        announce_sub = self._announcer
         command = args
 
         if Debug().pretending():
@@ -203,9 +186,6 @@ class UtilLoggedSubprocess:
                             lines_queue.put(line)
 
                 callback = clbk
-
-            if announce_sub:
-                announce_sub(module)
 
             result = Util.run_logged(module, filename, None, command, callback)
             retval.value = result
