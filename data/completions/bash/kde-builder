@@ -1,0 +1,346 @@
+# SPDX-FileCopyrightText: 2025 Ghanshyam Gupta <gk7778999@gmail.com>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# Bash completion for kde-builder
+# See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html for description of options.
+
+# Helper function: Project and group completion with caching
+_kde_builder_projects_and_groups() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/bash"
+    local cache_file="$cache_dir/kde_builder_projects_and_groups"
+    local cache_timeout=604800 # 1 week in seconds
+
+    # Create cache directory if it doesn't exist
+    mkdir -p "$cache_dir" 2>/dev/null
+
+    local all_completions
+
+    # Check if cache exists and is fresh
+    if [[ -f "$cache_file" ]]; then
+        local cache_age
+        if [[ -n "$(command -v stat)" ]]; then
+            # Try GNU stat first, then BSD stat
+            cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || stat -f %m "$cache_file" 2>/dev/null || echo 0)))
+        else
+            cache_age=$cache_timeout # Force refresh if stat not available
+        fi
+
+        if [[ $cache_age -lt $cache_timeout ]]; then
+            # Use cached data
+            all_completions=$(cat "$cache_file")
+        fi
+    fi
+
+    # If cache is empty or stale, regenerate
+    if [[ -z "$all_completions" ]]; then
+        # The output of `kde-builder -M --query group` is in the format:
+        # extra-cmake-modules: frameworks
+        # Where "extra-cmake-modules" is project name,
+        # ": " is output separator,
+        # "frameworks" is group name, containing the project
+
+        local query_output
+        query_output=$(kde-builder -M --query group --all-kde-projects --all-config-projects --log-level application=ERROR 2>/dev/null)
+
+        if [[ -n "$query_output" ]]; then
+            # Extract projects (everything before the colon)
+            local projects
+            projects=$(echo "$query_output" | cut -d: -f1)
+
+            # Extract groups (everything after ": ")
+            local groups
+            groups=$(echo "$query_output" | sed 's/^[^:]*: //')
+
+            # Combine and remove duplicates
+            all_completions=$(echo -e "$projects\n$groups" | sort -u | tr '\n' ' ')
+
+            # Cache the results
+            echo "$all_completions" > "$cache_file" 2>/dev/null
+        fi
+    fi
+
+    COMPREPLY=($(compgen -W "$all_completions" -- "$cur"))
+}
+
+# Helper function: Installed projects completion with caching
+_kde_builder_installed_projects() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/bash"
+    local cache_file="$cache_dir/kde_builder_installed_projects"
+    local cache_timeout=300  # 5 minutes in seconds
+
+    # Create cache directory if it doesn't exist
+    mkdir -p "$cache_dir" 2>/dev/null
+
+    local installed_projects
+
+    # Check if cache exists and is fresh
+    if [[ -f "$cache_file" ]]; then
+        local cache_age
+        if [[ -n "$(command -v stat)" ]]; then
+            cache_age=$(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || stat -f %m "$cache_file" 2>/dev/null || echo 0)))
+        else
+            cache_age=$cache_timeout # Force refresh if stat not available
+        fi
+
+        if [[ $cache_age -lt $cache_timeout ]]; then
+            # Use cached data
+            installed_projects=$(cat "$cache_file")
+        fi
+    fi
+
+    # If cache is empty or stale, regenerate
+    if [[ -z "$installed_projects" ]]; then
+        # Fetch installed modules
+        installed_projects=$(kde-builder --list-installed --no-metadata 2>/dev/null | tr '\n' ' ')
+
+        # Cache the results
+        if [[ -n "$installed_projects" ]]; then
+            echo "$installed_projects" > "$cache_file" 2>/dev/null
+        fi
+    fi
+
+    COMPREPLY=($(compgen -W "$installed_projects" -- "$cur"))
+}
+
+# Helper function: Check if an option is already present
+_kde_builder_option_present() {
+    local opt="$1"
+    local i
+    for ((i=1; i < COMP_CWORD; i++)); do
+        if [[ "${COMP_WORDS[i]}" == "$opt" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Helper function: Remove an option from the list
+_kde_builder_remove_option() {
+    local opts="$1"
+    local to_remove="$2"
+    local result=""
+
+    # Convert to array and filter
+    for opt in $opts; do
+        if [[ "$opt" != "$to_remove" ]]; then
+            result="$result $opt"
+        fi
+    done
+
+    echo "$result"
+}
+
+# Helper function: Filter out mutually exclusive options
+_kde_builder_filter_options() {
+    local opts="$1"
+
+    # Define mutually exclusive pairs and groups
+    local -A exclusions=(
+        ["--async"]="--no-async"
+        ["--no-async"]="--async"
+        ["--build-when-unchanged"]="--no-build-when-unchanged --no-force-build"
+        ["--force-build"]="--no-build-when-unchanged --no-force-build"
+        ["--no-build-when-unchanged"]="--build-when-unchanged --force-build"
+        ["--no-force-build"]="--build-when-unchanged --force-build"
+        ["--color"]="--no-color --no-colorful-output"
+        ["--colorful-output"]="--no-color --no-colorful-output"
+        ["--no-color"]="--color --colorful-output"
+        ["--no-colorful-output"]="--color --colorful-output"
+        ["--include-dependencies"]="--no-include-dependencies -d"
+        ["-D"]="--no-include-dependencies -d"
+        ["--no-include-dependencies"]="--include-dependencies -D"
+        ["-d"]="--include-dependencies -D"
+        ["--no-metadata"]="--metadata-only"
+        ["-M"]="--metadata-only"
+        ["--metadata-only"]="--no-metadata -M"
+        ["--run-tests"]="--no-run-tests"
+        ["--no-run-tests"]="--run-tests"
+        ["--use-clean-install"]="--no-use-clean-install"
+        ["--no-use-clean-install"]="--use-clean-install"
+        ["--use-idle-io-priority"]="--no-use-idle-io-priority"
+        ["--no-use-idle-io-priority"]="--use-idle-io-priority"
+        ["--use-inactive-projects"]="--no-use-inactive-projects"
+        ["--no-use-inactive-projects"]="--use-inactive-projects"
+        ["--stop-on-failure"]="--no-stop-on-failure"
+        ["--no-stop-on-failure"]="--stop-on-failure"
+        ["--refresh-build"]="--reconfigure"
+        ["-r"]="--reconfigure"
+        ["--reconfigure"]="--refresh-build -r"
+        ["--check-self-updates"]="--no-check-self-updates"
+        ["--no-check-self-updates"]="--check-self-updates"
+        ["--compile-commands-export"]="--no-compile-commands-export"
+        ["--no-compile-commands-export"]="--compile-commands-export"
+        ["--compile-commands-linking"]="--no-compile-commands-linking"
+        ["--no-compile-commands-linking"]="--compile-commands-linking"
+        ["--purge-old-logs"]="--no-purge-old-logs"
+        ["--no-purge-old-logs"]="--purge-old-logs"
+        ["--install-login-session"]="--no-install-login-session"
+        ["--no-install-login-session"]="--install-login-session"
+        ["--hold-work-branches"]="--no-hold-work-branches"
+        ["--no-hold-work-branches"]="--hold-work-branches"
+        ["--disable-agent-check"]="--no-disable-agent-check"
+        ["--no-disable-agent-check"]="--disable-agent-check"
+        ["--generate-vscode-project-config"]="--no-generate-vscode-project-config"
+        ["--no-generate-vscode-project-config"]="--generate-vscode-project-config"
+        ["--generate-qtcreator-project-config"]="--no-generate-qtcreator-project-config"
+        ["--no-generate-qtcreator-project-config"]="--generate-qtcreator-project-config"
+        ["--generate-clion-project-config"]="--no-generate-clion-project-config"
+        ["--no-generate-clion-project-config"]="--generate-clion-project-config"
+    )
+
+    # Special build mode exclusions
+    if _kde_builder_option_present "--build-only"; then
+        for opt in "--no-build" "--install-only" "--src-only" "-s"; do
+            opts=$(_kde_builder_remove_option "$opts" "$opt")
+        done
+    fi
+    if _kde_builder_option_present "--no-build"; then
+        for opt in "--build-only" "--install-only"; do
+            opts=$(_kde_builder_remove_option "$opts" "$opt")
+        done
+    fi
+    if _kde_builder_option_present "--install-only"; then
+        for opt in "--build-only" "--no-build" "--no-install" "--src-only" "-s"; do
+            opts=$(_kde_builder_remove_option "$opts" "$opt")
+        done
+    fi
+    if _kde_builder_option_present "--no-install"; then
+        opts=$(_kde_builder_remove_option "$opts" "--install-only")
+    fi
+    if _kde_builder_option_present "--src-only" || _kde_builder_option_present "-s"; then
+        for opt in "--build-only" "--install-only" "--no-src" "-S"; do
+            opts=$(_kde_builder_remove_option "$opts" "$opt")
+        done
+    fi
+    if _kde_builder_option_present "--no-src" || _kde_builder_option_present "-S"; then
+        opts=$(_kde_builder_remove_option "$opts" "--src-only")
+        opts=$(_kde_builder_remove_option "$opts" "-s")
+    fi
+
+    # Apply simple pair/group exclusions
+    local opt
+    for opt in "${!exclusions[@]}"; do
+        if _kde_builder_option_present "$opt"; then
+            local to_exclude
+            for to_exclude in ${exclusions[$opt]}; do
+                opts=$(_kde_builder_remove_option "$opts" "$to_exclude")
+            done
+        fi
+    done
+
+    echo "$opts"
+}
+
+# Main completion function for kde-builder
+_kde_builder() {
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    local all_opts="
+    --all-config-projects --all-kde-projects --async --no-async --binpath --branch-group
+    --branch --build-dir --build-only --no-build --build-system-only --build-when-unchanged
+    --no-build-when-unchanged --force-build --no-force-build --check-self-updates
+    --no-check-self-updates --cmake-generator --cmake-options --cmake-toolchain --color
+    --no-color --colorful-output --no-colorful-output --compile-commands-export
+    --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking
+    --configure-flags --custom-build-command --cxxflags --debug --dependency-tree
+    --dependency-tree-fullpath --dest-dir --directory-layout --disable-agent-check
+    --no-disable-agent-check --do-not-compile --generate-clion-project-config
+    --no-generate-clion-project-config --generate-config --generate-qtcreator-project-config
+    --no-generate-qtcreator-project-config --generate-vscode-project-config
+    --no-generate-vscode-project-config --git-user --help -h --hold-work-branches
+    --no-hold-work-branches --ignore-projects -! --include-dependencies
+    --no-include-dependencies -D -d --initial-setup --install-dir --install-distro-packages
+    --install-login-session --no-install-login-session --install-login-session-only
+    --install-only --no-install --libname --libpath --list-installed --log-dir
+    --make-install-prefix --make-options --meson-options --metadata-only --nice --niceness
+    --ninja-options --no-metadata -M --no-src -S -s --num-cores-low-mem --num-cores
+    --override-build-system --persistent-data-file --dry-run --pretend -p --purge-old-logs
+    --no-purge-old-logs --qmake-options --qt-install-dir --query --rc-file --rebuild-failures
+    --reconfigure --refresh-build-first --refresh-build -r --remove-after-install --resume
+    --after --resume-after -a --from --resume-from -f --resume-refresh-build-first -R
+    --revision --run-tests --no-run-tests --self-update --set-project-option-value --show-info
+    --show-options-specifiers --source-dir --source-when-start-program --src-only
+    --stop-after --to --stop-before --until --stop-on-failure --no-stop-on-failure --tag
+    --taskset-cpu-list --uninstall --use-clean-install --no-use-clean-install
+    --use-idle-io-priority --no-use-idle-io-priority --use-inactive-projects
+    --no-use-inactive-projects --version -v --run
+    "
+
+    # Check if we're in --run mode
+    local i run_mode=0
+    for ((i=1; i < COMP_CWORD; i++)); do
+        if [[ "${COMP_WORDS[i]}" == "--run" ]]; then
+            run_mode=1
+            break
+        fi
+    done
+
+    # Handle --run subcommand
+    if [[ $run_mode -eq 1 ]]; then
+        case "${prev}" in
+            -e|--exec)
+                # Complete with available commands
+                COMPREPLY=($(compgen -c -- "$cur"))
+                return 0
+                ;;
+            -f|--fork)
+                # Complete with installed projects
+                _kde_builder_installed_projects
+                return 0
+                ;;
+        esac
+
+        if [[ ${cur} == -* ]]; then
+            # Complete with --run specific options
+            COMPREPLY=($(compgen -W "-f --fork -e --exec" -- ${cur}))
+            return 0
+        fi
+
+        # Default for --run: complete with installed projects
+        _kde_builder_installed_projects
+        return 0
+    fi
+
+    # Handle regular kde-builder options
+    case "${prev}" in
+        --rc-file)
+            COMPREPLY=($(compgen -f -- "$cur"))
+            return 0
+            ;;
+        --ignore-projects|-!|--after|--resume-after|-a|--from|--resume-from|-f|--stop-before|--until)
+            _kde_builder_projects_and_groups
+            return 0
+            ;;
+        --binpath|--branch-group|--branch|--build-dir|--cmake-generator|--cmake-options|\
+        --cmake-toolchain|--configure-flags|--custom-build-command|--cxxflags|--dest-dir|\
+        --directory-layout|--do-not-compile|--git-user|--install-dir|--libname|--libpath|\
+        --log-dir|--make-install-prefix|--make-options|--meson-options|--nice|--niceness|\
+        --ninja-options|--num-cores-low-mem|--num-cores|--override-build-system|\
+        --persistent-data-file|--qmake-options|--qt-install-dir|--query|\
+        --remove-after-install|--revision|--set-project-option-value|--source-dir|\
+        --source-when-start-program|--stop-after|--to|--tag|--taskset-cpu-list)
+            # These options require arguments, but we don't complete them
+            return 0
+            ;;
+    esac
+
+    if [[ ${cur} == -* ]]; then
+        # Filter out mutually exclusive options
+        local filtered_opts
+        filtered_opts=$(_kde_builder_filter_options "$all_opts")
+        COMPREPLY=($(compgen -W "${filtered_opts}" -- ${cur}))
+        return 0
+    fi
+
+    # Default: complete with projects and groups
+    _kde_builder_projects_and_groups
+}
+
+# Register the completion
+complete -F _kde_builder kde-builder
