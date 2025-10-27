@@ -258,9 +258,9 @@ class Util:
         return return_str
 
     @staticmethod
-    def _run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
+    def _run_logged_internal(module: Module, filename: str, args: list[str], callback_func: Callable | None) -> int:
 
-        logger_logged_cmd.info(f"_run_logged_command(): Project {module}, Command: " + " ".join(command))
+        logger_logged_cmd.info(f"_run_logged_internal(): Project {module}, Command: " + " ".join(args))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             raise ProgramError(f"Pass only base filename for {module}/{filename}")
@@ -315,7 +315,7 @@ class Util:
             # Child. Note here that we need to avoid running our exit cleanup
             # handlers in here. For that we need sys.exit.
 
-            setproctitle.setproctitle("kde-builder run_logged_command: " + " ".join(command))
+            setproctitle.setproctitle("kde-builder run_logged_internal: " + " ".join(args))
 
             # Apply altered environment variables.
             module.commit_environment_changes()
@@ -356,7 +356,7 @@ class Util:
 
             # Don't leave empty output files, give an indication of the particular
             # command run.
-            print("# kde-builder running: '" + "' '".join(command) + "'")
+            print("# kde-builder running: '" + "' '".join(args) + "'")
             print("# from directory: ", os.getcwd())
             if module.current_phase != "update":
                 print("# with environment: ", module.fullpath("build") + "/kde-builder.env")
@@ -365,9 +365,9 @@ class Util:
 
             # External command.
             try:
-                os.execvp(command[0], command)
+                os.execvp(args[0], args)
             except Exception as e:
-                cmd_string = " ".join(command)
+                cmd_string = " ".join(args)
                 logger_util.error(dedent(f"""
                     r[b[Unable to execute "{cmd_string}"]!
                     {e}
@@ -432,7 +432,7 @@ class Util:
         if directory:
             Util.p_chdir(directory)
 
-        exitcode = Util._run_logged_command(module, filename, callback_func, args)
+        exitcode = Util._run_logged_internal(module, filename, args, callback_func)
 
         logger_logged_cmd.debug("Return to the original working directory after running log_command().")
         Util.p_chdir(orig_wd)
