@@ -99,7 +99,7 @@ output.
 
 ## Logs and build output
 
-All build commands are logged to a file (see `log_command` in `Util`).
+All build commands are logged to a file (see `run_logged()` in `Util`).
 This is both to declutter the terminal output and to enable troubleshooting
 after a build failure.
 
@@ -112,7 +112,7 @@ log directory for that project, which points to the specific build phase output
 file where the build was determined to have failed.
 
 Sometimes there is no log though (e.g. an internal kde-builder failure outside
-of log_command)!
+of run_logged())!
 
 Some users prefer to have TTY output. For now the --debug cmdline option is
 useful for that, but --debug has a significant amount of other changes as well.

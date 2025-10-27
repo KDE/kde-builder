@@ -44,7 +44,6 @@ def test_cmake_prefix(monkeypatch):
     assert len(module_list) == 6, "Right number of modules"
     assert isinstance(module_list[0].build_system, BuildSystemKDECMake)
 
-    # This requires log_command to be overridden above
     result = module_list[0].setup_build_system()
     assert set_command_called == 1, "Overridden set_command was called"
     assert result, "Setup build system for auto-set prefix path"

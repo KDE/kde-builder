@@ -297,7 +297,7 @@ class BuildSystem:
 
             result = Util.prune_under_directory(module, builddir)
 
-            # This variant of log_command runs the sub prune_under_directory($builddir)
+            # This variant of run_logged() runs the function prune_under_directory(builddir)
             # in a forked child, so that we can log its output.
             if not result:
                 logger_buildsystem.error(" r[b[*]\tFailed to clean build directory. Verify the permissions are correct.")
@@ -436,10 +436,6 @@ class BuildSystem:
     def _run_build_command(self, message: str, filename: str, args: list[str]) -> dict:
         """
         Run make and process the build process output in order to provide completion updates.
-
-        This procedure takes the same arguments as
-        log_command() (described here as well), except that the callback argument
-        is not used.
 
         Args:
             message: The message to display to the user while the build happens.

@@ -1182,7 +1182,7 @@ class Application:
                     logfile = module.get_option("#error-log-file")
 
                     # async updates may cause us not to have an error log file stored. There is only
-                    # one place it should be though, take advantage of side-effect of log_command() to find it.
+                    # one place it should be though, take advantage of side-effect of run_logged() to find it.
                     if not logfile:
                         error_log = module.get_log_dir() + "/error.log"
                         if os.path.exists(error_log):

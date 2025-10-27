@@ -944,7 +944,7 @@ class Module(OptionsBase):
 
     def reset_environment(self) -> None:
         """
-        Clear the list of environment variables to set for log_command runs.
+        Clear the list of environment variables to set for run_logged() runs.
         """
         self.env = {}
 

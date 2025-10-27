@@ -6,8 +6,6 @@
 import os
 import sys
 
-# Now we can load `Application`, which will load a bunch more modules all
-# using log_command and run_logged_p from `Util`
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.updater.updater import Updater

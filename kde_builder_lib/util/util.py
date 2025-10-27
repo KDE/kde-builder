@@ -259,11 +259,6 @@ class Util:
 
     @staticmethod
     def run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
-        """
-        Run logged command.
-
-        Common code for log_command and UtilLoggedSubprocess.
-        """
         logger_logged_cmd.info(f"run_logged_command(): Project {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
@@ -304,7 +299,7 @@ class Util:
             try:
                 os.close(pipe_read)
             except OSError as e:
-                raise ProgramError(f"syscall failed waiting on log_command to finish: {e}")
+                raise ProgramError(f"syscall failed waiting on run_logged() to finish: {e}")
 
             # Append the line with exit code to the log file that child process created
             with open(logpath, "a") as f:
@@ -391,45 +386,6 @@ class Util:
         return exitcode == 0
 
     @staticmethod
-    def log_command(module: Module, filename: str, args: list[str], callback_func: Callable | None = None) -> int:
-        """
-        Run a command, optionally filtering on the output of the child command.
-
-        Use like:
-
-            exitcode = log_command(module, "build-output", ["make", "-j4"])
-
-        Args:
-            module: Module.
-            filename: Base name for log file.
-            args: List with the command and arguments.
-            callback_func: Optional. A function to which each line of child output will be passed.
-
-        Note on callback_func: The child output passed to this function
-        is not supposed to be printed to the screen by the function. Normally
-        the output is only logged. However, this is useful for e.g. munging out the
-        progress of the build.
-
-        #  "no_translate": any true value will cause a flag to be set to request
-        #  the executed child process to not translate (for locale purposes) its
-        #  output, so that it can be screen-scraped.
-
-        The return value is the shell return code, so 0 is success, and non-zero is
-        failure.
-
-        `NOTE`: This function has a special feature. If the command passed into the
-        argument reference is "kde-builder", then log_command will, when it forks,
-        execute the function named by the second parameter rather than executing a
-        child process. The function should include the full python module name as well
-        (otherwise the class containing log_command's implementation is used). The
-        remaining arguments in the list are passed to the function that is called.
-        """
-        if Debug().pretending():
-            logger_logged_cmd.debug("\tWould have run g['" + "' '".join(args) + "'")
-            return 0
-        return Util.run_logged_command(module, filename, callback_func, args)
-
-    @staticmethod
     def run_logged(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
         """
         Run the command, and log it.
@@ -440,14 +396,16 @@ class Util:
             result = run_logged(module, "build", builddir, ["make", "-j8"])
 
         Args:
-            module: A Module object.
+            module: The Module object for which the command in args does something
             filename: A filename to use for log.
-            directory: Allows you to set the working directory to use. If it is None, then the directory is not changed.
-            args: The command itself.
+            directory: The working directory to run in. If it is None, the directory is not changed.
+            args: The command to run - args[0] is the executable, the rest - its arguments.
             callback_func: Optional. A function that will be passed to run_logged_command().
+                           Useful for e.g. munging out the progress of the build.
 
         Returns:
-             Exit status of the command.
+            Exit status of the command. This is a shell return code, so 0 is success,
+            and non-zero is failure.
         """
         if not directory:
             directory = ""
@@ -464,8 +422,10 @@ class Util:
         orig_wd = os.getcwd()
         if directory:
             Util.p_chdir(directory)
-        exitcode = Util.log_command(module, filename, args, callback_func)
-        logger_logged_cmd.debug("Return to the original working directory after running log_command().")
+
+        exitcode = Util.run_logged_command(module, filename, callback_func, args)
+
+        logger_logged_cmd.debug("Return to the original working directory after running run_logged().")
         Util.p_chdir(orig_wd)
 
         logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename + ".log")}\n""")

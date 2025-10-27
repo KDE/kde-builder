@@ -414,7 +414,7 @@ class BuildSystemKDECMake(BuildSystem):
         CMake is not actually run if pretend mode is enabled.
 
         Returns:
-            The shell return value as returned by log_command(). i.e.
+            The shell return value as returned by run_logged(). i.e.
             0 for success, non-zero for failure.
         """
         module = self.module
