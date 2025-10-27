@@ -258,13 +258,9 @@ class Util:
         return return_str
 
     @staticmethod
-    def run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
-        """
-        Run logged command.
+    def _run_logged_command(module: Module, filename: str, callback_func: Callable | None, command: list[str]) -> int:
 
-        Common code for log_command and UtilLoggedSubprocess.
-        """
-        logger_logged_cmd.info(f"run_logged_command(): Project {module}, Command: " + " ".join(command))
+        logger_logged_cmd.info(f"_run_logged_command(): Project {module}, Command: " + " ".join(command))
 
         if re.match(r"\.log$", filename) or re.match(r"/", filename):
             raise ProgramError(f"Pass only base filename for {module}/{filename}")
@@ -408,7 +404,7 @@ class Util:
             filename: A filename to use for log.
             directory: The working directory to run in. If it is None, the directory is not changed.
             args: The command to run - args[0] is the executable, the rest its arguments.
-            callback_func: Optional. A function that will be passed to run_logged_command().
+            callback_func: Optional. Will be invoked for every nonempty line of stdout from the command.
                            Useful for e.g. munging out the progress of the build.
 
         Returns:
@@ -436,7 +432,7 @@ class Util:
         if directory:
             Util.p_chdir(directory)
 
-        exitcode = Util.run_logged_command(module, filename, callback_func, args)
+        exitcode = Util._run_logged_command(module, filename, callback_func, args)
 
         logger_logged_cmd.debug("Return to the original working directory after running log_command().")
         Util.p_chdir(orig_wd)
