@@ -28,13 +28,6 @@ Arch Linux:
 yay -S kde-builder-git
 ```
 
-openSUSE Tumbleweed:
-
-```
-sudo zypper addrepo https://download.opensuse.org/repositories/home:/enmo/openSUSE_Tumbleweed/home:enmo.repo
-sudo zypper install kde-builder
-```
-
 (using-system-environment)=
 ## Using Python packages from your operating system
 
