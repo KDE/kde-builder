@@ -19,8 +19,8 @@ from kde_builder_lib.util.textwrap_mod import dedent
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 
-# <editor-fold desc="Check missing python modules">
-def find_missing_modules() -> list[str]:
+# Ensure that required Python modules are available so that the user isn't surprised later with an exception
+def ensure_runtime_pymodules_installed():
     required_modules = [
         "yaml",
         "setproctitle",
@@ -29,7 +29,6 @@ def find_missing_modules() -> list[str]:
 
     def validate_mod(mod_name):
         import importlib
-
         try:
             importlib.import_module(mod_name)
             return True
@@ -41,23 +40,18 @@ def find_missing_modules() -> list[str]:
             continue
         missing_modules.append(needed_module)
 
-    return missing_modules
-
-
-# Ensure that required Python modules are available so that the user isn't surprised later with an exception
-missing_module_descriptions = find_missing_modules()
-if missing_module_descriptions:
-    print(dedent("""
-        Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:
-        """))
-    for missing_module_desc in missing_module_descriptions:
+    if missing_modules:
+        print(dedent("""
+            Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:
+            """))
         print("\t" + missing_module_desc)
 
-    print("\nKDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org\n"
-          "Ensure you have successfully executed this script:\n"
-          f"\t{RealBinDir}/scripts/initial_setup.sh")
-    exit(1)
-# </editor-fold>
+        print("\nKDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org\n"
+            "Ensure you have successfully executed this script:\n"
+            f"\t{RealBinDir}/scripts/initial_setup.sh")
+        exit(1)
+
+ensure_runtime_pymodules_installed()
 
 # ---
 
