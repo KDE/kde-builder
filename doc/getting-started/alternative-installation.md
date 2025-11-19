@@ -11,22 +11,12 @@ If python is not installed, do it now (assuming you want to use Python 3.11):
 * openSUSE Tumbleweed: `sudo zypper install python311`
 * Debian/Ubuntu: `sudo apt install python3`
 
-There are three ways of installation. Choose the one that fits you most.
+There are several ways of installation. Choose the one that fits you most.
 
 | Installation way                                                                                                | Notes                                                           |
 |-----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
-| [Using the kde-builder package available for your operating system](#using-distribution-package)                | The easiest way, but may be unavailable for some distributions. |
 | [Manual git checkout of kde-builder, use Python packages from your operating system](#using-system-environment) | Requires that all python dependencies be provided by distro.    |
 | [Manual git checkout of kde-builder, use a Python virtual environment](#using-virtual-environment)              | The most reliable way, but a bit more complicated to set up.    |
-
-(using-distribution-package)=
-## Using the kde-builder package available for your operating system
-
-Arch Linux:
-
-```
-yay -S kde-builder-git
-```
 
 (using-system-environment)=
 ## Using Python packages from your operating system
