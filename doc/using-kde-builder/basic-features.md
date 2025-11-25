@@ -94,7 +94,7 @@ to other programs. In other words, having a higher
 niceness gives kde-builder a lower priority. So to
 give kde-builder a higher priority, reduce the
 niceness (and vice versa). The niceness can go from 0 (not nice at all, highest
-priority) to 20 (super nice, lowest priority).
+priority) to 19 (super nice, lowest priority).
 
 You can also temporarily change the priority for kde-builder by using
 the [--nice](#cmdline-nice) [command line option](../cmdline/cmdline-usage). The value
@@ -104,7 +104,7 @@ to the option is used exactly the same as for
 ```{note}
 It is possible for some programs run by the super user to have a
 negative nice value, with a correspondingly even higher priority for
-such programs. Setting a negative (or even 0) [niceness](#conf-niceness)
+such programs. Setting a negative [niceness](#conf-niceness)
 for kde-builder is not a great idea, as it will not help run time
 significantly, but will make your computer seem very sluggish should you
 still need to use it.

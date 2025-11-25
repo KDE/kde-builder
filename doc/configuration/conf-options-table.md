@@ -171,7 +171,7 @@ Related command-line option: --libpath \<path\>
 
 Type: Integer, Default value: 10
 
-Set this option to a number between 20 and 0. The higher the number,
+Set this option to an integer number between 0 and 19. The higher the number,
 the lower a priority kde-builder will set for itself, i.e. the higher
 the number, the "nicer" the program is.
 

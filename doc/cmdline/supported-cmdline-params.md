@@ -446,17 +446,10 @@ Enables `DEBUG` level for every logger of the kde-builder. See [](#changing-verb
 
 (cmdline-nice)=
 [`--nice`](cmdline-nice) (or `--niceness`) \<value\>  
-This value adjusts the computer CPU priority requested by kde-builder,
-and should be in the range of 0-20. 0 is highest priority (because it is
-the least "nice"), 20 is the lowest priority. This option defaults to 10.  
-
-Changes the CPU priority given to `kde-builder` (and all processes used
-by `kde-builder` e.g. `make`(1)). Value should be an integer number
-between -20 and 19. Positive values are "nicer" to the rest of the
-system (i.e. lower priority).
-
-Note that the possible priorities available on your system may be
-different from listed here, see `nice`(2) for more information.
+Changes the CPU priority given to `kde-builder` (and all subprocesses used
+by `kde-builder`, e.g. `make`). Value should be an integer number
+between 0 and 19. 0 is highest priority (because it is the least "nice"),
+19 is the lowest priority. This option defaults to 10.
 
 (cmdline-use-idle-io-priority)=
 [`--use-idle-io-priority`](cmdline-use-idle-io-priority), `--no-use-idle-io-priority`  

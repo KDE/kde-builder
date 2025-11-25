@@ -267,7 +267,7 @@ class BuildContext(Module):
         self.ignore_list.extend(moduleslist)
 
     def setup_operating_environment(self) -> None:
-        # Set the process priority
+        # Set the CPU priority
         os.nice(int(self.get_option("niceness")))
 
         # Set the IO priority.
