@@ -113,7 +113,7 @@ class BuildContext(Module):
             "build-when-unchanged": True,
             "colorful-output": True,
             "ignore-projects": "",
-            "niceness": "10",  # Needs to be a string, not int
+            "niceness": 10,
             "pretend": "",
             "refresh-build": "",
         }

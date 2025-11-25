@@ -114,13 +114,13 @@ To run kde-builder with a niceness of 15 (a lower priority than
 normal):
 
 ```bash
-kde-builder --nice=15
+kde-builder --nice 15
 ```
 Or you can edit the [configuration file](../getting-started/configure-data) to make the
 change permanent:
 
 ```yaml
-niceness: "15"
+niceness: 15
 ```
 
 ```{tip}

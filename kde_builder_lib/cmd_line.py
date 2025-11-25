@@ -202,7 +202,7 @@ class Cmdline:
                 line = line.removesuffix("=i")
             elif line.endswith(":10"):  # for --nice
                 nargs = "\"?\""
-                nargs += ", default=\"10\""
+                nargs += ", type=int, default=10"
                 line = line.removesuffix(":10")
             else:  # for example, for "-p" to not eat selector.
                 action = "\"store_true\""
@@ -348,7 +348,7 @@ class Cmdline:
         if args.metadata_only:
             found_options["metadata-only"] = True
 
-        if args.niceness != "10":
+        if args.niceness != 10:
             found_options["niceness"] = args.niceness
 
         if args.no_metadata:

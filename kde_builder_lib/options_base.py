@@ -155,7 +155,7 @@ class OptionsBase:
             return
 
     @staticmethod
-    def _substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | None, file_name: str) -> str | bool | list | dict:
+    def _substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | int | None, file_name: str) -> str | bool | list | dict | int:
         """
         Take an option value read from config, and resolve it.
 
@@ -176,6 +176,8 @@ class OptionsBase:
         if isinstance(unresolved_value, list):
             return unresolved_value
         if isinstance(unresolved_value, dict):
+            return unresolved_value
+        if isinstance(unresolved_value, int):  # The "nice" option is integer
             return unresolved_value
         if unresolved_value is None:  # in tests, there is a config that does not specify value
             return ""
