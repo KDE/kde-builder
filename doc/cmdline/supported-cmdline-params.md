@@ -456,12 +456,14 @@ between -20 and 19. Positive values are "nicer" to the rest of the
 system (i.e. lower priority).
 
 Note that the possible priorities available on your system may be
-different from listed here, see `nice`(2) for more information. Note
-also that this only changes *CPU* priority, often you want to change
-*I/O* priority on systems where that is supported. There is no
-command-line option for I/O priority adjustment, but there is a
-configuration file option: `use-idle-io-priority` (although like all
-options, there is a generic way to set this from the command line).
+different from listed here, see `nice`(2) for more information.
+
+(cmdline-use-idle-io-priority)=
+[`--use-idle-io-priority`](cmdline-use-idle-io-priority), `--no-use-idle-io-priority`  
+Changes the *I/O* priority on systems where that is supported. The priority
+is set to class "idle".
+
+The corresponding configuration file option is [use-idle-io-priority](#conf-use-idle-io-priority).
 
 (cmdline-rc-file)=
 [`--rc-file`](cmdline-rc-file) \<file\>  

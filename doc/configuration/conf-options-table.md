@@ -258,7 +258,7 @@ Use lower priority for disk and other I/O, which can significantly
 improve the responsiveness of the rest of the system at the expense of
 slightly longer running times for kde-builder.
 
-Related command-line option: --use-idle-io-priority, --no-use-idle-io-priority
+Related command-line option: [--use-idle-io-priority](cmdline-use-idle-io-priority)
 
 (conf-use-inactive-projects)=
 [`use-inactive-projects`](conf-use-inactive-projects)

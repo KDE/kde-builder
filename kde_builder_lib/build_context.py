@@ -269,11 +269,13 @@ class BuildContext(Module):
     def setup_operating_environment(self) -> None:
         # Set the process priority
         os.nice(int(self.get_option("niceness")))
-        # Set the IO priority if available.
+
+        # Set the IO priority.
         if self.get_option("use-idle-io-priority"):
-            # -p $$ is our PID, -c3 is idle priority
-            # 0 return value means success
-            if Util.safe_system(["ionice", "-c3", "-p", str(os.getpid())]) != 0:
+            # The "idle" priority is class 3.
+            ret_code = Util.safe_system(["ionice", "-c", "3", "-p", str(os.getpid())])
+
+            if ret_code != 0:  # 0 return value means success
                 logger_buildcontext.warning(" b[y[*] Unable to lower I/O priority, continuing...")
 
         # Get ready for logged output.

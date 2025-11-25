@@ -87,7 +87,7 @@ Using this technique, kde-builder will use extra CPU when it is
 available.
 
 To alter kde-builder so that it uses a higher (or lower) priority level
-permanently, then you need to adjust the [niceness](#conf-niceness)
+permanently, you need to adjust the [niceness](#conf-niceness)
 setting in the [configuration file](../getting-started/configure-data). The
 [niceness](#conf-niceness) setting controls how "nice" kde-builder is
 to other programs. In other words, having a higher
@@ -125,12 +125,12 @@ niceness: "15"
 
 ```{tip}
 The [niceness](#conf-niceness) option only affects the usage of the
-computer's processor(s). One other major affect on computer performance
+CPU. One other major affect on computer performance
 relates to how much data input or output (I/O) a program uses. In order
 to control how much I/O a program can use, modern Linux operating
-systems support a similar tool called ionice. kde-builder supports
-ionice, (but only to enable or disable it completely) using the
-[use-idle-io-priority](#conf-use-idle-io-priority) option.
+systems support a similar tool called ionice. KDE Builder can
+set the lowest I/O priority to itself (use a class called "idle" in ionice),
+using the [use-idle-io-priority](#conf-use-idle-io-priority) option.
 ```
 
 (root-installation)=
