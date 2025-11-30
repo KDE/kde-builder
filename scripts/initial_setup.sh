@@ -26,7 +26,7 @@ install_runtime_packages() {
   if [ "$ID" = "alpine" ]; then
     (set -x; sudo apk update)
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
-  elif [[ "$ID_LIKE" == *"arch"* || "$ID" = "arch" ]]; then
+  elif [[ "$ID" = "arch" || "$ID_LIKE" == *"arch"* ]]; then
     (set -x; sudo pacman -S git dbus-python python-yaml python-setproctitle --needed)
   elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ] || [ "$ID" = "neon" ]; then
     (set -x; sudo apt update)
@@ -41,7 +41,7 @@ install_runtime_packages() {
     pip install pipenv
     # For building from source code the Python module dbus-python.
     (set -x; sudo zypper install cmake gcc libdbus-c++-devel libglib-testing-devel python311-devel)
-  elif [[ "$ID_LIKE" == *"opensuse-tumbleweed"* || "$ID" = "opensuse-tumbleweed" ]]; then
+  elif [[ "$ID" = "opensuse-tumbleweed" || "$ID_LIKE" == *"opensuse-tumbleweed"* ]]; then
     (set -x; sudo zypper refresh)
     (set -x; sudo zypper install git python3-dbus-python python3-pyaml python3-setproctitle)
   elif [ "$ID" = "freebsd" ]; then
