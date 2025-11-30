@@ -23,7 +23,7 @@ trap "err_report" ERR  # When error happens, this function will run automaticall
 install_runtime_packages() {
   echo "Installing runtime packages"
 
-  if [ "$ID" = "alpine" ]; then
+  if [[ "$ID" == "alpine" || "$ID_LIKE" == *"alpine"* ]]; then
     (set -x; sudo apk update)
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
   elif [[ "$ID" = "arch" || "$ID_LIKE" == *"arch"* ]]; then
