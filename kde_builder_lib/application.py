@@ -78,10 +78,18 @@ class Application:
 
         self.metadata_module = None
         self.run_mode = "build"
-        self.modules = None
         self.module_factory = None
         """Function that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
+
+        self.ignore_list: list[str] = []
+        """
+        List of KDE project paths to ignore completely.
+
+        A list of KDE project paths to ignore, e.g. "sdk/kde-builder".
+        Partial paths are acceptable, matches are determined by comparing the path provided to the suffix of the full path
+        of modules being compared. See :meth:`KDEProjectsReader.project_path_matches_wildcard_search`.
+        """
 
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
@@ -95,6 +103,7 @@ class Application:
             exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
         self.modules: list[Module] = work_load["selected_modules"]
+        """This list of Module objects will be passed to BuildContext."""
         self.work_load = work_load
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
@@ -364,9 +373,8 @@ class Application:
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
-        # TODO: Verify this does anything still
         metadata_module = ctx.get_kde_projects_metadata_module()
-        ctx.add_to_ignore_list(metadata_module.scm().ignored_modules())
+        self.ignore_list = metadata_module.scm().ignored_modules()
 
         # Remove modules that are explicitly blanked out in their branch-group
         # i.e. those modules where they *have* a branch-group, and it's set to
@@ -452,6 +460,27 @@ class Application:
                    module.name not in ignored_selectors and
                    (module.get_module_set().name if module.get_module_set().name else "") not in ignored_selectors
                    ]
+
+        # Filtering out modules that are set to be ignored in repo-metadata
+        filtered_modules: list[Module] = []
+        for module in modules:
+            if not module:
+                traceback.print_exc()
+                raise Exception("No project to push")
+
+            path = None
+            if module in filtered_modules:
+                logger_app.debug("Skipping duplicate project " + module.name)
+            elif ((path := module.get_option("#kde-project-path") or module.name) and
+                  any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
+                # See if the name matches any given in the ignore list.
+
+                logger_app.debug(f"Skipping ignored project {module}")
+            else:
+                logger_app.debug(f"Adding {module} to project list")
+                filtered_modules.append(module)
+
+        modules = filtered_modules
 
         for module in modules:
             module.set_resolved_repository()
@@ -652,9 +681,7 @@ class Application:
         ctx = self.context
         modules = self.modules
 
-        # Add to global module list now that we've filtered everything.
-        for module in modules:
-            ctx.add_module(module)
+        ctx.modules = modules
 
         run_mode = self.run_mode
 

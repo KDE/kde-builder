@@ -53,21 +53,6 @@ class BuildContext(Module):
     "global" section in the rc-file). It is also a parent to every :class:`Module` in
     terms of the option hierarchy, serving as a fallback source for :class:`Module`'s
     `get_option()` calls for most (though not all!) options.
-
-    Examples:
-    ::
-
-         ctx = BuildContext.BuildContext()
-
-         fh = ctx.absolutize_config_file_path_and_ensure_it_exists()
-
-         ...
-
-         for modName in selectors:
-            ctx.add_module(Module.Module(ctx, modName))
-
-         ...
-         module_list = ctx.modules
     """
 
     xdg_state_home = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")  # If XDG_STATE_HOME is not set, defaults to ~/.local/state
@@ -185,7 +170,6 @@ class BuildContext(Module):
             "metadata-only": "",
         }
 
-        # newOpts
         self.modules: list[Module] = []
         """List of modules to build."""
 
@@ -218,9 +202,6 @@ class BuildContext(Module):
         self.persistent_options = {}
         """These are kept across multiple script runs."""
 
-        self.ignore_list: list[str] = []
-        """List of KDE project paths to ignore completely."""
-
         self.kde_projects_metadata = None
         """Enumeration of kde-projects."""
 
@@ -235,36 +216,6 @@ class BuildContext(Module):
         self.options = self.build_options["global"]
         boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]
         self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
-
-    def add_module(self, module: Module) -> None:
-        if not module:
-            traceback.print_exc()
-            raise Exception("No project to push")
-
-        path = None
-        if module in self.modules:
-            logger_buildcontext.debug("Skipping duplicate project " + module.name)
-        elif ((path := module.get_option("#kde-project-path") or module.name) and
-              any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
-            # See if the name matches any given in the ignore list.
-
-            logger_buildcontext.debug(f"Skipping ignored project {module}")
-        else:
-            logger_buildcontext.debug(f"Adding {module} to project list")
-            self.modules.append(module)
-
-    def add_to_ignore_list(self, moduleslist: list[str]) -> None:
-        """
-        Add a list of modules to ignore processing on completely.
-
-        Parameters should simply be a list of KDE project paths to ignore,
-        e.g. "extragear/utils/kdesrc-build". Partial paths are acceptable, matches
-        are determined by comparing the path provided to the suffix of the full path
-        of modules being compared.  See :meth:`KDEProjectsReader.project_path_matches_wildcard_search`.
-
-        Existing items on the ignore list are not removed.
-        """
-        self.ignore_list.extend(moduleslist)
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
