@@ -66,7 +66,6 @@ class KDEProjectsReader:
                 "repo": f"kde:{project}.git",
                 "name": project,
                 "active": True,
-                "kind": "software",
             }
 
             self.repositories[project] = repo_data
@@ -79,6 +78,9 @@ class KDEProjectsReader:
         if proj_data["projectpath"] == "repo-management":
             return
 
+        if proj_data["kind"] != "software":
+            return
+
         repo_path = proj_data["repopath"]
         repo_name = proj_data["identifier"]
 
@@ -89,7 +91,6 @@ class KDEProjectsReader:
             "repo": f"kde:{repo_path}.git",
             "name": repo_name,
             "active": bool(proj_data["repoactive"]),
-            "kind": proj_data["kind"],
         }
 
         self.repositories[repo_name] = cur_repository

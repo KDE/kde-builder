@@ -364,7 +364,7 @@ class Application:
                     repos = self.context.get_project_data_reader().repositories
                     active_kde_projects: list[str] = []
                     for pr in repos:
-                        if repos[pr]["active"] and repos[pr]["kind"] == "software":
+                        if repos[pr]["active"]:
                             active_kde_projects.append(repos[pr]["name"])
                     all_kde_projects: list[Module] = module_resolver.resolve_selectors_into_modules(active_kde_projects)
 
