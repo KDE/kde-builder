@@ -91,11 +91,11 @@ class Updater:
 
         return an_id
 
-    def _verify_ref_present(self, repo: str) -> bool:
+    def _verify_ref_present(self, repo: str) -> None:
         ref, commit_type = self.determine_preferred_checkout_source()
 
         if Debug().pretending():
-            return True
+            return
 
         if commit_type == "none":
             ref = "HEAD"
@@ -110,9 +110,9 @@ class Updater:
             result = -1
 
         if result == 2:  # Connection successful, but ref not found
-            return False
+            raise KBRuntimeError(f"\t{self.module.name} repository at {repo} has no ref y[{ref}]")
         if result == 0:  # Ref is present
-            return True
+            return
 
         raise KBRuntimeError(f"\tgit had error exit {result} when verifying {ref} present in repository at {repo}")
 
@@ -221,8 +221,7 @@ class Updater:
         else:
             self._verify_safe_to_clone_into_source_dir(module, srcdir)
 
-            if not self._verify_ref_present(git_repo):
-                raise KBRuntimeError(f"\t{module} build was requested, but it has no source code at the requested git branch")
+            self._verify_ref_present(git_repo)
 
             self._clone(git_repo)  # can handle pretending mode
             if Debug().pretending():
