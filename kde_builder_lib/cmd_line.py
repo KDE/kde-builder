@@ -116,7 +116,7 @@ class Cmdline:
         }
         found_options = {}
 
-        parser = argparse.ArgumentParser(add_help=False)
+        parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
 
         # Create a code as a string, containing functions to be run for flag options
         flag_handlers = ""
