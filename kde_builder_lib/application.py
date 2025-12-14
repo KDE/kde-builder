@@ -1531,7 +1531,7 @@ class Application:
         for module in ctx.modules_in_phase("build"):
             progs = module.build_system().required_programs()
 
-            required_programs = {prog: 1 for prog in progs}
+            required_programs.update({prog: 1 for prog in progs})
 
             for prog in progs:
                 if not modules_requiring_program.get(prog, None):
