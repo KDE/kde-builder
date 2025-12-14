@@ -156,7 +156,7 @@ class ModuleSetKDEProjects(ModuleSet):
         The modules returned have not been added to the build context.
         """
         module_list = []  # module names converted to `Module` objects.
-        found_modules: dict[str, int] = {}
+        found_modules: set[str] = set()
 
         # Setup default options for each module
         # Extraction of relevant kde-project modules will be handled immediately
@@ -168,7 +168,7 @@ class ModuleSetKDEProjects(ModuleSet):
 
             candidate_modules: list[Module] = self._expand_module_candidates(ctx, module_item)
             module_names: list[str] = [item.name for item in candidate_modules]
-            found_modules.update({module: 1 for module in module_names})
+            found_modules.update(module_names)
             module_list.extend(candidate_modules)
 
         if not len(module_list):
