@@ -820,8 +820,7 @@ class Updater:
             # git config output between key/val is divided by newline.
             remote_name, url = output.split("\n")
 
-            remote_name = re.sub(r"^remote\.", "", remote_name)
-            remote_name = re.sub(r"\.url$", "", remote_name)  # remove the cruft
+            remote_name = remote_name.removeprefix("remote.").removesuffix(".url")  # remove the cruft
 
             # Skip other remotes
             if not self._is_plausible_existing_remote(remote_name, url, configured_url):
