@@ -50,8 +50,7 @@ under the projects you list (in the KDE Project database).
 
 Taking the concept of a [group of projects](#project-groups) further, the
 KDE developers eventually found that synchronizing the names of the git
-branches across a large number of repositories was getting difficult,
-especially during the development push for the new KDE Frameworks for Qt 5.
+branches across a large number of repositories was getting difficult.
 
 So the concept of "branch groups" was developed, to allow users and
 developers to select one of only a few groups, and allow the kde-builder to

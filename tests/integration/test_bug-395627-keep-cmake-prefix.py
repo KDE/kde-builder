@@ -48,7 +48,7 @@ def test_cmake_prefix(monkeypatch):
 
     # We should expect an auto-set -DCMAKE_PREFIX_PATH passed to cmake somewhere
     prefix = next((x for x in saved_command if "-DCMAKE_PREFIX_PATH" in x), None)
-    assert prefix == "-DCMAKE_PREFIX_PATH=/tmp/qt5", "Prefix path set to custom Qt prefix"
+    assert prefix == "-DCMAKE_PREFIX_PATH=/tmp/qt", "Prefix path set to custom Qt prefix"
 
     result = module_list[2].setup_build_system()
     assert result, "Setup build system for manual-set prefix path"

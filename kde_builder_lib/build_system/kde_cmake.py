@@ -236,7 +236,7 @@ class BuildSystemKDECMake(BuildSystem):
 
         qt_installdir = module.get_option("qt-install-dir")
         if qt_installdir and qt_installdir != prefix:
-            # Ensure we can find Qt5's own CMake modules
+            # Ensure we can find Qt's own CMake modules
             module.prepend_environment_value("CMAKE_PREFIX_PATH", qt_installdir)
             module.prepend_environment_value("CMAKE_MODULE_PATH", f"{qt_installdir}/lib/cmake")
 

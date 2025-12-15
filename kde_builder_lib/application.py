@@ -37,7 +37,6 @@ from .module.module import Module
 from .module_resolver import ModuleResolver
 from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
-from .module_set.qt5 import ModuleSetQt5
 from .options_base import OptionsBase
 from .recursive_config_nodes_iterator import RecursiveConfigNodesIterator
 from .start_program import StartProgram
@@ -70,8 +69,6 @@ class Application:
     # We use a named remote to make some git commands work that don't accept the full path.
     KDE_PROJECT_ID = "kde-projects"
     """git-repository-base for sysadmin/repo-metadata. The value is determined as "kde:$repoPath.git", where $repoParh is read from yaml metadata file for each module."""
-    QT_PROJECT_ID = "qt-projects"
-    """git-repository-base for qt.io Git repo. The value is set as "https://invent.kde.org/qt/qt/qt5.git" when the module set transforms to qt5 super module."""
 
     def __init__(self, options: list[str]):
         self.context = BuildContext()
@@ -391,7 +388,7 @@ class Application:
 
         filtered_modules: list[Module] = []
         for module in modules:
-            if module.get_module_set().name in ["qt5-set", "qt6-set"]:
+            if module.get_module_set().name in ["qt6-set"]:
                 if module.get_option("install-dir") == "":
                     # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
                     # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
@@ -959,8 +956,6 @@ class Application:
                 # But we will do it this way for now.
                 if new_module_set.get_option("repository") == Application.KDE_PROJECT_ID:
                     new_module_set.__class__ = ModuleSetKDEProjects
-                elif new_module_set.get_option("repository") == Application.QT_PROJECT_ID:
-                    new_module_set.__class__ = ModuleSetQt5
 
                 creation_order += 1
                 new_module_set.start_for_create_id = creation_order
@@ -1550,7 +1545,7 @@ class Application:
 
             if not program_path:
                 # Don't complain about Qt if we're building it...
-                if prog == "qmake" and [x for x in build_modules if x.build_system_type() == "Qt" or x.build_system_type() == "Qt5"] or Debug().pretending():
+                if prog == "qmake" and [x for x in build_modules if x.build_system_type() == "Qt"] or Debug().pretending():
                     continue
 
                 was_error = True

@@ -25,14 +25,12 @@ from ..build_system.kde_cmake import BuildSystemKDECMake
 from ..build_system.meson import BuildSystemMeson
 from ..build_system.qmake5 import BuildSystemQMake5
 from ..build_system.qmake6 import BuildSystemQMake6
-from ..build_system.qt5 import BuildSystemQt5
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.ipc import IPC
 from ..options_base import OptionsBase
 from ..updater.kde_project import UpdaterKDEProject
 from ..updater.kde_project_metadata import UpdaterKDEProjectMetadata
-from ..updater.qt5 import UpdaterQt5
 from ..updater.updater import Updater
 from ..util.util import Util
 from ..util.textwrap_mod import textwrap
@@ -242,8 +240,6 @@ class Module(OptionsBase):
             new_type = UpdaterKDEProject(self)
         elif scm_type == "metadata":
             new_type = UpdaterKDEProjectMetadata(self)
-        elif scm_type == "qt5":
-            new_type = UpdaterQt5(self)
         else:
             new_type = None
 
@@ -280,7 +276,6 @@ class Module(OptionsBase):
             "qmake": BuildSystemQMake5,
             "qmake6": BuildSystemQMake6,
             "kde": BuildSystemKDECMake,
-            "qt5": BuildSystemQt5,
             "autotools": BuildSystemAutotools,
             "meson": BuildSystemMeson,
         }
@@ -977,9 +972,6 @@ class Module(OptionsBase):
             resolved = base_path + self.name
             logger_module.debug(f"Resolving {self.name} repository option with using git-repository-base to {resolved}")
             self.set_option("#resolved-repository", resolved)
-
-        elif selected_repo == "qt-projects":
-            self.set_option("#resolved-repository", "https://invent.kde.org/qt/qt/qt5.git")
 
         else:
             self.set_option("#resolved-repository", selected_repo)
