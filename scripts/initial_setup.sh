@@ -28,7 +28,7 @@ install_runtime_packages() {
     (set -x; sudo apk add git py3-yaml py3-setproctitle py3-pip)
   elif [[ "$ID" = "arch" || "$ID_LIKE" == *"arch"* ]]; then
     (set -x; sudo pacman -S git dbus-python python-yaml python-setproctitle --needed)
-  elif [ "$ID" = "debian" ] || [ "$ID" = "ubuntu" ] || [ "$ID" = "neon" ]; then
+  elif [[ "$ID" = "debian" || "$ID_LIKE" = *"debian"* ]]; then
     (set -x; sudo apt update)
     (set -x; sudo apt install git python3-dbus python3-yaml python3-setproctitle)
   elif [ "$ID" = "fedora" ]; then
