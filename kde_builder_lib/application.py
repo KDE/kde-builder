@@ -1441,9 +1441,13 @@ class Application:
         libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""
 
         if not os.path.isfile(install_sessions_script) or not os.path.isfile(startplasma_dev_script):
-            logger_app.debug(" b[*] Unable to find login-sessions scripts in plasma-workspace build directory.\n"
-                             "   You need to build plasma-workspace first. Cancelling login session installation.")
-            return
+            # We use "debug" log level here, because user may have their install-login-session option enabled,
+            # but working on some app, unrelated to session. And so, they may be not interested in this message.
+            logger_app.debug(" y[*] Unable to find login-sessions scripts in plasma-workspace build directory."
+                             " You need to build plasma-workspace first. Cancelling login session installation.")
+            # Despite we failed to install, we send "0" (success) here, for the same reason:
+            # user may be not interested in the result of install session, and the smile face should be smiling.
+            return 0
 
         def get_md5(path: str):
             return hashlib.md5(open(path, "rb").read()).hexdigest()
