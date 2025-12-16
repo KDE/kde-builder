@@ -1467,8 +1467,10 @@ class Application:
             if "6" in ctx.get_option("branch-group"):
                 plasmaver = "6"
 
-            check_match(pws_builddir + f"/login-sessions/plasmax11-dev{plasmaver}.desktop",
-                        f"/usr/local/share/xsessions/plasmax11-dev{plasmaver}.desktop")
+            # User may build plasma-workspace with "-DWITH_X11_SESSION=OFF", and have no plasmax11-dev6.desktop file.
+            if os.path.exists(pws_builddir + f"/login-sessions/plasmax11-dev{plasmaver}.desktop"):
+                check_match(pws_builddir + f"/login-sessions/plasmax11-dev{plasmaver}.desktop",
+                            f"/usr/local/share/xsessions/plasmax11-dev{plasmaver}.desktop")
             check_match(pws_builddir + f"/login-sessions/plasmawayland-dev{plasmaver}.desktop",
                         f"/usr/local/share/wayland-sessions/plasmawayland-dev{plasmaver}.desktop")
             check_match(pws_builddir + "/prefix.sh",
