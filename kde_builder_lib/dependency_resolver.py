@@ -696,7 +696,7 @@ class DependencyResolver:
         None is returned when the desired commit is not a branch name, otherwise
         the user-requested branch name is returned.
         """
-        scm = module.scm()
+        scm = module.scm
 
         # when the module's SCM is not git,
         # assume the default "no particular" branch wildcard

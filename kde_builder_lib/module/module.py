@@ -89,7 +89,7 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
 
         # newOptions:
-        self.scm_obj: Updater | None = None
+        self.scm: Updater | None = None
         self.build_obj: BuildSystem | None = None
         self.phases: PhaseList = phases
         self.context = ctx
@@ -221,12 +221,6 @@ class Module(OptionsBase):
         """
         return self.get_absolute_path("source-dir")
 
-    def scm(self):
-        """
-        Returns the `Updater` plugin.
-        """
-        return self.scm_obj
-
     def set_scm_type(self, scm_type: str) -> None:
         """
         Set the source control plugin (git, kde-projects) based on the given scm_type name.
@@ -243,7 +237,7 @@ class Module(OptionsBase):
         else:
             new_type = None
 
-        self.scm_obj = new_type
+        self.scm = new_type
 
     def scm_type(self) -> str:
         """
@@ -251,7 +245,7 @@ class Module(OptionsBase):
 
         Return value: "git" at this point, as appropriate.
         """
-        return self.scm().name()
+        return self.scm.name()
 
     def current_scm_revision(self) -> str:
         """
@@ -260,7 +254,7 @@ class Module(OptionsBase):
         Can be a Git-style SHA or something else entirely.
         Can case an autodetection of the scm plugin.
         """
-        return self.scm().current_revision_internal()
+        return self.scm.current_revision_internal()
 
     def build_system_from_name(self, name: str) -> BuildSystem:
         """
@@ -668,7 +662,7 @@ class Module(OptionsBase):
         self.current_phase = "update"
 
         try:
-            count = self.scm().update_internal(ipc)
+            count = self.scm.update_internal(ipc)
         except Exception as e:
             if not isinstance(e, KBException):
                 # Do not print traceback for our KBException type exceptions, as we want just a short error message in the output.

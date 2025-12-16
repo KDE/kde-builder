@@ -46,7 +46,7 @@ def test_option_reading(monkeypatch):
     # module2 is last in rc-file so should sort last
     assert module_list[3].name == "module2", "Right module name"
 
-    scm = module_list[3].scm()
+    scm = module_list[3].scm
     assert isinstance(scm, Updater)
 
     branch, sourcetype = scm.determine_preferred_checkout_source()
@@ -56,7 +56,7 @@ def test_option_reading(monkeypatch):
 
     # setmod2 is second module in set of 3 at start, should be second overall
     assert module_list[1].name == "setmod2", "Right module name from module-set"
-    branch, sourcetype = module_list[1].scm().determine_preferred_checkout_source()
+    branch, sourcetype = module_list[1].scm.determine_preferred_checkout_source()
 
     assert branch == "refs/tags/tag-setmod2", "Right tag name (options block)"
     assert sourcetype == "tag", "options block came back as tag"

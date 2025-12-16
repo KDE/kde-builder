@@ -17,7 +17,7 @@ def test_tag_names_based_on_time():
     assert len(module_list) == 3, "Right number of modules"
 
     for mod in module_list:
-        scm = mod.scm()
+        scm = mod.scm
         assert isinstance(scm, Updater)
 
         branch, sourcetype = scm.determine_preferred_checkout_source()

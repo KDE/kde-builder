@@ -558,7 +558,7 @@ class Updater:
         # entirely to allow for global/module branch selection
         # options to be selected... kind of complicated, but more DWIMy
         from .kde_project import UpdaterKDEProject
-        if not isinstance(module.scm(), UpdaterKDEProject):
+        if not isinstance(module.scm, UpdaterKDEProject):
             priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
 
         checkout_source = None

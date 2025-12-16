@@ -371,7 +371,7 @@ class Application:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
         metadata_module = ctx.get_kde_projects_metadata_module()
-        self.ignore_list = metadata_module.scm().ignored_modules()
+        self.ignore_list = metadata_module.scm.ignored_modules()
 
         # Remove modules that are explicitly blanked out in their branch-group
         # i.e. those modules where they *have* a branch-group, and it's set to
@@ -530,7 +530,7 @@ class Application:
                 orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
-                metadata_module.scm().update_internal()  # Skipped automatically in testing mode
+                metadata_module.scm.update_internal()  # Skipped automatically in testing mode
                 logger_app.warning("")  # Prints empty line to space it from next messages
                 metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
@@ -721,7 +721,7 @@ class Application:
                     return x.get_option("#kde-project-path")
             elif query_mode == "branch":
                 def query(x):
-                    return x.scm().determine_preferred_checkout_source()[0] or ""
+                    return x.scm.determine_preferred_checkout_source()[0] or ""
             elif query_mode == "group":
                 def query(x):
                     return x.module_set.name or "undefined_group"

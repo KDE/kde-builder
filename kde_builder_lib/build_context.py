@@ -791,7 +791,7 @@ class BuildContext(Module):
             if not metadata_module:
                 raise ProgramError("Tried to use branch-group, but needed data wasn't loaded!")
 
-            resolver = ModuleBranchGroupResolver(metadata_module.scm().logical_module_groups())
+            resolver = ModuleBranchGroupResolver(metadata_module.scm.logical_module_groups())
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver
