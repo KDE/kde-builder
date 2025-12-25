@@ -11,6 +11,10 @@ It does this by automating the process of downloading source code from the
 KDE source code repositories, building that source code, and installing it
 to your local system.
 
+**kde-builder** downloads and used data from special repository [**repo-metadata**](https://invent.kde.org/sysadmin/repo-metadata).  
+It contains KDE Projects database, names of branches to checkout for each project, build configs (default cmake options)
+for projects, and some other data.  
+
 **kde-builder** is a successor of a previously used tool called [**kdesrc-build**](https://invent.kde.org/sdk/kdesrc-build).  
 The predecessor project was written in Perl, and this was a significant barrier for new contributions.  
 The successor project is written in Python - a much more acknowledged language. This means that newly wanted features can be implemented with ease.  
