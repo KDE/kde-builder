@@ -35,6 +35,9 @@ global:
   # Makes the built-from-source Plasma session accessible from the SDDM login screen.
   install-login-session: %{install-login-session}
 
+  # Use power-profiles-daemon to hold performance profile.
+  hold-performance-profile: %{hold-performance-profile}
+
   # Stop the build process on the first failure. If set to false, when kde-builder
   # encounters a build failure, it will attempt to continue building other projects,
   # using libraries from the system in cases where they would otherwise be provided

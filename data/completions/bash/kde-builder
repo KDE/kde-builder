@@ -179,6 +179,8 @@ _kde_builder_filter_options() {
         ["--no-purge-old-logs"]="--purge-old-logs"
         ["--install-login-session"]="--no-install-login-session"
         ["--no-install-login-session"]="--install-login-session"
+        ["--hold-performance-profile"]="--no-hold-performance-profile"
+        ["--no-hold-performance-profile"]="--hold-performance-profile"
         ["--hold-work-branches"]="--no-hold-work-branches"
         ["--no-hold-work-branches"]="--hold-work-branches"
         ["--disable-agent-check"]="--no-disable-agent-check"
@@ -253,8 +255,8 @@ _kde_builder() {
     --no-disable-agent-check --do-not-compile --generate-clion-project-config
     --no-generate-clion-project-config --generate-config --generate-qtcreator-project-config
     --no-generate-qtcreator-project-config --generate-vscode-project-config
-    --no-generate-vscode-project-config --git-user --help -h --hold-work-branches
-    --no-hold-work-branches --ignore-projects -! --include-dependencies
+    --no-generate-vscode-project-config --git-user --help -h --hold-performance-profile --no-hold-performance-profile
+    --hold-work-branches --no-hold-work-branches --ignore-projects -! --include-dependencies
     --no-include-dependencies -D -d --initial-setup --install-dir --install-distro-packages
     --install-login-session --no-install-login-session --install-login-session-only
     --install-only --no-install --libname --libpath --list-installed --log-dir

@@ -40,6 +40,7 @@ _arguments \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   --git-user"[Specify user identity for newly cloned projects]"":argument:" \
   "(--help -h)"{--help,-h}"[Displays help on commandline options]" \
+  "(--hold-performance-profile --no-hold-performance-profile)"{--hold-performance-profile,--no-hold-performance-profile}"[Use power-profiles-daemon to hold performance profile]" \
   "(--hold-work-branches --no-hold-work-branches)"{--hold-work-branches,--no-hold-work-branches}"[Skip updating projects which are currently at work/* or mr/* branch]" \
   "(-! --ignore-projects)"{-!,--ignore-projects}"[Do not include specified projects in the update/build process]"":::_kde-builder_projects_and_groups" \
   "(--include-dependencies --no-include-dependencies -D -d)"{--include-dependencies,--no-include-dependencies,-D,-d}"[Builds/Skip KDE-based dependencies]" \

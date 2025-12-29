@@ -661,6 +661,15 @@ See the documentation on develop.kde.org on how to configure the Qt Creator manu
 
 Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config)
 
+(conf-hold-performance-profile)=
+[`hold-performance-profile`](conf-hold-performance-profile)
+
+Type: Boolean, Default value: True
+
+Controls whether kde-builder will request switching the system's power profile to performance mode while building. The mode will switch back once the build is finished.
+
+Related command-line option: [--hold-performance-profile](#cmdline-hold-performance-profile)
+
 (conf-hold-work-branches)=
 [`hold-work-branches`](cmdline-hold-work-branches)
 

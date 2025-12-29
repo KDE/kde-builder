@@ -1,5 +1,8 @@
 # Changelog
 
+2025-12-31
+: Added `--hold-performance-profile` option.
+
 2025-05-05
 : Added `--taskset-cpu-list` option.
 

@@ -749,8 +749,10 @@ class Application:
 
         result = None  # shell-style (0 == success)
 
-        # If power-profiles-daemon is in use, request switching to performance mode.
-        self._hold_performance_power_profile_if_possible()
+        if ctx.get_option("hold-performance-profile"):
+            # If power-profiles-daemon is in use, request switching to performance mode.
+            self._hold_performance_power_profile_if_possible()
+
         LogDir.cleanup_latest_log_dir(ctx)
 
         if run_mode == "build":

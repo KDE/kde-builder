@@ -87,6 +87,10 @@ compatibility with older scripts.
 This option is used to limit the number of cpu cores used in build/install process.
 For more info about value format, see corresponding config option [taskset-cpu-list](#conf-taskset-cpu-list).
 
+(cmdline-hold-performance-profile)=
+[`--hold-performance-profile`](cmdline-hold-performance-profile), `--no-hold-performance-profile`  
+Controls whether kde-builder will request switching the system's power profile to performance mode while building. The mode will switch back once the build is finished.
+
 (cmdline-hold-work-branches)=
 [`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
 This option allows you to skip updating sources for projects that have current branch which name starts with
