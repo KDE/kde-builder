@@ -56,8 +56,8 @@ class ModuleResolver:
         self.deferred_options: dict[str, dict] = {}
         """Holds options from "override" nodes for modules."""
 
-        self.defined_modules: dict[str, Module | ModuleSet] = {}
-        """Holds Modules defined in course of expanding module-sets."""
+        self.defined_modules_and_module_sets: dict[str, Module | ModuleSet] = {}
+        """Holds Modules and ModuleSets defined in course of expanding module-sets."""
 
         self.referenced_module_sets: dict[str, ModuleSet] = {}
         """Holds use-projects mentions with their source module-set."""
@@ -122,7 +122,7 @@ class ModuleResolver:
         self.input_modules_and_options = mod_opts
 
         # Build lookup dictionaries
-        self.defined_modules: dict[str, Module | ModuleSet] = {mod.name: mod for mod in mod_opts}
+        self.defined_modules_and_module_sets: dict[str, Module | ModuleSet] = {mod.name: mod for mod in mod_opts}
         self.referenced_module_sets: dict[str, ModuleSet] = self._list_referenced_module_sets(mod_opts)
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
@@ -191,7 +191,7 @@ class ModuleResolver:
 
         # Copy entries into the lookup dict, especially in case they're
         # from case 3
-        self.defined_modules.update({module_result.name: module_result for module_result in module_results})
+        self.defined_modules_and_module_sets.update({module_result.name: module_result for module_result in module_results})
 
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
         # in the lookup dict if it uniquely matches a module at all).
@@ -213,7 +213,7 @@ class ModuleResolver:
         selector: Module | ModuleSet | None = None
         results: list[Module | ModuleSet | None] = []  # Will default to the selector if unset by the end of function
 
-        # In the remainder of this code, self.defined_modules is basically handling
+        # In the remainder of this code, self.defined_modules_and_module_sets is basically handling
         # case 1, while self.referenced_module_sets handles case 2. No `Module`s
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
@@ -236,7 +236,7 @@ class ModuleResolver:
         # See resolve_selectors_into_modules for what the 3 "cases" mentioned below are.
 
         # Case 2. We make these checks first since they may update lookup dict
-        if selector_name in self.referenced_module_sets and selector_name not in self.defined_modules:
+        if selector_name in self.referenced_module_sets and selector_name not in self.defined_modules_and_module_sets:
             needed_module_set: ModuleSet = self.referenced_module_sets[selector_name]
             module_results: list[Module] = self._expand_single_module_set(needed_module_set)
 
@@ -245,7 +245,7 @@ class ModuleResolver:
                     module_result.set_option("include-dependencies", False)
 
             # Now lookup dict should be updated with expanded modules.
-            selector: Module | ModuleSet | None = self.defined_modules.get(selector_name, None)
+            selector: Module | ModuleSet | None = self.defined_modules_and_module_sets.get(selector_name, None)
 
             # If the selector doesn't match a name exactly it probably matches
             # a wildcard prefix. e.g. "kdeedu" as a selector would pull in all kdeedu/*
@@ -256,8 +256,8 @@ class ModuleResolver:
                 results.extend(module_results)
 
         # Case 1
-        elif selector_name in self.defined_modules:
-            selector: Module | ModuleSet = self.defined_modules[selector_name]
+        elif selector_name in self.defined_modules_and_module_sets:
+            selector: Module | ModuleSet = self.defined_modules_and_module_sets[selector_name]
 
             if not isinstance(selector, ModuleSet) and not including_deps:
                 # modules were manually selected on cmdline, so ignore
@@ -319,8 +319,8 @@ class ModuleResolver:
             # If the module we want could be found from within our rc-file
             # module-sets (even implicitly), use it. Otherwise, assume
             # kde-projects and evaluate now.
-            if guessed_module.name in self.defined_modules:
-                guessed_module: Module = self.defined_modules[guessed_module.name]
+            if guessed_module.name in self.defined_modules_and_module_sets:
+                guessed_module: Module = self.defined_modules_and_module_sets[guessed_module.name]
                 results.append(guessed_module)
             else:
                 mod_set = ModuleSetKDEProjects(ctx, "guessed_from_cmdline")
@@ -405,13 +405,13 @@ class ModuleResolver:
         # We may not already know about modules that can be found in kde-projects,
         # so double-check by resolving module name into a kde-projects module-set
         # selector (the + syntax) and then expanding out the module-set so generated.
-        if self.defined_modules.get(module_name) is None:
+        if self.defined_modules_and_module_sets.get(module_name) is None:
             try:
                 self._expand_single_module_set(*self._resolve_single_selector("+" + module_name))
             except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
-        ret: Module | None = self.defined_modules.get(module_name, None)
+        ret: Module | None = self.defined_modules_and_module_sets.get(module_name, None)
         return ret
 
     def expand_module_sets(self, build_module_list: list[Module | ModuleSet]) -> list[Module]:
