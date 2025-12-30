@@ -59,8 +59,8 @@ class ModuleResolver:
         self.defined_modules: dict[str, Module | ModuleSet] = {}
         """Holds Modules defined in course of expanding module-sets."""
 
-        self.referenced_modules: dict[str, ModuleSet] = {}
-        """Holds use-module mentions with their source module-set."""
+        self.referenced_module_sets: dict[str, ModuleSet] = {}
+        """Holds use-projects mentions with their source module-set."""
 
     def set_deferred_options(self, deferred_options: list[dict[str, str | dict]]) -> None:
         """
@@ -123,7 +123,7 @@ class ModuleResolver:
 
         # Build lookup dictionaries
         self.defined_modules: dict[str, Module | ModuleSet] = {mod.name: mod for mod in mod_opts}
-        self.referenced_modules: dict[str, ModuleSet] = self._list_referenced_modules(mod_opts)
+        self.referenced_module_sets: dict[str, ModuleSet] = self._list_referenced_module_sets(mod_opts)
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
         """
@@ -163,7 +163,7 @@ class ModuleResolver:
         return
 
     @staticmethod
-    def _list_referenced_modules(modules_and_modulesets: list[Module | ModuleSet]) -> dict[str, ModuleSet]:
+    def _list_referenced_module_sets(modules_and_modulesets: list[Module | ModuleSet]) -> dict[str, ModuleSet]:
         """
         Return a dict of all module names referenced in use-module declarations for any ModuleSet included within the input list.
 
@@ -180,7 +180,7 @@ class ModuleResolver:
 
     def _expand_single_module_set(self, needed_module_set: ModuleSet) -> list[Module]:
         """
-        Expand out a single module-set listed in referenced_modules and places any Modules created as a result within the lookup dict of Modules.
+        Expand out a single module-set listed in self.referenced_module_sets and places any Modules created as a result within the lookup dict of Modules.
 
         Returns the list of created Modules.
         """
@@ -195,10 +195,10 @@ class ModuleResolver:
 
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
         # in the lookup dict if it uniquely matches a module at all).
-        module_set_referents: list[str] = [key for key, value in self.referenced_modules.items() if value == needed_module_set]
+        module_set_referents: list[str] = [key for key, value in self.referenced_module_sets.items() if value == needed_module_set]
 
         for key in module_set_referents:
-            del self.referenced_modules[key]
+            del self.referenced_module_sets[key]
 
         return module_results
 
@@ -214,7 +214,7 @@ class ModuleResolver:
         results: list[Module | ModuleSet | None] = []  # Will default to the selector if unset by the end of function
 
         # In the remainder of this code, self.defined_modules is basically handling
-        # case 1, while self.referenced_modules handles case 2. No `Module`s
+        # case 1, while self.referenced_module_sets handles case 2. No `Module`s
         # are *both* case 1 and 2 at the same time, and a module-set can only
         # be case 1. We clean up and handle any case 3s (if any) at the end.
 
@@ -236,8 +236,8 @@ class ModuleResolver:
         # See resolve_selectors_into_modules for what the 3 "cases" mentioned below are.
 
         # Case 2. We make these checks first since they may update lookup dict
-        if selector_name in self.referenced_modules and selector_name not in self.defined_modules:
-            needed_module_set: ModuleSet = self.referenced_modules[selector_name]
+        if selector_name in self.referenced_module_sets and selector_name not in self.defined_modules:
+            needed_module_set: ModuleSet = self.referenced_module_sets[selector_name]
             module_results: list[Module] = self._expand_single_module_set(needed_module_set)
 
             if not including_deps:
@@ -287,7 +287,7 @@ class ModuleResolver:
         return results
 
     def _expand_all_unexpanded_module_sets(self) -> None:
-        unexpanded_module_sets: list[ModuleSet] = list(set(self.referenced_modules.values()))  # pl2py they used Util.unique_items, we do not need it
+        unexpanded_module_sets: list[ModuleSet] = list(set(self.referenced_module_sets.values()))
         unexpanded_module_sets.sort(key=lambda x: x.name)
         for unexpanded_module_set in unexpanded_module_sets:
             self._expand_single_module_set(unexpanded_module_set)
@@ -399,7 +399,7 @@ class ModuleResolver:
 
         Only a single module name is supported.
         """
-        if self.referenced_modules:
+        if self.referenced_module_sets:
             self._expand_all_unexpanded_module_sets()
 
         # We may not already know about modules that can be found in kde-projects,
