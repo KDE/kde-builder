@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from .module_set import ModuleSet
 from ..kb_exception import UnknownKdeProjectException
 from ..debug import KBLogger
-from ..kde_projects_reader import KDEProjectsReader
+from ..metadata.kde_projects_reader import KDEProjectsReader
 from ..module.module import Module
 from ..util.util import Util
 

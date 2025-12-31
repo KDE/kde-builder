@@ -20,7 +20,7 @@ from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .kb_exception import SetOptionError
-from .kde_projects_reader import KDEProjectsReader
+from .metadata.kde_projects_reader import KDEProjectsReader
 from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
 from .module_set.kde_projects import ModuleSetKDEProjects

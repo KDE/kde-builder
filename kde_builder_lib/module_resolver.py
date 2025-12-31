@@ -19,7 +19,7 @@ from .module_set.module_set import ModuleSet
 
 if TYPE_CHECKING:
     from build_context import BuildContext
-    from kde_projects_reader import KDEProjectsReader
+    from .metadata.kde_projects_reader import KDEProjectsReader
 
 
 class ModuleResolver:

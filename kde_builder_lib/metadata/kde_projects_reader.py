@@ -11,9 +11,9 @@ import re
 
 import yaml
 
-from .kb_exception import KBRuntimeError
-from .debug import Debug
-from .module.module import Module
+from ..kb_exception import KBRuntimeError
+from ..debug import Debug
+from ..module.module import Module
 
 
 class KDEProjectsReader:
