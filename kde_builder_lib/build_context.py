@@ -768,7 +768,8 @@ class BuildContext(Module):
         if not project_database_module:
             raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
-        self.projects_db = KDEProjectsReader(project_database_module)
+        repo_metadata_fullpath: str = project_database_module.fullpath("source")
+        self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
         return self.projects_db
 
     def effective_branch_group(self) -> str:

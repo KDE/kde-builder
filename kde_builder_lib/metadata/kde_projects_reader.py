@@ -13,7 +13,6 @@ import yaml
 
 from ..kb_exception import KBRuntimeError
 from ..debug import Debug
-from ..module.module import Module
 
 
 class KDEProjectsReader:
@@ -21,19 +20,19 @@ class KDEProjectsReader:
     Enumerates and provides basic metadata of KDE projects, based on the YAML metadata included in sysadmin/repo-management.
     """
 
-    def __init__(self, project_metadata_module: Module):
+    def __init__(self, repo_metadata_fullpath: str):
         """
         Construct a new KDEProjectsReader. This doesn't contradict any part of the class documentation which claims this class is a singleton.
 
         Args:
-            project_metadata_module: :class:`Module` that is the repo-metadata module.
+            repo_metadata_fullpath: string that is a path to repo-metadata.
         """
         self.repositories: dict[str, dict[str, str | bool]] = {}
         """Maps short names to repo info blocks."""
 
-        self._read_project_data(project_metadata_module)
+        self._read_project_data(repo_metadata_fullpath)
 
-    def _read_project_data(self, project_metadata_module: Module) -> None:
+    def _read_project_data(self, repo_metadata_fullpath: str) -> None:
         # The "main" method for this class. Reads in *all* KDE projects and notes
         # their details for later queries.
         # Be careful, can throw exceptions.
@@ -42,7 +41,7 @@ class KDEProjectsReader:
             self._load_mock_project_data()
             return
 
-        srcdir = project_metadata_module.fullpath("source")
+        srcdir = repo_metadata_fullpath
 
         if not os.path.isdir(srcdir):
             raise KBRuntimeError(f"No such source directory {srcdir}!")
