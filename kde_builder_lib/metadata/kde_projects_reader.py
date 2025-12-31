@@ -17,7 +17,7 @@ from ..debug import Debug
 
 class KDEProjectsReader:
     """
-    Enumerates and provides basic metadata of KDE projects, based on the YAML metadata included in sysadmin/repo-management.
+    Enumerates and provides basic metadata of KDE projects, based on the metadata.yaml included in sysadmin/repo-metadata.
     """
 
     def __init__(self, repo_metadata_fullpath: str):

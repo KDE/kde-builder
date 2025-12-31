@@ -106,7 +106,7 @@ class ModuleSetKDEProjects(ModuleSet):
             Runtime: if the git-push-protocol is unsupported.
             UnknownKdeProjectException: if an "assumed" kde-projects module was not actually one.
         """
-        all_module_results: list[dict[str, str | bool]] = ctx.get_project_data_reader().get_modules_for_project(module_search_item)
+        all_module_results: list[dict[str, str | bool]] = ctx.projects_db.get_modules_for_project(module_search_item)
 
         if not all_module_results:
             # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they

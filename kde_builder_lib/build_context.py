@@ -211,8 +211,8 @@ class BuildContext(Module):
 
         self.status_view: StatusView = StatusView()
 
-        self.projects_db = None
-        """See get_project_data_reader()."""
+        self.projects_db: KDEProjectsReader | None = None
+        """See set_projects_db()."""
 
         self.options = self.build_options["global"]
         boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]
@@ -754,23 +754,16 @@ class BuildContext(Module):
 
         return self.kde_projects_metadata
 
-    def get_project_data_reader(self) -> KDEProjectsReader:
+    def set_projects_db(self) -> None:
         """
-        Return a KDEProjectsReader module, which has already read in the database and is ready to be queried.
-
-        Note that exceptions can be thrown in the process
-        of downloading and parsing the database information, so be ready for that.
+        Set self.projects_db which is a KDEProjectsReader object.
         """
-        if self.projects_db:
-            return self.projects_db
-
         project_database_module = self.get_kde_projects_metadata_module()
         if not project_database_module:
             raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
         repo_metadata_fullpath: str = project_database_module.fullpath("source")
         self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
-        return self.projects_db
 
     def effective_branch_group(self) -> str:
         """

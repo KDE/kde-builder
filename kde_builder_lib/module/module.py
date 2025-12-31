@@ -953,7 +953,7 @@ class Module(OptionsBase):
             self.set_option("#resolved-repository", "")
 
         elif selected_repo == "kde-projects":
-            proj_db = self.context.get_project_data_reader().repositories
+            proj_db = self.context.projects_db.repositories
             if self.name in proj_db:
                 value = proj_db[self.name]["repo"]
                 self.set_option("#resolved-repository", value)

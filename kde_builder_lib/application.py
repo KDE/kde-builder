@@ -255,6 +255,9 @@ class Application:
         # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
+        # After we are sure the repo-metadata is cloned, initialize projects_db
+        ctx.set_projects_db()
+
         # The user might only want metadata to update to allow for a later --pretend run, check for that here.
         # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
         if "metadata-only" in cmdline_global_options:
@@ -358,7 +361,7 @@ class Application:
                     all_config_projects: list[Module] = module_resolver.expand_module_sets(modules_and_sets_from_userconfig)
 
                 if "all-kde-projects" in sp_sels:
-                    repos = self.context.get_project_data_reader().repositories
+                    repos = self.context.projects_db.repositories
                     active_kde_projects: list[str] = []
                     for pr in repos:
                         if repos[pr]["active"]:
@@ -380,7 +383,7 @@ class Application:
         branch_group = ctx.effective_branch_group()
 
         explicit_kdeproject_selectors: list[str] = []
-        proj_db = self.context.get_project_data_reader().repositories
+        proj_db = self.context.projects_db.repositories
         for el in cmdline_selectors:
             leaf = el.split("/")[-1]
             if leaf in proj_db:

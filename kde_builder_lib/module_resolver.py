@@ -71,7 +71,7 @@ class ModuleResolver:
         repository/use-module items). We want to handle the latter first, since
         we assume single "override" nodes should still be able to override these.
         """
-        proj_db: KDEProjectsReader = self.context.get_project_data_reader()
+        proj_db: KDEProjectsReader = self.context.projects_db
         set_indices: list[int] = []
         final_opts: dict[str, dict] = {}
 
