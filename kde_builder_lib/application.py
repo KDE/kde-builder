@@ -252,6 +252,9 @@ class Application:
         for opt_name, opt_val in cmdline_global_options.items():
             ctx.set_option(opt_name, opt_val)
 
+        # Before we clone repo-metadata, initialize metadata_module
+        ctx.set_metadata_module()
+
         # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
@@ -373,7 +376,7 @@ class Application:
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
-        metadata_module = ctx.get_kde_projects_metadata_module()
+        metadata_module = ctx.metadata_module
         self.ignore_list = metadata_module.scm.ignored_modules()
 
         # Remove modules that are explicitly blanked out in their branch-group
@@ -504,7 +507,7 @@ class Application:
         was_pretending = Debug().pretending()
 
         try:
-            metadata_module = ctx.get_kde_projects_metadata_module()
+            metadata_module = ctx.metadata_module
 
             source_dir = metadata_module.get_source_dir()
             Debug().set_pretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
@@ -569,7 +572,7 @@ class Application:
             supported_formats = yaml.safe_load(f)
         current_installation_format = supported_formats["kde-builder-format"]
 
-        metadata_module = self.context.get_kde_projects_metadata_module()
+        metadata_module = self.context.metadata_module
         metadata_dir = metadata_module.fullpath("source")
 
         try:
@@ -605,7 +608,7 @@ class Application:
         must be passed in as arguments
         """
         ctx = self.context
-        metadata_module = ctx.get_kde_projects_metadata_module()
+        metadata_module = ctx.metadata_module
 
         try:
             dependency_resolver = DependencyResolver(self.module_factory)

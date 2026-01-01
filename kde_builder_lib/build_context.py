@@ -203,8 +203,8 @@ class BuildContext(Module):
         self.persistent_options = {}
         """These are kept across multiple script runs."""
 
-        self.kde_projects_metadata = None
-        """Enumeration of kde-projects."""
+        self.metadata_module: Module | None = None
+        """A Module for repo-metadata (which has a "metadata" scm type)"""
 
         self.logical_module_resolver = None
         """For branch-group option."""
@@ -744,21 +744,17 @@ class BuildContext(Module):
 
         persistent_opts[module_name][key] = value
 
-    def get_kde_projects_metadata_module(self) -> Module:
+    def set_metadata_module(self) -> None:
         """
-        Return the :class:`Module` (which has a "metadata" scm type) that is used for kde-project metadata, so that other modules that need it can call into it if necessary.
+        Set self.metadata_module.
         """
-        # Initialize if not set
-        if not self.kde_projects_metadata:
-            self.kde_projects_metadata = ModuleSetKDEProjects.get_project_metadata_module(self)
-
-        return self.kde_projects_metadata
+        self.metadata_module = ModuleSetKDEProjects.get_project_metadata_module(self)
 
     def set_projects_db(self) -> None:
         """
         Set self.projects_db which is a KDEProjectsReader object.
         """
-        project_database_module = self.get_kde_projects_metadata_module()
+        project_database_module = self.metadata_module
         if not project_database_module:
             raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
@@ -781,7 +777,7 @@ class BuildContext(Module):
         https://community.kde.org/Infrastructure/Project_Metadata.
         """
         if not self.logical_module_resolver:
-            metadata_module = self.get_kde_projects_metadata_module()
+            metadata_module = self.metadata_module
 
             if not metadata_module:
                 raise ProgramError("Tried to use branch-group, but needed data wasn't loaded!")
