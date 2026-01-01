@@ -386,11 +386,14 @@ class Application:
         branch_group = ctx.effective_branch_group()
 
         explicit_kdeproject_selectors: list[str] = []
+        explicit_thirdparty_selectors: list[str] = []
         proj_db = self.context.projects_db.repositories
         for el in cmdline_selectors:
             leaf = el.split("/")[-1]
             if leaf in proj_db:
                 explicit_kdeproject_selectors.append(leaf)
+            else:
+                explicit_thirdparty_selectors.append(leaf)
 
         filtered_modules: list[Module] = []
         for module in modules:
@@ -464,6 +467,11 @@ class Application:
             module_set_name = module.get_module_set().name if module.get_module_set().name else ""
             if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
                 filtered_modules.append(module)
+            else:
+                if module.name in [*explicit_kdeproject_selectors, *explicit_thirdparty_selectors]:
+                    logger_app.warning(f" y[*] Project y[{module.name}] was explicitly selected in command line, but removed due to being ignored.")
+                else:
+                    logger_app.debug(f"Project y[{module.name}] was removed due to being ignored.")
         modules = filtered_modules
 
         # Filtering out modules that are set to be ignored in repo-metadata
