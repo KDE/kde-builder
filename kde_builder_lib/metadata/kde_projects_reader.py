@@ -73,10 +73,6 @@ class KDEProjectsReader:
         with open(filename, "r") as file:
             proj_data = yaml.safe_load(file)
 
-        # This is already "covered" as a special metadata module, ignore
-        if proj_data["projectpath"] == "repo-management":
-            return
-
         if proj_data["kind"] != "software":
             return
 
