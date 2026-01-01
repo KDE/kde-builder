@@ -459,10 +459,12 @@ class Application:
         modules = Application._apply_module_filters(ctx, modules)
 
         # Check for ignored modules (post-expansion)
-        modules = [module for module in modules if
-                   module.name not in ignored_selectors and
-                   (module.get_module_set().name if module.get_module_set().name else "") not in ignored_selectors
-                   ]
+        filtered_modules: list[Module] = []
+        for module in modules:
+            module_set_name = module.get_module_set().name if module.get_module_set().name else ""
+            if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
+                filtered_modules.append(module)
+        modules = filtered_modules
 
         # Filtering out modules that are set to be ignored in repo-metadata
         filtered_modules: list[Module] = []
