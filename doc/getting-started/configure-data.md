@@ -10,7 +10,7 @@ settings that you may wish to alter include:
 - [branch-group](#conf-branch-group), which can be used to choose the
   appropriate branch of development for the KDE projects as a whole.
   There are many supported build configurations, but you will likely want
-  to choose `kf6-qt6` so that KDE Builder downloads the latest code
+  to choose `latest-kf6` so that KDE Builder downloads the latest code
   based on Qt 6 and KDE Frameworks 6.
 
 ```{tip}

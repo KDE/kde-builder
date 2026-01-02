@@ -243,6 +243,7 @@ class FirstRun:
             nonlocal sample_rc
             sample_rc = sample_rc.replace(f"%{{{option_name}}}", value)
 
+        fill_placeholder("branch-group", "")
         fill_placeholder("include-dependencies", "bool_to_str")
         fill_placeholder("source-dir", "home_to_tilde")
         fill_placeholder("build-dir", "home_to_tilde")

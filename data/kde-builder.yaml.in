@@ -3,7 +3,7 @@
 
 config-version: 2
 global:
-  branch-group: kf6-qt6
+  branch-group: %{branch-group}
 
   # Finds and includes *KDE*-based dependencies into the build. This makes
   # it easier to ensure that you have all the projects needed, but the

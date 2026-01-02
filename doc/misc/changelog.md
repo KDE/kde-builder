@@ -1,5 +1,12 @@
 # Changelog
 
+2026-01-02
+: Changes to the branch-group data in repo-metadata was made. In the user config, you need to change `branch-group` as follows:
+: - "kf6-qt6" → "latest-kf6"
+: - "stable-kf6-qt6" → "stable-kf6"
+: - "kf5-qt5" → "latest-kf5"
+: - "stable-kf5-qt5" → "stable-kf5"
+
 2025-12-31
 : Added `--hold-performance-profile` option.
 

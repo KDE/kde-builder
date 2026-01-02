@@ -820,7 +820,8 @@ class Module(OptionsBase):
             return (f"{ctx_value} " + self.options.get(key, "")).strip()
 
         # Everything else overrides the global option, unless it's simply not set at all.
-        return self.options.get(key, ctx_value)
+        ret = self.options.get(key, ctx_value)
+        return ret
 
     def get_persistent_option(self, key: str) -> str | int | None:
         """

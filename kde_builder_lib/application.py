@@ -645,7 +645,7 @@ class Application:
                 srcdir = metadata_module.fullpath("source")
                 dependencies = None
 
-                dependency_file = f"{srcdir}/dependencies/dependency-data-{branch_group}"
+                dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
                 try:
                     dependencies = Util.open_or_fail(dependency_file)
                 except Exception as e:

@@ -64,7 +64,7 @@ branch-group can be used in the configuration file as follows:
 
 global:
   # Select KDE Frameworks 6 and other Qt6-based apps
-  branch-group: kf6-qt6
+  branch-group: latest-kf6
 
   # Other global options here ...
 

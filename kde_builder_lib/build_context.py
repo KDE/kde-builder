@@ -130,7 +130,7 @@ class BuildContext(Module):
         self.global_options_with_parameter = {
             "binpath": "",
             "branch": "",
-            "branch-group": "kf6-qt6",
+            "branch-group": "latest-kf6",
             "build-dir": os.getenv("HOME") + "/kde/build",
             "cmake-generator": "",
             "cmake-options": "",
@@ -778,8 +778,7 @@ class BuildContext(Module):
         Return a :class:`Module.BranchGroupResolver`.
 
         It can be used to efficiently determine a git branch to use for a given kde-projects module (when the
-        branch-group option is in use), as specified at
-        https://community.kde.org/Infrastructure/Project_Metadata.
+        branch-group option is in use).
         """
         if not self.logical_module_resolver:
             metadata_module = self.metadata_module

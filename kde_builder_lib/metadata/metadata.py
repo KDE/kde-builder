@@ -3,11 +3,10 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import json
+import yaml
 import re
 import textwrap
 
-from ..kb_exception import KBException
 from ..kb_exception import KBRuntimeError
 from ..kb_exception import ProgramError
 from ..debug import Debug
@@ -29,7 +28,7 @@ class Metadata:
         """
         Return a list of the full kde-project paths for each module to ignore.
         """
-        path = self.path_to_metadata + "/dependencies/build-script-ignore"
+        path = self.path_to_metadata + "/kde-dependencies/ignore-kde-projects"
 
         # Now that we in theory have up-to-date source code, read in the
         # ignore file and propagate that information to our context object.
@@ -64,32 +63,28 @@ class Metadata:
 
     def _logical_module_groups(self) -> dict:
         """
-        Return a dict to the logical module group data.
+        Return a dict of the branch-groups.yaml file.
 
-        JSON support should be present, and the metadata should already be downloaded (e.g. with ``update_internal``).
-        Logical module group data is contained within the kde-build-metadata, decoded from its JSON format.
-        See https://community.kde.org/Infrastructure/Project_Metadata
+        The metadata should already be downloaded.
         """
-        path = self.path_to_metadata + "/dependencies/logical-module-structure.json"
+        path = self.path_to_metadata + "/kde-dependencies/branch-groups.yaml"
 
         if Debug().is_testing():
             from io import StringIO
-            mock_lms_json = textwrap.dedent("""\
-                {
-                    "groups": {}
-                }
+            mock_lms_yaml = textwrap.dedent("""\
+                "groups": {}
                 """)
-            fh = StringIO(mock_lms_json)
+            fh = StringIO(mock_lms_yaml)
         else:
             fh = Util.open_or_fail(path)
 
         if not fh:
-            raise ProgramError("Unable to read logical-module-structure")
+            raise ProgramError("Unable to read branch-groups.yaml")
 
         try:
-            json_string = fh.read()  # slurps the whole file
-            json_dict = json.loads(json_string)
+            yaml_str = fh.read()  # slurps the whole file
+            yaml_dict = yaml.safe_load(yaml_str)
             fh.close()
-        except KBException as e:
-            raise KBRuntimeError(f"Unable to load logical-module-structure from {path}! :(\n\t{e}")
-        return json_dict
+        except Exception as e:
+            raise KBRuntimeError(f"Unable to load branch-groups from {path}! :(\n\t{e}")
+        return yaml_dict
