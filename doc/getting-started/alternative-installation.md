@@ -2,7 +2,7 @@
 
 If the `initial_setup.sh` installation method does not work for you, you can choose one of the alternative methods.
 
-KDE Builder can use Python version 3.9 or newer.  
+KDE Builder can use Python version 3.10 or newer.  
 
 If python is not installed, do it now (assuming you want to use Python 3.11):
 
@@ -81,7 +81,7 @@ cd ~/.local/share
 git clone https://invent.kde.org/sdk/kde-builder.git
 ```
 
-Note that `Pipfile` uses python 3.9 version. That is made this way because the gitlab ci job uses it, to ensure python 3.9
+Note that `Pipfile` uses python 3.10 version. That is made this way because the gitlab ci job uses it, to ensure python 3.10
 is correctly supported. If you want to use a more recent version, specify it with `--python /path/to/python`. 
 
 Create a virtual environment with the required packages:

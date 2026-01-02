@@ -9,7 +9,7 @@ stages:
 unit_and_integration_tests:
   tags:
     - Linux
-  image: python:3.9  # keep same version as defined in Pipfile
+  image: python:3.10  # keep same version as defined in Pipfile
   before_script:
     - apt update
     - apt install -y cmake libdbus-1-dev
