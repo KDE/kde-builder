@@ -21,6 +21,7 @@ from .debug import Debug
 from .debug import KBLogger
 from .kb_exception import SetOptionError
 from .metadata.kde_projects_reader import KDEProjectsReader
+from .metadata.metadata import Metadata
 from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
 from .module_set.kde_projects import ModuleSetKDEProjects
@@ -213,6 +214,9 @@ class BuildContext(Module):
 
         self.projects_db: KDEProjectsReader | None = None
         """See set_projects_db()."""
+
+        self.metadata: Metadata | None = None
+        """Stores info from repo-metadata."""
 
         self.options = self.build_options["global"]
         boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]
@@ -750,9 +754,9 @@ class BuildContext(Module):
         """
         self.metadata_module = ModuleSetKDEProjects.get_project_metadata_module(self)
 
-    def set_projects_db(self) -> None:
+    def set_metadata(self) -> None:
         """
-        Set self.projects_db which is a KDEProjectsReader object.
+        Set data from repo-metadata.
         """
         project_database_module = self.metadata_module
         if not project_database_module:
@@ -760,6 +764,7 @@ class BuildContext(Module):
 
         repo_metadata_fullpath: str = project_database_module.fullpath("source")
         self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
+        self.metadata = Metadata(repo_metadata_fullpath)
 
     def effective_branch_group(self) -> str:
         """
@@ -782,7 +787,7 @@ class BuildContext(Module):
             if not metadata_module:
                 raise ProgramError("Tried to use branch-group, but needed data wasn't loaded!")
 
-            resolver = ModuleBranchGroupResolver(metadata_module.scm.logical_module_groups())
+            resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
             self.logical_module_resolver = resolver
 
         return self.logical_module_resolver

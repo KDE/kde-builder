@@ -258,8 +258,8 @@ class Application:
         # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
-        # After we are sure the repo-metadata is cloned, initialize projects_db
-        ctx.set_projects_db()
+        # After we are sure the repo-metadata is cloned, initialize metadata.
+        ctx.set_metadata()
 
         # The user might only want metadata to update to allow for a later --pretend run, check for that here.
         # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
@@ -376,8 +376,7 @@ class Application:
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
-        metadata_module = ctx.metadata_module
-        self.ignore_list = metadata_module.scm.ignored_modules()
+        self.ignore_list = ctx.metadata.ignored_projects
 
         # Remove modules that are explicitly blanked out in their branch-group
         # i.e. those modules where they *have* a branch-group, and it's set to
