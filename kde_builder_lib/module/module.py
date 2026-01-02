@@ -821,25 +821,6 @@ class Module(OptionsBase):
 
         # Everything else overrides the global option, unless it's simply not set at all.
         ret = self.options.get(key, ctx_value)
-
-        # Warn users to change their branch-group value after renaming branch layers.
-        # TODO: Remove this after 02.04.2026
-        if key == "branch-group":
-            new_ret = ""
-            match ret:
-                case "kf5-qt5":
-                    new_ret = "latest-kf5"
-                case "stable-kf5-qt5":
-                    new_ret = "stable-kf5"
-                case "kf6-qt6":
-                    new_ret = "latest-kf6"
-                case "stable-kf6-qt6":
-                    new_ret = "stable-kf5"
-            if new_ret:
-                logger_module.warning(f" y[*] Warning: branch-group value y[\"{ret}\"] is deprecated. Use g[\"{new_ret}\"] value instead.")
-                logger_module.warning(f" y[*] The changed value is applied in runtime for now, but this will be removed in the future.")
-                ret = new_ret
-
         return ret
 
     def get_persistent_option(self, key: str) -> str | int | None:

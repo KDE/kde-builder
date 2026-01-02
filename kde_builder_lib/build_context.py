@@ -581,6 +581,27 @@ class BuildContext(Module):
              The same types that OptionsBase.get_option returns.
         """
         ret = OptionsBase.get_option(self, key)
+
+        # Warn users to change their branch-group value after renaming branch layers.
+        # TODO: Remove this after 02.04.2026
+        if key == "branch-group":
+            new_ret = ""
+            match ret:
+                case "kf5-qt5":
+                    new_ret = "latest-kf5"
+                case "stable-kf5-qt5":
+                    new_ret = "stable-kf5"
+                case "kf6-qt6":
+                    new_ret = "latest-kf6"
+                case "stable-kf6-qt6":
+                    new_ret = "stable-kf5"
+            if new_ret:
+                if not self.has_option("#warned-deprecated-branch-group"):  # avoid spamming
+                    logger_buildcontext.warning(f" y[*] Warning: branch-group value y[\"{ret}\"] is deprecated. Use g[\"{new_ret}\"] value instead.")
+                    logger_buildcontext.warning(f" y[*] The changed value is applied in runtime for now, but this will be removed in the future.")
+                    self.set_option("#warned-deprecated-branch-group", True)
+                ret = new_ret
+
         return ret
 
     # @override
