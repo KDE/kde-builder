@@ -580,7 +580,8 @@ class BuildContext(Module):
         Returns:
              The same types that OptionsBase.get_option returns.
         """
-        return OptionsBase.get_option(self, key)
+        ret = OptionsBase.get_option(self, key)
+        return ret
 
     # @override
     def set_option(self, opt_name: str, opt_val) -> None:
@@ -765,13 +766,6 @@ class BuildContext(Module):
         repo_metadata_fullpath: str = project_database_module.fullpath("source")
         self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
         self.metadata = Metadata(repo_metadata_fullpath)
-
-    def effective_branch_group(self) -> str:
-        """
-        Return the effective branch group to use for modules.
-        """
-        branch_group = self.get_option("branch-group")
-        return branch_group
 
     def module_branch_group_resolver(self) -> ModuleBranchGroupResolver:
         """

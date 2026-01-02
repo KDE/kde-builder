@@ -41,11 +41,12 @@ class OptionsBase:
 
     def has_option(self, key: str) -> bool:
         """
-        Return true if the given option has been set for this module.
+        Return True if the given option has been set for this module.
 
-        Use `get_option` to return the actual value in this case.
+        Use `get_option()` to return the actual value in this case.
         """
-        return key in self.options.keys()
+        ret = key in self.options
+        return ret
 
     def get_option(self, key: str) -> str | dict | list | bool:
         """
@@ -60,9 +61,10 @@ class OptionsBase:
          bool - "include-dependencies"
          str - almost everything else
         """
+        ret = ""
         if self.has_option(key):
-            return self.options[key]
-        return ""
+            ret = self.options[key]
+        return ret
 
     def set_option(self, opt_name: str, opt_val) -> None:
         """

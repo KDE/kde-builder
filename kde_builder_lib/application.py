@@ -382,7 +382,7 @@ class Application:
         # i.e. those modules where they *have* a branch-group, and it's set to
         # be empty ("").
         resolver = ctx.module_branch_group_resolver()
-        branch_group = ctx.effective_branch_group()
+        branch_group = ctx.get_option("branch-group")
 
         explicit_kdeproject_selectors: list[str] = []
         explicit_thirdparty_selectors: list[str] = []
@@ -621,7 +621,7 @@ class Application:
 
         try:
             dependency_resolver = DependencyResolver(self.module_factory)
-            branch_group = ctx.effective_branch_group()
+            branch_group = ctx.get_option("branch-group")
 
             if Debug().is_testing():
                 test_deps = textwrap.dedent("""\
