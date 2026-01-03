@@ -743,8 +743,7 @@ class TaskManager:
         if module.is_kde_project():
             proj_metadata = module.context.projects_db.repositories[module.name]
             invent_path_list = proj_metadata["invent_name"].split("/")
-            legacy_path = proj_metadata["full_name"]
-            mod_output = "g[" + invent_path_list[0] + "]/g[" + invent_path_list[1] + "]" + f" ({legacy_path})"
+            mod_output = "g[" + invent_path_list[0] + "]/g[" + invent_path_list[1] + "]"
         else:
             mod_output = "g[third-party]/g[" + module.name + "]"
 
