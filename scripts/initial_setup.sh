@@ -49,7 +49,7 @@ install_runtime_packages() {
     if [ $FREEBSD_OSVERSION -ge 1402000 ]; then
       (set -x; sudo pkg install git python3 py311-pyyaml py311-setproctitle py311-dbus)
     else
-      (set -x; sudo pkg install git python3 py39-yaml py39-setproctitle py39-dbus)
+      (set -x; sudo pkg install git python3 py310-yaml py310-setproctitle py310-dbus)
     fi
   elif [ "$ID" = "openbsd" ]; then
     VNAME=${VNAME:-$(sysctl -n kern.osrelease)}
