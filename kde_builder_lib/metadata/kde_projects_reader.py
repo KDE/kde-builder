@@ -60,8 +60,10 @@ class KDEProjectsReader:
         projects = ["kde-builder", "juk", "kcalc", "konsole", "dolphin", "elisa"]
 
         for project in projects:
+            # Keep in sync with _read_yaml()
             repo_data = {
                 "full_name": f"test/{project}",
+                "invent_name": f"test/{project}",
                 "repo": f"kde:{project}.git",
                 "name": project,
                 "active": True,
@@ -79,7 +81,7 @@ class KDEProjectsReader:
         repo_path = proj_data["repopath"]
         repo_name = proj_data["identifier"]
 
-        # Keep in sync with _load_mock_project_data
+        # Keep in sync with _load_mock_project_data()
         cur_repository = {
             "full_name": proj_data["projectpath"],
             "invent_name": repo_path,
