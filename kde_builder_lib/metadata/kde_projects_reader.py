@@ -62,7 +62,6 @@ class KDEProjectsReader:
         for project in projects:
             # Keep in sync with _read_yaml()
             repo_data = {
-                "full_name": f"test/{project}",
                 "invent_name": f"test/{project}",
                 "repo": f"kde:{project}.git",
                 "name": project,
@@ -83,7 +82,6 @@ class KDEProjectsReader:
 
         # Keep in sync with _load_mock_project_data()
         cur_repository = {
-            "full_name": proj_data["projectpath"],
             "invent_name": repo_path,
             "repo": f"kde:{repo_path}.git",
             "name": repo_name,
@@ -105,7 +103,7 @@ class KDEProjectsReader:
         results: list[str] = []
 
         def find_results():
-            match_list: list[str] = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["full_name"], proj)]
+            match_list: list[str] = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["invent_name"], proj)]
 
             results.extend(match_list)
 

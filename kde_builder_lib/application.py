@@ -407,7 +407,7 @@ class Application:
                     continue
 
             if module.is_kde_project():
-                branch = resolver.find_module_branch(module.get_option("#kde-project-path") or module.name, branch_group)
+                branch = resolver.find_module_branch(module.get_option("#kde-repo-path") or module.name, branch_group)
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
                     printpath = module.get_option("#kde-repo-path")
                     printpath = "y[" + printpath.replace("/", "]/y[") + "]"
@@ -483,7 +483,7 @@ class Application:
             path = None
             if module in filtered_modules:
                 logger_app.debug("Skipping duplicate project " + module.name)
-            elif ((path := module.get_option("#kde-project-path") or module.name) and
+            elif ((path := module.get_option("#kde-repo-path") or module.name) and
                   any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
                 # See if the name matches any given in the ignore list.
 

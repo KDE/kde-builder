@@ -11,19 +11,19 @@ from kde_builder_lib.module.module import Module
 
 @pytest.fixture
 def mock_module_fullproject(monkeypatch):
-    def mock__init__(self, project_path, kde):
-        self.projectPath = project_path
+    def mock__init__(self, repo_path, kde):
+        self.repo_path = repo_path
         self.kde = kde
 
     def mock__str__(self):  # need to redefine, because debugger wants to use this
-        return self.projectPath
+        return self.repo_path
 
     def mock_is_kde_project(self):
         return self.kde
 
     def mock_get_option(self, key: str):
-        assert key == "#kde-project-path"  # We redefine get_option only for this option
-        return self.projectPath
+        assert key == "#kde-repo-path"  # We redefine get_option only for this option
+        return self.repo_path
 
     monkeypatch.setattr(Module, "__init__", mock__init__)
     monkeypatch.setattr(Module, "__str__", mock__str__)
