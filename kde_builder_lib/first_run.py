@@ -243,15 +243,19 @@ class FirstRun:
             nonlocal sample_rc
             sample_rc = sample_rc.replace(f"%{{{option_name}}}", value)
 
+        # Here the replacements are done in the same order how they are in kde-builder.yaml.in file.
+        # Just for convenience of reviewing.
         fill_placeholder("branch-group", "")
         fill_placeholder("include-dependencies", "bool_to_str")
         fill_placeholder("source-dir", "home_to_tilde")
         fill_placeholder("build-dir", "home_to_tilde")
         fill_placeholder("install-dir", "home_to_tilde")
         fill_placeholder("log-dir", "home_to_tilde")
+        # "num-cores" and "num-cores-low-mem" were already handled above.
         fill_placeholder("install-login-session", "bool_to_str")
+        fill_placeholder("hold-performance-profile", "bool_to_str")
         fill_placeholder("stop-on-failure", "bool_to_str")
-        fill_placeholder("directory-layout")
+        fill_placeholder("directory-layout", "")
         fill_placeholder("compile-commands-linking", "bool_to_str")
         fill_placeholder("compile-commands-export", "bool_to_str")
         fill_placeholder("generate-clion-project-config", "bool_to_str")
