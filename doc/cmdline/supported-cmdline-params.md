@@ -240,9 +240,8 @@ following:
 
 - `install-dir` - the full path to where the project will be installed.
 
-- `project-path` - the location of the project within the hierarchy of KDE
-   source code repositories. See the section called [](#kde-projects-groups) for more information
-   on this hierarchy.
+- `repopath` - the repository path in the [invent.kde.org](https://invent.kde.org).
+   Only for KDE projects.
 
 - `branch` - the resolved git branch that will be used for each project, based
    on the [tag](#conf-tag), [branch](#conf-branch) and [branch-group](#conf-branch-group) settings in effect.

@@ -1100,7 +1100,7 @@ _except for_ some specific projects.
 
 The option value does not necessarily have to name the project
 directly. Any project that has full consecutive parts of its
-[KDE projects projectpath](#kde-projects-groups) match one
+[KDE projects repopath](#kde-projects-groups) match one
 of the option values will be ignored, so you can ignore multiple projects
 this way.
 

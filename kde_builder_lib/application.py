@@ -731,9 +731,9 @@ class Application:
             elif query_mode == "install-dir":
                 def query(x):
                     return x.installation_path()
-            elif query_mode == "project-path":
+            elif query_mode == "repopath":
                 def query(x):
-                    return x.get_option("#kde-project-path")
+                    return x.get_option("#kde-repo-path")
             elif query_mode == "branch":
                 def query(x):
                     return x.scm.determine_preferred_checkout_source()[0] or ""
