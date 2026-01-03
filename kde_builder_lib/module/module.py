@@ -898,9 +898,6 @@ class Module(OptionsBase):
             elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
                 base_path = self.get_option("#kde-repo-path", "module")
                 base_path = base_path or self.name  # Default if not provided in repo-metadata
-            elif layout == "metadata":
-                base_path = self.get_option("#kde-project-path")
-                base_path = base_path or self.name  # Default if not provided in repo-metadata
             else:
                 if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
                     logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")

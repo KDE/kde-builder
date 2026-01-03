@@ -583,7 +583,7 @@ The value must be specified in the form
 (conf-directory-layout)=
 [`directory-layout`](conf-directory-layout)
 
-Type: String, Valid values: `flat`, `invent`, `metadata`, Default value: flat
+Type: String, Valid values: `flat`, `invent`, Default value: flat
 
 Controls the structure of source and build directories for the projects when kde-builder creates them.
 
@@ -591,7 +591,6 @@ Assuming your [`source-dir`](conf-source-dir) is set to `~/kde/src`, and you do 
 
 Let's take KCalc as an example. It's metadata.yaml contains the following lines:
 ```yaml
-projectpath: kde/kdeutils/kcalc
 repopath: utilities/kcalc
 ```
 
@@ -599,12 +598,6 @@ If you use `flat` layout, the KCalc source directory will be created in the sour
 
 If you use `invent` layout, the source directory will be created in the source-dir in the subfolders, as seen in the repository path in
 [invent.kde.org](https://invent.kde.org/) (corresponds to the repopath field in metadata): `~/kde/src/utilities/kcalc`.
-
-If you use `metadata` layout, the source directory will be created in the source-dir in the subfolders, as seen in the projectpath field in metadata: 
-`~/kde/src/kde/kdeutils/kcalc`.
-
-Please avoid the `metadata` layout, as projectpath field is not stable (and so, when it changes, kde-builder will clone the repo to the new path and 
-your work may stay in the source dir from old path) and projectpath is a subject for removal.
 
 Related command-line option: --directory-layout \<value\>
 
