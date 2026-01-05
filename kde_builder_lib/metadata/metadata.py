@@ -68,13 +68,10 @@ class Metadata:
         path = self.path_to_metadata + "/kde-dependencies/branch-groups.yaml"
 
         if Debug().is_testing():
-            from io import StringIO
-            mock_lms_yaml = textwrap.dedent("""\
-                "groups": {}
-                """)
-            fh = StringIO(mock_lms_yaml)
-        else:
-            fh = Util.open_or_fail(path)
+            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
+            path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/branch-groups.yaml"
+
+        fh = Util.open_or_fail(path)
 
         if not fh:
             raise ProgramError("Unable to read branch-groups.yaml")
