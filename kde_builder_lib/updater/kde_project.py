@@ -29,7 +29,7 @@ class UpdaterKDEProject(Updater):
         # If we're using a logical group we need to query the global build context
         # to resolve it.
         ctx = module.context
-        resolver = ctx.module_branch_group_resolver()
+        resolver = ctx.branch_group_resolver
         module_path = module.get_option("#kde-repo-path") or module.name
         return resolver.find_module_branch(module_path, branch_group)
 

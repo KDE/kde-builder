@@ -207,8 +207,8 @@ class BuildContext(Module):
         self.metadata_module: Module | None = None
         """A Module for repo-metadata (which has a "metadata" scm type)"""
 
-        self.logical_module_resolver = None
-        """For branch-group option."""
+        self.branch_group_resolver: ModuleBranchGroupResolver | None = None
+        """Used to determine a git branch for kde projects (when the branch-group option is in use)."""
 
         self.status_view: StatusView = StatusView()
 
@@ -787,24 +787,7 @@ class BuildContext(Module):
         repo_metadata_fullpath: str = project_database_module.fullpath("source")
         self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
         self.metadata = Metadata(repo_metadata_fullpath)
-
-    def module_branch_group_resolver(self) -> ModuleBranchGroupResolver:
-        """
-        Return a :class:`Module.BranchGroupResolver`.
-
-        It can be used to efficiently determine a git branch to use for a given kde-projects module (when the
-        branch-group option is in use).
-        """
-        if not self.logical_module_resolver:
-            metadata_module = self.metadata_module
-
-            if not metadata_module:
-                raise ProgramError("Tried to use branch-group, but needed data wasn't loaded!")
-
-            resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
-            self.logical_module_resolver = resolver
-
-        return self.logical_module_resolver
+        self.branch_group_resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
 
     # @override
     def verify_option_value_type(self, option_name, option_value) -> None:
