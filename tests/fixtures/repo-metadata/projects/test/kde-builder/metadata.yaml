@@ -1,0 +1,4 @@
+identifier: kde-builder
+kind: software
+repoactive: true
+repopath: test/kde-builder
