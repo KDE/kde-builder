@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import yaml
+import os
 import re
 import textwrap
 
@@ -34,13 +35,10 @@ class Metadata:
         # ignore file and propagate that information to our context object.
 
         if Debug().is_testing():
-            from io import StringIO
-            mock_build_script_ignore = textwrap.dedent("""\
-                sdk/kde-ruleset  # example ignoring
-                """)
-            fh = StringIO(mock_build_script_ignore)
-        else:
-            fh = Util.open_or_fail(path)
+            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
+            path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/ignore-kde-projects"
+
+        fh = Util.open_or_fail(path)
 
         if not fh:
             raise ProgramError(f"Unable to read ignore data from {path}")
