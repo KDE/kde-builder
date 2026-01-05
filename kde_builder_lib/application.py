@@ -624,23 +624,13 @@ class Application:
             branch_group = ctx.get_option("branch-group")
 
             if Debug().is_testing():
-                test_deps = textwrap.dedent("""\
-                                           juk: kcalc
-                                           dolphin: konsole
-                                           kde-builder: juk
-                                           kde-builder: third-party/taglib
-                                           """)
-                import tempfile
-                with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
-                    temp_file.write(test_deps)
-                    temp_file_path = temp_file.name
+                kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/..")
+                dependency_file = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
 
-                dependencies = fileinput.FileInput(files=temp_file_path, mode="r")
+                dependencies = fileinput.FileInput(files=dependency_file, mode="r")
                 logger_app.debug(" -- Reading dependencies from test data")
                 dependency_resolver.read_dependency_data(dependencies)
                 dependencies.close()
-
-                os.remove(temp_file_path)  # the file was in /tmp, no subfolders needs to be deleted
             else:
                 srcdir = metadata_module.fullpath("source")
                 dependencies = None

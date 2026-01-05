@@ -1,0 +1,4 @@
+juk: kcalc
+dolphin: konsole
+kde-builder: juk
+kde-builder: third-party/taglib
