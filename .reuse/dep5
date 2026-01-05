@@ -15,6 +15,7 @@ Files:  .gitignore
         doc/_static/*.png
         doc/conf.py
         tests/integration/fixtures/*
+        tests/fixtures/*
         Pipfile
         ruff.toml
 Copyright: none
