@@ -93,6 +93,9 @@ class RecursiveConfigNodesIterator:
                             raise FileNotFoundError
                         with open(filename, "r") as f:
                             new_config_content = yaml.safe_load(f)
+                            # Support the case when yaml file does not contain any config entries, but just comments.
+                            if new_config_content is None:
+                                new_config_content = {}
                     except IOError:
                         raise ConfigError(f"Unable to open file \"{filename}\" which was included from {self.current_filename}")
 
