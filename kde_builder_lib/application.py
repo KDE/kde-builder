@@ -383,6 +383,7 @@ class Application:
         # be empty ("").
         resolver = ctx.branch_group_resolver
         branch_group = ctx.get_option("branch-group")
+        self._warn_if_branch_group_does_not_exists(branch_group)
 
         explicit_kdeproject_selectors: list[str] = []
         explicit_thirdparty_selectors: list[str] = []
@@ -1618,3 +1619,11 @@ class Application:
         except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
             logger_app.warning("Could not import dbus module. Skipping dbus calls.")
             return
+
+    def _warn_if_branch_group_does_not_exists(self, user_branch_group):
+        possible_branch_groups = self.context.branch_group_resolver.layers
+        if user_branch_group not in possible_branch_groups:
+            logger_app.warning(textwrap.dedent(f"""\
+            ] y[*] Your branch-group value y[\"{user_branch_group}\"] seems to be incorrect.
+            ] y[*] Possible values are: {'g["' + '"], g["'.join(possible_branch_groups) + '"]"'}.\
+            """))
