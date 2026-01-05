@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from functools import cmp_to_key
 import re
+from io import TextIOWrapper
 from typing import Callable
-from typing import TYPE_CHECKING
 
 from .kb_exception import ProgramError
 from .debug import Debug
@@ -18,8 +18,6 @@ from .module.module import Module
 from .updater.updater import Updater
 from .util.util import Util
 
-if TYPE_CHECKING:
-    from fileinput import FileInput
 
 logger_depres = KBLogger.getLogger("dependency-resolver")
 
@@ -120,7 +118,7 @@ class DependencyResolver:
 
         self.dependencies_of[f"{dep_name}:{dep_branch}"][dep_key].append(f"{src_name}:{src_branch}")
 
-    def read_dependency_data(self, fh: FileInput) -> None:
+    def read_dependency_data(self, fh: TextIOWrapper) -> None:
         """
         Read in dependency data in a pseudo-Makefile format.
 

@@ -38,9 +38,9 @@ class Metadata:
             kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
             path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/ignore-kde-projects"
 
-        fh = Util.open_or_fail(path)
-
-        if not fh:
+        try:
+            fh = open(path, "r")
+        except IOError:
             raise ProgramError(f"Unable to read ignore data from {path}")
 
         ignore_modules = []
@@ -71,9 +71,9 @@ class Metadata:
             kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
             path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/branch-groups.yaml"
 
-        fh = Util.open_or_fail(path)
-
-        if not fh:
+        try:
+            fh = open(path, "r")
+        except IOError:
             raise ProgramError("Unable to read branch-groups.yaml")
 
         try:

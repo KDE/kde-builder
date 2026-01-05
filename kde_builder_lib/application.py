@@ -633,18 +633,17 @@ class Application:
                 dependencies.close()
             else:
                 srcdir = metadata_module.fullpath("source")
-                dependencies = None
-
                 dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
+
                 try:
-                    dependencies = Util.open_or_fail(dependency_file)
-                except Exception as e:
-                    print(f"Unable to open {dependency_file}: {e}")
-
-                logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-                dependency_resolver.read_dependency_data(dependencies)
-
-                dependencies.close()
+                    dependencies = open(dependency_file, "r")
+                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                    dependency_resolver.read_dependency_data(dependencies)
+                    dependencies.close()
+                except IOError as e:
+                    e_str = str(e).replace("[", "").replace("]", "")
+                    msg_str = f"Unable to open y[{dependency_file}]:\n {e_str}"
+                    raise KBRuntimeError(msg_str)
 
             graph = dependency_resolver.resolve_to_module_graph(modules)
 

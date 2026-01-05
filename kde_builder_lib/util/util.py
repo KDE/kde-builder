@@ -553,25 +553,6 @@ class Util:
         return shlex.split(line.strip())
 
     @staticmethod
-    def open_or_fail(path) -> TextIOWrapper | False:
-        """
-        Open the given file and return a filehandle to it, or False on error.
-
-        Args:
-            path: Path to the file to open.
-
-        Returns:
-            filehandle on success (supports readline() and eof())
-            can return boolean False if there is an error opening file
-        """
-        try:
-            fh = open(path, "r")
-        except IOError:
-            return False
-
-        return fh
-
-    @staticmethod
     def safe_rmtree(path) -> bool:
         """
         Delete a directory and all files and subdirectories within.
