@@ -801,11 +801,6 @@ class Module(OptionsBase):
         """
         ctx = self.context
 
-        # Some global options would probably make no sense applied to Qt.
-        qt_copy_overrides = ["branch", "configure-flags", "tag", "cxxflags"]
-        if key in qt_copy_overrides and self.build_system_type() == "Qt":
-            level_limit = "module"
-
         Util.assert_in(level_limit, ["allow-inherit", "module"])
 
         # If module-only, check that first.
