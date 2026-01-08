@@ -172,7 +172,7 @@ class ModuleSet(OptionsBase):
             new_module = Module(ctx, module_name)
 
             self._initialize_new_module(new_module)
-            new_module.set_scm_type("git")
+            new_module.set_scm()
             module_list.append(new_module)
 
         if not self.modules_to_find():

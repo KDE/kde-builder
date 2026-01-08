@@ -29,8 +29,6 @@ from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.ipc import IPC
 from ..options_base import OptionsBase
-from ..updater.kde_project import UpdaterKDEProject
-from ..updater.kde_project_metadata import UpdaterKDEProjectMetadata
 from ..updater.updater import Updater
 from ..util.util import Util
 from ..util.textwrap_mod import textwrap
@@ -221,31 +219,11 @@ class Module(OptionsBase):
         """
         return self.get_absolute_path("source-dir")
 
-    def set_scm_type(self, scm_type: str) -> None:
+    def set_scm(self) -> None:
         """
-        Set the source control plugin (git, kde-projects) based on the given scm_type name.
-
-        Normally auto-detection is used instead, this permits manual setup.
+        Set the source control plugin.
         """
-        new_type = None
-        if scm_type == "git":
-            new_type = Updater(self)
-        elif scm_type == "proj":
-            new_type = UpdaterKDEProject(self)
-        elif scm_type == "metadata":
-            new_type = UpdaterKDEProjectMetadata(self)
-        else:
-            new_type = None
-
-        self.scm = new_type
-
-    def scm_type(self) -> str:
-        """
-        Return the name of the scm plugin, as determined by :meth:`scm()`.
-
-        Return value: "git" at this point, as appropriate.
-        """
-        return self.scm.name()
+        self.scm = Updater(self)
 
     def current_scm_revision(self) -> str:
         """
@@ -258,7 +236,7 @@ class Module(OptionsBase):
 
     def build_system_from_name(self, name: str) -> BuildSystem:
         """
-        As with :meth:`set_scm_type()`, used to manually set the build system plugin. This is exposed to the user as "override-build-system".
+        Used to manually set the build system plugin. This is exposed to the user as "override-build-system".
 
         Returns a new build system object, given the appropriate name.
         This is a suboptimal way to fix the problem of allowing users to override

@@ -46,7 +46,7 @@ class Updater:
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
-        scm-specific update procedure.
+        Update procedure.
 
         May change the current directory as necessary.
 
@@ -571,11 +571,10 @@ class Updater:
             ["branch-group", "branch", "allow-inherit"],
         ]
 
-        # For modules that are not actually a "proj" module we skip branch-group
+        # For modules that are not actually a kde projects we skip branch-group
         # entirely to allow for global/module branch selection
         # options to be selected... kind of complicated, but more DWIMy
-        from .kde_project import UpdaterKDEProject
-        if not isinstance(module.scm, UpdaterKDEProject):
+        if not module.is_kde_project():
             priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
 
         checkout_source = None

@@ -49,7 +49,7 @@ class ModuleSetKDEProjects(ModuleSet):
         metadata_module.set_option("#resolved-repository", f"kde:{module_name}")  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
         metadata_module.set_option("#kde-repo-path", module_name)
-        metadata_module.set_scm_type("metadata")
+        metadata_module.set_scm()
         metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
         metadata_module.set_option("branch", "master")
         metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))
@@ -137,7 +137,7 @@ class ModuleSetKDEProjects(ModuleSet):
             # Copy metadata from KDE project YAML file
             new_module.set_option("#kde-repo-path", result.get("invent_name", None))
 
-            new_module.set_scm_type("proj")
+            new_module.set_scm()
 
             if self.none_true([KDEProjectsReader.project_path_matches_wildcard_search(result["invent_name"], element) for element in ignore_list]):
                 module_list.append(new_module)
