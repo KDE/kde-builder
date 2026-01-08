@@ -847,6 +847,10 @@ class Module(OptionsBase):
         """
         Return True if this module belongs to kde projects, i.e. found in repo-metadata database.
         """
+        # Special case repo-metadata, because at that moment we do not have projects database yet.
+        if self.name == "sysadmin-repo-metadata":
+            return False
+
         repo_db = self.context.projects_db.repositories
         if self.name in repo_db:
             return True
