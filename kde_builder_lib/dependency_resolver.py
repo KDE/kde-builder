@@ -696,7 +696,7 @@ class DependencyResolver:
         """
         scm = module.scm
 
-        # when the module's SCM is not git,
+        # when the module's SCM is not set,
         # assume the default "no particular" branch wildcard
 
         if not isinstance(scm, Updater):

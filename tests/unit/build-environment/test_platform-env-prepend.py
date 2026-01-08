@@ -15,13 +15,15 @@ def test_environment_prepend():
     Test that empty install-dir and/or qt-install-dir do not cause empty /bin settings to be configured in environment.
     """
     ctx = BuildContext()
+    ctx.set_metadata_module()
+    ctx.set_metadata()
 
     def no_bare_bin(arg):
         elem = arg.split(":")
         return not any(x == "/bin" for x in elem)
 
     mod = Module(ctx, "test")
-    mod.set_scm_type("git")
+    mod.set_scm()
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -41,7 +43,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
-    mod.set_scm_type("git")
+    mod.set_scm()
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -61,7 +63,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
-    mod.set_scm_type("git")
+    mod.set_scm()
     new_path = os.environ.get("PATH")
     new_path = re.sub(r"^/bin:", "", new_path)  # Remove existing bare /bin entries if present
     new_path = re.sub(r":/bin$", "", new_path)
@@ -83,7 +85,7 @@ def test_environment_prepend():
     mod.reset_environment()
 
     mod = Module(ctx, "test")
-    mod.set_scm_type("git")
+    mod.set_scm()
     os.environ["PATH"] = "/bin:/usr/bin"
 
     ctx.set_option("binpath", "/tmp/fake/bin")

@@ -546,7 +546,8 @@ class Application:
                 orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
-                metadata_module.scm.update_internal()  # Skipped automatically in testing mode
+                if not Debug().is_testing():
+                    metadata_module.scm.update_internal()
                 logger_app.warning("")  # Prints empty line to space it from next messages
                 metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
@@ -991,10 +992,7 @@ class Application:
 
                 new_module: Module = Module(ctx, module_name)
                 new_module.apply_config_options(ctx, node, config_filename)
-                if new_module.get_option("repository") == Application.KDE_PROJECT_ID:
-                    new_module.set_scm_type("proj")
-                else:
-                    new_module.set_scm_type("git")
+                new_module.set_scm()
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module

@@ -591,7 +591,7 @@ class TaskManager:
         if ctx.get_option("disable-agent-check"):
             return True
 
-        git_servers: list[Module] = [module for module in ctx.modules_in_phase("update") if module.scm_type() == "git"]
+        git_servers: list[Module] = [module for module in ctx.modules_in_phase("update") if not module.is_kde_project()]
 
         ssh_servers: list[Module] = []
         for gitserver in git_servers:

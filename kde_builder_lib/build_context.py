@@ -205,7 +205,7 @@ class BuildContext(Module):
         """These are kept across multiple script runs."""
 
         self.metadata_module: Module | None = None
-        """A Module for repo-metadata (which has a "metadata" scm type)"""
+        """A Module for repo-metadata."""
 
         self.branch_group_resolver: ModuleBranchGroupResolver | None = None
         """Used to determine a git branch for kde projects (when the branch-group option is in use)."""

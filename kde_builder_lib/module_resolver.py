@@ -275,7 +275,7 @@ class ModuleResolver:
             selector: Module = Module(ctx, selector_name)
             selector.phases.reset_to(ctx.phases.phaselist)
 
-            selector.set_scm_type("proj")
+            selector.set_scm()
             selector.set_option("#guessed-kde-project", True)
             selector.set_option("#include-dependencies", including_deps)
 
@@ -513,7 +513,7 @@ kde-builder (although it is in reality), since taglib is not a KDE project.
 
 This mission of this class is to ensure that, no matter `how` a project ended
 up being selected by the user for the build list, that the same options are
-registered into the project, the project uses the same build and scm types, is
+registered into the project, the project uses the same build type, is
 defaulted to the right build phases, etc.
 
 To do this, this class takes the read-in options, projects, and groups from

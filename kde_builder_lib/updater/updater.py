@@ -24,7 +24,6 @@ from ..util.util import Util
 from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
-    from typing import NoReturn
     from ..build_context import BuildContext
     from ..ipc.ipc import IPC
     from ..module.module import Module
@@ -47,7 +46,7 @@ class Updater:
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
-        scm-specific update procedure.
+        Update procedure.
 
         May change the current directory as necessary.
 
@@ -66,8 +65,22 @@ class Updater:
     def name() -> str:
         return "git"
 
-    def _resolve_branch_group(self, branch_group: str) -> NoReturn:
-        raise KBRuntimeError("\t_resolve_branch_group is implemented in UpdaterKDEProject.")
+    def _resolve_branch_group(self, branch_group: str) -> str | None:
+        """
+        Resolve the requested branch-group for this Updater's module.
+
+        Returns the required branch name, or None if none is set.
+        """
+        module = self.module
+        if module.is_kde_project():
+            # If we're using a logical group we need to query the global build context to resolve it.
+            ctx = module.context
+            resolver = ctx.branch_group_resolver
+            module_path = module.get_option("#kde-repo-path") or module.name
+            ret = resolver.find_module_branch(module_path, branch_group)
+            return ret
+        else:
+            raise KBRuntimeError("\t_resolve_branch_group is implemented only for KDE Projects.")
 
     def current_revision_internal(self) -> str:
         return self.commit_id("HEAD")
@@ -230,15 +243,19 @@ class Updater:
                 ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
                 return ret
 
-    @staticmethod
-    def is_push_url_managed() -> bool:
+    def is_push_url_managed(self) -> bool:
         """
         Determine whether _setup_remote should manage the configuration of the git push URL for the repo.
 
         Returns:
              Boolean indicating whether _setup_remote should assume control over the push URL.
         """
-        return False
+        module = self.module
+        if module.is_kde_project():
+            ret = True
+        else:
+            ret = False
+        return ret
 
     def _setup_remote(self, remote: str) -> int:
         """
@@ -554,11 +571,10 @@ class Updater:
             ["branch-group", "branch", "allow-inherit"],
         ]
 
-        # For modules that are not actually a "proj" module we skip branch-group
+        # For modules that are not actually a kde projects we skip branch-group
         # entirely to allow for global/module branch selection
         # options to be selected... kind of complicated, but more DWIMy
-        from .kde_project import UpdaterKDEProject
-        if not isinstance(module.scm, UpdaterKDEProject):
+        if module.name == "sysadmin-repo-metadata" or not module.is_kde_project():
             priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
 
         checkout_source = None
@@ -783,8 +799,13 @@ class Updater:
         Returns:
              Whether the remote will be considered for best_remote_name
         """
-        # name - not used, subclasses might want to filter on remote name
-        return url == configured_url
+        # name - not used
+        module = self.module
+        if module.is_kde_project():
+            ret = url == configured_url or url.startswith("kde:")
+        else:
+            ret = url == configured_url
+        return ret
 
     def best_remote_name(self) -> list[str]:
         """
