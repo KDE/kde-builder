@@ -98,7 +98,7 @@ class KDEProjectsReader:
         # Non-wildcard matches have an implicit "$proj/*" search as well for
         # compatibility with previous use-projects
         # Project specifiers ending in .git are forced to be non-wildcarded.
-        if not re.search(r"\*", proj) and not re.search(r"\.git$", proj):
+        if "*" not in proj and not proj.endswith(".git"):
             # We have to do a search to account for over-specified module names
             # like phonon/phonon
             find_results()
@@ -107,11 +107,11 @@ class KDEProjectsReader:
             # if just "kdelibs" is asked for.
             proj += "/*"
 
-        proj = re.sub(r"\.git$", "", proj)
+        proj = proj.removesuffix(".git")
 
         # If still no wildcard and no "/" then we can use direct lookup by module
         # name.
-        if not re.search(r"\*", proj) and not re.search(r"/", proj) and proj in repositories:
+        if "*" not in proj and "/" not in proj and proj in repositories:
             results.append(proj)
         else:
             find_results()
