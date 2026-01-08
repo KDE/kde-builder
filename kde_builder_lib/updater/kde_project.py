@@ -32,9 +32,3 @@ class UpdaterKDEProject(Updater):
         resolver = ctx.branch_group_resolver
         module_path = module.get_option("#kde-repo-path") or module.name
         return resolver.find_module_branch(module_path, branch_group)
-
-    @staticmethod
-    # @override(check_signature=False)
-    def _is_plausible_existing_remote(name: str, url: str, configured_url: str) -> bool:
-        return url == configured_url or url.startswith("kde:")
-

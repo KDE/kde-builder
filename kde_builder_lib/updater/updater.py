@@ -787,8 +787,13 @@ class Updater:
         Returns:
              Whether the remote will be considered for best_remote_name
         """
-        # name - not used, subclasses might want to filter on remote name
-        return url == configured_url
+        # name - not used
+        module = self.module
+        if module.is_kde_project():
+            ret = url == configured_url or url.startswith("kde:")
+        else:
+            ret = url == configured_url
+        return ret
 
     def best_remote_name(self) -> list[str]:
         """
