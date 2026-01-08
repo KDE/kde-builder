@@ -20,10 +20,3 @@ class UpdaterKDEProjectMetadata(UpdaterKDEProject):
     # @override(check_signature=False)
     def name() -> str:
         return "metadata"
-
-    # @override(check_signature=False)
-    def update_internal(self, ipc=IPCNull()) -> None:
-        if Debug().is_testing():
-            return
-
-        super().update_internal(ipc)

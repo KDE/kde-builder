@@ -546,7 +546,8 @@ class Application:
                 orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
-                metadata_module.scm.update_internal()  # Skipped automatically in testing mode
+                if not Debug().is_testing():
+                    metadata_module.scm.update_internal()
                 logger_app.warning("")  # Prints empty line to space it from next messages
                 metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
