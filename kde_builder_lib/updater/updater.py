@@ -24,7 +24,6 @@ from ..util.util import Util
 from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
-    from typing import NoReturn
     from ..build_context import BuildContext
     from ..ipc.ipc import IPC
     from ..module.module import Module
@@ -66,8 +65,22 @@ class Updater:
     def name() -> str:
         return "git"
 
-    def _resolve_branch_group(self, branch_group: str) -> NoReturn:
-        raise KBRuntimeError("\t_resolve_branch_group is implemented in UpdaterKDEProject.")
+    def _resolve_branch_group(self, branch_group: str) -> str | None:
+        """
+        Resolve the requested branch-group for this Updater's module.
+
+        Returns the required branch name, or None if none is set.
+        """
+        module = self.module
+        if module.is_kde_project():
+            # If we're using a logical group we need to query the global build context to resolve it.
+            ctx = module.context
+            resolver = ctx.branch_group_resolver
+            module_path = module.get_option("#kde-repo-path") or module.name
+            ret = resolver.find_module_branch(module_path, branch_group)
+            return ret
+        else:
+            raise KBRuntimeError("\t_resolve_branch_group is implemented only for KDE Projects.")
 
     def current_revision_internal(self) -> str:
         return self.commit_id("HEAD")
