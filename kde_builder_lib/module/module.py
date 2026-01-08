@@ -877,7 +877,7 @@ class Module(OptionsBase):
             if layout == "flat":
                 base_path = self.name
             elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
-                base_path = self.get_option("#kde-repo-path", "module")
+                base_path = self.get_repopath()
                 base_path = base_path or self.name  # Default if not provided in repo-metadata
             else:
                 if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
@@ -915,6 +915,13 @@ class Module(OptionsBase):
         Each entry in the list will be a text message that should be shown (perhaps with additional formatting).
         """
         return self.post_build_msgs
+
+    def get_repopath(self) -> str | None:
+        if self.is_kde_project():
+            repopath = self.context.projects_db.repositories[self.name]["invent_name"]
+            return repopath
+        else:
+            return None
 
     def set_resolved_repository(self) -> None:
         """

@@ -76,7 +76,7 @@ class Updater:
             # If we're using a logical group we need to query the global build context to resolve it.
             ctx = module.context
             resolver = ctx.branch_group_resolver
-            module_path = module.get_option("#kde-repo-path") or module.name
+            module_path = module.get_repopath() or module.name
             ret = resolver.find_module_branch(module_path, branch_group)
             return ret
         else:

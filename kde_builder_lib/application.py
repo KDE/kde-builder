@@ -408,9 +408,10 @@ class Application:
                     continue
 
             if module.is_kde_project():
-                branch = resolver.find_module_branch(module.get_option("#kde-repo-path") or module.name, branch_group)
+                repopath = module.get_repopath()
+                branch = resolver.find_module_branch(repopath or module.name, branch_group)
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
-                    printpath = module.get_option("#kde-repo-path")
+                    printpath = repopath
                     printpath = "y[" + printpath.replace("/", "]/y[") + "]"
                     message = f" y[*] Removing {printpath} due to branch-group"
                     if module.name in explicit_kdeproject_selectors:
@@ -484,7 +485,7 @@ class Application:
             path = None
             if module in filtered_modules:
                 logger_app.debug("Skipping duplicate project " + module.name)
-            elif ((path := module.get_option("#kde-repo-path") or module.name) and
+            elif ((path := module.get_repopath() or module.name) and
                   any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
                 # See if the name matches any given in the ignore list.
 
@@ -724,7 +725,7 @@ class Application:
                     return x.installation_path()
             elif query_mode == "repopath":
                 def query(x):
-                    return x.get_option("#kde-repo-path")
+                    return x.get_repopath()
             elif query_mode == "branch":
                 def query(x):
                     return x.scm.determine_preferred_checkout_source()[0] or ""
