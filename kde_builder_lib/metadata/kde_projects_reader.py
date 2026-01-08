@@ -86,7 +86,11 @@ class KDEProjectsReader:
         results: list[str] = []
 
         def find_results():
-            match_list: list[str] = [key for key in sorted(repositories.keys()) if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["invent_name"], proj)]
+            match_list: list[str] = []
+            sorted_keys = sorted(repositories.keys())
+            for key in sorted_keys:
+                if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["invent_name"], proj):
+                    match_list.append(key)
 
             results.extend(match_list)
 
