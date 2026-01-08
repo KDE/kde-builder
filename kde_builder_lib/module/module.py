@@ -867,9 +867,13 @@ class Module(OptionsBase):
 
     def is_kde_project(self) -> bool:
         """
-        Return true if this module is (or was derived from) a kde-projects module.
+        Return True if this module belongs to kde projects, i.e. found in repo-metadata database.
         """
-        return self.scm_type() == "proj"
+        repo_db = self.context.projects_db.repositories
+        if self.name in repo_db:
+            return True
+        else:
+            return False
 
     def dest_dir(self) -> str:
         """

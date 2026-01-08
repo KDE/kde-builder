@@ -15,6 +15,8 @@ def test_environment_prepend():
     Test that empty install-dir and/or qt-install-dir do not cause empty /bin settings to be configured in environment.
     """
     ctx = BuildContext()
+    ctx.set_metadata_module()
+    ctx.set_metadata()
 
     def no_bare_bin(arg):
         elem = arg.split(":")
