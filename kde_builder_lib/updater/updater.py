@@ -230,15 +230,19 @@ class Updater:
                 ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
                 return ret
 
-    @staticmethod
-    def is_push_url_managed() -> bool:
+    def is_push_url_managed(self) -> bool:
         """
         Determine whether _setup_remote should manage the configuration of the git push URL for the repo.
 
         Returns:
              Boolean indicating whether _setup_remote should assume control over the push URL.
         """
-        return False
+        module = self.module
+        if module.is_kde_project():
+            ret = True
+        else:
+            ret = False
+        return ret
 
     def _setup_remote(self, remote: str) -> int:
         """

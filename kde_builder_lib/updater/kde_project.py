@@ -38,7 +38,3 @@ class UpdaterKDEProject(Updater):
     def _is_plausible_existing_remote(name: str, url: str, configured_url: str) -> bool:
         return url == configured_url or url.startswith("kde:")
 
-    @staticmethod
-    # @override
-    def is_push_url_managed() -> bool:
-        return True
