@@ -372,7 +372,7 @@ class Module(OptionsBase):
         build_system = self.build_system()
 
         if build_system.name() == "generic" and self.has_option("custom-build-command"):
-            logger_module.info(f" b[*] No build system detected for b[y[{self}], assuming custom build command will handle")
+            logger_module.info(f"\tb[*] No build system detected for b[y[{self}], assuming custom build command will handle")  # tab?
             return True
 
         if build_system.name() == "generic" and not Debug().pretending():
@@ -384,18 +384,17 @@ class Module(OptionsBase):
         builddir = self.fullpath("build")
         old_build_dir = self.get_option("#last-build-dir")
         if not Debug().pretending() and builddir != old_build_dir and os.path.isdir(old_build_dir) and not os.path.exists(builddir):
-            logger_module.warning(f" y[b[*] Build directory setting has changed to {builddir}.")
-            logger_module.warning(f" y[b[*] Moving old build directory at {old_build_dir} to the new location.")
+            logger_module.warning(f"\ty[b[*] Build directory setting has changed to {builddir}.")
+            logger_module.warning(f"\ty[b[*] Moving old build directory at {old_build_dir} to the new location.")
 
             try:
                 shutil.move(old_build_dir, builddir)
             except Exception as e:
                 logger_module.warning(textwrap.dedent(f"""\
-                    r[b[*] Unable to move {old_build_dir}
-                    r[b[*] to {builddir}
-                    r[b[*] Error: {e}
-                    y[b[*]
-                    y[b[*] Will proceed, generating a new build dir.
+                    \tr[b[*] Unable to move {old_build_dir}
+                    \tr[b[*] to {builddir}
+                    \tr[b[*] Error: {e}
+                    \ty[b[*] Will proceed, generating a new build dir.\
                     """))
 
         refresh_reason = build_system.needs_refreshed()
@@ -624,9 +623,9 @@ class Module(OptionsBase):
         fullpath = self.fullpath("source")
         old_source_dir = self.get_option("#last-source-dir")
         if not Debug().pretending() and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
-            logger_module.warning(f"""\
+            logger_module.warning(textwrap.dedent(f"""\
                 \ty[b[*] Source directory setting has changed to {fullpath}.
-                \ty[b[*] Moving old source directory at {old_source_dir} to the new location.""")
+                \ty[b[*] Moving old source directory at {old_source_dir} to the new location."""))
 
             try:
                 shutil.move(old_source_dir, fullpath)
@@ -654,7 +653,7 @@ class Module(OptionsBase):
             else:
                 e_str = str(e)
 
-            logger_module.error(f"{e_str}")
+            logger_module.error(f"\t{e_str}")
             if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
                 logger_module.error(f"\tError updating r[{self.name}], removing from list of projects to build.")
 
@@ -1085,7 +1084,7 @@ class Module(OptionsBase):
         logdir = self.get_log_dir()
 
         if self.has_option("#error-log-file"):
-            logger_module.error(f"{self} already has error log set, tried to set to r[b[{logfile}]")
+            logger_module.error(f"\tr[b[*] {self} already has error log set, tried to set to r[b[{logfile}]")
             return
 
         self.set_option("#error-log-file", f"{logdir}/{logfile}")
@@ -1098,7 +1097,7 @@ class Module(OptionsBase):
 
         if os.path.exists(f"{logdir}/error.log"):
             # Maybe it was a regular file?
-            logger_module.error("r[b[ * Unable to create symlink to error log file]")
+            logger_module.error("\tr[b[*] Unable to create symlink to error log file")
             return
 
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
