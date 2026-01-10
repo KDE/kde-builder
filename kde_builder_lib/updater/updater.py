@@ -150,16 +150,16 @@ class Updater:
             raise ProgramError("\tMissing IPC object")
         ipc = self.ipc
 
-        logger_updater.warning(f"\tCloning g[{module}]")
-
-        Util.p_chdir(module.get_source_dir())
-
         commit_id, commit_type = self.determine_preferred_checkout_source()
 
         if commit_type != "none":
-            commit_id = re.sub(r"^refs/tags/", "", commit_id)  # git-clone -b doesn't like refs/tags/
-            args.insert(0, commit_id)  # Checkout branch right away
-            args.insert(0, "-b")
+            commit_id = commit_id.removeprefix("refs/tags/")  # git-clone -b doesn't like refs/tags/
+            args = ["-b", commit_id] + args  # Checkout branch right away
+
+        logger_updater.warning(f"\tCloning g[{module}] pointing to {commit_type} b[{commit_id}]")
+
+        Util.p_chdir(module.get_source_dir())
+
 
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
