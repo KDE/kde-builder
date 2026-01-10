@@ -580,7 +580,11 @@ class Updater:
         checkout_source = None
         # easiest way to be clear that bool context is intended
 
-        source_type = next((x for x in priority_ordered_sources if (checkout_source := module.get_option(x[0], x[2]))), None)  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
+        source_type = None
+        for x in priority_ordered_sources:
+            if checkout_source := module.get_option(x[0], x[2]):  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
+                source_type = x
+                break
 
         # The user has no clear desire here (either set for the module or globally.
         # Note that the default config doesn't generate a global "branch" setting).
