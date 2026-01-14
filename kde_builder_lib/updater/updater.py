@@ -77,7 +77,7 @@ class Updater:
             ctx = module.context
             resolver = ctx.branch_group_resolver
             module_path = module.get_repopath() or module.name
-            ret = resolver.find_module_branch(module_path, branch_group)
+            ret = resolver.resolve_branch_group(module_path, branch_group)
             return ret
         else:
             raise KBRuntimeError("\t_resolve_branch_group is implemented only for KDE Projects.")

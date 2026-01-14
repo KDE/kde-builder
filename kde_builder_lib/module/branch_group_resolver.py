@@ -17,13 +17,12 @@ class ModuleBranchGroupResolver:
         self.layers: list[str] = yaml_data.get("layers", [])
         self.groups: dict[str, dict[str, str]] = yaml_data.get("groups", {})
 
-        # Extract wildcarded groups separately as they are handled separately
-        # later. Note that the specific catch-all group "*" is itself handled
-        # as a special case in find_module_branch.
+        wildcarded_prefixes: list[str] = [key for key in self.groups if key.endswith("*")]
 
-        self.wildcarded_groups: dict[str, dict[str, str]] = {key: self.groups[key] for key in self.groups if key[-1] == "*"}
+        # Sort longest required-prefix to the top. First match that is valid will then also be the right match.
+        self.ordered_wildcarded_prefixes: list[str] = sorted(wildcarded_prefixes, reverse=True)
 
-    def find_module_branch(self, entry_name: str, group_name: str) -> str | None:
+    def resolve_branch_group(self, entry_name: str, group_name: str) -> str | None:
         """
         Return the branch for the given group name and entry_name.
 
@@ -34,19 +33,14 @@ class ModuleBranchGroupResolver:
         if entry_name in self.groups:
             return self.groups[entry_name].get(group_name, None)
 
-        # Map module search spec to prefix string that is required for a match
-        catch_all_group_stats: dict[str, str] = {key: key[:-1] for key in self.wildcarded_groups.keys()}
-
-        # Sort longest required-prefix to the top... first match that is valid will
-        # then also be the right match.
-        ordered_candidates: list[str] = sorted(catch_all_group_stats.keys(), key=lambda x: catch_all_group_stats[x], reverse=True)
-
-        match: str | None = next((candidate for candidate in ordered_candidates if entry_name[:len(catch_all_group_stats[candidate])] == catch_all_group_stats[candidate]), None)
+        match: str | None = None
+        for wildcarded_prefix in self.ordered_wildcarded_prefixes:
+            prefix = wildcarded_prefix.removesuffix("*")
+            if entry_name.startswith(prefix):
+                match = wildcarded_prefix
+                break
 
         if match:
             return self.groups[match].get(group_name, None)
-
-        if "*" in self.groups:
-            return self.groups["*"].get(group_name, None)
 
         return None

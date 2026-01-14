@@ -409,7 +409,7 @@ class Application:
 
             if module.is_kde_project():
                 repopath = module.get_repopath()
-                branch = resolver.find_module_branch(repopath or module.name, branch_group)
+                branch = resolver.resolve_branch_group(repopath or module.name, branch_group)
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
                     printpath = repopath
                     printpath = "y[" + printpath.replace("/", "]/y[") + "]"
