@@ -22,25 +22,24 @@ class ModuleBranchGroupResolver:
         # Sort longest required-prefix to the top. First match that is valid will then also be the right match.
         self.ordered_wildcarded_prefixes: list[str] = sorted(wildcarded_prefixes, reverse=True)
 
-    def resolve_branch_group(self, entry_name: str, group_name: str) -> str | None:
+    def resolve_branch_group(self, repopath_entry_str: str, layer_name: str) -> str | None:
         """
         Return the branch for the given group name and entry_name.
 
         Args:
-            entry_name: full key name from branch groups (may contain "*")
-            group_name: value of group
+            repopath_entry_str: full repo path string that is searched in groups keys (for example, "sdk/kde-builder")
+            layer_name: value of branch-group layer name (for example, "latest-kf6")
         """
-        if entry_name in self.groups:
-            return self.groups[entry_name].get(group_name, None)
+        if repopath_entry_str in self.groups:
+            ret = self.groups[repopath_entry_str].get(layer_name, None)
+            if ret is not None:
+                return ret
 
-        match: str | None = None
         for wildcarded_prefix in self.ordered_wildcarded_prefixes:
             prefix = wildcarded_prefix.removesuffix("*")
-            if entry_name.startswith(prefix):
-                match = wildcarded_prefix
-                break
-
-        if match:
-            return self.groups[match].get(group_name, None)
+            if repopath_entry_str.startswith(prefix):
+                if layer_name in self.groups[wildcarded_prefix]:
+                    ret = self.groups[wildcarded_prefix][layer_name]
+                    return ret
 
         return None
