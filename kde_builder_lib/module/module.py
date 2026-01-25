@@ -740,7 +740,7 @@ class Module(OptionsBase):
         OptionsBase.set_option(self,  opt_name, opt_val)
 
     # @override(check_signature=False)
-    def get_option(self, key: str, level_limit="allow-inherit") -> str | bool | dict | None:
+    def get_option(self, key: str, level_limit="allow-inherit") -> str | dict | None:
         """
         Return an option value for a given module.
 
@@ -771,7 +771,6 @@ class Module(OptionsBase):
                     buildContext).
 
         Returned type - for example used in
-          bool - "#guessed-kde-project"
           None - unexisting key in module-only level
           dict - "set-env"
           str - almost everything else

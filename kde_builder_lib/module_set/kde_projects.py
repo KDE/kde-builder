@@ -10,7 +10,7 @@ import re
 from typing import TYPE_CHECKING
 
 from .module_set import ModuleSet
-from ..kb_exception import UnknownKdeProjectException
+# from ..kb_exception import UnknownKdeProjectException
 from ..debug import KBLogger
 from ..metadata.kde_projects_reader import KDEProjectsReader
 from ..module.module import Module
@@ -107,10 +107,10 @@ class ModuleSetKDEProjects(ModuleSet):
         """
         all_module_results: list[dict[str, str | bool]] = ctx.projects_db.get_modules_for_project(module_search_item)
 
-        if not all_module_results:
-            # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
-            # are not defined in config is normal.
-            raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
+        # if not all_module_results:
+        #     # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
+        #     # are not defined in config is normal.
+        #     raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.

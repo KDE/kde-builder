@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 
 from .kb_exception import KBException
 from .kb_exception import KBRuntimeError
+from .kb_exception import UnknownKdeProjectException
 from .module.module import Module
 from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
@@ -281,12 +282,16 @@ class ModuleResolver:
             selector.set_option("#include-dependencies", including_deps)
         # Case 3?
         else:
+            if selector_name not in self.context.projects_db.repositories:
+                # Third-party projects must not be crafted this way.
+                raise UnknownKdeProjectException(f"Unknown KDE project: {selector_name}", selector_name)
             selector: Module = Module(ctx, selector_name)
             selector.phases.reset_to(ctx.phases.phaselist)
 
             selector.set_scm()
-            selector.set_option("#guessed-kde-project", True)
             selector.set_option("#include-dependencies", including_deps)
+
+            self.defined_modules_and_module_sets[selector_name] = selector
 
         # In case selector is None (may happen in case 2), results list for sure becomes non-empty,
         # so None (the value of selector variable) will not be placed to the results list. Return type annotation is correct.
@@ -300,48 +305,6 @@ class ModuleResolver:
         unexpanded_module_sets.sort(key=lambda x: x.name)
         for unexpanded_module_set in unexpanded_module_sets:
             self._expand_single_module_set(unexpanded_module_set)
-
-    def _resolve_guessed_modules(self, modules: list[Module]) -> list[Module]:
-        ctx = self.context
-
-        # We didn't necessarily fully expand all module-sets available in the
-        # input_modules_and_options when we were resolving selectors.
-        # Because of this we may need to go a step further and expand out all
-        # remaining module-sets in rcFileModulesAndModuleSets if we have "guess"
-        # modules still left over (since they might be Case 3), and see if we can
-        # then successfully match.
-
-        if not any(module.get_option("#guessed-kde-project", "module") for module in modules):
-            return modules
-
-        self._expand_all_unexpanded_module_sets()
-
-        results: list[Module] = []
-
-        # We use foreach since we *want* to be able to replace the iterated variable
-        # if we find an existing module.
-        for guessed_module in modules:
-            if not guessed_module.get_option("#guessed-kde-project", "module"):
-                results.append(guessed_module)
-                continue
-
-            # If the module we want could be found from within our rc-file
-            # module-sets (even implicitly), use it. Otherwise, assume
-            # kde-projects and evaluate now.
-            if guessed_module.name in self.defined_modules_and_module_sets:
-                guessed_module: Module = self.defined_modules_and_module_sets[guessed_module.name]
-                results.append(guessed_module)
-            else:
-                mod_set = ModuleSetKDEProjects(ctx, "guessed_from_cmdline")
-                mod_set.set_modules_to_find([guessed_module.name])
-
-                set_results: list[Module] = self.expand_module_sets([mod_set])
-                search_item: str = guessed_module.name
-                if not set_results:
-                    raise KBRuntimeError(f"{search_item} doesn't match any projects.")
-                results.extend(set_results)
-
-        return results
 
     def resolve_selectors_into_modules(self, selectors: list[str]) -> list[Module]:
         """
@@ -382,13 +345,6 @@ class ModuleResolver:
 
         modules: list[Module] = self.expand_module_sets(output_list)
 
-        # If we have any "guessed" modules then they had no obvious source in the
-        # rc-file. But they might still be implicitly from one of our module-sets
-        # (Case 3).
-        # We want them to use `Module`s from the rc-file modules/module-sets
-        # instead of our shell Modules, if possible.
-        modules: list[Module] = self._resolve_guessed_modules(modules)
-
         return modules
 
     def resolve_module_if_present(self, module_name: str) -> Module | None:
@@ -426,7 +382,7 @@ class ModuleResolver:
         not actually modified in this process.
 
         Similar to resolve_selectors_into_modules, except that in this case no
-        "guessing" for Modules is allowed; the requested module is returned if
+        crafting (case 3) for Modules is allowed; the requested module is returned if
         present, or None otherwise. Also unlike resolve_selectors_into_modules, no
         exceptions are thrown if the module is not present.
 
