@@ -75,8 +75,8 @@ class Application:
 
         self.metadata_module = None
         self.run_mode = "build"
-        self.module_factory = None
-        """Function that makes a new Module. See generate_module_list()."""
+        self.module_resolver = None
+        """ModuleResolver object, that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
 
         self.ignore_list: list[str] = []
@@ -345,7 +345,7 @@ class Application:
         module_resolver.set_input_modules_and_options(modules_and_sets_from_userconfig)
         module_resolver.ignored_selectors = list(ignored_selectors.keys())
 
-        self._define_new_module_factory(module_resolver)
+        self.module_resolver = module_resolver
 
         modules: list[Module] = []
         if not cmdline_selectors_len and not opts["special-selectors"] and self.run_mode != "install-login-session-only":
@@ -623,7 +623,7 @@ class Application:
         metadata_module = ctx.metadata_module
 
         try:
-            dependency_resolver = DependencyResolver(self.module_factory)
+            dependency_resolver = DependencyResolver(self.module_resolver)
             branch_group = ctx.get_option("branch-group")
 
             if Debug().is_testing():
@@ -1184,22 +1184,6 @@ class Application:
             raise KBRuntimeError(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
 
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
-
-    def _define_new_module_factory(self, resolver: ModuleResolver) -> None:
-        """
-        Define the module factory function.
-
-        The factory function is needed for lower-level code to properly be able to create :class:`Module` objects from just the module name, while still
-        having the options be properly set and having the module properly tied into a context.
-        """
-        def module_factory(module_name: str) -> Module | None:
-            ret = resolver.resolve_module_if_present(module_name)
-            return ret
-
-        self.module_factory = module_factory
-        # We used to need a special module-set to ignore virtual deps (they
-        # would throw errors if the name did not exist). But, the resolver
-        # handles that fine as well.
 
     @staticmethod
     def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:

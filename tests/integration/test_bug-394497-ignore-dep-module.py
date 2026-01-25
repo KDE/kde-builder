@@ -15,7 +15,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
         """
         Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
         """
-        new_module = self.module_factory("setmod2")
+        new_module = self.module_resolver.resolve_module_if_present("setmod2")
 
         graph = {}
 

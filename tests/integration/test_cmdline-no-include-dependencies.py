@@ -13,7 +13,7 @@ from kde_builder_lib.debug import Debug
 def mock_application(monkeypatch):
     # Redefine Application._resolveModuleDependencies to avoid requiring metadata module.
     def mock_resolve_module_dependency_graph(self, modules: list):
-        new_module = self.module_factory("setmod2")
+        new_module = self.module_resolver.resolve_module_if_present("setmod2")
 
         graph = {
             "setmod1": {

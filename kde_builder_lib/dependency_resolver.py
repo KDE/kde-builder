@@ -15,6 +15,7 @@ from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .module.module import Module
+from .module_resolver import ModuleResolver
 from .updater.updater import Updater
 from .util.util import Util
 
@@ -36,22 +37,7 @@ class DependencyResolver:
     #     return grep { ++($seen{$_}) == 1 } @_;
     # }
 
-    def __init__(self, module_factory):
-        """
-        Initialize DependencyResolver.
-
-        Args:
-            module_factory: Function that creates :class:`Module` from
-            kde-project module names. Used for :class:`Module` for which the user
-            requested recursive dependency inclusion.
-
-        Example:
-        ::
-            resolver = DependencyResolver(modNew)
-            fh = os.open("file.txt", "r")
-            resolver.read_dependency_data(fh)
-            resolver.resolveDependencies(modules)
-        """
+    def __init__(self, module_resolver: ModuleResolver):
         self.dependencies_of = {}
         """
         Dict mapping short module names (m) to a dict key by branch name, the value of which is yet another dict (see read_dependency_data()).
@@ -65,9 +51,9 @@ class DependencyResolver:
         Dict mapping a wildcarded module name with no branch to a list of module:branch dependencies.
         """
 
-        self.module_factory = module_factory
+        self.module_resolver = module_resolver
         """
-        Function that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
+        ModuleResolver object, that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
         """
 
     @staticmethod
@@ -419,7 +405,7 @@ class DependencyResolver:
                         dep_module_graph["branch"] = dep_branch
 
             else:
-                dep_module = self.module_factory(dep_item)
+                dep_module: Module | None = self.module_resolver.resolve_module_if_present(dep_item)
                 resolved_path = DependencyResolver._get_dependency_path_of(dep_module, dep_item, dep_path)
                 # May not exist, e.g. misspellings or "virtual" dependencies like kf5umbrella.
                 if not dep_module:
