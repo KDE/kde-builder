@@ -189,8 +189,7 @@ class ModuleResolver:
         if not module_results:
             raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of projects!")
 
-        # Copy entries into the lookup dict, especially in case they're
-        # from case 3
+        # Copy entries into the lookup dict
         self.defined_modules_and_module_sets.update({module_result.name: module_result for module_result in module_results})
 
         # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
@@ -209,14 +208,26 @@ class ModuleResolver:
         The selector may refer to a module or module-set, which means that the
         return value may be a list of modules.
         """
+        # There are 3 types of selectors:
+        # 1. Directly named and defined modules or module-sets
+        # 2. Referenced (but undefined) modules. These are mentioned in a
+        #    use-projects in a module set, but not actually available as `Module`
+        #    objects yet. But we know they will exist.
+        # 3. Indirect modules. These are modules that do exist in the KDE project
+        #    metadata, and will be pulled in once all module-sets are expanded
+        #    (whether that's due to implicit wildcarding with use-projects, or due
+        #    to dependency following). However, we don't even know the names for
+        #    these yet.
+
         ctx = self.context
         selector: Module | ModuleSet | None = None
         results: list[Module | ModuleSet | None] = []  # Will default to the selector if unset by the end of function
 
-        # In the remainder of this code, self.defined_modules_and_module_sets is basically handling
-        # case 1, while self.use_projects_referenced_from_module_sets handles case 2. No `Module`s
-        # are *both* case 1 and 2 at the same time, and a module-set can only
-        # be case 1. We clean up and handle any case 3s (if any) at the end.
+        # self.defined_modules_and_module_sets handles case 1.
+        # self.use_projects_referenced_from_module_sets handles case 2.
+        # No `Module`s are *both* case 1 and 2 at the same time.
+        # A module-set can only be case 1.
+        # We clean up and handle any case 3 (if any) at the end.
 
         # Module selectors beginning with "+" force treatment as a kde-projects
         # module, which means they won't be matched here (we're only looking for
@@ -232,8 +243,6 @@ class ModuleResolver:
         # include-dependencies for now.
         def_including: bool = ctx.get_option("include-dependencies")
         including_deps: bool = self.cmdline_options["global"].get("include-dependencies", def_including)
-
-        # See resolve_selectors_into_modules for what the 3 "cases" mentioned below are.
 
         # Case 2. We make these checks first since they may update lookup dict
         if selector_name in self.use_projects_referenced_from_module_sets and selector_name not in self.defined_modules_and_module_sets:
@@ -270,8 +279,8 @@ class ModuleResolver:
             selector: ModuleSetKDEProjects = ModuleSetKDEProjects(ctx, "forced_to_kde_project")
             selector.set_modules_to_find([selector_name])
             selector.set_option("#include-dependencies", including_deps)
+        # Case 3?
         else:
-            # Case 3?
             selector: Module = Module(ctx, selector_name)
             selector.phases.reset_to(ctx.phases.phaselist)
 
@@ -364,17 +373,6 @@ class ModuleResolver:
         Returns a list of :class:`Module` in build order, with any module-sets fully
         expanded. The desired options will be set for each :class:`Module` returned.
         """
-        # Basically there are 3 types of selectors at this point:
-        # 1. Directly named and defined modules or module-sets.
-        # 2. Referenced (but undefined) modules. These are mentioned in a
-        #    use-projects in a module set but not actually available as `Module`
-        #    objects yet. But we know they will exist.
-        # 3. Indirect modules. These are modules that do exist in the KDE project
-        #    metadata, and will be pulled in once all module-sets are expanded
-        #    (whether that's due to implicit wildcarding with use-projects, or due
-        #    to dependency following). However, we don't even know the names for
-        #    these yet.
-
         # We have to be careful to maintain order of selectors throughout.
         output_list: list[Module | ModuleSet] = []
         for selector in selectors:
