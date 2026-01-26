@@ -86,13 +86,12 @@ class ModuleSet(OptionsBase):
         Get module names to find.
 
         Same as modules_to_find, but strips away any path components to leave just module names.
-        E.g. a "use-projects: [kde/kdelibs, juk.git]" would give [kdelibs, juk] as the result list.
+        E.g. a "use-projects: [kde/kdelibs, juk]" would give [kdelibs, juk] as the result list.
         """
         modules = self.modules_to_find()
         ret = []
         for module in modules:
             module = module.split("/")[-1]
-            module = module.removesuffix(".git")
             ret.append(module)
         return ret
 
@@ -167,7 +166,6 @@ class ModuleSet(OptionsBase):
         # of setting up a module-set, so there is no "search" or "ignore" to
         # handle, just create `Module` and dump options into them.
         for module_name in self.modules_to_find():
-            module_name = module_name.removesuffix(".git")
 
             new_module = Module(ctx, module_name)
 

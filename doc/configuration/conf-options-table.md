@@ -1147,7 +1147,7 @@ this).
 
 ```{important}
 The name to use for the project if you do this is simply the name that
-you passed to `use-projects`, with the exception that any `.git` is removed.
+you passed to `use-projects`.
 ```
 
 See the section called [](#groups) and [git-repository-base](#conf-git-repository-base)
