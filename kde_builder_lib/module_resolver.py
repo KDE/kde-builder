@@ -230,14 +230,6 @@ class ModuleResolver:
         # A module-set can only be case 1.
         # We clean up and handle any case 3 (if any) at the end.
 
-        # Module selectors beginning with "+" force treatment as a kde-projects
-        # module, which means they won't be matched here (we're only looking for
-        # sets).
-        forced_to_kde_project: bool = selector_name[:1] == "+"
-
-        if forced_to_kde_project:
-            selector_name = selector_name[1:]
-
         # Checks cmdline options only.  This is intended to make
         # --no-include-dependencies suppress the action of include-dependencies in
         # the config file so make the absence of the flag imply
@@ -275,11 +267,6 @@ class ModuleResolver:
                 # include-dependencies also set on cmdline.
                 selector.set_option("#include-dependencies", False)
 
-        elif forced_to_kde_project:
-            # Just assume it's a kde-projects module and expand away...
-            selector: ModuleSetKDEProjects = ModuleSetKDEProjects(ctx, "forced_to_kde_project")
-            selector.set_modules_to_find([selector_name])
-            selector.set_option("#include-dependencies", including_deps)
         # Case 3?
         else:
             if selector_name not in self.context.projects_db.repositories:
@@ -356,12 +343,9 @@ class ModuleResolver:
         if self.use_projects_referenced_from_module_sets:
             self._expand_all_unexpanded_module_sets()
 
-        # We may not already know about modules that can be found in kde-projects,
-        # so double-check by resolving module name into a kde-projects module-set
-        # selector (the + syntax) and then expanding out the module-set so generated.
         if self.defined_modules_and_module_sets.get(module_name) is None:
             try:
-                self._expand_single_module_set(*self._resolve_single_selector("+" + module_name))
+                self._expand_single_module_set(*self._resolve_single_selector(module_name))
             except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 

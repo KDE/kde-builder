@@ -27,16 +27,9 @@ repo-metadata's KDE project entry locates the project in
 to build kcalc:
 
 ```bash
-kde-builder +kde/kdeutils/kcalc
-kde-builder +kdeutils/kcalc
-kde-builder +kcalc
-```
-
-```{note}
-The commands in the example above preceded the project name with a
-`+`. This forces the project name to be interpreted as a project from the
-KDE project database, even if that project hasn't been defined in your
-configuration file.
+kde-builder kde/kdeutils/kcalc
+kde-builder kdeutils/kcalc
+kde-builder kcalc
 ```
 
 Be careful about specifying very generic projects (e.g.

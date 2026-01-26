@@ -11,8 +11,7 @@ more git projects. Projects are formed into the list in the order given in the
 configuration file, but any projects implicitly pulled in from the kde-project
 projects will be sorted appropriately by repo-metadata/dependencies.
 
-2. Projects can be directly specified on the command line. kde-projects projects
-can be forced by preceding the project name with a "+".
+2. Projects can be directly specified on the command line.
 
 After processing command line project names, any projects that match a project
 (or group) given from the configuration file will have the configuration
@@ -40,10 +39,6 @@ project names are read before the configuration file is even named (let alone
 read) kde-builder has to hold onto the list until much later in
 initialization before it can really figure out what's going on with the
 command line. So the sequence looks more like:
-
-> nameA/??, nameB/??, +nameC/??, nameD/??
-
-Then + names are forced to be proj-type
 
 > nameA/??, nameB/??, nameC/proj, nameD/??
 
