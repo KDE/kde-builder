@@ -29,7 +29,7 @@ from .options_base import OptionsBase
 from .phase_list import PhaseList
 from .status_view import StatusView
 from .util.util import Util
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 
 logger_buildcontext = KBLogger.getLogger("build-context")
 
@@ -452,7 +452,7 @@ class BuildContext(Module):
                 # This way the --metadata-only option could work in both cases: when user has config and when he has not.
                 # When he has config (not current case), the persistent option "last-metadata-update" will be set as expected, and after the build process, it will be stored in persistent file.
                 # When he has no config (the current case), we will let the _process_configs_content() function do its work on fake config, then we will return.
-                dummy_config = textwrap.dedent("""\
+                dummy_config = dedent("""
                     config-version: 2
                     global:
                       persistent-data-file: /not/existing/file  # should not exist in file system (so it is not tried to be read, otherwise we should provide a valid json)
@@ -460,6 +460,7 @@ class BuildContext(Module):
                     # To suppress warning about no projects in configuration.
                     project fake:
                       branch: fake
+
                     """)
 
                 temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -471,12 +472,13 @@ class BuildContext(Module):
                 return
 
             # If not found anything in the default location, and user did not specify the --rc-file in the command line, warn the user and fail.
-            logger_buildcontext.error(textwrap.dedent(f"""\
+            logger_buildcontext.error(dedent(f"""
                 b[r[*] No configuration file is present.
                 When run, KDE Builder will use kde-builder.yaml config file located in the current working directory.
                 If no such file exists, KDE Builder will use {BuildContext.xdg_config_home_short}/kde-builder.yaml instead.
                 You can generate config with b[--generate-config].
                 Or you can specify the path to the config file with --rc-file option.
+
                 """))
             raise KBRuntimeError("No configuration available")
 
@@ -484,11 +486,12 @@ class BuildContext(Module):
         config_file = os.path.abspath(config_file)
 
         if not os.path.exists(config_file):
-            logger_buildcontext.error(textwrap.dedent(f"""\
+            logger_buildcontext.error(dedent(f"""
             b[r[*] Unable to open config file {config_file}
             KDE Builder is stopping here since you specified --rc-file on the command line to load {config_file} manually.
             If you wish to run KDE Builder with config file from default location, leave the --rc-file option out of the command line.
             If you want to force an empty rc file, use --rc-file /dev/null
+
             """))
             raise KBRuntimeError(f"Missing {config_file}")
         self.rc_file = config_file

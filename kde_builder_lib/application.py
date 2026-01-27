@@ -43,7 +43,7 @@ from .start_program import StartProgram
 from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 from .version import Version
 
 logger_app = KBLogger.getLogger("application")
@@ -591,23 +591,25 @@ class Application:
             with open(f"{metadata_dir}/config/repo-metadata-format.yaml", "r") as f:
                 repo_metadata_format_yaml = yaml.safe_load(f.read())
         except FileNotFoundError:
-            msg = textwrap.dedent(f"""\
-                ] r[b[*] Cannot check kde-builder-format in repo-metadata, because r[repo-metadata-format.yaml] is missing in repo-metadata.
-                  r[*] It is possible that either kde-builder or repo-metadata are out of date.
-                  r[*] To update kde-builder, use y[--self-update].
-                  r[*] To update repo-metadata, use y[--metadata-only].""")
+            msg = dedent(f"""
+                 r[b[*] Cannot check kde-builder-format in repo-metadata, because r[repo-metadata-format.yaml] is missing in repo-metadata.
+                 r[*] It is possible that either kde-builder or repo-metadata are out of date.
+                 r[*] To update kde-builder, use y[--self-update].
+                 r[*] To update repo-metadata, use y[--metadata-only].
+                """, preserve_len=1)
             logger_app.error(msg)
             exit()
 
         repo_metadata_format = repo_metadata_format_yaml["kde-builder-format"]
 
         if repo_metadata_format != current_installation_format:
-            msg = textwrap.dedent(f"""\
-            ] r[b[*] Repo-metadata format has changed. Please update kde-builder.
-              r[*] kde-builder-format currently supported: b[{current_installation_format}]
-              r[*] kde-builder-format from repo-metadata: b[{repo_metadata_format}]
-              r[*] To update kde-builder, use y[--self-update].
-              r[*] To update repo-metadata, use y[--metadata-only].""")
+            msg = dedent(f"""
+                 r[b[*] Repo-metadata format has changed. Please update kde-builder.
+                 r[*] kde-builder-format currently supported: b[{current_installation_format}]
+                 r[*] kde-builder-format from repo-metadata: b[{repo_metadata_format}]
+                 r[*] To update kde-builder, use y[--self-update].
+                 r[*] To update repo-metadata, use y[--metadata-only].
+                """, preserve_len=1)
             logger_app.error(msg)
             exit()
 
@@ -768,10 +770,11 @@ class Application:
 
             # Check for absolutely essential programs now.
             if self._have_missing_build_tools():
-                logger_app.error(textwrap.dedent("""\
-                ] r[*] Please ensure the development packages are installed by using your distribution's package manager.
-                ] r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
-                ] r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway."""))
+                logger_app.error(dedent("""
+                     r[*] Please ensure the development packages are installed by using your distribution's package manager.
+                     r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
+                     r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.
+                    """, preserve_len=1))
                 result = 1
             else:
                 runner = TaskManager(self)
@@ -1123,18 +1126,12 @@ class Application:
 
         if ctx.get_option("resume-from") and ctx.get_option("resume-after"):
             # This one's an error.
-            logger_app.error(textwrap.dedent("""\
-            You specified both r[b[--resume-from] and r[b[--resume-after] but you can only
-            use one.
-            """))
+            logger_app.error("You specified both r[b[--resume-from] and r[b[--resume-after] but you can only use one.\n")
             raise KBRuntimeError("Both --resume-after and --resume-from specified.")
 
         if ctx.get_option("stop-before") and ctx.get_option("stop-after"):
             # This one's an error.
-            logger_app.error(textwrap.dedent("""\
-            You specified both r[b[--stop-before] and r[b[--stop-after] but you can only
-            use one.
-            """))
+            logger_app.error("You specified both r[b[--stop-before] and r[b[--stop-after] but you can only use one.\n")
             raise KBRuntimeError("Both --stop-before and --stop-from specified.")
 
         if not module_list:  # Empty input?
@@ -1219,11 +1216,12 @@ class Application:
 
         if len(module_names) > 0:
             names = ", ".join(module_names)
-            logger_app.warning(textwrap.dedent(f"""
-            Possible solution: Install the build dependencies for the projects:
-            {names}
-            You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
-            See https://develop.kde.org/docs/getting-started/building/help-dependencies"""))
+            logger_app.warning(dedent(f"""
+                Possible solution: Install the build dependencies for the projects:
+                {names}
+                You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
+                See https://develop.kde.org/docs/getting-started/building/help-dependencies
+                """))
 
     @staticmethod
     def _print_failed_modules_in_each_phase(ctx: BuildContext, module_graph: dict) -> None:
@@ -1548,9 +1546,7 @@ class Application:
 
                 modules_needing = modules_requiring_program[prog].keys()
 
-                logger_app.error(textwrap.dedent(f"""\
-                ] r[*] Unable to find r[b[{prog}]. This program is absolutely essential for building the projects: y[{", ".join(modules_needing)}].
-                """))
+                logger_app.error(f" r[*] Unable to find r[b[{prog}]. This program is absolutely essential for building the projects: y[{', '.join(modules_needing)}].\n")
         return was_error
 
     @staticmethod
@@ -1606,7 +1602,7 @@ class Application:
     def _warn_if_branch_group_does_not_exists(self, user_branch_group):
         possible_branch_groups = self.context.branch_group_resolver.layers
         if user_branch_group not in possible_branch_groups:
-            logger_app.warning(textwrap.dedent(f"""\
-            ] y[*] Your branch-group value y[\"{user_branch_group}\"] seems to be incorrect.
-            ] y[*] Possible values are: {'g["' + '"], g["'.join(possible_branch_groups) + '"]"'}.\
-            """))
+            logger_app.warning(dedent(f"""
+                 y[*] Your branch-group value y[\"{user_branch_group}\"] seems to be incorrect.
+                 y[*] Possible values are: {'g["' + '"], g["'.join(possible_branch_groups) + '"]"'}.
+                """, preserve_len=1))

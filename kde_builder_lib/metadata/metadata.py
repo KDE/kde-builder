@@ -6,7 +6,6 @@
 import yaml
 import os
 import re
-import textwrap
 
 from ..kb_exception import KBRuntimeError
 from ..kb_exception import ProgramError

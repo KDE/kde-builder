@@ -14,7 +14,6 @@ from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
 from ..phase_list import PhaseList
-from ..util.textwrap_mod import textwrap
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext

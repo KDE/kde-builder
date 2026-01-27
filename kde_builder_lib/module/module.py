@@ -31,7 +31,7 @@ from ..ipc.ipc import IPC
 from ..options_base import OptionsBase
 from ..updater.updater import Updater
 from ..util.util import Util
-from ..util.textwrap_mod import textwrap
+from ..util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
@@ -390,11 +390,11 @@ class Module(OptionsBase):
             try:
                 shutil.move(old_build_dir, builddir)
             except Exception as e:
-                logger_module.warning(textwrap.dedent(f"""\
+                logger_module.warning(dedent(f"""
                     \tr[b[*] Unable to move {old_build_dir}
                     \tr[b[*] to {builddir}
                     \tr[b[*] Error: {e}
-                    \ty[b[*] Will proceed, generating a new build dir.\
+                    \ty[b[*] Will proceed, generating a new build dir.
                     """))
 
         refresh_reason = build_system.needs_refreshed()
@@ -623,18 +623,20 @@ class Module(OptionsBase):
         fullpath = self.fullpath("source")
         old_source_dir = self.get_option("#last-source-dir")
         if not Debug().pretending() and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
-            logger_module.warning(textwrap.dedent(f"""\
+            logger_module.warning(dedent(f"""
                 \ty[b[*] Source directory setting has changed to {fullpath}.
-                \ty[b[*] Moving old source directory at {old_source_dir} to the new location."""))
+                \ty[b[*] Moving old source directory at {old_source_dir} to the new location.
+                """))
 
             try:
                 shutil.move(old_source_dir, fullpath)
             except Exception as e:
-                logger_module.warning(textwrap.dedent(f"""\
+                logger_module.warning(dedent(f"""
                     \tr[b[*] Unable to move {old_source_dir}
                     \tr[b[*] to {fullpath}
                     \tr[b[*] Error: {e}
-                    \ty[b[*] Will proceed, generating a new source dir."""))
+                    \ty[b[*] Will proceed, generating a new source dir.
+                    """))
 
         self.current_phase = "update"
 

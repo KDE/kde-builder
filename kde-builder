@@ -14,7 +14,7 @@ import traceback
 from kde_builder_lib.kb_exception import ProgramError
 from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
-from kde_builder_lib.util.textwrap_mod import textwrap
+from kde_builder_lib.util.textwrap_mod import dedent
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -47,8 +47,9 @@ def find_missing_modules() -> list[str]:
 # Ensure that required Python modules are available so that the user isn't surprised later with an exception
 missing_module_descriptions = find_missing_modules()
 if missing_module_descriptions:
-    print(textwrap.dedent("""\
-        Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:"""))
+    print(dedent("""
+        Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:
+        """))
     for missing_module_desc in missing_module_descriptions:
         print("\t" + missing_module_desc)
 
@@ -189,14 +190,16 @@ except UnknownKdeProjectException as err:
     logger_app.error(f" r[*] y[{err.unknown_project_name}] is not found in KDE projects, and there is no defined project with such name in the config.")
     exit(99)
 except ProgramError as err:
-    print(textwrap.dedent(f"""
-    kde-builder encountered an exceptional error condition:
-    ========
-    {err}
-    ========
-    Can't continue, so stopping now.
+    print(dedent(f"""
 
-    """))
+        kde-builder encountered an exceptional error condition:
+        ========
+        {err}
+        ========
+        Can't continue, so stopping now.
+
+
+        """))
 
     print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
@@ -214,11 +217,12 @@ except KBException as err:
 
 except Exception as err:
     # We encountered some other kind of error that didn't raise a `KBException`
-    print(textwrap.dedent(f"""\
-    Encountered an error in the execution of the script.
-    --> {err}
-    Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
-    """))
+    print(dedent(f"""
+        Encountered an error in the execution of the script.
+        --> {err}
+        Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
+
+        """))
 
     traceback.print_exc()
     if app:

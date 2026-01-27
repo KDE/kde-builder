@@ -12,7 +12,7 @@ from .debug import KBLogger
 from .os_support import OSSupport
 from .phase_list import PhaseList
 from .version import Version
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 
 logger_app = KBLogger.getLogger("application")
 
@@ -122,17 +122,19 @@ class Cmdline:
         flag_handlers = ""
         for key in BuildContext().global_options_with_negatable_form.keys():
             if key == "async":  # as async is reserved word in python, we use such way to access it
-                flag_handlers += textwrap.dedent("""\
+                flag_handlers += dedent("""
                     if vars(args)["async"] is not None:
                         found_options["async"] = vars(args)["async"]
+
                     """)
                 continue
 
             opt_name = key.replace("-", "_")
 
-            flag_handlers += textwrap.dedent(f"""\
+            flag_handlers += dedent(f"""
             if args.{opt_name} is not None:
                 found_options[\"{key}\"] = args.{opt_name}
+
             """)
 
         # Similar procedure for global options (they require one argument)
@@ -140,9 +142,10 @@ class Cmdline:
         for key in BuildContext().global_options_with_parameter.keys():
             opt_name = key.replace("-", "_")
 
-            global_opts_handler += textwrap.dedent(f"""\
+            global_opts_handler += dedent(f"""
             if args.{opt_name}:
                 found_options[\"{key}\"] = args.{opt_name}[0]
+
             """)
 
         supported_options = Cmdline._supported_options()
@@ -222,8 +225,9 @@ class Cmdline:
                 specstr += f", action={action}"
 
             # example of string: parser.add_argument("--show-info", action="store_true")
-            string_of_parser_add_arguments += textwrap.dedent(f"""\
+            string_of_parser_add_arguments += dedent(f"""
             parser.add_argument({specstr})
+
             """)
         exec(string_of_parser_add_arguments)
 
@@ -486,22 +490,24 @@ class Cmdline:
 
     @staticmethod
     def _show_help_and_exit() -> NoReturn:
-        print(textwrap.dedent("""\
-        KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
+        print(dedent("""
+            KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
 
-        Documentation: https://kde-builder.kde.org
-            Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
-            Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
-        """))
+            Documentation: https://kde-builder.kde.org
+                Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
+                Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
+
+            """))
         exit()
 
     @staticmethod
     def _show_info_and_exit() -> NoReturn:
         os_vendor = OSSupport().ID
         version = "kde-builder " + Version.script_version()
-        print(textwrap.dedent(f"""\
+        print(dedent(f"""
             {version}
-            OS: {os_vendor}"""))
+            OS: {os_vendor}
+            """))
         exit()
 
     @staticmethod

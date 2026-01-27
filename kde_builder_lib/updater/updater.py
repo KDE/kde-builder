@@ -21,7 +21,7 @@ from ..debug import KBLogger
 from ..ipc.null import IPCNull
 from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
-from ..util.textwrap_mod import textwrap
+from ..util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext
@@ -196,9 +196,10 @@ class Updater:
         Throws an exception if that's not true.
         """
         if os.path.exists(f"{srcdir}") and os.listdir(srcdir):
-            logger_updater.error(textwrap.dedent(f"""\
-            \tr[*] The desired source directory for b[{module}] is: y[b[{srcdir}]
-            \tr[*] This directory already exists, but it is not empty, and it is not a git repository."""))
+            logger_updater.error(dedent(f"""
+                \tr[*] The desired source directory for b[{module}] is: y[b[{srcdir}]
+                \tr[*] This directory already exists, but it is not empty, and it is not a git repository.
+                """))
             raise KBRuntimeError("\tUnrecognised content in source-dir present")
 
     def update_checkout(self) -> int:
@@ -220,9 +221,9 @@ class Updater:
 
         git_repo: str = module.get_option("#resolved-repository")
         if not git_repo:
-            msg = textwrap.dedent(f"""\
+            msg = dedent(f"""
                 \tThere was no y[b[repository] specified for the {module.name}.
-                \tSee https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups\
+                \tSee https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
                 """)
             raise ConfigError(msg)
 
@@ -365,13 +366,14 @@ class Updater:
             if not branch_name:
                 branch_name = f"New branch to point to {remote_name}/{branch}"
 
-            logger_updater.info(textwrap.dedent(f"""\
+            logger_updater.info(dedent(f"""
                 \ty[b[*] The project y[b[{module}] had local changes from a different branch than expected:
                 \ty[b[*]   Expected branch: b[{branch_name}]
                 \ty[b[*]   Actual branch:   b[{existing_branch}]
                 \ty[b[*]
                 \ty[b[*] To avoid conflict with your local changes, b[{module}] will not be updated, and the
                 \ty[b[*] branch will remain unchanged, so it may be out of date from upstream.
+
                 """))
 
             self._notify_post_build_message(f" y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")

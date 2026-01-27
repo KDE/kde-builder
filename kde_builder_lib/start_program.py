@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from .debug import Debug
 from .debug import KBLogger
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from .build_context import BuildContext
@@ -88,7 +88,7 @@ class StartProgram:
                 logger_app.warning(msg)
                 exit(1)
 
-        script = textwrap.dedent(f"""\
+        script = dedent(f"""
         #!/bin/sh
         . "{prefix_sh_path}"
         . "{extra_run_env}"
@@ -105,6 +105,7 @@ class StartProgram:
             printf "\\n\\n"
             exec "{exec_path}" "$@"
         fi
+
         """)
 
         # Print run information

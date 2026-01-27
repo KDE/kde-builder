@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 from typing import NoReturn
 
 
@@ -51,34 +51,36 @@ class SetOptionError(KBException):
         option_name = self.config_invalid_option_name
 
         if option_name == "git-repository-base":
-            result = textwrap.dedent("""\
-            The y[git-repository-base] option requires a repository name and URL.
+            result = dedent("""
+                The y[git-repository-base] option requires a repository name and URL.
 
-            e.g. git-repository-base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
+                e.g. git-repository-base y[b[kde-sdk] g[b[https://invent.kde.org/sdk/]
 
-            Use this in a "group" group:
+                Use this in a "group" group:
 
-            e.g.
-            group kdesdk-set:
-              repository: y[b[kde-sdk]
-              use-projects:
-                - kde-builder
-                - kde-dev-scripts
-                - clazy
-            """)
+                e.g.
+                group kdesdk-set:
+                  repository: y[b[kde-sdk]
+                  use-projects:
+                    - kde-builder
+                    - kde-dev-scripts
+                    - clazy
+
+                """)
 
         if option_name == "set-env":
-            result = textwrap.dedent("""\
-            The y[set-env] option should be declared as a dictionary with variable-name - variable-value pairs.
-            Example:
+            result = dedent("""
+                The y[set-env] option should be declared as a dictionary with variable-name - variable-value pairs.
+                Example:
 
-              override kcalc:
-                set-env:
-                  SOME_VAR: "helloworld"
-                  SOME_VAR2: "helloworld2"
+                  override kcalc:
+                    set-env:
+                      SOME_VAR: "helloworld"
+                      SOME_VAR2: "helloworld2"
 
-            See documentation: https://kde-builder.kde.org/en/using-kde-builder/advanced-features.html#changing-environment
-            """)
+                See documentation: https://kde-builder.kde.org/en/using-kde-builder/advanced-features.html#changing-environment
+
+                """)
         return result
 
 

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from .debug import Debug
 from .debug import KBLogger
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from module.module import Module
@@ -317,9 +317,10 @@ class IdeProjectConfigGenerator:
         """
         build_dir = self.module.fullpath("build")
         if os.path.exists(build_dir + "/prefix.sh"):
-            env_content = textwrap.dedent("""\
+            env_content = dedent("""
             # This file is .env type, for tools that can't make use of the prefix.sh
             # kate: syntax bash;
+
             """)
             with open(build_dir + "/prefix.sh", "r") as f:
                 for line in f:

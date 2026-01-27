@@ -28,7 +28,7 @@ from kde_builder_lib.kb_exception import KBRuntimeError
 from kde_builder_lib.debug import Debug
 from kde_builder_lib.debug import KBLogger
 from ..kb_exception import ProgramError
-from .textwrap_mod import textwrap
+from .textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from ..module.module import Module
@@ -420,12 +420,13 @@ class Util:
                 os.execvp(command[0], command)
             except Exception as e:
                 cmd_string = " ".join(command)
-                logger_util.error(textwrap.dedent(f"""\
+                logger_util.error(dedent(f"""
                     r[b[Unable to execute "{cmd_string}"]!
                     {e}
 
                     Please check your binpath setting (it controls the PATH used by kde-builder).
                     Currently it is set to g[{os.environ.get("PATH")}].
+
                     """))
                 # Don't use return, this is the child still!
                 sys.exit(1)

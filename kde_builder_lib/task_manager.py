@@ -23,7 +23,7 @@ from .ipc.ipc import IPC
 from .ipc.null import IPCNull
 from .ipc.pipe import IPCPipe
 from .util.util import Util
-from .util.textwrap_mod import textwrap
+from .util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from build_context import BuildContext
@@ -292,10 +292,11 @@ class TaskManager:
         try:
             status_fh = open(outfile, "w")
         except OSError:
-            logger_taskmanager.error(textwrap.dedent(f"""\
-             r[b[*] Unable to open output status file r[b[{outfile}]
-             r[b[*] You won't be able to use the g[--resume] switch next run.
-            """))
+            logger_taskmanager.error(dedent(f"""
+                 r[b[*] Unable to open output status file r[b[{outfile}]
+                 r[b[*] You won't be able to use the g[--resume] switch next run.
+
+                """, preserve_len=1))
             outfile = None
 
         build_done: list[str] = []
@@ -614,12 +615,13 @@ class TaskManager:
         if os.path.isdir("/proc") and not os.path.exists(f"/proc/{pid}"):
             # local $" = ", "; # override list interpolation separator
 
-            logger_taskmanager.warning(textwrap.dedent(f"""\
-                y[b[ *] SSH Agent is enabled, but y[doesn't seem to be running].
-                y[b[ *] The agent is needed for these projects:
-                y[b[ *]   b[{ssh_servers}]
-                y[b[ *] Please check that the agent is running and its environment variables defined
-                """))
+            logger_taskmanager.warning(dedent(f"""
+                 y[b[*] SSH Agent is enabled, but y[doesn't seem to be running].
+                 y[b[*] The agent is needed for these projects:
+                 y[b[*]   b[{ssh_servers}]
+                 y[b[*] Please check that the agent is running and its environment variables defined
+
+                """, preserve_len=1))
             return False
 
         # The agent is running, but does it have any keys?  We can't be more specific
@@ -636,11 +638,12 @@ class TaskManager:
         if not no_keys:
             return True
 
-        print(Debug().colorize(textwrap.dedent("""\
+        print(Debug().colorize(dedent("""
             b[y[*] SSH Agent does not appear to be managing any keys.  This will lead to you
             being prompted for every project update for your SSH passphrase.  So, we're
             running g[ssh-add] for you.  Please type your passphrase at the prompt when
             requested, (or simply Ctrl-C to abort the script).
+
             """)))
         command_line = ["ssh-add"]
         ident_file = ctx.get_option("ssh-identity-file")
@@ -651,11 +654,12 @@ class TaskManager:
         # Run this code for both death-by-signal and nonzero return
         if result:
             rcfile = ctx.rc_file()
-            print(Debug().colorize(textwrap.dedent(f"""
+            print(Debug().colorize(dedent(f"""
 
                 y[b[*] Unable to add SSH identity, aborting.
                 y[b[*] If you don't want kde-builder to check in the future,
                 y[b[*] Set the g[disable-agent-check] option to g[true] in your {rcfile}.
+
 
                 """)))
             return False
