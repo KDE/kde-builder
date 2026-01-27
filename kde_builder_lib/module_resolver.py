@@ -230,21 +230,10 @@ class ModuleResolver:
         # A module-set can only be case 1.
         # We clean up and handle any case 3 (if any) at the end.
 
-        # Checks cmdline options only.  This is intended to make
-        # --no-include-dependencies suppress the action of include-dependencies in
-        # the config file so make the absence of the flag imply
-        # include-dependencies for now.
-        def_including: bool = ctx.get_option("include-dependencies")
-        including_deps: bool = self.cmdline_options["global"].get("include-dependencies", def_including)
-
         # Case 2. We make these checks first since they may update lookup dict
         if selector_name in self.use_projects_referenced_from_module_sets and selector_name not in self.defined_modules_and_module_sets:
             needed_module_set: ModuleSet = self.use_projects_referenced_from_module_sets[selector_name]
-            module_results: list[Module] = self._expand_single_module_set(needed_module_set)
-
-            if not including_deps:
-                for module_result in module_results:
-                    module_result.set_option("include-dependencies", False)
+            self._expand_single_module_set(needed_module_set)
 
             # Now lookup dict should be updated with expanded modules.
             selector: Module | ModuleSet | None = self.defined_modules_and_module_sets.get(selector_name, None)
@@ -261,12 +250,6 @@ class ModuleResolver:
         elif selector_name in self.defined_modules_and_module_sets:
             selector: Module | ModuleSet = self.defined_modules_and_module_sets[selector_name]
 
-            if not isinstance(selector, ModuleSet) and not including_deps:
-                # modules were manually selected on cmdline, so ignore
-                # module-based include-dependencies, unless
-                # include-dependencies also set on cmdline.
-                selector.set_option("#include-dependencies", False)
-
         # Case 3?
         else:
             if selector_name not in self.context.projects_db.repositories:
@@ -276,7 +259,6 @@ class ModuleResolver:
             selector.phases.reset_to(ctx.phases.phaselist)
 
             selector.set_scm()
-            selector.set_option("#include-dependencies", including_deps)
 
             self.defined_modules_and_module_sets[selector_name] = selector
 
