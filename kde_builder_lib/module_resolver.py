@@ -259,7 +259,7 @@ class ModuleResolver:
             selector.phases.reset_to(ctx.phases.phaselist)
 
             selector.set_scm()
-
+            self._apply_options([selector])
             self.defined_modules_and_module_sets[selector_name] = selector
 
         # In case selector is None (may happen in case 2), results list for sure becomes non-empty,
@@ -327,7 +327,7 @@ class ModuleResolver:
 
         if self.defined_modules_and_module_sets.get(module_name) is None:
             try:
-                self._expand_single_module_set(*self._resolve_single_selector(module_name))
+                self._resolve_single_selector(module_name)
             except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
