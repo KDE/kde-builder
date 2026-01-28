@@ -233,7 +233,7 @@ class ModuleResolver:
         # Case 2. We make these checks first since they may update lookup dict
         if selector_name in self.use_projects_referenced_from_module_sets and selector_name not in self.defined_modules_and_module_sets:
             needed_module_set: ModuleSet = self.use_projects_referenced_from_module_sets[selector_name]
-            self._expand_single_module_set(needed_module_set)
+            module_results: list[Module] = self._expand_single_module_set(needed_module_set)
 
             # Now lookup dict should be updated with expanded modules.
             selector: Module | ModuleSet | None = self.defined_modules_and_module_sets.get(selector_name, None)
