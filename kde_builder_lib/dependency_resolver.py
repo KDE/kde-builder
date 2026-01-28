@@ -374,7 +374,7 @@ class DependencyResolver:
         item = module_desc["item"]
         branch = module_desc["branch"]
         pretty_branch = branch if branch else "*"
-        include_dependencies = module.get_option("include-dependencies") if module else module_desc["include_dependencies"]
+        include_dependencies = module.get_option("include-dependencies") if module else False
 
         errors = {
             "syntax_errors": 0,
@@ -428,7 +428,6 @@ class DependencyResolver:
                 }
 
                 dep_module_desc = {
-                    "include_dependencies": include_dependencies,
                     "module": dep_module,
                     "item": dep_item,
                     "path": resolved_path,
@@ -506,7 +505,6 @@ class DependencyResolver:
                 }
 
                 module_desc = {
-                    "include_dependencies": module.get_option("include-dependencies"),
                     "path": path,
                     "item": item,
                     "branch": branch,
