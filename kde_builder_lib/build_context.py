@@ -775,9 +775,25 @@ class BuildContext(Module):
 
     def set_metadata_module(self) -> None:
         """
-        Set self.metadata_module.
+        Create special repo-metadata Module and set it to self.metadata_module.
         """
-        self.metadata_module = ModuleSetKDEProjects.get_project_metadata_module(self)
+        module_name = "sysadmin/repo-metadata"
+
+        metadata_module = Module(self, re.sub("/", "-", module_name))
+
+        # Hardcode the results instead of expanding out the project info
+        metadata_module.set_option("#resolved-repository", f"kde:{module_name}")  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
+        # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
+        metadata_module.set_scm()
+        metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
+        metadata_module.set_option("branch", "master")
+        metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))
+        metadata_module.set_option("log-dir", "log")  # overwrite default value, because user may store his directories not under "~/kde"
+
+        # Ensure we only ever try to update source, not build.
+        metadata_module.phases.reset_to(["update"])
+
+        self.metadata_module = metadata_module
 
     def set_metadata(self) -> None:
         """
