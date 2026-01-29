@@ -342,8 +342,10 @@ class Application:
         module_resolver = ModuleResolver(ctx)
         module_resolver.cmdline_options = cmdline_options
         module_resolver.set_deferred_options(overrides_from_userconfig)
-        module_resolver.set_input_modules_and_options(modules_and_sets_from_userconfig)
+        module_resolver.set_initial_projects_and_groups(modules_and_sets_from_userconfig)
+        module_resolver.handle_initial_projects()
         module_resolver.ignored_selectors = list(ignored_selectors.keys())
+        module_resolver.expand_all_groups()
 
         self.module_resolver = module_resolver
 
@@ -361,7 +363,8 @@ class Application:
 
                 if "all-config-projects" in sp_sels:
                     # Build everything in the rc-file, in the order specified.
-                    all_config_projects: list[Module] = module_resolver.expand_module_sets(modules_and_sets_from_userconfig)
+                    selectors_list = [el.name for el in modules_and_sets_from_userconfig]
+                    all_config_projects: list[Module] = module_resolver.resolve_selectors_into_modules(selectors_list)
 
                 if "all-kde-projects" in sp_sels:
                     repos = self.context.projects_db.repositories

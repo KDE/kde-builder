@@ -33,10 +33,6 @@ class ModuleSetKDEProjects(ModuleSet):
     (except for ignored modules), by using KDEProjectsReader.
     """
 
-    def __init__(self, ctx: BuildContext, name: str):
-        ModuleSet.__init__(self, ctx, name)
-        self.projects_data_reader = None  # Will be filled in when we get fh
-
     @staticmethod
     def none_true(input_list: list) -> bool:
         return all(not element for element in input_list)
@@ -142,7 +138,7 @@ class ModuleSetKDEProjects(ModuleSet):
         return module_list
 
     # @override
-    def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
+    def convert_to_modules(self) -> list[Module]:
         """
         Convert given module set to a list of Module.
 
@@ -161,7 +157,7 @@ class ModuleSetKDEProjects(ModuleSet):
             if module_item in found_modules:
                 continue
 
-            candidate_modules: list[Module] = self._expand_module_candidates(ctx, module_item)
+            candidate_modules: list[Module] = self._expand_module_candidates(self.context, module_item)
             module_names: list[str] = [item.name for item in candidate_modules]
             found_modules.update(module_names)
             module_list.extend(candidate_modules)
@@ -170,4 +166,5 @@ class ModuleSetKDEProjects(ModuleSet):
             logger_moduleset.warning("No projects were defined for the group " + self.name)
             logger_moduleset.warning("You should use the g[b[use-projects] option to make the group useful.")
 
+        self.project_objects_list = module_list
         return module_list

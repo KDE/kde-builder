@@ -1,10 +1,7 @@
 # SPDX-FileCopyrightText: 2015, 2023 Michael Pyne <mpyne@kde.org>
-# SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2023 - 2026 Andrew Shark <ashark@linuxcomp.ru>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
-
-# Handle proper resolution of module selectors, including option
-# handling.
 
 from __future__ import annotations
 
@@ -39,9 +36,6 @@ class ModuleResolver:
         Any modules matching these selectors would be elided from any expanded module sets by default.
         """
 
-        self.input_modules_and_options: list[Module | ModuleSet] = []
-        """Read in from rc-file."""
-
         self.cmdline_options = {}
         """
         The options that should be applied to modules when they are created.
@@ -57,11 +51,18 @@ class ModuleResolver:
         self.deferred_options: dict[str, dict] = {}
         """Holds options from "override" nodes for modules."""
 
-        self.defined_modules_and_module_sets: dict[str, Module | ModuleSet] = {}
-        """Holds Modules and ModuleSets defined in course of expanding module-sets."""
+        self.defined_projects: dict[str, Module] = {}
+        """
+        Holds created Module objects. Contains both kde and third-party projects.
+        Initially populated because of declared "project <>" nodes in the config.
+        Then populated because of expanding declared "groups <>" nodes in the config.
+        Then populated because of following dependencies (only possible for kde projects).
+        They are filled-in with their options, as in defined defaults or in config ("global" node, "group <>" nodes,
+        "override <>" nodes) and command line. And then they could be finally used in run_all_module_phases().
+        """
 
-        self.use_projects_referenced_from_module_sets: dict[str, ModuleSet] = {}
-        """Holds use-projects mentions with their source module-set."""
+        self.defined_groups: dict[str, ModuleSet] = {}
+        """Holds ModuleSet objects, created because of declared in "group <>" nodes in config."""
 
     def set_deferred_options(self, deferred_options: list[dict[str, str | dict]]) -> None:
         """
@@ -116,15 +117,22 @@ class ModuleResolver:
 
         self.deferred_options = final_opts
 
-    def set_input_modules_and_options(self, mod_opts: list[Module | ModuleSet]) -> None:
+    def set_initial_projects_and_groups(self, projects_and_groups: list[Module | ModuleSet]) -> None:
         """
-        Declare the list of all modules and module-sets known to the program, along with their base options.
+        Initial fill-up of lookup dictionaries.
         """
-        self.input_modules_and_options = mod_opts
+        for pr_or_gr in projects_and_groups:
+            if isinstance(pr_or_gr, ModuleSet):
+                self.defined_groups[pr_or_gr.name] = pr_or_gr
+            elif isinstance(pr_or_gr, Module):
+                self.defined_projects[pr_or_gr.name] = pr_or_gr
 
-        # Build lookup dictionaries
-        self.defined_modules_and_module_sets: dict[str, Module | ModuleSet] = {mod.name: mod for mod in mod_opts}
-        self.use_projects_referenced_from_module_sets: dict[str, ModuleSet] = self._list_referenced_module_sets(mod_opts)
+    def handle_initial_projects(self):
+        """
+        Apply command line and override options to projects directly-defined in config.
+        """
+        projects: list[Module] = [el for el in self.defined_projects.values()]
+        self._apply_options(projects)
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
         """
@@ -163,117 +171,64 @@ class ModuleResolver:
                     m.set_option(opt_name, opt_val)
         return
 
-    @staticmethod
-    def _list_referenced_module_sets(modules_and_modulesets: list[Module | ModuleSet]) -> dict[str, ModuleSet]:
+    def _resolve_single_selector(self, selector_name: str) -> list[Module]:
         """
-        Return a dict of all module names referenced in use-module declarations for any ModuleSet included within the input list.
+        Return list of Module objects for a given selector.
 
-        Each entry in the dict will map the referenced module name to the source ModuleSet.
+        The selector may refer to a project or group, which means that the
+        returned list may have several Module objects.
         """
-        set_entry_lookup_dict: dict[str, ModuleSet] = {}
-
-        for module_set in [module_or_moduleset for module_or_moduleset in modules_and_modulesets if isinstance(module_or_moduleset, ModuleSet)]:
-            results: list[str] = module_set.module_names_to_find()
-
-            set_entry_lookup_dict.update({result: module_set for result in results})
-
-        return set_entry_lookup_dict
-
-    def _expand_single_module_set(self, needed_module_set: ModuleSet) -> list[Module]:
-        """
-        Expand out a single module-set listed in self.use_projects_referenced_from_module_sets and places any Modules created as a result within the lookup dict of Modules.
-
-        Returns the list of created Modules.
-        """
-        # expand_module_sets applies pending/cmdline options already.
-        module_results: list[Module] = self.expand_module_sets([needed_module_set])
-        if not module_results:
-            raise KBRuntimeError(f"{needed_module_set.name} expanded to an empty list of projects!")
-
-        # Copy entries into the lookup dict
-        self.defined_modules_and_module_sets.update({module_result.name: module_result for module_result in module_results})
-
-        # Ensure Case 2 and Case 1 stays disjoint (our selectors should now be
-        # in the lookup dict if it uniquely matches a module at all).
-        module_set_referents: list[str] = [key for key, value in self.use_projects_referenced_from_module_sets.items() if value == needed_module_set]
-
-        for key in module_set_referents:
-            del self.use_projects_referenced_from_module_sets[key]
-
-        return module_results
-
-    def _resolve_single_selector(self, selector_name: str) -> list[Module | ModuleSet]:
-        """
-        Determine the most appropriate module to return for a given selector.
-
-        The selector may refer to a module or module-set, which means that the
-        return value may be a list of modules.
-        """
-        # There are 3 types of selectors:
-        # 1. Directly named and defined modules or module-sets
-        # 2. Referenced (but undefined) modules. These are mentioned in a
-        #    use-projects in a module set, but not actually available as `Module`
-        #    objects yet. But we know they will exist.
-        # 3. Indirect modules. These are modules that do exist in the KDE project
-        #    metadata, and will be pulled in once all module-sets are expanded
-        #    (whether that's due to implicit wildcarding with use-projects, or due
-        #    to dependency following). However, we don't even know the names for
-        #    these yet.
-
         ctx = self.context
-        selector: Module | ModuleSet | None = None
-        results: list[Module | ModuleSet | None] = []  # Will default to the selector if unset by the end of function
+        results: list[Module] = []
 
-        # self.defined_modules_and_module_sets handles case 1.
-        # self.use_projects_referenced_from_module_sets handles case 2.
-        # No `Module`s are *both* case 1 and 2 at the same time.
-        # A module-set can only be case 1.
-        # We clean up and handle any case 3 (if any) at the end.
+        # Case 1: selector_name names a project (kde or third-party) that is already in self.defined_projects.
+        if selector_name in self.defined_projects:
+            project = self.defined_projects[selector_name]
+            results.append(project)
 
-        # Case 2. We make these checks first since they may update lookup dict
-        if selector_name in self.use_projects_referenced_from_module_sets and selector_name not in self.defined_modules_and_module_sets:
-            needed_module_set: ModuleSet = self.use_projects_referenced_from_module_sets[selector_name]
-            module_results: list[Module] = self._expand_single_module_set(needed_module_set)
+        # Case 2: selector_name names a group from the config
+        elif selector_name in self.defined_groups:
+            group: ModuleSet = self.defined_groups[selector_name]
+            # At this point, all groups are expanded. So just take its projects.
+            projects: list[Module] = group.get_projects()
+            results.extend(projects)
 
-            # Now lookup dict should be updated with expanded modules.
-            selector: Module | ModuleSet | None = self.defined_modules_and_module_sets.get(selector_name, None)
-
-            # If the selector doesn't match a name exactly it probably matches
-            # a wildcard prefix. e.g. "kdeedu" as a selector would pull in all kdeedu/*
-            # modules, but kdeedu is not a module-name itself anymore. In this
-            # case just return all the modules in the expanded list.
-            if not selector:
-                # In _expand_single_module_set() it is ensured module_results is not empty.
-                results.extend(module_results)
-
-        # Case 1
-        elif selector_name in self.defined_modules_and_module_sets:
-            selector: Module | ModuleSet = self.defined_modules_and_module_sets[selector_name]
-
-        # Case 3?
+        # Case 3: selector_name names either kde project that is not yet in self.defined_projects, or is fully unrecognized.
         else:
             if selector_name not in self.context.projects_db.repositories:
                 # Third-party projects must not be crafted this way.
                 raise UnknownKdeProjectException(f"Unknown KDE project: {selector_name}", selector_name)
-            selector: Module = Module(ctx, selector_name)
-            selector.phases.reset_to(ctx.phases.phaselist)
+            project: Module = Module(ctx, selector_name)
+            project.phases.reset_to(ctx.phases.phaselist)
 
-            selector.set_scm()
-            self._apply_options([selector])
-            self.defined_modules_and_module_sets[selector_name] = selector
-
-        # In case selector is None (may happen in case 2), results list for sure becomes non-empty,
-        # so None (the value of selector variable) will not be placed to the results list. Return type annotation is correct.
-        if not results:
-            results.append(selector)
+            project.set_scm()
+            self._apply_options([project])
+            self.defined_projects[selector_name] = project
+            results.append(project)
 
         return results
 
-    def _expand_all_unexpanded_module_sets(self) -> None:
-        unexpanded_module_sets: list[ModuleSet] = list(set(self.use_projects_referenced_from_module_sets.values()))
-        unexpanded_module_sets.sort(key=lambda x: x.name)
-        for unexpanded_module_set in unexpanded_module_sets:
-            self._expand_single_module_set(unexpanded_module_set)
+    def expand_all_groups(self) -> None:
+        """
+        Expand every group, populate self.defined_projects when necessary, and apply override options.
+
+        Takes every ModuleSet from self.defined_groups, and operates on it. Applies override options to it,
+        expands it to Module objects, and also applies options to them.
+        It takes existing Module object if it already exists in self.defined_projects, otherwise creates it and places there.
+        """
+        unexpanded_groups: list[ModuleSet] = list(self.defined_groups.values())
+        unexpanded_groups.sort(key=lambda x: x.name)
+
+        for unexpanded_group in unexpanded_groups:
+            # Need to update group first, so it can then apply its settings to projects it creates.
+            self._apply_options([unexpanded_group])
+            project_results: list[Module] = unexpanded_group.convert_to_modules()
+            self._apply_options(project_results)
+
+            if not project_results:
+                raise KBRuntimeError(f"{unexpanded_group.name} expanded to an empty list of projects!")
+
+            self.defined_projects.update({project_result.name: project_result for project_result in project_results})
 
     def resolve_selectors_into_modules(self, selectors: list[str]) -> list[Module]:
         """
@@ -306,15 +261,13 @@ class ModuleResolver:
         expanded. The desired options will be set for each :class:`Module` returned.
         """
         # We have to be careful to maintain order of selectors throughout.
-        output_list: list[Module | ModuleSet] = []
+        output_list: list[Module] = []
         for selector in selectors:
             if selector in self.ignored_selectors:
                 continue
             output_list.extend(self._resolve_single_selector(selector))
 
-        modules: list[Module] = self.expand_module_sets(output_list)
-
-        return modules
+        return output_list
 
     def resolve_module_if_present(self, module_name: str) -> Module | None:
         """
@@ -322,59 +275,14 @@ class ModuleResolver:
 
         Only a single module name is supported.
         """
-        if self.use_projects_referenced_from_module_sets:
-            self._expand_all_unexpanded_module_sets()
-
-        if self.defined_modules_and_module_sets.get(module_name) is None:
+        if self.defined_projects.get(module_name) is None:
             try:
                 self._resolve_single_selector(module_name)
             except KBException:  # UnknownKdeProjectException for third party dependencies is caught here.
                 pass
 
-        ret: Module | None = self.defined_modules_and_module_sets.get(module_name, None)
+        ret: Module | None = self.defined_projects.get(module_name, None)
         return ret
-
-    def expand_module_sets(self, build_module_list: list[Module | ModuleSet]) -> list[Module]:
-        """
-        Replace ModuleSets in the given list with their component Modules, and return the new list.
-
-        Converts any :class:`ModuleSet` objects in the given list of Modules and
-        ModuleSets into their component :class:`Module` objects (with proper options
-        set, and ignored modules not present). These component objects are spliced
-        into the list of module-type objects, replacing the ModuleSet they came
-        from.
-
-        The list of Module objects is then returned. The list passed in is
-        not actually modified in this process.
-
-        Similar to resolve_selectors_into_modules, except that in this case no
-        crafting (case 3) for Modules is allowed; the requested module is returned if
-        present, or None otherwise. Also unlike resolve_selectors_into_modules, no
-        exceptions are thrown if the module is not present.
-
-        The only major side-effect is that all known module-sets are expanded if
-        necessary before resorting to returning None.
-        """
-        ctx = self.context
-
-        return_list: list[Module] = []
-        for bm_set in build_module_list:
-            results: list[Module | ModuleSet] = [bm_set]
-
-            # If a module-set, need to update first so it can then apply its
-            # settings to modules it creates, otherwise update Module directly.
-            self._apply_options([bm_set])
-
-            if isinstance(bm_set, ModuleSet):
-                results: list[Module] = bm_set.convert_to_modules(ctx)
-                self._apply_options(results)
-            # else:
-            #     pass
-
-            return_list.extend(results)
-
-        return return_list
-
 
 """
 This class uses a multi-pass option resolving system, in accordance with
@@ -453,7 +361,7 @@ already known.
 
 From the perspective of calling code, the "outputs" of this project are
 lists of :class:`Module` objects, in the order they were selected (or mentioned
-in the rc-file). See expand_module_sets() and resolve_selectors_into_modules().
+in the rc-file). See expand_all_groups() and resolve_selectors_into_modules().
 
 Each object so returned should already have the appropriate options
 included (based on the cmdline_options member, which should be constructed

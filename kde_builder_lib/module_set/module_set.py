@@ -67,6 +67,7 @@ class ModuleSet(OptionsBase):
 
         self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
         self.context: BuildContext = ctx
+        self.project_objects_list: list[Module] = []
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
@@ -150,7 +151,7 @@ class ModuleSet(OptionsBase):
         # Actually set options.
         OptionsBase.set_option(self, opt_name, opt_val)
 
-    def convert_to_modules(self, ctx: BuildContext) -> list[Module]:
+    def convert_to_modules(self) -> list[Module]:
         """
         Convert this module set to a list of Module.
 
@@ -166,7 +167,7 @@ class ModuleSet(OptionsBase):
         # handle, just create `Module` and dump options into them.
         for module_name in self.modules_to_find():
 
-            new_module = Module(ctx, module_name)
+            new_module = Module(self.context, module_name)
 
             self._initialize_new_module(new_module)
             new_module.set_scm()
@@ -176,6 +177,7 @@ class ModuleSet(OptionsBase):
             logger_moduleset.warning(f"No projects were defined for the group {self.name}")
             logger_moduleset.warning("You should use the g[b[use-projects] option to make the group useful.")
 
+        self.project_objects_list = module_list
         return module_list
 
     # @override
@@ -184,3 +186,9 @@ class ModuleSet(OptionsBase):
         Ensure we are setting the correct type for value of option.
         """
         self.context.verify_option_value_type(option_name, option_value)
+
+    def get_projects(self):
+        """
+        Return the list of Module objects.
+        """
+        return self.project_objects_list
