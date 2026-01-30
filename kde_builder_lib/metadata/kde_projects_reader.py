@@ -13,6 +13,9 @@ import yaml
 
 from ..kb_exception import KBRuntimeError
 from ..debug import Debug
+from ..debug import KBLogger
+
+logger_moduleset = KBLogger.getLogger("module-set")
 
 
 class KDEProjectsReader:
@@ -117,6 +120,47 @@ class KDEProjectsReader:
         results = list(set(results))
         ret = [repositories[result] for result in results]
         return ret
+
+    def get_names_for_search_item(self, module_search_item: str, use_inactive: bool, ignore_list: list[str]) -> list[str]:
+        """
+        Expand module_search_item to list of project names it represents.
+
+        Args:
+            module_search_item: The search description. See project_path_matches_wildcard_search() for a description of the syntax.
+            use_inactive: Whether or not to use inactive projects.
+            ignore_list: A list of project names to ignore.
+        """
+        all_module_results: list[dict[str, str | bool]] = self.get_modules_for_project(module_search_item)
+
+        # if not all_module_results:
+        #     # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
+        #     # are not defined in config is normal.
+        #     raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
+
+        # It's possible to match modules which are marked as inactive on
+        # projects.kde.org, elide those.
+        active_results: list[dict[str, str | bool]] = all_module_results
+        if not use_inactive:
+            active_results = [module for module in all_module_results if module.get("active")]
+
+        if not active_results:
+            logger_moduleset.warning(f" y[b[*] Selector y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active projects to build!")
+
+            if all_module_results:
+                count = len(all_module_results)
+                logger_moduleset.warning("\tAlthough no active projects are available, there were\n" + f"\t{count} inactive projects.")
+
+        def none_true(input_list: list) -> bool:
+            return all(not element for element in input_list)
+
+        filtered_results = []
+
+        for result in active_results:
+            if none_true([self.project_path_matches_wildcard_search(result["invent_name"], element) for element in ignore_list]):
+                filtered_results.append(result)
+
+        result_names = [result["name"] for result in filtered_results]
+        return result_names
 
     @staticmethod
     def project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:

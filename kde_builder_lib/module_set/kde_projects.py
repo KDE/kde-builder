@@ -30,79 +30,18 @@ class ModuleSetKDEProjects(ModuleSet):
     (except for ignored modules), by using KDEProjectsReader.
     """
 
-    @staticmethod
-    def none_true(input_list: list) -> bool:
-        return all(not element for element in input_list)
-
-
-    def _expand_module_candidates(self, ctx: BuildContext, module_search_item: str) -> list[Module]:
-        """
-        Goes through the modules in our search list (assumed to be found in kde-projects), expands them into their equivalent modules, and returns the fully expanded list.
-
-        Non kde-projects modules cause an error, as do modules that do not exist at all within the database.
-
-        Modules that are part of a module-set requiring a specific branch, that don't
-        have that branch, are still listed in the return result since there's no way
-        to tell that the branch won't be there.  These should be removed later.
-
-        Args:
-            ctx: The ``BuildContext`` in use.
-            module_search_item: The search description to expand in ``Module``s. See
-                project_path_matches_wildcard_search for a description of the syntax.
-
-        Returns:
-            modules List of expanded git Modules.
-
-        Raises:
-            Runtime: if the kde-projects database was required but couldn't be downloaded or read.
-            Runtime: if the git-push-protocol is unsupported.
-            UnknownKdeProjectException: if an "assumed" kde-projects module was not actually one.
-        """
-        all_module_results: list[dict[str, str | bool]] = ctx.projects_db.get_modules_for_project(module_search_item)
-
-        # if not all_module_results:
-        #     # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
-        #     # are not defined in config is normal.
-        #     raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
-
-        # It's possible to match modules which are marked as inactive on
-        # projects.kde.org, elide those.
-        active_results: list[dict[str, str | bool]] = all_module_results
-        if not ctx.get_option("use-inactive-projects"):
-            active_results = [module for module in all_module_results if module.get("active")]
-
-        if not active_results:
-            logger_moduleset.warning(f" y[b[*] Selector y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active projects to build!")
-
-            if all_module_results:
-                count = len(all_module_results)
-                logger_moduleset.warning("\tAlthough no active projects are available, there were\n" + f"\t{count} inactive projects.")
-
-        # Setup module options.
-        module_list: list[Module] = []
-        ignore_list: list[str] = self.modules_to_ignore()
-
-        for result in active_results:
-            new_module = Module(ctx, result["name"])
-            self._initialize_new_module(new_module)
-
-            new_module.set_scm()
-
-            if self.none_true([KDEProjectsReader.project_path_matches_wildcard_search(result["invent_name"], element) for element in ignore_list]):
-                module_list.append(new_module)
-            else:
-                logger_moduleset.debug(f"--- Ignoring matched active project {new_module} in group " + self.name)
-        return module_list
-
     # @override
     def convert_to_modules(self) -> list[Module]:
         """
-        Convert given module set to a list of Module.
+        Convert this module set to a list of Module.
 
         This function should be called after options are read and build metadata is available.
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
+        use_inactive_projects = self.context.get_option("use-inactive-projects")
+        ignore_list: list[str] = self.modules_to_ignore()
+
         module_list = []  # module names converted to `Module` objects.
         found_modules: set[str] = set()
 
@@ -114,10 +53,17 @@ class ModuleSetKDEProjects(ModuleSet):
             if module_item in found_modules:
                 continue
 
-            candidate_modules: list[Module] = self._expand_module_candidates(self.context, module_item)
-            module_names: list[str] = [item.name for item in candidate_modules]
+            module_names: list[str] = self.context.projects_db.get_names_for_search_item(module_item, use_inactive_projects, ignore_list)
+
+            for module_name in module_names:
+
+                new_module = Module(self.context, module_name)
+
+                self._initialize_new_module(new_module)
+                new_module.set_scm()
+                module_list.append(new_module)
+
             found_modules.update(module_names)
-            module_list.extend(candidate_modules)
 
         if not len(module_list):
             logger_moduleset.warning("No projects were defined for the group " + self.name)

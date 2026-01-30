@@ -165,13 +165,17 @@ class ModuleSet(OptionsBase):
         # If we're in this method, we must be using the git-repository-base method
         # of setting up a module-set, so there is no "search" or "ignore" to
         # handle, just create `Module` and dump options into them.
-        for module_name in self.modules_to_find():
+        for module_item in self.modules_to_find():
 
-            new_module = Module(self.context, module_name)
+            module_names: list[str] = [module_item]
 
-            self._initialize_new_module(new_module)
-            new_module.set_scm()
-            module_list.append(new_module)
+            for module_name in module_names:
+
+                new_module = Module(self.context, module_name)
+
+                self._initialize_new_module(new_module)
+                new_module.set_scm()
+                module_list.append(new_module)
 
         if not self.modules_to_find():
             logger_moduleset.warning(f"No projects were defined for the group {self.name}")
