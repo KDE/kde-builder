@@ -112,15 +112,6 @@ class Module(OptionsBase):
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
 
-    def get_module_set(self):
-        """
-        Return the :class:`ModuleSet` that was assigned earlier. If no ModuleSet was assigned, return a valid (but null) ModuleSet.
-        """
-        from ..module_set.null import ModuleSetNull
-        if not self.module_set:
-            self.module_set = ModuleSetNull()
-        return self.module_set
-
     def set_module_set(self, module_set: ModuleSet) -> None:
         """
         Specify the `ModuleSet` this module was spawned from. Optional.

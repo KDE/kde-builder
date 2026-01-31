@@ -395,7 +395,7 @@ class Application:
 
         filtered_modules: list[Module] = []
         for module in modules:
-            if module.get_module_set().name in ["qt6-set"]:
+            if module.module_set and module.module_set.name in ["qt6-set"]:
                 if module.get_option("install-dir") == "":
                     # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
                     # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
@@ -463,7 +463,7 @@ class Application:
         # Check for ignored modules (post-expansion)
         filtered_modules: list[Module] = []
         for module in modules:
-            module_set_name = module.get_module_set().name if module.get_module_set().name else ""
+            module_set_name = module.module_set.name if module.module_set else ""
             if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
                 filtered_modules.append(module)
             else:
