@@ -43,15 +43,11 @@ class ModuleSetKDEProjects(ModuleSet):
         ignore_list: list[str] = self.modules_to_ignore()
 
         module_list = []  # module names converted to `Module` objects.
-        found_modules: set[str] = set()
 
         # Setup default options for each module
         # Extraction of relevant kde-project modules will be handled immediately
         # after this phase of execution.
         for module_item in self.modules_to_find():
-            # We might have already grabbed the right module recursively.
-            if module_item in found_modules:
-                continue
 
             module_names: list[str] = self.context.projects_db.get_names_for_search_item(module_item, use_inactive_projects, ignore_list)
 
@@ -62,8 +58,6 @@ class ModuleSetKDEProjects(ModuleSet):
                 self._initialize_new_module(new_module)
                 new_module.set_scm()
                 module_list.append(new_module)
-
-            found_modules.update(module_names)
 
         if not len(module_list):
             logger_moduleset.warning("No projects were defined for the group " + self.name)
