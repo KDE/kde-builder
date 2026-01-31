@@ -12,7 +12,6 @@ from .kb_exception import KBException
 from .kb_exception import KBRuntimeError
 from .kb_exception import UnknownKdeProjectException
 from .module.module import Module
-from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
 
 if TYPE_CHECKING:

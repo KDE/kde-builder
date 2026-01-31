@@ -93,6 +93,13 @@ class UnknownKdeProjectException(KBException):
         self.message = message
         self.unknown_project_name = unknown_project_name
 
+class NoKDEProjectsFound(KBException):
+    """
+    Raised when searching in kde projects database by path component resulted in empty list.
+    """
+
+    def __init__(self, message: str):
+        self.message = message
 
 class ProgramError(KBException):
     """

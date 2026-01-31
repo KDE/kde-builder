@@ -24,7 +24,6 @@ from .metadata.kde_projects_reader import KDEProjectsReader
 from .metadata.metadata import Metadata
 from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
-from .module_set.kde_projects import ModuleSetKDEProjects
 from .options_base import OptionsBase
 from .phase_list import PhaseList
 from .status_view import StatusView

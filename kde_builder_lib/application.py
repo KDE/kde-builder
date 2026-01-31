@@ -35,7 +35,6 @@ from .dependency_resolver import DependencyResolver
 from .log_dir import LogDir
 from .module.module import Module
 from .module_resolver import ModuleResolver
-from .module_set.kde_projects import ModuleSetKDEProjects
 from .module_set.module_set import ModuleSet
 from .options_base import OptionsBase
 from .recursive_config_nodes_iterator import RecursiveConfigNodesIterator
@@ -65,10 +64,6 @@ class Application:
         result = app.run_all_module_phases()
         app.finish(result)
     """
-
-    # We use a named remote to make some git commands work that don't accept the full path.
-    KDE_PROJECT_ID = "kde-projects"
-    """git-repository-base for sysadmin/repo-metadata. The value is determined as "kde:$repoPath.git", where $repoParh is read from yaml metadata file for each module."""
 
     def __init__(self, options: list[str]):
         self.context = BuildContext()
@@ -965,12 +960,6 @@ class Application:
                 # A module_set can give us more than one module to add.
                 new_module_set: ModuleSet = ModuleSet(ctx, module_set_name)
                 new_module_set.apply_config_options(ctx, node, config_filename)
-
-                # Transforming the new_module_set into the right "class".
-                # Possibly it is better to construct an entirely new object and copy the members over.
-                # But we will do it this way for now.
-                if new_module_set.get_option("repository") == Application.KDE_PROJECT_ID:
-                    new_module_set.__class__ = ModuleSetKDEProjects
 
                 creation_order += 1
                 new_module_set.start_for_create_id = creation_order

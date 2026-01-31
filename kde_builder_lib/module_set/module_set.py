@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from ..kb_exception import ConfigError
 from ..kb_exception import SetOptionError
+from ..kb_exception import NoKDEProjectsFound
 from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
@@ -25,31 +26,21 @@ class ModuleSet(OptionsBase):
     """
     Represents a collective grouping of modules that share common options.
 
-    Also, they share a common repository (in this case, based on the git-repository-base
-    option, but see also the more common ModuleSetKDEProjects which is used for
-    the special kde-projects repositories).
-
     This is parsed from module-set declarations in the rc-file.
 
     The major conceit here is several things:
 
     1. A dict of options to set for each module read into this module set.
     2. A list of module search declarations to be used to construct modules for
-    this module set (in the case of kde-projects repository). For other
-    repository types we can still consider it a "search", but with the
-    understanding that it's a 1:1 mapping to the "found" module (which may not
-    exist for real).
+    this module set.
     3. A list of module search declarations to *ignore* from this module set,
-    using the same syntax as used to search for them in 2. This is only really
-    useful at this point for kde-projects repository as everything else requires
-    you to manually specify modules one-by-one (module-sets are only useful here
-    for option grouping as per 1.).
+    using the same syntax as used to search for them in 2.
     4. A name, which must not be empty, although user-specified names cannot be
     assumed to be unique.
     5. A PhaseList describing what phases of the build a module should
     participate in by default.
 
-    See also: git-repository-base, ModuleSetKDEProjects, use-projects
+    See also: git-repository-base, use-projects
     """
 
     def __init__(self, ctx: BuildContext, name: str):
@@ -159,15 +150,19 @@ class ModuleSet(OptionsBase):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
+        use_inactive_projects = self.context.get_option("use-inactive-projects")
+        ignore_list: list[str] = self.modules_to_ignore()
+
         module_list = []  # module names converted to `Module` objects.
 
         # Setup default options for each module
-        # If we're in this method, we must be using the git-repository-base method
-        # of setting up a module-set, so there is no "search" or "ignore" to
-        # handle, just create `Module` and dump options into them.
         for module_item in self.modules_to_find():
 
-            module_names: list[str] = [module_item]
+            try:
+                module_names: list[str] = self.context.projects_db.get_names_for_search_item(module_item, use_inactive_projects, ignore_list)
+            except NoKDEProjectsFound:
+                # This will represent a third-party project
+                module_names: list[str] = [module_item]
 
             for module_name in module_names:
 
@@ -177,7 +172,7 @@ class ModuleSet(OptionsBase):
                 new_module.set_scm()
                 module_list.append(new_module)
 
-        if not self.modules_to_find():
+        if not len(module_list):
             logger_moduleset.warning(f"No projects were defined for the group {self.name}")
             logger_moduleset.warning("You should use the g[b[use-projects] option to make the group useful.")
 

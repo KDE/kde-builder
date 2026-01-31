@@ -12,6 +12,7 @@ import re
 import yaml
 
 from ..kb_exception import KBRuntimeError
+from ..kb_exception import NoKDEProjectsFound
 from ..debug import Debug
 from ..debug import KBLogger
 
@@ -132,10 +133,10 @@ class KDEProjectsReader:
         """
         all_module_results: list[dict[str, str | bool]] = self.get_modules_for_project(module_search_item)
 
-        # if not all_module_results:
-        #     # Do not exit here, because there are third-party projects (such as taglib) mentioned in dependencies, and the situation when they
-        #     # are not defined in config is normal.
-        #     raise UnknownKdeProjectException(f"Unknown KDE project: {module_search_item}", module_search_item)
+        if not all_module_results:
+            # To differentiate with the situation when the returned list is empty (because of ignoring some projects
+            # or because of some kde projects are inactive), we will raise exception.
+            raise NoKDEProjectsFound(f"No KDE projects with such path component: {module_search_item}")
 
         # It's possible to match modules which are marked as inactive on
         # projects.kde.org, elide those.
