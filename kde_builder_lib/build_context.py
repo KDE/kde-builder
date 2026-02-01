@@ -783,7 +783,6 @@ class BuildContext(Module):
         # Hardcode the results instead of expanding out the project info
         metadata_module.set_option("#resolved-repository", f"kde:{module_name}")  # The ~/.gitconfig should already have the "kde:" alias (otherwise we will get 128 exit code).
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
-        metadata_module.set_scm()
         metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
         metadata_module.set_option("branch", "master")
         metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))

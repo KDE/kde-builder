@@ -87,7 +87,7 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
 
         # newOptions:
-        self.scm: Updater | None = None
+        self.scm: Updater = Updater(self)
         self.build_obj: BuildSystem | None = None
         self.phases: PhaseList = phases
         self.context = ctx
@@ -210,11 +210,7 @@ class Module(OptionsBase):
         """
         return self.get_absolute_path("source-dir")
 
-    def set_scm(self) -> None:
-        """
-        Set the source control plugin.
-        """
-        self.scm = Updater(self)
+
 
     def current_scm_revision(self) -> str:
         """

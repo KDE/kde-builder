@@ -169,7 +169,6 @@ class ModuleSet(OptionsBase):
                 new_module = Module(self.context, module_name)
 
                 self._initialize_new_module(new_module)
-                new_module.set_scm()
                 module_list.append(new_module)
 
         if not len(module_list):

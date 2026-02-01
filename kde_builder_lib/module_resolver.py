@@ -200,7 +200,6 @@ class ModuleResolver:
             project: Module = Module(ctx, selector_name)
             project.phases.reset_to(ctx.phases.phaselist)
 
-            project.set_scm()
             self._apply_options([project])
             self.defined_projects[selector_name] = project
             results.append(project)

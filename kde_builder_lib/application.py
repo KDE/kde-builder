@@ -988,7 +988,6 @@ class Application:
 
                 new_module: Module = Module(ctx, module_name)
                 new_module.apply_config_options(ctx, node, config_filename)
-                new_module.set_scm()
                 new_module.create_id = creation_order + 1
                 creation_order += 1
                 seen_modules[module_name] = new_module
