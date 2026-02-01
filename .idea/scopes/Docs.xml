@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Docs" pattern="file:doc//*&amp;&amp;!file:doc/404handler.php&amp;&amp;!file:doc/conf.py&amp;&amp;!file:doc/README.md" />
+</component>
