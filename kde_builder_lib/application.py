@@ -220,8 +220,8 @@ class Application:
         opts: dict = c.read_command_line_options_and_selectors(argv)
 
         cmdline_selectors: list[str] = opts["selectors"]
-        cmdline_options: dict = opts["opts"]
-        cmdline_global_options: dict = cmdline_options["global"]
+        cmdline_per_project_options: dict = opts["per_project"]
+        cmdline_global_options: dict = opts["global"]
         ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
@@ -335,7 +335,7 @@ class Application:
         cmdline_selectors_len = len(cmdline_selectors)
 
         module_resolver = ModuleResolver(ctx)
-        module_resolver.cmdline_options = cmdline_options
+        module_resolver.cmdline_per_project_options = cmdline_per_project_options
         module_resolver.set_deferred_options(overrides_from_userconfig)
         module_resolver.set_initial_projects_and_groups(modules_and_sets_from_userconfig)
         module_resolver.handle_initial_projects()

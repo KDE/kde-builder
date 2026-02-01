@@ -29,27 +29,6 @@ class Cmdline:
     command-line is the primary interface to change program execution and has some
     complications as a result.
 
-    Example:
-    ::
-
-        # may exit! for things like --help, --version
-        opts = Cmdline.read_command_line_options_and_selectors()
-
-        for opt_name, opt_val in **opts["opts"]["global"].items():
-            ctx.set_option(opt_name, opt_val)
-
-        module_list = lookForModSelectors(*opts["selectors"])
-
-        if opts["run_mode"] == "query":
-        # handle query option
-        exit(0)
-
-        # ... let's build
-        for module in module_list:
-        # override module options from rc-file
-        for opt_name, opt_val in **opts["opts"][module.name].items():
-            module.set_option(opt_name, opt_val)
-
     At the command line, the user can specify things like:
         * Modules or module-sets to build (by name)
         * Command line options (such as ``--pretend`` or ``--no-src``), which normally apply globally (i.e. overriding module-specific options in the config file)
@@ -69,12 +48,11 @@ class Cmdline:
         ::
 
             returned_dict = {
-                "opts": { # see BuildContext's "internalGlobalOptions"
-                    "global": {
-                        # Always present even if no options read in
-                        "opt-name": "opt-value",
-                        ...
-                    },
+                "global": {
+                    "opt-name": "opt-value",
+                    ...
+                },
+                "per_project": {
                     "modulename": {
                         "opt-name": "opt-value",
                         ...
@@ -106,7 +84,8 @@ class Cmdline:
         """
         phases = PhaseList()
         opts = {
-            "opts": {"global": {}},
+            "global": {},
+            "per_project": {},
             "phases": [],
             "run_mode": "build",
             "selectors": [],
@@ -298,9 +277,10 @@ class Cmdline:
         if args.set_project_option_value:
             for module, option, value in args.set_project_option_value:
                 if module and option:
-                    if module not in opts["opts"]:
-                        opts["opts"][module] = {}
-                    opts["opts"][module][option] = value
+                    if module not in opts["per_project"]:
+                        opts["per_project"][module] = {}
+                    opts["per_project"][module][option] = value
+
         if args.ignore_projects:
             found_options["ignore-projects"] = args.ignore_projects
         # </editor-fold desc="arg functions">
@@ -478,7 +458,7 @@ class Cmdline:
 
         # </editor-fold desc="all other args handlers">
 
-        opts["opts"]["global"].update(found_options)
+        opts["global"] = found_options
         opts["phases"] = phases.phaselist
         return opts
 

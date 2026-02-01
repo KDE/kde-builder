@@ -35,10 +35,9 @@ class ModuleResolver:
         Any modules matching these selectors would be elided from any expanded module sets by default.
         """
 
-        self.cmdline_options = {}
+        self.cmdline_per_project_options = {}
         """
         The options that should be applied to modules when they are created.
-        No special handling for global options is performed here (but see :meth:`OptionsBase.get_option()` and its friends).
 
         A dict, where module-names are keys to values which are themselves dicts of option-name: value pairs:
 
@@ -151,12 +150,10 @@ class ModuleResolver:
             for opt_name, opt_val in opts.items():
                 m.set_option(opt_name, opt_val)
 
-            # Most of the time cmdline options will be empty
-            if self.cmdline_options:
+            # Most of the time cmdline per project options will be empty
+            if self.cmdline_per_project_options:
                 module_cmdline_args = {
-                    # order is important here
-                    **(self.cmdline_options.get("global", {})),
-                    **(self.cmdline_options.get(name, {}))
+                    **(self.cmdline_per_project_options.get(name, {}))
                 }
 
                 # Remove any options that would interfere with cmdline args

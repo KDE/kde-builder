@@ -47,11 +47,8 @@ def test_cmdline_makeoption():
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[0].get_option("make-options") == "j3", "make-options base value proper post-override"
 
-    # Policy discussion: Should command line options override *all* instances
-    # of an option in kde-builder.yaml? Historically the answer has deliberately
-    # been yes, so that's the behavior we enforce.
     assert module_list[3].name == "module2", "mod list[3] == module2"
-    assert module_list[3].get_option("make-options") == "j3", "module-override make-options proper post-override"
+    assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper post-override"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
