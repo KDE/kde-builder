@@ -225,6 +225,17 @@ class Application:
         ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
+        # todo Remove this in 2027.
+        # Convert deprecated selectors into new ones
+        for i in range(len(cmdline_selectors)):
+            for deprecated_name, new_name in [("workspace", "desktop-session"),
+                                              ("mobile", "mobile-session"),
+                                              ("bigscreen", "bigscreen-session"),]:
+                if cmdline_selectors[i] == deprecated_name:
+                    logger_app.warning(f" y[*] Replacing deprecated selector y[\"{deprecated_name}\"] with g[\"{new_name}\"].")
+                    cmdline_selectors[i] = new_name
+                    ctx.set_option("#warned-deprecated-selector", True)  # To remind also at the end.
+
         # Convert list to dict for lookup
         ignored_in_cmdline = {selector: True for selector in opts["ignore-projects"]}
         start_program_and_args: list[str] = opts["start-program"]
@@ -818,6 +829,9 @@ class Application:
             if last_self_updates_check + check_period <= int(time()) and not Debug().pretending():
                 Version.check_for_updates()
                 ctx.set_persistent_option("global", "last-self-updates-check", int(time()))
+
+        if ctx.get_option("#warned-deprecated-selector"):
+            logger_app.warning(f" y[*] Note that deprecated selectors will stop working in the future.")
 
         # Check for post-build messages and list them here
         for m in modules:
