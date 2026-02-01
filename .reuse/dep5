@@ -4,6 +4,7 @@ Upstream-Contact: KDE <community@kde.org>
 Source: https://invent.kde.org/sdk/kde-builder
 
 Files:  .gitignore
+        .idea/*
         data/00-plasma.conf.in
         data/clion/*
         data/kde-builder-logging.yaml
