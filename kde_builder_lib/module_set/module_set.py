@@ -56,7 +56,6 @@ class ModuleSet(OptionsBase):
         self.module_order: dict[str, int] = {}
         """Maps module names to position in list."""
 
-        self.phase_list: PhaseList = PhaseList(ctx.phases.phaselist)
         self.context: BuildContext = ctx
         self.project_objects_list: list[Module] = []
 
@@ -99,7 +98,6 @@ class ModuleSet(OptionsBase):
         Should be called for each new ``Module`` created in order to set up common module options.
         """
         new_module.set_module_set(self)
-        new_module.phases.reset_to(self.phase_list.phaselist)
         new_module.merge_options_from(self)
 
         # used for dependency sorting tiebreakers, by giving a fallback sort based

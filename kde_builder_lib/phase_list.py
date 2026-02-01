@@ -22,20 +22,8 @@ class PhaseList:
             phases.filter_out_phase("update")
     """
 
-    def __init__(self, phases: list[str] | None = None):
-        """
-        Construct a new phase list, with the provided list of phases or a default set if none are provided.
-
-        ::
-
-            phases1 = PhaseList() # default phases
-            print("phases are " + ", ".join(phases1.phaselist))
-
-            phases2 = PhaseList(["update", "test", "install"])
-        """
-        if not phases:
-            phases = ["update", "build", "install"]
-        self.phaselist = phases
+    def __init__(self):
+        self.phaselist = ["update", "build", "install"]
 
     def filter_out_phase(self, phase: str) -> None:
         """
