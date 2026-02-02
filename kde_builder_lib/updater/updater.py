@@ -221,10 +221,7 @@ class Updater:
 
         git_repo: str = module.get_option("#resolved-repository")
         if not git_repo:
-            msg = dedent(f"""
-                \tThere was no y[b[repository] specified for the {module.name}.
-                \tSee https://kde-builder.kde.org/en/getting-started/kde-projects-and-selection.html#groups
-                """)
+            msg = f"There was no y[b[repository] specified for the {module.name}."
             raise ConfigError(msg)
 
         # While .git is usually a directory, it can also be a file in case of a
