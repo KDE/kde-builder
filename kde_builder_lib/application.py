@@ -230,7 +230,8 @@ class Application:
         for i in range(len(cmdline_selectors)):
             for deprecated_name, new_name in [("workspace", "desktop-session"),
                                               ("mobile", "mobile-session"),
-                                              ("bigscreen", "bigscreen-session"),]:
+                                              ("bigscreen", "bigscreen-session"),
+                                              ("qt6-set", "qt6"),]:
                 if cmdline_selectors[i] == deprecated_name:
                     logger_app.warning(f" y[*] Replacing deprecated selector y[\"{deprecated_name}\"] with g[\"{new_name}\"].")
                     cmdline_selectors[i] = new_name
@@ -406,7 +407,7 @@ class Application:
 
         filtered_modules: list[Module] = []
         for module in modules:
-            if module.module_set and module.module_set.name in ["qt6-set"]:
+            if module.module_set and module.module_set.name in ["qt6"]:
                 if module.get_option("install-dir") == "":
                     # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
                     # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or

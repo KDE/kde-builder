@@ -86,7 +86,7 @@ include ${build-configs-dir}/kde6.yaml: ""
 #  To change options for projects that have already been defined, use an "override" node.
 #  Example:
 #
-#    override qt6-set:
+#    override qt6:
 #      branch: dev
 #
 #  To define a project with some options, use "project" node.

@@ -81,7 +81,7 @@ major space-using pieces when using kde-builder:
 
     Also, if you already have a Qt installed by your distribution (and
     the odds are good that you do), you probably do not need to install
-    the qt6-set group. That will shave about 200 megabytes off of the
+    the qt6 group. That will shave about 200 megabytes off of the
     on-disk source size.
 
 ```{note}

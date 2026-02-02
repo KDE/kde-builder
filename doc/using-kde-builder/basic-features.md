@@ -6,7 +6,7 @@
 
 KDE Builder supports building the Qt toolkit used by KDE software as a
 convenience to users. This support is handled by a special group
-named `qt6-set`. It is defined [here](https://invent.kde.org/sysadmin/repo-metadata/-/blob/master/build-configs/qt6.yaml?ref_type=heads).
+named `qt6`. It is defined [here](https://invent.kde.org/sysadmin/repo-metadata/-/blob/master/build-configs/qt6.yaml?ref_type=heads).
 
 ```{note}
 Qt is developed under a separate repository from KDE software located at
@@ -26,7 +26,7 @@ include ${build-configs-dir}/kde6.yaml: ""
 If this is the case, you are on a safe side.
 
 If for some reason you are not using default build configs, then you should ensure that
-the `qt6-set` group is added to your `kde-builder.yaml` _before_ any other projects in the file.
+the `qt6` group is added to your `kde-builder.yaml` _before_ any other projects in the file.
 Then you should verify that the [repository](#conf-repository) option and
 [branch](#conf-branch) options are set appropriately.
 
@@ -50,7 +50,7 @@ global:
 Now you can just run the following command:
 
 ```bash
-kde-builder qt6-set
+kde-builder qt6
 ```
 
 (kde-builder-std-flags)=
