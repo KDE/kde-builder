@@ -622,35 +622,26 @@ class Application:
         ctx = self.context
         metadata_module = ctx.metadata_module
 
+        dependency_resolver = DependencyResolver(self.module_resolver)
+        branch_group = ctx.get_option("branch-group")
+
+        if Debug().is_testing():
+            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/..")
+            dependency_file = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
+        else:
+            srcdir = metadata_module.fullpath("source")
+            dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
+
         try:
-            dependency_resolver = DependencyResolver(self.module_resolver)
-            branch_group = ctx.get_option("branch-group")
-
-            if Debug().is_testing():
-                kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/..")
-                dependency_file = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
-
-                dependencies = fileinput.FileInput(files=dependency_file, mode="r")
-                logger_app.debug(" -- Reading dependencies from test data")
-                dependency_resolver.read_dependency_data(dependencies)
-                dependencies.close()
-            else:
-                srcdir = metadata_module.fullpath("source")
-                dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
-
-                try:
-                    dependencies = open(dependency_file, "r")
-                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-                    dependency_resolver.read_dependency_data(dependencies)
-                    dependencies.close()
-                except IOError as e:
-                    e_str = str(e).replace("[", "").replace("]", "")
-                    msg_str = f"Unable to open y[{dependency_file}]:\n {e_str}"
-                    raise KBRuntimeError(msg_str)
+            dependencies = open(dependency_file, "r")
+            logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+            dependency_resolver.read_dependency_data(dependencies)
+            dependencies.close()
 
             graph = dependency_resolver.resolve_to_module_graph(modules)
 
         except Exception as e:
+            e = str(e).replace("[", "").replace("]", "")
             logger_app.warning(" r[b[*] Problems encountered trying to determine correct project graph:")
             logger_app.warning(f" r[b[*] {e}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
@@ -664,15 +655,12 @@ class Application:
                 "trivial_cycles": 0,
                 "path_errors": 0,
                 "branch_errors": 0,
-                "exception": e
             }
 
         else:
             if not graph["graph"] and self.run_mode != "install-login-session-only":
                 logger_app.warning(" r[b[*] Unable to determine correct project graph")
                 logger_app.warning(" r[b[*] Will attempt to continue.")
-
-        graph["exception"] = None
 
         return graph
 
