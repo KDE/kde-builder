@@ -71,23 +71,6 @@ class Util:
         return None
 
     @staticmethod
-    def assert_in(val, input_list):
-        """
-        Do assert on element in list.
-
-        Throws an exception if the first parameter is not included in the
-        provided list of possible alternatives.
-
-        Args:
-            val: The value to check.
-            input_list: List of alternatives.
-        """
-        if val not in input_list:
-            raise KBRuntimeError(f"{val} is not a permissible value for its argument")
-
-        return val
-
-    @staticmethod
     def safe_unlink(path) -> None:
         """
         Unlink the given symlink if global-pretend isn't set.

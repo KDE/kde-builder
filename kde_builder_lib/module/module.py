@@ -763,7 +763,7 @@ class Module(OptionsBase):
         """
         ctx = self.context
 
-        Util.assert_in(level_limit, ["allow-inherit", "module"])
+        assert level_limit in ["allow-inherit", "module"]
 
         # If module-only, check that first.
         if level_limit == "module":
@@ -822,7 +822,7 @@ class Module(OptionsBase):
         """
         # Returns the path to the desired directory type (source or build),
         # including the module destination directory itself.
-        Util.assert_in(dirtype, ["build", "source"])
+        assert dirtype in ["build", "source"]
 
         pathinfo = self.get_install_path_components(dirtype)
         return pathinfo["fullpath"]
