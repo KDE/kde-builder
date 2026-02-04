@@ -555,18 +555,18 @@ class Application:
 
             Debug().set_pretending(was_pretending)
 
-        except Exception as err:
+        except KBRuntimeError as err:
             Debug().set_pretending(was_pretending)
 
+            logger_app.warning("\tb[r[*] Unable to update repo-metadata.")
+            logger_app.warning(err.message)
+
             if update_needed:
+                err.message = "Cannot continue without repo-metadata."
                 raise err
 
-            # Assume previously-updated metadata will work if not updating
-            logger_app.warning(" b[r[*] Unable to download required metadata for build process")
-            logger_app.warning(" b[r[*] Will attempt to press onward...")
-            logger_app.warning(f" b[r[*] Exception message: {err}")
-
-            traceback.print_exc()
+            logger_app.warning("\tb[r[*] Will attempt to continue with outdated repo-metadata.")
+            logger_app.warning("")  # Print empty line
 
     def _check_metadata_format_version(self) -> None:
         """
