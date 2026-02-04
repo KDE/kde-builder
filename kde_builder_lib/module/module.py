@@ -639,7 +639,7 @@ class Module(OptionsBase):
             else:
                 e_str = str(e)
 
-            logger_module.error(f"\t{e_str}")
+            logger_module.error(f"{e_str}")
             if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
                 logger_module.error(f"\tError updating r[{self.name}], removing from list of projects to build.")
 
