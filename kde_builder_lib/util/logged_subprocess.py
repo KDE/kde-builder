@@ -131,9 +131,7 @@ class UtilLoggedSubprocess:
 
         Exceptions may be thrown.
         """
-        from ..module.module import Module
         module = self._module
-        Util.assert_isa(module, Module)
         if not (filename := self._log_to):
             raise ProgramError("Need to log somewhere")
         if not (args := self._set_command):

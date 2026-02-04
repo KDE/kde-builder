@@ -116,8 +116,6 @@ class Module(OptionsBase):
         """
         Specify the `ModuleSet` this module was spawned from. Optional.
         """
-        from ..module_set.module_set import ModuleSet
-        Util.assert_isa(module_set, ModuleSet)
         self.module_set = module_set
 
     def get_absolute_path(self, option_name: str) -> str:
@@ -291,7 +289,6 @@ class Module(OptionsBase):
 
         Like :meth:`build_system_from_name()`, but passes the proper `BuildSystem` directly.
         """
-        Util.assert_isa(obj, BuildSystem)
         self.build_obj = obj
 
     def build_system_type(self) -> str:

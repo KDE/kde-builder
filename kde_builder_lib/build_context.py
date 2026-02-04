@@ -550,7 +550,6 @@ class BuildContext(Module):
         return options[0]
 
     def mark_module_phase_failed(self, phase: str, module: Module) -> None:
-        Util.assert_isa(module, Module)
         self.errors[module.name] = phase
 
     def failed_modules_in_phase(self, phase: str) -> list[Module]:

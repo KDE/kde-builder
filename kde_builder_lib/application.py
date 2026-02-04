@@ -1024,7 +1024,6 @@ class Application:
         Returns:
              Shell-style success code (0 == success)
         """
-        Util.assert_isa(ctx, BuildContext)
         modules = ctx.modules_in_phase("install")
 
         modules = [module for module in modules if module.build_system().needs_installed()]
@@ -1060,7 +1059,6 @@ class Application:
         Returns:
              Shell-style success code (0 == success)
         """
-        Util.assert_isa(ctx, BuildContext)
         modules = ctx.modules_in_phase("uninstall")
 
         modules = [module for module in modules if module.build_system().needs_installed()]
@@ -1097,8 +1095,6 @@ class Application:
             applied. Do not assume this list will be a strict subset of the input list,
             however the order will not change amongst the input modules.
         """
-        Util.assert_isa(ctx, BuildContext)
-
         if not ctx.get_option("resume-from") and not ctx.get_option("resume-after") and not ctx.get_option("stop-before") and not ctx.get_option("stop-after"):
             logger_app.debug("No command-line filter seems to be present.")
             return module_list
@@ -1178,8 +1174,6 @@ class Application:
         Returns:
             None
         """
-        Util.assert_isa(ctx, BuildContext)
-
         if not fail_list:
             return
         if Debug().pretending():
@@ -1216,8 +1210,6 @@ class Application:
             ctx: Build context
             module_graph: The module graph.
         """
-        Util.assert_isa(ctx, BuildContext)
-
         extra_debug_info = {
             "phases": {},
             "failCount": {}
@@ -1311,8 +1303,6 @@ class Application:
         Returns:
              None
         """
-        Util.assert_isa(ctx, BuildContext)
-
         try:
             input_file = fileinput.FileInput(files=source_path, mode="r")
         except OSError as e:
@@ -1372,7 +1362,6 @@ class Application:
         Returns:
              None
         """
-        Util.assert_isa(ctx, BuildContext)
         base_name = os.path.basename(source_file_path)
 
         if os.path.exists(dest_file_path):

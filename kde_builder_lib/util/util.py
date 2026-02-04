@@ -71,19 +71,6 @@ class Util:
         return None
 
     @staticmethod
-    def assert_isa(obj, class_name):
-        """
-        Do assert on object.
-
-        Throws an exception if the first parameter is not an object at all, or if
-        it is not an object of the type given by the second parameter (which
-        should be a string of the class name). There is no return value.
-        """
-        if not isinstance(obj, class_name):
-            raise ProgramError(f"{obj} is not of type {class_name}, but of type " + type(obj))
-        return obj
-
-    @staticmethod
     def assert_in(val, input_list):
         """
         Do assert on element in list.

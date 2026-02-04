@@ -139,7 +139,6 @@ class OptionsBase:
         baseline to make small changes afterwards without having to worry about
         aliasing the other module's option set.
         """
-        Util.assert_isa(other, OptionsBase)
         new_opts = copy.deepcopy(other.options)
         for opt_name, opt_val in new_opts.items():
             self.set_option(opt_name, opt_val)
@@ -184,8 +183,6 @@ class OptionsBase:
         if unresolved_value is None:  # in tests, there is a config that does not specify value
             return ""
 
-        from .build_context import BuildContext
-        Util.assert_isa(ctx, BuildContext)
         option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
 
         # Simplify whitespace.

@@ -368,9 +368,6 @@ class DependencyResolver:
 
     def _resolve_dependencies_for_module_description(self, module_graph: dict, module_desc: dict) -> dict:
         module = module_desc["module"]
-        if module:
-            Util.assert_isa(module, Module)
-
         item = module_desc["item"]
         branch = module_desc["branch"]
         pretty_branch = branch if branch else "*"
@@ -592,7 +589,6 @@ class DependencyResolver:
         item_index = 1
 
         for module in modules:
-            Util.assert_isa(module, Module)
             item = module.name
             sub_graph = module_graph[item]
             branch = sub_graph.get("branch", "")

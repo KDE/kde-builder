@@ -55,9 +55,6 @@ class TaskManager:
     """
 
     def __init__(self, app: Application):
-        from .application import Application
-        Util.assert_isa(app, Application)
-
         self.ksb_app = app
         self.DO_STOP = 0
 
