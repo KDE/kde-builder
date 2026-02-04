@@ -83,13 +83,12 @@ class Module(OptionsBase):
 
         phases = None
         if ctx:
-            # Clone the passed-in phases so we can be different. They may be modified later in set_option.
             phases = copy.copy(ctx.phases)
+        self.phases: PhaseList = phases
 
         # newOptions:
         self.scm: Updater = Updater(self)
         self.build_obj: BuildSystem | None = None
-        self.phases: PhaseList = phases
         self.context = ctx
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []

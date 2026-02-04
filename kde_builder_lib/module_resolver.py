@@ -195,7 +195,6 @@ class ModuleResolver:
                 # Third-party projects must not be crafted this way.
                 raise UnknownKdeProjectException(f"Unknown KDE project: {selector_name}", selector_name)
             project: Module = Module(ctx, selector_name)
-            project.phases.reset_to(ctx.phases.phaselist)
 
             self._apply_options([project])
             self.defined_projects[selector_name] = project
