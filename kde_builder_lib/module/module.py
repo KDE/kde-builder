@@ -313,7 +313,7 @@ class Module(OptionsBase):
         build_system = self.build_system()
 
         if build_system.name() == "generic" and not Debug().pretending() and not self.has_option("custom-build-command"):
-            logger_module.error(f"\tr[b[{self}] does not seem to have a build system to use.")
+            logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
             return False
 
         # Ensure we're in a known directory before we start; some options remove
@@ -355,7 +355,7 @@ class Module(OptionsBase):
         build_system = self.build_system()
 
         if build_system.name() == "generic" and self.has_option("custom-build-command"):
-            logger_module.info(f"\tb[*] No build system detected for b[y[{self}], assuming custom build command will handle")  # tab?
+            logger_module.info(f"\tb[*] No build system detected for b[y[{self.name}], assuming custom build command will handle")  # tab?
             return True
 
         if build_system.name() == "generic" and not Debug().pretending():
@@ -384,15 +384,15 @@ class Module(OptionsBase):
         if refresh_reason != "":
             # The build system needs created, either because it doesn't exist, or
             # because the user has asked that it be completely rebuilt.
-            logger_module.info(f"\tPreparing build system for y[{self}].")
+            logger_module.info(f"\tPreparing build system for y[{self.name}].")
 
             if not build_system.clean_build_system():
-                logger_module.warning(f"\tUnable to clean r[{self}]!")
+                logger_module.warning(f"\tUnable to clean r[{self.name}]!")
                 return False
 
         result = build_system.create_build_system()
         if not result:
-            logger_module.error(f"\tError creating r[{self}]'s build system!")
+            logger_module.error(f"\tError creating r[{self.name}]'s build system!")
             return False
 
         # Now we're in the checkout directory
@@ -401,7 +401,7 @@ class Module(OptionsBase):
         Util.p_chdir(builddir)
 
         if not build_system.configure_internal():
-            logger_module.error(f"\tUnable to configure r[{self}] with " + self.build_system_type())
+            logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system_type())
 
             # Add undocumented ".refresh-me" file to build directory to flag
             # for --refresh-build for this module on next run. See also the
@@ -425,7 +425,7 @@ class Module(OptionsBase):
         build_sys_file = self.build_system().configured_module_file_name()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
-            logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
+            logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
             logger_module.warning("\tTherefore, we can't install it. y[:-(].")
             return False
 
@@ -438,18 +438,18 @@ class Module(OptionsBase):
         # to weed out old unused files.
         if self.get_option("use-clean-install") and self.get_persistent_option("last-install-rev"):
             if not self.build_system().uninstall_internal(make_install_opts):
-                logger_module.warning(f"\tUnable to uninstall r[{self}] before installing the new build.")
+                logger_module.warning(f"\tUnable to uninstall r[{self.name}] before installing the new build.")
                 logger_module.warning("\tContinuing anyways...")
             else:
                 self.unset_persistent_option("last-install-rev")
 
         if not self.build_system().install_internal(make_install_opts):
-            logger_module.error(f"\tUnable to install r[{self}]!")
+            logger_module.error(f"\tUnable to install r[{self.name}]!")
             self.context.mark_module_phase_failed("install", self)
             return False
 
         if Debug().pretending():
-            logger_module.debug(f"\tWould have installed g[{self}]")
+            logger_module.debug(f"\tWould have installed g[{self.name}]")
             return True
 
         # Past this point we know we've successfully installed, for real.
@@ -463,12 +463,12 @@ class Module(OptionsBase):
         if remove_setting == "all":
             # Remove srcdir
             srcdir = self.fullpath("source")
-            logger_module.warning(f"\tRemoving b[r[{self} source].")
+            logger_module.warning(f"\tRemoving b[r[{self.name} source].")
             Util.safe_rmtree(srcdir)
 
         if remove_setting == "builddir" or remove_setting == "all":
             # Remove builddir
-            logger_module.warning(f"\tRemoving b[r[{self} build directory].")
+            logger_module.warning(f"\tRemoving b[r[{self.name} build directory].")
             Util.safe_rmtree(builddir)
 
             # We're likely already in the builddir, so chdir back to the root
@@ -488,7 +488,7 @@ class Module(OptionsBase):
         build_sys_file = self.build_system().configured_module_file_name()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
-            logger_module.warning(f"\tThe build system doesn't exist for r[{self}].")
+            logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
             logger_module.warning("\tTherefore, we can't uninstall it.")
             return False
 
@@ -498,12 +498,12 @@ class Module(OptionsBase):
         make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         if not self.build_system().uninstall_internal(make_install_opts):
-            logger_module.error(f"\tUnable to uninstall r[{self}]!")
+            logger_module.error(f"\tUnable to uninstall r[{self.name}]!")
             self.context.mark_module_phase_failed("uninstall", self)
             return False
 
         if Debug().pretending():
-            logger_module.debug(f"\tWould have uninstalled g[{self}]")
+            logger_module.debug(f"\tWould have uninstalled g[{self.name}]")
             return True
 
         self.unset_persistent_option("last-install-rev")
@@ -529,7 +529,7 @@ class Module(OptionsBase):
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
         # Let the toolchain files/definitions take care of themselves.
         if build_system.has_toolchain():
-            logger_module.debug(f"\tNot setting environment variables for b[{self}]: a custom toolchain is used")
+            logger_module.debug(f"\tNot setting environment variables for b[{self.name}]: a custom toolchain is used")
         else:
             installdir = self.get_option("install-dir")
             qt_installdir = self.get_option("qt-install-dir")
@@ -595,7 +595,7 @@ class Module(OptionsBase):
         if kdesrc != module_src_dir:
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
-                logger_module.error(f"\tUnable to create separate source directory for r[{self}]: {module_src_dir}")
+                logger_module.error(f"\tUnable to create separate source directory for r[{self.name}]: {module_src_dir}")
                 ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
                 self.current_phase = None
                 logger_module.info("")  # Print empty line.
@@ -661,7 +661,7 @@ class Module(OptionsBase):
             # number of files updated doesn't get run, so manually mention it
             # here.
             if not ipc.supports_concurrency():
-                logger_module.info(f"\t{self} update complete, {message}")
+                logger_module.info(f"\t{self.name} update complete, {message}")
 
             return_value = True
         self.current_phase = None
@@ -680,7 +680,7 @@ class Module(OptionsBase):
         # Ensure we don't accidentally get fed module-set options
         for mso in ["use-projects", "ignore-projects"]:
             if opt_name == mso:
-                logger_module.error(f" r[b[*] project b[{self}] should be declared as group to use b[{mso}]")
+                logger_module.error(f" r[b[*] project b[{self.name}] should be declared as group to use b[{mso}]")
                 raise SetOptionError(mso, f"Option {mso} can only be used in group")
 
         # Special case handling.
@@ -864,7 +864,7 @@ class Module(OptionsBase):
                 base_path = base_path or self.name  # Default if not provided in repo-metadata
             else:
                 if not self.has_option("#warned-invalid-directory-layout"):  # avoid spamming
-                    logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self}]")
+                    logger_module.warning(f"y[ * Invalid b[directory-layout]y[ value: \"{layout}\". Will use b[flat]y[ instead for b[{self.name}]")
                     self.set_option("#warned-invalid-directory-layout", True)
                 base_path = self.name
 
@@ -1068,11 +1068,11 @@ class Module(OptionsBase):
         logdir = self.get_log_dir()
 
         if self.has_option("#error-log-file"):
-            logger_module.error(f"\tr[b[*] {self} already has error log set, tried to set to r[b[{logfile}]")
+            logger_module.error(f"\tr[b[*] {self.name} already has error log set, tried to set to r[b[{logfile}]")
             return
 
         self.set_option("#error-log-file", f"{logdir}/{logfile}")
-        logger_module.debug(f"Logfile for {self} is {logfile}")
+        logger_module.debug(f"Logfile for {self.name} is {logfile}")
 
         # Setup symlink in the module log directory pointing to the appropriate
         # file. Make sure to remove it first if it already exists.
