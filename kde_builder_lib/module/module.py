@@ -88,7 +88,7 @@ class Module(OptionsBase):
 
         # newOptions:
         self.scm: Updater = Updater(self)
-        self.build_obj: BuildSystem | None = None
+        self.build_system: BuildSystem | None = None
         self.context = ctx
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []
@@ -249,7 +249,7 @@ class Module(OptionsBase):
         updates first, because we need to inspect source code files to autodetect build system.
         """
         if user_build_system := self.get_option("override-build-system"):
-            self.build_obj = self.build_system_from_name(user_build_system)
+            self.build_system = self.build_system_from_name(user_build_system)
             return
 
         build_type = None
@@ -278,13 +278,7 @@ class Module(OptionsBase):
         if not build_type:
             build_type = BuildSystem(self)
 
-        self.build_obj = build_type
-
-    def build_system(self) -> BuildSystem:
-        """
-        Return the `BuildSystem` plugin.
-        """
-        return self.build_obj
+        self.build_system = build_type
 
     def build(self) -> bool:
         """
@@ -294,7 +288,7 @@ class Module(OptionsBase):
              False on failure, True on success.
         """
         pathinfo = self.get_install_path_components("build")
-        build_system = self.build_system()
+        build_system = self.build_system
 
         if build_system.name() == "generic" and not Debug().pretending() and not self.get_option("custom-build-command"):
             logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
@@ -317,7 +311,7 @@ class Module(OptionsBase):
         self.set_persistent_option("last-build-rev", self.current_scm_revision())
 
         if self.get_option("run-tests"):
-            self.build_system().run_testsuite()
+            self.build_system.run_testsuite()
 
         if not self.phases.has("install"):
             logger_module.info("\tSkipping install due to disabled install phase.")
@@ -336,7 +330,7 @@ class Module(OptionsBase):
         Returns:
              True on success, False (0) on failure.
         """
-        build_system = self.build_system()
+        build_system = self.build_system
 
         if build_system.name() == "generic" and self.get_option("custom-build-command"):
             logger_module.info(f"\tb[*] No build system detected for b[y[{self.name}], assuming custom build command will handle")  # tab?
@@ -385,7 +379,7 @@ class Module(OptionsBase):
         Util.p_chdir(builddir)
 
         if not build_system.configure_internal():
-            logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system().name())
+            logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system.name())
 
             # Add undocumented ".refresh-me" file to build directory to flag
             # for --refresh-build for this module on next run. See also the
@@ -406,7 +400,7 @@ class Module(OptionsBase):
         Exceptions may be thrown for abnormal conditions (e.g. no build dir exists)
         """
         builddir = self.fullpath("build")
-        build_sys_file = self.build_system().configured_module_file_name()
+        build_sys_file = self.build_system.configured_module_file_name()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
@@ -421,13 +415,13 @@ class Module(OptionsBase):
         # We can optionally uninstall prior to installing
         # to weed out old unused files.
         if self.get_option("use-clean-install") and self.get_persistent_option("last-install-rev"):
-            if not self.build_system().uninstall_internal(make_install_opts):
+            if not self.build_system.uninstall_internal(make_install_opts):
                 logger_module.warning(f"\tUnable to uninstall r[{self.name}] before installing the new build.")
                 logger_module.warning("\tContinuing anyways...")
             else:
                 self.unset_persistent_option("last-install-rev")
 
-        if not self.build_system().install_internal(make_install_opts):
+        if not self.build_system.install_internal(make_install_opts):
             logger_module.error(f"\tUnable to install r[{self.name}]!")
             self.context.mark_module_phase_failed("install", self)
             return False
@@ -469,7 +463,7 @@ class Module(OptionsBase):
              False on failure, True on success.
         """
         builddir = self.fullpath("build")
-        build_sys_file = self.build_system().configured_module_file_name()
+        build_sys_file = self.build_system.configured_module_file_name()
 
         if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
@@ -481,7 +475,7 @@ class Module(OptionsBase):
         make_install_opts = self.get_option("make-install-prefix").split(" ")
         make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
-        if not self.build_system().uninstall_internal(make_install_opts):
+        if not self.build_system.uninstall_internal(make_install_opts):
             logger_module.error(f"\tUnable to uninstall r[{self.name}]!")
             self.context.mark_module_phase_failed("uninstall", self)
             return False
@@ -508,7 +502,7 @@ class Module(OptionsBase):
                 self.queue_environment_variable(key, value)
 
         # Build system's environment injection
-        build_system = self.build_system()
+        build_system = self.build_system
 
         # Suppress injecting qt-install-dir/install-dir related environment variables if a toolchain is also set
         # Let the toolchain files/definitions take care of themselves.

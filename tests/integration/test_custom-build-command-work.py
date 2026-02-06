@@ -68,10 +68,10 @@ def test_build_internal(monkeypatch):
     assert module.get_option("custom-build-command") == "echo", "Custom build command setup"
     assert module.get_option("override-build-system") == "generic", "Custom build system required"
 
-    assert module.build_system() is not None, "module has a build_system"
+    assert module.build_system is not None, "module has a build_system"
 
     # Don't use isinstance() because we want this exact class
-    assert type(module.build_system()) is BuildSystem
+    assert type(module.build_system) is BuildSystem
 
     # Disable --pretend mode, the build/install methods should be mocked and
     # harmless and we won't proceed to build_internal if in pretend mode

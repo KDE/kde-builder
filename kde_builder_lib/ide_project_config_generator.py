@@ -26,7 +26,7 @@ class IdeProjectConfigGenerator:
 
     def __init__(self, module: Module, cmake_opts: list[str]):
         self.module = module
-        self.build_opts = module.build_system().get_build_options()
+        self.build_opts = module.build_system.get_build_options()
         self.cmake_opts = cmake_opts
 
     def _generate_vs_code_config(self) -> bool:

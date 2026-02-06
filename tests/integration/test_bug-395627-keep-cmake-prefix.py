@@ -41,7 +41,7 @@ def test_cmake_prefix(monkeypatch):
         m.set_build_system()
 
     assert len(module_list) == 6, "Right number of modules"
-    assert isinstance(module_list[0].build_system(), BuildSystemKDECMake)
+    assert isinstance(module_list[0].build_system, BuildSystemKDECMake)
 
     # This requires log_command to be overridden above
     result = module_list[0].setup_build_system()

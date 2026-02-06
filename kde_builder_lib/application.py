@@ -723,11 +723,11 @@ class Application:
             elif query_mode == "build-system":
                 def query(x):
                     x.set_build_system()
-                    return x.build_system().name()
+                    return x.build_system.name()
             elif query_mode == "cmake-options":
                 def query(x):
-                    if x.build_system().name() == "KDE CMake":
-                        out_res = x.build_system().get_final_cmake_options()
+                    if x.build_system.name() == "KDE CMake":
+                        out_res = x.build_system.get_final_cmake_options()
                         return " ".join(out_res)
                     else:
                         return "<not a cmake build system>"
@@ -1493,7 +1493,7 @@ class Application:
         modules_requiring_program = {}
 
         for module in ctx.modules_in_phase("build"):
-            progs = module.build_system().required_programs()
+            progs = module.build_system.required_programs()
 
             required_programs.update(progs)
 

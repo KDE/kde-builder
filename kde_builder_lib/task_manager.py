@@ -221,7 +221,7 @@ class TaskManager:
             logger_taskmanager.warning(f"\tSource update complete for g[{module}]: {message}")
         elif result_status_of_update == "skipped":
             logger_taskmanager.warning(f"\tNo changes to g[{module}] source code.")
-            refresh_reason = module.build_system().needs_refreshed()
+            refresh_reason = module.build_system.needs_refreshed()
 
             if refresh_reason:
                 logger_taskmanager.info(f"\tRebuilding because {refresh_reason}.")
