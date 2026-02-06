@@ -40,6 +40,8 @@ def test_option_reading(monkeypatch):
 
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects".split(" "))
     module_list = app.modules
+    for m in module_list:
+        m.set_build_system()
 
     assert len(module_list) == 4, "Right number of modules"
 

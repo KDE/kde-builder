@@ -32,6 +32,7 @@ def test_environment_prepend():
     ctx.set_option("install-dir", "")  # must be set but empty
     ctx.set_option("qt-install-dir", "/dev/null")
 
+    mod.set_build_system()
     mod.setup_environment()
 
     assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
@@ -51,6 +52,7 @@ def test_environment_prepend():
     ctx.set_option("qt-install-dir", "")  # must be set but empty
     ctx.set_option("install-dir", "/dev/null")
 
+    mod.set_build_system()
     mod.setup_environment()
 
     assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
@@ -70,6 +72,7 @@ def test_environment_prepend():
     ctx.set_option("qt-install-dir", "/dev/null")
     ctx.set_option("install-dir", "/dev/null")
 
+    mod.set_build_system()
     mod.setup_environment()
 
     assert "PATH" in mod.env, "Entry created for PATH when setting up mod env"
@@ -87,6 +90,7 @@ def test_environment_prepend():
     ctx.set_option("binpath", "/tmp/fake/bin")
     ctx.set_option("libpath", "/tmp/fake/lib:/tmp/fake/lib64")
 
+    mod.set_build_system()
     mod.setup_environment()
 
     assert re.search("/tmp/fake/bin", mod.env["PATH"]), "Ensure `binpath` present in generated PATH"

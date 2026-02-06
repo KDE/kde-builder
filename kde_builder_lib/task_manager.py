@@ -197,7 +197,6 @@ class TaskManager:
              The failure phase, or empty string on success.
         """
         module.reset_environment()
-        module.setup_environment()
 
         # Cache module directories, e.g. to be consumed in kde-builder --run
         module.set_persistent_option("source-dir", module.fullpath("source"))
@@ -209,6 +208,9 @@ class TaskManager:
         message: str
         result_status_of_update, message = ipc.wait_for_module(module)
         ipc.forget_module(module)
+
+        module.set_build_system()  # After we downloaded source code, we can determine build system
+        module.setup_environment()
 
         if result_status_of_update == "failed":
             logger_taskmanager.error(f"\tUnable to update r[{module}], build canceled.")

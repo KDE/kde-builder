@@ -722,6 +722,7 @@ class Application:
                     return x.module_set.name or "undefined_group"
             elif query_mode == "build-system":
                 def query(x):
+                    x.set_build_system()
                     return x.build_system().name()
             elif query_mode == "cmake-options":
                 def query(x):
@@ -754,17 +755,23 @@ class Application:
             # build and (by default) install.  This will involve two simultaneous
             # processes performing update and build at the same time by default.
 
-            # Check for absolutely essential programs now.
-            if self._have_missing_build_tools():
-                logger_app.error(dedent("""
-                     r[*] Please ensure the development packages are installed by using your distribution's package manager.
-                     r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
-                     r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.
-                    """, preserve_len=1))
-                result = 1
-            else:
-                runner = TaskManager(self)
-                result = runner.run_all_tasks()
+            # _have_missing_build_tools() requires build_system to already be set. But we can only set it after we download source code.
+            # So disable this for now.
+            # todo: Enable this after refactoring kde-builder flow that will make the "update" phase be finished completely
+            #  for all projects before starting "build" phase for all projects. In other words, we need to unparallelize them.
+            # # Check for absolutely essential programs now.
+            # if self._have_missing_build_tools():
+            #     logger_app.error(dedent("""
+            #          r[*] Please ensure the development packages are installed by using your distribution's package manager.
+            #          r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
+            #          r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.
+            #         """, preserve_len=1))
+            #     result = 1
+            # else:
+            #     ...
+
+            runner = TaskManager(self)
+            result = runner.run_all_tasks()
         elif run_mode == "install":
             # install but do not build (... unless the build_system does that but
             # hey, we tried)
@@ -1030,6 +1037,7 @@ class Application:
 
         for module in modules:
             module.reset_environment()
+            module.set_build_system()
             failed = not module.install() or failed
 
             if failed and module.get_option("stop-on-failure"):
@@ -1064,6 +1072,7 @@ class Application:
 
         for module in modules:
             module.reset_environment()
+            module.set_build_system()
             failed = not module.uninstall() or failed
 
             if failed and module.get_option("stop-on-failure"):

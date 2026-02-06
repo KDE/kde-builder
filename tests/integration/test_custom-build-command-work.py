@@ -58,6 +58,8 @@ def test_build_internal(monkeypatch):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --no-metadata --custom-build-command echo --override-build-system generic".split(" ")
     app = Application(args)
     module_list = app.modules
+    for m in module_list:
+        m.set_build_system()
 
     assert len(module_list) == 4, "Right number of modules"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"

@@ -37,6 +37,8 @@ def test_cmake_prefix(monkeypatch):
     args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kde-builder.yaml --all-config-projects".split(" ")
     app = Application(args)
     module_list = app.modules
+    for m in module_list:
+        m.set_build_system()
 
     assert len(module_list) == 6, "Right number of modules"
     assert isinstance(module_list[0].build_system(), BuildSystemKDECMake)

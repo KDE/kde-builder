@@ -241,18 +241,17 @@ class Module(OptionsBase):
             raise KBRuntimeError(f"Invalid build system {name} requested")
         return class_name(self)
 
-    def build_system(self) -> BuildSystem:
+    def set_build_system(self) -> None:
         """
-        Autodetects the appropriate build system plugin if not already done (or manually set) and then returns the `BuildSystem` plugin.
-        """
-        if self.build_obj and self.build_obj.name() != "generic":
-            return self.build_obj
+        Autodetect the appropriate build system plugin (or manually set).
 
+        The reason why we do not call this function immediately in generate_module_list() is that we need to handle
+        updates first, because we need to inspect source code files to autodetect build system.
+        """
         if user_build_system := self.get_option("override-build-system"):
             self.build_obj = self.build_system_from_name(user_build_system)
-            return self.build_obj
+            return
 
-        # If not set, let's guess.
         build_type = None
         source_dir = self.fullpath("source")
 
@@ -280,15 +279,12 @@ class Module(OptionsBase):
             build_type = BuildSystem(self)
 
         self.build_obj = build_type
+
+    def build_system(self) -> BuildSystem:
+        """
+        Return the `BuildSystem` plugin.
+        """
         return self.build_obj
-
-    def set_build_system(self, obj: BuildSystem) -> None:
-        """
-        Set the build system **object**, although you can find the build system type afterwards (see build_system_type).
-
-        Like :meth:`build_system_from_name()`, but passes the proper `BuildSystem` directly.
-        """
-        self.build_obj = obj
 
     def build(self) -> bool:
         """

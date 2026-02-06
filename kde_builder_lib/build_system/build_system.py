@@ -35,7 +35,7 @@ class BuildSystem:
 
     ::
 
-        buildsys = module.build_system()  # auto-detects
+        buildsys = module.build_system()
 
         if not buildsys.has_toolchain():
             buildsys.prepare_module_build_environment()
