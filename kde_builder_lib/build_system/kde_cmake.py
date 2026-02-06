@@ -201,11 +201,6 @@ class BuildSystemKDECMake(BuildSystem):
 
     @staticmethod
     # @override
-    def needs_installed() -> bool:
-        return True
-
-    @staticmethod
-    # @override
     def name() -> str:
         return "KDE CMake"
 

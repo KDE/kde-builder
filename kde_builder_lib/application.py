@@ -1026,7 +1026,6 @@ class Application:
         """
         modules = ctx.modules_in_phase("install")
 
-        modules = [module for module in modules if module.build_system().needs_installed()]
         failed = False
 
         for module in modules:
@@ -1061,7 +1060,6 @@ class Application:
         """
         modules = ctx.modules_in_phase("uninstall")
 
-        modules = [module for module in modules if module.build_system().needs_installed()]
         failed = False
 
         for module in modules:

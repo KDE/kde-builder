@@ -41,9 +41,6 @@ class BuildSystem:
             buildsys.prepare_module_build_environment()
 
         results = buildsys.build_internal()
-
-        if (results["was_successful"] and buildsys.needs_installed()):
-            buildsys.install_internal()
     """
 
     def __init__(self, module: Module):
@@ -132,13 +129,6 @@ class BuildSystem:
         Should take `has_toolchain()` into account here.
         """
         pass
-
-    @staticmethod
-    def needs_installed() -> bool:
-        """
-        Return true if the module should have make install run in order to be used, or false if installation is not required or possible.
-        """
-        return True
 
     @staticmethod
     def required_programs() -> list[str]:
