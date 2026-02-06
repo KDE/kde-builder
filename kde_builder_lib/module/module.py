@@ -290,18 +290,6 @@ class Module(OptionsBase):
         """
         self.build_obj = obj
 
-    def build_system_type(self) -> str:
-        """
-        Return the name of the build system plugin, as determined by :meth:`build_system()`.
-
-        Current possible build system types: KDE (i.e. cmake), Qt, autotools (either configure or autogen.sh).
-        A final possibility is "pendingSource" which simply means that we don't know yet.
-
-        If the build system type is not set ("pendingSource" counts as being set!) when this function is called
-        then it will be autodetected if possible, but note that not all possible types will be detected this way.
-        """
-        return self.build_system().name()
-
     def build(self) -> bool:
         """
         Execute the build and install (or pretends to in pretend mode) using the appropriate build system. Can also run the testsuite as part of the build.
@@ -401,7 +389,7 @@ class Module(OptionsBase):
         Util.p_chdir(builddir)
 
         if not build_system.configure_internal():
-            logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system_type())
+            logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system().name())
 
             # Add undocumented ".refresh-me" file to build directory to flag
             # for --refresh-build for this module on next run. See also the

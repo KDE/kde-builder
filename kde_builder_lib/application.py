@@ -1504,10 +1504,6 @@ class Application:
                 program_path = BuildSystemQMake5.abs_path_to_qmake()
 
             if not program_path:
-                # Don't complain about Qt if we're building it...
-                if prog == "qmake" and [x for x in build_modules if x.build_system_type() == "Qt"] or Debug().pretending():
-                    continue
-
                 was_error = True
 
                 modules_needing = modules_requiring_program[prog].keys()
