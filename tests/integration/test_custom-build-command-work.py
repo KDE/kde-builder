@@ -68,8 +68,8 @@ def test_build_internal(monkeypatch):
 
     assert module.build_system() is not None, "module has a build_system"
 
-    # Don't use ->isa because we want this exact class
-    assert isinstance(module.build_system(), BuildSystem)
+    # Don't use isinstance() because we want this exact class
+    assert type(module.build_system()) is BuildSystem
 
     # Disable --pretend mode, the build/install methods should be mocked and
     # harmless and we won't proceed to build_internal if in pretend mode

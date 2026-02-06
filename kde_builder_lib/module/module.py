@@ -312,7 +312,7 @@ class Module(OptionsBase):
         pathinfo = self.get_install_path_components("build")
         build_system = self.build_system()
 
-        if build_system.name() == "generic" and not Debug().pretending() and not self.has_option("custom-build-command"):
+        if build_system.name() == "generic" and not Debug().pretending() and not self.get_option("custom-build-command"):
             logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
             return False
 
@@ -354,7 +354,7 @@ class Module(OptionsBase):
         """
         build_system = self.build_system()
 
-        if build_system.name() == "generic" and self.has_option("custom-build-command"):
+        if build_system.name() == "generic" and self.get_option("custom-build-command"):
             logger_module.info(f"\tb[*] No build system detected for b[y[{self.name}], assuming custom build command will handle")  # tab?
             return True
 

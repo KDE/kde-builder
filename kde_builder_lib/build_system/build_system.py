@@ -49,29 +49,6 @@ class BuildSystem:
     def __init__(self, module: Module):
         self.module = module
 
-        # This is simply the "default" build system at this point, so options
-        # intended for unique/bespoke build systems should be stripped from global
-        # before being applied to a module.
-        if not self.__class__.__name__ == "BuildSystemKDECMake":
-            self._mask_global_build_system_options()
-
-    def _mask_global_build_system_options(self) -> None:
-        """
-        Remove or mask global build system-related options.
-
-        This is done so that they aren't accidentally picked up for use with our non-default build system.
-        Module-specific options are left intact.
-        """
-        module = self.module
-        ctx = module.context
-        build_system_options = ["cmake-options", "cmake-generator", "configure-flags", "custom-build-command", "cxxflags", "make-options", "run-tests", "use-clean-install"]
-
-        for opt in build_system_options:
-            # If an option is present, and not set at module-level, it must be
-            # global. Can't use get_option() method due to recursion.
-            if ctx.options[opt] and not module.options.get(opt, None):
-                module.options[opt] = ""
-
     def has_toolchain(self) -> bool:
         """
         Check if a (custom) toolchain is defined.
