@@ -188,7 +188,23 @@ try:
     app.finish(result)
 except UnknownKdeProjectException as err:
     logger_app = KBLogger.getLogger("application")
-    logger_app.error(f" r[*] y[{err.unknown_project_name}] is not found in KDE projects, and there is no defined project with such name in the config.")
+    unrecognized_name = err.unknown_project_name
+    ctx = app.context
+    repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
+    active = repo_data.get("active", False)
+    msg = ""
+    if unrecognized_name.startswith("-"):
+        msg = f" r[*] Unrecognized option y[{unrecognized_name}] was used."
+    elif repo_data and not active:
+        msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
+    else:
+        msg = dedent(f"""
+             r[*] y[{unrecognized_name}] is not found in KDE projects, and there is no defined third-party project with such name in the config.
+             r[*] Note that kde-builder only recognizes KDE projects that are marked in repo-metadata as "software" kind.
+             r[*] Such kinds as "website", "infrastructure", "packaging", "other" are ignored.
+            """, preserve_len=1)
+
+    logger_app.error(msg)
     exit(99)
 except ProgramError as err:
     print(dedent(f"""
