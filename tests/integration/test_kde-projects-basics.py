@@ -15,6 +15,7 @@ def test_kde_projects():
     # kcalc juk in that order
     args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-with-deps.yaml --all-config-projects".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 3, "Right number of modules (include-dependencies)"

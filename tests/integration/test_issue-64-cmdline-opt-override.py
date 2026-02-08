@@ -21,6 +21,7 @@ def test_no_cmdline_override():
 
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
@@ -39,6 +40,7 @@ def test_cmdline_makeoption():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --make-options j3".split(" ")
 
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
@@ -57,6 +59,7 @@ def test_cmdline_numcores():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --num-cores=5".split(" ")  # 4 is default, 8 is in rc-file, use something different
 
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert app.context.get_option("num-cores") == "5", "Updated cmdline option changes global value"

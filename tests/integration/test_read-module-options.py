@@ -39,6 +39,7 @@ def test_option_reading(monkeypatch):
     monkeypatch.setattr(UtilLoggedSubprocess, "start", mock_start)
 
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects".split(" "))
+    app.generate_module_list()
     module_list = app.modules
     for m in module_list:
         m.set_build_system()

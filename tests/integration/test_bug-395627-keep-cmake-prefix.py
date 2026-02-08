@@ -36,6 +36,7 @@ def test_cmake_prefix(monkeypatch):
 
     args = "--pretend --rc-file tests/integration/fixtures/bug-395627/kde-builder.yaml --all-config-projects".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
     for m in module_list:
         m.set_build_system()

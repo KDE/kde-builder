@@ -20,6 +20,7 @@ def test_cmdline_selector_not_eaten():
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --stop-on-failure setmod3".split(" ")
 
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 1, "Right number of modules (just one)"

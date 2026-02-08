@@ -12,6 +12,7 @@ def test_repository_resolution():
     """
     args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-repository-resolving.yaml --all-config-projects".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
     for module in module_list:
         module.set_resolved_repository()

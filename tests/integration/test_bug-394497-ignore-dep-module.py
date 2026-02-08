@@ -52,6 +52,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
 def test_include_deps(mock_app_res_mod_dep_graph):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 3, "Right number of modules (include-dependencies)"
@@ -69,6 +70,7 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --include-dependencies setmod1 setmod3 --ignore-projects setmod2".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-projects)"
@@ -84,6 +86,7 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --ignore-projects set1".split(" ")
 
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 1, "Right number of modules (ignore module-set)"

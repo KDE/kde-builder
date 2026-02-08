@@ -53,6 +53,7 @@ def test_no_include_deps(mock_application):
     """
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder-with-deps.yaml --no-include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 2, "Right number of modules (include-dependencies)"
@@ -64,6 +65,7 @@ def test_no_include_deps(mock_application):
 def test_no_include_deps_ignore_modules(mock_application):
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder-with-deps.yaml --no-include-dependencies setmod1 setmod3 --ignore-projects setmod2".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
 
     assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-projects)"

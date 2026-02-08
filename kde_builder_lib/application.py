@@ -56,13 +56,6 @@ class Application:
     to supporting classes, this class primarily does the orchestration that goes
     from reading command line options, choosing which modules to build, overseeing
     the build process, and reporting the results to the user.
-
-    Examples:
-    ::
-
-        app = kde_builder_lib.Application.Application(sys.argv)
-        result = app.run_all_module_phases()
-        app.finish(result)
     """
 
     def __init__(self, options: list[str]):
@@ -132,11 +125,6 @@ class Application:
         self._check_metadata_format_version()  # Skipped automatically in testing mode
 
         ctx.absolutize_config_file_path_and_ensure_it_exists()
-
-        self.generate_module_list()
-        if not self.modules:
-            print("No projects to build, exiting.")
-            sys.exit(0)
 
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
@@ -642,6 +630,10 @@ class Application:
         """
         ctx = self.context
         modules = self.modules
+
+        if not modules:
+            print("No projects to build, exiting.")
+            sys.exit(0)
 
         ctx.modules = modules
 

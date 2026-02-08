@@ -15,14 +15,16 @@ def test_unrecognized_project():
     """
     with pytest.raises(UnknownKdeProjectException) as excinfo:
         # kcalc is defined in test project metadata (see _load_mock_project_data). "gnome-calc" is our unrecognized selector.
-        Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "kcalc", "gnome-calc"])
+        app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "kcalc", "gnome-calc"])
+        app.generate_module_list()
 
     assert excinfo.value.unknown_project_name == "gnome-calc", "Correct name of the unrecognized project"
 
     try:
         # Test dependencies data contains "kde-builder: third-party/taglib" (see _resolve_module_dependency_graph), and in the config,
         # there is no module named "taglib". This should not raise UnknownKdeProjectException.
-        Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "--all-config-projects"])
+        app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "--all-config-projects"])
+        app.generate_module_list()
     except UnknownKdeProjectException:
         pytest.fail("Unexpectedly raised UnknownKdeProjectException when there was no unknown project selector in command line")
 

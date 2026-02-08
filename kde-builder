@@ -183,6 +183,7 @@ from kde_builder_lib.kb_exception import KBException  # noqa: E402
 app = None
 try:
     app = Application(sys.argv[1:])  # the 0 element is script name
+    app.generate_module_list()
     result = app.run_all_module_phases()
     app.finish(result)
 except UnknownKdeProjectException as err:

@@ -57,6 +57,7 @@ def test_build_internal(monkeypatch):
 
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --no-metadata --custom-build-command echo --override-build-system generic".split(" ")
     app = Application(args)
+    app.generate_module_list()
     module_list = app.modules
     for m in module_list:
         m.set_build_system()

@@ -12,6 +12,7 @@ def test_set_project_option():
     Test use of --set-project-option-value.
     """
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --set-project-option-value module2,tag,fake-tag10 --set-project-option-value setmod2,tag,tag-setmod10".split(" "))
+    app.generate_module_list()
     module_list = app.modules
     assert len(module_list) == 4, "Right number of modules"
 
