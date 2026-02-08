@@ -194,6 +194,13 @@ class ModuleResolver:
             if selector_name not in self.context.projects_db.repositories:
                 # Third-party projects must not be crafted this way.
                 raise UnknownKdeProjectException(f"Unknown KDE project: {selector_name}", selector_name)
+
+            use_inactive = self.context.get_option("use-inactive-projects")
+            is_active = self.context.projects_db.repositories[selector_name]["active"]
+
+            if not is_active and not use_inactive:
+                raise UnknownKdeProjectException(f"Archived KDE project: {selector_name}", selector_name)
+
             project: Module = Module(ctx, selector_name)
 
             self._apply_options([project])
