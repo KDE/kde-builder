@@ -99,12 +99,6 @@ class Application:
 
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
-        # After this call, we must run the finish() method
-        # to cleanly complete process execution.
-        if not Debug().pretending() and not self.context.take_lock():  # todo move take_lock to the place before the actual work, not when creating an instance of Application.
-            print(f"{sys.argv[0]} is already running!\n")
-            exit(1)  # Don't finish(), it's not our lockfile!!
-
         # os.setpgrp()  # Create our own process group, its id will be equal to self._base_pid. Needed to send signal to the whole group when exiting.
         self._already_got_signal = False  # Used to prevent secondary invocation of signal handler
 
@@ -727,6 +721,10 @@ class Application:
                 print(f"{m}: " + res)
 
             return 0
+
+        # After this call, we must run the finish() method to cleanly complete process execution.
+        if not Debug().pretending() and not self.context.take_lock():
+            exit(1)  # Don't finish(), it's not our lockfile!
 
         result = None  # shell-style (0 == success)
 
