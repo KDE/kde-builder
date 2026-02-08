@@ -22,7 +22,7 @@ def test_unrecognized_project():
     try:
         # Test dependencies data contains "kde-builder: third-party/taglib" (see _resolve_module_dependency_graph), and in the config,
         # there is no module named "taglib". This should not raise UnknownKdeProjectException.
-        Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml"])
+        Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "--all-config-projects"])
     except UnknownKdeProjectException:
         pytest.fail("Unexpectedly raised UnknownKdeProjectException when there was no unknown project selector in command line")
 

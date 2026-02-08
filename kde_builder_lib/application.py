@@ -86,17 +86,17 @@ class Application:
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
-        work_load = self.generate_module_list(options)
-        if not work_load.get("build", None):
+        self.dependency_info = None
+        self.modules: list[Module] = []
+
+        self.generate_module_list(options)
+        if not self.modules:
             if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
                 return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
                 # Todo: Currently we still need to exit when normal use like `kde-builder --metadata-only`, because otherwise script tries to proceed with "result = app.run_all_module_phases()". Fix it.
             print("No projects to build, exiting.\n")
             exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
-        self.modules: list[Module] = work_load["selected_modules"]
-        """This list of Module objects will be passed to BuildContext."""
-        self.work_load = work_load
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
         # After this call, we must run the finish() method
@@ -190,7 +190,7 @@ class Application:
         context["depth"] = depth + 1
         context["report"](connector + current_item)
 
-    def generate_module_list(self, options: list[str]) -> dict:
+    def generate_module_list(self, options: list[str]) -> None:
         """
         Generate the build context and module list based on the command line options and module command line selectors provided.
 
@@ -199,14 +199,6 @@ class Application:
 
         After this function is called all module set command line selectors will have been
         expanded, and we will have downloaded kde-projects metadata.
-
-        Returns:
-            dict:
-                {
-                    "selected_modules": the selected modules to build
-                    "dependency_info": reference to dependency info object as created by :class:`DependencyResolver`
-                    "build": whether to actually perform a build action
-                }
         """
         argv = options
 
@@ -259,7 +251,7 @@ class Application:
         # The user might only want metadata to update to allow for a later --pretend run, check for that here.
         # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
         if "metadata-only" in cmdline_global_options:
-            return {}
+            return
 
         # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
         self._check_metadata_format_version()  # Skipped automatically in testing mode
@@ -446,12 +438,8 @@ class Application:
                 modules
             )
 
-            result = {
-                "dependency_info": module_graph,
-                "selected_modules": [],
-                "build": False
-            }
-            return result
+            self.dependency_info = module_graph
+            return
 
         modules = DependencyResolver.sort_modules_into_build_order(module_graph["graph"])
 
@@ -497,12 +485,9 @@ class Application:
         for module in modules:
             module.set_resolved_repository()
 
-        result = {
-            "dependency_info": module_graph,
-            "selected_modules": modules,
-            "build": True
-        }
-        return result
+        self.dependency_info = module_graph
+        self.modules = modules
+        return
 
     def _download_kde_project_metadata(self) -> None:
         """
@@ -681,7 +666,7 @@ class Application:
             query_mode = ctx.get_option("query")
 
             if query_mode == "project-info":
-                dependency_graph = self.work_load["dependency_info"]
+                dependency_graph = self.dependency_info
                 results = {
                     project: {
                         "path": info["path"],
@@ -782,8 +767,7 @@ class Application:
         if ctx.get_option("purge-old-logs"):
             LogDir.delete_unreferenced_log_directories(ctx)
 
-        work_load = self.work_load
-        dependency_graph = work_load["dependency_info"]["graph"]
+        dependency_graph = self.dependency_info["graph"]
         ctx = self.context
 
         Application._print_failed_modules_in_each_phase(ctx, dependency_graph)
