@@ -688,6 +688,7 @@ class Application:
                     return x.build_system.name()
             elif query_mode == "cmake-options":
                 def query(x):
+                    x.set_build_system()
                     if x.build_system.name() == "KDE CMake":
                         out_res = x.build_system.get_final_cmake_options()
                         return " ".join(out_res)
