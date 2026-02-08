@@ -67,9 +67,9 @@ class Application:
 
     def __init__(self, options: list[str]):
         self.context = BuildContext()
+        ctx = self.context
 
         self.metadata_module = None
-        self.run_mode = "build"
         self.module_resolver = None
         """ModuleResolver object, that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
@@ -89,10 +89,54 @@ class Application:
         self.dependency_info = None
         self.modules: list[Module] = []
 
-        self.generate_module_list(options)
+        c = Cmdline()
+        opts: dict = c.read_command_line_options_and_selectors(options)
+        self.cmdline_opts = opts
+
+        ctx.phases.reset_to(opts["phases"])
+        self.run_mode: str = opts["run_mode"]
+
+        start_program_and_args: list[str] = opts["start-program"]
+        if start_program_and_args:
+            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
+
+        # Self-update should be done early. At least before we read config.
+        # This is to minimize situations of trying to read a not yet supported version of repo-metadata by outdated kde-builder installation.
+        # Otherwise, manual intervention would be required to update kde-builder.
+        if "self-update" in opts["global"]:
+            Version.self_update()
+
+        cmdline_rc_file = opts["global"].get("rc-file", "")
+        if cmdline_rc_file:
+            ctx.rc_file = cmdline_rc_file
+
+        for opt_name, opt_val in opts["global"].items():
+            ctx.set_option(opt_name, opt_val)
+
+        # Before we clone repo-metadata, initialize metadata_module
+        ctx.set_metadata_module()
+
+        # We download repo-metadata before reading config, because config already includes the build-configs from it.
+        self._download_kde_project_metadata()  # Skipped automatically in testing mode
+
+        # After we are sure the repo-metadata is cloned, initialize metadata.
+        ctx.set_metadata()
+
+        # The user might only want metadata to update to allow for a later --pretend run, check for that here.
+        # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
+        if "metadata-only" in opts["global"]:
+            # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
+            sys.exit(0)
+
+        # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
+        self._check_metadata_format_version()  # Skipped automatically in testing mode
+
+        ctx.absolutize_config_file_path_and_ensure_it_exists()
+
+        self.generate_module_list()
         if not self.modules:
-            print("No projects to build, exiting.\n")
-            sys.exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
+            print("No projects to build, exiting.")
+            sys.exit(0)
 
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
@@ -181,7 +225,7 @@ class Application:
         context["depth"] = depth + 1
         context["report"](connector + current_item)
 
-    def generate_module_list(self, options: list[str]) -> None:
+    def generate_module_list(self) -> None:
         """
         Generate the build context and module list based on the command line options and module command line selectors provided.
 
@@ -191,66 +235,19 @@ class Application:
         After this function is called all module set command line selectors will have been
         expanded, and we will have downloaded kde-projects metadata.
         """
-        argv = options
-
-        # Note: Don't change the order around unless you're sure of what you're
-        # doing.
-
         ctx = self.context
-
-        # Process --help, etc. first.
-        c = Cmdline()
-        opts: dict = c.read_command_line_options_and_selectors(argv)
+        opts: dict = self.cmdline_opts
 
         cmdline_selectors: list[str] = opts["selectors"]
         cmdline_per_project_options: dict = opts["per_project"]
         cmdline_global_options: dict = opts["global"]
-        ctx.phases.reset_to(opts["phases"])
-        self.run_mode: str = opts["run_mode"]
 
         # Convert list to dict for lookup
         ignored_in_cmdline = {selector: True for selector in opts["ignore-projects"]}
-        start_program_and_args: list[str] = opts["start-program"]
-
-        # Self-update should be done early. At least before we read config.
-        # This is to minimize situations of trying to read a not yet supported version of repo-metadata by outdated kde-builder installation.
-        # Otherwise, manual intervention would be required to update kde-builder.
-        if "self-update" in cmdline_global_options.keys():
-            Version.self_update()
-
-        cmdline_rc_file = cmdline_global_options.get("rc-file", "")
-        if cmdline_rc_file:
-            ctx.rc_file = cmdline_rc_file
-
-        # pl2py: this was commented there in perl.
-        # disable async if only running a single phase.
-        #   if len(ctx.phases.phaselist) == 1:
-        #     cmdline_global_options["async"] = 0
-
-        for opt_name, opt_val in cmdline_global_options.items():
-            ctx.set_option(opt_name, opt_val)
-
-        # Before we clone repo-metadata, initialize metadata_module
-        ctx.set_metadata_module()
-
-        # We download repo-metadata before reading config, because config already includes the build-configs from it.
-        self._download_kde_project_metadata()  # Skipped automatically in testing mode
-
-        # After we are sure the repo-metadata is cloned, initialize metadata.
-        ctx.set_metadata()
-
-        # The user might only want metadata to update to allow for a later --pretend run, check for that here.
-        # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
-        if "metadata-only" in cmdline_global_options:
-            return
-
-        # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
-        self._check_metadata_format_version()  # Skipped automatically in testing mode
 
         # _process_configs_content() will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
-        ctx.absolutize_config_file_path_and_ensure_it_exists()
         modules_and_sets_from_userconfig: list[Module | ModuleSet]
         overrides_from_userconfig: list[dict[str, str | dict]]  # "override" nodes.
         modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
@@ -301,9 +298,6 @@ class Application:
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
         ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
-
-        if start_program_and_args:
-            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
 
         if not Debug().is_testing():
             # Running in a test harness, avoid downloading metadata which will be
