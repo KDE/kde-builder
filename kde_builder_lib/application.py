@@ -91,11 +91,8 @@ class Application:
 
         self.generate_module_list(options)
         if not self.modules:
-            if len(options) == 2 and options[0] == "--metadata-only" and options[1] == "--metadata-only":  # Exactly this command line from FirstRun
-                return  # Avoid exit, we can continue in the --install-distro-packages in FirstRun
-                # Todo: Currently we still need to exit when normal use like `kde-builder --metadata-only`, because otherwise script tries to proceed with "result = app.run_all_module_phases()". Fix it.
             print("No projects to build, exiting.\n")
-            exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
+            sys.exit(0)  # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
 
         self.context.setup_operating_environment()  # i.e. niceness, ulimits, etc.
 
