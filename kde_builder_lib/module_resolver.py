@@ -88,9 +88,9 @@ class ModuleResolver:
 
             # Use KDE project database to pull list of matching `Module`s
             for m in referenced_modules:
-                mods: list[dict[str, str | bool]] = proj_db.get_modules_for_project(m)
-                for mod in mods:
-                    name = mod["name"]
+                _empty_list = []
+                names: list[str] = proj_db.get_identifiers_for_selector(m, True, _empty_list)
+                for name in names:
                     if name not in final_opts:
                         final_opts[name] = copy.deepcopy(opts)
 

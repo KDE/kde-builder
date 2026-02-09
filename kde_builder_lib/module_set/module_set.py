@@ -157,7 +157,7 @@ class ModuleSet(OptionsBase):
         for module_item in self.modules_to_find():
 
             try:
-                module_names: list[str] = self.context.projects_db.get_names_for_search_item(module_item, use_inactive_projects, ignore_list)
+                module_names: list[str] = self.context.projects_db.get_identifiers_for_selector(module_item, use_inactive_projects, ignore_list)
             except NoKDEProjectsFound:
                 # This will represent a third-party project
                 module_names: list[str] = [module_item]

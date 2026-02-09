@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2013, 2014, 2017, 2023 Michael Pyne <mpyne@kde.org>
-# SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2023 - 2026 Andrew Shark <ashark@linuxcomp.ru>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -77,119 +77,73 @@ class KDEProjectsReader:
 
         self.repositories[repo_name] = cur_repository
 
-    def get_modules_for_project(self, proj: str) -> list[dict[str, str | bool]]:
+    def get_identifiers_for_selector(self, selector: str, use_inactive: bool, ignore_list: list[str]) -> list[str]:
         """
-        Get modules for project.
-
-        Note on ``proj``: A "/"-separated path is fine, in which case we look
-        for the right-most part of the full path which matches all of searchProject.
-        e.g. kde/kdebase/kde-runtime would be matched by a proj of either
-        "kdebase/kde-runtime" or simply "kde-runtime".
-        """
-        repositories = self.repositories
-        results: list[str] = []
-
-        def find_results():
-            match_list: list[str] = []
-            sorted_keys = sorted(repositories.keys())
-            for key in sorted_keys:
-                if KDEProjectsReader.project_path_matches_wildcard_search(repositories[key]["invent_name"], proj):
-                    match_list.append(key)
-
-            results.extend(match_list)
-
-        # Wildcard matches happen as specified if asked for.
-        # Non-wildcard matches have an implicit "$proj/*" search as well for
-        # compatibility with previous use-projects
-        if "*" not in proj:
-            # We have to do a search to account for over-specified module names
-            # like phonon/phonon
-            find_results()
-
-            # Now setup for a wildcard search to find things like kde/kdelibs/baloo
-            # if just "kdelibs" is asked for.
-            proj += "/*"
-
-        # If still no wildcard and no "/" then we can use direct lookup by module
-        # name.
-        if "*" not in proj and "/" not in proj and proj in repositories:
-            results.append(proj)
-        else:
-            find_results()
-
-        # As we run find_results twice (for example, when proj is "workspace"), remove duplicates
-        results = list(set(results))
-        ret = [repositories[result] for result in results]
-        return ret
-
-    def get_names_for_search_item(self, module_search_item: str, use_inactive: bool, ignore_list: list[str]) -> list[str]:
-        """
-        Expand module_search_item to list of project names it represents.
+        Expand selector to list of project identifiers it represents.
 
         Args:
-            module_search_item: The search description. See project_path_matches_wildcard_search() for a description of the syntax.
+            selector: The selector string. May contain "/". May end with "*".
+                If "/"-separated path is used, we look for the right-most part of that.
+                E.g. "utilities/kcalc" would be converted to "kcalc".
             use_inactive: Whether or not to use inactive projects.
-            ignore_list: A list of project names to ignore.
+            ignore_list: A list of selectors to ignore.
         """
-        all_module_results: list[dict[str, str | bool]] = self.get_modules_for_project(module_search_item)
+        repositories = self.repositories
+        sorted_keys = sorted(repositories.keys())
 
-        if not all_module_results:
+        all_matched_metadata: list[dict[str, str | bool]] = []
+        for key in sorted_keys:
+            if self._repopath_matches_selector(repositories[key]["invent_name"], selector):
+                all_matched_metadata.append(repositories[key])
+
+        if not all_matched_metadata:
             # To differentiate with the situation when the returned list is empty (because of ignoring some projects
             # or because of some kde projects are inactive), we will raise exception.
-            raise NoKDEProjectsFound(f"No KDE projects with such path component: {module_search_item}")
+            raise NoKDEProjectsFound(f"No KDE projects with such path component: {selector}")
 
-        # It's possible to match modules which are marked as inactive on
-        # projects.kde.org, elide those.
-        active_results: list[dict[str, str | bool]] = all_module_results
+        active_matched_metadata: list[dict[str, str | bool]] = all_matched_metadata
         if not use_inactive:
-            active_results = [module for module in all_module_results if module.get("active")]
+            active_matched_metadata = [metadata for metadata in all_matched_metadata if metadata.get("active")]
 
-        if not active_results:
-            logger_moduleset.warning(f" y[b[*] Selector y[{module_search_item}] is apparently a KDE collection, but contains no\n" + "active projects to build!")
+        if not active_matched_metadata:
+            logger_moduleset.warning(f" y[b[*] Selector y[{selector}] is expanded only to inactive projects!")
 
-            if all_module_results:
-                count = len(all_module_results)
-                logger_moduleset.warning("\tAlthough no active projects are available, there were\n" + f"\t{count} inactive projects.")
+        filtered_metadata = []
 
-        def none_true(input_list: list) -> bool:
-            return all(not element for element in input_list)
+        for active_metadata in active_matched_metadata:
+            active_repopath = active_metadata["invent_name"]
 
-        filtered_results = []
+            for ignore_selector in ignore_list:
+                if self._repopath_matches_selector(active_repopath, ignore_selector):
+                    break
+            else:
+                filtered_metadata.append(active_metadata)
 
-        for result in active_results:
-            if none_true([self.project_path_matches_wildcard_search(result["invent_name"], element) for element in ignore_list]):
-                filtered_results.append(result)
-
-        result_names = [result["name"] for result in filtered_results]
+        result_names = [metadata["name"] for metadata in filtered_metadata]
         return result_names
 
     @staticmethod
-    def project_path_matches_wildcard_search(project_path: str, search_item: str) -> bool:
+    def _repopath_matches_selector(repopath: str, selector: str) -> bool:
         """
-        Return true if the given kde-project full path (e.g. kde/kdelibs/nepomuk-core) matches the given search item.
+        Return True if the given kde-project full repopath (e.g. "utilities/kcalc") matches the given selector.
 
-        The search item itself is based on path-components. Each path component in
-        the search item must be present in the equivalent path component in the
-        module's project path for a match. A "*" in a path component position for the
-        search item matches any project path component.
-
-        Finally, the search is pinned to search for a common suffix. E.g. a search
-        item of "kdelibs" would match a project path of "kde/kdelibs" but not
-        "kde/kdelibs/nepomuk-core". However, "kdelibs/*" would match
-        "kde/kdelibs/nepomuk-core".
+        The selector can be based on path-components. Each path component in
+        the selector must be present in the equivalent path component in the
+        repopath for a match. A "*" in a path component position for the
+        selector matches any repopath component.
 
         Args:
-            project_path: The full project path from the kde-projects database.
-            search_item: The search item.
+            repopath: The full repopath from the kde-projects database.
+            selector: The selector.
 
         Returns:
              True if they match, False otherwise.
         """
-        search_parts: list[str] = search_item.split("/")
-        name_stack: list[str] = project_path.split("/")
+        selector_parts: list[str] = selector.split("/")
+        repopath_parts: list[str] = repopath.split("/")
 
-        if len(name_stack) >= len(search_parts):
-            size_difference = len(name_stack) - len(search_parts)
+        if len(repopath_parts) >= len(selector_parts):
+            size_difference = len(repopath_parts) - len(selector_parts)
 
             # We might have to loop if we somehow find the wrong start point for our search.
             # E.g. looking for a/b/* against a/a/b/c, we'd need to start with the second a.
@@ -197,21 +151,21 @@ class KDEProjectsReader:
             while i <= size_difference:
                 # Find our common prefix, then ensure the remainder matches item-for-item.
                 while i <= size_difference:
-                    if name_stack[i] == search_parts[0]:
+                    if repopath_parts[i] == selector_parts[0]:
                         break
                     i += 1
 
                 if i > size_difference:  # Not enough room to find it now
                     return False
 
-                # At this point we have synched up name_stack to search_parts, ensure they
+                # At this point we have synced up repopath_parts to selector_parts, ensure they
                 # match item-for-item.
                 found = 1
                 j = 0
-                while found and j < len(search_parts):
-                    if search_parts[j] == "*":  # This always works
+                while found and j < len(selector_parts):
+                    if selector_parts[j] == "*":  # This always works
                         return True
-                    if search_parts[j] != name_stack[i + j]:
+                    if selector_parts[j] != repopath_parts[i + j]:
                         found = 0
                     j += 1
 
