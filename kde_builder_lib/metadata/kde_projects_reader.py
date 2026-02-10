@@ -139,34 +139,22 @@ class KDEProjectsReader:
         selector_parts: list[str] = selector.split("/")
         repopath_parts: list[str] = repopath.split("/")
 
-        if len(repopath_parts) >= len(selector_parts):
-            size_difference = len(repopath_parts) - len(selector_parts)
+        if len(repopath_parts) < len(selector_parts):
+            return False
 
-            # We might have to loop if we somehow find the wrong start point for our search.
-            # E.g. looking for a/b/* against a/a/b/c, we'd need to start with the second a.
-            i = 0
-            while i <= size_difference:
-                # Find our common prefix, then ensure the remainder matches item-for-item.
-                while i <= size_difference:
-                    if repopath_parts[i] == selector_parts[0]:
-                        break
-                    i += 1
+        # Align parts by dropping extra repopath parts if present
+        while len(repopath_parts) > len(selector_parts):
+            repopath_parts.pop(0)
 
-                if i > size_difference:  # Not enough room to find it now
-                    return False
+        while len(repopath_parts) > 1:
+            repopath_part = repopath_parts.pop(0)
+            selector_part = selector_parts.pop(0)
+            if selector_part != repopath_part:
+                return False
 
-                # At this point we have synced up repopath_parts to selector_parts, ensure they
-                # match item-for-item.
-                found = 1
-                j = 0
-                while found and j < len(selector_parts):
-                    if selector_parts[j] == "*":  # This always works
-                        return True
-                    if selector_parts[j] != repopath_parts[i + j]:
-                        found = 0
-                    j += 1
-
-                if found:  # We matched every item to the substring we found.
-                    return True
-                i += 1  # Try again
-        return False
+        repopath_last_part = repopath_parts.pop()
+        selector_last_part = selector_parts.pop()
+        if selector_last_part == repopath_last_part or selector_last_part == "*":
+            return True
+        else:
+            return False
