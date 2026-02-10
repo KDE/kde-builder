@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from .kb_exception import KBException
 from .kb_exception import KBRuntimeError
+from .kb_exception import NoKDEProjectsFound
 from .kb_exception import UnknownKdeProjectException
 from .module.module import Module
 from .module_set.module_set import ModuleSet
@@ -261,8 +262,22 @@ class ModuleResolver:
         expanded. The desired options will be set for each :class:`Module` returned.
         """
         # We have to be careful to maintain order of selectors throughout.
-        output_list: list[Module] = []
+        names: list[str] = []
+        _empty_list = []
         for selector in selectors:
+            try:
+                # If selector is a full repopath of kde project, like "utilities/kcalc",
+                # it will be converted to just project identifier "kcalc".
+                # If selector is a gitlab group name, like "plasma/*",
+                # it will be converted to identifiers from that group, like ["plasma-activities", "libplasma", ...].
+                identifiers = self.context.projects_db.get_identifiers_for_selector(selector, _empty_list)
+            except NoKDEProjectsFound:
+                # This means either selector is a group name, or third-party project, or is unrecognized.
+                identifiers = [selector]
+            names.extend(identifiers)
+
+        output_list: list[Module] = []
+        for selector in names:
             if selector in self.ignored_selectors:
                 continue
             output_list.extend(self._resolve_single_selector(selector))
