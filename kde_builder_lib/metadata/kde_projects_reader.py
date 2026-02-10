@@ -77,7 +77,7 @@ class KDEProjectsReader:
 
         self.repositories[repo_name] = cur_repository
 
-    def get_identifiers_for_selector(self, selector: str, use_inactive: bool, ignore_list: list[str]) -> list[str]:
+    def get_identifiers_for_selector(self, selector: str, ignore_list: list[str]) -> list[str]:
         """
         Expand selector to list of project identifiers it represents.
 
@@ -85,7 +85,6 @@ class KDEProjectsReader:
             selector: The selector string. May contain "/". May end with "*".
                 If "/"-separated path is used, we look for the right-most part of that.
                 E.g. "utilities/kcalc" would be converted to "kcalc".
-            use_inactive: Whether or not to use inactive projects.
             ignore_list: A list of selectors to ignore.
         """
         repositories = self.repositories
@@ -101,9 +100,7 @@ class KDEProjectsReader:
             # or because of some kde projects are inactive), we will raise exception.
             raise NoKDEProjectsFound(f"No KDE projects with such path component: {selector}")
 
-        active_matched_metadata: list[dict[str, str | bool]] = all_matched_metadata
-        if not use_inactive:
-            active_matched_metadata = [metadata for metadata in all_matched_metadata if metadata.get("active")]
+        active_matched_metadata: list[dict[str, str | bool]] = [metadata for metadata in all_matched_metadata if metadata.get("active")]
 
         if not active_matched_metadata:
             logger_moduleset.warning(f" y[b[*] Selector y[{selector}] is expanded only to inactive projects!")

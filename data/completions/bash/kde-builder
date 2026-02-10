@@ -162,8 +162,6 @@ _kde_builder_filter_options() {
         ["--no-use-clean-install"]="--use-clean-install"
         ["--use-idle-io-priority"]="--no-use-idle-io-priority"
         ["--no-use-idle-io-priority"]="--use-idle-io-priority"
-        ["--use-inactive-projects"]="--no-use-inactive-projects"
-        ["--no-use-inactive-projects"]="--use-inactive-projects"
         ["--stop-on-failure"]="--no-stop-on-failure"
         ["--no-stop-on-failure"]="--stop-on-failure"
         ["--refresh-build"]="--reconfigure"
@@ -270,8 +268,8 @@ _kde_builder() {
     --show-options-specifiers --source-dir --source-when-start-program --src-only
     --stop-after --to --stop-before --until --stop-on-failure --no-stop-on-failure --tag
     --taskset-cpu-list --uninstall --use-clean-install --no-use-clean-install
-    --use-idle-io-priority --no-use-idle-io-priority --use-inactive-projects
-    --no-use-inactive-projects --version -v --run
+    --use-idle-io-priority --no-use-idle-io-priority
+    --version -v --run
     "
 
     # Check if we're in --run mode

@@ -89,7 +89,7 @@ class ModuleResolver:
             # Use KDE project database to pull list of matching `Module`s
             for m in referenced_modules:
                 _empty_list = []
-                names: list[str] = proj_db.get_identifiers_for_selector(m, True, _empty_list)
+                names: list[str] = proj_db.get_identifiers_for_selector(m, _empty_list)
                 for name in names:
                     if name not in final_opts:
                         final_opts[name] = copy.deepcopy(opts)
@@ -195,10 +195,9 @@ class ModuleResolver:
                 # Third-party projects must not be crafted this way.
                 raise UnknownKdeProjectException(f"Unknown KDE project: {selector_name}", selector_name)
 
-            use_inactive = self.context.get_option("use-inactive-projects")
             is_active = self.context.projects_db.repositories[selector_name]["active"]
 
-            if not is_active and not use_inactive:
+            if not is_active:
                 raise UnknownKdeProjectException(f"Archived KDE project: {selector_name}", selector_name)
 
             project: Module = Module(ctx, selector_name)

@@ -260,16 +260,6 @@ slightly longer running times for kde-builder.
 
 Related command-line option: [--use-idle-io-priority](cmdline-use-idle-io-priority)
 
-(conf-use-inactive-projects)=
-[`use-inactive-projects`](conf-use-inactive-projects)
-
-Type: Boolean, Default value: False
-
-Some projects in repo-metadata are marked as inactive, and kde-builder ignores them. This option, if enabled, allows kde-builder to consider them as 
-active, which can be used to clone archived projects.
-
-Related command-line option: --use-inactive-projects, --no-use-inactive-projects
-
 (option-table)=
 ## All scopes (project, group and global) options
 

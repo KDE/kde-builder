@@ -100,7 +100,6 @@ _arguments \
   --uninstall"[Uninstalls the project]" \
   "(--use-clean-install --no-use-clean-install)"{--use-clean-install,--no-use-clean-install}"[Run make uninstall directly before running make install]" \
   "(--use-idle-io-priority --no-use-idle-io-priority)"{--use-idle-io-priority,--no-use-idle-io-priority}"[Use lower priority for disk and other I/O]" \
-  "(--use-inactive-projects --no-use-inactive-projects)"{--use-inactive-projects,--no-use-inactive-projects}"[Allow kde-builder to also clone and pull from repositories marked as inactive]" \
   "(--version -v)"{--version,-v}"[Script information]" \
   --run"[Start a program built with kde-builder]" \
   \

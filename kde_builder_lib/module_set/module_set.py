@@ -148,7 +148,6 @@ class ModuleSet(OptionsBase):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        use_inactive_projects = self.context.get_option("use-inactive-projects")
         ignore_list: list[str] = self.modules_to_ignore()
 
         module_list = []  # module names converted to `Module` objects.
@@ -157,7 +156,7 @@ class ModuleSet(OptionsBase):
         for module_item in self.modules_to_find():
 
             try:
-                module_names: list[str] = self.context.projects_db.get_identifiers_for_selector(module_item, use_inactive_projects, ignore_list)
+                module_names: list[str] = self.context.projects_db.get_identifiers_for_selector(module_item, ignore_list)
             except NoKDEProjectsFound:
                 # This will represent a third-party project
                 module_names: list[str] = [module_item]

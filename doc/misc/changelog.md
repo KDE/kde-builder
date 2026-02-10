@@ -1,5 +1,8 @@
 # Changelog
 
+2026-02-10
+: Removed option `use-inactive-projects`.
+
 2026-01-02
 : Changes to the branch-group data in repo-metadata was made. In the user config, you need to change `branch-group` as follows:
 : - "kf6-qt6" → "latest-kf6"
