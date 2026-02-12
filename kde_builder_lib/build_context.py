@@ -63,7 +63,7 @@ class BuildContext(Module):
 
     rcfiles = ["./kde-builder.yaml",
                f"{xdg_config_home}/kde-builder.yaml"]
-    LOCKFILE_NAME = ".kdesrc-lock"
+    LOCKFILE_NAME = ".kde-builder-lock"
     PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
 
     def __init__(self):
