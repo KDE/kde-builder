@@ -402,7 +402,8 @@ class Updater:
         # "branch" option requests a given remote head in the user's selected
         # repository. The local branch with "branch" as upstream might have a
         # different name. If there's no local branch this method creates one.
-        branch_name = self.get_remote_branch_name(remote_name, branch)
+        # branch_name = self.get_remote_branch_name(remote_name, branch)
+        branch_name = branch
 
         if self._warn_if_stashed_from_wrong_branch(remote_name, branch, branch_name):
             return 0
