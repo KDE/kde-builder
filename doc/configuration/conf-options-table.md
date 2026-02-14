@@ -283,7 +283,7 @@ Related command-line option: --binpath \<path\>
 
 Type: String, Default value: master
 
-Checkout the specified branch instead of the default branch.
+Checkout the specified remote branch instead of the default branch.
 
 ```{note}
 For most KDE projects you probably wish to use the [branch-group](#conf-branch-group) option instead and use this
