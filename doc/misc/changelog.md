@@ -1,5 +1,8 @@
 # Changelog
 
+2026-02-15
+: Removed option `build-when-unchanged`.
+
 2026-02-10
 : Removed option `use-inactive-projects`.
 

@@ -94,7 +94,6 @@ class BuildContext(Module):
         # Their more complex specifier is made in `Cmdline` _supported_options().
         # If adding new option here, and it is boolean, do not forget to add it in the boolean_extra_specified_options.
         self.global_options_with_extra_specifier = {
-            "build-when-unchanged": True,
             "colorful-output": True,
             "ignore-projects": "",
             "niceness": 10,
@@ -215,7 +214,7 @@ class BuildContext(Module):
         """Stores info from repo-metadata."""
 
         self.options = self.build_options["global"]
-        boolean_extra_specified_options = ["build-when-unchanged", "colorful-output", "pretend", "refresh-build"]
+        boolean_extra_specified_options = ["colorful-output", "pretend", "refresh-build"]
         self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
 
     def setup_operating_environment(self) -> None:

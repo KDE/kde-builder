@@ -225,11 +225,7 @@ class TaskManager:
                 refresh_reason = "failed to build or update last time"
                 logger_taskmanager.info(f"\tRebuilding because {refresh_reason}.")
             else:
-                if module.get_option("build-when-unchanged"):
-                    logger_taskmanager.warning(f"\tProceeding to build g[{module}], because build-when-unchanged was set.")
-                else:
-                    logger_taskmanager.warning(f"\tSkipping build of g[{module}], because sources did not change.")
-                    return ""
+                logger_taskmanager.warning(f"\tProceeding to build g[{module}].")
 
         # If the build gets interrupted, ensure the persistent options that are
         # written reflect that the build failed by preemptively setting the future

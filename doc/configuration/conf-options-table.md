@@ -322,34 +322,6 @@ This option can be changed per project.
 
 Related command-line option: --build-dir \<path\>
 
-(conf-build-when-unchanged)=
-[`build-when-unchanged`](conf-build-when-unchanged)
-
-Type: Boolean, Default value: True
-
-Control whether kde-builder always tries to build a project that has
-not had any source code updates.
-
-If set to `true`, kde-builder always attempts the build
-phase for a project, even if the project did not have any source code
-updates. With this value it will more likely lead to a correct build.
-
-If set to `false`, kde-builder will only attempt to run
-the build phase for a project if the project has a source code update, or
-in other situations where it is likely that a rebuild is actually
-required. This can save time, especially if you run kde-builder daily,
-or more frequently.
-
-```{important}
-This feature is provided as an optimization only. Like many other
-optimizations, there are trade-offs for the correctness of your
-installation. For instance, changes to the qt projects (modules) may
-cause a rebuild of other projects to be necessary, even if the source
-code doesn't change at all.
-```
-
-Related command-line option: [--build-when-unchanged](#cmdline-build-when-unchanged)
-
 (conf-cmake-generator)=
 [`cmake-generator`](conf-cmake-generator)
 

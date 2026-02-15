@@ -369,15 +369,6 @@ See [](#installing-login-session) for more information.
 
 ## Build behavior
 
-(cmdline-build-when-unchanged)=
-[`--build-when-unchanged`](cmdline-build-when-unchanged) (or `--force-build`), `--no-build-when-unchanged` (or `--no-force-build`)  
-Enabling this option explicitly disables skipping the build process (an
-optimization controlled by the
-[build-when-unchanged](#conf-build-when-unchanged) option). This is
-useful for making kde-builder run the build when you have changed
-something that kde-builder cannot check. This option is enabled by
-default.
-
 (cmdline-refresh-build)=
 [`--refresh-build`](cmdline-refresh-build) (or `-r`)  
 Removes the build directory for a project before the build phase starts.

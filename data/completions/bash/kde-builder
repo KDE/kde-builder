@@ -141,10 +141,6 @@ _kde_builder_filter_options() {
     local -A exclusions=(
         ["--async"]="--no-async"
         ["--no-async"]="--async"
-        ["--build-when-unchanged"]="--no-build-when-unchanged --no-force-build"
-        ["--force-build"]="--no-build-when-unchanged --no-force-build"
-        ["--no-build-when-unchanged"]="--build-when-unchanged --force-build"
-        ["--no-force-build"]="--build-when-unchanged --force-build"
         ["--color"]="--no-color --no-colorful-output"
         ["--colorful-output"]="--no-color --no-colorful-output"
         ["--no-color"]="--color --colorful-output"
@@ -241,8 +237,8 @@ _kde_builder() {
 
     local all_opts="
     --all-config-projects --all-kde-projects --async --no-async --binpath --branch-group
-    --branch --build-dir --build-only --no-build --build-system-only --build-when-unchanged
-    --no-build-when-unchanged --force-build --no-force-build --check-self-updates
+    --branch --build-dir --build-only --no-build --build-system-only
+    --check-self-updates
     --no-check-self-updates --cmake-generator --cmake-options --cmake-toolchain --color
     --no-color --colorful-output --no-colorful-output --compile-commands-export
     --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking

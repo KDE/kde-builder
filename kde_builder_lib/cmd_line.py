@@ -260,9 +260,7 @@ class Cmdline:
             found_options["query"] = arg
             found_options["pretend"] = True  # Implied pretend mode
         if args.pretend:
-            # Set pretend mode but also force the build process to run.
             found_options["pretend"] = True
-            found_options["build-when-unchanged"] = True
         if args.resume or args.resume_refresh_build_first:
             found_options["resume"] = True
             phases.filter_out_phase("update")  # Implied --no-src
@@ -307,9 +305,6 @@ class Cmdline:
 
         if args.build_system_only:
             found_options["build-system-only"] = True
-
-        if args.build_when_unchanged is not None:
-            found_options["build-when-unchanged"] = args.build_when_unchanged
 
         if args.colorful_output is not None:
             found_options["colorful-output"] = args.colorful_output
@@ -545,7 +540,6 @@ class Cmdline:
         ]
 
         context_options_with_extra_specifier = [
-            "build-when-unchanged|force-build!",
             "colorful-output|color!",
             "ignore-projects|!=s{,}",
             "niceness|nice:10",
