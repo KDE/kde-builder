@@ -18,12 +18,6 @@ point, many of the commands it uses are. `kde-builder` normally sets
 manually do this as well. If setting `LC_ALL`=C fixes a `kde-builder`
 problem please submit a bug report.
 
-`SSH_AGENT_PID`  
-This environment variable is checked to see if `ssh-agent`(1) is
-running, but only if `kde-builder` determines that you are checking out
-a project that requires an SSH login (but you should know this as no
-project requires this by default).
-
 `KDE_BUILDER_USE_TTY`  
 If set, this variable forces `kde-builder` not to close its input while
 executing system processes. Normally `kde-builder` closes `stdin` since

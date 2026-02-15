@@ -137,10 +137,6 @@ class TaskManager:
             ipc.send_ipc_message(IPC.ALL_DONE, "update-list-empty")
             return 0
 
-        if not self._check_for_ssh_agent(ctx):
-            ipc.send_ipc_message(IPC.ALL_FAILURE, "ssh-failure")
-            return 1
-
         kdesrc = ctx.get_source_dir()
         if not os.path.exists(kdesrc):
             if not ipc.supports_concurrency():
@@ -572,97 +568,6 @@ class TaskManager:
 
         monitor_to_build_ipc.close()
         return result
-
-    @staticmethod
-    def _check_for_ssh_agent(ctx: BuildContext) -> bool:
-        """
-        Check if we are supposed to use ssh agent by examining the environment, and if so, checks if ssh-agent has a list of identities.
-
-        If it doesn't, we run
-        ssh-add (with no arguments) and inform the user. This can be controlled with
-        the disable-agent-check parameter.
-
-        Args:
-            ctx: Build context
-        """
-        # Don't bother with all this if the user isn't even using SSH.
-        if Debug().pretending():
-            return True
-        if ctx.get_option("disable-agent-check"):
-            return True
-
-        git_servers: list[Module] = [module for module in ctx.modules_in_phase("update") if not module.is_kde_project()]
-
-        ssh_servers: list[Module] = []
-        for gitserver in git_servers:
-            if url := urlparse(gitserver.get_option("#resolved-repository")):  # Check for git+ssh:// or git@git.kde.org:/path/etc.
-                if url.scheme == "git+ssh" or url.username == "git" and url.hostname == "git.kde.org":
-                    ssh_servers.append(gitserver)
-
-        if not ssh_servers:
-            return True
-        logger_taskmanager.debug("\tChecking for SSH Agent")
-
-        # We're using ssh to download, see if ssh-agent is running.
-        if "SSH_AGENT_PID" not in os.environ:
-            return True
-
-        pid = os.environ.get("SSH_AGENT_PID")
-
-        # It's supposed to be running, let's see if there exists the program with
-        # that pid (this check is linux-specific at the moment).
-        if os.path.isdir("/proc") and not os.path.exists(f"/proc/{pid}"):
-            # local $" = ", "; # override list interpolation separator
-
-            logger_taskmanager.warning(dedent(f"""
-                 y[b[*] SSH Agent is enabled, but y[doesn't seem to be running].
-                 y[b[*] The agent is needed for these projects:
-                 y[b[*]   b[{ssh_servers}]
-                 y[b[*] Please check that the agent is running and its environment variables defined
-
-                """, preserve_len=1))
-            return False
-
-        # The agent is running, but does it have any keys?  We can't be more specific
-        # with this check because we don't know what key is required.
-        no_keys = 0
-
-        def no_keys_filter(_):
-            nonlocal no_keys
-            if not no_keys:
-                no_keys = "no identities"
-
-        Util.filter_program_output(no_keys_filter, "ssh-add", "-l")
-
-        if not no_keys:
-            return True
-
-        print(Debug().colorize(dedent("""
-            b[y[*] SSH Agent does not appear to be managing any keys.  This will lead to you
-            being prompted for every project update for your SSH passphrase.  So, we're
-            running g[ssh-add] for you.  Please type your passphrase at the prompt when
-            requested, (or simply Ctrl-C to abort the script).
-
-            """)))
-        command_line = ["ssh-add"]
-        ident_file = ctx.get_option("ssh-identity-file")
-        if ident_file:
-            command_line.append(ident_file)
-        result = os.system(command_line)
-
-        # Run this code for both death-by-signal and nonzero return
-        if result:
-            rcfile = ctx.rc_file()
-            print(Debug().colorize(dedent(f"""
-
-                y[b[*] Unable to add SSH identity, aborting.
-                y[b[*] If you don't want kde-builder to check in the future,
-                y[b[*] Set the g[disable-agent-check] option to g[true] in your {rcfile}.
-
-
-                """)))
-            return False
-        return True
 
     @staticmethod
     def _handle_monitoring(ipc_to_build: IPCPipe, ipc_from_updater: IPCPipe) -> int:

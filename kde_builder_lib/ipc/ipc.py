@@ -46,7 +46,7 @@ class IPC:
     # One of these messages should be the first message placed on the queue.
 
     ALL_FAILURE = 6
-    """Used to indicate a major update failure (don't build) (if could not check ssh agent, or could not create source dir)."""
+    """Used to indicate a major update failure (don't build) (if could not create source dir)."""
 
     ALL_UPDATING = 7
     """Informational message, feel free to start the build. (if no ALL_FAILURE happened, sent before starting updates)."""

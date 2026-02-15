@@ -32,7 +32,6 @@ _arguments \
   "(--dependency-tree --dependency-tree-fullpath)"--dependency-tree-fullpath"[Print out dependency information (fullpath) on the projects that would be built]" \
   --dest-dir"[The name a project is given on disk]"":argument:" \
   --directory-layout"[Layout which kde-builder should use when creating source and build directories]"":argument:" \
-  "(--disable-agent-check --no-disable-agent-check)"{--disable-agent-check,--no-disable-agent-check}"[Prevent ssh from asking for your pass phrase for every project]" \
   --do-not-compile"[Select a specific set of directories not to be built in a project]"":argument:" \
   "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
   --generate-config"[Installs a base config file]" \

@@ -33,10 +33,6 @@ KDE Builder features include:
   project](#partial-builds), for those situations where you only need one
   program from a large project.
 
-- For developers: KDE Builder will [remind you](#ssh-agent-reminder) if
-  you use git+ssh:// but ssh-agent is not running, as this will lead to
-  repeated password requests from SSH.
-
 - Can [delete the build directory](#deleting-build-dir) of a project
   after its installation to save space at the expense of future
   compilation time.

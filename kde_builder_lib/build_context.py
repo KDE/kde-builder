@@ -87,7 +87,6 @@ class BuildContext(Module):
             "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
             "repository": "kde-projects",
             "set-env": {},  # dict of environment vars to set
-            "ssh-identity-file": "",  # If set, is passed to ssh-add.
             "use-projects": ""
         }
 
@@ -109,7 +108,6 @@ class BuildContext(Module):
             "check-self-updates": True,
             "compile-commands-export": True,
             "compile-commands-linking": True,
-            "disable-agent-check": False,  # If true we don't check on ssh-agent
             "generate-clion-project-config": False,
             "generate-vscode-project-config": False,
             "generate-qtcreator-project-config": False,

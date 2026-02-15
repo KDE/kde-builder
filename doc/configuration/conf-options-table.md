@@ -50,19 +50,6 @@ console).
 
 Related command-line option: [--color](#cmdline-color)
 
-(conf-disable-agent-check)=
-[`disable-agent-check`](conf-disable-agent-check)
-
-Type: Boolean, Default value: False
-
-If you are using ssh to download the sources (such as if you are
-using the git+ssh protocol), this option controls if kde-builder will
-try and make sure that if you are using ssh-agent, it is actually
-managing some ssh identities. This is to try and prevent ssh from asking
-for your pass phrase for every project.
-
-Related command-line option: --disable-agent-check, --no-disable-agent-check
-
 (conf-git-push-protocol)=
 [`git-push-protocol`](conf-git-push-protocol)
 
@@ -237,17 +224,6 @@ With this option, you can specify a path to shell file, which will be sourced be
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
 Related command line option: [--source-when-start-program](cmdline-source-when-start-program)
-
-(conf-ssh-identity-file)=
-[`ssh-identity-file`](conf-ssh-identity-file)
-
-Type: String
-
-Set this option to control which private SSH key file is passed to
-the `ssh-add` command when kde-builder is downloading source
-code from repositories that require authentication. 
-
-See also: the section called [](#ssh-agent-reminder).
 
 (conf-use-idle-io-priority)=
 [`use-idle-io-priority`](conf-use-idle-io-priority)

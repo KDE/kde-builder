@@ -181,8 +181,6 @@ _kde_builder_filter_options() {
         ["--no-hold-performance-profile"]="--hold-performance-profile"
         ["--hold-work-branches"]="--no-hold-work-branches"
         ["--no-hold-work-branches"]="--hold-work-branches"
-        ["--disable-agent-check"]="--no-disable-agent-check"
-        ["--no-disable-agent-check"]="--disable-agent-check"
         ["--generate-vscode-project-config"]="--no-generate-vscode-project-config"
         ["--no-generate-vscode-project-config"]="--generate-vscode-project-config"
         ["--generate-qtcreator-project-config"]="--no-generate-qtcreator-project-config"
@@ -249,8 +247,8 @@ _kde_builder() {
     --no-color --colorful-output --no-colorful-output --compile-commands-export
     --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking
     --configure-flags --custom-build-command --cxxflags --debug --dependency-tree
-    --dependency-tree-fullpath --dest-dir --directory-layout --disable-agent-check
-    --no-disable-agent-check --do-not-compile --generate-clion-project-config
+    --dependency-tree-fullpath --dest-dir --directory-layout
+    --do-not-compile --generate-clion-project-config
     --no-generate-clion-project-config --generate-config --generate-qtcreator-project-config
     --no-generate-qtcreator-project-config --generate-vscode-project-config
     --no-generate-vscode-project-config --git-user --help -h --hold-performance-profile --no-hold-performance-profile
