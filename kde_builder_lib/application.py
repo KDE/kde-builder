@@ -89,10 +89,6 @@ class Application:
         ctx.phases.reset_to(opts["phases"])
         self.run_mode: str = opts["run_mode"]
 
-        start_program_and_args: list[str] = opts["start-program"]
-        if start_program_and_args:
-            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
-
         # Self-update should be done early. At least before we read config.
         # This is to minimize situations of trying to read a not yet supported version of repo-metadata by outdated kde-builder installation.
         # Otherwise, manual intervention would be required to update kde-builder.
@@ -286,6 +282,11 @@ class Application:
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
         ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
+
+        # After we read install-dir from config, we can check if we need to start program.
+        start_program_and_args: list[str] = opts["start-program"]
+        if start_program_and_args:
+            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
 
         if not Debug().is_testing():
             # Running in a test harness, avoid downloading metadata which will be
