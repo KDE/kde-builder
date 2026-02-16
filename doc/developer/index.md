@@ -6,7 +6,6 @@ nosearch:
 
 ```{toctree}
 concepts
-appendix-projects
 Internals
 IPC-notes
 adding-new-options
