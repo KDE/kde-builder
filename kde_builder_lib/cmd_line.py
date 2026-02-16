@@ -280,7 +280,7 @@ class Cmdline:
                     opts["per_project"][module][option] = value
 
         if args.ignore_projects:
-            found_options["ignore-projects"] = args.ignore_projects
+            opts["ignore-projects"] = args.ignore_projects
         # </editor-fold desc="arg functions">
         exec(flag_handlers)
         exec(global_opts_handler)
@@ -288,13 +288,6 @@ class Cmdline:
         # Module selectors (i.e. an actual argument)
         for unknown_arg in unknown_args:
             opts["selectors"].append(unknown_arg)
-
-        # Don't get ignore-projects confused with global options
-        protected_keys = ["ignore-projects"]
-        for key in protected_keys:
-            if key in found_options:
-                opts[key] = found_options[key]
-                del found_options[key]
 
         # <editor-fold desc="all other args handlers">
         if args.all_config_projects:

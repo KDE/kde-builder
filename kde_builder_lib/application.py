@@ -226,8 +226,8 @@ class Application:
         cmdline_per_project_options: dict = opts["per_project"]
         cmdline_global_options: dict = opts["global"]
 
-        # Convert list to dict for lookup
-        ignored_in_cmdline = {selector: True for selector in opts["ignore-projects"]}
+        # Convert list to set
+        ignored_in_cmdline: set[str] = set(opts["ignore-projects"])
 
         # _process_configs_content() will add pending global opts to ctx while ensuring
         # returned modules/sets have any such options stripped out. It will also add
@@ -277,11 +277,12 @@ class Application:
                     print(key)
             exit(0)
 
-        ignored_in_global_section = {selector: True for selector in ctx.options["ignore-projects"] if selector != ""}  # do not place empty string key, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
+        ignored_in_global_section: set[str] = set(ctx.options["ignore-projects"])
+        ignored_in_global_section.discard("")  # do not place empty string element, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
         ctx.options["ignore-projects"] = []
 
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
-        ignored_selectors = {**ignored_in_cmdline, **ignored_in_global_section}
+        ignored_selectors: set[str] = ignored_in_cmdline | ignored_in_global_section
 
         # After we read install-dir from config, we can check if we need to start program.
         start_program_and_args: list[str] = opts["start-program"]
@@ -305,7 +306,7 @@ class Application:
         module_resolver.set_deferred_options(overrides_from_userconfig)
         module_resolver.set_initial_projects_and_groups(modules_and_sets_from_userconfig)
         module_resolver.handle_initial_projects()
-        module_resolver.ignored_selectors = list(ignored_selectors.keys())
+        module_resolver.ignored_selectors = ignored_selectors
         module_resolver.expand_all_groups()
 
         self.module_resolver = module_resolver

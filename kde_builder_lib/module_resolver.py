@@ -30,7 +30,7 @@ class ModuleResolver:
     def __init__(self, ctx: BuildContext):
         self.context = ctx
 
-        self.ignored_selectors: list[str] = []
+        self.ignored_selectors: set[str] = set()
         """
         Declares all selectors that should be ignored by default in the process of expanding module sets.
         Any modules matching these selectors would be elided from any expanded module sets by default.
