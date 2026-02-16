@@ -6,7 +6,6 @@ nosearch:
 
 ```{toctree}
 concepts
-Internals
 IPC-notes
 adding-new-options
 adding-logger
