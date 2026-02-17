@@ -21,9 +21,9 @@ def test_tag_names_based_on_time():
         scm = mod.scm
         assert isinstance(scm, Updater)
 
-        branch, sourcetype = scm.determine_preferred_checkout_source()
-        assert branch == "master@{3 weeks ago}", "Right tag name"
-        assert sourcetype == "tag", "Result came back as a tag with detached HEAD"
-        assert sourcetype == "tag", "Result came back as a tag with detached HEAD"
+        ref_value, ref_type = scm.determine_preferred_checkout_source()
+        assert ref_value == "master@{3 weeks ago}", "Right tag name"
+        assert ref_type == "tag", "Result came back as a tag with detached HEAD"
+        assert ref_type == "tag", "Result came back as a tag with detached HEAD"
 
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

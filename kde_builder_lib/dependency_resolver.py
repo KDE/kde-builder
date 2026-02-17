@@ -667,12 +667,9 @@ class DependencyResolver:
     @staticmethod
     def _get_branch_of(module: Module) -> str | None:
         """
-        Extract the branch of the given Module by calling its scm object's branch-determining method.
+        Determine checkout source of the given Module, ensure that the ref type is "branch" (as opposed to a detached HEAD), and return the branch name.
 
-        It also ensures that the branch
-        returned was really intended to be a branch (as opposed to a detached HEAD);
-        None is returned when the desired commit is not a branch name, otherwise
-        the user-requested branch name is returned.
+        When the ref_type is "branch", the branch name is returned. Otherwise, None is returned.
         """
         scm = module.scm
 
@@ -682,5 +679,7 @@ class DependencyResolver:
         if not isinstance(scm, Updater):
             return None
 
-        branch, sourcetype = scm.determine_preferred_checkout_source()
-        return branch if sourcetype == "branch" else None
+        ref_value, ref_type = scm.determine_preferred_checkout_source()
+        if ref_type == "branch":
+            return ref_value
+        return None

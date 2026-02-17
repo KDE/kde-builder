@@ -18,16 +18,16 @@ def test_set_project_option():
 
     module = [m for m in module_list if f"{m}" == "module2"][0]
     scm = module.scm
-    branch, sourcetype = scm.determine_preferred_checkout_source()
+    ref_value, ref_type = scm.determine_preferred_checkout_source()
 
-    assert branch == "refs/tags/fake-tag10", "Right tag name"
-    assert sourcetype == "tag", "Result came back as a tag"
+    assert ref_value == "refs/tags/fake-tag10", "Right tag name"
+    assert ref_type == "tag", "Result came back as a tag"
 
     module = [m for m in module_list if f"{m}" == "setmod2"][0]
-    branch, sourcetype = module.scm.determine_preferred_checkout_source()
+    ref_value, ref_type = module.scm.determine_preferred_checkout_source()
 
-    assert branch == "refs/tags/tag-setmod10", "Right tag name (options block from cmdline)"
-    assert sourcetype == "tag", "cmdline options block came back as tag"
+    assert ref_value == "refs/tags/tag-setmod10", "Right tag name (options block from cmdline)"
+    assert ref_type == "tag", "cmdline options block came back as tag"
 
     assert not module.is_kde_project(), "setmod2 is *not* a \"KDE\" project"
     Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -106,15 +106,15 @@ class Updater:
         return an_id
 
     def _verify_ref_present(self, repo: str) -> None:
-        ref, commit_type = self.determine_preferred_checkout_source()
+        ref_value, ref_type = self.determine_preferred_checkout_source()
 
         if Debug().pretending():
             return
 
-        if commit_type == "none":
-            ref = "HEAD"
+        if ref_type == "none":
+            ref_value = "HEAD"
 
-        process = subprocess.Popen(f"git ls-remote --exit-code {repo} {ref}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(f"git ls-remote --exit-code {repo} {ref_value}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             _, _ = process.communicate(timeout=10)
             result = process.returncode
@@ -123,12 +123,12 @@ class Updater:
             _, _ = process.communicate()
             result = -1
 
-        if result == 2:  # Connection successful, but ref not found
-            raise KBRuntimeError(f"\t{self.module.name} repository at {repo} has no ref y[{ref}]")
+        if result == 2:  # Connection successful, but ref_value not found
+            raise KBRuntimeError(f"\t{self.module.name} repository at {repo} has no ref y[{ref_value}]")
         if result == 0:  # Ref is present
             return
 
-        raise KBRuntimeError(f"\tgit had error exit {result} when verifying {ref} present in repository at {repo}")
+        raise KBRuntimeError(f"\tgit had error exit {result} when verifying {ref_value} present in repository at {repo}")
 
     def _clone(self, git_repo: str) -> int:
         """
@@ -151,13 +151,13 @@ class Updater:
             raise ProgramError("\tMissing IPC object")
         ipc = self.ipc
 
-        commit_id, commit_type = self.determine_preferred_checkout_source()
+        ref_value, ref_type = self.determine_preferred_checkout_source()
 
-        if commit_type != "none":
-            commit_id = commit_id.removeprefix("refs/tags/")  # git-clone -b doesn't like refs/tags/
-            args = ["-b", commit_id] + args  # Checkout branch right away
+        if ref_type != "none":
+            ref_value = ref_value.removeprefix("refs/tags/")  # git-clone -b doesn't like refs/tags/
+            args = ["-b", ref_value] + args  # Checkout branch right away
 
-        logger_updater.warning(f"\tCloning g[{module}] pointing to {commit_type} b[{commit_id}]")
+        logger_updater.warning(f"\tCloning g[{module}] pointing to {ref_type} b[{ref_value}]")
 
         Util.p_chdir(module.get_source_dir())
 
@@ -508,15 +508,15 @@ class Updater:
 
         # Now we need to figure out if we should update a branch, or simply
         # checkout a specific tag/SHA1/etc.
-        commit_id, commit_type = self.determine_preferred_checkout_source()
-        if commit_type == "none":
-            commit_type = "branch"
-            commit_id = self._detect_default_remote_head(remote_name)
+        ref_value, ref_type = self.determine_preferred_checkout_source()
+        if ref_type == "none":
+            ref_type = "branch"
+            ref_value = self._detect_default_remote_head(remote_name)
 
-        logger_updater.warning(f"\tMerging g[{module}] changes from {commit_type} b[{commit_id}]")
+        logger_updater.warning(f"\tMerging g[{module}] changes from {ref_type} b[{ref_value}]")
         start_commit = self.commit_id("HEAD")
 
-        self.stash_and_update(commit_type, remote_name, commit_id)
+        self.stash_and_update(ref_type, remote_name, ref_value)
         ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"]).decode().strip())
         return ret
 

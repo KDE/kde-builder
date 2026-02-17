@@ -52,17 +52,17 @@ def test_option_reading(monkeypatch):
     scm = module_list[3].scm
     assert isinstance(scm, Updater)
 
-    branch, sourcetype = scm.determine_preferred_checkout_source()
+    ref_value, ref_type = scm.determine_preferred_checkout_source()
 
-    assert branch == "refs/tags/fake-tag5", "Right tag name"
-    assert sourcetype == "tag", "Result came back as a tag"
+    assert ref_value == "refs/tags/fake-tag5", "Right tag name"
+    assert ref_type == "tag", "Result came back as a tag"
 
     # setmod2 is second module in set of 3 at start, should be second overall
     assert module_list[1].name == "setmod2", "Right module name from module-set"
-    branch, sourcetype = module_list[1].scm.determine_preferred_checkout_source()
+    ref_value, ref_type = module_list[1].scm.determine_preferred_checkout_source()
 
-    assert branch == "refs/tags/tag-setmod2", "Right tag name (options block)"
-    assert sourcetype == "tag", "options block came back as tag"
+    assert ref_value == "refs/tags/tag-setmod2", "Right tag name (options block)"
+    assert ref_type == "tag", "options block came back as tag"
 
     # Test some of the option parsing indirectly by seeing how the value is input
     # into build system.
