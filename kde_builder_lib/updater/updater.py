@@ -11,6 +11,7 @@ import os.path
 import re
 import subprocess
 import time
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from ..kb_exception import KBRuntimeError
@@ -547,67 +548,66 @@ class Updater:
         head = head.removesuffix("\n")
         return head
 
-    def determine_preferred_checkout_source(self) -> tuple:
+    def determine_preferred_checkout_source(self) -> tuple[str, str]:
         """
         Goes through all the various combination of git checkout selection options in various orders of priority.
 
         Returns:
             Tuple containing:
-            1 - the resultant symbolic ref/or SHA1.
-            2 - "branch" or "tag" (to determine if something like git-pull would be suitable or whether you have a detached HEAD).
+            1 - git ref value (symbolic or SHA1).
+            2 - git ref type ("branch" or "tag"), to determine if something like git-pull would be suitable or whether you have a detached HEAD.
         """
         module = self.module
 
-        priority_ordered_sources = [
-            #   option-name    type   get_option-inheritance-flag
-            ["commit", "tag", "module"],
-            ["revision", "tag", "module"],
-            ["tag", "tag", "module"],
-            ["branch", "branch", "module"],
-            ["branch-group", "branch", "module"],
-            # commit/rev/tag don't make sense for git as globals
-            ["branch", "branch", "allow-inherit"],
-            ["branch-group", "branch", "allow-inherit"],
+        @dataclass
+        class CheckoutSource:
+            option_name: str
+            inherit_mode: str
+            git_type: str
+
+        priority_ordered_checkout_sources = [
+            CheckoutSource(option_name="commit",       inherit_mode="module",        git_type="tag"   ),
+            CheckoutSource(option_name="revision",     inherit_mode="module",        git_type="tag"   ),
+            CheckoutSource(option_name="tag",          inherit_mode="module",        git_type="tag"   ),
+            CheckoutSource(option_name="branch",       inherit_mode="module",        git_type="branch"),
+            CheckoutSource(option_name="branch-group", inherit_mode="module",        git_type="branch"),
+            # "commit", "revision", "tag" - don't make sense for git as globals
+            CheckoutSource(option_name="branch",       inherit_mode="allow-inherit", git_type="branch"),
+            CheckoutSource(option_name="branch-group", inherit_mode="allow-inherit", git_type="branch"),
         ]
 
-        # For modules that are not actually a kde projects we skip branch-group
-        # entirely to allow for global/module branch selection
-        # options to be selected... kind of complicated, but more DWIMy
         if not module.is_kde_project():
-            priority_ordered_sources = [priorityOrderedSource for priorityOrderedSource in priority_ordered_sources if priorityOrderedSource[0] != "branch-group"]
+            priority_ordered_checkout_sources = [checkout_source for checkout_source in priority_ordered_checkout_sources if checkout_source.option_name != "branch-group"]
 
-        checkout_source = None
-        # easiest way to be clear that bool context is intended
+        ref_string = ""
 
-        source_type = None
-        for x in priority_ordered_sources:
-            if checkout_source := module.get_option(x[0], x[2]):  # Note that we check for truth of get_option, not if it is None, because we want to treat empty string also as false
-                source_type = x
+        matched_checkout_source = None
+        for checkout_source in priority_ordered_checkout_sources:
+            if ref_string := module.get_option(checkout_source.option_name, checkout_source.inherit_mode):
+                matched_checkout_source = checkout_source
                 break
 
-        # The user has no clear desire here (either set for the module or globally.
-        # Note that the default config doesn't generate a global "branch" setting).
+        # The user has no clear desire here (either set for the module or globally).
+        # Note that the default config doesn't generate a global "branch" setting.
         # In this case it's unclear which convention source modules will use between
-        # "master", "main", or something entirely different.  So just don't guess...
-        if not source_type:
+        # "master", "main", or something entirely different. So just don't guess.
+        if matched_checkout_source is None:
             logger_updater.debug(f"\tNo branch specified for {module}, will use whatever git gives us")
             return "none", "none"
 
-        # Likewise branch-group requires special handling. checkout_source is
-        # currently the branch-group to be resolved.
-        if source_type[0] == "branch-group":
-            # noinspection PyUnreachableCode
-            checkout_source = self._resolve_branch_group(checkout_source)
+        if matched_checkout_source.option_name == "branch-group":
+            #  ref_string is currently the branch-group to be resolved.
+            ref_string = self._resolve_branch_group(ref_string)
 
-            if not checkout_source:
+            if not ref_string:
                 branch_group = module.get_option("branch-group")
                 logger_updater.debug(f"\tNo specific branch set for {module} and {branch_group}, using master!")
-                checkout_source = "master"
+                ref_string = "master"
 
-        if source_type[0] == "tag" and not checkout_source.startswith("^refs/tags/"):
-            checkout_source = f"refs/tags/{checkout_source}"
+        if matched_checkout_source.option_name == "tag" and not ref_string.startswith("refs/tags/"):
+            ref_string = f"refs/tags/{ref_string}"
 
-        return checkout_source, source_type[1]
+        return ref_string, matched_checkout_source.git_type
 
     @staticmethod
     def _has_submodules() -> bool:
