@@ -50,6 +50,9 @@ class Debug:
             self.__initialized = True
             self.screen_log = None
             """Filehandle pointing to the "build log"."""
+            self._pending_screen_log_text = ""
+            """Store screen text that was printed before we determined log-dir."""
+
             self.is_pretending = False
             self.debug_level = Debug.INFO
 
@@ -117,6 +120,7 @@ class Debug:
             return
         try:
             self.screen_log = open(file_name, "w")
+            print(self._pending_screen_log_text, file=self.screen_log)  # flush pended text to log file
         except IOError:
             logger_root = logging.getLogger()
             logger_root.error(f"Unable to open log file {file_name}!")
@@ -171,13 +175,17 @@ class KBLogger(logging.Logger):
         real_level_method = getattr(super(KBLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
         real_level_method(d.colorize(msg + "]"))
 
-        if d.screen_log is not None:  # todo: This should be just another handler for the logger
+        if not d.pretending():
+            # todo: This should be just another handler for the logger
             int_message_level = KBLogger.level_names_mapping[message_level.upper()]
             if kblogger.isEnabledFor(int_message_level):
                 saved_colors = [d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD]
                 # Remove color but still extract codes
                 d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = [""] * 5
-                print(d.colorize(msg), file=d.screen_log)
+                if d.screen_log is not None:
+                    print(d.colorize(msg), file=d.screen_log)
+                else:
+                    d._pending_screen_log_text += d.colorize(msg) + "\n"
                 d.RED, d.GREEN, d.YELLOW, d.NORMAL, d.BOLD = saved_colors
 
     # The next few methods are used to print output at different importance
