@@ -286,19 +286,9 @@ class TaskManager:
         successfully_built_log_timestamped = f"{logdir_timestamped}/successfully-built.log"
 
         if Debug().pretending():
-            outfile = "/dev/null"
-        else:
-            outfile = status_list_log_timestamped
+            status_list_log_timestamped = "/dev/null"
 
-        try:
-            status_fh = open(outfile, "w")
-        except OSError:
-            logger_taskmanager.error(dedent(f"""
-                 r[b[*] Unable to open output status file r[b[{outfile}]
-                 r[b[*] You won't be able to use the g[--resume] switch next run.
-
-                """, preserve_len=1))
-            outfile = None
+        status_fh = open(status_list_log_timestamped, "w")
 
         build_done: list[str] = []
         result = 0
@@ -349,37 +339,36 @@ class TaskManager:
             cur_module += 1
             print()  # Space things out
 
-        if outfile:
-            status_fh.close()
+        status_fh.close()
 
-            # Update the symlink in latest to point to this file.
-            if os.path.islink(status_list_log_latest):
-                Util.safe_unlink(status_list_log_latest)
+        # Update the symlink in latest to point to this file.
+        if os.path.islink(status_list_log_latest):
+            Util.safe_unlink(status_list_log_latest)
 
-            if not os.path.exists(status_list_log_latest):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
-                try:
-                    os.symlink(outfile, status_list_log_latest)
-                except FileNotFoundError:
-                    # pl2py: In perl they just ignore the case when the symlink was not successfully created.
-                    # This case may happen when you do not have a source directory (the log directory that will contain a symlink),
-                    # and do pretending. In pretending, the real log file is /dev/null.
-                    # So os.symlink will try to symlink "/home/username/kde/src/log/latest/status-list.log" to "/dev/null" when "/home/username/kde" dir does not exist.
-                    # We also will ignore that.
-                    pass
+        if not os.path.exists(status_list_log_latest):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
+            try:
+                os.symlink(status_list_log_timestamped, status_list_log_latest)
+            except FileNotFoundError:
+                # pl2py: In perl they just ignore the case when the symlink was not successfully created.
+                # This case may happen when you do not have a source directory (the log directory that will contain a symlink),
+                # and do pretending. In pretending, the real log file is /dev/null.
+                # So os.symlink will try to symlink "/home/username/kde/src/log/latest/status-list.log" to "/dev/null" when "/home/username/kde" dir does not exist.
+                # We also will ignore that.
+                pass
 
-            if os.path.islink(screen_log_latest):
-                Util.safe_unlink(screen_log_latest)
+        if os.path.islink(screen_log_latest):
+            Util.safe_unlink(screen_log_latest)
 
-            if not os.path.exists(screen_log_latest):
-                try:
-                    # After first launching in pretending mode, the symlink becomes broken (points to the log dir, which is not actually created).
-                    # And at second launching in pretending mode, we get here (because os.path.exists returns False in case of broken symlink).
-                    # And this causes a FileAlreadyExists exception.
-                    # So, we will only symlink if not pretending.
-                    if not Debug().pretending():
-                        os.symlink(screen_log_timestamped, screen_log_latest)
-                except FileNotFoundError:
-                    pass
+        if not os.path.exists(screen_log_latest):
+            try:
+                # After first launching in pretending mode, the symlink becomes broken (points to the log dir, which is not actually created).
+                # And at second launching in pretending mode, we get here (because os.path.exists returns False in case of broken symlink).
+                # And this causes a FileAlreadyExists exception.
+                # So, we will only symlink if not pretending.
+                if not Debug().pretending():
+                    os.symlink(screen_log_timestamped, screen_log_latest)
+            except FileNotFoundError:
+                pass
 
         if len(build_done) > 0:
             logger_taskmanager.info("g[<<<  PROJECTS SUCCESSFULLY BUILT  >>>]")
