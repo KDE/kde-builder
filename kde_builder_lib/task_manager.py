@@ -376,33 +376,15 @@ class TaskManager:
                     pass
 
         if len(build_done) > 0:
-            logger_taskmanager.info("<<<  g[PROJECTS SUCCESSFULLY BUILT]  >>>")
-
-        successes = len(build_done)
-        if successes == 1:
-            mods = "project"
-        else:
-            mods = "projects"
+            logger_taskmanager.info("g[<<<  PROJECTS SUCCESSFULLY BUILT  >>>]")
 
         if not Debug().pretending():
-            # Print out results, and output to a file
-            logdir = ctx.get_log_dir()
-
-            with open(f"{logdir}/successfully-built", "w") as built:
+            with open(f"{ctx_logdir}/successfully-built", "w") as built:
                 for module in build_done:
-                    if successes <= 10:
-                        logger_taskmanager.info(f"{module}")
                     print(f"{module}", file=built)
 
-            if successes > 10:
-                logger_taskmanager.info(f"Built g[{successes}] {mods}")
-        else:
-            # Just print out the results
-            if successes <= 10:
-                logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
-            else:
-                if successes > 10:
-                    logger_taskmanager.info(f"Built g[{successes}] {mods}")
+        logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
+
         return result
 
     def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext) -> int:
