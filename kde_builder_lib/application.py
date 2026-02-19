@@ -1136,45 +1136,6 @@ class Application:
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
     @staticmethod
-    def _output_possible_solution(ctx: BuildContext, fail_list: list[Module]) -> None:
-        """
-        Print out a "possible solution" message.
-
-        It will display a list of command lines to run.
-
-        No message is printed out if the list of failed modules is empty, so this
-        function can be called unconditionally.
-
-        Args:
-            ctx: Build Context
-            fail_list: List of :class:`Module` that had failed to build/configure/cmake.
-
-        Returns:
-            None
-        """
-        if not fail_list:
-            return
-        if Debug().pretending():
-            return
-
-        module_names = []
-
-        for module in fail_list:
-            logfile = module.get_option("#error-log-file")
-
-            if re.search(r"/cmake\.log$", logfile) or re.search(r"/meson-setup\.log$", logfile):
-                module_names.append(module.name)
-
-        if len(module_names) > 0:
-            names = ", ".join(module_names)
-            logger_app.warning(dedent(f"""
-                Possible solution: Install the build dependencies for the projects:
-                {names}
-                You can use "sudo apt build-dep <source_package>", "sudo dnf builddep <package>", "sudo zypper --plus-content repo-source source-install --build-deps-only <source_package>" or a similar command for your distro of choice.
-                See https://develop.kde.org/docs/getting-started/building/help-dependencies
-                """))
-
-    @staticmethod
     def _print_failed_modules_in_each_phase(ctx: BuildContext, module_graph: dict) -> None:
         """
         Print the list of failed modules for each phase.
@@ -1252,8 +1213,6 @@ class Application:
                             "interesting' to 'probably least interesting' failure:\n")
             for item in sorted_for_debug[:top]:  # pl2py: in python the stop point is not included, so we add +1
                 logger_app.info(f"\tr[b[{item}]")
-
-        Application._output_possible_solution(ctx, actual_failures)
 
     @staticmethod
     def _install_templated_file(source_path: str, destination_path: str, ctx: BuildContext) -> None:
