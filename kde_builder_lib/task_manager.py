@@ -183,7 +183,7 @@ class TaskManager:
         return had_error
 
     @staticmethod
-    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module, start_time: int) -> str:
+    def _build_single_module(ipc: IPC, ctx: BuildContext, module: Module) -> str:
         """
         Build the given module.
 
@@ -284,11 +284,22 @@ class TaskManager:
         screen_log_latest = f"{logdir_latest}/screen.log"
 
         successfully_built_log_timestamped = f"{logdir_timestamped}/successfully-built.log"
+        successfully_built_log_latest = f"{logdir_latest}/successfully-built.log"
+        failed_to_build_log_timestamped = f"{logdir_timestamped}/failed-to-build.log"
+        failed_to_build_log_latest = f"{logdir_latest}/failed-to-build.log"
+        failed_to_update_log_timestamped = f"{logdir_timestamped}/failed-to-update.log"
+        failed_to_update_log_latest = f"{logdir_latest}/failed-to-update.log"
 
         if Debug().pretending():
             status_list_log_timestamped = "/dev/null"
+            failed_to_build_log_timestamped = "/dev/null"
+            failed_to_update_log_timestamped = "/dev/null"
+            successfully_built_log_timestamped = "/dev/null"
 
-        status_fh = open(status_list_log_timestamped, "w")
+        status_list_fh = open(status_list_log_timestamped, "w")
+        failed_to_build_fh = open(failed_to_build_log_timestamped, "w")
+        failed_to_update_fh = open(failed_to_update_log_timestamped, "w")
+        successfully_build_fh = open(successfully_built_log_timestamped, "w")
 
         build_done: list[str] = []
         result = 0
@@ -309,14 +320,16 @@ class TaskManager:
             block_substr = self._form_block_substring(module)
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
 
-            start_time = int(time.time())
-            failed_phase: str = TaskManager._build_single_module(ipc, ctx, module, start_time)
-            elapsed: str = Util.prettify_seconds(int(time.time()) - start_time)
+            failed_phase: str = TaskManager._build_single_module(ipc, ctx, module)
 
             if failed_phase:
                 # FAILURE
                 ctx.mark_module_phase_failed(failed_phase, module)
-                print(f"{module}: Failed on {failed_phase} after {elapsed}.", file=status_fh)
+                print(f"{module.name}: Failed to {failed_phase}.", file=status_list_fh)
+                if failed_phase == "build":
+                    print(module.name, file=failed_to_build_fh)
+                if failed_phase == "update":
+                    print(module.name, file=failed_to_update_fh)
 
                 if result == 0:
                     # No failures yet, mark this as resume point
@@ -333,13 +346,17 @@ class TaskManager:
                 status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
             else:
                 # Success
-                print(f"{module}: Succeeded after {elapsed}.", file=status_fh)
+                print(f"{module.name}: Succeeded.", file=status_list_fh)
+                print(f"{module.name}", file=successfully_build_fh)
                 build_done.append(module_name)  # Make it show up as a success
                 status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
             cur_module += 1
             print()  # Space things out
 
-        status_fh.close()
+        status_list_fh.close()
+        failed_to_build_fh.close()
+        failed_to_update_fh.close()
+        successfully_build_fh.close()
 
         if not Debug().pretending():
             if os.path.exists(status_list_log_latest):
@@ -350,16 +367,21 @@ class TaskManager:
                 os.remove(screen_log_latest)
             os.symlink(screen_log_timestamped, screen_log_latest)
 
+            if os.path.exists(failed_to_build_log_latest):
+                os.remove(failed_to_build_log_latest)
+            os.symlink(failed_to_build_log_timestamped, failed_to_build_log_latest)
+
+            if os.path.exists(failed_to_update_log_latest):
+                os.remove(failed_to_update_log_latest)
+            os.symlink(failed_to_update_log_timestamped, failed_to_update_log_latest)
+
+            if os.path.exists(successfully_built_log_latest):
+                os.remove(successfully_built_log_latest)
+            os.symlink(successfully_built_log_timestamped, successfully_built_log_latest)
 
         if len(build_done) > 0:
             logger_taskmanager.info("g[<<<  PROJECTS SUCCESSFULLY BUILT  >>>]")
-
-        if not Debug().pretending():
-            with open(successfully_built_log_timestamped, "w") as built:
-                for module in build_done:
-                    print(f"{module}", file=built)
-
-        logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
+            logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
 
         return result
 
