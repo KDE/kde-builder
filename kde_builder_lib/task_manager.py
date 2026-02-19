@@ -273,12 +273,22 @@ class TaskManager:
         # build.
         ipc.wait_for_stream_start()
         ctx.unset_persistent_option("global", "resume-list")
-        ctx_logdir = ctx.get_log_dir()
+
+        logdir_latest = ctx.get_absolute_path("log-dir") + "/latest"
+        logdir_timestamped = ctx.get_log_dir()
+
+        status_list_log_timestamped = f"{logdir_timestamped}/status-list.log"
+        status_list_log_latest = f"{logdir_latest}/status-list.log"
+
+        screen_log_timestamped = f"{logdir_timestamped}/screen.log"
+        screen_log_latest = f"{logdir_latest}/screen.log"
+
+        successfully_built_log_timestamped = f"{logdir_timestamped}/successfully-built.log"
 
         if Debug().pretending():
             outfile = "/dev/null"
         else:
-            outfile = ctx_logdir + "/status-list.log"
+            outfile = status_list_log_timestamped
 
         try:
             status_fh = open(outfile, "w")
@@ -343,14 +353,12 @@ class TaskManager:
             status_fh.close()
 
             # Update the symlink in latest to point to this file.
-            logdir = ctx.get_absolute_path("log-dir")
-            status_file_loc = f"{logdir}/latest/status-list.log"
-            if os.path.islink(status_file_loc):
-                Util.safe_unlink(status_file_loc)
+            if os.path.islink(status_list_log_latest):
+                Util.safe_unlink(status_list_log_latest)
 
-            if not os.path.exists(status_file_loc):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
+            if not os.path.exists(status_list_log_latest):  # pl2py: in perl the os.symlink does not overwrite the existing symlink and returns success
                 try:
-                    os.symlink(outfile, status_file_loc)
+                    os.symlink(outfile, status_list_log_latest)
                 except FileNotFoundError:
                     # pl2py: In perl they just ignore the case when the symlink was not successfully created.
                     # This case may happen when you do not have a source directory (the log directory that will contain a symlink),
@@ -359,19 +367,17 @@ class TaskManager:
                     # We also will ignore that.
                     pass
 
-            screenlog_file_loc = f"{logdir}/latest/screen.log"
-            if os.path.islink(screenlog_file_loc):
-                Util.safe_unlink(screenlog_file_loc)
+            if os.path.islink(screen_log_latest):
+                Util.safe_unlink(screen_log_latest)
 
-            if not os.path.exists(screenlog_file_loc):
+            if not os.path.exists(screen_log_latest):
                 try:
-                    realfile = ctx_logdir + "/screen.log"
                     # After first launching in pretending mode, the symlink becomes broken (points to the log dir, which is not actually created).
                     # And at second launching in pretending mode, we get here (because os.path.exists returns False in case of broken symlink).
                     # And this causes a FileAlreadyExists exception.
                     # So, we will only symlink if not pretending.
                     if not Debug().pretending():
-                        os.symlink(realfile, screenlog_file_loc)
+                        os.symlink(screen_log_timestamped, screen_log_latest)
                 except FileNotFoundError:
                     pass
 
@@ -379,7 +385,7 @@ class TaskManager:
             logger_taskmanager.info("g[<<<  PROJECTS SUCCESSFULLY BUILT  >>>]")
 
         if not Debug().pretending():
-            with open(f"{ctx_logdir}/successfully-built", "w") as built:
+            with open(successfully_built_log_timestamped, "w") as built:
                 for module in build_done:
                     print(f"{module}", file=built)
 
