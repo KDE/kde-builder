@@ -507,7 +507,7 @@ class Application:
                 logger_app.warning(f"Updating g[repo-metadata]")
                 if not Debug().is_testing():
                     metadata_module.scm.update_internal()
-                logger_app.warning("")  # Prints empty line to space it from next messages
+                logger_app.warning("")  # Space after "Updating repo-metadata" block
                 metadata_module.current_phase = None
                 logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
                 Util.p_chdir(orig_wd)

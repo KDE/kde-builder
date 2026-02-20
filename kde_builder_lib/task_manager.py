@@ -351,7 +351,7 @@ class TaskManager:
                 build_done.append(module_name)  # Make it show up as a success
                 status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
             cur_module += 1
-            print()  # Space things out
+            logger_taskmanager.warning("")  # Space between "Building project/name (n/n)" blocks
 
         status_list_fh.close()
         failed_to_build_fh.close()
