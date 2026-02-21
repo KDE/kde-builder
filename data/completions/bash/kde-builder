@@ -244,7 +244,7 @@ _kde_builder() {
     --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking
     --configure-flags --custom-build-command --cxxflags --debug --dependency-tree
     --dependency-tree-fullpath --dest-dir --directory-layout
-    --do-not-compile --generate-clion-project-config
+    --generate-clion-project-config
     --no-generate-clion-project-config --generate-config --generate-qtcreator-project-config
     --no-generate-qtcreator-project-config --generate-vscode-project-config
     --no-generate-vscode-project-config --git-user --help -h --hold-performance-profile --no-hold-performance-profile
@@ -313,7 +313,7 @@ _kde_builder() {
             ;;
         --binpath|--branch-group|--branch|--build-dir|--cmake-generator|--cmake-options|\
         --cmake-toolchain|--configure-flags|--custom-build-command|--cxxflags|--dest-dir|\
-        --directory-layout|--do-not-compile|--git-user|--install-dir|--libname|--libpath|\
+        --directory-layout|--git-user|--install-dir|--libname|--libpath|\
         --log-dir|--make-install-prefix|--make-options|--meson-options|--nice|--niceness|\
         --ninja-options|--num-cores-low-mem|--num-cores|--override-build-system|\
         --persistent-data-file|--qmake-options|--qt-install-dir|--query|\

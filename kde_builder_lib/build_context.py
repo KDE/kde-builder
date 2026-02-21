@@ -135,7 +135,6 @@ class BuildContext(Module):
             "cxxflags": "-pipe",
             "directory-layout": "flat",
             "dest-dir": "${MODULE}",
-            "do-not-compile": "",
             "git-user": "",
             "install-dir": os.getenv("HOME") + "/kde/usr",
             "libname": self.libname,

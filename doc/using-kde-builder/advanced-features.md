@@ -1,47 +1,6 @@
 (advanced-features)=
 # Advanced features
 
-(partial-builds)=
-## Partially building a project
-
-It is possible to build only pieces from a single KDE project. For
-example, you may want to compile only one program from a project.
-KDE Builder has features to make this easy. There are several
-complementing ways to do this.
-
-(not-compiling)=
-### Removing directories from a build
-
-It is possible to have the build system leave out a few directories when it does the build of
-a project. This requires
-that the project uses CMake and that the project's build system allows the
-directory to remove to be optional.
-
-This is controlled with the [do-not-compile](#conf-do-not-compile)
-option.
-
-```{important}
-This option requires at least that the build system for the project is
-reconfigured after changing it. This is done using the
-`kde-builder --reconfigure project` command.
-```
-
-```{note}
-Possibly outdated info. Curently there is no any active repo under kde/kdebindings.
-```
-
-To remove the `python` directory from the kdebindings build process:
-
-```yaml
-project kdebindings:
-  do-not-compile: python
-```
-
-```{note}
-This function depends on some standard conventions used in most KDE
-projects. Therefore it may not work for all programs.
-```
-
 (stopping-the-build-early)=
 ## Stopping the build early
 

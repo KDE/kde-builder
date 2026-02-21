@@ -29,10 +29,6 @@ KDE Builder features include:
   of a project. You can also ensure that a specific
   [revision](#conf-revision) is checked out of a project.
 
-- KDE Builder can [checkout only portions of a
-  project](#partial-builds), for those situations where you only need one
-  program from a large project.
-
 - Can [delete the build directory](#deleting-build-dir) of a project
   after its installation to save space at the expense of future
   compilation time.
@@ -62,7 +58,7 @@ KDE Builder features include:
   `--refresh-build` option.
 
 - You can specify various environment values to be used during the
-  build, including `DO_NOT_COMPILE` and `CXXFLAGS`.
+  build, including `CXXFLAGS`.
 
 - Command logging. Logs are dated and numbered so that you always have a
   log of a script run. Also, a special symlink called latest is created

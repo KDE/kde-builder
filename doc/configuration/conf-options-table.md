@@ -482,27 +482,6 @@ or [source-dir](#conf-source-dir) options.
 
 Related command-line option: --dest-dir \<path\>
 
-(conf-do-not-compile)=
-[`do-not-compile`](conf-do-not-compile)
-
-Type: String
-
-Use this option to select a specific set of directories not to be
-built in a project (instead of all of them). The directories not to build
-should be space-separated.
-
-Note that the sources to the programs will still be downloaded.
-
-For example, to disable building the `codeeditor` and
-`minimaltest` directories of the
-`syntaxhighlighting` framework, you would add
-`do-not-compile: codeeditor minimaltest` compiling, you would
-add "do-not-compile: juk kscd" to your syntaxhighlighting options.
-
-See the section called [](#not-compiling) for an example.
-
-Related command-line option: --do-not-compile \<value\>
-
 (conf-git-user)=
 [`git-user`](conf-git-user)
 

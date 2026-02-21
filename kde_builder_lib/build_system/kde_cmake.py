@@ -362,13 +362,6 @@ class BuildSystemKDECMake(BuildSystem):
         if module.get_option("compile-commands-export"):
             commands.insert(0, "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON")
 
-        # Add -DBUILD_foo=OFF options for the directories in do-not-compile.
-        # This will only work if the CMakeLists.txt file uses macro_optional_add_subdirectory()
-        masked_directories = module.get_option("do-not-compile").split(" ")
-        masked_directories = [el for el in masked_directories if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
-        for directory in masked_directories:
-            commands.append(f"-DBUILD_{directory}=OFF")
-
         # Get the user's CXXFLAGS, use them if specified and not already given
         # on the command line.
         cxxflags = module.get_option("cxxflags")

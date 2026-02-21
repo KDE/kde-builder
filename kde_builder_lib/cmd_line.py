@@ -389,9 +389,6 @@ class Cmdline:
         if args.dest_dir is not None:
             found_options["dest-dir"] = args.dest_dir[0]
 
-        if args.do_not_compile is not None:
-            found_options["do-not-compile"] = args.do_not_compile[0]
-
         if args.install_login_session_only:
             opts["run_mode"] = "install-login-session-only"
             phases.clear()
