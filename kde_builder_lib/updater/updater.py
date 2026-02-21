@@ -97,7 +97,7 @@ class Updater:
         gitdir = module.fullpath("source") + "/.git"
 
         # Note that the --git-dir must come before the git command itself.
-        an_id = Util.filter_program_output(None, *["git", "--git-dir", gitdir, "rev-parse", commit])
+        an_id = Util.get_program_output("git", "--git-dir", gitdir, "rev-parse", commit)
         if an_id:
             an_id = an_id[0].removesuffix("\n")
         else:
@@ -350,7 +350,7 @@ class Updater:
         # not, and if we stashed local changes, then we might dump a bunch of
         # conflicts in the repo if we un-stash those changes after a branch switch.
         # See issue #67.
-        existing_branch = next(iter(Util.filter_program_output(None, "git", "branch", "--show-current")), None)
+        existing_branch = next(iter(Util.get_program_output("git", "branch", "--show-current")), None)
         if existing_branch is not None:
             existing_branch = existing_branch.removesuffix("\n")
 
@@ -621,7 +621,7 @@ class Updater:
         """
         # The git-config line shows all option names of the form submodule.foo.active,
         # filtering down to options for which the option is set to "true"
-        config_lines = Util.filter_program_output(None, "git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
+        config_lines = Util.get_program_output("git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
         return len(config_lines) > 0
 
     @staticmethod
@@ -900,14 +900,10 @@ class Updater:
     def slurp_git_config_output(args: list[str]) -> list[str]:
         """
         Split the output of "git config --null" correctly.
-
-        All parameters are then passed to filter_program_output (so look there for help on usage).
         """
-        # Don't call with $self->, all args are passed to filter_program_output
-
         # This gets rid of the trailing nulls for single-line output. (chomp uses
         # $/ instead of hardcoding newline
-        output = Util.filter_program_output(None, *args)  # No filter
+        output = Util.get_program_output(*args)
         output = [o.removesuffix("\0") for o in output]
         return output
 
@@ -919,13 +915,12 @@ class Updater:
         has_remote = False
 
         try:
-            def filter_fn(x):
-                nonlocal has_remote
-                if not has_remote:
-                    has_remote = x and x.startswith(remote)
+            lines = Util.get_program_output("git", "remote")
 
-            Util.filter_program_output(filter_fn, "git", "remote")
-        except Exception:
+            for line in lines:
+                if not has_remote:
+                    has_remote = line and line.startswith(remote)
+        except KBRuntimeError:
             pass
         return has_remote
 

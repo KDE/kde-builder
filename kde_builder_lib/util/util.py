@@ -182,30 +182,15 @@ class Util:
             del os.environ["LC_ALL"]
 
     @staticmethod
-    def filter_program_output(filter_func: Callable | None, program: str, *args) -> list[str]:
+    def get_program_output(program: str, *args) -> list[str]:
         """
         Return a list of output lines from a program.
 
-        Use this only if you expect
-        that the output after filtering will be short.
-
-            def filter(arg):
-                if arg.upper():
-                    return True
-            output = filter_program_output(filter, "git", "describe", "HEAD")
-
         Args:
-            filter_func: function to use as a filter (this function  will
-                be passed a line at a time and should return True if the line should be
-                returned). If no filtering is desired pass None.
             program: The program to run (either full path or something
                 accessible in PATH).
             *args: All remaining arguments are passed to the program.
         """
-        if filter_func is None:
-            def filter_func(_):
-                return True  # Default to all lines
-
         logger_util.debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
 
         # Check early for whether an executable exists.
@@ -224,7 +209,7 @@ class Util:
             child_outputs = child_outputs[:-1] if child_outputs[-1] == "" else child_outputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
             child_outputs = list(map(lambda x: x + "\n", child_outputs))
 
-        lines = [line for line in child_outputs if filter_func(line)]
+        lines = child_outputs
 
         if exit_code:
             # other errors might still be serious but don't need a backtrace
@@ -380,9 +365,6 @@ class Util:
             if module.current_phase != "update":
                 print("# with environment: ", module.fullpath("build") + "/kde-builder.env")
 
-            # TODO: Implement this when appropriate, but also keep in mind that
-            # filter_program_output might be a better idea if you're parsing
-            # output, and that function already does this.
             # disable_locale_message_translation();
 
             # External command.
@@ -429,9 +411,6 @@ class Util:
         the output is only logged. However, this is useful for e.g. munging out the
         progress of the build.
 
-        If you wish to run short commands and look through their output, prefer
-        ``filter_program_output`` instead, as this disables message translation.
-
         #  "no_translate": any true value will cause a flag to be set to request
         #  the executed child process to not translate (for locale purposes) its
         #  output, so that it can be screen-scraped.
@@ -445,12 +424,6 @@ class Util:
         child process. The function should include the full python module name as well
         (otherwise the class containing log_command's implementation is used). The
         remaining arguments in the list are passed to the function that is called.
-
-        Pretend handling:
-
-        The program is not actually executed in pretend mode. If you need the program
-        to always be run, use a python IPC mechanism like os.system(), subprocess, or
-        a utility like ``filter_program_output``.
         """
         if options is None:
             options = {}
