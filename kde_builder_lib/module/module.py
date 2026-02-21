@@ -618,10 +618,10 @@ class Module(OptionsBase):
 
             logger_module.error(f"{e_str}")
             if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
-                logger_module.error(f"\tError updating r[{self.name}], removing from list of projects to build.")
+                logfile = self.get_option("#error-log-file")
+                logger_module.error(f"\tError log: r[" + logfile)
 
             ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
-            self.phases.filter_out_phase("build")
             return_value = False
         else:  # executed if there were no exceptions in try block
             message = ""
