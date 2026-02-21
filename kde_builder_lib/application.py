@@ -1181,9 +1181,9 @@ class Application:
                     # async updates may cause us not to have an error log file stored. There is only
                     # one place it should be though, take advantage of side-effect of log_command() to find it.
                     if not logfile:
-                        logdir = module.get_log_dir() + "/error.log"
-                        if os.path.exists(logdir):
-                            logfile = logdir
+                        error_log = module.get_log_dir() + "/error.log"
+                        if os.path.exists(error_log):
+                            logfile = os.path.realpath(error_log)
                         else:
                             logfile = "No log file"
                     out_str += f" - g[{logfile}]"

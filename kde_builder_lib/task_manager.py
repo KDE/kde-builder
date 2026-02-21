@@ -342,6 +342,16 @@ class TaskManager:
                     return 1  # Error
 
                 logfile = module.get_option("#error-log-file")
+
+                # Async updates do not send setting "#error-log-file" option over IPC.
+                # But if the failed command was run via log_command() (that is not always),
+                # then the set_error_logfile() was invoked, which created error.log symlink.
+                if not logfile:
+                    error_log = module.get_log_dir() + "/error.log"
+                    if os.path.exists(error_log):
+                        logfile = os.path.realpath(error_log)
+                    else:
+                        logfile = "No log file"
                 logger_taskmanager.info("\tError log: r[" + logfile)
                 status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
             else:
