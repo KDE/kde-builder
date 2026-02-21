@@ -391,7 +391,7 @@ class Util:
         return exitcode == 0
 
     @staticmethod
-    def log_command(module: Module, filename: str, args: list[str], options: dict | None = None) -> int:
+    def log_command(module: Module, filename: str, args: list[str], callback_func: Callable | None = None) -> int:
         """
         Run a command, optionally filtering on the output of the child command.
 
@@ -399,15 +399,14 @@ class Util:
 
             exitcode = log_command(module, "build-output", ["make", "-j4"])
 
-        After the required three parameters (module, base name for log file, and a list
-        with the command and arguments) you can pass a dict of optional
-        features:
+        Args:
+            module: Module.
+            filename: Base name for log file.
+            args: List with the command and arguments.
+            callback_func: Optional. A function to which each line of child output will be passed.
 
-            def callback(line):
-                ...
-
-        A function to have each line of child output passed to. This
-        output is not supposed to be printed to the screen by the function, normally
+        Note on callback_func: The child output passed to this function
+        is not supposed to be printed to the screen by the function. Normally
         the output is only logged. However, this is useful for e.g. munging out the
         progress of the build.
 
@@ -425,14 +424,8 @@ class Util:
         (otherwise the class containing log_command's implementation is used). The
         remaining arguments in the list are passed to the function that is called.
         """
-        if options is None:
-            options = {}
-
-        command = args
-        callback_func = options.get("callback", None)
-
         if Debug().pretending():
-            logger_logged_cmd.debug("\tWould have run g['" + "' '".join(command) + "'")
+            logger_logged_cmd.debug("\tWould have run g['" + "' '".join(args) + "'")
             return 0
         return Util.run_logged_command(module, filename, callback_func, args)
 
@@ -471,7 +464,7 @@ class Util:
         orig_wd = os.getcwd()
         if directory:
             Util.p_chdir(directory)
-        exitcode = Util.log_command(module, filename, args, {"callback": callback_func})
+        exitcode = Util.log_command(module, filename, args, callback_func)
         logger_logged_cmd.debug("Return to the original working directory after running log_command().")
         Util.p_chdir(orig_wd)
 
