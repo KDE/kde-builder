@@ -683,7 +683,10 @@ class Application:
                     return x.scm.determine_preferred_checkout_source()[0] or ""
             elif query_mode == "group":
                 def query(x):
-                    return x.module_set.name or "undefined_group"
+                    if x.module_set:
+                        return x.module_set.name
+                    else:
+                        return ""
             elif query_mode == "build-system":
                 def query(x):
                     x.set_build_system()
