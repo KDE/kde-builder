@@ -146,58 +146,6 @@ class Module(OptionsBase):
 
         return directory
 
-    def get_install_path_components(self, dirtype: str) -> dict:
-        """
-        Return the directory that a module should be installed in.
-
-        NOTE: The return value is a dict.
-        The key "module" will return the final module name.
-        The key "path" will return the full path to the module.
-        The key "fullpath" will return their concatenation.
-
-        For example, with module == "KDE/kdelibs", and no change in the dest-dir option, you'd get something like:
-        ::
-            {
-              "path": "/home/user/kde/src/KDE",
-              "module": "kdelibs",
-              "fullpath": "/home/user/kde/src/KDE/kdelibs"
-            }
-
-        If dest-dir were changed to e.g. extragear-multimedia, you'd get:
-        ::
-            {
-              "path": "/home/user/kde/src",
-              "module": "extragear-multimedia",
-              "fullpath": "/home/user/kde/src/extragear-multimedia"
-            }
-
-        Args:
-            dirtype: Either "source" or "build".
-
-        Returns:
-            dict
-        """
-        module = self
-
-        destdir = module.dest_dir()
-        srcbase = module.get_source_dir()
-        if dirtype == "build":
-            srcbase = module.get_absolute_path("build-dir")
-
-        combined = f"{srcbase}/{destdir}"
-
-        # Remove dup //
-        combined = re.sub("/+", "/", combined)
-
-        parts = combined.split("/")
-        result = {"module": parts.pop(), "path": "/".join(parts)}
-        result["fullpath"] = f"""{result["path"]}/{result["module"]}"""
-
-        # We used to have code here to migrate very old directory layouts. It was
-        # removed as of about 2013-09-29.
-
-        return result
-
     def get_source_dir(self) -> str:
         """
         Return absolute base path to the source directory.
@@ -287,17 +235,11 @@ class Module(OptionsBase):
         Returns:
              False on failure, True on success.
         """
-        pathinfo = self.get_install_path_components("build")
         build_system = self.build_system
 
         if build_system.name() == "generic" and not Debug().pretending() and not self.get_option("custom-build-command"):
             logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
             return False
-
-        # Ensure we're in a known directory before we start; some options remove
-        # the old build directory that a previous module might have been using.
-        Util.super_mkdir(pathinfo["path"])
-        Util.p_chdir(pathinfo["path"])
 
         if not self.setup_build_system():
             return False
@@ -793,16 +735,24 @@ class Module(OptionsBase):
 
     def fullpath(self, dirtype: str) -> str:
         """
-        Return the absolute full path to the source or build directory, including any module name or dest-dir.
+        Return the absolute full path to the source or build directory, including the module dest-dir.
 
         This is the directory you can git-clone to, cd to for build, etc.
         """
-        # Returns the path to the desired directory type (source or build),
-        # including the module destination directory itself.
         assert dirtype in ["build", "source"]
 
-        pathinfo = self.get_install_path_components(dirtype)
-        return pathinfo["fullpath"]
+        destdir = self.dest_dir()
+        directory = ""
+        if dirtype == "source":
+            directory = self.get_option("source-dir")
+        if dirtype == "build":
+            directory = self.get_option("build-dir")
+
+        if directory.startswith("~"):
+            directory = re.sub(r"^~", os.getenv("HOME"), directory)
+
+        fullpath = f"{directory}/{destdir}"
+        return fullpath
 
     def is_kde_project(self) -> bool:
         """
