@@ -69,37 +69,29 @@ class BuildSystem:
             return 1
         return int(max_cores * 0.8)
 
-    def build_constraints(self) -> dict[str, int]:
+    def _num_cores_to_use(self) -> int | None:
         """
-        Return a dict holding the resource constraints to try to apply during the build.
-
-        Buildsystems should apply the constraints they understand before
-        running the build command.
-        ::
-
-            {
-              "compute": OPTIONAL, if set a max number of CPU cores to use, or "1" if unable to tell
-              # no other constraints supported
-            }
+        Return cpu cores limit to apply during the build.
         """
-        cores = self.module.get_option("num-cores")
+        num_cores: str = self.module.get_option("num-cores")
 
         # If set to empty, accept user's decision
-        if cores == "":
-            return {}
+        if num_cores == "":
+            return None
 
-        if cores == "auto":
+        if num_cores == "auto":
             # If the build_system can manage it and the user doesn't care, that's OK too
             if self.supports_auto_parallelism():
-                return {}
+                return None
             else:
-                cores = self.auto_cores_number()
+                cores: int = self.auto_cores_number()
+        else:
+            cores = int(num_cores)
+            # If user sets cores to something silly, set it to a failsafe.
+            if cores <= 0:
+                cores = 4
 
-        # If user sets cores to something silly, set it to a failsafe.
-        if int(cores) <= 0:
-            cores = 4
-
-        return {"compute": cores}
+        return cores
 
     def needs_refreshed(self) -> str:
         """
@@ -197,8 +189,7 @@ class BuildSystem:
         build_options = [el for el in build_options if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         # Look for CPU core limits to enforce. This handles core limits for all current build systems.
-        build_constraints = self.build_constraints()
-        num_cores = build_constraints.get("compute", None)
+        num_cores = self._num_cores_to_use()
 
         if num_cores:
             # Prepend parallelism arg to allow user settings to override
