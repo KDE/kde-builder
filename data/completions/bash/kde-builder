@@ -239,7 +239,7 @@ _kde_builder() {
     --all-config-projects --all-kde-projects --async --no-async --binpath --branch-group
     --branch --build-dir --build-only --no-build --build-system-only
     --check-self-updates
-    --no-check-self-updates --cmake-generator --cmake-options --cmake-toolchain --color
+    --no-check-self-updates --cmake-generator --cmake-options --color
     --no-color --colorful-output --no-colorful-output --compile-commands-export
     --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking
     --configure-flags --custom-build-command --cxxflags --debug --dependency-tree
@@ -312,7 +312,7 @@ _kde_builder() {
             return 0
             ;;
         --binpath|--branch-group|--branch|--build-dir|--cmake-generator|--cmake-options|\
-        --cmake-toolchain|--configure-flags|--custom-build-command|--cxxflags|--dest-dir|\
+        --configure-flags|--custom-build-command|--cxxflags|--dest-dir|\
         --directory-layout|--git-user|--install-dir|--libname|--libpath|\
         --log-dir|--make-install-prefix|--make-options|--meson-options|--nice|--niceness|\
         --ninja-options|--num-cores-low-mem|--num-cores|--override-build-system|\

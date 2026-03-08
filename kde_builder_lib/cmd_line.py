@@ -374,9 +374,6 @@ class Cmdline:
         if args.cmake_options is not None:
             found_options["cmake-options"] = args.cmake_options[0]
 
-        if args.cmake_toolchain is not None:
-            found_options["cmake-toolchain"] = args.cmake_toolchain[0]
-
         if args.configure_flags is not None:
             found_options["configure-flags"] = args.configure_flags[0]
 

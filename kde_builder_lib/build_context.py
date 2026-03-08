@@ -129,7 +129,6 @@ class BuildContext(Module):
             "build-dir": os.getenv("HOME") + "/kde/build",
             "cmake-generator": "",
             "cmake-options": "",
-            "cmake-toolchain": "",
             "configure-flags": "",
             "custom-build-command": "",
             "cxxflags": "-pipe",

@@ -19,7 +19,6 @@ _arguments \
   "(--check-self-updates --no-check-self-updates)"{--check-self-updates,--no-check-self-updates}"[Show a message when kde-builder detects it is outdated]" \
   --cmake-generator"[Which generator to use with CMake]"":argument:" \
   --cmake-options"[Flags to pass to CMake when creating the build system for the project]"":argument:" \
-  --cmake-toolchain"[Specify a toolchain file to use with CMake]"":argument:" \
   "(--color --no-color --colorful-output --no-colorful-output)"{--color,--no-color,--colorful-output,--no-colorful-output}"[Toggle colorful output]" \
   "(--compile-commands-export --no-compile-commands-export)"{--compile-commands-export,--no-compile-commands-export}"[Generation of a compile_commands.json]" \
   "(--compile-commands-linking --no-compile-commands-linking)"{--compile-commands-linking,--no-compile-commands-linking}"[Creation of symbolic links from compile_commands.json to source directory]" \

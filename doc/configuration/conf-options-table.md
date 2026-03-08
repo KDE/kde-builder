@@ -341,24 +341,6 @@ will be used, and not the value from the `cmake-generator`.
 
 Related command-line option: --cmake-generator \<value\>
 
-(conf-cmake-toolchain)=
-[`cmake-toolchain`](conf-cmake-toolchain)
-
-Type: String
-
-A toolchain file to be used by cmake.
-
-By default, the toolchain is not set, and kde-builder automatically sets the needed environment variables, see the
-[standard flags added by kde-builder](#kde-builder-std-flags).  
-In case you specify a valid toolchain file with this option, kde-builder will not set them automatically.
-So, if it is required to set some environment variables, you can do so with [set-env](#conf-set-env). Also see [binpath](#conf-binpath) and 
-[libpath](#conf-libpath).
-
-Also note, that you may also specify a toolchain in [cmake-options](#conf-cmake-options) (with "-DCMAKE_TOOLCHAIN_FILE" option), and if it is valid, it 
-will be used, and not the value from `cmake-toolchain`.
-
-Related command-line option: --cmake-toolchain \<value\>
-
 (conf-cmake-options)=
 [`cmake-options`](conf-cmake-options)
 
@@ -376,8 +358,7 @@ you to specify common CMake options in the global node.
 If you specify a valid (supported) generator in `cmake-options`, it will override the value from [cmake-generator](#conf-cmake-generator) option. In case 
 invalid (unsupported) generator was used, it will be ignored and will not be passed to cmake.
 
-If you specify a valid toolchain file in `cmake-options`, it will override the value from [cmake-toolchain](#conf-cmake-toolchain) option. In case invalid 
-toolchain was used, it will be ignored and not be passed to cmake.
+If you specify an invalid toolchain file in `cmake-options`, it will be ignored and not passed to cmake.
 
 Since these options are passed directly to the CMake command line,
 they should be given as they would be typed into CMake. For example:

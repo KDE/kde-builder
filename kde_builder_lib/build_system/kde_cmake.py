@@ -159,8 +159,10 @@ class BuildSystemKDECMake(BuildSystem):
         module = self.module
         cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
 
-        toolchain = next((toolchain for toolchain in (self._find_toolchain_in_cmake_options(cmake_options), module.get_option("cmake-toolchain")) if self._check_toolchain_ok(toolchain)), None)
-        return toolchain or ""
+        toolchain = self._find_toolchain_in_cmake_options(cmake_options)
+        if not self._check_toolchain_ok(toolchain):
+            toolchain = ""
+        return toolchain
 
     def get_cmake_toolchain(self) -> str:
         if not self.cmake_toolchain:

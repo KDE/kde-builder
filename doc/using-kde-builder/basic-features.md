@@ -72,7 +72,7 @@ environment for you:
   [set-env](#conf-set-env) to add these.
 
 
-Note that this does not apply if you are using custom toolchain file, for example with [cmake-toolchain](#conf-cmake-toolchain).
+Note that this does not apply if you are using custom toolchain file (`-DCMAKE_TOOLCHAIN_FILE` cmake option).
 
 (build-priority)=
 ## Changing kde-builder's build priority
