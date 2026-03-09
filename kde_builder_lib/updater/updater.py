@@ -914,14 +914,12 @@ class Updater:
         """
         has_remote = False
 
-        try:
-            lines = Util.get_program_output("git", "remote")
+        existing_remotes = Util.get_program_output("git", "remote")
+        existing_remotes = [el.removesuffix("\n") for el in existing_remotes]
 
-            for line in lines:
-                if not has_remote:
-                    has_remote = line and line.startswith(remote)
-        except KBRuntimeError:
-            pass
+        for existing_remote in existing_remotes:
+            if not has_remote:
+                has_remote = existing_remote == remote
         return has_remote
 
     @staticmethod
