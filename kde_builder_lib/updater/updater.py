@@ -167,8 +167,6 @@ class Updater:
         if not exitcode == 0:
             raise KBRuntimeError("\tFailed to make initial clone of project")
 
-        ipc.notify_persistent_option_change(module.name, "git-cloned-repository", git_repo)
-
         Util.p_chdir(srcdir)
 
         # Setup user configuration
@@ -273,6 +271,16 @@ class Updater:
 
         if has_old_remote:
             logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
+
+            old_repo = subprocess.run(f"git config --get remote.{remote}.url", shell=True, capture_output=True, text=True).stdout.strip()
+
+            if old_repo and (repo != old_repo):
+                logger_updater.warning(dedent(f"""
+                    \ty[b[*] Repository url for y[{module}] has changed
+                    \ty[b[*]   from y[{old_repo}]
+                    \ty[b[*]   to   b[{repo}]
+                    \ty[b[*] The url for git remote named b[{remote}] has been updated.
+                    """))
             exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])
             if not exitcode == 0:
                 raise KBRuntimeError(f"\tUnable to update the URL for git remote {remote} of {module} ({repo})")
@@ -316,26 +324,10 @@ class Updater:
 
         See also the "repository" module option.
         """
-        module = self.module
-        cur_repo = module.get_option("#resolved-repository")
-        if not self.ipc:
-            raise ProgramError("\tMissing IPC object")
-        ipc = self.ipc
-
         chosen_remote = self._determine_remote_name()
 
         self._setup_remote(chosen_remote)
 
-        # Make a notice if the repository we're using has moved.
-        old_repo = module.get_persistent_option("git-cloned-repository")
-        if old_repo and (cur_repo != old_repo):
-            logger_updater.warning(f"\ty[b[*]\ty[{module}]'s selected repository has changed")
-            logger_updater.warning(f"\ty[b[*]\tfrom y[{old_repo}]")
-            logger_updater.warning(f"\ty[b[*]\tto   b[{cur_repo}]")
-            logger_updater.warning("\ty[b[*]\tThe git remote named b[" + Updater.DEFAULT_GIT_REMOTE + "] has been updated")
-
-            # Update what we think is the current repository on-disk.
-            ipc.notify_persistent_option_change(module.name, "git-cloned-repository", cur_repo)
         return chosen_remote
 
     def _warn_if_stashed_from_wrong_branch(self, remote_name: str, branch: str, branch_name: str) -> bool:

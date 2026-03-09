@@ -56,7 +56,7 @@ class IPC:
     """Tagged message should be put to TTY for module. (for passing messages via ipc, see Debug.print_clr())."""
 
     MODULE_PERSIST_OPT = 10
-    """Change to a persistent module option (when cloning and updating remote address, for setting "git-cloned-repository" persistent option)."""
+    """Change to a persistent module option."""
 
     ALL_DONE = 11
     """Affirmatively flags that all updates are done (sent when update list ended or was empty)."""
