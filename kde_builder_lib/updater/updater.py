@@ -322,9 +322,7 @@ class Updater:
             raise ProgramError("\tMissing IPC object")
         ipc = self.ipc
 
-        # Search for an existing remote name first. If none, add our alias.
-        remote_names = self.best_remote_name()
-        chosen_remote = remote_names[0] if remote_names else Updater.DEFAULT_GIT_REMOTE
+        chosen_remote = self._determine_remote_name()
 
         self._setup_remote(chosen_remote)
 
@@ -786,77 +784,50 @@ class Updater:
                 return this_branch
         return ""
 
-    def _is_plausible_existing_remote(self, name: str, url: str, configured_url: str) -> bool:
+    def _determine_remote_name(self) -> str:
         """
-        Filter for best_remote_name to determine if a given remote name and url looks like a plausible prior existing remote for a given configured repository URL.
-
-        Note that the actual repository fetch URL is not necessarily the same as the
-        configured (expected) fetch URL: an upstream might have moved, or kde-builder
-        configuration might have been updated to the same effect.
-
-        Args:
-            name: name of the remote found
-            url: the configured (fetch) URL
-            configured_url: the configured URL for the module (the expected fetch URL).
-
-        Returns:
-             Whether the remote will be considered for best_remote_name
-        """
-        # name - not used
-        module = self.module
-        if module.is_kde_project():
-            ret = url == configured_url or url.startswith("kde:")
-        else:
-            ret = url == configured_url
-        return ret
-
-    def best_remote_name(self) -> list[str]:
-        """
-        Return a list of all remote aliased matching the supplied repository (besides the internal alias that is).
+        Determine the remote name that have the wanted repository URL.
 
         99% of the time the "origin" remote will be what we want anyway, and
         0.5% of the rest the user will have manually added a remote, which we
         should try to utilize when doing checkouts for instance. To aid in this, this function is run.
 
+        We will get the "repository" value from user config (to be precise, the resolved value "#resolved-repository").
+        Then we will get list of existing remotes, and check which remote has the url that is equal to "#resolved-repository".
+        If we found one, that will be the remote name to use.
+        If we do not found appropriate remote, we will fall back to "origin".
+
         Assumes that we are already in the proper source directory.
 
         Returns:
-             A list of matching remote names (list in case the user hates us
-            and has aliased more than one remote to the same repo). Obviously the list
-            will be empty if no remote names were found.
+            A name of the remote to use.
         """
         module = self.module
-        configured_url = module.get_option("#resolved-repository")
-        outputs = []
+        resolved_repository = module.get_option("#resolved-repository")
 
         # The Repo URL isn't much good, let's find a remote name to use it with.
         # We'd have to escape the repo URL to pass it to Git, which I don't trust,
         # so we just look for all remotes and make sure the URL matches afterwards.
-        try:
-            outputs = self.slurp_git_config_output(r"git config --null --get-regexp remote\..*\.url .".split(" "))
-        except Exception as e:
-            print(e)
-            logger_updater.error("\tUnable to run git config, is there a setup error?")
-            return []
+        outputs = self.slurp_git_config_output(r"git config --null --get-regexp remote\..*\.url .".split(" "))
 
-        results = []
         for output in outputs:
             # git config output between key/val is divided by newline.
-            remote_name, url = output.split("\n")
+            remote_name, remote_url = output.split("\n")
 
             remote_name = remote_name.removeprefix("remote.").removesuffix(".url")  # remove the cruft
 
-            # Skip other remotes
-            if not self._is_plausible_existing_remote(remote_name, url, configured_url):
-                continue
+            if remote_url == resolved_repository:
+                is_plausible_url = True
+            elif module.is_kde_project():
+                is_plausible_url = remote_url.startswith("kde:")
+            else:
+                is_plausible_url = False
 
-            # Try to avoid "weird" remote names.
-            if not re.match(r"^[\w-]*$", remote_name):
+            if is_plausible_url:
+                return remote_name
+            else:
                 continue
-
-            # A winner is this one.
-            results.append(remote_name)
-        return results
+        return Updater.DEFAULT_GIT_REMOTE
 
     def make_branchname(self, remote_name: str, branch: str) -> str:
         """
