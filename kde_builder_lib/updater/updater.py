@@ -254,7 +254,7 @@ class Updater:
             ret = False
         return ret
 
-    def _setup_remote(self, remote: str) -> int:
+    def _set_remote_url(self, remote: str) -> None:
         """
         Ensure the given remote is pre-configured for the module's git repository.
 
@@ -262,8 +262,6 @@ class Updater:
 
         Args:
             remote: name (alias) of the remote to configure
-
-        Returns 1 or raises exception on an error.
         """
         module = self.module
         repo = module.get_option("#resolved-repository")
@@ -281,54 +279,38 @@ class Updater:
                     \ty[b[*]   to   b[{repo}]
                     \ty[b[*] The url for git remote named b[{remote}] has been updated.
                     """))
-            exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "remote", "set-url", remote, repo])
+            exitcode = Util.run_logged(module, "git-remote-set-url", None, ["git", "remote", "set-url", remote, repo])
             if not exitcode == 0:
                 raise KBRuntimeError(f"\tUnable to update the URL for git remote {remote} of {module} ({repo})")
         else:
             logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
-            exitcode = Util.run_logged(module, "git-add-remote", None, ["git", "remote", "add", remote, repo])
+            exitcode = Util.run_logged(module, "git-remote-add", None, ["git", "remote", "add", remote, repo])
             if not exitcode == 0:
                 raise KBRuntimeError(f"\tUnable to add new git remote {remote} of {module} ({repo})")
 
         # If we make it here, no exceptions were thrown
         if not self.is_push_url_managed():
-            return 1
+            return
 
         # pushInsteadOf does not work nicely with git remote set-url --push
         # The result would be that the pushInsteadOf kde: prefix gets ignored.
         #
         # The next best thing is to remove any preconfigured pushurl and
-        # restore the kde: prefix mapping that way.  This is effectively the
+        # restore the kde: prefix mapping that way. This is effectively the
         # same as updating the push URL directly because of the remote set-url
         # executed previously by this function for the fetch URL.
 
         existing_push_url = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
 
         if not existing_push_url:
-            return 1
+            return
 
         logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existing_push_url}")
 
-        exitcode = Util.run_logged(module, "git-fix-remote", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
+        exitcode = Util.run_logged(module, "git-remote-unset-pushurl", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
         if not exitcode == 0:
             raise KBRuntimeError(f"\tUnable to remove preconfigured push URL for {module}!")
-        return 1  # overall success
-
-    def _setup_best_remote(self) -> str:
-        """
-        Select a git remote for the user's selected repository (preferring a defined remote if available, using "origin" otherwise).
-
-        Assumes the current directory is already set to the source directory.
-
-        Returns the name of the remote (which will be setup by kde-builder) to use for updates, or raises exception on an error.
-
-        See also the "repository" module option.
-        """
-        chosen_remote = self._determine_remote_name()
-
-        self._setup_remote(chosen_remote)
-
-        return chosen_remote
+        return
 
     def _warn_if_stashed_from_wrong_branch(self, remote_name: str, branch: str, branch_name: str) -> bool:
         """
@@ -486,7 +468,8 @@ class Updater:
         if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
             raise KBRuntimeError(f"\tAborting git update for {module}, you appear to have a rebase or merge in progress!")
 
-        remote_name = self._setup_best_remote()
+        remote_name = self._determine_remote_name()
+        self._set_remote_url(remote_name)
         logger_updater.info(f"\tFetching remote changes to g[{module}]")
         exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "-f", "--tags", remote_name])
 
