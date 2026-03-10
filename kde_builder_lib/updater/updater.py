@@ -382,23 +382,18 @@ class Updater:
 
         croak_reason = None
         result = None
-        cmd = UtilLoggedSubprocess().module(module).chdir_to(module.fullpath("source"))
+        chdir_to = module.fullpath("source")
 
         if not branch_name:
             new_name = self.make_branchname(remote_name, branch)
 
-            cmd.log_to("git-checkout-branch") \
-                .set_command(["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"])
+            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"])
 
             croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{branch} to a local branch of {new_name}"
-            result = cmd.start()
         else:
-            cmd.log_to("git-checkout-update") \
-                .set_command(["git", "checkout", branch_name])
+            result = Util.run_logged(module, "git-checkout-update", chdir_to, ["git", "checkout", branch_name])
 
             croak_reason = f"\tUnable to perform a git checkout to existing branch {branch_name}"
-
-            result = cmd.start()
 
             if not result == 0:
                 pass
