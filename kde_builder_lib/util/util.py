@@ -258,13 +258,7 @@ class Util:
         return return_str
 
     @staticmethod
-    def _run_logged_internal(module: Module, filename: str, args: list[str], callback_func: Callable | None) -> int:
-        logger_logged_cmd.info(f"_run_logged_internal(): Project {module}, Command: " + " ".join(args))
-
-        if re.match(r"\.log$", filename) or re.match(r"/", filename):
-            raise ProgramError(f"Pass only base filename for {module}/{filename}")
-        logpath = module.get_log_path(f"{filename}.log")
-
+    def _run_logged_internal(module: Module, logpath: str, args: list[str], callback_func: Callable | None) -> int:
         # Fork a child, with its stdout connected to CHILD.
         pipe_read, pipe_write = os.pipe()
         pid = os.fork()
@@ -390,11 +384,6 @@ class Util:
         """
         Run the command, and log it.
 
-        ::
-
-            builddir = module.fullpath("build")  # need to pass dir to use
-            result = run_logged(module, "build", builddir, ["make", "-j8"])
-
         Args:
             module: The Module object for which the command in args does something
             filename: A filename to use for log.
@@ -407,30 +396,41 @@ class Util:
             Exit status of the command. This is a shell return code, so 0 is success,
             and non-zero is failure.
         """
-        if not directory:
-            directory = ""
         if Debug().pretending():
             args_str = "', '".join(args)
             logger_logged_cmd.debug(f"\tWould have run] (g['{args_str}'])")
             return 0
 
-        # Do this before we fork so the path is finalized to prevent auto-detection
-        # in the child
-        # Todo Check if this is still needed.
-        module.get_log_path(f"{filename}.log")
+        if filename.endswith(".log") or "/" in filename:
+            raise ProgramError(f"Incorrect basename passed: {filename}")
+        filename = filename + ".log"
+
+        logpath = module.get_log_path(filename)
+
+        logger_logged_cmd.info(f"run_logged(): Project {module}, Command: " + " ".join(args))
+
+        if not directory:
+            directory = ""
 
         orig_wd = os.getcwd()
+
+        if directory == orig_wd:
+            # This will simplify debug log, by skipping messages of cd-ing to where we already are.
+            directory = ""
+
         if directory:
+            logger_logged_cmd.debug("\tGoing to the specified working directory before running _run_logged_internal().")
             Util.p_chdir(directory)
 
-        exitcode = Util._run_logged_internal(module, filename, args, callback_func)
+        exitcode = Util._run_logged_internal(module, logpath, args, callback_func)
 
-        logger_logged_cmd.debug("Return to the original working directory after running run_logged().")
-        Util.p_chdir(orig_wd)
+        if directory:
+            logger_logged_cmd.debug("\tReturning to the original working directory after running _run_logged_internal().")
+            Util.p_chdir(orig_wd)
 
-        logger_logged_cmd.info(f"""run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename + ".log")}\n""")
+        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename)}\n")
         if not exitcode == 0:
-            module.set_error_logfile(f"{filename}.log")
+            module.set_error_logfile(filename)
         return exitcode
 
     @staticmethod
