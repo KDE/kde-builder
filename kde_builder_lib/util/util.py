@@ -202,12 +202,9 @@ class Util:
         exit_code = p.returncode
         child_output = p.stdout.decode()
 
-        if "\0" in child_output:
-            child_outputs = [item + "\0" for item in child_output.split("\0") if item]  # pl2py: for our git command terminated with --null
-        else:
-            child_outputs = child_output.split("\n")
-            child_outputs = child_outputs[:-1] if child_outputs[-1] == "" else child_outputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
-            child_outputs = list(map(lambda x: x + "\n", child_outputs))
+        child_outputs = child_output.split("\n")
+        child_outputs = child_outputs[:-1] if child_outputs[-1] == "" else child_outputs  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it. # pl2py split
+        child_outputs = list(map(lambda x: x + "\n", child_outputs))
 
         lines = child_outputs
 

@@ -745,14 +745,11 @@ class Updater:
         module = self.module
         resolved_repository = module.get_option("#resolved-repository")
 
-        # The Repo URL isn't much good, let's find a remote name to use it with.
-        # We'd have to escape the repo URL to pass it to Git, which I don't trust,
-        # so we just look for all remotes and make sure the URL matches afterwards.
-        outputs = self.slurp_git_config_output(r"git config --null --get-regexp remote\..*\.url .".split(" "))
+        lines = Util.get_program_output("git", "config", "--get-regexp", r"remote\..*\.url", ".")
 
-        for output in outputs:
-            # git config output between key/val is divided by newline.
-            remote_name, remote_url = output.split("\n")
+        for line in lines:
+            line = line.removesuffix("\n")
+            remote_name, remote_url = line.split(" ")
 
             remote_name = remote_name.removeprefix("remote.").removesuffix(".url")  # remove the cruft
 
@@ -806,17 +803,6 @@ class Updater:
                 return possible_branch
 
         raise KBRuntimeError(f"\tUnable to find good branch name for {module} branch name {branch}")
-
-    @staticmethod
-    def slurp_git_config_output(args: list[str]) -> list[str]:
-        """
-        Split the output of "git config --null" correctly.
-        """
-        # This gets rid of the trailing nulls for single-line output. (chomp uses
-        # $/ instead of hardcoding newline
-        output = Util.get_program_output(*args)
-        output = [o.removesuffix("\0") for o in output]
-        return output
 
     @staticmethod
     def has_remote(remote: str) -> bool:
