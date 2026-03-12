@@ -375,7 +375,7 @@ class Updater:
         # "branch" option requests a given remote head in the user's selected
         # repository. The local branch with "branch" as upstream might have a
         # different name. If there's no local branch this method creates one.
-        branch_name = self.get_remote_branch_name(remote_name, branch)
+        branch_name = self._detect_existing_local_branch_tracking_remote_branch(remote_name, branch)
 
         if self._warn_if_stashed_from_wrong_branch(remote_name, branch, branch_name):
             return 0
@@ -714,44 +714,29 @@ class Updater:
 
         return result
 
-    def get_remote_branch_name(self, remote_name: str, branch_name: str) -> str:
+    @staticmethod
+    def _detect_existing_local_branch_tracking_remote_branch(remote_name: str, remote_branch: str) -> str:
         """
-        Find an existing remote-tracking branch name for the given repository's named remote.
+        Determine if there is existing local branch that tracks specified remote branch of the specified remote.
 
-        For instance if the user was using the
-        local remote-tracking branch called "qt-stable" to track kde-qt's master
-        branch, this function would return the branchname "qt-stable" when
-        passed kde-qt and "master".
-
-        The current directory must be the source directory of the git module.
+        Note that local branch name may be different from the name of remote branch.
+        For example, the user has local branch called "my-master", and that branch is tracking remote branch "master".
+        In this case, invoking this function with remote_branch "master" would return "my-master".
 
         Args:
             remote_name: The git remote to use (normally origin).
-            branch_name: The remote head name to find a local branch for.
+            remote_branch: The remote head name to find a local branch for.
 
         Returns:
-            Empty string if no match is found, or the name of the local
-            remote-tracking branch if one exists.
+            Empty string if no match is found, or the name of the local remote-tracking branch if one exists.
         """
-        # We'll parse git config output to search for branches that have a
-        # remote of $remote_name and a "merge" of refs/heads/$branch_name.
-
-        # TODO: Replace with git for-each-ref refs/heads and the %(upstream)
-        # format.
-        branches = self.slurp_git_config_output(["git", "config", "--null", "--get-regexp", r"branch\..*\.remote", remote_name])
-
-        for git_branch in branches:
-            # The key/value is \n separated, we just want the key.
-            key_name = git_branch.split("\n")[0]
-            this_branch = re.match(r"^branch\.(.*)\.remote$", key_name).group(1)
-
-            # We have the local branch name, see if it points to the remote
-            # branch we want.
-            config_output = self.slurp_git_config_output(["git", "config", "--null", f"branch.{this_branch}.merge"])
-
-            if config_output and config_output[0] == f"refs/heads/{branch_name}":
-                # We have a winner
-                return this_branch
+        lines = Util.get_program_output("git", "for-each-ref", "refs/heads", "--format", "%(refname) %(upstream)")
+        for line in lines:
+            line = line.removesuffix("\n")
+            refname, upstream = line.split(" ")
+            if upstream == f"refs/remotes/{remote_name}/{remote_branch}":
+                local_branch = refname.removeprefix("refs/heads/")
+                return local_branch
         return ""
 
     def _determine_remote_name(self) -> str:
