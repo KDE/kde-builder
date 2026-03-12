@@ -350,21 +350,17 @@ class Updater:
             return True
         return False
 
-    def _update_to_remote_head(self, remote_name: str, branch: str) -> int:
+    def _update_to_remote_head(self, remote_name: str, remote_branch: str) -> int:
         """
         Completes the steps needed to update a git checkout to be checked-out to a given remote-tracking branch.
 
-        Any existing local branch with the given
-        branch set as upstream will be used if one exists, otherwise one will be
-        created. The given branch will be rebased into the local branch.
-
-        No checkout is done, this should be performed first.
-        Assumes we're already in the needed source dir.
-        Assumes we're in a clean working directory (use git-stash to achieve if necessary).
+        Any existing local branch with the given remote branch set as upstream will be used if one exists,
+        otherwise a new local branch will be created.
+        The given remote branch will be rebased into the local branch.
 
         Args:
             remote_name: The remote to use.
-            branch: The branch to update to.
+            remote_branch: The branch to update to.
 
         Returns:
              boolean success flag.
@@ -372,37 +368,26 @@ class Updater:
         """
         module = self.module
 
-        # "branch" option requests a given remote head in the user's selected
-        # repository. The local branch with "branch" as upstream might have a
-        # different name. If there's no local branch this method creates one.
-        branch_name = self._detect_existing_local_branch_tracking_remote_branch(remote_name, branch)
+        local_branch = self._detect_existing_local_branch_tracking_remote_branch(remote_name, remote_branch)
 
-        if self._warn_if_stashed_from_wrong_branch(remote_name, branch, branch_name):
+        if self._warn_if_stashed_from_wrong_branch(remote_name, remote_branch, local_branch):
             return 0
 
-        croak_reason = None
-        result = None
         chdir_to = module.fullpath("source")
 
-        if not branch_name:
-            new_name = self.make_branchname(remote_name, branch)
-
-            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_name, f"{remote_name}/{branch}"])
-
-            croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{branch} to a local branch of {new_name}"
+        if not local_branch:
+            new_name = self.make_branchname(remote_name, remote_branch)
+            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_name, f"{remote_name}/{remote_branch}"])
+            croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{remote_branch}"
         else:
-            result = Util.run_logged(module, "git-checkout-update", chdir_to, ["git", "checkout", branch_name])
+            result = Util.run_logged(module, "git-checkout-update", chdir_to, ["git", "checkout", local_branch])
+            croak_reason = f"\tUnable to perform a git checkout to existing branch {local_branch}"
 
-            croak_reason = f"\tUnable to perform a git checkout to existing branch {branch_name}"
-
-            if not result == 0:
-                pass
-            else:
-                croak_reason = f"\t{module}: Unable to reset to remote development branch {branch}"
-
-                # Given that we're starting with a "clean" checkout, it's now simply a fast-forward
-                # to the remote HEAD (previously we pulled, incurring additional network I/O).
-                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remote_name}/{branch}"])
+            if result == 0:
+                # Given that we're starting with a "clean" checkout, it's now simply a fast-forward to the remote HEAD
+                # (previously we pulled, incurring additional network I/O).
+                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remote_name}/{remote_branch}"])
+                croak_reason = f"\t{module}: Unable to reset to remote development branch {remote_branch}"
 
         if not result == 0:
             raise KBRuntimeError(croak_reason)
