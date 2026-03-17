@@ -501,7 +501,7 @@ class Application:
                 # This must be not in pretending mode, because we use "kde:" alias in the repository option of repo-metadata module, and so we really need to edit user's git config.
                 Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status.
 
-            if (update_desired and not Debug().pretending()) or update_needed:
+            if update_desired or update_needed:
                 orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
