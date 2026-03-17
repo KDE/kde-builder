@@ -20,11 +20,20 @@ logger_app = KBLogger.getLogger("application")
 
 class StartProgram:
     """
-    Run the installed binary of some module.
+    Run the installed binary of some project.
     """
 
-    @staticmethod
-    def execute_built_binary(ctx: BuildContext, args: list[str]) -> NoReturn:
+    def __init__(self, ctx: BuildContext) -> None:
+        self.ctx = ctx
+        self.pers_opts = self.ctx.persistent_options
+
+        self.bin_to_proj_map: dict[str, list[str]] = {}
+        for proj_name, proj_data in self.pers_opts.items():
+            binaries = proj_data.get("installed-binaries", [])
+            for binary in binaries:
+                self.bin_to_proj_map[binary] = proj_name
+
+    def execute_built_binary(self, args: list[str]) -> NoReturn:
         """
         Execute the binary from install-dir/bin, and sources the environment file before that.
         """
@@ -48,45 +57,23 @@ class StartProgram:
             logger_app.error("Executable name is missing")
             exit(1)
 
-        pers_opts = ctx.persistent_options
-        extra_run_env = ctx.get_option("source-when-start-program")
+        extra_run_env = self.ctx.get_option("source-when-start-program")
 
-        install_dir = ctx.get_option("install-dir")
+        install_dir = self.ctx.get_option("install-dir")
         bin_dir = f"{install_dir}/bin/"
         exec_path = f"{install_dir}/bin/{executable}"
-        prefix_sh_path = f"{install_dir}/prefix.sh"
 
         if not os.path.exists(exec_path):
             logger_app.error(f" r[*] Program r[{executable}] does not exist in {bin_dir} directory.")
-            if executable in pers_opts:  # Hint possible variants in case we got executable named as some already built module
-                install_manifest = ctx.get_option("build-dir") + f"/{executable}/install_manifest.txt"
-                bins_of_module = []
-                if os.path.exists(install_manifest):
-                    with open(install_manifest, "r") as f:
-                        for line in f:
-                            if line.startswith(bin_dir):
-                                line = line.removeprefix(bin_dir).rstrip("\n")
-                                bins_of_module.append(line)
-                if bins_of_module:
+            if executable in self.pers_opts:  # Hint possible variants in case we got a name of some already built project
+                bins_of_project = self.pers_opts[executable].get("installed-binaries", [])
+                if bins_of_project:
                     logger_app.error("   You probably mean one from this list:")
-                    for binary in bins_of_module:
+                    for binary in bins_of_project:
                         logger_app.error("\ty[" + binary)
             exit(127)  # Command not found
 
-        if not os.path.exists(prefix_sh_path):
-            # Try to use prefix.sh from build dir if we can guess module (the case when executable is identical to module name, which is not always)
-            msg = (f" r[*] Not found y[{install_dir}/prefix.sh] file. Please copy prefix.sh manually from build directory of any kde project or "
-                   "add the \"-DKDE_INSTALL_PREFIX_SCRIPT=ON\" to cmake-options of any kde project and (re)build it.")
-            if executable in pers_opts:
-                prefix_sh_path = pers_opts[executable].get("build-dir", "/dev/null") + "/prefix.sh"
-                if os.path.exists(prefix_sh_path):
-                    logger_app.debug("Using prefix.sh from build directory")
-                else:
-                    logger_app.warning(msg)
-                    exit(1)
-            else:
-                logger_app.warning(msg)
-                exit(1)
+        prefix_sh_path = self._determine_prefix_sh_path(executable)
 
         script = dedent(f"""
         #!/bin/sh
@@ -124,3 +111,33 @@ class StartProgram:
         except Exception as e:
             logger_app.error(f"Error executing {executable}: {e}")
             exit(1)
+
+    def _determine_prefix_sh_path(self, executable) -> str:
+        build_dir = ""
+
+        # Try to use prefix.sh from build dir if we can determine project name,
+        # and persistent option lists the executable.
+        if executable in self.bin_to_proj_map:
+            proj_name = self.bin_to_proj_map[executable]
+            build_dir = self.pers_opts[proj_name].get("build-dir", "")
+
+            if build_dir:
+                build_dir_prefix_sh_path = build_dir + "/prefix.sh"
+                if os.path.exists(build_dir_prefix_sh_path):
+                    logger_app.debug("Using prefix.sh from build directory")
+                    return build_dir_prefix_sh_path
+
+        # Try to fall back to common prefix.sh
+        install_dir = self.ctx.get_option("install-dir")
+        common_prefix_sh_path = f"{install_dir}/prefix.sh"
+        if os.path.exists(common_prefix_sh_path):
+            logger_app.debug("Using prefix.sh from install directory")
+            return common_prefix_sh_path
+
+        logger_app.error(dedent(f"""
+             r[*] Not found y[prefix.sh] file neither in build-dir, nor in install-dir.
+                 build-dir: {build_dir or "<undefined>"}
+                 install-dir: {install_dir}
+             r[*] Please copy prefix.sh manually from build directory of any kde project or add the \"-DKDE_INSTALL_PREFIX_SCRIPT=ON\" to cmake-options of any kde project and (re)build it.
+            """, preserve_len=1))
+        exit(1)

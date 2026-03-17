@@ -375,6 +375,7 @@ class Module(OptionsBase):
         # Past this point we know we've successfully installed, for real.
 
         self.set_persistent_option("last-install-rev", self.current_scm_revision())
+        self._remember_project_binaries()
 
         remove_setting = self.get_option("remove-after-install")
 
@@ -428,6 +429,30 @@ class Module(OptionsBase):
 
         self.unset_persistent_option("last-install-rev")
         return True
+
+    def _remember_project_binaries(self):
+        """
+        Set persistent option that lists project binaries.
+
+        This could be later used when starting some program (with --run option).
+        """
+        if self.build_system.name() != "KDE CMake":
+            return
+
+        install_dir = self.get_option("install-dir")
+        bin_dir = f"{install_dir}/bin/"
+        build_dir = self.fullpath("build")
+        install_manifest = build_dir + "/install_manifest.txt"
+
+        bins_of_project = []
+        if os.path.exists(install_manifest):
+            with open(install_manifest, "r") as f:
+                for line in f:
+                    if line.startswith(bin_dir):
+                        line = line.removeprefix(bin_dir).rstrip("\n")
+                        bins_of_project.append(line)
+
+        self.set_persistent_option("installed-binaries", bins_of_project)
 
     def setup_environment(self) -> None:
         """

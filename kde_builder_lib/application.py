@@ -287,7 +287,8 @@ class Application:
         # After we read install-dir from config, we can check if we need to start program.
         start_program_and_args: list[str] = opts["start-program"]
         if start_program_and_args:
-            StartProgram.execute_built_binary(ctx, start_program_and_args)  # noreturn
+            sp = StartProgram(ctx)
+            sp.execute_built_binary(start_program_and_args)  # noreturn
 
         if not Debug().is_testing():
             # Running in a test harness, avoid downloading metadata which will be
