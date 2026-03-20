@@ -259,6 +259,7 @@ class Cmdline:
             opts["run_mode"] = "query"
             found_options["query"] = arg
             found_options["pretend"] = True  # Implied pretend mode
+            found_options["no-metadata"] = True  # Implied --no-metadata
         if args.pretend:
             found_options["pretend"] = True
         if args.resume or args.resume_refresh_build_first:
