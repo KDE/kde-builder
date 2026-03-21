@@ -376,8 +376,12 @@ class Updater:
         chdir_to = module.fullpath("source")
 
         if not local_branch:
-            new_name = self.make_branchname(remote_name, remote_branch)
-            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_name, f"{remote_name}/{remote_branch}"])
+            new_local_branch = remote_branch
+            status = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{new_local_branch}"])
+            if status != 1:
+                raise KBRuntimeError(f"\tLocal branch y[{new_local_branch}] already exists, but it is not tracking remote branch!")
+
+            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_local_branch, f"{remote_name}/{remote_branch}"])
             croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{remote_branch}"
         else:
             result = Util.run_logged(module, "git-checkout-update", chdir_to, ["git", "checkout", local_branch])
@@ -765,44 +769,6 @@ class Updater:
             else:
                 continue
         return Updater.DEFAULT_GIT_REMOTE
-
-    def make_branchname(self, remote_name: str, branch: str) -> str:
-        """
-        Generate a potential new branch name for the case where we have to set up a new remote-tracking branch for a repository/branch.
-
-        There are several criteria that go into this:
-        - The local branch name will be equal to the remote branch name to match usual
-          Git convention.
-        - The name chosen must not already exist. This method tests for that.
-        - The repo name chosen should be (ideally) a remote name that the user has
-          added. If not, we'll try to autogenerate a repo name (but not add a
-          remote!) based on the repository.git part of the URI.
-
-        As with nearly all git support functions, we should be running in the
-        source directory of the git module. Don't call this function unless
-        you've already checked that a suitable remote-tracking branch doesn't
-        exist.
-
-        Args:
-            remote_name: The name of a git remote to use.
-            branch: The name of the remote head we need to make a branch name of.
-
-        Returns:
-             A useful branch name that doesn't already exist, or "" if no
-            name can be generated.
-        """
-        if not remote_name:
-            remote_name = "origin"
-        module = self.module
-
-        # Use "branch" directly if not already used, otherwise try to prefix with the remote name.
-        for possible_branch in [branch, f"{remote_name}-{branch}", f"ksdc-{remote_name}-{branch}"]:
-            result = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{possible_branch}"])
-
-            if result == 1:
-                return possible_branch
-
-        raise KBRuntimeError(f"\tUnable to find good branch name for {module} branch name {branch}")
 
     @staticmethod
     def has_remote(remote: str) -> bool:
