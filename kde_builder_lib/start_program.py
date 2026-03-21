@@ -60,11 +60,21 @@ class StartProgram:
         extra_run_env = self.ctx.get_option("source-when-start-program")
 
         install_dir = self.ctx.get_option("install-dir")
-        bin_dir = f"{install_dir}/bin/"
-        exec_path = f"{install_dir}/bin/{executable}"
+        bin_dir = f"{install_dir}/bin"
+        libname = self.ctx.get_option("libname")
+        libexec_dir = f"{install_dir}/{libname}/libexec"
+        exec_path_bin = f"{bin_dir}/{executable}"
+        exec_path_libexec = f"{libexec_dir}/{executable}"
 
-        if not os.path.exists(exec_path):
-            logger_app.error(f" r[*] Program r[{executable}] does not exist in {bin_dir} directory.")
+        if os.path.exists(exec_path_bin):
+            exec_path = exec_path_bin
+        elif os.path.exists(exec_path_libexec):
+            exec_path = exec_path_libexec
+        else:
+            exec_path = ""
+
+        if not exec_path:
+            logger_app.error(f" r[*] Program r[{executable}] does not exist in {bin_dir} or {libexec_dir} directory.")
             if executable in self.pers_opts:  # Hint possible variants in case we got a name of some already built project
                 bins_of_project = self.pers_opts[executable].get("installed-binaries", [])
                 if bins_of_project:

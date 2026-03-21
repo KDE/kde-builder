@@ -441,6 +441,8 @@ class Module(OptionsBase):
 
         install_dir = self.get_option("install-dir")
         bin_dir = f"{install_dir}/bin/"
+        libname = self.get_option("libname")
+        libexec_dir = f"{install_dir}/{libname}/libexec/"
         build_dir = self.fullpath("build")
         install_manifest = build_dir + "/install_manifest.txt"
 
@@ -450,6 +452,9 @@ class Module(OptionsBase):
                 for line in f:
                     if line.startswith(bin_dir):
                         line = line.removeprefix(bin_dir).rstrip("\n")
+                        bins_of_project.append(line)
+                    elif line.startswith(libexec_dir):
+                        line = line.removeprefix(libexec_dir).rstrip("\n")
                         bins_of_project.append(line)
 
         self.set_persistent_option("installed-binaries", bins_of_project)
