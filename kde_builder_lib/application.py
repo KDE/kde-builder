@@ -43,6 +43,7 @@ from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
 from .util.textwrap_mod import dedent
+from .util.data_path import data_file_path
 from .version import Version
 
 logger_app = KBLogger.getLogger("application")
@@ -538,8 +539,7 @@ class Application:
         if Debug().is_testing():
             return
 
-        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        with open(real_bin_dir + "/data/supported-formats.yaml", "r") as f:
+        with open(data_file_path("supported-formats.yaml"), "r") as f:
             supported_formats = yaml.safe_load(f)
         current_installation_format = supported_formats["kde-builder-format"]
 
@@ -1329,8 +1329,6 @@ class Application:
         then the installation script is invoked. Otherwise, invocation is skipped, so user is not asked to enter sudo
         password.
         """
-        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-
         ctx = self.context
         pws_builddir = ctx.get_option("build-dir") + "/plasma-workspace"
         install_sessions_script = pws_builddir + "/login-sessions/install-sessions.sh"
@@ -1374,7 +1372,7 @@ class Application:
                         libexecdir + "/plasma-dev-prefix.sh")
             check_match(startplasma_dev_script,
                         libexecdir + "/startplasma-dev.sh")
-            check_match(real_bin_dir + "/data/00-plasma.conf.in",
+            check_match(data_file_path("00-plasma.conf.in"),
                         "/etc/dbus-1/session.d/00-plasma.conf")
 
             dbus1_files_dir = ctx.get_option("install-dir") + "/share/dbus-1"

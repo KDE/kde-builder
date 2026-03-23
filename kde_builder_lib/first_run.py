@@ -16,6 +16,7 @@ from .kb_exception import KBException
 from .kb_exception import SetupError
 from .debug import KBLogger
 from .os_support import OSSupport
+from .util.data_path import data_file_path
 
 logger_fr = KBLogger.getLogger("first-run")
 
@@ -33,11 +34,9 @@ class FirstRun:
 
     def __init__(self, prefilled_prompt_answer: str | None = None):
         self.oss = OSSupport()
-        self.base_dir = None
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
-    def setup_user_system(self, base_dir, setup_steps: list[str]) -> NoReturn:
-        self.base_dir = base_dir
+    def setup_user_system(self, setup_steps: list[str]) -> NoReturn:
 
         try:
             if "install-distro-packages" in setup_steps:
@@ -224,7 +223,7 @@ class FirstRun:
 
         logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdg_config_home_short}/kde-builder.yaml\"]...")
 
-        with open(os.path.dirname(os.path.realpath(__file__)) + "/../data/kde-builder.yaml.in", "r") as data_file:
+        with open(data_file_path("kde-builder.yaml.in"), "r") as data_file:
             sample_rc = data_file.read()
 
         sample_rc = sample_rc.replace("%{num_cores}", "\"" + "auto" + "\"")

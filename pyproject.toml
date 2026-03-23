@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kde-builder"
+version = "0.1.0"
+description = "A tool to help build KDE software from source"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "GPL-2.0-or-later"
+authors = [
+    { name = "Michael Pyne", email = "mpyne@kde.org" },
+    { name = "Andrew Shark", email = "ashark@linuxcomp.ru" },
+]
+dependencies = [
+    "pyyaml",
+    "setproctitle",
+]
+
+[project.optional-dependencies]
+dev = [
+    "dbus-python",
+    "overrides",
+    "pytest",
+    "pytest-cov",
+    "exceptiongroup; python_version < '3.11'",
+    "ruff",
+]
+
+[project.scripts]
+kde-builder = "kde_builder_lib.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["kde_builder_lib"]
+#artifacts = ["kde_builder_lib/data/*"]
+
+[tool.hatch.build.targets.wheel.force-include] # Python packages except data to be part of source package
+"kde-builder" = "kde_builder_lib/cli.py"
+"data/" = "kde_builder_lib/data"

@@ -6,12 +6,13 @@
 from __future__ import annotations
 
 import os
-import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from .debug import Debug
 from .debug import KBLogger
 from .util.textwrap_mod import dedent
+from .util.data_path import data_file_path
 
 if TYPE_CHECKING:
     from module.module import Module
@@ -58,14 +59,11 @@ class IdeProjectConfigGenerator:
 
         os.mkdir(config_dir)
 
-        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        data_dir = f"{base_dir}/data/vscode"
-
         # c_cpp_properties.json configures C++, CMake & IntelliSense.
-        c_cpp_properties_json = self._read_file(f"{data_dir}/c_cpp_properties.json.in")
+        c_cpp_properties_json = self._read_file(data_file_path("vscode/c_cpp_properties.json.in"))
 
         # settings.json configures the paths for CMake, QML, Qt, etc.
-        settings_json = self._read_file(f"{data_dir}/settings.json.in")
+        settings_json = self._read_file(data_file_path("vscode/settings.json.in"))
 
         settings_json = settings_json.replace("%{build_dir}", build_dir)
 
@@ -96,10 +94,10 @@ class IdeProjectConfigGenerator:
         settings_json = settings_json.replace("%{install_dir}", install_dir)
 
         # extensions.json recommends extensions to install/enable.
-        extensions_json = self._read_file(f"{data_dir}/extensions.json.in")
+        extensions_json = self._read_file(data_file_path("vscode/extensions.json.in"))
 
         # launch.json configures the run with debugger functionality.
-        launch_json = self._read_file(f"{data_dir}/launch.json.in")
+        launch_json = self._read_file(data_file_path("vscode/launch.json.in"))
         program = install_dir + "/bin/" + module.name
         launch_json = launch_json.replace("%{program}", program)
         launch_json = launch_json.replace("%{install_dir}", install_dir)
@@ -129,7 +127,7 @@ class IdeProjectConfigGenerator:
         launch_json = launch_json.replace("%{envFile}", extra_run_env)
 
         # tasks.json contains tasks to be easily / automatically run.
-        tasks_json = self._read_file(f"{data_dir}/tasks.json.in")
+        tasks_json = self._read_file(data_file_path("tasks.json.in"))
 
         self._write_to_file(f"{config_dir}/c_cpp_properties.json", c_cpp_properties_json)
         self._write_to_file(f"{config_dir}/settings.json", settings_json)
@@ -172,10 +170,7 @@ class IdeProjectConfigGenerator:
         build_opts = self.build_opts
         build_opts = " ".join(build_opts)
 
-        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        data_dir = f"{base_dir}/data/clion"
-
-        cmake_xml = self._read_file(f"{data_dir}/cmake.xml.in")
+        cmake_xml = self._read_file(data_file_path("clion/cmake.xml.in"))
         cmake_xml = cmake_xml.replace("%{GENERATION_DIR}", build_dir)
         cmake_xml = cmake_xml.replace("%{GENERATION_OPTIONS}", cmake_opts)
         cmake_xml = cmake_xml.replace("%{BUILD_OPTIONS}", build_opts)
@@ -187,7 +182,7 @@ class IdeProjectConfigGenerator:
 
         self._write_to_file(f"{config_dir}/cmake.xml", cmake_xml)
 
-        run_conf_xml = self._read_file(f"{data_dir}/KDE_Builder_run_debug_configuration.xml.in")
+        run_conf_xml = self._read_file(data_file_path("clion/KDE_Builder_run_debug_configuration.xml.in"))
         extra_run_env = module.get_option("source-when-start-program")
         run_conf_xml = run_conf_xml.replace("%{ENVFILE}", extra_run_env)
         install_dir = module.installation_path()
@@ -220,7 +215,7 @@ class IdeProjectConfigGenerator:
         run_conf_xml = run_conf_xml.replace("%{env_entries}", env_entries_str)
         self._write_to_file(f"{config_dir}/runConfigurations/KDE_Builder_run_debug_configuration.xml", run_conf_xml)
 
-        misc_xml = self._read_file(f"{data_dir}/misc.xml")
+        misc_xml = self._read_file(data_file_path("clion/misc.xml"))
         self._write_to_file(f"{config_dir}/misc.xml", misc_xml)
 
         return True
@@ -275,7 +270,7 @@ class IdeProjectConfigGenerator:
         return True
 
     @staticmethod
-    def _read_file(file_path: str) -> str:
+    def _read_file(file_path: str|Path) -> str:
         """
         Read the contents of a file.
 

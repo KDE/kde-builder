@@ -8,6 +8,7 @@
 import argparse
 import logging.config
 import os
+from pathlib import Path
 import sys
 import traceback
 
@@ -15,8 +16,7 @@ from kde_builder_lib.kb_exception import ProgramError
 from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
 from kde_builder_lib.util.textwrap_mod import dedent
-
-RealBinDir = os.path.dirname(os.path.realpath(__file__))
+from kde_builder_lib.util.data_path import data_file_path
 
 def ensure_runtime_pymodules_installed():
     """
@@ -48,11 +48,13 @@ def ensure_runtime_pymodules_installed():
         for missing_module in missing_modules:
             print("\t" + missing_module)
 
-        print(dedent(f"""
-            KDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org
-            Ensure you have successfully executed this script:
-            \t{RealBinDir}/scripts/initial_setup.sh
-            """))
+        initial_setup_path = Path(__file__).resolve().parent / "scripts" / "initial_setup.sh"
+        if initial_setup_path.exists(): # Check if initial_setup.sh exists, that will mean we are in source tree
+            print(dedent(f"""
+                KDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org
+                Ensure you have successfully executed this script:
+                \t{initial_setup_path}
+                """))
         sys.exit(1)
 
 def main():
@@ -79,7 +81,7 @@ def main():
     import yaml  # noqa: E402
 
     # <editor-fold desc="Applying loggers configuration">
-    with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
+    with open(data_file_path("kde-builder-logging.yaml"), "r") as f:
         config = yaml.safe_load(f.read())
 
     override_config = {}
@@ -169,9 +171,8 @@ def main():
         d.set_colorful_output(True)
         prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
         fr = FirstRun(prompt_answer)
-        exit(fr.setup_user_system(RealBinDir, setup_steps))
+        exit(fr.setup_user_system(setup_steps))
 
-    from kde_builder_lib.version import Version  # noqa: E402
     from kde_builder_lib.application import Application  # noqa: E402
     from kde_builder_lib.kb_exception import KBException  # noqa: E402
 
