@@ -14,6 +14,7 @@ from ..kb_exception import ProgramError
 from ..debug import KBLogger
 from ..ide_project_config_generator import IdeProjectConfigGenerator
 from ..util.logged_subprocess import UtilLoggedSubprocess
+from ..util.textwrap_mod import dedent
 from ..util.util import Util
 
 logger_buildsystem = KBLogger.getLogger("build-system")
@@ -269,32 +270,20 @@ class BuildSystemKDECMake(BuildSystem):
         # Note that we do not run safe_make, which should really be called
         # safe_compile at this point.
 
-        # Step 1: Ensure the tests are built, oh wait we already did that when we ran
-        # CMake :)
-
         logger_buildsystem.info("\tRunning test suite...")
-
-        # Step 2: Run the tests.
         build_command = self.default_build_command()
-        num_tests = "Some"  # overwritten by a specific number, hopefully
 
-        cmd = UtilLoggedSubprocess().module(module).log_to("test-results").set_command([build_command, "test"])
-
-        def on_child_output(line):
-            match = re.match(r"([0-9]+) tests failed out of", line)
-            if match:
-                nonlocal num_tests
-                num_tests = match.group(1)
-
-        cmd.child_output_handler = on_child_output  # pl2py: this is in testsuite
-
-        result = Util.good_exitcode(cmd.start())
+        exitcode = Util.run_logged(module, "test-results", None, [build_command, "test"])
+        result = Util.good_exitcode(exitcode)
 
         if not result:
             log_dir = module.get_log_dir()
-            logger_buildsystem.warning(f"\t{num_tests} tests failed for y[{module}], consult {log_dir}/test-results.log for info")
+            logger_buildsystem.warning(dedent(f"""
+                \t  r[Some tests failed.]
+                \t  Log file: y[{log_dir}/test-results.log]
+                """))
         else:
-            logger_buildsystem.info("\tAll tests ran successfully.")
+            logger_buildsystem.info("\t  All tests ran successfully.")
         return result
 
     # @override
