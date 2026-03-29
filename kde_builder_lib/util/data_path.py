@@ -1,8 +1,12 @@
 # SPDX-FileCopyrightText: 2026 Benjamin Port <benjamin.port@kde.org>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
+import sys
 
-from importlib.resources.abc import Traversable
+if sys.version_info >= (3, 11):
+    from importlib.resources.abc import Traversable
+else:
+    from importlib.abc import Traversable
 from pathlib import Path
 
 from importlib.resources import files
