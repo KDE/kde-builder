@@ -1,0 +1,41 @@
+version = 1
+SPDX-PackageName = "kde-builder"
+SPDX-PackageSupplier = "KDE <community@kde.org>"
+SPDX-PackageDownloadLocation = "https://invent.kde.org/sdk/kde-builder"
+
+[[annotations]]
+path = [
+    ".gitignore",
+    ".idea/**",
+    "data/00-plasma.conf.in",
+    "data/clion/**",
+    "data/kde-builder-logging.yaml",
+    "data/kde-builder.desktop.in",
+    "data/kde-builder.yaml.in",
+    "data/supported-formats.yaml",
+    "data/vscode/**",
+    "data/qtcreator/**",
+    "doc/_static/**.png",
+    "doc/conf.py",
+    "tests/integration/fixtures/**",
+    "tests/fixtures/**",
+    "Pipfile",
+    "ruff.toml",
+    ]
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = "doc/404handler.php"
+SPDX-FileCopyrightText = "2021 Ben Cooksley <bcooksley@kde.org>"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "doc/**.md"
+SPDX-FileCopyrightText = ["2003 - 2023 Michael Pyne <mpyne@kde.org>", "2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>"]
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = "logo.png"
+SPDX-FileCopyrightText = "2022 Manuel Jesús de la Fuente <m@nueljl.in>"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
