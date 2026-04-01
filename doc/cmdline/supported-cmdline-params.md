@@ -15,6 +15,9 @@ Simple read-only commands (such as reading file information) may still
 be run to make the output more relevant (such as correctly simulating
 whether source code would be checked out or updated).
 
+The corresponding configuration file option is
+[pretend](#conf-pretend).
+
 (cmdline-include-dependencies)=
 [`--include-dependencies`](cmdline-include-dependencies) (or `-d`), `--no-include-dependencies` (or `-D`)  
 This option causes kde-builder to automatically include other KDE and
@@ -25,10 +28,10 @@ file](../getting-started/configure-data).
 The projects that are added are as recorded within the KDE repo-metadata
 dependencies. See the section called [](#kde-projects-groups).
 
+This option is enabled by default.
+
 The corresponding configuration file option is
 [include-dependencies](#conf-include-dependencies).
-
-This option is enabled by default.
 
 (cmdline-ignore-projects)=
 [`--ignore-projects`](cmdline-ignore-projects) (or `-!`) project \[project ...]  
@@ -40,6 +43,9 @@ few).
 Note that this option does not override
 [ignore-projects](#conf-ignore-projects) config option in global section.
 Instead, it appends it.
+
+The corresponding configuration file option is
+[ignore-projects](#conf-ignore-projects).
 
 (cmdline-run)=
 [`--run`](cmdline-run) (or `--start-program`) \[-f\|--fork\] \<program\> \[parameters ...\]  
@@ -72,6 +78,9 @@ kde-builder --run kate-syntax-highlighter --list-themes
 With this option, you can specify a path to shell file, which will be sourced before the project is launched with `--run` option.
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
+The corresponding configuration file option is
+[source-when-start-program](#conf-source-when-start-program).
+
 (cmdline-revision)=
 [`--revision`](cmdline-revision) \<id\>  
 This option causes kde-builder to checkout a specific numbered revision
@@ -82,14 +91,22 @@ these projects.
 This option is likely not a good idea, and is only supported for
 compatibility with older scripts.
 
+The corresponding configuration file option is
+[revision](#conf-revision).
+
 (cmdline-taskset-cpu-list)=
 [`--taskset-cpu-list`](cmdline-taskset-cpu-list) \<value\>  
 This option is used to limit the number of cpu cores used in build/install process.
-For more info about value format, see corresponding config option [taskset-cpu-list](#conf-taskset-cpu-list).
+
+The corresponding configuration file option is
+[taskset-cpu-list](#conf-taskset-cpu-list).
 
 (cmdline-hold-performance-profile)=
 [`--hold-performance-profile`](cmdline-hold-performance-profile), `--no-hold-performance-profile`  
 Controls whether kde-builder will request switching the system's power profile to performance mode while building. The mode will switch back once the build is finished.
+
+The corresponding configuration file option is
+[hold-performance-profile](#conf-hold-performance-profile).
 
 (cmdline-hold-work-branches)=
 [`--hold-work-branches`](cmdline-hold-work-branches), `--no-hold-work-branches`  
@@ -100,6 +117,9 @@ This simplifies workflow when you want to work on specific project. If you check
 (see [wiki documentation](https://community.kde.org/Infrastructure/GitLab)), the
 branch will be called something like "mr/80", and kde-builder will behave like if you have specified a "no-src" option for that project in the config.
 
+The corresponding configuration file option is
+[hold-work-branches](#conf-hold-work-branches).
+
 (cmdline-all-config-projects)=
 [`--all-config-projects`](cmdline-all-config-projects)  
 This option is used to select all projects defined in user config for kde-builder to operate on.
@@ -108,19 +128,180 @@ This option is used to select all projects defined in user config for kde-builde
 [`--all-kde-projects`](cmdline-all-kde-projects)  
 This option is used to select all known projects defined in metadata for kde-builder to operate on.
 
-(cmdline-option-name)=
-[`--<option-name>`](cmdline-option-name) \<value\>  
-You can use this option to override an option in your [configuration
-file](../getting-started/configure-data) for every project. For instance, to override the
-[log-dir](#conf-log-dir) option, you would do: `--log-dir /path/to/dir`.
+(cmdline-git-push-protocol)=
+[`--git-push-protocol`](cmdline-git-push-protocol)  
+The corresponding configuration file option is
+[git-push-protocol](#conf-git-push-protocol).
 
-```{note}
-This feature can only be used for option names already recognized by
-kde-builder, that are not already supported by relevant command line
-options. For example the [async](#conf-async) configuration file option
-has specific [--async](#cmdline-async) and [--no-async](#cmdline-async)
-command line options that are preferred by kde-builder.
-```
+(cmdline-install-login-session)=
+[`--install-login-session`](cmdline-install-login-session), `--no-install-login-session`  
+The corresponding configuration file option is
+[install-login-session](#conf-install-login-session).
+
+(cmdline-libpath)=
+[`--libpath`](cmdline-libpath) \<path\>  
+The corresponding configuration file option is
+[libpath](#conf-libpath).
+
+(cmdline-num-cores)=
+[`--num-cores`](cmdline-num-cores) \<value\>  
+The corresponding configuration file option is
+[num-cores](#conf-num-cores).
+
+(cmdline-num-cores-low-mem)=
+[`--num-cores-low-mem`](cmdline-num-cores-low-mem) \<value\>  
+The corresponding configuration file option is
+[num-cores-low-mem](#conf-num-cores-low-mem).
+
+(cmdline-binpath)=
+[`--binpath`](cmdline-binpath) \<path\>  
+The corresponding configuration file option is
+[binpath](#conf-binpath).
+
+(cmdline-branch)=
+[`--branch`](cmdline-branch) \<value\>  
+The corresponding configuration file option is
+[branch](#conf-branch).
+
+(cmdline-branch-group)=
+[`--branch-group`](cmdline-branch-group) \<value\>  
+The corresponding configuration file option is
+[branch-group](#conf-branch-group).
+
+(cmdline-build-dir)=
+[`--build-dir`](cmdline-build-dir) \<path\>  
+The corresponding configuration file option is
+[build-dir](#conf-build-dir).
+
+(cmdline-cmake-generator)=
+[`--cmake-generator`](cmdline-cmake-generator) \<value\>  
+The corresponding configuration file option is
+[cmake-generator](#conf-cmake-generator).
+
+(cmdline-cmake-options)=
+[`--cmake-options`](cmdline-cmake-options) \<value\>  
+The corresponding configuration file option is
+[cmake-options](#conf-cmake-options).
+
+(cmdline-compile-commands-export)=
+[`--compile-commands-export`](cmdline-compile-commands-export), `--no-compile-commands-export`  
+The corresponding configuration file option is
+[compile-commands-export](#conf-compile-commands-export).
+
+(cmdline-compile-commands-linking)=
+[`--compile-commands-linking`](cmdline-compile-commands-linking), `--no-compile-commands-linking`  
+The corresponding configuration file option is
+[compile-commands-linking](#conf-compile-commands-linking).
+
+(cmdline-configure-flags)=
+[`--configure-flags`](cmdline-configure-flags) \<value\>  
+The corresponding configuration file option is
+[configure-flags](#conf-configure-flags).
+
+(cmdline-custom-build-command)=
+[`--custom-build-command`](cmdline-custom-build-command) \<value\>  
+The corresponding configuration file option is
+[custom-build-command](#conf-custom-build-command).
+
+(cmdline-cxxflags)=
+[`--cxxflags`](cmdline-cxxflags) \<value\>  
+The corresponding configuration file option is
+[cxxflags](#conf-cxxflags).
+
+(cmdline-dest-dir)=
+[`--dest-dir`](cmdline-dest-dir) \<path\>  
+The corresponding configuration file option is
+[dest-dir](#conf-dest-dir).
+
+(cmdline-git-user)=
+[`--git-user`](cmdline-git-user) \<value\>  
+The corresponding configuration file option is
+[git-user](#conf-git-user).
+
+(cmdline-directory-layout)=
+[`--directory-layout`](cmdline-directory-layout) \<value\>  
+The corresponding configuration file option is
+[directory-layout](#conf-directory-layout).
+
+(cmdline-libname)=
+[`--libname`](cmdline-libname) \<value\>  
+The corresponding configuration file option is
+[libname](#conf-libname).
+
+(cmdline-log-dir)=
+[`--log-dir`](cmdline-log-dir) \<path\>  
+The corresponding configuration file option is
+[log-dir](#conf-log-dir).
+
+(cmdline-make-install-prefix)=
+[`--make-install-prefix`](cmdline-make-install-prefix) \<value\>  
+The corresponding configuration file option is
+[make-install-prefix](#conf-make-install-prefix).
+
+(cmdline-make-options)=
+[`--make-options`](cmdline-make-options) \<value\>  
+The corresponding configuration file option is
+[make-options](#conf-make-options).
+
+(cmdline-meson-options)=
+[`--meson-options`](cmdline-meson-options) \<value\>  
+The corresponding configuration file option is
+[meson-options](#conf-meson-options).
+
+(cmdline-ninja-options)=
+[`--ninja-options`](cmdline-ninja-options) \<value\>  
+The corresponding configuration file option is
+[ninja-options](#conf-ninja-options).
+
+(cmdline-override-build-system)=
+[`--override-build-system`](cmdline-override-build-system) \<value\>  
+The corresponding configuration file option is
+[override-build-system](#conf-override-build-system).
+
+(cmdline-purge-old-logs)=
+[`--purge-old-logs`](cmdline-purge-old-logs), `--no-purge-old-logs`  
+The corresponding configuration file option is
+[purge-old-logs](#conf-purge-old-logs).
+
+(cmdline-qmake-options)=
+[`--qmake-options`](cmdline-qmake-options) \<value\>  
+The corresponding configuration file option is
+[qmake-options](#conf-qmake-options).
+
+(cmdline-qt-install-dir)=
+[`--qt-install-dir`](cmdline-qt-install-dir) \<path\>  
+The corresponding configuration file option is
+[qt-install-dir](#conf-qt-install-dir).
+
+(cmdline-remove-after-install)=
+[`--remove-after-install`](cmdline-remove-after-install) \<value\>  
+The corresponding configuration file option is
+[remove-after-install](#conf-remove-after-install).
+
+(cmdline-repository)=
+[`--repository`](cmdline-repository)  
+The corresponding configuration file option is
+[repository](#conf-repository).
+
+(cmdline-run-tests)=
+[`--run-tests`](cmdline-run-tests), `--no-run-tests`  
+The corresponding configuration file option is
+[run-tests](#conf-run-tests).
+
+(cmdline-source-dir)=
+[`--source-dir`](cmdline-source-dir) \<path\>  
+The corresponding configuration file option is
+[source-dir](#conf-source-dir).
+
+(cmdline-tag)=
+[`--tag`](cmdline-tag) \<value\>  
+The corresponding configuration file option is
+[tag](#conf-tag).
+
+(cmdline-use-clean-install)=
+[`--use-clean-install`](cmdline-use-clean-install), `--no-use-clean-install`  
+The corresponding configuration file option is
+[use-clean-install](#conf-use-clean-install).
 
 (cmdline-set-project-option-value)=
 [`--set-project-option-value`](cmdline-set-project-option-value) \<project-name\>,\<option-name\>,\<option-value\>  
@@ -204,8 +385,8 @@ occurs. Default behavior is --stop-on-failure. You may override it if
 you wish to still process the rest of the projects in the build, to avoid
 wasting time in case the problem is with a single project.
 
-See also the [stop-on-failure](#conf-stop-on-failure) configuration file
-option.
+The corresponding configuration file option is
+[stop-on-failure](#conf-stop-on-failure).
 
 (cmdline-rebuild-failures)=
 [`--rebuild-failures`](cmdline-rebuild-failures)  
@@ -308,6 +489,9 @@ this option for subsequent runs.
 [`--no-src`](cmdline-no-src) (or `-S`)  
 Skips the source update phase. Other phases are included as normal.
 
+The corresponding configuration file option is
+[no-src](#conf-no-src).
+
 (cmdline-no-build)=
 [`--no-build`](cmdline-no-build)  
 Skip the build phase for the build. Internally the install phase
@@ -315,9 +499,15 @@ depends on the build phase completing so this is effectively equivalent
 to `--src-only`, but the semantics may change in the future (e.g. when
 test suites are moved into their own phase).
 
+The corresponding configuration file option is
+[no-build](#conf-no-build).
+
 (cmdline-no-install)=
 [`--no-install`](cmdline-no-install)  
 Skip the install phase from the build. Other phases are included as normal.
+
+The corresponding configuration file option is
+[no-install](#conf-no-install).
 
 ## Only specific action
 
@@ -336,6 +526,9 @@ Forces the build process to be performed without updating source code
 first. In addition, installation is not performed. (Testing is still
 performed if applicable, but this will change in a future release).
 
+The corresponding configuration file option is
+[build-only](#conf-build-only).
+
 (cmdline-install-only)=
 [`--install-only`](cmdline-install-only)  
 If this is the only command-line option, it tries to install all the
@@ -343,11 +536,17 @@ projects contained in `log/latest/status-list.log`. If command-line options
 are specified after this option, they are all assumed to be projects to
 install (even if they did not successfully build on the last run).
 
+The corresponding configuration file option is
+[install-only](#conf-install-only).
+
 (cmdline-uninstall)=
 [`--uninstall`](cmdline-uninstall)
 Skips the update and build phase and immediately attempts to uninstall
 the projects given. **NOTE**: This is only supported for buildsystems
 that supports the `make uninstall` command (e.g. KDE CMake-based).
+
+The corresponding configuration file option is
+[uninstall](#conf-uninstall).
 
 (cmdline-build-system-only)=
 [`--build-system-only`](cmdline-build-system-only)  
@@ -361,6 +560,9 @@ This option causes kde-builder to abort building a project just before
 the `make` command would have been run. This is supported for
 compatibility with older versions only, this effect is not helpful for
 the current KDE build system.
+
+The corresponding configuration file option is
+[build-system-only](#conf-build-system-only).
 
 (cmdline-install-login-session-only)=
 [`--install-login-session-only`](cmdline-install-login-session-only)  
@@ -379,6 +581,9 @@ have problems getting a project to build but realize it will take longer
 (possibly much longer) for the build to complete as a result. When in
 doubt use this option for the entire `kde-builder` run.
 
+The corresponding configuration file option is
+[refresh-build](#conf-refresh-build).
+
 (cmdline-refresh-build-first)=
 [`--refresh-build-first`](cmdline-refresh-build-first)  
 Enables the `refresh-build` option for the first project appeared in final projects list to build.
@@ -396,26 +601,41 @@ this, as kde-builder will detect when you change the relevant options
 and automatically re-run the build setup. This option is implied if
 `--refresh-build` is used.
 
+The corresponding configuration file option is
+[reconfigure](#conf-reconfigure).
+
 (cmdline-install-dir)=
-[`--install-dir`](cmdline-install-dir) path  
+[`--install-dir`](cmdline-install-dir) \<path\>  
 This allows you to change the directory where projects will be installed
 to. This option implies [`--reconfigure`](#cmdline-reconfigure), but
 using [`--refresh-build`](#cmdline-refresh-build) may still be required.
+
+The corresponding configuration file option is
+[install-dir](#conf-install-dir).
 
 (cmdline-generate-clion-project-config)=
 [`--generate-clion-project-config`](cmdline-generate-clion-project-config), `--no-generate-clion-project-config`  
 Generate a `.idea` directory with configurations for building and
 debugging in CLion. This option is disabled by default.
 
+The corresponding configuration file option is
+[generate-clion-project-config](#conf-generate-clion-project-config).
+
 (cmdline-generate-vscode-project-config)=
 [`--generate-vscode-project-config`](cmdline-generate-vscode-project-config), `--no-generate-vscode-project-config`  
 Generate a `.vscode` directory with configurations for building and
 debugging in Visual Studio Code. This option is disabled by default.
 
+The corresponding configuration file option is
+[generate-vscode-project-config](#conf-generate-vscode-project-config).
+
 (cmdline-generate-qtcreator-project-config)=
 [`--generate-qtcreator-project-config`](cmdline-generate-clion-project-config), `--no-generate-qtcreator-project-config`  
 Generate a `.qtcreator` directory with files that can be used for copying to the Qt Creator configuration
 for building and debugging. This option is disabled by default.
+
+The corresponding configuration file option is
+[generate-qtcreator-project-config](#conf-generate-qtcreator-project-config).
 
 ## Script runtime
 
@@ -429,10 +649,14 @@ encounter IPC errors while running kde-builder try disabling it, and
 submitting a [bug report](https://bugs.kde.org/). This option is enabled
 by default.
 
+The corresponding configuration file option is [async](#conf-async).
+
 (cmdline-color)=
 [`--color`](cmdline-color) (or `--colorful-output`), `--no-color` (or `--no-colorful-output`)  
 Enable or disable colorful output. By default, this option is enabled
 for interactive terminals.
+
+The corresponding configuration file option is [colorful-output](#conf-colorful-output).
 
 (cmdline-debug)=
 [`--debug`](cmdline-debug)  
@@ -444,6 +668,8 @@ Changes the CPU priority given to `kde-builder` (and all subprocesses used
 by `kde-builder`, e.g. `make`). Value should be an integer number
 between 0 and 19. 0 is highest priority (because it is the least "nice"),
 19 is the lowest priority. This option defaults to 10.
+
+The corresponding configuration file option is [niceness](#conf-niceness).
 
 (cmdline-use-idle-io-priority)=
 [`--use-idle-io-priority`](cmdline-use-idle-io-priority), `--no-use-idle-io-priority`  
@@ -477,6 +703,11 @@ if its version is outdated compared to the version available in its repository.
 
 The corresponding configuration file option is
 [check-self-updates](#conf-check-self-updates).
+
+(cmdline-persistent-data-file)=
+[`--persistent-data-file`](cmdline-persistent-data-file) \<file\>  
+The corresponding configuration file option is
+[persistent-data-file](#conf-persistent-data-file).
 
 ## Setup
 

@@ -25,7 +25,7 @@ source code update and the build process will be performed in parallel,
 instead of waiting for all the source code updates before starting
 the build process.
 
-Related command-line option: [--async](#cmdline-async)
+Related command-line option: [--async](#cmdline-async).
 
 (conf-check-self-updates)=
 [`check-self-updates`](conf-check-self-updates)
@@ -36,7 +36,7 @@ If this option is enabled, kde-builder will periodically (once a week) check
 if its version is outdated compared to the version available in its repository.
 If it is, the warning message will be shown in the terminal.
 
-Related command-line option: [--check-self-updates](#cmdline-check-self-updates)
+Related command-line option: [--check-self-updates](#cmdline-check-self-updates).
 
 (conf-colorful-output)=
 [`colorful-output`](conf-colorful-output)
@@ -48,7 +48,7 @@ of kde-builder. Note that kde-builder will not output the color codes
 to anything but a terminal (such as xterm, Konsole, or the normal Linux
 console).
 
-Related command-line option: [--color](#cmdline-color)
+Related command-line option: [--color](#cmdline-color).
 
 (conf-git-push-protocol)=
 [`git-push-protocol`](conf-git-push-protocol)
@@ -67,6 +67,8 @@ This option only applies to projects that are [KDE projects](#kde-projects-group
 ```{note}
 The protocol for fetching KDE projects is always `https`.
 ```
+
+Related command-line option: [--git-push-protocol](#cmdline-git-push-protocol).
 
 (conf-git-repository-base)=
 [`git-repository-base`](conf-git-repository-base)
@@ -129,6 +131,8 @@ repository across many different groups.
 
 See also [repository](#conf-repository) option.
 
+The option `git-repository-base` cannot be used from command line.
+
 (conf-install-login-session)=
 [`install-login-session`](conf-install-login-session)
 
@@ -137,7 +141,7 @@ Type: Boolean, Default value: True
 If enabled, KDE Builder will invoke session installation script from `plasma-workspace` project. See
 [](#installing-login-session) for details.
 
-Related command-line option: --install-login-session, --no-install-login-session
+Related command-line option: [--install-login-session](#cmdline-install-login-session).
 
 (conf-libpath)=
 [`libpath`](conf-libpath)
@@ -151,7 +155,7 @@ setting in a project option. The default value is blank, but the paths
 `${qt-install-dir}/$LIBNAME` are automatically added. You may
 use the tilde (~) for any paths you add using this option.
 
-Related command-line option: --libpath \<path\>
+Related command-line option: [--libpath](#cmdline-libpath).
 
 (conf-niceness)=
 [`niceness`](conf-niceness)
@@ -162,7 +166,7 @@ Set this option to an integer number between 0 and 19. The higher the number,
 the lower a priority kde-builder will set for itself, i.e. the higher
 the number, the "nicer" the program is.
 
-Related command-line option: [--nice](#cmdline-nice)
+Related command-line option: [--nice](#cmdline-nice).
 
 (conf-num-cores)=
 [`num-cores`](conf-num-cores)
@@ -176,7 +180,7 @@ multiplied by 0.8.
 See [](#make-options-example) for an example of this
 option's usage.
 
-Related command-line option: --num-cores \<value\>
+Related command-line option: [--num-cores](#cmdline-num-cores).
 
 (conf-num-cores-low-mem)=
 [`num-cores-low-mem`](conf-num-cores-low-mem)
@@ -196,7 +200,7 @@ it for any of project in the same way that `num-cores` is used.
 
 If kde-builder cannot detect available memory then this value will be set to 4.
 
-Related command-line option: --num-cores-low-mem \<value\>
+Related command-line option: [--num-cores-low-mem](#cmdline-num-cores-low-mem).
 
 (conf-persistent-data-file)=
 [`persistent-data-file`](conf-persistent-data-file)
@@ -213,7 +217,12 @@ If you have multiple available configurations in the same directory, you may wan
 option, so that different configurations do not end up with conflicting
 persistent data.
 
-Related command-line option: --persistent-data-file \<file\>
+Related command-line option: [--persistent-data-file](#cmdline-persistent-data-file).
+
+(conf-pretend)=
+[`pretend`](conf-pretend)
+
+Related command-line option: [--pretend](#cmdline-pretend).
 
 (conf-source-when-start-program)=
 [`source-when-start-program`](conf-source-when-start-program)
@@ -223,7 +232,7 @@ Type: String
 With this option, you can specify a path to shell file, which will be sourced before the project binary is launched with `--run` option.
 For example, you can use it to set `QT_LOGGING_RULES` and `QT_MESSAGE_PATTERN` variables, so you could customize the debug output.
 
-Related command line option: [--source-when-start-program](cmdline-source-when-start-program)
+Related command line option: [--source-when-start-program](cmdline-source-when-start-program).
 
 (conf-use-idle-io-priority)=
 [`use-idle-io-priority`](conf-use-idle-io-priority)
@@ -234,7 +243,7 @@ Use lower priority for disk and other I/O, which can significantly
 improve the responsiveness of the rest of the system at the expense of
 slightly longer running times for kde-builder.
 
-Related command-line option: [--use-idle-io-priority](cmdline-use-idle-io-priority)
+Related command-line option: [--use-idle-io-priority](cmdline-use-idle-io-priority).
 
 (option-table)=
 ## All scopes (project, group and global) options
@@ -252,7 +261,7 @@ development toolchain. The paths `${install-dir}/bin` and
 `${qt-install-dir}/bin` are automatically added. You may use
 the tilde (~) for any paths you add using this option.
 
-Related command-line option: --binpath \<path\>
+Related command-line option: [--binpath](#cmdline-binpath).
 
 (conf-branch)=
 [`branch`](conf-branch)
@@ -266,7 +275,7 @@ For most KDE projects you probably wish to use the [branch-group](#conf-branch-g
 option for case-by-case exceptions.
 ```
 
-Related command-line option: --branch \<value\>
+Related command-line option: [--branch](#cmdline-branch).
 
 (conf-branch-group)=
 [`branch-group`](conf-branch-group)
@@ -294,7 +303,7 @@ branch selection options such as [tag](#conf-tag).
 This option only applies to `kde-projects` projects. See also the section called [](#kde-projects-groups).
 ```
 
-Related command-line option: --branch-group \<value\>
+Related command-line option: [--branch-group](#cmdline-branch-group).
 
 (conf-build-dir)=
 [`build-dir`](conf-build-dir)
@@ -320,7 +329,14 @@ analogous to the shell's tilde-expansion. For example,
 
 This option can be changed per project.
 
-Related command-line option: --build-dir \<path\>
+Related command-line option: [--build-dir](#cmdline-build-dir).
+
+(conf-build-system-only)=
+[`build-system-only`](conf-build-system-only)
+
+Type: Boolean, Default value: False
+
+Related command-line option: [`--build-system-only`](cmdline-build-system-only).
 
 (conf-cmake-generator)=
 [`cmake-generator`](conf-cmake-generator)
@@ -339,7 +355,7 @@ If you specify invalid value, it will be ignored.
 Also note, that you may also specify the generator directly in [cmake-options](#conf-cmake-options) (with "-G" option). In this case, if it is valid, it 
 will be used, and not the value from the `cmake-generator`.
 
-Related command-line option: --cmake-generator \<value\>
+Related command-line option: [--cmake-generator](#cmdline-cmake-generator).
 
 (conf-cmake-options)=
 [`cmake-options`](conf-cmake-options)
@@ -372,7 +388,7 @@ long as the rest of the options are set correctly, you should be able to
 leave this option blank. (In other words, _required_ CMake
 parameters are set for you automatically)
 
-Related command-line option: --cmake-options \<value\>
+Related command-line option: [--cmake-options](#cmdline-cmake-options).
 
 (conf-compile-commands-export)=
 [`compile-commands-export`](conf-compile-commands-export)
@@ -381,7 +397,7 @@ Type: Boolean, Default value: True
 
 If enabled, the `compile_commands.json` file will be generated in the build directory.
 
-Related command-line option: --compile-commands-export, --no-compile-commands-export
+Related command-line option: [--compile-commands-export](#cmdline-compile-commands-export).
 
 (conf-compile-commands-linking)=
 [`compile-commands-linking`](conf-compile-commands-linking)
@@ -390,7 +406,7 @@ Type: Boolean, Default value: True
 
 If enabled, kde-builder will make a symbolic link in the source directory, pointing to the `compile_commands.json` file in the build directory.
 
-Related command-line option: --compile-commands-linking, --no-compile-commands-linking
+Related command-line option: [--compile-commands-linking](#cmdline-compile-commands-linking).
 
 (conf-configure-flags)=
 [`configure-flags`](conf-configure-flags)
@@ -406,7 +422,7 @@ global option, it is applied to all projects that this script builds.
 
 To change configuration settings for KDE projects, see [cmake-options](#conf-cmake-options).
 
-Related command-line option: --configure-flags \<value\>
+Related command-line option: [--configure-flags](#cmdline-configure-flags).
 
 (conf-custom-build-command)=
 [`custom-build-command`](conf-custom-build-command)
@@ -423,7 +439,7 @@ The value of this option is used as the command line to run, modified
 by the [make-options](#conf-make-options) option as
 normal.
 
-Related command-line option: --custom-build-command \<value\>
+Related command-line option: [--custom-build-command](#cmdline-custom-build-command).
 
 (conf-cxxflags)=
 [`cxxflags`](conf-cxxflags)
@@ -447,7 +463,7 @@ Note that for KDE 4 and any other projects that use CMake, it is
 necessary to set the CMAKE_BUILD_TYPE option to `none` when
 configuring the project. This can be done using the [cmake-options](#conf-cmake-options) option.
 
-Related command-line option: --cxxflags \<value\>
+Related command-line option: [--cxxflags](#cmdline-cxxflags).
 
 (conf-dest-dir)=
 [`dest-dir`](conf-dest-dir)
@@ -461,7 +477,7 @@ name of the project on disk, it is not a good idea to include directories
 or directory separators in the name as this will interfere with any [build-dir](#conf-build-dir)
 or [source-dir](#conf-source-dir) options.
 
-Related command-line option: --dest-dir \<path\>
+Related command-line option: [--dest-dir](#cmdline-dest-dir).
 
 (conf-git-user)=
 [`git-user`](conf-git-user)
@@ -477,6 +493,8 @@ repository are filled in to the values set by this option.
 
 The value must be specified in the form
 `User Name <email@example.com>`.
+
+Related command-line option: [--git-user](#cmdline-git-user).
 
 (conf-directory-layout)=
 [`directory-layout`](conf-directory-layout)
@@ -497,7 +515,7 @@ If you use `flat` layout, the KCalc source directory will be created in the sour
 If you use `invent` layout, the source directory will be created in the source-dir in the subfolders, as seen in the repository path in
 [invent.kde.org](https://invent.kde.org/) (corresponds to the repopath field in metadata): `~/kde/src/utilities/kcalc`.
 
-Related command-line option: --directory-layout \<value\>
+Related command-line option: [--directory-layout](#cmdline-directory-layout).
 
 (conf-generate-clion-project-config)=
 [`generate-clion-project-config`](conf-generate-clion-project-config)
@@ -518,7 +536,7 @@ If you do not have any toolchanis yet, place the `data/clion/toolchains.xml` fil
 directory of the IDE, i.e. the path would look like `/home/andrew/.config/JetBrains/CLion2024.2/options/linux/toolchains.xml`.
 ```
 
-Related command-line option: [--generate-clion-project-config](#cmdline-generate-clion-project-config)
+Related command-line option: [--generate-clion-project-config](#cmdline-generate-clion-project-config).
 
 (conf-generate-vscode-project-config)=
 [`generate-vscode-project-config`](conf-generate-vscode-project-config)
@@ -533,7 +551,7 @@ is enabled, it will be created with the build settings and environment from kde-
 The generated .vscode project will have such conveniences as enabled use of LSP, launch/debug configuration, and will recommend to install extensions that 
 may be useful for KDE development.
 
-Related command-line option: [--generate-vscode-project-config](#cmdline-generate-vscode-project-config)
+Related command-line option: [--generate-vscode-project-config](#cmdline-generate-vscode-project-config).
 
 (conf-generate-qtcreator-project-config)=
 [`generate-qtcreator-project-config`](conf-generate-qtcreator-project-config)
@@ -550,7 +568,7 @@ See developer documentation why it is currently not possible to just generate a 
 See the documentation on develop.kde.org on how to configure the Qt Creator manually to replicate KDE Builder environment.  
 ```
 
-Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config)
+Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config).
 
 (conf-hold-performance-profile)=
 [`hold-performance-profile`](conf-hold-performance-profile)
@@ -559,7 +577,7 @@ Type: Boolean, Default value: True
 
 Controls whether kde-builder will request switching the system's power profile to performance mode while building. The mode will switch back once the build is finished.
 
-Related command-line option: [--hold-performance-profile](#cmdline-hold-performance-profile)
+Related command-line option: [--hold-performance-profile](#cmdline-hold-performance-profile).
 
 (conf-hold-work-branches)=
 [`hold-work-branches`](cmdline-hold-work-branches)
@@ -575,7 +593,7 @@ This simplifies workflow when you want to work on specific project. If you check
 (see [wiki documentation](https://community.kde.org/Infrastructure/GitLab)), the
 branch will be called something like "mr/80", and kde-builder will behave like if you have specified a "no-src" option for that project in the config.
 
-Related command-line option: [--hold-work-branches](#cmdline-hold-work-branches)
+Related command-line option: [--hold-work-branches](#cmdline-hold-work-branches).
 
 (conf-include-dependencies)=
 [`include-dependencies`](conf-include-dependencies)
@@ -595,7 +613,7 @@ developers is accurate for your selected [branch-group](#conf-branch-group).
 This is to support building applications that need versions of Qt or
 Plasma more recent than supported on common operating systems.
 
-Related command-line option: [--include-dependencies](#cmdline-include-dependencies)
+Related command-line option: [--include-dependencies](#cmdline-include-dependencies).
 
 (conf-install-dir)=
 [`install-dir`](conf-install-dir)
@@ -614,7 +632,7 @@ applications.
 
 The `${MODULE}` or `$MODULE` substring in the value of this option will be replaced with the project node name.
 
-Related command-line option: [--install-dir](#cmdline-install-dir)
+Related command-line option: [--install-dir](#cmdline-install-dir).
 
 (conf-libname)=
 [`libname`](conf-libname)
@@ -624,7 +642,7 @@ Type: String, Default value: Auto detected
 Controls the installed library directory name inside ${install-dir} and ${qt-install-dir}. Usually it is "lib" or "lib64".
 This is auto-detected by default. But in case something is wrong in autodetection, you can set it manually with this option.
 
-Related command-line option: --libname \<value\>
+Related command-line option: [--libname](#cmdline-libname).
 
 (conf-log-dir)=
 [`log-dir`](conf-log-dir)
@@ -634,7 +652,7 @@ Type: String
 Use this option to change the directory used to hold the log files
 generated by KDE Builder.
 
-Related command-line option: --log-dir \<path\>
+Related command-line option: [--log-dir](#cmdline-log-dir).
 
 (conf-make-install-prefix)=
 [`make-install-prefix`](conf-make-install-prefix)
@@ -647,7 +665,7 @@ command used to install projects. This is useful for installing projects
 with sudo for example, but please be careful while dealing with root
 privileges.
 
-Related command-line option: --make-install-prefix \<value\>
+Related command-line option: [--make-install-prefix](#cmdline-make-install-prefix).
 
 (conf-make-options)=
 [`make-options`](conf-make-options)
@@ -663,7 +681,7 @@ Note that not all supported build systems use `make`. For
 build systems that use `ninja` for build (such as the [Meson build system](#conf-override-build-system)),
 see the [ninja-options](#conf-ninja-options) setting.
 
-Related command-line option: --make-options \<value\>
+Related command-line option: [--make-options](#cmdline-make-options).
 
 (conf-meson-options)=
 [`meson-options`](conf-meson-options)
@@ -673,7 +691,7 @@ Type: String
 Set this option in order to pass command line options to the
 `meson` configure command.
 
-Related command-line option: --meson-options \<value\>
+Related command-line option: [--meson-options](#cmdline-meson-options).
 
 (conf-ninja-options)=
 [`ninja-options`](conf-ninja-options)
@@ -685,7 +703,7 @@ Set this variable in order to pass command line options to the
 output or to manually reduce the number of parallel build jobs that
 `ninja` would use.
 
-Related command-line option: --ninja-options \<value\>
+Related command-line option: [--ninja-options](#cmdline-ninja-options).
 
 (conf-override-build-system)=
 [`override-build-system`](conf-override-build-system)
@@ -728,7 +746,7 @@ meson
   required for some non-KDE projects.
 ```
 
-Related command-line option: --override-build-system \<value\>
+Related command-line option: [--override-build-system](#cmdline-override-build-system).
 
 (conf-purge-old-logs)=
 [`purge-old-logs`](conf-purge-old-logs)
@@ -738,7 +756,7 @@ Type: Boolean, Default value: True
 This option controls whether old log directories are automatically
 deleted or not.
 
-Related command-line option: --purge-old-logs, --no-purge-old-logs
+Related command-line option: [--purge-old-logs](#cmdline-purge-old-logs).
 
 (conf-qmake-options)=
 [`qmake-options`](conf-qmake-options)
@@ -750,7 +768,7 @@ command, for projects that use the `qmake` build system. For
 instance, you can use the `PREFIX=/path/to/qt` option to
 qmake to override where it installs the project.
 
-Related command-line option: --qmake-options \<value\>
+Related command-line option: [--qmake-options](#cmdline-qmake-options).
 
 (conf-qt-install-dir)=
 [`qt-install-dir`](conf-qt-install-dir)
@@ -761,7 +779,21 @@ This option controls where to install qt projects (modules) after build. If you
 do not specify this option, kde-builder will assume that Qt is provided
 by the operating system.
 
-Related command-line option: --qt-install-dir \<path\>
+Related command-line option: [--qt-install-dir](#cmdline-qt-install-dir).
+
+(conf-reconfigure)=
+[`reconfigure`](conf-reconfigure)
+
+Type: Boolean, Default value: False
+
+Related command-line option: [--reconfigure](#cmdline-reconfigure).
+
+(conf-refresh-build)=
+[`refresh-build`](conf-refresh-build)
+
+Type: Boolean, Default value: False
+
+Related command-line option: [--refresh-build](#cmdline-refresh-build).
 
 (conf-remove-after-install)=
 [`remove-after-install`](conf-remove-after-install)
@@ -784,7 +816,7 @@ on both your bandwidth usage (if you use \<all\>) and the time taken
 to compile KDE software, since kde-builder will be unable to perform
 incremental builds.
 
-Related command-line option: --remove-after-install \<value\>
+Related command-line option: [--remove-after-install](#cmdline-remove-after-install).
 
 (conf-repository)=
 [`repository`](conf-repository)
@@ -801,6 +833,8 @@ For all other projects, you need to specify the correct url in this option yours
 If using [git-repository-base](conf-git-repository-base), the url is resolved as a prefix name,
 followed immediately by the given project name.
 
+Related command-line option: [--repository](#cmdline-repository).
+
 (conf-revision)=
 [`revision`](conf-revision)
 
@@ -813,7 +847,7 @@ effect. If the project is already at the given revision then it will not
 be updated further unless this option is changed or removed from the
 configuration.
 
-Related command-line option: [--revision](#cmdline-revision)
+Related command-line option: [--revision](#cmdline-revision).
 
 (conf-run-tests)=
 [`run-tests`](conf-run-tests)
@@ -834,7 +868,7 @@ KDE Builder will show a simple report of
 the test results. This is useful for developers or those who want to
 ensure their system is set up correctly.
 
-Related command-line option: --run-tests, --no-run-tests
+Related command-line option: [--run-tests](#cmdline-run-tests).
 
 (conf-set-env)=
 [`set-env`](conf-set-env)
@@ -846,6 +880,8 @@ what you want the variable to be set to.
 
 See [](changing-environment) for more information.
 
+The option `set-env` cannot be used from command line.
+
 (conf-source-dir)=
 [`source-dir`](conf-source-dir)
 
@@ -855,7 +891,7 @@ This option is used to set the directory on your computer to store
 the sources at. You may use the tilde (~) to represent the home
 directory if using this option.
 
-Related command-line option: --source-dir \<path\>
+Related command-line option: [--source-dir](#cmdline-source-dir).
 
 (conf-stop-on-failure)=
 [`stop-on-failure`](conf-stop-on-failure)
@@ -866,7 +902,7 @@ Setting this option to `false` allows the kde-builder to
 continue execution after an error occurs during the build or install
 process.
 
-Related command-line option: [--stop-on-failure](#cmdline-stop-on-failure)
+Related command-line option: [--stop-on-failure](#cmdline-stop-on-failure).
 
 (conf-tag)=
 [`tag`](conf-tag)
@@ -879,7 +915,7 @@ _Note:_ The odds are very good that you _do not want_
 to use this option. KDE releases are available in tarball form from the
 [KDE download site](https://download.kde.org/).
 
-Related command-line option: --tag \<value\>
+Related command-line option: [--tag](#cmdline-tag).
 
 (conf-taskset-cpu-list)=
 [`taskset-cpu-list`](conf-taskset-cpu-list)
@@ -899,6 +935,8 @@ to restrict builds to using the first 6 CPU threads on your machine.
 system to stay responsive while building. It is convenient if you often change host machine
 (or number of processors of virtual machine), because it does not require changing config in that case.
 
+Related command-line option: [--taskset-cpu-list](#cmdline-taskset-cpu-list).
+
 (conf-use-clean-install)=
 [`use-clean-install`](conf-use-clean-install)
 
@@ -913,8 +951,7 @@ files, CMake metadata, etc. that can cause issues in long-lived KDE
 installations. However, this only works on build systems that support
 `make uninstall`.
 
-Related command-line option: --use-clean-install,
---no-use-clean-install
+Related command-line option: [--use-clean-install](#cmdline-use-clean-install).
 
 (options-phase-selection-table)=
 ## Phase selection options
@@ -927,7 +964,7 @@ These options do require empty value (except "filter-out-phases").
 Remove _update_ phase. The other phases that were
 presented will still be processed.
 
-Related command-line option: [--no-src](#cmdline-no-src)
+Related command-line option: [--no-src](#cmdline-no-src).
 
 (conf-no-install)=
 [`no-install`](conf-no-install)
@@ -935,7 +972,7 @@ Related command-line option: [--no-src](#cmdline-no-src)
 Remove _install_ phase. The other phases that were
 presented will still be processed.
 
-Related command-line option: [--no-install](#cmdline-no-install)
+Related command-line option: [--no-install](#cmdline-no-install).
 
 (conf-no-build)=
 [`no-build`](conf-no-build)
@@ -943,7 +980,7 @@ Related command-line option: [--no-install](#cmdline-no-install)
 Remove _build_ phase. The other phases that were presented
 will still be processed.
 
-Related command-line option: [--no-build](#cmdline-no-build)
+Related command-line option: [--no-build](#cmdline-no-build).
 
 (conf-build-only)=
 [`build-only`](conf-build-only)
@@ -951,7 +988,7 @@ Related command-line option: [--no-build](#cmdline-no-build)
 If had _build_ phase, remove any other phases. Otherwise,
 remove all phases.
 
-Related command-line option: [--build-only](#cmdline-build-only)
+Related command-line option: [--build-only](#cmdline-build-only).
 
 (conf-install-only)=
 [`install-only`](conf-install-only)
@@ -959,7 +996,7 @@ Related command-line option: [--build-only](#cmdline-build-only)
 If had _install_ phase, remove any other phases.
 Otherwise, remove all phases.
 
-Related command-line option: [--install-only](#cmdline-install-only)
+Related command-line option: [--install-only](#cmdline-install-only).
 
 (conf-uninstall)=
 [`uninstall`](conf-uninstall)
@@ -967,7 +1004,7 @@ Related command-line option: [--install-only](#cmdline-install-only)
 If had _uninstall_ phase, remove any other phases.
 Otherwise, remove all phases.
 
-Related command-line option: --uninstall
+Related command-line option: [--uninstall](#cmdline-uninstall).
 
 (conf-filter-out-phases)=
 [`filter-out-phases`](conf-filter-out-phases)
@@ -975,6 +1012,8 @@ Related command-line option: --uninstall
 Remove those phases that are listed (space separated) in this
 option. The other phases that were presented will still be
 processed.
+
+The option `filter-out-phases` cannot be used from command line.
 
 (options-group-table)=
 ## Projects selection options
@@ -1011,7 +1050,7 @@ excluded (though not `kde/kdelibs` since the full part
 See also [](#example-ignoring-a-project).
 ```
 
-Related command-line option: [--ignore-projects](#cmdline-ignore-projects)
+Related command-line option: [--ignore-projects](#cmdline-ignore-projects).
 
 (conf-use-projects)=
 [`use-projects`](conf-use-projects)
@@ -1050,3 +1089,5 @@ you passed to `use-projects`.
 
 See the section called [](#groups) and [git-repository-base](#conf-git-repository-base)
 for a description of its use and an example.
+
+The option `use-projects` cannot be used from command line.
