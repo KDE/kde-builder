@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "kde-builder"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A tool to help build KDE software from source"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,3 +36,6 @@ packages = ["kde_builder_lib"]
 [tool.hatch.build.targets.wheel.force-include] # Python packages except data to be part of source package
 "kde-builder" = "kde_builder_lib/cli.py"
 "data/" = "kde_builder_lib/data"
+
+[tool.hatch.version]
+source = "vcs"

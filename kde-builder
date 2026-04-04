@@ -16,7 +16,7 @@ from kde_builder_lib.kb_exception import ProgramError
 from kde_builder_lib.kb_exception import UnknownKdeProjectException
 from kde_builder_lib.debug import KBLogger
 from kde_builder_lib.util.textwrap_mod import dedent
-from kde_builder_lib.util.data_path import data_file_path
+from kde_builder_lib.util.util_package import data_file_path
 
 def ensure_runtime_pymodules_installed():
     """

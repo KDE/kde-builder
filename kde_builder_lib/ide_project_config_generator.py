@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from .debug import Debug
 from .debug import KBLogger
 from .util.textwrap_mod import dedent
-from .util.data_path import data_file_path
+from .util.util_package import data_file_path
 
 if TYPE_CHECKING:
     from module.module import Module

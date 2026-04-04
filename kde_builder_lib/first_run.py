@@ -16,7 +16,7 @@ from .kb_exception import KBException
 from .kb_exception import SetupError
 from .debug import KBLogger
 from .os_support import OSSupport
-from .util.data_path import data_file_path
+from .util.util_package import data_file_path
 
 logger_fr = KBLogger.getLogger("first-run")
 

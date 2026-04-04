@@ -5,9 +5,12 @@
 
 import os
 import subprocess
+from importlib.metadata import version
+
 from typing import NoReturn
 
 from .debug import KBLogger
+from .util.util_package import is_installed_as_package
 
 logger_app = KBLogger.getLogger("application")
 
@@ -30,6 +33,9 @@ class Version:
         current checkout and append the ID (in ``git-describe`` format) to the output
         string as well.
         """
+        if is_installed_as_package():
+            return version("kde-builder")
+
         can_run_git = subprocess.call("type " + "git", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
         if Version.KB_REPO_DIR and can_run_git and os.path.isdir(f"{Version.KB_REPO_DIR}/.git"):
             result = subprocess.run(['printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"'], shell=True, capture_output=True, check=False, cwd=Version.KB_REPO_DIR)
@@ -41,6 +47,10 @@ class Version:
 
     @staticmethod
     def self_update() -> NoReturn:
+        if is_installed_as_package():
+            logger_app.info("Using an installed package. Please update using your package manager.")
+            exit()
+
         logger_app.info("b[*] Running g[git pull] in the " + Version.KB_REPO_DIR)
         subprocess.run("git pull", shell=True, cwd=Version.KB_REPO_DIR)
         exit()

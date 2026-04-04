@@ -43,7 +43,7 @@ from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
 from .util.textwrap_mod import dedent
-from .util.data_path import data_file_path
+from .util.util_package import data_file_path
 from .version import Version
 
 logger_app = KBLogger.getLogger("application")
