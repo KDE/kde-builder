@@ -7,6 +7,7 @@ nosearch:
 
 ```{toctree}
 using-kde-builder-preface
+building-qt
 basic-features
 advanced-features
 developer-features
