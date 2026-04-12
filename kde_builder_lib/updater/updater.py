@@ -346,7 +346,7 @@ class Updater:
 
                 """))
 
-            self._notify_post_build_message(f" y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")
+            self._notify_post_build_message(f"y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")
             return True
         return False
 
@@ -655,7 +655,7 @@ class Updater:
             # We could mark everything as resolved using git add . before stashing,
             # but that might not always be appreciated by people having to figure
             # out what the original merge conflicts were afterwards.
-            self._notify_post_build_message(f"\tb[{module}] may have local changes that we couldn't handle, so the project was left alone.")
+            self._notify_post_build_message(f"b[{module}] may have local changes that we couldn't handle, so the project was left alone.")
 
             result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
             raise KBRuntimeError(f"\tUnable to stash local changes (if any) for {module}, aborting update.")
@@ -692,8 +692,7 @@ class Updater:
             # that KDE developers working on changes do not have to manually re-apply.
             exitcode = Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"])
             if exitcode != 0:
-                message = f"\tr[b[*] Unable to restore local changes for b[{module}]! " + \
-                          f"You should manually inspect the new stash: b[{stash_name}]"
+                message = f"r[b[*] Unable to restore local changes for b[{module}]! You should manually inspect the new stash: b[{stash_name}]"
                 logger_updater.warning(f"\t{message}")
                 self._notify_post_build_message(message)
             else:

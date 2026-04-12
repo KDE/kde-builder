@@ -794,6 +794,7 @@ class Application:
 
             logger_app.warning(f"\ny[Important notification for b[{m}]:")
             for msg in msgs:
+                # We add spaces before printing post-build messages to indentat them
                 logger_app.warning(f"    {msg}")
 
         color = "g[b["
