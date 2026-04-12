@@ -560,12 +560,12 @@ Type: Boolean, Default value: False
 
 Project setting overrides global
 
-Set this option to `true` to make KDE Builder create files, for ability to easily copy content from them to
-Qt Creator configuration. They are generated to `.qtcreator` directory.
+Set this option to `true` to make KDE Builder generate Qt Creator project helpers in the source directory.
+Today this includes the legacy `.qtcreator` helper files and a `CMakeUserPresets.json` with the project's configure/build settings.
 
 ```{note}
-See developer documentation why it is currently not possible to just generate a project configuration like it is possible for other IDEs.  
-See the documentation on develop.kde.org on how to configure the Qt Creator manually to replicate KDE Builder environment.  
+Qt Creator 20+ consumes both the standard preset fields and the Qt Creator-specific `vendor` keys written by kde-builder, so the generated preset can drive configure/build/install/run integration directly.
+Older versions can still fall back to the `.qtcreator` helper files and the manual setup described in the developer documentation.
 ```
 
 Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config).

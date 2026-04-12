@@ -630,9 +630,11 @@ The corresponding configuration file option is
 [generate-vscode-project-config](#conf-generate-vscode-project-config).
 
 (cmdline-generate-qtcreator-project-config)=
-[`--generate-qtcreator-project-config`](cmdline-generate-clion-project-config), `--no-generate-qtcreator-project-config`  
-Generate a `.qtcreator` directory with files that can be used for copying to the Qt Creator configuration
-for building and debugging. This option is disabled by default.
+[`--generate-qtcreator-project-config`](cmdline-generate-qtcreator-project-config), `--no-generate-qtcreator-project-config`  
+Generate Qt Creator project helpers in the source tree. This currently includes the legacy `.qtcreator`
+snippets and a `CMakeUserPresets.json` with kde-builder's configure/build settings.
+On Qt Creator 20+, the generated preset and its vendor metadata provide full configure/build/install/run
+integration. Older versions still require manual run/deploy follow-up. This option is disabled by default.
 
 The corresponding configuration file option is
 [generate-qtcreator-project-config](#conf-generate-qtcreator-project-config).
