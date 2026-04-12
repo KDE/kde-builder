@@ -391,6 +391,10 @@ class Cmdline:
             opts["run_mode"] = "install-login-session-only"
             phases.clear()
 
+        if args.setup_qtcreator_kde_kit:
+            opts["run_mode"] = "setup-qtcreator-kde-kit"
+            phases.clear()
+
         if args.libname is not None:
             found_options["libname"] = args.libname[0]
 
@@ -520,6 +524,7 @@ class Cmdline:
             "resume-refresh-build-first|R",
             "self-update",
             "set-project-option-value=s",
+            "setup-qtcreator-kde-kit",
             "show-info",
             "show-options-specifiers",
             "stop-after|to=s",

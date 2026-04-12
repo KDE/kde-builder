@@ -132,73 +132,35 @@ Todo: Check if that feature is implemented, and if it was, add to appropriate op
 
 ## Qt Creator
 
-Here is documentation on how to make a shared configuration: https://doc.qt.io/qtcreator/creator-sharing-project-settings.html.
+For Qt Creator, `kde-builder` generates a `CMakeUserPresets.json` tailored for Qt Creator, alongside the existing `.qtcreator` helper files.
 
-Unfortunately, I (Andrew Shark) had no success to generate the configuration from outside. The nearest I got is file in successfully importing configuration
-from file you can see in `data/qtcreator/CMakeLists.txt.shared.in`. I placed some variable in configure, build, and run, and also added a cmake option.
+Starting with Qt Creator 20, the generated preset and its `vendor.qt.io/QtCreator/1.0` metadata have everything needed to get started in seconds.
+Just enable `generate-qtcreator-project-config`, open the top `CMakeLists.txt` file, and enjoy hacking - no kit registration required!
 
-The problem currently is that such .shared file cannot be actually shared, because of the `<value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">`
-in Target configuration. Without that value tag, the .shared file is just ignored, so there is no sense to generate it in such way.
+Older versions will need some manual tweaks, described below.
 
-Instead, I generate the txt files under `.qtcreator` directory, from where the user can copy-paste text for cmake options and environment.
+### Kit (Qt Creator &lt; 20 only)
 
-The full configuration guide will be in the develop.kde.org.
+Qt Creator 20+ no longer needs a pre-registered kit — the generated `CMakeUserPresets.json` carries all
+the CMake configuration, build environment, run environment, and deploy steps by itself.
 
-Here I will leave some useful info that could be used in case Qt Creator improves in the future.
-
-### Kit
+For Qt Creator versions **older than 20**, run `kde-builder --setup-qtcreator-kde-kit` once to register
+the `KDE Builder` kit before opening a project.
 
 [QT Creator Kits documentation](https://doc.qt.io/qtcreator/creator-preferences-kits.html)  
 [Qt Creator Activate kits for a project documentation](https://doc.qt.io/qtcreator/creator-how-to-activate-kits.html)  
 
-A kit is an IDE specific (i.e., not a project setting), and creation of it cannot be automated. So we ask user to define a kit manually.
+`kde-builder` uses [SDK Tool](https://doc.qt.io/qtcreator/creator-sdk-tool.html) to register the kit.
+By default, it searches for sdktool in `~/Qt/Tools/sdktool/libexec/qtcreator`, `/usr/libexec/qtcreator/sdktool` and `/usr/lib/qtcreator/sdktool`.
+If you have installed it in a different place, make sure you specify its path by setting `qtcreator-sdktool-path` property in `~/.config/kde-builder.yaml`. `qtcreator-settings-path` property from the same file can be used to override the default (`~/.config/QtProject/qtcreator`) Qt Creator settings folder.
 
-In main menu, go to Edit -> Preferences. In the opened window, in the "Kits" category, go to "Kits" tab.
+The kit sets the build and run environment variables, common CMake options, toolchain, debugger, and Qt version.
+After this kit is registered, please check if we picked the right Qt version for you.
 
-There is no way to not define a generator in kit, but it can be overriden by the cmake configuration.
-
-The kit must have two cmake options:
-```text
--DCMAKE_C_COMPILER:FILEPATH=%{Compiler:Executable:C}
--DCMAKE_CXX_COMPILER:FILEPATH=%{Compiler:Executable:Cxx}
-```
-otherwise, it will have exclamation mark.
-
-#### Qt version in kit
-Do we need to create a "Qt Version"? It seems no.  
-In my Arch Linux, the Qt 5 was autodetected, but not Qt 6. The page [Opening Project](https://doc.qt.io/qtcreator/creator-project-opening.html) says:
-> Even if you do not intend to build the project, the C++ and QML code models need a Qt version and compiler to offer code completion. To specify them, 
-select the Preferences link, or select Preferences > Kits.
-
-We can manually add `/usr/bin/qmake6` path in "Qt Versions". But tooltip says that for systems not using qmake, this is optional.
-
-#### Removing unwanted kits
-
-In case project has `CMakePresets.json` file, then when we open it, it will create many "temporary" kits. We do not need them, and can remove all of them.
-In case we want them in the future, we could do Build -> Reload CMake Presets.
-
-Alternatively, we could keep them there in kits, but deactivate for the project/for all projects. If we accidentally clicked on an unwanted kit in
-"Build & Run", it got activated. To disable it again, click on its name with right mouse button, and select "Disable Kit for all projects".
-See screenshot from [here](https://doc.qt.io/qtcreator/creator-configuring-projects.html).
 
 ### Configuration documentation:
 
-#### Build Configuration
+#### Deploy Settings
 
-[Configure projects for building](https://doc.qt.io/qtcreator/creator-build-settings.html)  
-[Configuring cmake options and build environment](https://doc.qt.io/qtcreator/creator-build-settings-cmake.html)  
-
-#### Run Configuration
-
-[Run settings](https://doc.qt.io/qtcreator/creator-run-settings.html)  
-[Run settings Desktop](https://doc.qt.io/qtcreator/creator-run-settings-desktop-devices.html)  
-
-### Environment Configuration
-
-[Controlling variables expansion and substitution](https://doc.qt.io/qtcreator/creator-how-to-use-qtc-variables.html)  
-[Edit environment settings](https://doc.qt.io/qtcreator/creator-how-to-edit-environment-settings.html)  
-
-### Other notes
-
-[Opening project](https://doc.qt.io/qtcreator/creator-project-opening.html). The "Import builds" function seems not very useful, because you anyway would 
-not have the initial configuration (cmake options and enviroment).
+Qt Creator 20+ creates the `CMake install` deploy step from the generated vendor metadata.
+Users of Qt Creator 19 or earlier need to add the `CMake install` deploy step manually.

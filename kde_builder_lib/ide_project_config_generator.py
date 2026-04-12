@@ -5,7 +5,9 @@
 
 from __future__ import annotations
 
+import json
 import os
+import shutil
 import sys
 from typing import TYPE_CHECKING
 
@@ -274,6 +276,128 @@ class IdeProjectConfigGenerator:
 
         return True
 
+    def _generate_cmake_user_presets(self) -> bool:
+        """
+        Generate CMakeUserPresets.json in the project source directory.
+
+        This file instructs CMake-aware IDEs (Qt Creator, CLion, VS Code) to use the correct
+        build directory, CMake options, and environment variables. The vendor section carries
+        Qt Creator-specific run environment and deploy metadata; Qt Creator 20+ reads this directly
+        without needing a pre-registered kit. Older versions can still use --setup-qtcreator-kde-kit
+        to register a kit.
+
+        Always overwrites to reflect current kde-builder configuration.
+        """
+        if Debug().pretending():
+            logger_ide_proj.debug("\tWould have generated CMakeUserPresets.json")
+            return False
+
+        module = self.module
+        project_name = module.name
+        build_dir = module.fullpath("build")
+        src_dir = module.fullpath("source")
+
+        # Extract generator from cmake_opts: ["cmake", "-B", ".", "-S", srcdir, "-G", generator, ...]
+        generator = "Ninja"
+        if len(self.cmake_opts) > 6 and self.cmake_opts[5] == "-G":
+            generator = self.cmake_opts[6]
+
+        # Parse -D options into cacheVariables
+        cache_vars: dict[str, str] = {}
+        for opt in self.cmake_opts[7:]:
+            if not opt.startswith("-D"):
+                continue
+            kv = opt[2:]
+            eq_pos = kv.find("=")
+            if eq_pos <= 0:
+                continue
+            cache_vars[kv[:eq_pos]] = kv[eq_pos + 1:]
+
+        if module.get_option("compile-commands-export"):
+            cache_vars["CMAKE_EXPORT_COMPILE_COMMANDS:BOOL"] = "ON"
+
+        # Set QT_QMAKE_EXECUTABLE so CMake/IDE can locate the Qt installation.
+        # Prefer qmake6 from qt-install-dir if set, otherwise search PATH.
+        if "QT_QMAKE_EXECUTABLE" not in cache_vars:
+            qmake_path: str | None = None
+            qt_install_dir = module.get_option("qt-install-dir")
+            if qt_install_dir:
+                for name in ("qmake6", "qmake"):
+                    candidate = os.path.join(qt_install_dir, "bin", name)
+                    if os.path.isfile(candidate):
+                        qmake_path = candidate
+                        break
+            if not qmake_path:
+                qmake_path = shutil.which("qmake6") or shutil.which("qmake")
+            if qmake_path:
+                cache_vars["QT_QMAKE_EXECUTABLE"] = qmake_path
+
+        # CMAKE_PREFIX_PATH and CMAKE_MODULE_PATH come from module.env (not cmake_opts),
+        # but belong in cacheVariables rather than environment.
+        for key in ("CMAKE_PREFIX_PATH", "CMAKE_MODULE_PATH"):
+            if key not in cache_vars and key in module.env:
+                cache_vars[key] = module.env[key]
+
+        # Build environment: exclude CMAKE_PREFIX_PATH/CMAKE_MODULE_PATH (they're in cacheVariables)
+        env_vars: dict[str, str] = {}
+        cmake_env_keys = {"CMAKE_PREFIX_PATH", "CMAKE_MODULE_PATH"}
+        for key, val in module.env.items():
+            if key not in cmake_env_keys:
+                env_vars[key] = val
+
+        # Run environment (mirrors prefix.sh / kit --run-env)
+        install_dir = module.installation_path()
+        libname = module.context.libname
+        # TODO Unify run env generation, it's kinda silly to have more or less the same thing in 4 different places!
+        run_env: dict[str, str] = {
+            "PATH": f"{install_dir}/bin:" + os.environ.get("PATH", ""),
+            "XDG_DATA_DIRS": f"{install_dir}/share:" + os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share"),
+            "XDG_CONFIG_DIRS": f"{install_dir}/etc/xdg:" + os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg"),
+            "QT_PLUGIN_PATH": f"{install_dir}/{libname}/plugins:" + os.environ.get("QT_PLUGIN_PATH", ""),
+            "QML2_IMPORT_PATH": f"{install_dir}/{libname}/qml:" + os.environ.get("QML2_IMPORT_PATH", ""),
+            "QT_QUICK_CONTROLS_STYLE_PATH": f"{install_dir}/{libname}/qml/QtQuick/Controls.2/:" + os.environ.get("QT_QUICK_CONTROLS_STYLE_PATH", ""),
+            "MANPATH": f"{install_dir}/share/man:" + os.environ.get("MANPATH", "/usr/local/share/man:/usr/share/man"),
+            "SASL_PATH": f"{install_dir}/{libname}/sasl2:" + os.environ.get("SASL_PATH", f"/usr/{libname}/sasl2"),
+        }
+
+        presets = {
+            "version": 6,
+            "configurePresets": [
+                {
+                    "name": "kde-builder",
+                    "displayName": "KDE Builder",
+                    "generator": generator,
+                    "binaryDir": build_dir,
+                    "vendor": {
+                        "qt.io/QtCreator/1.0": {
+                            "runEnvironment": run_env,
+                        },
+                    },
+                    "cacheVariables": cache_vars,
+                    "environment": env_vars,
+                },
+            ],
+            "buildPresets": [
+                {"name": "kde-builder", "configurePreset": "kde-builder"},
+            ],
+             "vendor": {
+                "qt.io/QtCreator/1.0": {
+                    "deployPresets": [
+                        {
+                            "type": "install",
+                            "name": "kde-builder"
+                        }
+                    ],
+                },
+            },
+        }
+
+        preset_path = f"{src_dir}/CMakeUserPresets.json"
+        logger_ide_proj.debug(f"\tGenerating CMakeUserPresets.json for {project_name}: {preset_path}")
+
+        self._write_to_file(preset_path, json.dumps(presets, indent=4) + "\n")
+        return True
+
     @staticmethod
     def _read_file(file_path: str) -> str:
         """
@@ -348,6 +472,7 @@ class IdeProjectConfigGenerator:
 
         if module.get_option("generate-qtcreator-project-config"):
             self._generate_qtcreator_config()
+            self._generate_cmake_user_presets()
         else:
             logger_ide_proj.debug("\tGenerating qtcreator configs - disabled for this project")
 

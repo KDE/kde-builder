@@ -155,6 +155,8 @@ class BuildContext(Module):
             "source-when-start-program": "/dev/null",
             "tag": "",
             "taskset-cpu-list": "",
+            "qtcreator-sdktool-path": "",
+            "qtcreator-settings-path": "",
         }
 
         # These options are exposed as cmdline options without parameters

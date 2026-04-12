@@ -560,12 +560,12 @@ Type: Boolean, Default value: False
 
 Project setting overrides global
 
-Set this option to `true` to make KDE Builder create files, for ability to easily copy content from them to
-Qt Creator configuration. They are generated to `.qtcreator` directory.
+Set this option to `true` to make KDE Builder generate Qt Creator project helpers in the source directory.
+Today this includes the legacy `.qtcreator` helper files and a `CMakeUserPresets.json` with the project's configure/build settings.
 
 ```{note}
-See developer documentation why it is currently not possible to just generate a project configuration like it is possible for other IDEs.  
-See the documentation on develop.kde.org on how to configure the Qt Creator manually to replicate KDE Builder environment.  
+Qt Creator 20+ consumes both the standard preset fields and the Qt Creator-specific `vendor` keys written by kde-builder, so the generated preset can drive configure/build/install/run integration directly.
+Older versions can still fall back to the `.qtcreator` helper files and the manual setup described in the developer documentation.
 ```
 
 Related command-line option: [--generate-qtcreator-project-config](#cmdline-generate-qtcreator-project-config).
@@ -780,6 +780,24 @@ do not specify this option, kde-builder will assume that Qt is provided
 by the operating system.
 
 Related command-line option: [--qt-install-dir](#cmdline-qt-install-dir).
+
+(conf-qtcreator-sdktool-path)=
+[`qtcreator-sdktool-path`](conf-qtcreator-sdktool-path)
+
+Type: String
+
+Path to Qt Creator's `sdktool` binary used by [`--setup-qtcreator-kde-kit`](#cmdline-setup-qtcreator-kde-kit).
+Only relevant for Qt Creator versions older than 20 (see [`--setup-qtcreator-kde-kit`](#cmdline-setup-qtcreator-kde-kit)).
+If unset, kde-builder searches `~/Qt/Tools/sdktool/libexec/qtcreator/sdktool`, `/usr/libexec/qtcreator/sdktool`, `/usr/lib/qtcreator/sdktool`, then falls back to `sdktool` from `PATH`.
+
+(conf-qtcreator-settings-path)=
+[`qtcreator-settings-path`](conf-qtcreator-settings-path)
+
+Type: String
+
+Path to the Qt Creator settings directory used by [`--setup-qtcreator-kde-kit`](#cmdline-setup-qtcreator-kde-kit).
+Only relevant for Qt Creator versions older than 20 (see [`--setup-qtcreator-kde-kit`](#cmdline-setup-qtcreator-kde-kit)).
+If unset, kde-builder uses `~/.config/QtProject/qtcreator`.
 
 (conf-reconfigure)=
 [`reconfigure`](conf-reconfigure)

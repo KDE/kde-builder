@@ -39,6 +39,7 @@ from .module_set.module_set import ModuleSet
 from .options_base import OptionsBase
 from .recursive_config_nodes_iterator import RecursiveConfigNodesIterator
 from .start_program import StartProgram
+from .qtcreator_kit_setup import QtCreatorKitSetup
 from .task_manager import TaskManager
 from .updater.updater import Updater
 from .util.util import Util
@@ -289,6 +290,11 @@ class Application:
         if start_program_and_args:
             sp = StartProgram(ctx)
             sp.execute_built_binary(start_program_and_args)  # noreturn
+
+        if self.run_mode == "setup-qtcreator-kde-kit":
+            kit_setup = QtCreatorKitSetup(ctx)
+            result = 0 if kit_setup.setup_kit() else 1
+            exit(result)
 
         if not Debug().is_testing():
             # Running in a test harness, avoid downloading metadata which will be
