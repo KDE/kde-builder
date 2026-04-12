@@ -245,6 +245,7 @@ _kde_builder() {
     --configure-flags --custom-build-command --cxxflags --debug --dependency-tree
     --dependency-tree-fullpath --dest-dir --directory-layout
     --generate-clion-project-config
+    --setup-qtcreator-kde-kit
     --no-generate-clion-project-config --generate-config --generate-qtcreator-project-config
     --no-generate-qtcreator-project-config --generate-vscode-project-config
     --no-generate-vscode-project-config --git-user --help -h --hold-performance-profile --no-hold-performance-profile

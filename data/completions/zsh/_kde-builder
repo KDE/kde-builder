@@ -32,6 +32,7 @@ _arguments \
   --directory-layout"[Layout which kde-builder should use when creating source and build directories]"":argument:" \
   "(--generate-clion-project-config --no-generate-clion-project-config)"{--generate-clion-project-config,--no-generate-clion-project-config}"[Generate a clion project config]" \
   --generate-config"[Installs a base config file]" \
+  --setup-qtcreator-kde-kit"[Setups the QtCreator kde kit]" \
   "(--generate-qtcreator-project-config --no-generate-qtcreator-project-config)"{--generate-qtcreator-project-config,--no-generate-qtcreator-project-config}"[Generate a qtcreator project config]" \
   "(--generate-vscode-project-config --no-generate-vscode-project-config)"{--generate-vscode-project-config,--no-generate-vscode-project-config}"[Generate a vscode project config]" \
   --git-user"[Specify user identity for newly cloned projects]"":argument:" \

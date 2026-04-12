@@ -64,9 +64,18 @@ global:
   # Enable this if you want to use Visual Studio Code for development
   generate-vscode-project-config: %{generate-vscode-project-config}
 
-  # Generate copy-pastable files for manual qtcreator config creation
-  # Enable this if you want to use Qt Creator for development
+  # Generate Qt Creator helper files and CMakeUserPresets.json in project directories
+  # Enable this if you want to use Qt Creator with kde-builder-managed project settings
   generate-qtcreator-project-config: %{generate-qtcreator-project-config}
+
+  # Path to Qt Creator's sdktool binary (used by --setup-qtcreator-kde-kit)
+  # If not set, kde-builder will search in ~/Qt/Tools/sdktool/, /usr/libexec/qtcreator/,
+  # /usr/lib/qtcreator/, then fall back to sdktool from PATH
+  # qtcreator-sdktool-path:
+
+  # Path to Qt Creator's settings directory (used by --setup-qtcreator-kde-kit)
+  # If not set, defaults to ~/.config/QtProject/qtcreator
+  # qtcreator-settings-path:
 
   # Show a message when kde-builder detects it is outdated.
   check-self-updates: %{check-self-updates}
