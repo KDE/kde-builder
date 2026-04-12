@@ -636,17 +636,12 @@ class Updater:
 
         old_stash_count = self.count_stash()
 
-        # always stash:
-        # - also stash untracked files because what if upstream started to track them
-        # - we do not stash .gitignore'd files because they may be needed for builds?
-        #   on the other hand that leaves a slight risk if upstream altered those
-        #   (i.e. no longer truly .gitignore'd)
         logger_updater.debug("\tStashing local changes if any...")
 
         if Debug().pretending():  # probably best not to do anything if pretending
             result = 0
         else:
-            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "-u", "--quiet", "--message", stash_name])
+            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "--quiet", "--message", stash_name])
 
         if result == 0:
             pass
