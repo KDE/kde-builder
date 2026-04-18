@@ -71,7 +71,7 @@ class UtilLoggedSubprocess:
         self._log_to = None
         self._chdir_to = None
         self._set_command = None
-        self._disable_translations = 0
+        self._disable_translations = False
         # end of attributes
 
         self.child_output_handler: None | Callable = None
@@ -111,15 +111,14 @@ class UtilLoggedSubprocess:
         self._set_command = set_command
         return self
 
-    def disable_translations(self, disable_translations: bool | None = None):
+    def disable_translations(self, disable_translations: bool):
         """
         Make the child process to attempt to disable command localization by setting the "C" locale in the shell environment.
 
         Optional.
         This can be needed for filtering command output but should be avoided if possible otherwise.
         """
-        if disable_translations is not None:
-            self._disable_translations = disable_translations
+        self._disable_translations = disable_translations
         return self
 
     def start(self) -> int:
@@ -171,7 +170,7 @@ class UtilLoggedSubprocess:
             if dir_to_run_from:
                 Util.p_chdir(dir_to_run_from)
 
-            if self.disable_translations():
+            if self._disable_translations:
                 Util.disable_locale_message_translation()
 
             callback = None
