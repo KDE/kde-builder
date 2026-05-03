@@ -312,41 +312,54 @@ class Updater:
             raise KBRuntimeError(f"\tUnable to remove preconfigured push URL for {module}!")
         return
 
-    def _warn_if_stashed_from_wrong_branch(self, remote_name: str, branch: str, branch_name: str) -> bool:
+    def _decide_if_refuse_to_stash(self, remote_name: str, remote_branch_name: str) -> bool:
         """
-        Return true if there is a git stash active from the wrong branch, so we don't mistakenly try to apply the stash after we switch branch.
+        Determine the case when we should skip stashing local changes.
+
+        This is to prevent stash-pop user changes to another branch.
+        I.e. user has their branch "user-branch", has uncommitted local changes, and then kde-builder is run with branch configured to "master".
+        Then if we try to stash changes, then switch branch, then stash-pop changes, there will be a problem.
+        First, highly likely there will be merge conflict.
+        Second, even if no conflict, user does not want changes to be unexpectedly applied to some another branch. See kdesrc-build issue #67.
+
+        Return:
+             True - if decided to refuse to stash, False - if decided to try stashing normally.
         """
         module = self.module
 
-        # Check if this branch_name we want was already the branch we were on. If
-        # not, and if we stashed local changes, then we might dump a bunch of
-        # conflicts in the repo if we un-stash those changes after a branch switch.
-        # See issue #67.
-        existing_branch = next(iter(Util.get_program_output("git", "branch", "--show-current")), None)
-        if existing_branch is not None:
-            existing_branch = existing_branch.removesuffix("\n")
+        # Let us check if we have uncommitted changes
+        status_lines = Util.get_program_output("git", "status", "--porcelain", "--untracked-files=no")
+        have_uncommitted_changes = bool(status_lines)
 
-        # The result is empty if in "detached HEAD" state where we should also
-        # clearly not switch branches if there are local changes.
-        if module.get_option("#git-was-stashed") and (not existing_branch or (existing_branch != branch_name)):
+        if not have_uncommitted_changes:
+            return False
 
+        # Let us check if we are staying on the same branch, or will switch to another one.
+
+        current_branch = next(iter(Util.get_program_output("git", "branch", "--show-current")), None)
+        if current_branch is not None:
+            current_branch = current_branch.removesuffix("\n")
+
+        local_branch_name = self._detect_existing_local_branch_tracking_remote_branch(remote_name, remote_branch_name)
+
+        # The current_branch is empty if in "detached HEAD" state, in that case we should also refuse stashing if there are local changes.
+        if not current_branch or (current_branch != local_branch_name):
             # Make error message make more sense
-            if not existing_branch:
-                existing_branch = "Detached HEAD"
-            if not branch_name:
-                branch_name = f"New branch to point to {remote_name}/{branch}"
+            if not current_branch:
+                current_branch = "Detached HEAD"
+            if not local_branch_name:
+                local_branch_name = f"Not yet created branch that will point to {remote_name}/{remote_branch_name}"
 
             logger_updater.info(dedent(f"""
-                \ty[b[*] The project y[b[{module}] had local changes from a different branch than expected:
-                \ty[b[*]   Expected branch: b[{branch_name}]
-                \ty[b[*]   Actual branch:   b[{existing_branch}]
+                \ty[b[*] The project y[b[{module.name}] is currently at different branch than wanted, and has local changes.
+                \ty[b[*]   Current branch:  b[{current_branch}]
+                \ty[b[*]   Wanted branch:   b[{local_branch_name}]
                 \ty[b[*]
-                \ty[b[*] To avoid conflict with your local changes, b[{module}] will not be updated, and the
-                \ty[b[*] branch will remain unchanged, so it may be out of date from upstream.
-
+                \ty[b[*] To avoid conflict with your local changes, it will not be updated, and the branch will remain unchanged.
+                \ty[b[*] Please commit or stash your changes, and then rerun kde-builder update for this project.
                 """))
 
-            self._notify_post_build_message(f"y[b[*] b[{module}] was not updated as it had local changes against an unexpected branch.")
+            self._notify_post_build_message(f"y[b[*] b[{module.name}] was not updated as it had local changes on a different branch than wanted.")
             return True
         return False
 
@@ -369,9 +382,6 @@ class Updater:
         module = self.module
 
         local_branch = self._detect_existing_local_branch_tracking_remote_branch(remote_name, remote_branch)
-
-        if self._warn_if_stashed_from_wrong_branch(remote_name, remote_branch, local_branch):
-            return 0
 
         chdir_to = module.fullpath("source")
 
@@ -641,6 +651,9 @@ class Updater:
         if Debug().pretending():  # probably best not to do anything if pretending
             result = 0
         else:
+            will_refuse_stashing = self._decide_if_refuse_to_stash(remote_name, commit_id)
+            if will_refuse_stashing:
+                raise KBRuntimeError(f"\tRefusing to stash changes from other branch.")
             result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "--quiet", "--message", stash_name])
 
         if result == 0:
@@ -660,11 +673,6 @@ class Updater:
         # might have been a genuine user's stash already prior to kde-builder
         # taking over the reins in the repo.
         new_stash_count = self.count_stash()
-
-        # mark that we applied a stash so that $updateSub (_update_to_remote_head or
-        # _update_to_detached_head) can know not to do dumb things
-        if new_stash_count != old_stash_count:
-            module.set_option("#git-was-stashed", True)
 
         # finally, update to remote head
         if commit_type == "branch":
