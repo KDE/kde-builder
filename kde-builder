@@ -171,6 +171,10 @@ def main():
         fr = FirstRun(prompt_answer)
         exit(fr.setup_user_system(RealBinDir, setup_steps))
 
+    if len(sys.argv) > 1 and sys.argv[1] == "bst-generate":
+        from kde_builder_lib.bst_generator import run_bst_generate_cli  # noqa: E402
+        exit(run_bst_generate_cli(sys.argv[2:]))
+
     from kde_builder_lib.version import Version  # noqa: E402
     from kde_builder_lib.application import Application  # noqa: E402
     from kde_builder_lib.kb_exception import KBException  # noqa: E402

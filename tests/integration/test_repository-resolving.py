@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import unittest  # noqa: F401
+
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
 
