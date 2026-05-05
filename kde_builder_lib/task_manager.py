@@ -105,10 +105,10 @@ class TaskManager:
 
             signal.signal(signal.SIGHUP, handle_sighup)
 
-            logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
+            logger_taskmanager.info("\n b[<<<  Update Process  >>>]\n")
             result: int = self._handle_updates(ipc, ctx)
 
-            logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
+            logger_taskmanager.info(" b[<<<  Build Process  >>>]\n")
             result: int = self._handle_build(ipc, ctx) or result
 
         return result
