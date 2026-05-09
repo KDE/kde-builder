@@ -634,10 +634,6 @@ class Application:
         ctx = self.context
         modules = self.modules
 
-        if not modules:
-            print("No projects to build, exiting.")
-            sys.exit(0)
-
         ctx.modules = modules
 
         run_mode = self.run_mode
@@ -769,7 +765,7 @@ class Application:
             # --rebuild-failures
             ctx.set_persistent_option("global", "last-failed-module-list", failed_modules)
 
-        if (ctx.get_option("install-login-session") or run_mode == "install-login-session-only") and not Debug().pretending():
+        if ctx.get_option("install-login-session") or run_mode == "install-login-session-only":
             res = self.install_login_session()
             if res and not result:
                 result = res
@@ -1330,6 +1326,9 @@ class Application:
         then the installation script is invoked. Otherwise, invocation is skipped, so user is not asked to enter sudo
         password.
         """
+        if Debug().pretending():
+            return 0
+
         real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
         ctx = self.context
