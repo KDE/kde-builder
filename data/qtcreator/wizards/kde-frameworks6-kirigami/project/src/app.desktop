@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+
+Name=%{ProjectName}
+GenericName=A Kirigami Application
+Icon=%{ProjectNameLC}
+
+Exec=%{ProjectNameLC}
+StartupWMClass=org.kde.%{ProjectNameLC}

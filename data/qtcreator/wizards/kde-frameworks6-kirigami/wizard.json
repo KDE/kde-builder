@@ -1,0 +1,175 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject" ],
+    "id": "C.KDEFrameworks6Kirigami",
+    "category": "G.KDE",
+    "trDescription": "Creates a convergent KDE application built with Kirigami and QML, backed by C++.\n\nUses a QQmlApplicationEngine with a Kirigami.ApplicationWindow, a C++ backend type exposed to QML, and KAboutData / KLocalizedContext integration. Builds with CMake and extra-cmake-modules (ECM), and ships an autotest, an app icon and translation scaffolding.",
+    "trDisplayName": "KDE Kirigami Application (C++/QML)",
+    "trDisplayCategory": "KDE",
+    "icon": "icon.png",
+    "enabled": "%{JS: isPluginRunning('cmakeprojectmanager') && isPluginRunning('qmljseditor')}",
+
+    "options":
+    [
+        { "key": "ProjectNameLC", "value": "%{JS: value('ProjectName').toLowerCase()}" },
+        { "key": "ProjectNameUC", "value": "%{JS: value('ProjectName').toUpperCase()}" },
+        { "key": "CurrentYear", "value": "%{JS: new Date().getFullYear()}" },
+        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Project Location",
+            "trShortTitle": "Location",
+            "typeId": "Project",
+            "data": { "trDescription": "Creates a convergent KDE Kirigami/QML application backed by C++. The project name is used as the application and binary name and as the QML module URI (org.kde.<name>), so a lowercase name (for example \"myapp\") is recommended." }
+        },
+        {
+            "trDisplayName": "Application Details",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data":
+            [
+                {
+                    "name": "DetailsLabel",
+                    "type": "Label",
+                    "data":
+                    {
+                        "trText": "These values are used in the generated source file headers, the about dialog, and the AppStream metadata.",
+                        "wordWrap": true
+                    }
+                },
+                { "name": "Sp0", "type": "Spacer" },
+                {
+                    "name": "Author",
+                    "trDisplayName": "Author:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "Your Name" }
+                },
+                {
+                    "name": "Email",
+                    "trDisplayName": "Email:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "you@example.com" }
+                },
+                {
+                    "name": "Version",
+                    "trDisplayName": "Version:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "0.1" }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "data": { "projectFilePath": "%{CMakeFile}" }
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "project/CMakeLists.txt",
+                    "target": "CMakeLists.txt",
+                    "openAsProject": true
+                },
+                {
+                    "source": "project/CMakeUserPresets.json",
+                    "target": "CMakeUserPresets.json"
+                },
+                {
+                    "source": "project/LICENSES/LicenseRef-KDE-Accepted-GPL.txt",
+                    "target": "LICENSES/LicenseRef-KDE-Accepted-GPL.txt"
+                },
+                {
+                    "source": "project/src/CMakeLists.txt",
+                    "target": "src/CMakeLists.txt"
+                },
+                {
+                    "source": "project/src/main.cpp",
+                    "target": "src/main.cpp"
+                },
+                {
+                    "source": "project/src/greeter.h",
+                    "target": "src/greeter.h"
+                },
+                {
+                    "source": "project/src/greeter.cpp",
+                    "target": "src/greeter.cpp"
+                },
+                {
+                    "source": "project/src/Main.qml",
+                    "target": "src/Main.qml",
+                    "openInEditor": true
+                },
+                {
+                    "source": "project/src/app.desktop",
+                    "target": "src/org.kde.%{ProjectNameLC}.desktop"
+                },
+                {
+                    "source": "project/src/app.metainfo.xml",
+                    "target": "src/org.kde.%{ProjectNameLC}.metainfo.xml"
+                },
+                {
+                    "source": "project/Messages.sh",
+                    "target": "Messages.sh"
+                },
+                {
+                    "source": "project/icons/CMakeLists.txt",
+                    "target": "icons/CMakeLists.txt"
+                },
+                {
+                    "source": "project/icons/16-apps-app.png",
+                    "target": "icons/16-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/22-apps-app.png",
+                    "target": "icons/22-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/32-apps-app.png",
+                    "target": "icons/32-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/48-apps-app.png",
+                    "target": "icons/48-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/autotests/CMakeLists.txt",
+                    "target": "autotests/CMakeLists.txt"
+                },
+                {
+                    "source": "project/autotests/greetertest.cpp",
+                    "target": "autotests/%{ProjectNameLC}greetertest.cpp"
+                },
+                {
+                    "source": "project/autotests/qmltest.cpp",
+                    "target": "autotests/qmltest.cpp"
+                },
+                {
+                    "source": "project/autotests/tst_greeting.qml",
+                    "target": "autotests/tst_greeting.qml"
+                }
+            ]
+        }
+    ]
+}

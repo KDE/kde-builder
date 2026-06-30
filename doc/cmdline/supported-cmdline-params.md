@@ -741,6 +741,23 @@ Generate the kde-builder configuration file.
 
 See also `--initial-setup`
 
+(cmdline-install-qtcreator-templates)=
+[`--install-qtcreator-templates`](cmdline-install-qtcreator-templates)
+Install the bundled Qt Creator project wizard templates so you can create new
+KDE projects directly from Qt Creator's _New Project_ dialog (under the _KDE_
+category).
+
+The templates are copied into Qt Creator's configuration directory, under
+`$XDG_CONFIG_HOME/QtProject/qtcreator/templates/wizards/` (that is,
+`~/.config/QtProject/qtcreator/templates/wizards/`).
+
+For each template, a `CMakeUserPresets.json` is generated so that projects
+created from the wizard configure, build, install and run against the KDE that
+kde-builder installed (rather than the system KDE). The environment baked into
+that file reflects your kde-builder configuration (such as `install-dir`) at the
+time this command is run, so re-run it after changing those settings. Restart
+Qt Creator afterwards for it to pick up the templates.
+
 (cmdline-prompt-answer)=
 [`--prompt-answer`](cmdline-prompt-answer) \<value\>  
 Prevent the interactive prompts, and use the _value_ as the prompt answer. Such prompts can be seen in install-distro-packages step.

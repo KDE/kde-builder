@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.kde.%{ProjectNameLC}</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  <name>%{ProjectName}</name>
+  <summary>A Kirigami application written with KDE Frameworks</summary>
+  <description>
+    <p>%{ProjectName} is a convergent KDE application built with Kirigami and QML.</p>
+  </description>
+  <url type="homepage">https://www.example.org</url>
+  <url type="bugtracker">https://bugs.example.org</url>
+  <url type="donation">https://www.example.org/community/donations</url>
+  <provides>
+    <binary>%{ProjectNameLC}</binary>
+  </provides>
+  <launchable type="desktop-id">org.kde.%{ProjectNameLC}.desktop</launchable>
+  <project_group>KDE</project_group>
+</component>

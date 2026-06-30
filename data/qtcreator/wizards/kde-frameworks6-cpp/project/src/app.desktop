@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+
+Name=%{ProjectName}
+GenericName=A Simple Application written with KDE Frameworks
+Icon=%{ProjectNameLC}
+
+Exec=%{ProjectNameLC}
+StartupWMClass=%{ProjectNameLC}
+X-DocPath=%{ProjectNameLC}/index.html

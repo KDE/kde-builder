@@ -1,0 +1,211 @@
+{
+    "version": 1,
+    "supportedProjectTypes": [ "CMakeProjectManager.CMakeProject" ],
+    "id": "A.KDEFrameworks6CppWidgets",
+    "category": "G.KDE",
+    "trDescription": "Creates a KDE Frameworks 6 GUI application written in C++ with Qt Widgets.\n\nUses KXmlGui for the main window, KConfig for settings, and KAboutData, KCrash and KDBusService for application integration. Builds with CMake and extra-cmake-modules (ECM).",
+    "trDisplayName": "KDE Frameworks 6 GUI Application (C++)",
+    "trDisplayCategory": "KDE",
+    "icon": "icon.png",
+    "enabled": "%{JS: isPluginRunning('cmakeprojectmanager') && isPluginRunning('cppeditor')}",
+
+    "options":
+    [
+        { "key": "ProjectNameLC", "value": "%{JS: value('ProjectName').toLowerCase()}" },
+        { "key": "ProjectNameUC", "value": "%{JS: value('ProjectName').toUpperCase()}" },
+        { "key": "CurrentYear", "value": "%{JS: new Date().getFullYear()}" },
+        { "key": "CMakeFile", "value": "%{ProjectDirectory}/CMakeLists.txt" }
+    ],
+
+    "pages":
+    [
+        {
+            "trDisplayName": "Project Location",
+            "trShortTitle": "Location",
+            "typeId": "Project",
+            "data": { "trDescription": "Creates a KDE Frameworks 6 GUI application written in C++ with Qt Widgets. The project name is used as the application and binary name, so a lowercase name (for example \"myapp\") is recommended." }
+        },
+        {
+            "trDisplayName": "Application Details",
+            "trShortTitle": "Details",
+            "typeId": "Fields",
+            "data":
+            [
+                {
+                    "name": "DetailsLabel",
+                    "type": "Label",
+                    "data":
+                    {
+                        "trText": "These values are used in the generated source file headers, the about dialog, and the AppStream metadata.",
+                        "wordWrap": true
+                    }
+                },
+                {
+                    "name": "Sp0",
+                    "type": "Spacer"
+                },
+                {
+                    "name": "Author",
+                    "trDisplayName": "Author:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "Your Name" }
+                },
+                {
+                    "name": "Email",
+                    "trDisplayName": "Email:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "you@example.com" }
+                },
+                {
+                    "name": "Version",
+                    "trDisplayName": "Version:",
+                    "mandatory": true,
+                    "type": "LineEdit",
+                    "data": { "text": "0.1" }
+                }
+            ]
+        },
+        {
+            "trDisplayName": "Kit Selection",
+            "trShortTitle": "Kits",
+            "typeId": "Kits",
+            "data": { "projectFilePath": "%{CMakeFile}" }
+        },
+        {
+            "trDisplayName": "Project Management",
+            "trShortTitle": "Summary",
+            "typeId": "Summary"
+        }
+    ],
+
+    "generators":
+    [
+        {
+            "typeId": "File",
+            "data":
+            [
+                {
+                    "source": "project/CMakeLists.txt",
+                    "target": "CMakeLists.txt",
+                    "openAsProject": true
+                },
+                {
+                    "source": "project/CMakeUserPresets.json",
+                    "target": "CMakeUserPresets.json"
+                },
+                {
+                    "source": "project/LICENSES/LicenseRef-KDE-Accepted-GPL.txt",
+                    "target": "LICENSES/LicenseRef-KDE-Accepted-GPL.txt"
+                },
+                {
+                    "source": "project/src/CMakeLists.txt",
+                    "target": "src/CMakeLists.txt"
+                },
+                {
+                    "source": "project/src/main.cpp",
+                    "target": "src/main.cpp"
+                },
+                {
+                    "source": "project/src/window.h",
+                    "target": "src/%{ProjectNameLC}window.h"
+                },
+                {
+                    "source": "project/src/window.cpp",
+                    "target": "src/%{ProjectNameLC}window.cpp",
+                    "openInEditor": true
+                },
+                {
+                    "source": "project/src/view.h",
+                    "target": "src/%{ProjectNameLC}view.h"
+                },
+                {
+                    "source": "project/src/view.cpp",
+                    "target": "src/%{ProjectNameLC}view.cpp"
+                },
+                {
+                    "source": "project/src/view.ui",
+                    "target": "src/%{ProjectNameLC}view.ui"
+                },
+                {
+                    "source": "project/src/settings.ui",
+                    "target": "src/settings.ui"
+                },
+                {
+                    "source": "project/src/Settings.kcfg",
+                    "target": "src/%{ProjectName}Settings.kcfg"
+                },
+                {
+                    "source": "project/src/Settings.kcfgc",
+                    "target": "src/%{ProjectName}Settings.kcfgc"
+                },
+                {
+                    "source": "project/src/app.qrc",
+                    "target": "src/%{ProjectNameLC}.qrc"
+                },
+                {
+                    "source": "project/src/appui.rc",
+                    "target": "src/%{ProjectNameLC}ui.rc"
+                },
+                {
+                    "source": "project/src/app.desktop",
+                    "target": "src/org.example.%{ProjectNameLC}.desktop"
+                },
+                {
+                    "source": "project/src/app.metainfo.xml",
+                    "target": "src/org.example.%{ProjectNameLC}.metainfo.xml"
+                },
+                {
+                    "source": "project/Messages.sh",
+                    "target": "Messages.sh"
+                },
+                {
+                    "source": "project/doc/CMakeLists.txt",
+                    "target": "doc/CMakeLists.txt"
+                },
+                {
+                    "source": "project/doc/index.docbook",
+                    "target": "doc/index.docbook"
+                },
+                {
+                    "source": "project/icons/CMakeLists.txt",
+                    "target": "icons/CMakeLists.txt"
+                },
+                {
+                    "source": "project/icons/16-apps-app.png",
+                    "target": "icons/16-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/22-apps-app.png",
+                    "target": "icons/22-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/32-apps-app.png",
+                    "target": "icons/32-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/48-apps-app.png",
+                    "target": "icons/48-apps-%{ProjectNameLC}.png",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/icons/sc-apps-app.svgz",
+                    "target": "icons/sc-apps-%{ProjectNameLC}.svgz",
+                    "isBinary": true
+                },
+                {
+                    "source": "project/autotests/CMakeLists.txt",
+                    "target": "autotests/CMakeLists.txt"
+                },
+                {
+                    "source": "project/autotests/settingstest.cpp",
+                    "target": "autotests/%{ProjectNameLC}settingstest.cpp"
+                }
+            ]
+        }
+    ]
+}

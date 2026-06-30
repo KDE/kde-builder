@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 
 from .debug import Debug
 from .debug import KBLogger
+from .qtcreator_presets import cmake_run_environment
+from .qtcreator_presets import cmake_user_presets
 from .util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
@@ -344,52 +346,19 @@ class IdeProjectConfigGenerator:
             if key not in cmake_env_keys:
                 env_vars[key] = val
 
-        # Run environment (mirrors prefix.sh / kit --run-env)
+        # Run environment (mirrors prefix.sh / kit --run-env). Shared with the new-project wizard
+        # templates so the two stay in sync (see qtcreator_presets).
         install_dir = module.installation_path()
         libname = module.context.libname
-        # TODO Unify run env generation, it's kinda silly to have more or less the same thing in 4 different places!
-        run_env: dict[str, str] = {
-            "PATH": f"{install_dir}/bin:" + os.environ.get("PATH", ""),
-            "XDG_DATA_DIRS": f"{install_dir}/share:" + os.environ.get("XDG_DATA_DIRS", "/usr/local/share:/usr/share"),
-            "XDG_CONFIG_DIRS": f"{install_dir}/etc/xdg:" + os.environ.get("XDG_CONFIG_DIRS", "/etc/xdg"),
-            "QT_PLUGIN_PATH": f"{install_dir}/{libname}/plugins:" + os.environ.get("QT_PLUGIN_PATH", ""),
-            "QML2_IMPORT_PATH": f"{install_dir}/{libname}/qml:" + os.environ.get("QML2_IMPORT_PATH", ""),
-            "QT_QUICK_CONTROLS_STYLE_PATH": f"{install_dir}/{libname}/qml/QtQuick/Controls.2/:" + os.environ.get("QT_QUICK_CONTROLS_STYLE_PATH", ""),
-            "MANPATH": f"{install_dir}/share/man:" + os.environ.get("MANPATH", "/usr/local/share/man:/usr/share/man"),
-            "SASL_PATH": f"{install_dir}/{libname}/sasl2:" + os.environ.get("SASL_PATH", f"/usr/{libname}/sasl2"),
-        }
+        run_env = cmake_run_environment(install_dir, libname)
 
-        presets = {
-            "version": 6,
-            "configurePresets": [
-                {
-                    "name": "kde-builder",
-                    "displayName": "KDE Builder",
-                    "generator": generator,
-                    "binaryDir": build_dir,
-                    "vendor": {
-                        "qt.io/QtCreator/1.0": {
-                            "runEnvironment": run_env,
-                        },
-                    },
-                    "cacheVariables": cache_vars,
-                    "environment": env_vars,
-                },
-            ],
-            "buildPresets": [
-                {"name": "kde-builder", "configurePreset": "kde-builder"},
-            ],
-             "vendor": {
-                "qt.io/QtCreator/1.0": {
-                    "deployPresets": [
-                        {
-                            "type": "install",
-                            "name": "kde-builder"
-                        }
-                    ],
-                },
-            },
-        }
+        presets = cmake_user_presets(
+            generator=generator,
+            binary_dir=build_dir,
+            cache_vars=cache_vars,
+            environment=env_vars,
+            run_environment=run_env,
+        )
 
         preset_path = f"{src_dir}/CMakeUserPresets.json"
         logger_ide_proj.debug(f"\tGenerating CMakeUserPresets.json for {project_name}: {preset_path}")

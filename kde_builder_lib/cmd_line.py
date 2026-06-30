@@ -478,7 +478,7 @@ class Cmdline:
         supported_options = Cmdline._supported_options()
 
         # The initial setup options are handled outside the Cmdline (in the starting script).
-        initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
+        initial_options = ["initial-setup", "install-distro-packages", "generate-config", "install-qtcreator-templates"]
 
         for option in [*supported_options, *initial_options, "debug"]:
             print(option)

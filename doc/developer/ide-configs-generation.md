@@ -156,3 +156,21 @@ For Qt Creator versions **older than 20**, you will need to create the `KDE Buil
 
 Qt Creator 20+ creates the `CMake install` deploy step from the generated vendor metadata.
 Users of Qt Creator 19 or earlier need to add the `CMake install` deploy step manually.
+
+## Qt Creator new-project wizard templates
+
+Besides configuring *existing* projects, kde-builder can install Qt Creator *project wizard templates*
+(`kde-builder --install-qtcreator-templates`), so that new KDE projects can be created straight from
+Qt Creator's *New Project* dialog. They are copied into `<qtcreator-settings>/templates/wizards/`, where
+Qt Creator discovers any `wizard.json`.
+
+The bundled templates live in `data/qtcreator/wizards/<name>/` and are plain
+[Qt Creator JSON wizards](https://doc.qt.io/qtcreator/creator-project-wizards.html): a `wizard.json`
+(pages, options, generators) plus a `project/` tree of source files using Qt Creator's `%{...}`
+placeholders. Adding a template is just adding a directory there — the installer auto-discovers it.
+
+For each template that ships a CMake `project/` directory, the installer generates a
+`CMakeUserPresets.json` alongside it (the wizard then copies it into every new project). This is the
+same preset that kde-builder writes for managed projects, so the new project builds and runs against
+the kde-builder install prefix out of the box. The preset assembly and run environment are shared with
+the per-project generator via `kde_builder_lib/qtcreator_presets.py`.

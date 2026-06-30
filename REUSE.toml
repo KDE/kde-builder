@@ -25,6 +25,17 @@ path = [
 SPDX-FileCopyrightText = "none"
 SPDX-License-Identifier = "CC0-1.0"
 
+# The Qt Creator wizard templates under data/qtcreator/wizards/ are template *data*. Their source
+# files carry placeholder SPDX headers (e.g. "LicenseRef-KDE-Accepted-GPL" and "%{Author}") that are
+# only meant to become the headers of the *generated* project - a default the new project's author is
+# free to change. precedence = "override" tells reuse to treat these files as template data (CC0) and
+# ignore those inline placeholders, so kde-builder does not itself declare or mandate that license.
+[[annotations]]
+path = "data/qtcreator/wizards/**"
+precedence = "override"
+SPDX-FileCopyrightText = "none"
+SPDX-License-Identifier = "CC0-1.0"
+
 [[annotations]]
 path = "doc/404handler.php"
 SPDX-FileCopyrightText = "2021 Ben Cooksley <bcooksley@kde.org>"

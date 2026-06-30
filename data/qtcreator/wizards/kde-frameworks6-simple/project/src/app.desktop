@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+
+Name=%{ProjectName}
+GenericName=A Simple KDE Application
+Icon=%{ProjectNameLC}
+
+Exec=%{ProjectNameLC}
+StartupWMClass=%{ProjectNameLC}

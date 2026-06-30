@@ -68,6 +68,7 @@ def main():
     parser.add_argument("--initial-setup", action="store_true")
     parser.add_argument("--install-distro-packages", action="store_true")
     parser.add_argument("--generate-config", action="store_true")
+    parser.add_argument("--install-qtcreator-templates", action="store_true")
     parser.add_argument("--prompt-answer",  nargs=1)
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append")  # allowing repeating several times
@@ -151,6 +152,13 @@ def main():
     # </editor-fold>
 
     # ---
+
+    if args.install_qtcreator_templates:
+        from kde_builder_lib.qtcreator_templates import QtCreatorTemplatesInstaller
+        from kde_builder_lib.debug import Debug
+
+        Debug().set_colorful_output(True)
+        exit(QtCreatorTemplatesInstaller().install())
 
     setup_steps = []
     if args.initial_setup:
