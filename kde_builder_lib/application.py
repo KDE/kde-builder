@@ -1338,13 +1338,31 @@ class Application:
         libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""
 
         if not os.path.isfile(install_sessions_script) or not os.path.isfile(startplasma_dev_script):
-            # We use "debug" log level here, because user may have their install-login-session option enabled,
-            # but working on some app, unrelated to session. And so, they may be not interested in this message.
-            logger_app.debug(" y[*] Unable to find login-sessions scripts in plasma-workspace build directory."
-                             " You need to build plasma-workspace first. Cancelling login session installation.")
-            # Despite we failed to install, we send "0" (success) here, for the same reason:
-            # user may be not interested in the result of install session, and the smile face should be smiling.
-            return 0
+            if not os.path.isdir(pws_builddir):
+                msg = dedent(f"""
+                     y[*] Cancelling login session installation because
+                       plasma-workspace build directory does not exist: y[{pws_builddir}]
+                       You need to build plasma-workspace first.
+                    """, preserve_len=1)
+            else:
+                msg = dedent(f"""
+                     y[*] Cancelling login session installation because
+                       unable to find login-sessions scripts in plasma-workspace build directory
+                         install_sessions_script: y[{install_sessions_script}]
+                         startplasma_dev_script: y[{startplasma_dev_script}]
+                       You need to rebuild plasma-workspace first.
+                    """, preserve_len=1)
+
+            if self.run_mode == "install-login-session-only":
+                logger_app.warning(msg)
+                return 0
+            else:
+                # We use "debug" log level here, because user may have their install-login-session option enabled,
+                # but working on some app, unrelated to session. And so, they may be not interested in this message.
+                logger_app.debug(msg)
+                # Despite we failed to install, we send "0" (success) here, for the same reason:
+                # user may be not interested in the result of install session, and the smile face should be smiling.
+                return 0
 
         def get_md5(path: str):
             return hashlib.md5(open(path, "rb").read()).hexdigest()
