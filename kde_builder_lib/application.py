@@ -1332,7 +1332,9 @@ class Application:
         real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
 
         ctx = self.context
-        pws_builddir = ctx.get_option("build-dir") + "/plasma-workspace"
+        layout = ctx.get_option("directory-layout")
+        pws_dest_dir = "/plasma/plasma-workspace" if layout == "invent" else "/plasma-workspace"
+        pws_builddir = ctx.get_option("build-dir") + pws_dest_dir
         install_sessions_script = pws_builddir + "/login-sessions/install-sessions.sh"
         startplasma_dev_script = pws_builddir + "/login-sessions/startplasma-dev.sh"
         libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""
