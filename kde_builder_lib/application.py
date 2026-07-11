@@ -392,9 +392,6 @@ class Application:
 
         module_graph = self._resolve_module_dependency_graph(modules)
 
-        if not module_graph or "graph" not in module_graph:
-            raise KBRuntimeError("Failed to resolve dependency graph")
-
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             dep_tree_ctx = {
                 "stack": [""],
