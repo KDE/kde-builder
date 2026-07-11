@@ -437,10 +437,6 @@ class Application:
         # Filtering out modules that are set to be ignored in repo-metadata
         filtered_modules: list[Module] = []
         for module in modules:
-            if not module:
-                traceback.print_exc()
-                raise Exception("No project to push")
-
             path = None
             if module in filtered_modules:
                 logger_app.debug("Skipping duplicate project " + module.name)
