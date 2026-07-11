@@ -11,7 +11,8 @@ from kde_builder_lib.module.module import Module
 
 @pytest.fixture
 def mock_module_fullproject(monkeypatch):
-    def mock__init__(self, repo_path="", is_kde=True):
+    def mock__init__(self, name: str, repo_path="", is_kde=True):
+        self.name = name
         self.repo_path = repo_path
         self.is_kde = is_kde
 
@@ -34,13 +35,9 @@ def test_dependency_path(mock_module_fullproject):
     """
     Verify that _get_dependency_path_of() works properly.
     """
-    module1 = Module(repo_path="test/path", is_kde=True)
+    module1 = Module(name="mod1", repo_path="kdepath/mod1", is_kde=True)
 
-    assert DependencyResolver._get_dependency_path_of(module1, "foo", "bar") == "test/path", "should return full project path if a KDE module object is passed"
+    assert DependencyResolver._get_dependency_path_of(module1) == "kdepath/mod1", "should return full project path if a KDE module object is passed"
 
-    module2 = None
-
-    assert DependencyResolver._get_dependency_path_of(module2, "foo", "bar") == "bar", "should return the provided default if no module is passed"
-
-    module3 = Module(repo_path="test/path", is_kde=False)
-    assert DependencyResolver._get_dependency_path_of(module3, "foo", "bar") == "third-party/test/path", "should return \"third-party/\" prefixed project path if a non-KDE module object is passed"
+    module3 = Module(name="mod3", repo_path="", is_kde=False)
+    assert DependencyResolver._get_dependency_path_of(module3) == "third-party/mod3", "should return \"third-party/\" prefixed project path if a non-KDE module object is passed"

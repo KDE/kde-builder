@@ -212,8 +212,8 @@ class DependencyResolver:
                 direct_deps.extend(module_dep_entry["+"])
                 exclusions.extend(module_dep_entry["-"])
 
-        # Apply catch-all dependencies but only for KDE modules, not third-party
-        # modules. See _get_dependency_path_of for how this is detected.
+        # Apply catch-all dependencies but only for KDE modules, not third-party modules.
+        # See _get_dependency_path_of() for how this is detected.
         if not re.match(r"^third-party/", item):
             for catch_all, deps in self.catch_all_dependencies.items():
                 prefix = catch_all
@@ -353,18 +353,12 @@ class DependencyResolver:
         return None
 
     @staticmethod
-    def _get_dependency_path_of(module: Module, item: str, path: str) -> str:
-        if module:
-            project_path = module.get_repopath() or module.name
-
-            if not module.is_kde_project():
-                project_path = f"third-party/{project_path}"
-
-            logger_depres.debug(f"\tUsing path: \"b[{project_path}]\" for item: b[{item}]")
-            return project_path
-
-        logger_depres.debug(f"\tGuessing path: \"b[{path}]\" for item: b[{item}]")
-        return path
+    def _get_dependency_path_of(module: Module) -> str:
+        if module.is_kde_project():
+            project_path = module.get_repopath()
+        else:
+            project_path = f"third-party/{module.name}"
+        return project_path
 
     def _resolve_dependencies_for_module_description(self, module_graph: dict, module_desc: dict) -> dict:
         module = module_desc["module"]
@@ -403,7 +397,12 @@ class DependencyResolver:
 
             else:
                 dep_module: Module | None = self.module_resolver.resolve_module_if_present(dep_item)
-                resolved_path = DependencyResolver._get_dependency_path_of(dep_module, dep_item, dep_path)
+                if dep_module:
+                    resolved_path = DependencyResolver._get_dependency_path_of(dep_module)
+                    logger_depres.debug(f"\tUsing path: \"b[{resolved_path}]\" for item: b[{item}]")
+                else:
+                    resolved_path = dep_path
+                    logger_depres.debug(f"\tGuessing path: \"b[{resolved_path}]\" for item: b[{item}]")
                 # May not exist, e.g. misspellings or "virtual" dependencies like kf5umbrella.
                 if not dep_module:
                     logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined project: b[{dep_item}]\n")
@@ -465,7 +464,8 @@ class DependencyResolver:
         for module in modules:
             item = module.name  # _shorten_module_name(path)
             branch = self._get_branch_of(module)
-            path = DependencyResolver._get_dependency_path_of(module, item, "")
+            path = DependencyResolver._get_dependency_path_of(module)
+            logger_depres.debug(f"\tUsing path: \"b[{path}]\" for item: b[{item}]")
 
             if not path:
                 logger_depres.error(f"r[Unable to determine project/dependency path of project: {item}]")
