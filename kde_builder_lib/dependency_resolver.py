@@ -449,17 +449,13 @@ class DependencyResolver:
     def resolve_to_module_graph(self, modules: list[Module]) -> dict:
         module_graph = {}
 
-        result = {
-            "graph": module_graph,
-            "errors": {
-                "branch_errors": 0,
-                "path_errors": 0,
-                "trivial_cycles": 0,
-                "syntax_errors": 0,
-                "cycles": 0
-            }
+        errors = {
+            "branch_errors": 0,
+            "path_errors": 0,
+            "trivial_cycles": 0,
+            "syntax_errors": 0,
+            "cycles": 0
         }
-        errors = result["errors"]
 
         for module in modules:
             item = module.name  # _shorten_module_name(path)
@@ -529,8 +525,7 @@ class DependencyResolver:
         if syntax_errors or path_errors or branch_errors:
             logger_depres.error("Unable to resolve dependency graph")
 
-            result["graph"] = None
-            return result
+            return {}
 
         trivial_cycles = errors["trivial_cycles"]
 
@@ -543,12 +538,11 @@ class DependencyResolver:
             logger_depres.error(f"Total of items with at least one circular dependency detected: {errors}")
             logger_depres.error("Unable to resolve dependency graph")
 
-            result["cycles"] = cycles
-            result["graph"] = None
-            return result
+            errors["cycles"] = cycles
+            return {}
         else:
-            result["graph"] = self._run_dependency_vote(DependencyResolver._copy_up_dependencies(module_graph))
-            return result
+            ret = self._run_dependency_vote(DependencyResolver._copy_up_dependencies(module_graph))
+            return ret
 
     @staticmethod
     def _descend_module_graph(module_graph, callback, node_info, context) -> None:

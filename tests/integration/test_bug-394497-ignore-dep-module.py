@@ -44,7 +44,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
                     "module": new_module,
                 }
 
-        return {"graph": graph}
+        return graph
 
     monkeypatch.setattr(Application, "_resolve_module_dependency_graph", mock_resolve_module_dependency_graph)
 

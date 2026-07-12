@@ -38,11 +38,7 @@ def mock_application(monkeypatch):
             }
         }
 
-        result = {
-            "graph": graph
-        }
-
-        return result
+        return graph
 
     monkeypatch.setattr(Application, "_resolve_module_dependency_graph", mock_resolve_module_dependency_graph)
 

@@ -79,7 +79,7 @@ class Application:
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
-        self.dependency_info = None
+        self.dependency_graph = {}
         self.modules: list[Module] = []
 
         c = Cmdline()
@@ -411,10 +411,10 @@ class Application:
                 modules
             )
 
-            self.dependency_info = module_graph
+            self.dependency_graph = module_graph
             return
 
-        modules = DependencyResolver.sort_modules_into_build_order(module_graph["graph"])
+        modules = DependencyResolver.sort_modules_into_build_order(module_graph)
 
         # Filter --resume-foo options. This might be a second pass, but that should
         # be OK since there's nothing different going on from the first pass (in
@@ -454,7 +454,7 @@ class Application:
         for module in modules:
             module.set_resolved_repository()
 
-        self.dependency_info = module_graph
+        self.dependency_graph = module_graph
         self.modules = modules
         return
 
@@ -602,17 +602,10 @@ class Application:
 
             # traceback.print_exc()
 
-            graph = {
-                "graph": {},
-                "syntax_errors": 0,
-                "cycles": 0,
-                "trivial_cycles": 0,
-                "path_errors": 0,
-                "branch_errors": 0,
-            }
+            graph = {}
 
         else:
-            if not graph["graph"] and self.run_mode != "install-login-session-only":
+            if not graph and self.run_mode != "install-login-session-only":
                 logger_app.warning(" r[b[*] Unable to determine correct project graph")
                 logger_app.warning(" r[b[*] Will attempt to continue.")
 
@@ -635,7 +628,7 @@ class Application:
             query_mode = ctx.get_option("query")
 
             if query_mode == "project-info":
-                dependency_graph = self.dependency_info
+                dependency_graph = self.dependency_graph
                 results = {
                     project: {
                         "path": info["path"],
@@ -650,7 +643,7 @@ class Application:
                         "phases": list(info["module"].phases.phaselist),
                         "dependencies": list(info["deps"].keys()),
                     }
-                    for project, info in dependency_graph["graph"].items()
+                    for project, info in dependency_graph.items()
                     if info["module"]
                 }
                 print(yaml.dump(results, default_flow_style=False, indent=2))
@@ -744,7 +737,7 @@ class Application:
         if ctx.get_option("purge-old-logs"):
             LogDir.delete_unreferenced_log_directories(ctx)
 
-        dependency_graph = self.dependency_info["graph"]
+        dependency_graph = self.dependency_graph
         ctx = self.context
 
         Application._print_failed_modules_in_each_phase(ctx, dependency_graph)
