@@ -48,7 +48,6 @@ def test_option_reading(monkeypatch):
     assert module_list[3].name == "module2", "Right module name"
 
     scm = module_list[3].scm
-    assert isinstance(scm, Updater)
 
     ref_value, ref_type = scm.determine_preferred_checkout_source()
 

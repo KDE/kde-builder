@@ -673,12 +673,6 @@ class DependencyResolver:
         """
         scm = module.scm
 
-        # when the module's SCM is not set,
-        # assume the default "no particular" branch wildcard
-
-        if not isinstance(scm, Updater):
-            return None
-
         ref_value, ref_type = scm.determine_preferred_checkout_source()
         if ref_type == "branch":
             return ref_value

@@ -19,7 +19,6 @@ def test_tag_names_based_on_time():
 
     for mod in module_list:
         scm = mod.scm
-        assert isinstance(scm, Updater)
 
         ref_value, ref_type = scm.determine_preferred_checkout_source()
         assert ref_value == "master@{3 weeks ago}", "Right tag name"
