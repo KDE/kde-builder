@@ -405,7 +405,7 @@ class Application:
                 callback = self._yield_module_dependency_tree_entry_full_path
 
             DependencyResolver.walk_module_dependency_trees(
-                module_graph["graph"],
+                module_graph,
                 callback,
                 dep_tree_ctx,
                 modules
