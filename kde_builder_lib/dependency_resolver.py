@@ -56,6 +56,8 @@ class DependencyResolver:
         ModuleResolver object, that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
         """
 
+        self.dependency_graph = {}
+
     @staticmethod
     def _shorten_module_name(name: str) -> str:
         """
@@ -263,16 +265,16 @@ class DependencyResolver:
                 }
         return result
 
-    @staticmethod
-    def _run_dependency_vote(module_graph: dict) -> dict:
+    def _run_dependency_vote(self) -> None:
+        module_graph = self.dependency_graph
         for item in module_graph.keys():
             names = list(module_graph[item]["all_deps"]["items"].keys())
             for name in names:
                 module_graph[name]["votes"][item] = module_graph[name]["votes"].get(item, 0) + 1
-        return module_graph
+        return
 
-    @staticmethod
-    def _detect_dependency_cycle(module_graph, dep_item, item):
+    def _detect_dependency_cycle(self, dep_item, item):
+        module_graph = self.dependency_graph
         dep_module_graph = module_graph[dep_item]
         if dep_module_graph.setdefault("traces", {}).get("status", None):
             if dep_module_graph["traces"]["status"] == 2:
@@ -288,13 +290,13 @@ class DependencyResolver:
 
             names = list(dep_module_graph["deps"].keys())
             for name in names:
-                if DependencyResolver._detect_dependency_cycle(module_graph, name, item):
+                if self._detect_dependency_cycle(name, item):
                     dep_module_graph["traces"]["result"] = 1
         dep_module_graph["traces"]["status"] = 2
         return dep_module_graph["traces"]["result"]
 
-    @staticmethod
-    def _check_dependency_cycles(module_graph: dict) -> int:
+    def _check_dependency_cycles(self) -> int:
+        module_graph = self.dependency_graph
         errors = 0
 
         # sorted() is used for module_graph.keys() because in perl the dict keys are returned in random way.
@@ -304,14 +306,14 @@ class DependencyResolver:
         # After we drop perl version, we can remove the unneeded sorting.
 
         for item in sorted(module_graph.keys()):
-            if DependencyResolver._detect_dependency_cycle(module_graph, item, item):
+            if self._detect_dependency_cycle(item, item):
                 logger_depres.error(f"Somehow there is a circular dependency involving b[{item}]! :(")
                 logger_depres.error("Please file a bug against repo-metadata about this!")
                 errors += 1
         return errors
 
-    @staticmethod
-    def _copy_up_dependencies_for_module(module_graph: dict, item: str) -> None:
+    def _copy_up_dependencies_for_module(self, item: str) -> None:
+        module_graph = self.dependency_graph
         all_deps = module_graph[item]["all_deps"]
 
         if "done" in all_deps:
@@ -325,7 +327,7 @@ class DependencyResolver:
                 if name in all_deps["items"]:
                     logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{name}] for b[{item}] -- skipping")
                 else:
-                    DependencyResolver._copy_up_dependencies_for_module(module_graph, name)
+                    self._copy_up_dependencies_for_module(name)
                     copied = list(module_graph[name]["all_deps"]["items"])
                     for copy in copied:
                         if copy in all_deps["items"]:
@@ -335,14 +337,14 @@ class DependencyResolver:
                     all_deps["items"][name] = all_deps["items"].get(name, 0) + 1
             all_deps["done"] = all_deps.get("done", 0) + 1
 
-    @staticmethod
-    def _copy_up_dependencies(module_graph: dict) -> dict:
+    def _copy_up_dependencies(self) -> None:
+        module_graph = self.dependency_graph
         for item in module_graph.keys():
-            DependencyResolver._copy_up_dependencies_for_module(module_graph, item)
-        return module_graph
+            self._copy_up_dependencies_for_module(item)
+        return
 
-    @staticmethod
-    def _detect_branch_conflict(module_graph: dict, item: str, branch: str | None) -> str | None:
+    def _detect_branch_conflict(self, item: str, branch: str | None) -> str | None:
+        module_graph = self.dependency_graph
         if branch:
             sub_graph = module_graph[item]
             previously_selected_branch = sub_graph.get(branch, None)
@@ -360,7 +362,8 @@ class DependencyResolver:
             project_path = f"third-party/{module.name}"
         return project_path
 
-    def _resolve_dependencies_for_module_description(self, module_graph: dict, module_desc: dict) -> dict:
+    def _resolve_dependencies_for_module_description(self, module_desc: dict) -> dict:
+        module_graph = self.dependency_graph
         module = module_desc["module"]
         item = module_desc["item"]
         branch = module_desc["branch"]
@@ -387,7 +390,7 @@ class DependencyResolver:
             dep_module_graph = module_graph.get(dep_item, None)
 
             if dep_module_graph:
-                previously_selected_branch = self._detect_branch_conflict(module_graph, dep_item, dep_branch)
+                previously_selected_branch = self._detect_branch_conflict(dep_item, dep_branch)
                 if previously_selected_branch:
                     logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{pretty_dep_branch}]\") for b[{dep_item}]! :(")
                     errors["branch_errors"] += 1
@@ -439,15 +442,15 @@ class DependencyResolver:
                     errors["branch_errors"] += 1
 
                 logger_depres.debug(f"Resolving transitive dependencies for project: b[{item}] (via: b[{dep_item}:{pretty_dep_branch}])")
-                resolv_errors = self._resolve_dependencies_for_module_description(module_graph, dep_module_desc)
+                resolv_errors = self._resolve_dependencies_for_module_description(dep_module_desc)
 
                 errors["branch_errors"] += resolv_errors["branch_errors"]
                 errors["syntax_errors"] += resolv_errors["syntax_errors"]
                 errors["trivial_cycles"] += resolv_errors["trivial_cycles"]
         return errors
 
-    def resolve_to_module_graph(self, modules: list[Module]) -> dict:
-        module_graph = {}
+    def resolve_to_module_graph(self, modules: list[Module]) -> None:
+        module_graph = self.dependency_graph
 
         errors = {
             "branch_errors": 0,
@@ -470,7 +473,7 @@ class DependencyResolver:
 
             if item in module_graph and module_graph[item]:
                 logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {item}")
-                previously_selected_branch = self._detect_branch_conflict(module_graph, item, branch)
+                previously_selected_branch = self._detect_branch_conflict(item, branch)
                 if previously_selected_branch:
                     logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{item}]! :(")
                     errors["branch_errors"] += 1
@@ -504,7 +507,7 @@ class DependencyResolver:
                     "module": module
                 }
 
-                resolv_errors = self._resolve_dependencies_for_module_description(module_graph, module_desc)
+                resolv_errors = self._resolve_dependencies_for_module_description(module_desc)
 
                 errors["branch_errors"] += resolv_errors["branch_errors"]
                 errors["syntax_errors"] += resolv_errors["syntax_errors"]
@@ -524,28 +527,30 @@ class DependencyResolver:
 
         if syntax_errors or path_errors or branch_errors:
             logger_depres.error("Unable to resolve dependency graph")
-
-            return {}
+            module_graph.clear()
+            return
 
         trivial_cycles = errors["trivial_cycles"]
 
         if trivial_cycles:
             logger_depres.debug(f"Total of \"trivial\" dependency cycles detected & eliminated: {trivial_cycles}")
 
-        cycles = self._check_dependency_cycles(module_graph)
+        cycles = self._check_dependency_cycles()
 
         if cycles:
             logger_depres.error(f"Total of items with at least one circular dependency detected: {errors}")
             logger_depres.error("Unable to resolve dependency graph")
 
             errors["cycles"] = cycles
-            return {}
-        else:
-            ret = self._run_dependency_vote(DependencyResolver._copy_up_dependencies(module_graph))
-            return ret
+            module_graph.clear()
+            return
 
-    @staticmethod
-    def _descend_module_graph(module_graph, callback, node_info, context) -> None:
+        self._copy_up_dependencies()
+        self._run_dependency_vote()
+        return
+
+    def _descend_module_graph(self, callback, node_info, context) -> None:
+        module_graph = self.dependency_graph
         depth = node_info["depth"]
         current_item = node_info["current_item"]
         current_branch = node_info["current_branch"]
@@ -573,12 +578,11 @@ class DependencyResolver:
                 "parent_item": current_item,
                 "parent_branch": current_branch
             }
-            DependencyResolver._descend_module_graph(module_graph, callback, item_info, context)
+            self._descend_module_graph(callback, item_info, context)
             item_index += 1
 
-    @staticmethod
-    def walk_module_dependency_trees(module_graph: dict, callback: Callable, context: dict, modules: list[Module]) -> None:
-
+    def walk_module_dependency_trees(self, callback: Callable, context: dict, modules: list[Module]) -> None:
+        module_graph = self.dependency_graph
         item_count = len(modules)
         item_index = 1
 
@@ -596,11 +600,11 @@ class DependencyResolver:
                 "parent_item": "",
                 "parent_branch": ""
             }
-            DependencyResolver._descend_module_graph(module_graph, callback, info, context)
+            self._descend_module_graph(callback, info, context)
             item_index += 1
 
-    @staticmethod
-    def make_comparison_func(module_graph: dict) -> Callable:
+    def make_comparison_func(self) -> Callable:
+        module_graph = self.dependency_graph
 
         def _compare_build_order_depends(a, b):
             # comparison results uses:
@@ -650,11 +654,11 @@ class DependencyResolver:
 
         return _compare_build_order_depends
 
-    @staticmethod
-    def sort_modules_into_build_order(module_graph: dict) -> list[Module]:
+    def sort_modules_into_build_order(self) -> list[Module]:
+        module_graph = self.dependency_graph
         resolved = list(module_graph.keys())
         built = [el for el in resolved if module_graph[el]["build"] and module_graph[el]["module"]]
-        prioritised = sorted(built, key=cmp_to_key(DependencyResolver.make_comparison_func(module_graph)))
+        prioritised = sorted(built, key=cmp_to_key(self.make_comparison_func()))
         modules = [module_graph[key]["module"] for key in prioritised]
         return modules
 

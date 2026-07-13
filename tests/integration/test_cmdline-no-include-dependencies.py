@@ -7,6 +7,7 @@ import pytest
 
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
+from kde_builder_lib.dependency_resolver import DependencyResolver
 
 
 @pytest.fixture
@@ -15,7 +16,8 @@ def mock_application(monkeypatch):
     def mock_resolve_module_dependency_graph(self, modules: list):
         new_module = self.module_resolver.resolve_module_if_present("setmod2")
 
-        graph = {
+        self.dependency_resolver = DependencyResolver(self.module_resolver)
+        self.dependency_resolver.dependency_graph = {
             "setmod1": {
                 "votes": {
                     "setmod2": 1,
@@ -38,7 +40,7 @@ def mock_application(monkeypatch):
             }
         }
 
-        return graph
+        return
 
     monkeypatch.setattr(Application, "_resolve_module_dependency_graph", mock_resolve_module_dependency_graph)
 

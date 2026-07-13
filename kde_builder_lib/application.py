@@ -79,7 +79,7 @@ class Application:
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
-        self.dependency_graph = {}
+        self.dependency_resolver: DependencyResolver = None
         self.modules: list[Module] = []
 
         c = Cmdline()
@@ -390,7 +390,7 @@ class Application:
 
         modules = filtered_modules
 
-        module_graph = self._resolve_module_dependency_graph(modules)
+        self._resolve_module_dependency_graph(modules)
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             dep_tree_ctx = {
@@ -404,17 +404,15 @@ class Application:
             else:
                 callback = self._yield_module_dependency_tree_entry_full_path
 
-            DependencyResolver.walk_module_dependency_trees(
-                module_graph,
+            self.dependency_resolver.walk_module_dependency_trees(
                 callback,
                 dep_tree_ctx,
                 modules
             )
 
-            self.dependency_graph = module_graph
             return
 
-        modules = DependencyResolver.sort_modules_into_build_order(module_graph)
+        modules = self.dependency_resolver.sort_modules_into_build_order()
 
         # Filter --resume-foo options. This might be a second pass, but that should
         # be OK since there's nothing different going on from the first pass (in
@@ -454,7 +452,6 @@ class Application:
         for module in modules:
             module.set_resolved_repository()
 
-        self.dependency_graph = module_graph
         self.modules = modules
         return
 
@@ -565,9 +562,9 @@ class Application:
             logger_app.error(msg)
             exit()
 
-    def _resolve_module_dependency_graph(self, modules: list[Module]) -> dict:
+    def _resolve_module_dependency_graph(self, modules: list[Module]) -> None:
         """
-        Return a graph of Modules according to the KDE project database dependency information.
+        Construct a graph of Modules according to the KDE project database dependency information.
 
         The sysadmin/repo-metadata repository must have already been updated, and the
         module factory must be setup. The modules for which to calculate the graph
@@ -576,7 +573,8 @@ class Application:
         ctx = self.context
         metadata_module = ctx.metadata_module
 
-        dependency_resolver = DependencyResolver(self.module_resolver)
+        self.dependency_resolver = DependencyResolver(self.module_resolver)
+        dependency_resolver = self.dependency_resolver
         branch_group = ctx.get_option("branch-group")
 
         if Debug().is_testing():
@@ -592,7 +590,7 @@ class Application:
             dependency_resolver.read_dependency_data(dependencies)
             dependencies.close()
 
-            graph = dependency_resolver.resolve_to_module_graph(modules)
+            dependency_resolver.resolve_to_module_graph(modules)
 
         except Exception as e:
             e = str(e).replace("[", "").replace("]", "")
@@ -602,14 +600,12 @@ class Application:
 
             # traceback.print_exc()
 
-            graph = {}
+            dependency_resolver.dependency_graph.clear()
 
         else:
-            if not graph and self.run_mode != "install-login-session-only":
+            if not dependency_resolver.dependency_graph and self.run_mode != "install-login-session-only":
                 logger_app.warning(" r[b[*] Unable to determine correct project graph")
                 logger_app.warning(" r[b[*] Will attempt to continue.")
-
-        return graph
 
     def run_all_module_phases(self) -> int | bool:
         """
@@ -628,7 +624,7 @@ class Application:
             query_mode = ctx.get_option("query")
 
             if query_mode == "project-info":
-                dependency_graph = self.dependency_graph
+                dependency_graph = self.dependency_resolver.dependency_graph
                 results = {
                     project: {
                         "path": info["path"],
@@ -737,10 +733,9 @@ class Application:
         if ctx.get_option("purge-old-logs"):
             LogDir.delete_unreferenced_log_directories(ctx)
 
-        dependency_graph = self.dependency_graph
         ctx = self.context
 
-        Application._print_failed_modules_in_each_phase(ctx, dependency_graph)
+        self._print_failed_modules_in_each_phase(ctx)
 
         # Record all failed modules. Unlike the "resume-list" option this doesn't
         # include any successfully-built modules in between failures.
@@ -1122,8 +1117,7 @@ class Application:
 
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
-    @staticmethod
-    def _print_failed_modules_in_each_phase(ctx: BuildContext, module_graph: dict) -> None:
+    def _print_failed_modules_in_each_phase(self, ctx: BuildContext) -> None:
         """
         Print the list of failed modules for each phase.
 
@@ -1134,8 +1128,8 @@ class Application:
 
         Args:
             ctx: Build context
-            module_graph: The module graph.
         """
+        module_graph = self.dependency_resolver.dependency_graph
         extra_debug_info = {
             "phases": {},
             "failCount": {}

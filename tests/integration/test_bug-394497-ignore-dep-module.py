@@ -7,6 +7,7 @@ import pytest
 
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
+from kde_builder_lib.dependency_resolver import DependencyResolver
 
 
 @pytest.fixture
@@ -17,7 +18,8 @@ def mock_app_res_mod_dep_graph(monkeypatch):
         """
         new_module = self.module_resolver.resolve_module_if_present("setmod2")
 
-        graph = {}
+        self.dependency_resolver = DependencyResolver(self.module_resolver)
+        graph = self.dependency_resolver.dependency_graph
 
         # Construct graph manually based on real module list
         for module in modules:
@@ -44,7 +46,7 @@ def mock_app_res_mod_dep_graph(monkeypatch):
                     "module": new_module,
                 }
 
-        return graph
+        return
 
     monkeypatch.setattr(Application, "_resolve_module_dependency_graph", mock_resolve_module_dependency_graph)
 

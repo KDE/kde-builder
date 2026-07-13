@@ -103,6 +103,8 @@ def test_vote_dependencies():
         }
     }
 
-    DependencyResolver._run_dependency_vote(graph1)
+    dr = DependencyResolver(None)
+    dr.dependency_graph = graph1
+    dr._run_dependency_vote()
 
     assert graph1 == expected1, "should yield expected votes"

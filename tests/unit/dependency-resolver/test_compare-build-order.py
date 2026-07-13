@@ -62,34 +62,37 @@ def test_comparison(mock_module_from_attrs):
         },
     }
 
+    dr = DependencyResolver(None)
+    dr.dependency_graph = graph1
+
     # Test that tests are symmetric e.g. a > b => b < a. This permits us to only manually
     # test one pair of these tests now that the test matrix is growing.
     for left in ["a", "b", "c", "d", "e", "f"]:
         for right in ["a", "b", "c", "d", "e", "f"]:
-            res = DependencyResolver.make_comparison_func(graph1)(left, right)
+            res = dr.make_comparison_func()(left, right)
 
             if left == right:
                 assert res == 0, f"\"{left}\" should be sorted at the same position as itself"
             else:
                 assert abs(res) == 1, f"Different module items (\"{left}\" and \"{right}\") compare to 1 or -1 (but not 0)"
-                assert DependencyResolver.make_comparison_func(graph1)(right, left) == -res, f"Swapping order of operands should negate the result (\"{right}\" vs \"{left}\")"
+                assert dr.make_comparison_func()(right, left) == -res, f"Swapping order of operands should negate the result (\"{right}\" vs \"{left}\")"
 
-    assert DependencyResolver.make_comparison_func(graph1)("a", "b") == -1, "\"a\" should be sorted before \"b\" by dependency ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("a", "c") == -1, "\"a\" should be sorted before \"c\" by vote ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("a", "d") == -1, "\"a\" should be sorted before \"d\" by dependency ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("a", "e") == -1, "\"a\" should be sorted before \"e\" by lexicographic ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("a", "f") == -1, "\"a\" should be sorted before \"f\" by lexicographic ordering"
+    assert dr.make_comparison_func()("a", "b") == -1, "\"a\" should be sorted before \"b\" by dependency ordering"
+    assert dr.make_comparison_func()("a", "c") == -1, "\"a\" should be sorted before \"c\" by vote ordering"
+    assert dr.make_comparison_func()("a", "d") == -1, "\"a\" should be sorted before \"d\" by dependency ordering"
+    assert dr.make_comparison_func()("a", "e") == -1, "\"a\" should be sorted before \"e\" by lexicographic ordering"
+    assert dr.make_comparison_func()("a", "f") == -1, "\"a\" should be sorted before \"f\" by lexicographic ordering"
 
-    assert DependencyResolver.make_comparison_func(graph1)("b", "c") == 1, "\"b\" should be sorted after \"c\" by vote ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("b", "d") == -1, "\"b\" should be sorted before \"d\" by lexicographic ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("b", "e") == 1, "\"b\" should be sorted after \"e\" by dependency ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("b", "f") == 1, "\"b\" should be sorted after \"f\" by dependency ordering"
+    assert dr.make_comparison_func()("b", "c") == 1, "\"b\" should be sorted after \"c\" by vote ordering"
+    assert dr.make_comparison_func()("b", "d") == -1, "\"b\" should be sorted before \"d\" by lexicographic ordering"
+    assert dr.make_comparison_func()("b", "e") == 1, "\"b\" should be sorted after \"e\" by dependency ordering"
+    assert dr.make_comparison_func()("b", "f") == 1, "\"b\" should be sorted after \"f\" by dependency ordering"
 
-    assert DependencyResolver.make_comparison_func(graph1)("c", "d") == -1, "\"c\" should be sorted before \"d\" by dependency ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("c", "e") == 1, "\"c\" should be sorted after \"e\" by vote ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("c", "f") == 1, "\"c\" should be sorted after \"f\" by vote ordering"
+    assert dr.make_comparison_func()("c", "d") == -1, "\"c\" should be sorted before \"d\" by dependency ordering"
+    assert dr.make_comparison_func()("c", "e") == 1, "\"c\" should be sorted after \"e\" by vote ordering"
+    assert dr.make_comparison_func()("c", "f") == 1, "\"c\" should be sorted after \"f\" by vote ordering"
 
-    assert DependencyResolver.make_comparison_func(graph1)("d", "e") == 1, "\"d\" should be sorted after \"e\" by dependency ordering"
-    assert DependencyResolver.make_comparison_func(graph1)("d", "f") == 1, "\"d\" should be sorted after \"f\" by dependency ordering"
+    assert dr.make_comparison_func()("d", "e") == 1, "\"d\" should be sorted after \"e\" by dependency ordering"
+    assert dr.make_comparison_func()("d", "f") == 1, "\"d\" should be sorted after \"f\" by dependency ordering"
 
-    assert DependencyResolver.make_comparison_func(graph1)("e", "f") == 1, "\"e\" should be sorted after \"f\" by rc-file ordering"
+    assert dr.make_comparison_func()("e", "f") == 1, "\"e\" should be sorted after \"f\" by rc-file ordering"
