@@ -681,3 +681,56 @@ class DependencyResolver:
         if ref_type == "branch":
             return ref_value
         return None
+
+    @staticmethod
+    def _yield_module_dependency_tree_entry(node_info: dict, module: Module, context: dict) -> None:
+        depth = node_info["depth"]
+        index = node_info["idx"]
+        count = node_info["count"]
+        build = node_info["build"]
+        current_item = node_info["current_item"]
+        current_branch = node_info["current_branch"]
+
+        build_status = "built" if build else "not built"
+        status_info = f"({build_status}: {current_branch})" if current_branch else f"({build_status})"
+
+        connector_stack = context["stack"]
+
+        prefix = connector_stack.pop()
+
+        while context["depth"] > depth:
+            prefix = connector_stack.pop()
+            context["depth"] -= 1
+
+        connector_stack.append(prefix)
+
+        if depth == 0:
+            connector = prefix + " ── "
+            connector_stack.append(prefix + (" " * 4))
+        else:
+            connector = prefix + ("└── " if index == count else "├── ")
+            connector_stack.append(prefix + (" " * 4 if index == count else "│   "))
+
+        context["depth"] = depth + 1
+        context["report"](connector + current_item + " " + status_info)
+
+    @staticmethod
+    def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
+        depth = node_info["depth"]
+        current_item = node_info["current_item"]
+
+        connector_stack = context["stack"]
+
+        prefix = connector_stack.pop()
+
+        while context["depth"] > depth:
+            prefix = connector_stack.pop()
+            context["depth"] -= 1
+
+        connector_stack.append(prefix)
+
+        connector = prefix
+        connector_stack.append(prefix + current_item + "/")
+
+        context["depth"] = depth + 1
+        context["report"](connector + current_item)
