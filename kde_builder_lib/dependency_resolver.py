@@ -549,14 +549,17 @@ class DependencyResolver:
         self._run_dependency_vote()
         return
 
-    def _descend_module_graph(self, callback, node_info, context) -> None:
+    def _descend_module_graph(self, mode: str, node_info, context) -> None:
         module_graph = self.dependency_graph
         depth = node_info["depth"]
         current_item = node_info["current_item"]
         current_branch = node_info["current_branch"]
 
         sub_graph = module_graph[current_item]
-        callback(node_info, sub_graph["module"], context)
+        if mode == "tree":
+            self._yield_module_dependency_tree_entry(node_info, sub_graph["module"], context)
+        else:
+            self._yield_module_dependency_tree_entry_full_path(node_info, sub_graph["module"], context)
 
         depth += 1
 
@@ -578,10 +581,10 @@ class DependencyResolver:
                 "parent_item": current_item,
                 "parent_branch": current_branch
             }
-            self._descend_module_graph(callback, item_info, context)
+            self._descend_module_graph(mode, item_info, context)
             item_index += 1
 
-    def walk_module_dependency_trees(self, callback: Callable, modules: list[Module]) -> None:
+    def walk_module_dependency_trees(self, mode: str, modules: list[Module]) -> None:
         module_graph = self.dependency_graph
         item_count = len(modules)
         item_index = 1
@@ -606,7 +609,7 @@ class DependencyResolver:
                 "parent_item": "",
                 "parent_branch": ""
             }
-            self._descend_module_graph(callback, info, context)
+            self._descend_module_graph(mode, info, context)
             item_index += 1
 
     def make_comparison_func(self) -> Callable:

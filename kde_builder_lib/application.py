@@ -341,12 +341,12 @@ class Application:
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             if "dependency-tree" in cmdline_global_options:
-                callback = self.dependency_resolver._yield_module_dependency_tree_entry
+                mode="tree"
             else:
-                callback = self.dependency_resolver._yield_module_dependency_tree_entry_full_path
+                mode="fullpath"
 
             self.dependency_resolver.walk_module_dependency_trees(
-                callback,
+                mode,
                 modules
             )
 
