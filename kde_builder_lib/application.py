@@ -67,15 +67,6 @@ class Application:
         """ModuleResolver object, that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
 
-        self.ignore_list: list[str] = []
-        """
-        List of KDE project paths to ignore completely.
-
-        A list of KDE project paths to ignore, e.g. "sdk/kde-builder".
-        Partial paths are acceptable, matches are determined by comparing the path provided to the suffix of the full path
-        of modules being compared. See :meth:`KDEProjectsReader.project_path_matches_wildcard_search`.
-        """
-
         # Default to colorized output if sending to TTY
         Debug().set_colorful_output(True if sys.stdout.isatty() else False)
 
@@ -228,8 +219,10 @@ class Application:
         ignored_in_global_section.discard("")  # do not place empty string element, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
         ctx.options["ignore-projects"] = []
 
+        ignored_in_metadata: set[str] = {item.rsplit("/", 1)[-1] for item in ctx.metadata.ignored_projects}
+
         # For user convenience, cmdline ignored selectors would not override the config selectors. Instead, they will be merged.
-        ignored_selectors: set[str] = ignored_in_cmdline | ignored_in_global_section
+        ignored_selectors: set[str] = ignored_in_cmdline | ignored_in_global_section | ignored_in_metadata
 
         # After we read install-dir from config, we can check if we need to start program.
         start_program_and_args: list[str] = opts["start-program"]
@@ -288,8 +281,6 @@ class Application:
 
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
-
-        self.ignore_list = ctx.metadata.ignored_projects
 
         # Remove modules that are explicitly blanked out in their branch-group
         # i.e. those modules where they *have* a branch-group, and it's set to
@@ -372,17 +363,10 @@ class Application:
                     logger_app.debug(f"Project y[{module.name}] was removed due to being ignored.")
         modules = filtered_modules
 
-        # Filtering out modules that are set to be ignored in repo-metadata
         filtered_modules: list[Module] = []
         for module in modules:
-            path = None
             if module in filtered_modules:
                 logger_app.debug("Skipping duplicate project " + module.name)
-            elif ((path := module.get_repopath() or module.name) and
-                  any(re.search(rf"(^|/){item}($|/)", path) for item in self.ignore_list)):
-                # See if the name matches any given in the ignore list.
-
-                logger_app.debug(f"Skipping ignored project {module}")
             else:
                 logger_app.debug(f"Adding {module} to project list")
                 filtered_modules.append(module)
