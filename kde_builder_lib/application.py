@@ -363,16 +363,6 @@ class Application:
                     logger_app.debug(f"Project y[{module.name}] was removed due to being ignored.")
         modules = filtered_modules
 
-        filtered_modules: list[Module] = []
-        for module in modules:
-            if module in filtered_modules:
-                logger_app.debug("Skipping duplicate project " + module.name)
-            else:
-                logger_app.debug(f"Adding {module} to project list")
-                filtered_modules.append(module)
-
-        modules = filtered_modules
-
         for module in modules:
             module.set_resolved_repository()
 
