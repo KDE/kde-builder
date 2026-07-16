@@ -393,12 +393,6 @@ class Application:
         self._resolve_module_dependency_graph(modules)
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
-            dep_tree_ctx = {
-                "stack": [""],
-                "depth": 0,
-                "report": lambda *args: print(*args, sep="", end="\n")
-            }
-
             if "dependency-tree" in cmdline_global_options:
                 callback = self._yield_module_dependency_tree_entry
             else:
@@ -406,7 +400,6 @@ class Application:
 
             self.dependency_resolver.walk_module_dependency_trees(
                 callback,
-                dep_tree_ctx,
                 modules
             )
 

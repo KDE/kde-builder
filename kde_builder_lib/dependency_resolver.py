@@ -581,10 +581,16 @@ class DependencyResolver:
             self._descend_module_graph(callback, item_info, context)
             item_index += 1
 
-    def walk_module_dependency_trees(self, callback: Callable, context: dict, modules: list[Module]) -> None:
+    def walk_module_dependency_trees(self, callback: Callable, modules: list[Module]) -> None:
         module_graph = self.dependency_graph
         item_count = len(modules)
         item_index = 1
+
+        context = {
+            "stack": [""],
+            "depth": 0,
+            "report": lambda *args: print(*args, sep="", end="\n")
+        }
 
         for module in modules:
             item = module.name
