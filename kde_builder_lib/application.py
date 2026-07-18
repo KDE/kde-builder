@@ -345,10 +345,7 @@ class Application:
 
         modules = self.dependency_resolver.sort_modules_into_build_order()
 
-        # Filter --resume-foo options. This might be a second pass, but that should
-        # be OK since there's nothing different going on from the first pass (in
-        # resolve_selectors_into_modules) in that event.
-        modules = Application._apply_module_filters(ctx, modules)
+        modules = self._slice_resume_and_stop_points(modules)
 
         # Check for ignored modules (post-expansion)
         filtered_modules: list[Module] = []
@@ -947,52 +944,50 @@ class Application:
                 return True  # Error
         return failed
 
-    @staticmethod
-    def _apply_module_filters(ctx: BuildContext, module_list: list[Module]) -> list[Module]:
+    def _slice_resume_and_stop_points(self, module_list: list[Module]) -> list[Module]:
         """
-        Apply any module-specific filtering that is necessary after reading command line and rc-file options.
-
-        (This is as opposed to phase filters, which leave
-        each module as-is but change the phases they operate as part of, this
-        function could remove a module entirely from the build).
-
-        Used for --resume-{from,after} and --stop-{before,after}, but more could be
-        added in theory.
-        This function supports --{resume,stop}-* for both modules and module-sets.
-
-        Args:
-            ctx: :class:`BuildContext` in use.
-            module_list: List of :class:`Module` or :class:`ModuleSet` to apply filters on.
-
-        Returns:
-            List of :class:`Modules` or :class:`ModuleSet` with any inclusion/exclusion filters
-            applied. Do not assume this list will be a strict subset of the input list,
-            however the order will not change amongst the input modules.
+        Remove starting and/or ending elements from list according to --resume-{from,after} and --stop-{before,after} options.
         """
-        if not ctx.get_option("resume-from") and not ctx.get_option("resume-after") and not ctx.get_option("stop-before") and not ctx.get_option("stop-after"):
-            logger_app.debug("No command-line filter seems to be present.")
+        ctx = self.context
+
+        resume_from = ctx.get_option("resume-from")
+        resume_after = ctx.get_option("resume-after")
+        stop_before = ctx.get_option("stop-before")
+        stop_after = ctx.get_option("stop-after")
+
+        if not resume_from and not resume_after and not stop_before and not stop_after:
+            logger_app.debug("Not slicing project list because --resume-from, --resume-after, --stop-before, --stop-after options are not present.")
             return module_list
 
-        if ctx.get_option("resume-from") and ctx.get_option("resume-after"):
+        if resume_from and resume_after:
             # This one's an error.
             logger_app.error("You specified both r[b[--resume-from] and r[b[--resume-after] but you can only use one.\n")
-            raise KBRuntimeError("Both --resume-after and --resume-from specified.")
+            raise KBRuntimeError("Both --resume-from and --resume-after specified.")
 
-        if ctx.get_option("stop-before") and ctx.get_option("stop-after"):
+        if stop_before and stop_after:
             # This one's an error.
             logger_app.error("You specified both r[b[--stop-before] and r[b[--stop-after] but you can only use one.\n")
-            raise KBRuntimeError("Both --stop-before and --stop-from specified.")
+            raise KBRuntimeError("Both --stop-before and --stop-after specified.")
 
         if not module_list:  # Empty input?
             return []
 
-        resume_point = ctx.get_option("resume-from") or ctx.get_option("resume-after")
+        if resume_from:
+            resume_mode = "--resume-from"
+            resume_point = resume_from
+        elif resume_after:
+            resume_mode = "--resume-after"
+            resume_point = resume_after
+        else:
+            resume_mode = ""
+            resume_point = ""
+
         start_index = len(module_list)
 
         if resume_point:
-            logger_app.debug(f"Looking for {resume_point} for --resume-* option")
+            logger_app.debug(f"Slicing project list with {resume_mode} {resume_point}")
 
-            filter_inclusive = ctx.get_option("resume-from") or 0
+            filter_inclusive = True if resume_mode == "--resume-from" else False
             found = 0
 
             for i in range(len(module_list)):
@@ -1006,13 +1001,22 @@ class Application:
         else:
             start_index = 0
 
-        stop_point = ctx.get_option("stop-before") or ctx.get_option("stop-after")
+        if stop_before:
+            stop_mode = "--stop-before"
+            stop_point = stop_before
+        elif stop_after:
+            stop_mode = "--stop-after"
+            stop_point = stop_after
+        else:
+            stop_mode = ""
+            stop_point = ""
+
         stop_index = 0
 
         if stop_point:
-            logger_app.debug(f"Looking for {stop_point} for --stop-* option")
+            logger_app.debug(f"Slicing project list with {stop_mode} {stop_point}")
 
-            filter_inclusive = ctx.get_option("stop-before") or 0
+            filter_exclusive = True if stop_mode == "--stop-before" else False
             found = 0
 
             for i in range(start_index, len(module_list)):
@@ -1020,14 +1024,21 @@ class Application:
 
                 found = module.name == stop_point
                 if found:
-                    stop_index = i - (1 if filter_inclusive else 0)
+                    stop_index = i - (1 if filter_exclusive else 0)
                     break
         else:
             stop_index = len(module_list) - 1
 
         if start_index > stop_index or len(module_list) == 0:
-            # Lost all modules somehow.
-            raise KBRuntimeError(f"Unknown resume -> stop point {resume_point} -> {stop_point}.")
+            # Lost all projects.
+            msg = dedent(f"""
+             r[*] Could not slice project list with: y[{resume_mode} {resume_point} {stop_mode} {stop_point}]
+             r[*] The project list was the following:\n
+            """, preserve_len=1)
+            for el in module_list:
+                msg += f"     {el.name}\n"
+            logger_app.error(msg)
+            raise KBRuntimeError(f"Unable to slice project list with resume and/or stop points.")
 
         return module_list[start_index:stop_index + 1]  # pl2py: in python the stop index is not included, so we add +1
 
