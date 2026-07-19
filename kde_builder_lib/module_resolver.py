@@ -250,35 +250,11 @@ class ModuleResolver:
 
     def resolve_selectors_into_modules(self, selectors: list[str]) -> list[Module]:
         """
-        Resolve the given list of module selectors into :class:`Module` objects.
-
-        Uses the pending command-line options, ignore-selectors and available
-        modules/module-sets.
-
-        Selectors always choose an available :class:`Module` or :class:`ModuleSet` if
-        present (based on the .name of each Module or ModuleSet, including any
-        use-projects entries for ModuleSet objects). If a selector cannot be
-        directly found then ModuleSet objects may be expanded into their
-        constituent Module objects and the search performed again. If a selector
-        still cannot be found an exception is thrown.
-
-        Any embedded ModuleSets are expanded to Modules in the return value.
-
-        The list of selected Modules is returned, in the approximate order of the
-        input list (selectors for module-sets are expanded in arbitrary order).
+        Resolve the given list of selectors into :class:`Module` objects.
 
         If you are just looking for a Module that should already be present, see
         resolve_module_if_present().
-
-            modules = resolver.resolve_selectors_into_modules(["kdelibs", "juk"])
-
-        Resolves already-stored module selectors into :class:`Module`, based on
-        the options, modules, and module-sets set.
-
-        Returns a list of :class:`Module` in build order, with any module-sets fully
-        expanded. The desired options will be set for each :class:`Module` returned.
         """
-        # We have to be careful to maintain order of selectors throughout.
         names: list[str] = []
         _empty_list = []
         for selector in selectors:
