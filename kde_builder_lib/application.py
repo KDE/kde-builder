@@ -338,8 +338,6 @@ class Application:
 
         modules = self._slice_resume_and_stop_points(modules)
 
-        modules = module_resolver.filter_out_unneeded_modules(modules)
-
         for module in modules:
             module.set_resolved_repository()
 

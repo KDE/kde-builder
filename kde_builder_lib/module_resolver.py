@@ -271,9 +271,9 @@ class ModuleResolver:
 
         output_list: list[Module] = []
         for selector in names:
-            if selector in self.ignored_selectors:
-                continue
-            output_list.extend(self._resolve_single_selector(selector))
+            selector_results = self._resolve_single_selector(selector)
+            filtered_results = self.filter_out_unneeded_modules(selector_results)
+            output_list.extend(filtered_results)
 
         return output_list
 
@@ -290,6 +290,9 @@ class ModuleResolver:
                 pass
 
         ret: Module | None = self.defined_projects.get(module_name, None)
+        if ret:
+            out = self.filter_out_unneeded_modules([ret])
+            ret = out[0] if out else None
         return ret
 
     def filter_out_unneeded_modules(self, modules: list[Module]) -> list[Module]:
