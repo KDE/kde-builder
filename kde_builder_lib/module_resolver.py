@@ -321,13 +321,25 @@ class ModuleResolver:
         filtered_modules: list[Module] = []
         for module in modules:
             module_set_name = module.module_set.name if module.module_set else ""
-            if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
-                filtered_modules.append(module)
-            else:
+
+            if module.name in ignored_selectors:
                 if module.name in [*self.explicit_kdeproject_selectors, *self.explicit_thirdparty_selectors]:
                     logger_modres.warning(f" y[*] Project y[{module.name}] was explicitly selected in command line, but removed due to being ignored.")
                 else:
                     logger_modres.debug(f"Project y[{module.name}] was removed due to being ignored.")
+                continue
+            elif module_set_name in ignored_selectors:
+                if module_set_name in self.explicit_group_selectors:
+                    logger_modres.warning(f" y[*] Group y[{module_set_name}] was explicitly selected in command line, but is ignored, so project y[{module.name}] was removed.")
+                else:
+                    if module.name in [*self.explicit_kdeproject_selectors, *self.explicit_thirdparty_selectors]:
+                        logger_modres.warning(f" y[*] Group y[{module_set_name}] is ignored, so project y[{module.name}] was removed.")
+                    else:
+                        logger_modres.debug(f"Group y[{module_set_name}] is ignored, so project y[{module.name}] was removed.")
+                continue
+            else:
+                filtered_modules.append(module)
+
         return filtered_modules
 
 """
