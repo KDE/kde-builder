@@ -216,7 +216,7 @@ class Application:
             exit(0)
 
         ignored_in_global_section: set[str] = set(ctx.options["ignore-projects"])
-        ignored_in_global_section.discard("")  # do not place empty string element, there is a check with empty string element of module's module_set later (in post-expansion ignored-selectors check).
+        ignored_in_global_section.discard("")  # do not place empty string element, there is a check with empty string element of module's module_set later in filter_out_unneeded_modules().
         ctx.options["ignore-projects"] = []
 
         ignored_in_metadata: set[str] = {item.rsplit("/", 1)[-1] for item in ctx.metadata.ignored_projects}
@@ -338,18 +338,7 @@ class Application:
 
         modules = self._slice_resume_and_stop_points(modules)
 
-        # Check for ignored modules (post-expansion)
-        filtered_modules: list[Module] = []
-        for module in modules:
-            module_set_name = module.module_set.name if module.module_set else ""
-            if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
-                filtered_modules.append(module)
-            else:
-                if module.name in [*module_resolver.explicit_kdeproject_selectors, *module_resolver.explicit_thirdparty_selectors]:
-                    logger_app.warning(f" y[*] Project y[{module.name}] was explicitly selected in command line, but removed due to being ignored.")
-                else:
-                    logger_app.debug(f"Project y[{module.name}] was removed due to being ignored.")
-        modules = filtered_modules
+        modules = module_resolver.filter_out_unneeded_modules(modules)
 
         for module in modules:
             module.set_resolved_repository()

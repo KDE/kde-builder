@@ -12,12 +12,15 @@ from .kb_exception import KBException
 from .kb_exception import KBRuntimeError
 from .kb_exception import NoKDEProjectsFound
 from .kb_exception import UnknownKdeProjectException
+from .debug import KBLogger
 from .module.module import Module
 from .module_set.module_set import ModuleSet
 
 if TYPE_CHECKING:
     from build_context import BuildContext
     from .metadata.kde_projects_reader import KDEProjectsReader
+
+logger_modres = KBLogger.getLogger("module-resolver")
 
 
 class ModuleResolver:
@@ -312,6 +315,20 @@ class ModuleResolver:
 
         ret: Module | None = self.defined_projects.get(module_name, None)
         return ret
+
+    def filter_out_unneeded_modules(self, modules: list[Module]) -> list[Module]:
+        ignored_selectors = self.ignored_selectors
+        filtered_modules: list[Module] = []
+        for module in modules:
+            module_set_name = module.module_set.name if module.module_set else ""
+            if module.name not in ignored_selectors and module_set_name not in ignored_selectors:
+                filtered_modules.append(module)
+            else:
+                if module.name in [*self.explicit_kdeproject_selectors, *self.explicit_thirdparty_selectors]:
+                    logger_modres.warning(f" y[*] Project y[{module.name}] was explicitly selected in command line, but removed due to being ignored.")
+                else:
+                    logger_modres.debug(f"Project y[{module.name}] was removed due to being ignored.")
+        return filtered_modules
 
 """
 This class uses a multi-pass option resolving system, in accordance with

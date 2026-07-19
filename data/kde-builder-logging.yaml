@@ -82,6 +82,12 @@ loggers:
     handlers: [console]
     propagate: no
 
+  module-resolver:
+    level: INFO
+#    level: DEBUG
+    handlers: [console]
+    propagate: no
+
   module-set:
     level: INFO
 #    level: DEBUG
