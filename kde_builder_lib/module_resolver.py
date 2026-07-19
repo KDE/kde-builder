@@ -62,6 +62,10 @@ class ModuleResolver:
         self.defined_groups: dict[str, ModuleSet] = {}
         """Holds ModuleSet objects, created because of declared in "group <>" nodes in config."""
 
+        self.explicit_kdeproject_selectors: list[str] = []
+        self.explicit_group_selectors: list[str] = []
+        self.explicit_thirdparty_selectors: list[str] = []
+
     def set_deferred_options(self, deferred_options: list[dict[str, str | dict]]) -> None:
         """
         Set options to apply later if a module set resolves to a named module, used for "override" nodes.
@@ -229,6 +233,17 @@ class ModuleResolver:
                 raise KBRuntimeError(f"{unexpanded_group.name} expanded to an empty list of projects!")
 
             self.defined_projects.update({project_result.name: project_result for project_result in project_results})
+
+    def set_explicit_cmdline_selectors(self, cmdline_selectors: list[str]) -> None:
+        proj_db = self.context.projects_db.repositories
+        for el in cmdline_selectors:
+            leaf = el.split("/")[-1]
+            if leaf in proj_db:
+                self.explicit_kdeproject_selectors.append(leaf)
+            elif leaf in self.defined_groups:
+                self.explicit_group_selectors.append(leaf)
+            else:
+                self.explicit_thirdparty_selectors.append(leaf)
 
     def resolve_selectors_into_modules(self, selectors: list[str]) -> list[Module]:
         """
