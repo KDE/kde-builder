@@ -292,16 +292,6 @@ class Application:
 
         filtered_modules: list[Module] = []
         for module in modules:
-            if module.module_set and module.module_set.name in ["qt6-set"]:
-                if module.get_option("install-dir") == "":
-                    # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
-                    # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
-                    # by building all when not specifying any). We should not allow building qt modules in such case.
-                    # Otherwise, as their real "install-dir" is empty, their CMAKE_INSTALL_PREFIX will be incorrect (set to empty), and such
-                    # modules could not pass cmake configure.
-                    logger_app.warning(f" y[*] Removing y[third-party]/y[{module.name}] due to qt-install-dir")
-                    continue
-
             if module.is_kde_project():
                 repopath = module.get_repopath()
                 branch = resolver.resolve_branch_group(repopath or module.name, branch_group)
