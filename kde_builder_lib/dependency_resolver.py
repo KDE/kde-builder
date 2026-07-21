@@ -442,7 +442,9 @@ class DependencyResolver:
                 }
 
                 if not module_graph[dep_item]["build"]:
-                    logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but no project builds {dep_item} for this run.]")
+                    # Even if dep_item is not _yet_ selected to be built, it still may be marked to be built in this run,
+                    # if other projects include it as a dependency, or if it selected in command line.
+                    logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but {dep_item} is not marked to be built (at least yet).")
 
                 if dep_branch and (self._get_branch_of(dep_module) or "") != dep_branch:
                     wrong_branch = self._get_branch_of(dep_module) or "?"
@@ -489,7 +491,7 @@ class DependencyResolver:
                     module_graph[item][branch] = branch
 
                 # May have been pulled in via dependencies but not yet marked for
-                # build. Do so now, since it is listed explicitly in @modules
+                # build. Do so now, since it is listed explicitly in modules list.
                 module_graph[item]["build"] = True
             else:
                 dep_lookup_result = self._lookup_direct_dependencies(path, branch)
