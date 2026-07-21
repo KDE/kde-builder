@@ -283,31 +283,8 @@ class Application:
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
-        # Remove modules that are explicitly blanked out in their branch-group
-        # i.e. those modules where they *have* a branch-group, and it's set to
-        # be empty ("").
-        resolver = ctx.branch_group_resolver
         branch_group = ctx.get_option("branch-group")
         self._warn_if_branch_group_does_not_exists(branch_group)
-
-        filtered_modules: list[Module] = []
-        for module in modules:
-            if module.is_kde_project():
-                repopath = module.get_repopath()
-                branch = resolver.resolve_branch_group(repopath or module.name, branch_group)
-                if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
-                    printpath = repopath
-                    printpath = "y[" + printpath.replace("/", "]/y[") + "]"
-                    message = f" y[*] Removing {printpath} due to branch-group"
-                    if module.name in module_resolver.explicit_kdeproject_selectors:
-                        logger_app.warning(message)
-                    else:
-                        logger_app.debug(message)
-                    continue
-
-            filtered_modules.append(module)
-
-        modules = filtered_modules
 
         self._resolve_module_dependency_graph(modules)
 
