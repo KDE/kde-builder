@@ -406,9 +406,6 @@ class DependencyResolver:
                 else:
                     resolved_path = dep_path
                     logger_depres.debug(f"\tGuessing path: \"b[{resolved_path}]\" for item: b[{item}]")
-                # May not exist, e.g. misspellings or "virtual" dependencies like kf5umbrella.
-                if not dep_module:
-                    logger_depres.debug(f"\tdep-resolve: Will not build virtual or undefined project: b[{dep_item}]\n")
 
                 dep_lookup_result = self._lookup_direct_dependencies(resolved_path, dep_branch)
 

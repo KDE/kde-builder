@@ -293,6 +293,8 @@ class ModuleResolver:
         if ret:
             out = self.filter_out_unneeded_modules([ret])
             ret = out[0] if out else None
+        else:
+            logger_modres.debug(f" y[*] Project y[third-party]/y[{module_name}] is not defined!")
         return ret
 
     def filter_out_unneeded_modules(self, modules: list[Module]) -> list[Module]:
