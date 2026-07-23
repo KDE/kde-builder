@@ -32,6 +32,12 @@ install_runtime_packages() {
     (set -x; sudo apt update)
     (set -x; sudo apt install git python3-dbus python3-yaml python3-setproctitle)
   elif [ "$ID" = "fedora" ]; then
+    if [[ "$VARIANT_ID" = "kinoite" ]]; then
+      echo -e "${Red}Error: Unsupported OS variant: ${Yellow}$VARIANT_ID${Red}, cannot install runtime packages.${Color_Off}" 1>&2
+      echo -e "${Red}Please visit documentation page for alternative installation method: https://kde-builder.kde.org/en/getting-started/alternative-installation.html#using-a-python-virtual-environment${Color_Off}"
+      err_report  # manually show error message
+      exit 1
+    fi
     (set -x; sudo dnf install git python3-dbus python3-pyyaml python3-setproctitle)
   elif [ "$ID" = "gentoo" ]; then
     (set -x; sudo emerge -qu dev-python/dbus-python dev-python/pyyaml dev-python/setproctitle)
