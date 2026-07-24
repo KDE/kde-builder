@@ -83,7 +83,6 @@ class StatusView:
         E.g. for TTY it clears the line and redisplays the current stats.
         """
         progress_total = self.progress_total
-        msg = None
 
         mod_total, mod_success, mod_failed = self.mod_total, self.mod_success, self.mod_failed
 
@@ -91,16 +90,16 @@ class StatusView:
 
         if mod_total > 1:
             # Build up message in reverse order
-            msg = f"{mod_total} projects"
+            tail_msg = f"{mod_total} projects"
             if mod_failed:
-                msg = Debug().colorize(f"r[b[{mod_failed}] failed, ") + msg
+                tail_msg = Debug().colorize(f"r[b[{mod_failed}] failed, ") + tail_msg
             if mod_success:
-                msg = Debug().colorize(f"g[b[{mod_success}] built, ") + msg
+                tail_msg = Debug().colorize(f"g[b[{mod_success}] built, ") + tail_msg
 
-            status_line = self.status + f" ({msg})"
+            status_line = status_line + f" ({tail_msg})"
 
         if progress_total > 0:
-            msg = "{:.1f}%{}".format(self.cur_progress * 100 / progress_total, status_line)
+            msg = f"{self.cur_progress * 100 / progress_total:.1f}%{status_line}"
 
         elif self.cur_progress < 0:
             msg = status_line
