@@ -19,22 +19,29 @@ class StatusView:
     """
 
     def __init__(self):
-        # defaultOpts
-
         self.cur_progress = -1
         self.progress_total = -1
+        """
+        The total amount of progress deemed possible.
+        """
         self.status = ""
+        """
+        The "base" message to show as part of the update. E.g. "Compiling...".
+        """
 
         # Records number of modules built stats
         self.mod_total = -1
+        """
+        Number of modules to be built.
+        """
         self.mod_failed = 0
+        """
+        Number of modules not built successfully.
+        """
         self.mod_success = 0
-
-    def set_status(self, new_status) -> None:
         """
-        Set the "base" message to show as part of the update. E.g. "Compiling...".
+        Number of modules built successfully.
         """
-        self.status = Debug().colorize(new_status)
 
     def set_progress(self, new_progress) -> None:
         """
@@ -45,36 +52,6 @@ class StatusView:
 
         if old_progress != new_progress:
             self.update()
-
-    def set_progress_total(self, new_progress_total) -> None:
-        """
-        Set the total amount of progress deemed possible.
-        """
-        self.progress_total = new_progress_total
-
-    def number_modules_total(self, new_total: int = None) -> int:
-        """
-        Get (or set, if arg provided) number of modules to be built.
-        """
-        if new_total:
-            self.mod_total = new_total
-        return self.mod_total
-
-    def number_modules_succeeded(self, new_total: int | None = None) -> int:
-        """
-        Get (or set, if arg provided) number of modules built successfully.
-        """
-        if new_total:
-            self.mod_success = new_total
-        return self.mod_success
-
-    def number_modules_failed(self, new_total: int | None = None) -> int:
-        """
-        Get (or set, if arg provided) number of modules not built successfully.
-        """
-        if new_total:
-            self.mod_failed = new_total
-        return self.mod_failed
 
     def update(self) -> None:
         """

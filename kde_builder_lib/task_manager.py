@@ -311,7 +311,7 @@ class TaskManager:
         num_modules = len(modules)
 
         status_viewer = ctx.status_view
-        status_viewer.number_modules_total(num_modules)
+        status_viewer.mod_total = num_modules
 
         while modules:
             module = modules.pop(0)
@@ -356,13 +356,13 @@ class TaskManager:
                     else:
                         logfile = "No log file"
                 logger_taskmanager.info("\tError log: r[" + logfile)
-                status_viewer.number_modules_failed(1 + status_viewer.number_modules_failed())
+                status_viewer.mod_failed += 1
             else:
                 # Success
                 print(f"{module.name}: Succeeded.", file=status_list_fh)
                 print(f"{module.name}", file=successfully_build_fh)
                 build_done.append(module_name)  # Make it show up as a success
-                status_viewer.number_modules_succeeded(1 + status_viewer.number_modules_succeeded())
+                status_viewer.mod_success += 1
             cur_module += 1
             logger_taskmanager.warning("")  # Space between "Building project/name (n/n)" blocks
 

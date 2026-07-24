@@ -454,7 +454,7 @@ class BuildSystem:
         a_time = int(time.time())
 
         status_viewer = ctx.status_view
-        status_viewer.set_status(f"\t{message}")
+        status_viewer.status = Debug().colorize(f"\t{message}")
         status_viewer.update()
 
         if logger_logged_cmd.level == logging.INFO and ctx.status_view.cur_progress == -1:
@@ -479,7 +479,7 @@ class BuildSystem:
                 percentage = int(match.group(1))
 
             if percentage:
-                status_viewer.set_progress_total(100)
+                status_viewer.progress_total = 100
                 status_viewer.set_progress(percentage)
             else:
                 x, y = None, None
@@ -489,7 +489,7 @@ class BuildSystem:
 
                 if x and y:
                     # ninja-syntax
-                    status_viewer.set_progress_total(y)
+                    status_viewer.progress_total = y
                     status_viewer.set_progress(x)
 
             if "warning: " in input_line:
