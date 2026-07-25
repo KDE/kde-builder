@@ -19,8 +19,8 @@ class StatusView:
     """
 
     def __init__(self):
-        self.cur_progress = -1
-        self.progress_total = -1
+        self.current_project_cur_progress = -1
+        self.current_project_full_progress = -1
         """
         The total amount of progress deemed possible.
         """
@@ -47,8 +47,8 @@ class StatusView:
         """
         Set the amount of progress made vs. the total progress possible.
         """
-        old_progress = self.cur_progress
-        self.cur_progress = new_progress
+        old_progress = self.current_project_cur_progress
+        self.current_project_cur_progress = new_progress
 
         if old_progress != new_progress:
             self.update()
@@ -59,7 +59,7 @@ class StatusView:
 
         E.g. for TTY it clears the line and redisplays the current stats.
         """
-        progress_total = self.progress_total
+        current_project_full_progress = self.current_project_full_progress
 
         mod_total, mod_success, mod_failed = self.mod_total, self.mod_success, self.mod_failed
 
@@ -75,14 +75,14 @@ class StatusView:
 
             status_line = status_line + f" ({tail_msg})"
 
-        if progress_total > 0:
-            msg = f"{self.cur_progress * 100 / progress_total:.1f}%{status_line}"
+        if current_project_full_progress > 0:
+            msg = f"{self.current_project_cur_progress * 100 / current_project_full_progress:.1f}%{status_line}"
 
-        elif self.cur_progress < 0:
+        elif self.current_project_cur_progress < 0:
             msg = status_line
         else:
             spinner = "-\\|/"
-            msg = spinner[self.cur_progress % len(spinner)] + status_line
+            msg = spinner[self.current_project_cur_progress % len(spinner)] + status_line
 
         StatusView._clear_line_and_update(msg)
 

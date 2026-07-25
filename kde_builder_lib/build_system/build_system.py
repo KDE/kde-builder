@@ -457,7 +457,7 @@ class BuildSystem:
         status_viewer.status = Debug().colorize(f"\t{message}")
         status_viewer.update()
 
-        if logger_logged_cmd.level == logging.INFO and ctx.status_view.cur_progress == -1:
+        if logger_logged_cmd.level == logging.INFO and ctx.status_view.current_project_cur_progress == -1:
             # When user configured logged-command logger to not print the output of the command to console (i.e. logged-command level is higher than DEBUG), but still print the info of started and finished logged command,
             # (i.e. logged-command level is lower than WARNING), in other words, when logged-command level is INFO, the user will want to see the initial status message.
             # status_viewer lines are assumed to be overwritten by some line at the end. For example, the initial status line is "        Installing ark". It then is replaced by progress status line "66.7%   Installing ark".
@@ -479,7 +479,7 @@ class BuildSystem:
                 percentage = int(match.group(1))
 
             if percentage:
-                status_viewer.progress_total = 100
+                status_viewer.current_project_full_progress = 100
                 status_viewer.set_progress(percentage)
             else:
                 x, y = None, None
@@ -489,7 +489,7 @@ class BuildSystem:
 
                 if x and y:
                     # ninja-syntax
-                    status_viewer.progress_total = y
+                    status_viewer.current_project_full_progress = y
                     status_viewer.set_progress(x)
 
             if "warning: " in input_line:
