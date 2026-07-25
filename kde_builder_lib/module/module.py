@@ -230,7 +230,7 @@ class Module(OptionsBase):
 
     def build(self) -> bool:
         """
-        Execute the build and install (or pretends to in pretend mode) using the appropriate build system. Can also run the testsuite as part of the build.
+        Execute the build (or pretends to in pretend mode) using the appropriate build system. Can also run the testsuite as part of the build.
 
         Returns:
              False on failure, True on success.
@@ -255,19 +255,7 @@ class Module(OptionsBase):
         if self.get_option("run-tests"):
             self.build_system.run_testsuite()
 
-        if not self.phases.has("install"):
-            logger_module.info("\tSkipping install due to disabled install phase.")
-            return True
-
-        # Clear the progress values after build process, so they do not influence on initial progress of install process.
-        # This is needed because currently the install() is invoked from build().
-        sv = self.context.status_view
-        sv.current_project_cur_progress = -1
-        sv.current_project_full_progress = -1
-        sv.status = ""
-
-        # TODO: this should be a phase to run.
-        return self.install()
+        return True
 
     def setup_build_system(self) -> bool:
         """

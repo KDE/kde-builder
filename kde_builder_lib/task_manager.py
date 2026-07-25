@@ -235,10 +235,26 @@ class TaskManager:
         # value to write. If the build succeeds we'll reset to 0 then.
         module.set_persistent_option("failure-count", fail_count + 1)
 
-        if module.build():
+        if not module.build():
+            return "build"  # phase failed at
+
+        if not module.phases.has("install"):
+            logger_taskmanager.info("\tSkipping install due to disabled install phase.")
             module.set_persistent_option("failure-count", 0)
             return ""
-        return "build"  # phase failed at
+
+        # Clear the progress values after build process, so they do not influence on initial progress of install process.
+        # This is needed because the install() is invoked after build().
+        sv = module.context.status_view
+        sv.current_project_cur_progress = -1
+        sv.current_project_full_progress = -1
+        sv.status = ""
+
+        if not module.install():
+            return "install"  # phase failed at
+
+        module.set_persistent_option("failure-count", 0)
+        return ""
 
     def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
@@ -329,7 +345,7 @@ class TaskManager:
                 # FAILURE
                 ctx.mark_module_phase_failed(failed_phase, module)
                 print(f"{module.name}: Failed to {failed_phase}.", file=status_list_fh)
-                if failed_phase == "build":
+                if failed_phase == "build" or failed_phase == "install":
                     print(module.name, file=failed_to_build_fh)
                 if failed_phase == "update":
                     print(module.name, file=failed_to_update_fh)
