@@ -111,6 +111,7 @@ class TaskManager:
             logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
             result: int = self._handle_build(ipc, ctx) or result
 
+        ctx.status_view.progress_bar_disable()
         return result
 
     # Internal API
@@ -245,10 +246,7 @@ class TaskManager:
 
         # Clear the progress values after build process, so they do not influence on initial progress of install process.
         # This is needed because the install() is invoked after build().
-        sv = module.context.status_view
-        sv.current_project_cur_progress = -1
-        sv.current_project_full_progress = -1
-        sv.status = ""
+        module.context.status_view.reset_progress()
 
         if not module.install():
             return "install"  # phase failed at
@@ -338,6 +336,9 @@ class TaskManager:
             module_name = module.name
             block_substr = self._form_block_substring(module)
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
+            status_viewer.mod_current = cur_module
+            status_viewer.reset_progress()  # Resetting previous project's progress
+            status_viewer.progress_bar_update()
 
             failed_phase: str = TaskManager._build_single_module(ipc, module)
 

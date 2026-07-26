@@ -19,6 +19,11 @@ class StatusView:
     """
 
     def __init__(self):
+        self.current_project_phase: str | None = None
+        """
+        We update progress bar percenatage for current project only for "build" phase, not for "install" phase.
+        """
+
         self.current_project_cur_progress = -1
         self.current_project_full_progress = -1
         """
@@ -42,6 +47,10 @@ class StatusView:
         """
         Number of modules built successfully.
         """
+        self.mod_current = -1
+        """
+        The number of module that is currently built.
+        """
 
     def set_progress(self, new_progress) -> None:
         """
@@ -52,6 +61,11 @@ class StatusView:
 
         if old_progress != new_progress:
             self.update()
+
+    def reset_progress(self) -> None:
+        self.current_project_cur_progress = -1
+        self.current_project_full_progress = -1
+        self.status = ""
 
     def update(self) -> None:
         """
@@ -85,6 +99,29 @@ class StatusView:
             msg = spinner[self.current_project_cur_progress % len(spinner)] + status_line
 
         StatusView._clear_line_and_update(msg)
+        # Avoid updating progress bar in "install" phase. We do this because the "install"
+        # phase is run after "build" phase, and it resets the progress back to 0.
+        # Otherwise, user will see progress bar ugly jumps back.
+        if self.current_project_phase == "build":
+             self.progress_bar_update()
+
+    def progress_bar_update(self):
+        mod_current = self.mod_current
+        mod_total = self.mod_total
+        current_project_full_progress = self.current_project_full_progress
+        current_project_cur_progress = self.current_project_cur_progress
+
+        passed_by_other_projects = int(100 * (mod_current - 1) / mod_total)
+
+        if current_project_full_progress > 0:
+            passed_by_current_project = int(100 * (current_project_cur_progress / current_project_full_progress) / mod_total)
+            percent = passed_by_other_projects + passed_by_current_project
+        else:
+            percent = passed_by_other_projects
+        print(f"\033]9;4;1;{percent}\033\\", end="")
+
+    def progress_bar_disable(self):
+        print("\033]9;4;0;0\033\\", end="")
 
     @staticmethod
     def release_tty(msg: str = "") -> None:

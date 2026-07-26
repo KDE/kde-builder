@@ -95,7 +95,7 @@ class Module(OptionsBase):
         self.env: dict[str, str] = {}
 
         self.current_phase: str | None = None
-        """For disabling the line "# with environment: .../kde-builder.env" in logged commands for git commands."""
+        """For customizing behavior depending on the phase."""
 
         if self.__class__.__name__ != "BuildContext":
             # Avoid setting this for BuildContext, because it has its own option value type verification code, which needs BuildContext to be already initialized
@@ -246,7 +246,9 @@ class Module(OptionsBase):
         if self.get_option("build-system-only"):
             return True
 
+        self.current_phase = "build"
         build_results = build_system.build_internal()
+        self.current_phase = None
         if not build_results["was_successful"]:
             return False
 

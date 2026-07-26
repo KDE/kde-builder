@@ -648,6 +648,10 @@ class Application:
         """
         ctx = self.context
 
+        # Disabling progress bar also here, for the case when user interrupted
+        # the execution with Ctrl+C.
+        ctx.status_view.progress_bar_disable()
+
         if Debug().pretending() or self._base_pid != os.getpid():
             # Abort early if pretending or if we're not the same process
             # that was started by the user (e.g. async mode, forked pipe-opens

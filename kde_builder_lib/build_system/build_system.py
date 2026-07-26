@@ -455,6 +455,7 @@ class BuildSystem:
 
         status_viewer = ctx.status_view
         status_viewer.status = Debug().colorize(f"\t{message}")
+        status_viewer.current_project_phase = self.module.current_phase
         status_viewer.update()
 
         if logger_logged_cmd.level == logging.INFO and ctx.status_view.current_project_cur_progress == -1:
