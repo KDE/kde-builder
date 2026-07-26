@@ -325,7 +325,10 @@ class ModuleResolver:
                     # by building all). We should not allow building qt modules in such case.
                     # Otherwise, as their real "install-dir" is empty, their CMAKE_INSTALL_PREFIX will be incorrect (set to empty), and such
                     # modules could not pass cmake configure.
-                    logger_modres.warning(f" y[*] Removing y[third-party]/y[{module.name}] due to qt-install-dir")
+                    if module.name in self.explicit_thirdparty_selectors:
+                        logger_modres.warning(f" y[*] Removing y[third-party]/y[{module.name}] due to qt-install-dir")
+                    else:
+                        logger_modres.debug(f"Removing y[third-party]/y[{module.name}] due to qt-install-dir")
                     continue
 
             if module.is_kde_project():
@@ -339,11 +342,10 @@ class ModuleResolver:
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
                     printpath = repopath
                     printpath = "y[" + printpath.replace("/", "]/y[") + "]"
-                    message = f" y[*] Removing {printpath} due to branch-group"
                     if module.name in self.explicit_kdeproject_selectors:
-                        logger_modres.warning(message)
+                        logger_modres.warning(f" y[*] Removing {printpath} due to branch-group")
                     else:
-                        logger_modres.debug(message)
+                        logger_modres.debug(f"Removing {printpath} due to branch-group")
                     continue
 
             filtered_modules.append(module)
