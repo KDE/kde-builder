@@ -171,7 +171,7 @@ class Application:
         # returned modules/sets have any such options stripped out. It will also add
         # module-specific options to any returned modules/sets.
         modules_and_sets_from_userconfig: list[Module | ModuleSet]
-        overrides_from_userconfig: list[dict[str, str | dict]]  # "override" nodes.
+        overrides_from_userconfig: list[OptionsBase]  # "override" nodes.
         modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
 
         ctx.load_persistent_options()
@@ -675,7 +675,7 @@ class Application:
         exit(exitcode)
 
     @staticmethod
-    def _process_configs_content(ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[dict[str, str | dict]]]:
+    def _process_configs_content(ctx: BuildContext, config_path: str, cmdline_global_options: dict) -> tuple[list[Module | ModuleSet], list[OptionsBase]]:
         """
         Read in the settings from the configuration.
 
@@ -751,7 +751,7 @@ class Application:
         seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
         seen_module_sets = {}  # and vice versa
         # seen_module_set_items = {}  # To track option override modules.
-        deferred_options: list[dict[str, str | dict]] = []
+        deferred_options: list[OptionsBase] = []
 
         for node_name, node, config_filename in config_nodes_list:
             if node_name.startswith("group "):
@@ -806,17 +806,11 @@ class Application:
             if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options: OptionsBase = OptionsBase(ctx)
+                options: OptionsBase = OptionsBase(ctx, options_name)
                 options.apply_config_options(ctx, node, config_filename)
 
-                deferred_options.append({
-                    "name": options_name,
-                    "opts": options.options
-                })
-
-                # NOTE: There is no duplicate options block checking here, and we now currently rely on there being no duplicate checks to allow
-                # for things like kf5-common-options.ksb to be included multiple times.
-                continue  # Don't add to module list
+                deferred_options.append(options)
+                continue
 
         for name, module_set in seen_module_sets.items():
             pass
