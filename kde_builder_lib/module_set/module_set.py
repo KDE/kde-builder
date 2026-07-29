@@ -43,19 +43,17 @@ class ModuleSet(OptionsBase):
     See also: git-repository-base, use-projects
     """
 
-    def __init__(self, ctx: BuildContext, name: str):
-        OptionsBase.__init__(self)
+    def __init__(self, ctx: BuildContext, name: str = ""):
+        super().__init__(ctx=ctx, name=name)
         self.start_for_create_id: int = 0
         self.options["repository"] = "kde-projects"
 
-        self.name: str = name or ""
         self.modules_to_find: list[str] = []
         self.modules_to_ignore: list[str] = []
 
         self.module_order: dict[str, int] = {}
         """Maps module names to position in list."""
 
-        self.context: BuildContext = ctx
         self.project_objects_list: list[Module] = []
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.

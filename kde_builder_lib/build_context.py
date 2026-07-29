@@ -67,7 +67,7 @@ class BuildContext(Module):
     PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
 
     def __init__(self):
-        Module.__init__(self, None, "global")
+        super().__init__(ctx=None, name="global")
 
         # There doesn't seem to be a great way to get this from CMake easily, but we can
         # reason that if there is a /usr/lib64 (and it's not just a compat symlink),

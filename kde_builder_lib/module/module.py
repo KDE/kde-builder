@@ -63,8 +63,7 @@ class Module(OptionsBase):
     """
 
     def __init__(self, ctx: BuildContext, name: str):
-        OptionsBase.__init__(self)
-        self.name = name
+        super().__init__(ctx=ctx, name=name)
 
         if not self.name:
             raise ProgramError("Empty Module constructed")
@@ -86,10 +85,8 @@ class Module(OptionsBase):
             phases = copy.copy(ctx.phases)
         self.phases: PhaseList = phases
 
-        # newOptions:
         self.scm: Updater = Updater(self)
         self.build_system: BuildSystem | None = None
-        self.context = ctx
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []
         self.env: dict[str, str] = {}
