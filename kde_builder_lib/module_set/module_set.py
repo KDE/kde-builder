@@ -48,10 +48,9 @@ class ModuleSet(OptionsBase):
         self.start_for_create_id: int = 0
         self.options["repository"] = "kde-projects"
 
-        # newOptions:
         self.name: str = name or ""
-        self.module_search_decls: list[str] = []
-        self.module_ignore_decls: list[str] = []
+        self.modules_to_find: list[str] = []
+        self.modules_to_ignore: list[str] = []
 
         self.module_order: dict[str, int] = {}
         """Maps module names to position in list."""
@@ -61,35 +60,6 @@ class ModuleSet(OptionsBase):
 
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
-
-    def modules_to_find(self) -> list[str]:
-        return self.module_search_decls
-
-    def set_modules_to_find(self, module_decls: list[str]) -> None:
-        decl_order: dict[str, int] = {module_decls[i]: i for i in range(len(module_decls))}
-
-        self.module_search_decls = module_decls
-        self.module_order = decl_order
-
-    def module_names_to_find(self) -> list[str]:
-        """
-        Get module names to find.
-
-        Same as modules_to_find, but strips away any path components to leave just module names.
-        E.g. a "use-projects: [kde/kdelibs, juk]" would give [kdelibs, juk] as the result list.
-        """
-        modules = self.modules_to_find()
-        ret = []
-        for module in modules:
-            module = module.split("/")[-1]
-            ret.append(module)
-        return ret
-
-    def modules_to_ignore(self) -> list[str]:
-        return self.module_ignore_decls
-
-    def add_modules_to_ignore(self, module_decls: list[str]) -> None:
-        self.module_ignore_decls.extend(module_decls)
 
     def _initialize_new_module(self, new_module: Module) -> None:
         """
@@ -106,7 +76,7 @@ class ModuleSet(OptionsBase):
         # to sort at the end within the module-set.
         start_order = self.start_for_create_id
 
-        order_in_list: int = self.module_order.get(f"{new_module}", len(self.module_search_decls))
+        order_in_list: int = self.module_order.get(f"{new_module}", len(self.modules_to_find))
         new_module.create_id = start_order + order_in_list
 
     # @override
@@ -123,7 +93,8 @@ class ModuleSet(OptionsBase):
                 logger_moduleset.error("in the y[use-projects] entry.")
                 raise SetOptionError("use-projects", "Invalid use-projects")
 
-            self.set_modules_to_find(modules)
+            self.modules_to_find = modules
+            self.module_order: dict[str, int] = {modules[i]: i for i in range(len(modules))}
             return
 
         if opt_name == "ignore-projects":
@@ -134,7 +105,7 @@ class ModuleSet(OptionsBase):
                 logger_moduleset.error("in the y[ignore-projects] entry.")
                 raise SetOptionError("ignore-projects", "Invalid ignore-projects")
 
-            self.add_modules_to_ignore(modules)
+            self.modules_to_ignore.extend(modules)
             return
 
         # Actually set options.
@@ -148,12 +119,12 @@ class ModuleSet(OptionsBase):
         Any modules ignored by this module set are excluded from the returned list.
         The modules returned have not been added to the build context.
         """
-        ignore_list: list[str] = self.modules_to_ignore()
+        ignore_list: list[str] = self.modules_to_ignore
 
         module_list = []  # module names converted to `Module` objects.
 
         # Setup default options for each module
-        for module_item in self.modules_to_find():
+        for module_item in self.modules_to_find:
 
             try:
                 module_names: list[str] = self.context.projects_db.get_identifiers_for_selector(module_item, ignore_list)
@@ -181,9 +152,3 @@ class ModuleSet(OptionsBase):
         Ensure we are setting the correct type for value of option.
         """
         self.context.verify_option_value_type(option_name, option_value)
-
-    def get_projects(self):
-        """
-        Return the list of Module objects.
-        """
-        return self.project_objects_list

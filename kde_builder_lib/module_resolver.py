@@ -193,7 +193,7 @@ class ModuleResolver:
         elif selector_name in self.defined_groups:
             group: ModuleSet = self.defined_groups[selector_name]
             # At this point, all groups are expanded. So just take its projects.
-            projects: list[Module] = group.get_projects()
+            projects: list[Module] = group.project_objects_list
             results.extend(projects)
 
         # Case 3: selector_name names either kde project that is not yet in self.defined_projects, or is fully unrecognized.

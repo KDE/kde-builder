@@ -774,7 +774,7 @@ class Application:
 
                 # Save "use-projects" entries, so we can see if later module decls
                 # are overriding/overlaying their options.
-                module_set_items = new_module_set.module_names_to_find()
+                module_set_items = [name.rsplit("/", 1)[-1] for name in new_module_set.modules_to_find]
                 # seen_module_set_items = {item: new_module_set for item in module_set_items}
 
                 # Reserve enough "create IDs" for all named modules to use
