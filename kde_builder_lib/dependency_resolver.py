@@ -622,62 +622,59 @@ class DependencyResolver:
             self._descend_module_graph(mode, info, context)
             item_index += 1
 
-    def make_comparison_func(self) -> Callable:
+    def _compare_build_order_depends(self, a, b):
         module_graph = self.dependency_graph
 
-        def _compare_build_order_depends(a, b):
-            # comparison results uses:
-            # -1 if a < b
-            # 0 if a == b
-            # 1 if a > b
+        # comparison results uses:
+        # -1 if a < b
+        # 0 if a == b
+        # 1 if a > b
 
-            a_votes = module_graph[a]["votes"]
-            b_votes = module_graph[b]["votes"]
+        a_votes = module_graph[a]["votes"]
+        b_votes = module_graph[b]["votes"]
 
-            # Enforce a strict dependency ordering.
-            # The case where both are true should never happen, since that would
-            # amount to a cycle, and cycle detection is supposed to have been
-            # performed beforehand.
+        # Enforce a strict dependency ordering.
+        # The case where both are true should never happen, since that would
+        # amount to a cycle, and cycle detection is supposed to have been
+        # performed beforehand.
 
-            b_depends_on_a = a_votes.get(b, 0)
-            a_depends_on_b = b_votes.get(a, 0)
-            order = -1 if b_depends_on_a else (1 if a_depends_on_b else 0)
+        b_depends_on_a = a_votes.get(b, 0)
+        a_depends_on_b = b_votes.get(a, 0)
+        order = -1 if b_depends_on_a else (1 if a_depends_on_b else 0)
 
-            if order:
-                return order
+        if order:
+            return order
 
-            # Assuming no dependency relation, next sort by "popularity":
-            # the item with the most votes (back edges) is depended on the most
-            # so it is probably a good idea to build that one earlier to help
-            # maximise the duration of time for which builds can be run in parallel
+        # Assuming no dependency relation, next sort by "popularity":
+        # the item with the most votes (back edges) is depended on the most
+        # so it is probably a good idea to build that one earlier to help
+        # maximise the duration of time for which builds can be run in parallel
 
-            votes = len(b_votes) - len(a_votes)
+        votes = len(b_votes) - len(a_votes)
 
-            if votes:
-                return votes
+        if votes:
+            return votes
 
-            # If there is no good reason to prefer one module over another,
-            # simply sort by the order contained within the configuration file (if
-            # present), which would be setup as the rc-file is read.
+        # If there is no good reason to prefer one module over another,
+        # simply sort by the order contained within the configuration file (if
+        # present), which would be setup as the rc-file is read.
 
-            a_rc_order: int = module_graph[a]["module"].create_id
-            b_rc_order: int = module_graph[b]["module"].create_id
-            config_order = (a_rc_order > b_rc_order) - (a_rc_order < b_rc_order)
+        a_rc_order: int = module_graph[a]["module"].create_id
+        b_rc_order: int = module_graph[b]["module"].create_id
+        config_order = (a_rc_order > b_rc_order) - (a_rc_order < b_rc_order)
 
-            if config_order:
-                return config_order
+        if config_order:
+            return config_order
 
-            # If the rc-file is not present then sort by name to ensure a reproducible
-            # build order that isn't influenced by randomization of the runtime.
-            return (a > b) - (a < b)
-
-        return _compare_build_order_depends
+        # If the rc-file is not present then sort by name to ensure a reproducible
+        # build order that isn't influenced by randomization of the runtime.
+        return (a > b) - (a < b)
 
     def sort_modules_into_build_order(self) -> list[Module]:
         module_graph = self.dependency_graph
         resolved = list(module_graph.keys())
         built = [el for el in resolved if module_graph[el]["build"] and module_graph[el]["module"]]
-        prioritised = sorted(built, key=cmp_to_key(self.make_comparison_func()))
+        prioritised = sorted(built, key=cmp_to_key(self._compare_build_order_depends))
         modules = [module_graph[key]["module"] for key in prioritised]
         return modules
 
