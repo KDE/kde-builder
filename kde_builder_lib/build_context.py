@@ -24,7 +24,7 @@ from .metadata.kde_projects_reader import KDEProjectsReader
 from .metadata.metadata import Metadata
 from .module.branch_group_resolver import ModuleBranchGroupResolver
 from .module.module import Module
-from .options_base import OptionsBase
+from .options_base import PathResolvingOptions
 from .phase_list import PhaseList
 from .status_view import StatusView
 from .util.util import Util
@@ -33,10 +33,7 @@ from .util.textwrap_mod import dedent
 logger_buildcontext = KBLogger.getLogger("build-context")
 
 
-# We derive from Module so that BuildContext acts like the "global"
-# Module, with some extra functionality.
-# TODO: Derive from OptionsBase directly and remove get_option override
-class BuildContext(Module):
+class BuildContext(PathResolvingOptions):
     """
     Contains the information needed about the build context, e.g. list of modules, what phases each module is in, the various options, etc.
 
@@ -168,7 +165,6 @@ class BuildContext(Module):
         self.modules: list[Module] = []
         """List of modules to build."""
 
-        self.context = self  # Fix link to buildContext (i.e. self)
         self.build_options = {
             "global": {
                 **self.global_options_private,
@@ -336,7 +332,11 @@ class BuildContext(Module):
         except Exception as e:
             logger_buildcontext.warning(f" y[*] Failed to close lock: {e}")
 
-    def get_log_dir_for(self, module: Module) -> str:
+    # @override
+    def get_log_dir(self) -> str:
+        return self.get_log_dir_for(self)
+
+    def get_log_dir_for(self, module: PathResolvingOptions) -> str:
         """
         Return the log directory of specified module.
 
@@ -372,7 +372,11 @@ class BuildContext(Module):
 
         return log_dir
 
-    def get_log_path_for(self, module: Module, path: str) -> str:
+    # @override
+    def get_log_path(self, path: str) -> str:
+        return self.get_log_path_for(self, path)
+
+    def get_log_path_for(self, module: PathResolvingOptions, path: str) -> str:
         """
         Return the absolute filename to open() for a log file for this module based on the given basename (including extensions). Update the "latest" symlink.
 
@@ -560,21 +564,6 @@ class BuildContext(Module):
         modules = [module for module in modules if module.name in self.errors]
         return modules
 
-    # @override(check_signature=False)
-    def get_option(self, key: str) -> str | dict | list | bool:
-        """
-        Get context option.
-
-        Our immediate parent class Module overrides this, but we actually
-        want the OptionsBase version to be used instead, until we break the recursive
-        use of Module's own get_option calls on our get_option.
-
-        Returns:
-             The same types that OptionsBase.get_option returns.
-        """
-        ret = OptionsBase.get_option(self, key)
-        return ret
-
     # @override
     def set_option(self, opt_name: str, opt_val) -> None:
 
@@ -584,10 +573,7 @@ class BuildContext(Module):
                 self.phases.filter_out_phase(phase)
             return
 
-        # Our immediate parent class Module overrides this, but we actually
-        # want the OptionsBase version to be used instead, because Module's version specifically checks for
-        # some options prohibited for it (such as "ignore-projects") but we may want such for BuildContext.
-        OptionsBase.set_option(self, opt_name, opt_val)
+        super().set_option(opt_name, opt_val)
 
         # Automatically respond to various global option changes.
         if opt_name == "colorful-output":

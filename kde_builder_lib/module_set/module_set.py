@@ -107,7 +107,7 @@ class ModuleSet(OptionsBase):
             return
 
         # Actually set options.
-        OptionsBase.set_option(self, opt_name, opt_val)
+        super().set_option(opt_name, opt_val)
 
     def convert_to_modules(self) -> list[Module]:
         """

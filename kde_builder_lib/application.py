@@ -737,7 +737,7 @@ class Application:
             ctx.merge_options_from(global_opts)
 
         # Now we have determined log-dir, and can set screen log file.
-        Debug().set_log_file(ctx.get_log_dir_for(ctx) + "/screen.log")
+        Debug().set_log_file(ctx.get_log_dir() + "/screen.log")
 
         # Now, after global options were resolved and set, we can resolve paths in include lines and read those config files.
         node_reader = RecursiveConfigNodesIterator(config_content, rcfile, ctx)
