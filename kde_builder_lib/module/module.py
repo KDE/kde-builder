@@ -603,23 +603,17 @@ class Module(PathResolvingOptions):
 
         super().set_option(opt_name, opt_val)
 
-    # @override(check_signature=False)
-    def get_option(self, key: str, level_limit="allow-inherit") -> str | dict | None:
+    # @override
+    def get_option(self, key: str, level_limit="allow-inherit") -> str | dict:
         """
         Return an option value for a given module.
 
         Some globals can't be overridden by a module's choice (but see level_limit parameter below).
         If so, the module's choice will be ignored, and a warning will be issued.
 
-        Option names are case-sensitive!
-
         Some options (e.g. cmake-options, configure-flags, meson-options) have the global value
         and then the module's own value appended together. To get the actual
         module setting you must use the level limit parameter set to "module".
-
-        Likewise, some qt module options do not obey the previous proviso since
-        Qt options are not likely to agree nicely with generic KDE build_system
-        options.
 
         Options starting with "#" can only be set internally (i.e. not from rc-file
         or cmdline) so this can be used as a way to tag modules with data meant not
@@ -635,7 +629,6 @@ class Module(PathResolvingOptions):
                     buildContext).
 
         Returned type - for example used in
-          None - unexisting key in module-only level
           dict - "set-env"
           str - almost everything else
         """
@@ -645,7 +638,7 @@ class Module(PathResolvingOptions):
 
         # If module-only, check that first.
         if level_limit == "module":
-            return self.options[key] if key in self.options else None
+            return self.options[key] if key in self.options else ""
 
         ctx_value = ctx.get_option(key)  # we'll use this a lot from here
 

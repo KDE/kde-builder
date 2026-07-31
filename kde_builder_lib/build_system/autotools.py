@@ -73,9 +73,7 @@ class BuildSystemAutotools(BuildSystem):
         builddir = module.fullpath("build")
         installdir = module.installation_path()
 
-        # "module"-limited option grabbing can return None, so use Logical Defined-Or
-        # to convert to empty string in that case.
-        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module") or "")
+        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module"))
         try:
             configure_command = self._autogen()
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])
