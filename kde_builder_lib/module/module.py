@@ -470,10 +470,8 @@ class Module(PathResolvingOptions):
              False on failure, True on success.
         """
         module_name = self.name
-        module_src_dir = self.get_source_dir()
-        kdesrc = ctx.get_source_dir()
-
-        if kdesrc != module_src_dir:
+        if ctx.get_option("source-dir") != self.get_option("source-dir"):
+            module_src_dir = self.get_source_dir()
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
                 logger_module.error(f"\tUnable to create separate source directory for r[{self.name}]: {module_src_dir}")
