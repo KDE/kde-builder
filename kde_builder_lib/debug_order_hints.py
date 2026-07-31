@@ -25,6 +25,10 @@ class DebugOrderHints:
     missing dependency).
     """
 
+    def __init__(self, module_graph: dict, extra_debug_info: dict):
+        self.module_graph = module_graph
+        self.extra_debug_info = extra_debug_info
+
     @staticmethod
     def _get_phase_score(phase: str) -> int:
         """
@@ -52,108 +56,106 @@ class DebugOrderHints:
             return 1
         return 0
 
-    @staticmethod
-    def _make_comparison_func(module_graph, extra_debug_info):
-        def _compare_debug_order(a, b):
-            # comparison results uses:
-            # -1 if a < b
-            # 0 if a == b
-            # 1 if a > b
+    def _compare_debug_order(self, a, b):
+        module_graph = self.module_graph
+        extra_debug_info = self.extra_debug_info
 
-            name_a = a.name
-            name_b = b.name
+        # comparison results uses:
+        # -1 if a < b
+        # 0 if a == b
+        # 1 if a > b
 
-            # Enforce a strict dependency ordering.
-            # The case where both are true should never happen, since that would
-            # amount to a cycle, and cycle detection is supposed to have been
-            # performed beforehand.
-            #
-            # Assumption: if A depends on B, and B is broken then a failure to build
-            # A is probably due to lacking a working B.
+        name_a = a.name
+        name_b = b.name
 
-            b_depends_on_a = module_graph[name_a]["votes"].get(name_b, 0)
-            a_depends_on_b = module_graph[name_b]["votes"].get(name_a, 0)
-            order = -1 if b_depends_on_a else (1 if a_depends_on_b else 0)
+        # Enforce a strict dependency ordering.
+        # The case where both are true should never happen, since that would
+        # amount to a cycle, and cycle detection is supposed to have been
+        # performed beforehand.
+        #
+        # Assumption: if A depends on B, and B is broken then a failure to build
+        # A is probably due to lacking a working B.
 
-            if order:
-                return order
+        b_depends_on_a = module_graph[name_a]["votes"].get(name_b, 0)
+        a_depends_on_b = module_graph[name_b]["votes"].get(name_a, 0)
+        order = -1 if b_depends_on_a else (1 if a_depends_on_b else 0)
 
-            # TODO we could tag explicitly selected modules from command line?
-            # If we do so, then the user is probably more interested in debugging
-            # those first, rather than "unrelated" noise from modules pulled in due
-            # to possibly overly broad dependency declarations. In that case we
-            # should sort explicitly tagged modules next highest, after dependency
-            # ordering.
+        if order:
+            return order
 
-            # Assuming no dependency resolution, next favour possible root causes as
-            # may be inferred from the dependency tree.
-            #
-            # Assumption: there may be certain "popular" modules which rely on a
-            # failed module. Those should probably not be considered as "interesting"
-            # as root cause failures in less popuplar dependency trees. This is
-            # essentially a mitigation against noise introduced from raw "popularity"
-            # contests (see below).
+        # TODO we could tag explicitly selected modules from command line?
+        # If we do so, then the user is probably more interested in debugging
+        # those first, rather than "unrelated" noise from modules pulled in due
+        # to possibly overly broad dependency declarations. In that case we
+        # should sort explicitly tagged modules next highest, after dependency
+        # ordering.
 
-            is_root_a = len(module_graph[name_a]["deps"]) == 0
-            is_root_b = len(module_graph[name_b]["deps"]) == 0
+        # Assuming no dependency resolution, next favour possible root causes as
+        # may be inferred from the dependency tree.
+        #
+        # Assumption: there may be certain "popular" modules which rely on a
+        # failed module. Those should probably not be considered as "interesting"
+        # as root cause failures in less popuplar dependency trees. This is
+        # essentially a mitigation against noise introduced from raw "popularity"
+        # contests (see below).
 
-            if is_root_a and not is_root_b:
-                return -1
-            if is_root_b and not is_root_a:
-                return 1
+        is_root_a = len(module_graph[name_a]["deps"]) == 0
+        is_root_b = len(module_graph[name_b]["deps"]) == 0
 
-            # Next sort by "popularity": the item with the most votes (back edges) is
-            # depended on the most.
-            #
-            # Assumption: it is probably a good idea to debug that one earlier.
-            # This would point the user to fixing the most heavily used dependencies
-            # first before investing time in more "exotic" modules
+        if is_root_a and not is_root_b:
+            return -1
+        if is_root_b and not is_root_a:
+            return 1
 
-            vote_a = len(module_graph[name_a]["votes"])
-            vote_b = len(module_graph[name_b]["votes"])
-            votes = vote_b - vote_a
+        # Next sort by "popularity": the item with the most votes (back edges) is
+        # depended on the most.
+        #
+        # Assumption: it is probably a good idea to debug that one earlier.
+        # This would point the user to fixing the most heavily used dependencies
+        # first before investing time in more "exotic" modules
 
-            if votes:
-                return votes
+        vote_a = len(module_graph[name_a]["votes"])
+        vote_b = len(module_graph[name_b]["votes"])
+        votes = vote_b - vote_a
 
-            # Try and see if there is something "interesting" that might e.g. indicate
-            # issues with the system itself, preventing a successful build.
+        if votes:
+            return votes
 
-            phase_a = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_a, ""))
-            phase_b = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_b, ""))
-            phase = (phase_b > phase_a) - (phase_b < phase_a)
+        # Try and see if there is something "interesting" that might e.g. indicate
+        # issues with the system itself, preventing a successful build.
 
-            if phase:
-                return phase
+        phase_a = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_a, ""))
+        phase_b = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_b, ""))
+        phase = (phase_b > phase_a) - (phase_b < phase_a)
 
-            # Assumption: persistently failing modules do not prompt the user
-            # to act and therefore these are likely not that interesting.
-            # Conversely *new* failures are.
-            #
-            # If we get this wrong the user will likely be on the case anyway:
-            # someone does not need prodding if they have been working on it
-            # for the past X builds or so already.
+        if phase:
+            return phase
 
-            fail_count_a = a.get_persistent_option("failure-count")
-            fail_count_b = b.get_persistent_option("failure-count")
-            fail_count = (fail_count_a or 0) - (fail_count_b or 0)
+        # Assumption: persistently failing modules do not prompt the user
+        # to act and therefore these are likely not that interesting.
+        # Conversely *new* failures are.
+        #
+        # If we get this wrong the user will likely be on the case anyway:
+        # someone does not need prodding if they have been working on it
+        # for the past X builds or so already.
 
-            if fail_count:
-                return fail_count
+        fail_count_a = a.get_persistent_option("failure-count")
+        fail_count_b = b.get_persistent_option("failure-count")
+        fail_count = (fail_count_a or 0) - (fail_count_b or 0)
 
-            # If there is no good reason to prefer one module over another,
-            # simply sort by name to get a reproducible order.
-            # That simplifies autotesting and/or reproducible builds.
-            # (The items to sort are supplied as a dict so the order of keys is by
-            # definition not guaranteed.)
+        if fail_count:
+            return fail_count
 
-            name = (name_a > name_b) - (name_a < name_b)
+        # If there is no good reason to prefer one module over another,
+        # simply sort by name to get a reproducible order.
+        # That simplifies autotesting and/or reproducible builds.
+        # (The items to sort are supplied as a dict so the order of keys is by
+        # definition not guaranteed.)
 
-            return name
+        name = (name_a > name_b) - (name_a < name_b)
 
-        return _compare_debug_order
+        return name
 
-    @staticmethod
-    def sort_failures_in_debug_order(module_graph, extra_debug_info, failures: list[Module]) -> list[Module]:
-        prioritised = sorted(failures, key=cmp_to_key(DebugOrderHints._make_comparison_func(module_graph, extra_debug_info)))
+    def sort_failures_in_debug_order(self, failures: list[Module]) -> list[Module]:
+        prioritised = sorted(failures, key=cmp_to_key(self._compare_debug_order))
         return prioritised

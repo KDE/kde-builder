@@ -1055,7 +1055,7 @@ class Application:
         # this feature is meant for 5 out of 65
 
         if num_suggested_modules > top:
-            sorted_for_debug = DebugOrderHints.sort_failures_in_debug_order(module_graph, extra_debug_info, actual_failures)
+            sorted_for_debug = DebugOrderHints(module_graph, extra_debug_info).sort_failures_in_debug_order(actual_failures)
 
             logger_app.info(f"\nThe following top {top} may be the most important to fix to " +
                             "get the build to work, listed in order of 'probably most " +
