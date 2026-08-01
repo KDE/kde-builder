@@ -25,9 +25,8 @@ class DebugOrderHints:
     missing dependency).
     """
 
-    def __init__(self, module_graph: dict, extra_debug_info: dict):
+    def __init__(self, module_graph: dict):
         self.module_graph = module_graph
-        self.extra_debug_info = extra_debug_info
 
     @staticmethod
     def _get_phase_score(phase: str) -> int:
@@ -56,9 +55,8 @@ class DebugOrderHints:
             return 1
         return 0
 
-    def _compare_debug_order(self, a, b):
+    def _compare_debug_order(self, a: Module, b: Module):
         module_graph = self.module_graph
-        extra_debug_info = self.extra_debug_info
 
         # comparison results uses:
         # -1 if a < b
@@ -124,8 +122,8 @@ class DebugOrderHints:
         # Try and see if there is something "interesting" that might e.g. indicate
         # issues with the system itself, preventing a successful build.
 
-        phase_a = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_a, ""))
-        phase_b = DebugOrderHints._get_phase_score(extra_debug_info["phases"].get(name_b, ""))
+        phase_a = DebugOrderHints._get_phase_score(a.failed_phase or "")
+        phase_b = DebugOrderHints._get_phase_score(b.failed_phase or "")
         phase = (phase_b > phase_a) - (phase_b < phase_a)
 
         if phase:

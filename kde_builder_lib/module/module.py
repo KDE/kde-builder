@@ -88,6 +88,8 @@ class Module(PathResolvingOptions):
         self.current_phase: str | None = None
         """For customizing behavior depending on the phase."""
 
+        self.failed_phase = ""
+
         # Record current values of what would be last source/build dir, if present,
         # before they are potentially reset during the module build.
         self.set_option("#last-source-dir", self.get_persistent_option("source-dir") or "")

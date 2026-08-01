@@ -546,6 +546,7 @@ class BuildContext(PathResolvingOptions):
 
     def mark_module_phase_failed(self, phase: str, module: Module) -> None:
         self.errors[module.name] = phase
+        module.failed_phase = phase
 
     def failed_modules_in_phase(self, phase: str) -> list[Module]:
         """

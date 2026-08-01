@@ -589,8 +589,6 @@ class Application:
         if ctx.get_option("purge-old-logs"):
             LogDir.delete_unreferenced_log_directories(ctx)
 
-        ctx = self.context
-
         self._print_failed_modules_in_each_phase(ctx)
 
         # Record all failed modules. Unlike the "resume-list" option this doesn't
@@ -998,10 +996,6 @@ class Application:
             ctx: Build context
         """
         module_graph = self.dependency_resolver.dependency_graph
-        extra_debug_info = {
-            "phases": {},
-            "failCount": {}
-        }
         actual_failures: list[Module] = []
 
         # This list should correspond to the possible phase names (although
@@ -1009,12 +1003,6 @@ class Application:
         for phase in ctx.phases.phaselist:
             failures: list[Module] = ctx.failed_modules_in_phase(phase)
             for failure in failures:
-                # we already tagged the failure before, should not happen but
-                # make sure to check to avoid spurious duplicate output
-                if extra_debug_info["phases"].get(failure, None):
-                    continue
-
-                extra_debug_info["phases"][failure] = phase
                 actual_failures.append(failure)
 
             if not failures:
@@ -1055,7 +1043,7 @@ class Application:
         # this feature is meant for 5 out of 65
 
         if num_suggested_modules > top:
-            sorted_for_debug = DebugOrderHints(module_graph, extra_debug_info).sort_failures_in_debug_order(actual_failures)
+            sorted_for_debug = DebugOrderHints(module_graph).sort_failures_in_debug_order(actual_failures)
 
             logger_app.info(f"\nThe following top {top} may be the most important to fix to " +
                             "get the build to work, listed in order of 'probably most " +
