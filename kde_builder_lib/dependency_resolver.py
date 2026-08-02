@@ -46,11 +46,6 @@ class DependencyResolver:
         list of module:branch dependencies.
         """
 
-        self.catch_all_dependencies = {}
-        """
-        Dict mapping a wildcarded module name with no branch to a list of module:branch dependencies.
-        """
-
         self.module_resolver = module_resolver
         """
         ModuleResolver object, that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
@@ -156,11 +151,6 @@ class DependencyResolver:
                 source_item = None
                 source_branch = None
 
-            # Ignore "catch-all" dependencies where the source is the catch-all
-            if source_item.endswith("*"):
-                logger_depres.warning("\tIgnoring dependency on wildcard project grouping " + f"on line {fh.filelineno()} of repo-metadata/dependencies/dependency-data")
-                continue
-
             dependent_branch = dependent_branch or "*"  # If no branch, apply catch-all flag
             source_branch = source_branch or "*"
 
@@ -168,16 +158,7 @@ class DependencyResolver:
             dep_key = "-" if source_item.startswith("-") else "+"
             source_item = re.sub("^-", "", source_item)  # remove negation marker if name already short
 
-            # Source can never be a catch-all, so we can shorten early. Also,
-            # we *must* shorten early to avoid a dependency on a long path.
             source_item = self._shorten_module_name(source_item)
-
-            # Handle catch-all dependent groupings
-            if re.match(r"\*$", dependent_item):
-                self.catch_all_dependencies[dependent_item] = self.catch_all_dependencies.get(dependent_item, [])
-                self.catch_all_dependencies[dependent_item].append(f"{source_item}:{source_branch}")
-                continue
-
             dependent_item = self._shorten_module_name(dependent_item)
 
             self._add_dependency(dependent_item, dependent_branch, source_item, source_branch, dep_key)
@@ -213,16 +194,6 @@ class DependencyResolver:
                 logger_depres.debug(f"handling dependencies for: {module_name} with branch ({branch})")
                 direct_deps.extend(module_dep_entry["+"])
                 exclusions.extend(module_dep_entry["-"])
-
-        # Apply catch-all dependencies but only for KDE modules, not third-party modules.
-        # See _get_dependency_path_of() for how this is detected.
-        if not re.match(r"^third-party/", module_name):
-            for catch_all, deps in self.catch_all_dependencies.items():
-                prefix = catch_all
-                prefix = re.sub(r"\*$", "", prefix)
-
-                if re.match(f"^{prefix}", path) or not prefix:
-                    direct_deps.extend(deps)
 
         for exclusion in exclusions:
             # Remove only modules at the exact given branch as a dep.
