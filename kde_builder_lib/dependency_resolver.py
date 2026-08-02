@@ -199,24 +199,24 @@ class DependencyResolver:
         direct_deps = []
         exclusions = []
 
-        item = self._shorten_module_name(path)
-        module_dep_entry = self.dependencies_of.get(f"{item}:*", None)
+        module_name = self._shorten_module_name(path)
+        module_dep_entry = self.dependencies_of.get(f"{module_name}:*", None)
 
         if module_dep_entry:
-            logger_depres.debug(f"handling dependencies for: {item} without branch (*)")
+            logger_depres.debug(f"handling dependencies for: {module_name} without branch (*)")
             direct_deps.extend(module_dep_entry["+"])
             exclusions.extend(module_dep_entry["-"])
 
         if branch and branch != "*":
-            module_dep_entry = self.dependencies_of.get(f"{item}:{branch}", None)
+            module_dep_entry = self.dependencies_of.get(f"{module_name}:{branch}", None)
             if module_dep_entry:
-                logger_depres.debug(f"handling dependencies for: {item} with branch ({branch})")
+                logger_depres.debug(f"handling dependencies for: {module_name} with branch ({branch})")
                 direct_deps.extend(module_dep_entry["+"])
                 exclusions.extend(module_dep_entry["-"])
 
         # Apply catch-all dependencies but only for KDE modules, not third-party modules.
         # See _get_dependency_path_of() for how this is detected.
-        if not re.match(r"^third-party/", item):
+        if not re.match(r"^third-party/", module_name):
             for catch_all, deps in self.catch_all_dependencies.items():
                 prefix = catch_all
                 prefix = re.sub(r"\*$", "", prefix)
@@ -243,14 +243,14 @@ class DependencyResolver:
                 logger_depres.error(f"r[Invalid dependency declaration: b[{dep}]]")
                 result["syntax_errors"] += 1
                 continue
-            dep_item = self._shorten_module_name(dep_path)
-            if dep_item == item:
-                logger_depres.debug(f"\tBreaking trivial cycle of b[{dep_item}] -> b[{item}]")
+            dep_module_name = self._shorten_module_name(dep_path)
+            if dep_module_name == module_name:
+                logger_depres.debug(f"\tBreaking trivial cycle of b[{dep_module_name}] -> b[{module_name}]")
                 result["trivial_cycles"] += 1
                 continue
 
-            if dep_item in result["dependencies"]:
-                logger_depres.debug(f"\tSkipping duplicate direct dependency b[{dep_item}] of b[{item}]")
+            if dep_module_name in result["dependencies"]:
+                logger_depres.debug(f"\tSkipping duplicate direct dependency b[{dep_module_name}] of b[{module_name}]")
             else:
                 if not dep_branch:
                     dep_branch = ""
@@ -258,7 +258,7 @@ class DependencyResolver:
                 # branch name/value
                 if dep_branch == "" or dep_branch == "*":
                     dep_branch = None
-                result["dependencies"][dep_item] = {
+                result["dependencies"][dep_module_name] = {
                     "path": dep_path,
                     "branch": dep_branch
                 }
@@ -266,22 +266,22 @@ class DependencyResolver:
 
     def _run_dependency_vote(self) -> None:
         module_graph = self.dependency_graph
-        for item in module_graph.keys():
-            names = list(module_graph[item]["all_deps"]["items"].keys())
+        for module_name in module_graph.keys():
+            names = list(module_graph[module_name]["all_deps"]["items"].keys())
             for name in names:
-                module_graph[name]["votes"][item] = module_graph[name]["votes"].get(item, 0) + 1
+                module_graph[name]["votes"][module_name] = module_graph[name]["votes"].get(module_name, 0) + 1
         return
 
-    def _detect_dependency_cycle(self, dep_item, item):
+    def _detect_dependency_cycle(self, dep_module_name, module_name):
         module_graph = self.dependency_graph
-        dep_module_graph = module_graph[dep_item]
+        dep_module_graph = module_graph[dep_module_name]
         if dep_module_graph.setdefault("traces", {}).get("status", None):
             if dep_module_graph["traces"]["status"] == 2:
-                logger_depres.debug(f"Already resolved {dep_item} -- skipping")
+                logger_depres.debug(f"Already resolved {dep_module_name} -- skipping")
                 return dep_module_graph["traces"]["result"]
             else:
                 if not Debug().is_testing():
-                    logger_depres.error(f"Found a dependency cycle at: {dep_item} while tracing {item}")
+                    logger_depres.error(f"Found a dependency cycle at: {dep_module_name} while tracing {module_name}")
                 dep_module_graph["traces"]["result"] = 1
         else:
             dep_module_graph["traces"]["status"] = 1
@@ -289,7 +289,7 @@ class DependencyResolver:
 
             names = list(dep_module_graph["deps"].keys())
             for name in names:
-                if self._detect_dependency_cycle(name, item):
+                if self._detect_dependency_cycle(name, module_name):
                     dep_module_graph["traces"]["result"] = 1
         dep_module_graph["traces"]["status"] = 2
         return dep_module_graph["traces"]["result"]
@@ -304,33 +304,33 @@ class DependencyResolver:
         # To be able to easily compare perl and python versions, I (Andrew Shark) sorted keys as it is done there.
         # After we drop perl version, we can remove the unneeded sorting.
 
-        for item in sorted(module_graph.keys()):
-            if self._detect_dependency_cycle(item, item):
-                logger_depres.error(f"Somehow there is a circular dependency involving b[{item}]! :(")
+        for module_name in sorted(module_graph.keys()):
+            if self._detect_dependency_cycle(module_name, module_name):
+                logger_depres.error(f"Somehow there is a circular dependency involving b[{module_name}]! :(")
                 logger_depres.error("Please file a bug against repo-metadata about this!")
                 errors += 1
         return errors
 
-    def _copy_up_dependencies_for_module(self, item: str) -> None:
+    def _copy_up_dependencies_for_module(self, module_name: str) -> None:
         module_graph = self.dependency_graph
-        all_deps = module_graph[item]["all_deps"]
+        all_deps = module_graph[module_name]["all_deps"]
 
         if "done" in all_deps:
-            logger_depres.debug(f"\tAlready copied up dependencies for b[{item}] -- skipping")
+            logger_depres.debug(f"\tAlready copied up dependencies for b[{module_name}] -- skipping")
         else:
-            logger_depres.debug(f"\tCopying up dependencies and transitive dependencies for item: b[{item}]")
+            logger_depres.debug(f"\tCopying up dependencies and transitive dependencies for item: b[{module_name}]")
             all_deps["items"] = {}
 
-            names = module_graph[item]["deps"].keys()
+            names = module_graph[module_name]["deps"].keys()
             for name in names:
                 if name in all_deps["items"]:
-                    logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{name}] for b[{item}] -- skipping")
+                    logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{name}] for b[{module_name}] -- skipping")
                 else:
                     self._copy_up_dependencies_for_module(name)
                     copied = list(module_graph[name]["all_deps"]["items"])
                     for copy in copied:
                         if copy in all_deps["items"]:
-                            logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{copy}] for b[{item}] -- skipping")
+                            logger_depres.debug(f"\tAlready copied up (transitive) dependency on b[{copy}] for b[{module_name}] -- skipping")
                         else:
                             all_deps["items"][copy] = all_deps["items"].get(copy, 0) + 1
                     all_deps["items"][name] = all_deps["items"].get(name, 0) + 1
@@ -338,14 +338,14 @@ class DependencyResolver:
 
     def _copy_up_dependencies(self) -> None:
         module_graph = self.dependency_graph
-        for item in module_graph.keys():
-            self._copy_up_dependencies_for_module(item)
+        for module_name in module_graph.keys():
+            self._copy_up_dependencies_for_module(module_name)
         return
 
-    def _detect_branch_conflict(self, item: str, branch: str | None) -> str | None:
+    def _detect_branch_conflict(self, module_name: str, branch: str | None) -> str | None:
         module_graph = self.dependency_graph
         if branch:
-            sub_graph = module_graph[item]
+            sub_graph = module_graph[module_name]
             previously_selected_branch = sub_graph.get(branch, None)
 
             if previously_selected_branch and previously_selected_branch != branch:
@@ -364,7 +364,7 @@ class DependencyResolver:
     def _resolve_dependencies_for_module_description(self, module_desc: dict) -> dict:
         module_graph = self.dependency_graph
         module = module_desc["module"]
-        item = module_desc["item"]
+        module_name = module_desc["module_name"]
         branch = module_desc["branch"]
         pretty_branch = branch if branch else "*"
         include_dependencies = module.get_option("include-dependencies") if module else False
@@ -375,33 +375,33 @@ class DependencyResolver:
             "branch_errors": 0
         }
 
-        logger_depres.debug(f"Resolving dependencies for project: b[{item}]")
+        logger_depres.debug(f"Resolving dependencies for project: b[{module_name}]")
 
-        for dep_item in sorted(module_graph[item]["deps"].keys()):
-            dep_info = module_graph[item]["deps"][dep_item]
+        for dep_module_name in sorted(module_graph[module_name]["deps"].keys()):
+            dep_info = module_graph[module_name]["deps"][dep_module_name]
             dep_path = dep_info["path"]
             dep_branch = dep_info["branch"]
 
             pretty_dep_branch = dep_branch if dep_branch else "*"
 
-            logger_depres.debug(f"\tdep-resolv: b[{item}:{pretty_branch}] depends on b[{dep_item}:{pretty_dep_branch}]")
+            logger_depres.debug(f"\tdep-resolv: b[{module_name}:{pretty_branch}] depends on b[{dep_module_name}:{pretty_dep_branch}]")
 
-            dep_module_graph = module_graph.get(dep_item, None)
+            dep_module_graph = module_graph.get(dep_module_name, None)
 
             if dep_module_graph:
-                previously_selected_branch = self._detect_branch_conflict(dep_item, dep_branch)
+                previously_selected_branch = self._detect_branch_conflict(dep_module_name, dep_branch)
                 if previously_selected_branch:
-                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{pretty_dep_branch}]\") for b[{dep_item}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{pretty_dep_branch}]\") for b[{dep_module_name}]! :(")
                     errors["branch_errors"] += 1
                 else:
                     if dep_branch:
                         dep_module_graph["branch"] = dep_branch
 
             else:
-                dep_module: Module | None = self.module_resolver.resolve_module_if_present(dep_item)
+                dep_module: Module | None = self.module_resolver.resolve_module_if_present(dep_module_name)
                 if not dep_module:
                     # Still, we will place the graph entry, so that --dependency-tree could show the not-built project in tree.
-                    module_graph[dep_item] = {
+                    module_graph[dep_module_name] = {
                         "votes": {},
                         "path": "",
                         "build": False,
@@ -415,14 +415,14 @@ class DependencyResolver:
                     continue
 
                 resolved_path = DependencyResolver._get_dependency_path_of(dep_module)
-                logger_depres.debug(f"\tUsing path: \"b[{resolved_path}]\" for item: b[{item}]")
+                logger_depres.debug(f"\tUsing path: \"b[{resolved_path}]\" for item: b[{module_name}]")
 
                 dep_lookup_result = self._lookup_direct_dependencies(resolved_path, dep_branch)
 
                 errors["trivial_cycles"] += dep_lookup_result["trivial_cycles"]
                 errors["syntax_errors"] += dep_lookup_result["syntax_errors"]
 
-                module_graph[dep_item] = {
+                module_graph[dep_module_name] = {
                     "votes": {},
                     "path": resolved_path,
                     "build": include_dependencies,
@@ -435,22 +435,22 @@ class DependencyResolver:
 
                 dep_module_desc = {
                     "module": dep_module,
-                    "item": dep_item,
+                    "module_name": dep_module_name,
                     "path": resolved_path,
                     "branch": dep_branch
                 }
 
-                if not module_graph[dep_item]["build"]:
-                    # Even if dep_item is not _yet_ selected to be built, it still may be marked to be built in this run,
+                if not module_graph[dep_module_name]["build"]:
+                    # Even if dep_module_name is not _yet_ selected to be built, it still may be marked to be built in this run,
                     # if other projects include it as a dependency, or if it selected in command line.
-                    logger_depres.debug(f" y[b[*] {item} depends on {dep_item}, but {dep_item} is not marked to be built (at least yet).")
+                    logger_depres.debug(f" y[b[*] {module_name} depends on {dep_module_name}, but {dep_module_name} is not marked to be built (at least yet).")
 
                 if dep_branch and (self._get_branch_of(dep_module) or "") != dep_branch:
                     wrong_branch = self._get_branch_of(dep_module) or "?"
-                    logger_depres.error(f" r[b[*] {item} needs {dep_item}:{pretty_dep_branch}, not {dep_item}:{wrong_branch}]")
+                    logger_depres.error(f" r[b[*] {module_name} needs {dep_module_name}:{pretty_dep_branch}, not {dep_module_name}:{wrong_branch}]")
                     errors["branch_errors"] += 1
 
-                logger_depres.debug(f"Resolving transitive dependencies for project: b[{item}] (via: b[{dep_item}:{pretty_dep_branch}])")
+                logger_depres.debug(f"Resolving transitive dependencies for project: b[{module_name}] (via: b[{dep_module_name}:{pretty_dep_branch}])")
                 resolv_errors = self._resolve_dependencies_for_module_description(dep_module_desc)
 
                 errors["branch_errors"] += resolv_errors["branch_errors"]
@@ -470,35 +470,35 @@ class DependencyResolver:
         }
 
         for module in modules:
-            item = module.name  # _shorten_module_name(path)
+            module_name = module.name  # _shorten_module_name(path)
             branch = self._get_branch_of(module)
             path = DependencyResolver._get_dependency_path_of(module)
-            logger_depres.debug(f"\tUsing path: \"b[{path}]\" for item: b[{item}]")
+            logger_depres.debug(f"\tUsing path: \"b[{path}]\" for item: b[{module_name}]")
 
             if not path:
-                logger_depres.error(f"r[Unable to determine project/dependency path of project: {item}]")
+                logger_depres.error(f"r[Unable to determine project/dependency path of project: {module_name}]")
                 errors["path_errors"] += 1
                 continue
 
-            if item in module_graph and module_graph[item]:
-                logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {item}")
-                previously_selected_branch = self._detect_branch_conflict(item, branch)
+            if module_name in module_graph and module_graph[module_name]:
+                logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {module_name}")
+                previously_selected_branch = self._detect_branch_conflict(module_name, branch)
                 if previously_selected_branch:
-                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{item}]! :(")
+                    logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{module_name}]! :(")
                     errors["branch_errors"] += 1
                 elif branch:
-                    module_graph[item]["branch"] = branch
+                    module_graph[module_name]["branch"] = branch
 
                 # May have been pulled in via dependencies but not yet marked for
                 # build. Do so now, since it is listed explicitly in modules list.
-                module_graph[item]["build"] = True
+                module_graph[module_name]["build"] = True
             else:
                 dep_lookup_result = self._lookup_direct_dependencies(path, branch)
 
                 errors["trivial_cycles"] += dep_lookup_result["trivial_cycles"]
                 errors["syntax_errors"] += dep_lookup_result["syntax_errors"]
 
-                module_graph[item] = {
+                module_graph[module_name] = {
                     "votes": {},
                     "path": path,
                     "build": True,
@@ -511,7 +511,7 @@ class DependencyResolver:
 
                 module_desc = {
                     "path": path,
-                    "item": item,
+                    "module_name": module_name,
                     "branch": branch,
                     "module": module
                 }
@@ -561,10 +561,10 @@ class DependencyResolver:
     def _descend_module_graph(self, mode: str, node_info, context) -> None:
         module_graph = self.dependency_graph
         depth = node_info["depth"]
-        current_item = node_info["current_item"]
+        current_module_name = node_info["current_module_name"]
         current_branch = node_info["current_branch"]
 
-        sub_graph = module_graph[current_item]
+        sub_graph = module_graph[current_module_name]
         if mode == "tree":
             self._yield_module_dependency_tree_entry(node_info, sub_graph["module"], context)
         else:
@@ -572,22 +572,22 @@ class DependencyResolver:
 
         depth += 1
 
-        items = list(sub_graph["deps"].keys())
+        module_names = list(sub_graph["deps"].keys())
 
-        item_count = len(items)
+        item_count = len(module_names)
         item_index = 1
 
-        for item in items:
-            sub_graph = module_graph[item]
+        for module_name in module_names:
+            sub_graph = module_graph[module_name]
             branch = sub_graph.get("branch", "")
             item_info = {
                 "build": sub_graph["build"],
                 "depth": depth,
                 "idx": item_index,
                 "count": item_count,
-                "current_item": item,
+                "current_module_name": module_name,
                 "current_branch": branch,
-                "parent_item": current_item,
+                "parent_module_name": current_module_name,
                 "parent_branch": current_branch
             }
             self._descend_module_graph(mode, item_info, context)
@@ -605,17 +605,17 @@ class DependencyResolver:
         }
 
         for module in modules:
-            item = module.name
-            sub_graph = module_graph[item]
+            module_name = module.name
+            sub_graph = module_graph[module_name]
             branch = sub_graph.get("branch", "")
             info = {
                 "build": sub_graph["build"],
                 "depth": 0,
                 "idx": item_index,
                 "count": item_count,
-                "current_item": item,
+                "current_module_name": module_name,
                 "current_branch": branch,
-                "parent_item": "",
+                "parent_module_name": "",
                 "parent_branch": ""
             }
             self._descend_module_graph(mode, info, context)
@@ -697,7 +697,7 @@ class DependencyResolver:
         index = node_info["idx"]
         count = node_info["count"]
         build = node_info["build"]
-        current_item = node_info["current_item"]
+        current_module_name = node_info["current_module_name"]
         current_branch = node_info["current_branch"]
 
         build_status = "built" if build else "not built"
@@ -721,12 +721,12 @@ class DependencyResolver:
             connector_stack.append(prefix + (" " * 4 if index == count else "│   "))
 
         context["depth"] = depth + 1
-        context["report"](connector + current_item + " " + status_info)
+        context["report"](connector + current_module_name + " " + status_info)
 
     @staticmethod
     def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
         depth = node_info["depth"]
-        current_item = node_info["current_item"]
+        current_module_name = node_info["current_module_name"]
 
         connector_stack = context["stack"]
 
@@ -739,7 +739,7 @@ class DependencyResolver:
         connector_stack.append(prefix)
 
         connector = prefix
-        connector_stack.append(prefix + current_item + "/")
+        connector_stack.append(prefix + current_module_name + "/")
 
         context["depth"] = depth + 1
-        context["report"](connector + current_item)
+        context["report"](connector + current_module_name)
