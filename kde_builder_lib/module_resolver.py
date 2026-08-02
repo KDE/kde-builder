@@ -319,18 +319,20 @@ class ModuleResolver:
                     else:
                         logger_modres.debug(f"Group y[{module_set_name}] is ignored, so project y[{module.name}] was removed.")
                 continue
-            elif module_set_name in ["qt6-set"]:
-                if module.get_option("install-dir") == "":
-                    # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
-                    # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
-                    # by building all). We should not allow building qt modules in such case.
-                    # Otherwise, as their real "install-dir" is empty, their CMAKE_INSTALL_PREFIX will be incorrect (set to empty), and such
-                    # modules could not pass cmake configure.
+            elif module_set_name == "qt6-set" and module.get_option("install-dir") == "":
+                # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
+                # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
+                # by building all). We should not allow building qt modules in such case.
+                # Otherwise, as their real "install-dir" is empty, their CMAKE_INSTALL_PREFIX will be incorrect (set to empty), and such
+                # modules could not pass cmake configure.
+                if module_set_name in self.explicit_group_selectors:
+                    logger_modres.warning(f" y[*] Group y[{module_set_name}] was explicitly selected in command line, but was removed due to qt-install-dir, so project y[{module.name}] was removed.")
+                else:
                     if module.name in self.explicit_thirdparty_selectors:
                         logger_modres.warning(f" y[*] Removing y[third-party]/y[{module.name}] due to qt-install-dir")
                     else:
                         logger_modres.debug(f"Removing y[third-party]/y[{module.name}] due to qt-install-dir")
-                    continue
+                continue
 
             if module.is_kde_project():
                 # Remove projects that are explicitly blanked out in their branch-group,
