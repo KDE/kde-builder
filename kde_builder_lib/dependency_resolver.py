@@ -229,7 +229,7 @@ class DependencyResolver:
             # However, catch-alls can remove catch-alls.
             # But catch-alls cannot remove a specific branch, such exclusions have
             # to also be specific.
-            direct_deps = [directDep for directDep in direct_deps if directDep != exclusion]
+            direct_deps = [direct_dep for direct_dep in direct_deps if direct_dep != exclusion]
 
         result = {
             "syntax_errors": 0,
@@ -259,7 +259,6 @@ class DependencyResolver:
                 if dep_branch == "" or dep_branch == "*":
                     dep_branch = None
                 result["dependencies"][dep_item] = {
-                    "item": dep_item,
                     "path": dep_path,
                     "branch": dep_branch
                 }
@@ -488,7 +487,7 @@ class DependencyResolver:
                     logger_depres.error(f"r[Found a dependency conflict in branches (\"b[{previously_selected_branch}]\" is not \"b[{branch}]\") for b[{item}]! :(")
                     errors["branch_errors"] += 1
                 elif branch:
-                    module_graph[item][branch] = branch
+                    module_graph[item]["branch"] = branch
 
                 # May have been pulled in via dependencies but not yet marked for
                 # build. Do so now, since it is listed explicitly in modules list.
