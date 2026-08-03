@@ -483,7 +483,7 @@ class Application:
                 dependency_graph = self.dependency_resolver.dependency_graph
                 results = {
                     project: {
-                        "path": info["path"],
+                        "path": DependencyResolver._get_dependency_path_of(info["module"]),
                         "branch": info["branch"],
                         "build": info["build"],
                         "repository": info["module"].options.get("#resolved-repository", ""),

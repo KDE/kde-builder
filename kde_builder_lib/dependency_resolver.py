@@ -175,12 +175,11 @@ class DependencyResolver:
             dependencies["-"] = sorted(dependencies["-"])
             dependencies["+"] = sorted(dependencies["+"])
 
-    def _lookup_direct_dependencies(self, path: str, branch: str) -> dict:
+    def _lookup_direct_dependencies(self, module_name: str, branch: str) -> dict:
 
         direct_deps = []
         exclusions = []
 
-        module_name = self._shorten_module_name(path)
         module_dep_entry = self.dependencies_of.get(f"{module_name}:*", None)
 
         if module_dep_entry:
@@ -230,7 +229,6 @@ class DependencyResolver:
                 if dep_branch == "" or dep_branch == "*":
                     dep_branch = None
                 result["dependencies"][dep_module_name] = {
-                    "path": dep_path,
                     "branch": dep_branch
                 }
         return result
@@ -350,7 +348,6 @@ class DependencyResolver:
 
         for dep_module_name in sorted(module_graph[module_name]["deps"].keys()):
             dep_info = module_graph[module_name]["deps"][dep_module_name]
-            dep_path = dep_info["path"]
             dep_branch = dep_info["branch"]
 
             pretty_dep_branch = dep_branch if dep_branch else "*"
@@ -374,7 +371,6 @@ class DependencyResolver:
                     # Still, we will place the graph entry, so that --dependency-tree could show the not-built project in tree.
                     module_graph[dep_module_name] = {
                         "votes": {},
-                        "path": "",
                         "build": False,
                         "branch": "",
                         "deps": {},
@@ -385,17 +381,13 @@ class DependencyResolver:
 
                     continue
 
-                resolved_path = DependencyResolver._get_dependency_path_of(dep_module)
-                logger_depres.debug(f"\tUsing path: \"b[{resolved_path}]\" for item: b[{module_name}]")
-
-                dep_lookup_result = self._lookup_direct_dependencies(resolved_path, dep_branch)
+                dep_lookup_result = self._lookup_direct_dependencies(dep_module_name, dep_branch)
 
                 errors["trivial_cycles"] += dep_lookup_result["trivial_cycles"]
                 errors["syntax_errors"] += dep_lookup_result["syntax_errors"]
 
                 module_graph[dep_module_name] = {
                     "votes": {},
-                    "path": resolved_path,
                     "build": include_dependencies,
                     "branch": dep_branch,
                     "deps": dep_lookup_result["dependencies"],
@@ -407,7 +399,6 @@ class DependencyResolver:
                 dep_module_desc = {
                     "module": dep_module,
                     "module_name": dep_module_name,
-                    "path": resolved_path,
                     "branch": dep_branch
                 }
 
@@ -441,15 +432,8 @@ class DependencyResolver:
         }
 
         for module in modules:
-            module_name = module.name  # _shorten_module_name(path)
+            module_name = module.name
             branch = self._get_branch_of(module)
-            path = DependencyResolver._get_dependency_path_of(module)
-            logger_depres.debug(f"\tUsing path: \"b[{path}]\" for item: b[{module_name}]")
-
-            if not path:
-                logger_depres.error(f"r[Unable to determine project/dependency path of project: {module_name}]")
-                errors["path_errors"] += 1
-                continue
 
             if module_name in module_graph and module_graph[module_name]:
                 logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {module_name}")
@@ -464,14 +448,13 @@ class DependencyResolver:
                 # build. Do so now, since it is listed explicitly in modules list.
                 module_graph[module_name]["build"] = True
             else:
-                dep_lookup_result = self._lookup_direct_dependencies(path, branch)
+                dep_lookup_result = self._lookup_direct_dependencies(module_name, branch)
 
                 errors["trivial_cycles"] += dep_lookup_result["trivial_cycles"]
                 errors["syntax_errors"] += dep_lookup_result["syntax_errors"]
 
                 module_graph[module_name] = {
                     "votes": {},
-                    "path": path,
                     "build": True,
                     "branch": branch,
                     "module": module,
@@ -481,7 +464,6 @@ class DependencyResolver:
                 }
 
                 module_desc = {
-                    "path": path,
                     "module_name": module_name,
                     "branch": branch,
                     "module": module
