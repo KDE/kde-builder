@@ -81,13 +81,6 @@ class DebugOrderHints:
         if order:
             return order
 
-        # TODO we could tag explicitly selected modules from command line?
-        # If we do so, then the user is probably more interested in debugging
-        # those first, rather than "unrelated" noise from modules pulled in due
-        # to possibly overly broad dependency declarations. In that case we
-        # should sort explicitly tagged modules next highest, after dependency
-        # ordering.
-
         # Assuming no dependency resolution, next favour possible root causes as
         # may be inferred from the dependency tree.
         #
