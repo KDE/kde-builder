@@ -214,44 +214,39 @@ kde-builder --ignore-projects extragear/multimedia kdereview
 (changing-global-opts)=
 ### Changing global options
 
-You can change the setting of options read from the [configuration
+You can change the setting of global options read from the [configuration
 file](../getting-started/configure-data) directly from the command line. This change will
 override the configuration file setting, but is only temporary. It only
 takes effect as long as it is still present on the command line.
 
-kde-builder allows you to change options named like \<option-name\> by
-passing an argument on the command line in the form
-`--option-name=value`. kde-builder will recognize whether it does not
-know what the option is, and search for the name in its list of option
-names. If it does not recognize the name, it will warn you, otherwise it
-will remember the value you set it to and override any setting from the
-configuration file.
+For this, you just need to use the `--<option name>`, where "\<option name\>" is the same as
+it appears in the config file.
+See [](#supported-cmdline-parameters) for the list of options you can use.
 
-```{note}
-Todo: Check the statement about unrecognised option and searching it in its list.
-```
-
-Setting the [source-dir](#conf-source-dir) option to `/dev/null` for
-testing:
+For example, temporary setting the [source-dir](#conf-source-dir) global option to `~/another/path`
+without changing your config file may look like this:
 
 ```bash
-kde-builder --pretend --source-dir=/dev/null
+kde-builder kcalc dolphin --pretend --source-dir ~/another/path
 ```
 
 (changing-project-opts)=
 ### Changing project options
 
-It is also possible to change options only for a specific project. The
-syntax is similar: `--<project>,<option-name>=<value>`.
+You can change the setting of individual project options read from the [configuration
+file](../getting-started/configure-data) directly from the command line. This change will
+override the configuration file setting, but is only temporary. It only
+takes effect as long as it is still present on the command line.
 
-This change overrides any duplicate setting for the project found in the
-[configuration file](../getting-started/configure-data), and applies only while the option
-is passed on the command line.
+For this, you just need to use `--set-project-option-value` with a value that is made
+with the following template: `<project>,<option-name>,<value>`.
+See [](#supported-cmdline-parameters) for the list of options you can use.
 
-Using a different build directory for the kcalc project:
+For example, temporary setting a different [build-dir](#conf-build-dir)
+individually for the kcalc project without changing your config file may look like this:
 
-```
-kde-builder --kcalc,build-dir=temp-build
+```bash
+kde-builder kcalc dolphin --pretend --set-project-option-value kcalc,build-dir,temp-build
 ```
 
 (installing-login-session)=
