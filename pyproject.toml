@@ -1,0 +1,22 @@
+[project]
+name = "kde-builder"
+dynamic = ["version"]
+description = "A tool to streamline the process of setting up and maintaining development environment for KDE software"
+requires-python = ">=3.10"
+
+dependencies = [
+    "dbus-python",
+    "exceptiongroup; python_version < '3.10'",
+    "overrides; python_version < '3.11'",
+    "pyyaml",
+    "setproctitle",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.uv]
+package = false

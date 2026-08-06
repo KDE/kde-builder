@@ -9,18 +9,18 @@ stages:
 unit_and_integration_tests:
   tags:
     - Linux
-  image: python:3.10  # keep same version as defined in Pipfile
+  image: ghcr.io/astral-sh/uv:debian
   before_script:
     - apt update
-    - apt install -y cmake libdbus-1-dev
+    - apt install -y cmake libdbus-1-dev python3-dev
     - cmake --version
-    - python --version
-    - pip install pipenv --quiet
-    - pipenv install --dev
-    - pipenv graph
+    - uv --version
+    - uv venv .venv
+    - uv pip install -r pyproject.toml --group dev
+    - uv pip tree
     - export PYTHONPATH="$PYTHONPATH:$(pwd)"
   script:
-    - pipenv run pytest --cov --cov-report term --cov-report xml:coverage.xml
+    - uv run --no-project pytest --cov --cov-report term --cov-report xml:coverage.xml
   artifacts:
     reports:
       coverage_report:

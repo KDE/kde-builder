@@ -19,7 +19,7 @@ path = [
     "doc/conf.py",
     "tests/integration/fixtures/**",
     "tests/fixtures/**",
-    "Pipfile",
+    "pyproject.toml",
     "ruff.toml",
     ]
 SPDX-FileCopyrightText = "none"
