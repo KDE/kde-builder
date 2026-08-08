@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import yaml
-import os
 import re
 
+from kde_builder import KB_REPO_DIR
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 from kde_builder.debug import Debug
@@ -33,8 +33,7 @@ class Metadata:
         # ignore file and propagate that information to our context object.
 
         if Debug().is_testing():
-            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
-            path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/ignore-kde-projects"
+            path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/ignore-kde-projects"
 
         try:
             fh = open(path, "r")
@@ -66,8 +65,7 @@ class Metadata:
         path = self.path_to_metadata + "/kde-dependencies/branch-groups.yaml"
 
         if Debug().is_testing():
-            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
-            path = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/branch-groups.yaml"
+            path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/branch-groups.yaml"
 
         try:
             fh = open(path, "r")

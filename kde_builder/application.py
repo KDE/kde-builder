@@ -23,6 +23,7 @@ from typing import NoReturn
 import yaml
 
 from kde_builder import KB_PACKAGE_DIR
+from kde_builder import KB_REPO_DIR
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.build_context import BuildContext
@@ -433,8 +434,7 @@ class Application:
         branch_group = ctx.get_option("branch-group")
 
         if Debug().is_testing():
-            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/..")
-            dependency_file = kb_repo_dir + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
+            dependency_file = KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
         else:
             srcdir = metadata_module.fullpath("source")
             dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"

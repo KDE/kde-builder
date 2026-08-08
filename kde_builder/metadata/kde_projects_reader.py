@@ -10,6 +10,7 @@ from pathlib import Path
 
 import yaml
 
+from kde_builder import KB_REPO_DIR
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import NoKDEProjectsFound
 from kde_builder.debug import Debug
@@ -41,8 +42,7 @@ class KDEProjectsReader:
         # Be careful, can throw exceptions.
 
         if Debug().is_testing():
-            kb_repo_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../..")
-            srcdir = kb_repo_dir + "/tests/fixtures/repo-metadata"
+            srcdir = KB_REPO_DIR + "/tests/fixtures/repo-metadata"
         else:
             srcdir = repo_metadata_fullpath
 
