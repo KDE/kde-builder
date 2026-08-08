@@ -11,12 +11,11 @@ import os
 import sys
 import traceback
 
+from kde_builder import KB_PACKAGE_DIR
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
 from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
-
-RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
 def ensure_runtime_pymodules_installed():
     """
@@ -50,8 +49,6 @@ def ensure_runtime_pymodules_installed():
 
         print(dedent(f"""
             KDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org
-            Ensure you have successfully executed this script:
-            \t{RealBinDir}/scripts/initial_setup.sh
             """))
         sys.exit(1)
 
@@ -79,7 +76,7 @@ def main():
     import yaml  # noqa: E402
 
     # <editor-fold desc="Applying loggers configuration">
-    with open(f"{RealBinDir}/data/kde-builder-logging.yaml", "r") as f:
+    with open(f"{KB_PACKAGE_DIR}/../data/kde-builder-logging.yaml", "r") as f:
         config = yaml.safe_load(f.read())
 
     override_config = {}

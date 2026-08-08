@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 import os
-import sys
 from typing import TYPE_CHECKING
 
+from kde_builder import KB_PACKAGE_DIR
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
@@ -58,8 +58,7 @@ class IdeProjectConfigGenerator:
 
         os.mkdir(config_dir)
 
-        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        data_dir = f"{base_dir}/data/vscode"
+        data_dir = f"{KB_PACKAGE_DIR}/../data/vscode"
 
         # c_cpp_properties.json configures C++, CMake & IntelliSense.
         c_cpp_properties_json = self._read_file(f"{data_dir}/c_cpp_properties.json.in")
@@ -172,8 +171,7 @@ class IdeProjectConfigGenerator:
         build_opts = self.build_opts
         build_opts = " ".join(build_opts)
 
-        base_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        data_dir = f"{base_dir}/data/clion"
+        data_dir = f"{KB_PACKAGE_DIR}/../data/clion"
 
         cmake_xml = self._read_file(f"{data_dir}/cmake.xml.in")
         cmake_xml = cmake_xml.replace("%{GENERATION_DIR}", build_dir)

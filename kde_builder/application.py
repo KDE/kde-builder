@@ -22,6 +22,7 @@ from typing import Callable
 from typing import NoReturn
 import yaml
 
+from kde_builder import KB_PACKAGE_DIR
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.build_context import BuildContext
@@ -383,8 +384,7 @@ class Application:
         if Debug().is_testing():
             return
 
-        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-        with open(real_bin_dir + "/data/supported-formats.yaml", "r") as f:
+        with open(f"{KB_PACKAGE_DIR}/../data/supported-formats.yaml", "r") as f:
             supported_formats = yaml.safe_load(f)
         current_installation_format = supported_formats["kde-builder-format"]
 
@@ -1162,8 +1162,6 @@ class Application:
         if Debug().pretending():
             return 0
 
-        real_bin_dir = os.path.dirname(os.path.realpath(sys.modules["__main__"].__file__))
-
         ctx = self.context
         layout = ctx.get_option("directory-layout")
         pws_dest_dir = "/plasma/plasma-workspace" if layout == "invent" else "/plasma-workspace"
@@ -1227,7 +1225,7 @@ class Application:
                         libexecdir + "/plasma-dev-prefix.sh")
             check_match(startplasma_dev_script,
                         libexecdir + "/startplasma-dev.sh")
-            check_match(real_bin_dir + "/data/00-plasma.conf.in",
+            check_match(f"{KB_PACKAGE_DIR}/../data/00-plasma.conf.in",
                         "/etc/dbus-1/session.d/00-plasma.conf")
 
             dbus1_files_dir = ctx.get_option("install-dir") + "/share/dbus-1"
