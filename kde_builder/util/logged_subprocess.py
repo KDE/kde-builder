@@ -10,10 +10,10 @@ import queue
 import sys
 from typing import Callable
 
-from .util import Util
-from ..kb_exception import ProgramError
-from ..debug import Debug
-from ..debug import KBLogger
+from kde_builder.util.util import Util
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
 
 if sys.platform == "darwin":
     import multiprocess as multiprocessing

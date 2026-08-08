@@ -9,12 +9,12 @@ import os
 import sys
 from typing import TYPE_CHECKING
 
-from .debug import Debug
-from .debug import KBLogger
-from .util.textwrap_mod import dedent
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
-    from module.module import Module
+    from kde_builder.module.module import Module
 
 logger_ide_proj = KBLogger.getLogger("ide_project_configs")
 

@@ -14,19 +14,19 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import ConfigError
-from ..kb_exception import ProgramError
-from ..debug import Debug
-from ..debug import KBLogger
-from ..ipc.null import IPCNull
-from ..util.util import Util
-from ..util.textwrap_mod import dedent
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import ConfigError
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.ipc.null import IPCNull
+from kde_builder.util.util import Util
+from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
-    from ..build_context import BuildContext
-    from ..ipc.ipc import IPC
-    from ..module.module import Module
+    from kde_builder.build_context import BuildContext
+    from kde_builder.ipc.ipc import IPC
+    from kde_builder.module.module import Module
 
 logger_updater = KBLogger.getLogger("updater")
 

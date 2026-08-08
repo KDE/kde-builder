@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from .util.textwrap_mod import dedent
+from kde_builder.util.textwrap_mod import dedent
 
 
 class KBException(Exception):  # noqa: N818

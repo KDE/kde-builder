@@ -11,11 +11,11 @@ import subprocess
 import time
 from typing import NoReturn
 
-from .build_context import BuildContext
-from .kb_exception import KBException
-from .kb_exception import SetupError
-from .debug import KBLogger
-from .os_support import OSSupport
+from kde_builder.build_context import BuildContext
+from kde_builder.kb_exception import KBException
+from kde_builder.kb_exception import SetupError
+from kde_builder.debug import KBLogger
+from kde_builder.os_support import OSSupport
 
 logger_fr = KBLogger.getLogger("first-run")
 
@@ -46,7 +46,7 @@ class FirstRun:
                 # The distro dependencies are listed in sysadmin/repo-metadata repository
                 # First, we need to download metadata with Application.
 
-                from .application import Application
+                from kde_builder.application import Application
                 try:
                     Application(["--metadata-only"])  # invokes _download_kde_project_metadata internally
                 except SystemExit:

@@ -9,7 +9,7 @@ from functools import cmp_to_key
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from module.module import Module
+    from kde_builder.module.module import Module
 
 
 class DebugOrderHints:

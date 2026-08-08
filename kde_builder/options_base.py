@@ -10,11 +10,11 @@ import os
 import re
 from typing import TYPE_CHECKING
 
-from .debug import KBLogger
-from .kb_exception import SetOptionError
+from kde_builder.debug import KBLogger
+from kde_builder.kb_exception import SetOptionError
 
 if TYPE_CHECKING:
-    from .build_context import BuildContext
+    from kde_builder.build_context import BuildContext
 
 logger_optbase = KBLogger.getLogger("options-base")
 logger_var_subst = KBLogger.getLogger("variables_substitution")
@@ -117,7 +117,7 @@ class OptionsBase:
             try:
                 int(opt_val)  # any value that can be cast to int.
             except ValueError:  # some string like "auto" is set.
-                from .os_support import CoresAndMemorySupport
+                from kde_builder.os_support import CoresAndMemorySupport
                 opt_val = str(CoresAndMemorySupport.get_num_cores_for_low_memory())
 
         # Everything else can be dumped straight into our dict.
@@ -233,7 +233,7 @@ class OptionsBase:
         self.set_option("#entry_num", OptionsBase.moduleID)
         OptionsBase.moduleID += 1
 
-        from .cmd_line import Cmdline
+        from kde_builder.cmd_line import Cmdline
         phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
         all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
 

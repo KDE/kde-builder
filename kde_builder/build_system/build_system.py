@@ -12,14 +12,14 @@ import sys
 import time
 from typing import TYPE_CHECKING
 
-from ..kb_exception import ProgramError
-from ..debug import Debug
-from ..debug import KBLogger
-from ..util.logged_subprocess import UtilLoggedSubprocess
-from ..util.util import Util
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
+from kde_builder.util.util import Util
 
 if TYPE_CHECKING:
-    from ..module.module import Module
+    from kde_builder.module.module import Module
 
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")

@@ -12,12 +12,12 @@ from typing import Callable
 from typing import NoReturn
 from typing import TYPE_CHECKING
 
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import ProgramError
-from ..debug import KBLogger
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import KBLogger
 
 if TYPE_CHECKING:
-    from ..module.module import Module
+    from kde_builder.module.module import Module
 
 logger_ipc = KBLogger.getLogger("ipc")
 

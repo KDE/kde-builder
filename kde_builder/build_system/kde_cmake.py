@@ -9,13 +9,13 @@ import os.path
 import re
 import sys
 
-from .build_system import BuildSystem
-from ..kb_exception import ProgramError
-from ..debug import KBLogger
-from ..ide_project_config_generator import IdeProjectConfigGenerator
-from ..util.logged_subprocess import UtilLoggedSubprocess
-from ..util.textwrap_mod import dedent
-from ..util.util import Util
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import KBLogger
+from kde_builder.ide_project_config_generator import IdeProjectConfigGenerator
+from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
+from kde_builder.util.textwrap_mod import dedent
+from kde_builder.util.util import Util
 
 logger_buildsystem = KBLogger.getLogger("build-system")
 

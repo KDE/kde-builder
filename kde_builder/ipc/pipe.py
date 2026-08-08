@@ -6,9 +6,9 @@
 import os
 import struct
 
-from .ipc import IPC
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import ProgramError
+from kde_builder.ipc.ipc import IPC
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import ProgramError
 
 
 class IPCPipe(IPC):

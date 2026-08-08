@@ -7,7 +7,7 @@ import os
 import subprocess
 from typing import NoReturn
 
-from .debug import KBLogger
+from kde_builder.debug import KBLogger
 
 logger_app = KBLogger.getLogger("application")
 

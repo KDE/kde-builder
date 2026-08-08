@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .qmake6 import BuildSystemQMake6
+from kde_builder.build_system.qmake6 import BuildSystemQMake6
 
 
 class BuildSystemQMake5(BuildSystemQMake6):

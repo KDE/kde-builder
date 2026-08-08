@@ -8,7 +8,7 @@ import sys
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ipc.pipe import IPCPipe
+    from kde_builder.ipc.pipe import IPCPipe
 
 
 class Debug:
@@ -131,7 +131,7 @@ class Debug:
         bother with this if the IPC method is actually concurrent.
         """
         self.ipc = ipc
-        from .ipc.ipc import IPC
+        from kde_builder.ipc.ipc import IPC
         if not isinstance(ipc, IPC):
             raise ValueError(f"{ipc} isn't an IPC obj!")
 

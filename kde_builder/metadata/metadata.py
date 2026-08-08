@@ -7,9 +7,9 @@ import yaml
 import os
 import re
 
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import ProgramError
-from ..debug import Debug
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import ProgramError
+from kde_builder.debug import Debug
 
 
 class Metadata:

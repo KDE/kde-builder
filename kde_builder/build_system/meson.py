@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from ..debug import KBLogger
-from .build_system import BuildSystem
-from ..util.util import Util
+from kde_builder.debug import KBLogger
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.util.util import Util
 
 
 logger_buildsystem = KBLogger.getLogger("build-system")

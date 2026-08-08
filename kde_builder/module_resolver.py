@@ -8,18 +8,18 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from .kb_exception import KBException
-from .kb_exception import KBRuntimeError
-from .kb_exception import NoKDEProjectsFound
-from .kb_exception import UnknownKdeProjectException
-from .debug import KBLogger
-from .module.module import Module
-from .module_set.module_set import ModuleSet
-from .options_base import OptionsBase
+from kde_builder.kb_exception import KBException
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import NoKDEProjectsFound
+from kde_builder.kb_exception import UnknownKdeProjectException
+from kde_builder.debug import KBLogger
+from kde_builder.module.module import Module
+from kde_builder.module_set.module_set import ModuleSet
+from kde_builder.options_base import OptionsBase
 
 if TYPE_CHECKING:
-    from build_context import BuildContext
-    from .metadata.kde_projects_reader import KDEProjectsReader
+    from kde_builder.build_context import BuildContext
+    from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
 
 logger_modres = KBLogger.getLogger("module-resolver")
 

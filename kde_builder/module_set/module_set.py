@@ -7,14 +7,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..kb_exception import SetOptionError
-from ..kb_exception import NoKDEProjectsFound
-from ..debug import KBLogger
-from ..module.module import Module
-from ..options_base import OptionsBase
+from kde_builder.kb_exception import SetOptionError
+from kde_builder.kb_exception import NoKDEProjectsFound
+from kde_builder.debug import KBLogger
+from kde_builder.module.module import Module
+from kde_builder.options_base import OptionsBase
 
 if TYPE_CHECKING:
-    from ..build_context import BuildContext
+    from kde_builder.build_context import BuildContext
 
 logger_moduleset = KBLogger.getLogger("module-set")
 

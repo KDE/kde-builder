@@ -5,11 +5,11 @@
 
 import os
 
-from .build_system import BuildSystem
-from ..kb_exception import KBException
-from ..kb_exception import KBRuntimeError
-from ..debug import KBLogger
-from ..util.util import Util
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.kb_exception import KBException
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.debug import KBLogger
+from kde_builder.util.util import Util
 
 logger_buildsystem = KBLogger.getLogger("build-system")
 

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from .ipc import IPC
+from kde_builder.ipc.ipc import IPC
 
 
 class IPCNull(IPC):

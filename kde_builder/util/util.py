@@ -26,11 +26,11 @@ import setproctitle
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
-from ..kb_exception import ProgramError
-from .textwrap_mod import dedent
+from kde_builder.kb_exception import ProgramError
+from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
-    from ..module.module import Module
+    from kde_builder.module.module import Module
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 logger_util = KBLogger.getLogger("util")

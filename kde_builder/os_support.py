@@ -10,8 +10,8 @@ import re
 import subprocess
 import sys
 
-from .debug import KBLogger
-from .kb_exception import KBRuntimeError
+from kde_builder.debug import KBLogger
+from kde_builder.kb_exception import KBRuntimeError
 
 logger_app = KBLogger.getLogger("application")
 

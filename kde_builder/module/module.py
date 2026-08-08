@@ -15,28 +15,28 @@ import sys
 import traceback
 from typing import TYPE_CHECKING
 
-from ..kb_exception import KBException
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import ProgramError
-from ..kb_exception import SetOptionError
-from ..build_system.autotools import BuildSystemAutotools
-from ..build_system.build_system import BuildSystem
-from ..build_system.kde_cmake import BuildSystemKDECMake
-from ..build_system.meson import BuildSystemMeson
-from ..build_system.qmake5 import BuildSystemQMake5
-from ..build_system.qmake6 import BuildSystemQMake6
-from ..debug import Debug
-from ..debug import KBLogger
-from ..ipc.ipc import IPC
-from ..options_base import PathResolvingOptions
-from ..updater.updater import Updater
-from ..util.util import Util
-from ..util.textwrap_mod import dedent
+from kde_builder.kb_exception import KBException
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import ProgramError
+from kde_builder.kb_exception import SetOptionError
+from kde_builder.build_system.autotools import BuildSystemAutotools
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.build_system.kde_cmake import BuildSystemKDECMake
+from kde_builder.build_system.meson import BuildSystemMeson
+from kde_builder.build_system.qmake5 import BuildSystemQMake5
+from kde_builder.build_system.qmake6 import BuildSystemQMake6
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.ipc.ipc import IPC
+from kde_builder.options_base import PathResolvingOptions
+from kde_builder.updater.updater import Updater
+from kde_builder.util.util import Util
+from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
-    from ..build_context import BuildContext
-    from ..module_set.module_set import ModuleSet
-    from ..phase_list import PhaseList
+    from kde_builder.build_context import BuildContext
+    from kde_builder.module_set.module_set import ModuleSet
+    from kde_builder.phase_list import PhaseList
 
 logger_module = KBLogger.getLogger("module")
 

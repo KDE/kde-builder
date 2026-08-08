@@ -10,10 +10,10 @@ from pathlib import Path
 
 import yaml
 
-from ..kb_exception import KBRuntimeError
-from ..kb_exception import NoKDEProjectsFound
-from ..debug import Debug
-from ..debug import KBLogger
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_exception import NoKDEProjectsFound
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
 
 logger_moduleset = KBLogger.getLogger("module-set")
 

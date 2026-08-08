@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 
-from .debug import Debug
+from kde_builder.debug import Debug
 
 
 class StatusView:

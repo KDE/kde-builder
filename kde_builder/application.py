@@ -24,25 +24,25 @@ import yaml
 
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
-from .build_context import BuildContext
-from .build_system.qmake5 import BuildSystemQMake5
-from .cmd_line import Cmdline
-from .debug import Debug
-from .debug import KBLogger
-from .debug_order_hints import DebugOrderHints
-from .dependency_resolver import DependencyResolver
-from .log_dir import LogDir
-from .module.module import Module
-from .module_resolver import ModuleResolver
-from .module_set.module_set import ModuleSet
-from .options_base import OptionsBase
-from .recursive_config_nodes_iterator import RecursiveConfigNodesIterator
-from .start_program import StartProgram
-from .task_manager import TaskManager
-from .updater.updater import Updater
-from .util.util import Util
-from .util.textwrap_mod import dedent
-from .version import Version
+from kde_builder.build_context import BuildContext
+from kde_builder.build_system.qmake5 import BuildSystemQMake5
+from kde_builder.cmd_line import Cmdline
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.debug_order_hints import DebugOrderHints
+from kde_builder.dependency_resolver import DependencyResolver
+from kde_builder.log_dir import LogDir
+from kde_builder.module.module import Module
+from kde_builder.module_resolver import ModuleResolver
+from kde_builder.module_set.module_set import ModuleSet
+from kde_builder.options_base import OptionsBase
+from kde_builder.recursive_config_nodes_iterator import RecursiveConfigNodesIterator
+from kde_builder.start_program import StartProgram
+from kde_builder.task_manager import TaskManager
+from kde_builder.updater.updater import Updater
+from kde_builder.util.util import Util
+from kde_builder.util.textwrap_mod import dedent
+from kde_builder.version import Version
 
 logger_app = KBLogger.getLogger("application")
 

@@ -5,11 +5,11 @@
 import os
 import re
 
-from .build_context import BuildContext
-from .debug import Debug
-from .debug import KBLogger
-from .kb_exception import KBRuntimeError
-from .util.util import Util
+from kde_builder.build_context import BuildContext
+from kde_builder.debug import Debug
+from kde_builder.debug import KBLogger
+from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.util.util import Util
 
 logger_app = KBLogger.getLogger("application")
 

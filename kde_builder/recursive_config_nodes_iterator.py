@@ -9,11 +9,11 @@ import re
 from typing import TYPE_CHECKING
 import yaml
 
-from .kb_exception import ConfigError
-from .debug import KBLogger
+from kde_builder.kb_exception import ConfigError
+from kde_builder.debug import KBLogger
 
 if TYPE_CHECKING:
-    from .build_context import BuildContext
+    from kde_builder.build_context import BuildContext
 
 
 logger_var_subst = KBLogger.getLogger("variables_substitution")
