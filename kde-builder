@@ -171,7 +171,6 @@ def main():
         fr = FirstRun(prompt_answer)
         exit(fr.setup_user_system(RealBinDir, setup_steps))
 
-    from kde_builder_lib.version import Version  # noqa: E402
     from kde_builder_lib.application import Application  # noqa: E402
     from kde_builder_lib.kb_exception import KBException  # noqa: E402
 

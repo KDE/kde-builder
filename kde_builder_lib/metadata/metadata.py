@@ -10,7 +10,6 @@ import re
 from ..kb_exception import KBRuntimeError
 from ..kb_exception import ProgramError
 from ..debug import Debug
-from ..util.util import Util
 
 
 class Metadata:

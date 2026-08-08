@@ -20,7 +20,6 @@ from ..kb_exception import ProgramError
 from ..debug import Debug
 from ..debug import KBLogger
 from ..ipc.null import IPCNull
-from ..util.logged_subprocess import UtilLoggedSubprocess
 from ..util.util import Util
 from ..util.textwrap_mod import dedent
 

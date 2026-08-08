@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os.path
 from pathlib import Path
-import re
 
 import yaml
 

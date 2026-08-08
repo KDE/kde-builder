@@ -9,15 +9,12 @@ from __future__ import annotations
 from functools import cmp_to_key
 import re
 from io import TextIOWrapper
-from typing import Callable
 
 from .kb_exception import ProgramError
 from .debug import Debug
 from .debug import KBLogger
 from .module.module import Module
 from .module_resolver import ModuleResolver
-from .updater.updater import Updater
-from .util.util import Util
 
 
 logger_depres = KBLogger.getLogger("dependency-resolver")
@@ -30,12 +27,6 @@ class DependencyResolver:
     Each "module" from the perspective of this resolver is simply a module full name, as
     given by the KDE Project database (e.g. extragear/utils/kdesrc-build).
     """
-
-    # sub uniq
-    # {
-    #     my %seen;
-    #     return grep { ++($seen{$_}) == 1 } @_;
-    # }
 
     def __init__(self, module_resolver: ModuleResolver):
         self.dependencies_of = {}

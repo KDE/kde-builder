@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import logging
-import os
-import re
 import sys
 from typing import TYPE_CHECKING
 

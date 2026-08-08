@@ -5,16 +5,13 @@
 
 from __future__ import annotations
 
-import re
 from typing import TYPE_CHECKING
 
-from ..kb_exception import ConfigError
 from ..kb_exception import SetOptionError
 from ..kb_exception import NoKDEProjectsFound
 from ..debug import KBLogger
 from ..module.module import Module
 from ..options_base import OptionsBase
-from ..phase_list import PhaseList
 
 if TYPE_CHECKING:
     from ..build_context import BuildContext

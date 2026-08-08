@@ -8,7 +8,6 @@ import sys
 
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
-from kde_builder_lib.updater.updater import Updater
 from kde_builder_lib.util.logged_subprocess import UtilLoggedSubprocess  # load early so we can override
 
 

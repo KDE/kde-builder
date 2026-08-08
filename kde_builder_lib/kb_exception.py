@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 from .util.textwrap_mod import dedent
-from typing import NoReturn
 
 
 class KBException(Exception):  # noqa: N818

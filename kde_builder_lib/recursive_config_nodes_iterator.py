@@ -45,8 +45,6 @@ class RecursiveConfigNodesIterator:
         return self
 
     def __next__(self):
-        from .application import Application
-
         while True:
             if self.current_index < len(self.current_keys_list):
                 node_name = self.current_keys_list[self.current_index]

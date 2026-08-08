@@ -1,7 +1,7 @@
 include = ["kde-builder", "kde_builder_lib/**/*.py", "tests/**/*.py", "scripts/gen_zsh_completions.py"]
 
 [lint]
-select = ["D", "E", "N", "W"]
+select = ["D", "E", "F401", "N", "W"]
 
 pydocstyle.convention = "google"
 

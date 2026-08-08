@@ -10,9 +10,7 @@ import os.path
 import selectors
 import signal
 import sys
-import time
 from typing import TYPE_CHECKING
-from urllib.parse import urlparse
 
 import setproctitle
 
@@ -23,7 +21,6 @@ from .ipc.ipc import IPC
 from .ipc.null import IPCNull
 from .ipc.pipe import IPCPipe
 from .util.util import Util
-from .util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from build_context import BuildContext

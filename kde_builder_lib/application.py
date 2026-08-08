@@ -18,7 +18,6 @@ import subprocess
 import sys
 from time import sleep
 from time import time
-import traceback
 from typing import Callable
 from typing import NoReturn
 import yaml
@@ -453,8 +452,6 @@ class Application:
             logger_app.warning(" r[b[*] Problems encountered trying to determine correct project graph:")
             logger_app.warning(f" r[b[*] {e}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
-
-            # traceback.print_exc()
 
             dependency_resolver.dependency_graph.clear()
 

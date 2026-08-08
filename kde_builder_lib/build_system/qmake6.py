@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import glob
-import re
 
 from .build_system import BuildSystem
 from ..kb_exception import ProgramError

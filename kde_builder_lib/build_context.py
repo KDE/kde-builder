@@ -13,7 +13,6 @@ from pathlib import Path
 import re
 import sys
 import tempfile
-import traceback
 
 from .kb_exception import KBRuntimeError
 from .kb_exception import ProgramError

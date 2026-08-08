@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING
 
 from .debug import KBLogger
 from .kb_exception import SetOptionError
-from .util.util import Util
 
 if TYPE_CHECKING:
     from .build_context import BuildContext

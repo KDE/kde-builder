@@ -5,7 +5,6 @@
 
 from kde_builder_lib.application import Application
 from kde_builder_lib.debug import Debug
-from kde_builder_lib.updater.updater import Updater
 
 
 def test_tag_names_based_on_time():

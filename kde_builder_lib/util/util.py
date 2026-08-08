@@ -11,7 +11,6 @@ import codecs
 import hashlib
 import logging
 import os.path
-from io import TextIOWrapper
 from pathlib import Path
 import re
 import shlex
