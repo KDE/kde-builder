@@ -33,12 +33,9 @@ class FirstRun:
 
     def __init__(self, prefilled_prompt_answer: str | None = None):
         self.oss = OSSupport()
-        self.base_dir = None
         self.prefilled_prompt_answer = prefilled_prompt_answer
 
-    def setup_user_system(self, base_dir, setup_steps: list[str]) -> NoReturn:
-        self.base_dir = base_dir
-
+    def setup_user_system(self, setup_steps: list[str]) -> NoReturn:
         try:
             if "install-distro-packages" in setup_steps:
                 logger_fr.warning("=== install-distro-packages ===")

@@ -169,7 +169,7 @@ def main():
         d.set_colorful_output(True)
         prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
         fr = FirstRun(prompt_answer)
-        exit(fr.setup_user_system(RealBinDir, setup_steps))
+        exit(fr.setup_user_system(setup_steps))
 
     from kde_builder.application import Application  # noqa: E402
     from kde_builder.kb_exception import KBException  # noqa: E402
