@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
 [project]
 name = "kde-builder"
 dynamic = ["version"]
@@ -18,5 +22,15 @@ dev = [
     "pytest-cov",
 ]
 
+[project.scripts]
+kde-builder = "kde_builder.main:main"
+
 [tool.uv]
-package = false
+package = true
+
+[tool.hatch.version]
+source = "vcs"
+raw-options = { version_scheme = "post-release" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["kde_builder"]
