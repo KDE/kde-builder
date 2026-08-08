@@ -11,10 +11,10 @@ import os
 import sys
 import traceback
 
-from kde_builder_lib.kb_exception import ProgramError
-from kde_builder_lib.kb_exception import UnknownKdeProjectException
-from kde_builder_lib.debug import KBLogger
-from kde_builder_lib.util.textwrap_mod import dedent
+from kde_builder.kb_exception import ProgramError
+from kde_builder.kb_exception import UnknownKdeProjectException
+from kde_builder.debug import KBLogger
+from kde_builder.util.textwrap_mod import dedent
 
 RealBinDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -162,8 +162,8 @@ def main():
             setup_steps.append("generate-config")
 
     if setup_steps:
-        from kde_builder_lib.first_run import FirstRun
-        from kde_builder_lib.debug import Debug
+        from kde_builder.first_run import FirstRun
+        from kde_builder.debug import Debug
 
         d = Debug()
         d.set_colorful_output(True)
@@ -171,8 +171,8 @@ def main():
         fr = FirstRun(prompt_answer)
         exit(fr.setup_user_system(RealBinDir, setup_steps))
 
-    from kde_builder_lib.application import Application  # noqa: E402
-    from kde_builder_lib.kb_exception import KBException  # noqa: E402
+    from kde_builder.application import Application  # noqa: E402
+    from kde_builder.kb_exception import KBException  # noqa: E402
 
     # Script starts.
 

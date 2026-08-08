@@ -7,8 +7,8 @@ import os
 from pathlib import Path
 import tempfile
 
-from kde_builder_lib.build_context import BuildContext
-from kde_builder_lib.util.util import Util
+from kde_builder.build_context import BuildContext
+from kde_builder.util.util import Util
 
 
 def test_prune_under_dir():

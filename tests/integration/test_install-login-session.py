@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from kde_builder_lib.application import Application
+from kde_builder.application import Application
 
 def test_install_login_session(monkeypatch):
     """

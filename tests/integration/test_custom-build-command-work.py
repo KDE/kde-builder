@@ -5,10 +5,10 @@
 
 import os
 
-from kde_builder_lib.application import Application
-from kde_builder_lib.build_system.build_system import BuildSystem
-from kde_builder_lib.debug import Debug
-from kde_builder_lib.module.module import Module
+from kde_builder.application import Application
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.debug import Debug
+from kde_builder.module.module import Module
 
 
 def test_build_internal(monkeypatch):

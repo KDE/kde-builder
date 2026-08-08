@@ -7,9 +7,9 @@ import os
 
 import pytest
 
-from kde_builder_lib.build_context import BuildContext
-from kde_builder_lib.build_system.build_system import BuildSystem
-from kde_builder_lib.module.module import Module
+from kde_builder.build_context import BuildContext
+from kde_builder.build_system.build_system import BuildSystem
+from kde_builder.module.module import Module
 
 
 @pytest.fixture

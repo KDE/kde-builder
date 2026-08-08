@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from kde_builder_lib.os_support import OSSupport
+from kde_builder.os_support import OSSupport
 
 
 def test_ossupport():

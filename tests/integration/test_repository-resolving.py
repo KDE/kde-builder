@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from kde_builder_lib.application import Application
-from kde_builder_lib.debug import Debug
+from kde_builder.application import Application
+from kde_builder.debug import Debug
 
 
 def test_repository_resolution():

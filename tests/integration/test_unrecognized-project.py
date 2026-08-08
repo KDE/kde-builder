@@ -4,9 +4,9 @@
 
 import pytest
 
-from kde_builder_lib.application import Application
-from kde_builder_lib.kb_exception import UnknownKdeProjectException
-from kde_builder_lib.debug import Debug
+from kde_builder.application import Application
+from kde_builder.kb_exception import UnknownKdeProjectException
+from kde_builder.debug import Debug
 
 
 def test_unrecognized_project():

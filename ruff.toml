@@ -1,4 +1,4 @@
-include = ["kde-builder", "kde_builder_lib/**/*.py", "tests/**/*.py", "scripts/gen_zsh_completions.py"]
+include = ["kde-builder", "kde_builder/**/*.py", "tests/**/*.py", "scripts/gen_zsh_completions.py"]
 
 [lint]
 select = ["D", "E", "F401", "N", "W"]
