@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from importlib.metadata import version, PackageNotFoundError
 import os
 import subprocess
 from typing import NoReturn
@@ -28,14 +29,18 @@ class Version:
         current checkout and append the ID (in ``git-describe`` format) to the output
         string as well.
         """
-        can_run_git = subprocess.call("type " + "git", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
-        if KB_REPO_DIR and can_run_git and os.path.isdir(f"{KB_REPO_DIR}/.git"):
-            result = subprocess.run(['printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"'], shell=True, capture_output=True, check=False, cwd=KB_REPO_DIR)
-            output = result.stdout.decode("utf-8").removesuffix("\n")
-            ok = result.returncode == 0
-            if ok and output:
-                return f"{output}"
-        return "Unknown version"
+        try:
+            current_version = version("kde-builder")
+            return current_version
+        except PackageNotFoundError:
+            can_run_git = subprocess.call("type " + "git", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+            if KB_REPO_DIR and can_run_git and os.path.isdir(f"{KB_REPO_DIR}/.git"):
+                result = subprocess.run(['printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"'], shell=True, capture_output=True, check=False, cwd=KB_REPO_DIR)
+                output = result.stdout.decode("utf-8").removesuffix("\n")
+                ok = result.returncode == 0
+                if ok and output:
+                    return f"{output}"
+            return "Unknown version"
 
     @staticmethod
     def self_update() -> NoReturn:
