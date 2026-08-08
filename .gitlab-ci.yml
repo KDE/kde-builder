@@ -7,8 +7,6 @@ stages:
   - build
 
 unit_and_integration_tests:
-  tags:
-    - Linux
   image: ghcr.io/astral-sh/uv:debian
   before_script:
     - apt update
