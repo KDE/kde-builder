@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2026 Andrew Shark <ashark@linuxcomp.ru>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+from kde_builder.main import main
+
+if __name__ == "__main__":
+    main()
