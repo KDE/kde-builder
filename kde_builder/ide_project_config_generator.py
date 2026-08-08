@@ -58,7 +58,7 @@ class IdeProjectConfigGenerator:
 
         os.mkdir(config_dir)
 
-        data_dir = f"{KB_PACKAGE_DIR}/../data/vscode"
+        data_dir = f"{KB_PACKAGE_DIR}/resources/vscode"
 
         # c_cpp_properties.json configures C++, CMake & IntelliSense.
         c_cpp_properties_json = self._read_file(f"{data_dir}/c_cpp_properties.json.in")
@@ -171,7 +171,7 @@ class IdeProjectConfigGenerator:
         build_opts = self.build_opts
         build_opts = " ".join(build_opts)
 
-        data_dir = f"{KB_PACKAGE_DIR}/../data/clion"
+        data_dir = f"{KB_PACKAGE_DIR}/resources/clion"
 
         cmake_xml = self._read_file(f"{data_dir}/cmake.xml.in")
         cmake_xml = cmake_xml.replace("%{GENERATION_DIR}", build_dir)

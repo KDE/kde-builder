@@ -222,7 +222,7 @@ class FirstRun:
 
         logger_fr.info(f"b[*] Creating b[sample configuration file]: b[y[\"{xdg_config_home_short}/kde-builder.yaml\"]...")
 
-        with open(f"{KB_PACKAGE_DIR}/../data/kde-builder.yaml.in", "r") as data_file:
+        with open(f"{KB_PACKAGE_DIR}/resources/kde-builder.yaml.in", "r") as data_file:
             sample_rc = data_file.read()
 
         sample_rc = sample_rc.replace("%{num_cores}", "\"" + "auto" + "\"")

@@ -385,7 +385,7 @@ class Application:
         if Debug().is_testing():
             return
 
-        with open(f"{KB_PACKAGE_DIR}/../data/supported-formats.yaml", "r") as f:
+        with open(f"{KB_PACKAGE_DIR}/resources/supported-formats.yaml", "r") as f:
             supported_formats = yaml.safe_load(f)
         current_installation_format = supported_formats["kde-builder-format"]
 
@@ -1225,7 +1225,7 @@ class Application:
                         libexecdir + "/plasma-dev-prefix.sh")
             check_match(startplasma_dev_script,
                         libexecdir + "/startplasma-dev.sh")
-            check_match(f"{KB_PACKAGE_DIR}/../data/00-plasma.conf.in",
+            check_match(f"{KB_PACKAGE_DIR}/resources/00-plasma.conf.in",
                         "/etc/dbus-1/session.d/00-plasma.conf")
 
             dbus1_files_dir = ctx.get_option("install-dir") + "/share/dbus-1"

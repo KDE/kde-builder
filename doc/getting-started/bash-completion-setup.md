@@ -46,7 +46,7 @@ Create symlink to the completion file:
 mkdir -p ~/.local/share/bash-completion/completions/
 
 # Link to the completion file
-ln -s ~/.local/share/kde-builder/data/completions/bash/kde-builder ~/.local/share/bash-completion/completions/kde-builder
+ln -s ~/.local/share/kde-builder/kde_builder/resources/completions/bash/kde-builder ~/.local/share/bash-completion/completions/kde-builder
 ```
 
 Add the following lines to your `~/.bashrc` file:
@@ -182,7 +182,7 @@ Or simply restart your terminal.
 To install for all users (requires root):
 
 ```bash
-sudo ln -s ~/.local/share/kde-builder/data/completions/bash/kde-builder /usr/share/bash-completion/completions/kde-builder
+sudo ln -s ~/.local/share/kde-builder/resources/completions/bash/kde-builder /usr/share/bash-completion/completions/kde-builder
 ```
 
 Then each user only needs to configure `~/.inputrc` for menu-complete feature.

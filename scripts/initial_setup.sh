@@ -154,7 +154,7 @@ install_icon_and_desktop_file() {
   mkdir -p ~/.local/share/icons
   cp -v ~/.local/share/kde-builder/logo.png ~/.local/share/icons/kde-builder.png
   mkdir -p ~/.local/share/applications
-  cp -v ~/.local/share/kde-builder/data/kde-builder.desktop.in ~/.local/share/applications/kde-builder.desktop
+  cp -v ~/.local/share/kde-builder/kde_builder/resources/kde-builder.desktop.in ~/.local/share/applications/kde-builder.desktop
 }
 
 ensure_kde_builder_launches() {
@@ -165,7 +165,7 @@ ensure_kde_builder_launches() {
 
 check_zsh_fpath() {
   echo "Checking that fpath contains path to kde-builder zsh completions"
-  local kb_completions_path="$HOME/.local/share/kde-builder/data/completions/zsh/"
+  local kb_completions_path="$HOME/.local/share/kde-builder/kde_builder/resources/completions/zsh/"
 
   local ZDOTDIR="${ZDOTDIR:-$HOME}"
   # The $FPATH is not exported to scripts, so we get from launched subshell

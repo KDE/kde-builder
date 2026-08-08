@@ -6,9 +6,9 @@
 
 kde-builder has several loggers, which you can configure to control the amount of output they generate.
 
-Loggers' default severity levels and formatters are defined in the `data/kde-builder-logging.yaml`.
+Loggers' default severity levels and formatters are defined in the `resources/kde-builder-logging.yaml`.
 
-To override specific loggers values, copy `data/kde-builder-logging.yaml` config to the `~/.config/kde-builder-logging.yaml`
+To override specific loggers values, copy `resources/kde-builder-logging.yaml` config to the `~/.config/kde-builder-logging.yaml`
 or to the current working directory. Alternatively, instead of copying file, you can just create a yaml file with only overridden values
 in the mentioned locations.
 
@@ -20,7 +20,7 @@ loggers:
 ```
 
 The order of loggers configs are read is the following:  
-1. kde-builder applies the default configuration from `data/kde-builder-logging.yaml` (located in the kde-builder root directory).  
+1. kde-builder applies the default configuration from `resources/kde-builder-logging.yaml` (located in the kde-builder root directory).  
 2. If the `./kde-builder-logging.yaml` file is found (from the current working directory), it overrides the default configuration.  
 3. If the file was not found in previous step, then if the `~/.config/kde-builder-logging.yaml` file is found, it overrides the default configuration.
 

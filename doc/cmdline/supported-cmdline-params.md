@@ -693,7 +693,7 @@ Example:
 ```shell
 kde-builder wayland --log-level logged-command=INFO --log-level ide_project_configs=DEBUG
 ```
-Available logger names can be seen in the `data/kde-builder-logging.yaml`
+Available logger names can be seen in the `resources/kde-builder-logging.yaml`
 file. Level names can be one of "ERROR", "WARNING", "INFO", "DEBUG". See also [](../developer/adding-logger.md).
 
 (cmdline-check-self-updates)=

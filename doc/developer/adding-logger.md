@@ -6,7 +6,7 @@ Python provides a built-in `logging` module, and we can use separate loggers for
 
 Here is how we add a new logger to the project.
 
-Add logger to the `data/kde-builder-logging.yaml`. For example:
+Add logger to the `resources/kde-builder-logging.yaml`. For example:
 ```yaml
 loggers:
   resolving-dependencies:

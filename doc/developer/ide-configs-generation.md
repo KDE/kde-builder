@@ -135,7 +135,7 @@ Todo: Check if that feature is implemented, and if it was, add to appropriate op
 Here is documentation on how to make a shared configuration: https://doc.qt.io/qtcreator/creator-sharing-project-settings.html.
 
 Unfortunately, I (Andrew Shark) had no success to generate the configuration from outside. The nearest I got is file in successfully importing configuration
-from file you can see in `data/qtcreator/CMakeLists.txt.shared.in`. I placed some variable in configure, build, and run, and also added a cmake option.
+from file you can see in `resources/qtcreator/CMakeLists.txt.shared.in`. I placed some variable in configure, build, and run, and also added a cmake option.
 
 The problem currently is that such .shared file cannot be actually shared, because of the `<value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">`
 in Target configuration. Without that value tag, the .shared file is just ignored, so there is no sense to generate it in such way.

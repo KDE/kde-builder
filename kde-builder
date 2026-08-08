@@ -76,7 +76,7 @@ def main():
     import yaml  # noqa: E402
 
     # <editor-fold desc="Applying loggers configuration">
-    with open(f"{KB_PACKAGE_DIR}/../data/kde-builder-logging.yaml", "r") as f:
+    with open(f"{KB_PACKAGE_DIR}/resources/kde-builder-logging.yaml", "r") as f:
         config = yaml.safe_load(f.read())
 
     override_config = {}

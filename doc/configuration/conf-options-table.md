@@ -532,7 +532,7 @@ The .idea folder will be created in the project source directory, only if it doe
 You will need to manually create a toolchain named "KDE Builder toolchain" in Clion.  
 This cannot be automated, because this configuration is stored in IDE configs, not in the project configs.  
 The IDE configs location is dependent on the IDE version.  
-If you do not have any toolchanis yet, place the `data/clion/toolchains.xml` file into the configuration
+If you do not have any toolchanis yet, place the `resources/clion/toolchains.xml` file into the configuration
 directory of the IDE, i.e. the path would look like `/home/andrew/.config/JetBrains/CLion2024.2/options/linux/toolchains.xml`.
 ```
 
