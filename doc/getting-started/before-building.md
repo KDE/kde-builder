@@ -22,15 +22,6 @@ Make sure it works by running:
 kde-builder --version
 ```
 
-Add these cmake options to your config:
-
-```yaml
-global:
-  cmake-options ... -DPython3_FIND_VIRTUALENV=STANDARD -DPython3_FIND_UNVERSIONED_NAMES=FIRST
-```
-
-This will let cmake find python modules from your system packages.
-
 (generate-rcfile)=
 ### Prepare the configuration file
 
