@@ -1172,7 +1172,7 @@ class Application:
         pws_builddir = ctx.get_option("build-dir") + pws_dest_dir
         install_sessions_script = pws_builddir + "/login-sessions/install-sessions.sh"
         startplasma_dev_script = pws_builddir + "/login-sessions/startplasma-dev.sh"
-        libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""
+        libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""  # fallback, refined from install-sessions.sh below
 
         if not os.path.isfile(install_sessions_script) or not os.path.isfile(startplasma_dev_script):
             if not os.path.isdir(pws_builddir):
@@ -1200,6 +1200,15 @@ class Application:
                 # Despite we failed to install, we send "0" (success) here, for the same reason:
                 # user may be not interested in the result of install session, and the smile face should be smiling.
                 return 0
+
+        # install-sessions.sh has the real install destinations baked in by plasma-workspace's
+        # CMake. Read the libexec directory from it rather than trusting our own libname, so a
+        # libdir mismatch (e.g. the project installed into lib64 while kde-builder assumes lib)
+        # does not make us re-run the sudo install on every invocation.
+        with open(install_sessions_script) as f:
+            match = re.search(r"^install\s+\S+/prefix\.sh\s+(.+)/plasma-dev-prefix\.sh\s*$", f.read(), re.MULTILINE)
+        if match:
+            libexecdir = match.group(1)
 
         def get_md5(path: str):
             return hashlib.md5(open(path, "rb").read()).hexdigest()
