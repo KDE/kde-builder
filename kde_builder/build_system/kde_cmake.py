@@ -364,6 +364,16 @@ class BuildSystemKDECMake(BuildSystem):
 
         commands.append(f"-DCMAKE_INSTALL_PREFIX={installdir}")
 
+        # Install libraries into the same libdir that kde-builder itself assumes (see the libname
+        # detection in BuildContext). Otherwise KDEInstallDirs may independently pick a different
+        # one - e.g. lib64 on a distro where /usr/lib64 is a symlink and kde-builder chose lib -
+        # which splits the install prefix and breaks the paths kde-builder derives from libname
+        # (LD_LIBRARY_PATH, PKG_CONFIG_PATH, libexec/ lookups, ...). Skip it if the user set a
+        # libdir themselves.
+        libname = module.get_option("libname")
+        if libname and not [command for command in commands if re.match(r"^\s*-D(KDE|CMAKE)_INSTALL_LIBDIR(:\w+)?=", command)]:
+            commands.append(f"-DKDE_INSTALL_LIBDIR={libname}")
+
         # Add custom Qt to the installdir (but don't overwrite a user-set install-dir)
         qt_installdir = module.get_option("qt-install-dir")
         if qt_installdir and qt_installdir != installdir and not [command for command in commands if re.match(r"^\s*-DCMAKE_PREFIX_PATH", command)]:
