@@ -356,7 +356,8 @@ class TaskManager:
 
                 if module.get_option("stop-on-failure"):
                     logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
-                    return 1  # Error
+                    result = 1
+                    break
 
                 logfile = module.get_option("#error-log-file")
 
