@@ -948,6 +948,7 @@ class Module(PathResolvingOptions):
             return
 
         logdir = self.get_log_dir()
+        ctx_logdir = self.context.get_log_dir()
 
         if self.has_option("#error-log-file"):
             logger_module.error(f"\tr[b[*] {self.name} already has error log set, tried to set to r[b[{logfile}]")
@@ -961,13 +962,26 @@ class Module(PathResolvingOptions):
         if os.path.islink(f"{logdir}/error.log"):
             os.unlink(f"{logdir}/error.log")
 
+        if os.path.islink(f"{ctx_logdir}/last_error.log"):
+            os.unlink(f"{ctx_logdir}/last_error.log")
+
         if os.path.exists(f"{logdir}/error.log"):
+            # Maybe it was a regular file?
+            logger_module.error("\tr[b[*] Unable to create symlink to error log file")
+            return
+
+        # todo Check if this check is needed
+        if os.path.exists(f"{ctx_logdir}/last_error.log"):
             # Maybe it was a regular file?
             logger_module.error("\tr[b[*] Unable to create symlink to error log file")
             return
 
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
             os.symlink(f"{logfile}", f"{logdir}/error.log")
+
+        # todo Check if this check is needed
+        if os.path.exists(ctx_logdir):
+            os.symlink(f"{logdir}/error.log", f"{ctx_logdir}/last_error.log")
 
     # @override
     def verify_option_value_type(self, option_name, option_value) -> None:
