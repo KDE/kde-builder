@@ -297,6 +297,9 @@ class TaskManager:
         screen_log_timestamped = f"{logdir_timestamped}/screen.log"
         screen_log_latest = f"{logdir_latest}/screen.log"
 
+        last_error_log_timestamped = f"{logdir_timestamped}/last_error.log"
+        last_error_log_latest = f"{logdir_latest}/last_error.log"
+
         successfully_built_log_timestamped = f"{logdir_timestamped}/successfully-built.log"
         successfully_built_log_latest = f"{logdir_latest}/successfully-built.log"
         failed_to_build_log_timestamped = f"{logdir_timestamped}/failed-to-build.log"
@@ -394,6 +397,11 @@ class TaskManager:
             if os.path.exists(screen_log_latest):
                 os.remove(screen_log_latest)
             os.symlink(screen_log_timestamped, screen_log_latest)
+
+            if os.path.exists(last_error_log_latest):
+                os.remove(last_error_log_latest)
+            # todo Check if it is needed to check if last_error_log_timestamped even exists
+            os.symlink(last_error_log_timestamped, last_error_log_latest)
 
             if os.path.exists(failed_to_build_log_latest):
                 os.remove(failed_to_build_log_latest)
