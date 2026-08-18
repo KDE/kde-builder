@@ -21,7 +21,7 @@ class Metadata:
         self.path_to_metadata = path_to_metadata
 
         self.ignored_projects = self._ignored_modules()
-        self.branch_groups = self._logical_module_groups()
+        self.branch_groups = self._read_branch_groups()
 
     def _ignored_modules(self) -> list[str]:
         """
@@ -56,26 +56,23 @@ class Metadata:
         fh.close()
         return ignore_modules
 
-    def _logical_module_groups(self) -> dict:
+    def _read_branch_groups(self) -> dict:
         """
         Return a dict of the branch-groups.yaml file.
 
         The metadata should already be downloaded.
         """
-        path = self.path_to_metadata + "/kde-dependencies/branch-groups.yaml"
+        path = self.path_to_metadata + "/branch-groups.yaml"
 
         if Debug().is_testing():
-            path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/branch-groups.yaml"
+            path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/branch-groups.yaml"
 
         try:
-            fh = open(path, "r")
-        except IOError:
-            raise ProgramError("Unable to read branch-groups.yaml")
+            with open(path, "r") as file:
+                yaml_dict = yaml.safe_load(file)
+        except FileNotFoundError:
+            raise KBRuntimeError("Unable to read branch-groups.yaml")
+        except yaml.YAMLError:
+            raise KBRuntimeError(f"Unable to load branch-groups.yaml")
 
-        try:
-            yaml_str = fh.read()  # slurps the whole file
-            yaml_dict = yaml.safe_load(yaml_str)
-            fh.close()
-        except Exception as e:
-            raise KBRuntimeError(f"Unable to load branch-groups from {path}! :(\n\t{e}")
         return yaml_dict

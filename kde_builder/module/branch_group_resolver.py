@@ -9,8 +9,6 @@ from __future__ import annotations
 class ModuleBranchGroupResolver:
     """
     Provides an object that can be used to look up the appropriate git branch to use for a given KDE project and given desired branch group.
-
-    Uses supplied YAML data (from repo-metadata's /kde-dependencies directory).
     """
 
     def __init__(self, yaml_data: dict):
