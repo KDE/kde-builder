@@ -426,16 +426,19 @@ class Application:
         dependency_resolver = self.dependency_resolver
         branch_group = ctx.get_option("branch-group")
 
+        dependency_files = []
         if Debug().is_testing():
-            dependency_file = KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies"
+            dependency_files.append(KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies")
         else:
             srcdir = metadata_module.fullpath("source")
-            dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
+            dependency_files.append(f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}")
+            dependency_files.append(f"{srcdir}/kde-dependencies/third-party-dependencies")
 
         try:
-            with open(dependency_file, "r") as dependencies:
-                logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-                dependency_resolver.read_dependency_data(dependencies)
+            for dependency_file in dependency_files:
+                with open(dependency_file, "r") as dependencies:
+                    logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                    dependency_resolver.read_dependency_data(dependencies)
         except FileNotFoundError as e:
             e = str(e).replace("[", "").replace("]", "")
             logger_app.warning(" r[b[*] Unable to read kde-dependencies:")
