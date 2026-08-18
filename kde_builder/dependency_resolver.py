@@ -10,7 +10,7 @@ from functools import cmp_to_key
 import re
 from io import TextIOWrapper
 
-from kde_builder.kb_exception import ProgramError
+from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.module.module import Module
@@ -96,16 +96,15 @@ class DependencyResolver:
         """
         Read in dependency data in a pseudo-Makefile format.
 
-        See repo-metadata/dependencies/dependency-data.
+        See repo-metadata/kde-dependencies/.
 
         Args:
             fh: Filehandle to read dependencies from (should already be opened).
 
         Raises:
-            Exception: Can throw an exception on I/O errors or malformed dependencies.
+            KBRuntimeError: On malformed dependencies.
         """
         dependency_atom = re.compile(
-            r"^\s*"  # Clear leading whitespace
             r"([^\[:\s]+)"  # (1) Capture anything not a [, :, or whitespace (dependent item)
             r"\s*"  # Clear whitespace we didn't capture
             r"(?:\["  # Open a non-capture group...
@@ -118,36 +117,26 @@ class DependencyResolver:
             r"(?:\s*\["  # Open a non-capture group...
             r"([^]\s]+)"  # (4) Capture branch name without brackets
             r"])?"  # Close group, make optional
-            r"\s*$"  # Ensure no trailing cruft. Any whitespace should end line
+            r"$"  # Ensure no trailing cruft.
         )
 
         for line in fh:
-            # Strip comments, skip empty lines.
-            line = re.sub(r"#.*$", "", line)
-            if re.match(r"^\s*$", line):
+            line = line.split("#", 1)[0].strip()  # Remove comments, leading and trailing whitespace and newlines
+            if not line:
                 continue
 
-            if not re.match(dependency_atom, line):
-                raise ProgramError(f"Invalid line {line} when reading dependency data.")
+            match = dependency_atom.match(line)
+            if not match:
+                raise KBRuntimeError(f"Invalid line {line} when reading dependency data.")
 
-            match = re.search(dependency_atom, line)
-            if match:
-                dependent_item = match.group(1)
-                dependent_branch = match.group(2)
-                source_item = match.group(3)
-                source_branch = match.group(4)
-            else:
-                dependent_item = None
-                dependent_branch = None
-                source_item = None
-                source_branch = None
+            dependent_item, dependent_branch, source_item, source_branch = match.groups()
 
             dependent_branch = dependent_branch or "*"  # If no branch, apply catch-all flag
             source_branch = source_branch or "*"
 
             # _shorten_module_name may remove negation marker so check now
             dep_key = "-" if source_item.startswith("-") else "+"
-            source_item = re.sub("^-", "", source_item)  # remove negation marker if name already short
+            source_item = source_item.removeprefix("-")  # remove negation marker if name already short
 
             source_item = self._shorten_module_name(source_item)
             dependent_item = self._shorten_module_name(dependent_item)
