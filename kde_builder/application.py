@@ -287,6 +287,8 @@ class Application:
         branch_group = ctx.get_option("branch-group")
         self._warn_if_branch_group_does_not_exists(branch_group)
 
+        self.dependency_resolver = DependencyResolver(self.module_resolver)
+        self._read_kde_dependencies()
         self._resolve_module_dependency_graph(modules)
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
@@ -418,18 +420,9 @@ class Application:
             logger_app.error(msg)
             exit()
 
-    def _resolve_module_dependency_graph(self, modules: list[Module]) -> None:
-        """
-        Construct a graph of Modules according to the KDE project database dependency information.
-
-        The sysadmin/repo-metadata repository must have already been updated, and the
-        module factory must be setup. The modules for which to calculate the graph
-        must be passed in as arguments
-        """
+    def _read_kde_dependencies(self) -> None:
         ctx = self.context
         metadata_module = ctx.metadata_module
-
-        self.dependency_resolver = DependencyResolver(self.module_resolver)
         dependency_resolver = self.dependency_resolver
         branch_group = ctx.get_option("branch-group")
 
@@ -440,13 +433,25 @@ class Application:
             dependency_file = f"{srcdir}/kde-dependencies/kde-dependencies-{branch_group}"
 
         try:
-            dependencies = open(dependency_file, "r")
-            logger_app.debug(f" -- Reading dependencies from {dependency_file}")
-            dependency_resolver.read_dependency_data(dependencies)
-            dependencies.close()
+            with open(dependency_file, "r") as dependencies:
+                logger_app.debug(f" -- Reading dependencies from {dependency_file}")
+                dependency_resolver.read_dependency_data(dependencies)
+        except FileNotFoundError as e:
+            e = str(e).replace("[", "").replace("]", "")
+            logger_app.warning(" r[b[*] Unable to read kde-dependencies:")
+            logger_app.warning(f" r[b[*] {e}")
+            logger_app.warning(" r[b[*] Will attempt to continue.")
 
+            dependency_resolver.dependencies_of.clear()
+
+    def _resolve_module_dependency_graph(self, modules: list[Module]) -> None:
+        """
+        Construct a graph of Modules according to the KDE project database dependency information.
+        """
+        dependency_resolver = self.dependency_resolver
+
+        try:
             dependency_resolver.resolve_to_module_graph(modules)
-
         except Exception as e:
             e = str(e).replace("[", "").replace("]", "")
             logger_app.warning(" r[b[*] Problems encountered trying to determine correct project graph:")

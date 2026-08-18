@@ -30,12 +30,6 @@ class DependencyResolver:
 
     def __init__(self, module_resolver: ModuleResolver):
         self.dependencies_of = {}
-        """
-        Dict mapping short module names (m) to a dict key by branch name, the value of which is yet another dict (see read_dependency_data()).
-        Note that this assumes KDE git infrastructure ensures that all full module names (e.g. kde/workspace/plasma-workspace) map to a *unique*
-        short name (e.g. plasma-workspace) by stripping leading path components dict mapping a wildcarded module name with no branch to a
-        list of module:branch dependencies.
-        """
 
         self.module_resolver = module_resolver
         """
@@ -60,7 +54,7 @@ class DependencyResolver:
         name = re.sub(r"^.*/", "", name)  # Uses greedy capture by default
         return name
 
-    def _add_dependency(self, dep_name: str, dep_branch: str, src_name: str, src_branch: str, dep_key: str | None = "+") -> None:
+    def _add_dependency(self, dep_name: str, dep_branch: str, src_name: str, src_branch: str, dep_key: str = "+") -> None:
         """
         Add an edge in the dependency graph from ``dep_name`` (at the given branch) to ``src_name`` (at its respective branch).
 

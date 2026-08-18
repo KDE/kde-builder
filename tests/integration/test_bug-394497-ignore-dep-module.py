@@ -7,7 +7,6 @@ import pytest
 
 from kde_builder.application import Application
 from kde_builder.debug import Debug
-from kde_builder.dependency_resolver import DependencyResolver
 
 
 @pytest.fixture
@@ -17,8 +16,6 @@ def mock_app_res_mod_dep_graph(monkeypatch):
         Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
         """
         new_module = self.module_resolver.resolve_module_if_present("setmod2")
-
-        self.dependency_resolver = DependencyResolver(self.module_resolver)
         graph = self.dependency_resolver.dependency_graph
 
         # Construct graph manually based on real module list

@@ -7,7 +7,6 @@ import pytest
 
 from kde_builder.application import Application
 from kde_builder.debug import Debug
-from kde_builder.dependency_resolver import DependencyResolver
 
 
 @pytest.fixture
@@ -15,8 +14,6 @@ def mock_application(monkeypatch):
     # Redefine Application._resolveModuleDependencies to avoid requiring metadata module.
     def mock_resolve_module_dependency_graph(self, modules: list):
         new_module = self.module_resolver.resolve_module_if_present("setmod2")
-
-        self.dependency_resolver = DependencyResolver(self.module_resolver)
         self.dependency_resolver.dependency_graph = {
             "setmod1": {
                 "votes": {
