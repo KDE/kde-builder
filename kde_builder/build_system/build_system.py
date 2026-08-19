@@ -107,8 +107,10 @@ class BuildSystem:
             return "the build directory doesn't exist"
         if os.path.exists(f"{builddir}/.refresh-me"):
             return "the last configure failed"  # see module.py
+        if module.get_option("rebuild"):
+            return "the option rebuild was set"
         if module.get_option("refresh-build"):
-            return "the option refresh-build was set"
+            return "the option refresh-build (legacy alias for rebuild) was set"
         if not os.path.exists(f"{builddir}/{conf_file_key}"):
             return f"{builddir}/{conf_file_key} is missing"
         return ""

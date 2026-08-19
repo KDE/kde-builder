@@ -262,7 +262,7 @@ class Cmdline:
             found_options["no-metadata"] = True  # Implied --no-metadata
         if args.pretend:
             found_options["pretend"] = True
-        if args.resume or args.resume_refresh_build_first:
+        if args.resume or args.resume_rebuild_first:
             found_options["resume"] = True
             phases.filter_out_phase("update")  # Implied --no-src
             found_options["no-metadata"] = True  # Implied --no-metadata
@@ -336,11 +336,11 @@ class Cmdline:
         if args.reconfigure:
             found_options["reconfigure"] = True
 
-        if args.refresh_build:
-            found_options["refresh-build"] = True
+        if args.rebuild:
+            found_options["rebuild"] = True
 
-        if args.refresh_build_first or args.resume_refresh_build_first:
-            found_options["refresh-build-first"] = True
+        if args.rebuild_first or args.resume_rebuild_first:
+            found_options["rebuild-first"] = True
 
         if args.resume_after is not None:
             found_options["resume-after"] = args.resume_after[0]
@@ -514,10 +514,11 @@ class Cmdline:
             "query=s",
             "rc-file=s",
             "rebuild-failures",
+            "rebuild-first|refresh-build-first",
             "resume",
             "resume-after|after|a=s",
             "resume-from|from|f=s",
-            "resume-refresh-build-first|R",
+            "resume-rebuild-first|resume-refresh-build-first|R",
             "self-update",
             "set-project-option-value=s",
             "show-info",
@@ -532,7 +533,7 @@ class Cmdline:
             "ignore-projects|!=s{,}",
             "niceness|nice:10",
             "pretend|dry-run|p",
-            "refresh-build|r",
+            "rebuild|refresh-build|r",
         ]
 
         options_converted_to_canonical = [

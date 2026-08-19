@@ -267,7 +267,7 @@ class Module(PathResolvingOptions):
             logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system.name())
 
             # Add undocumented ".refresh-me" file to build directory to flag
-            # for --refresh-build for this module on next run. See also the
+            # for --rebuild for this module on next run. See also the
             # "needs_refreshed" function.
             if fh := open(".refresh-me", "w"):
                 print("# Build directory will be re-generated next kde-builder run", file=fh)

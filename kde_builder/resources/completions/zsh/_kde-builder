@@ -72,13 +72,13 @@ _arguments \
   --rc-file"[Read configuration from filename instead of default]"":::_files" \
   --rebuild-failures"[Only those projects which failed to build on a previous run.]" \
   --reconfigure"[Run cmake or configure again, without cleaning the build directory]" \
-  --refresh-build-first"[Start the build from scratch of first project]" \
-  "(--refresh-build -r)"{--refresh-build,-r}"[Start the build from scratch]" \
+  "(--rebuild-first --refresh-build-first)"{--rebuild-first,--refresh-rebuild-first}"[Start the build from scratch of first project]" \
+  "(--rebuild --refresh-build -r)"{--rebuild,--refresh-build,-r}"[Start the build from scratch]" \
   --remove-after-install"[Delete the source and/or build directory after the project is successfully installed]"":argument:" \
   --resume"[Resume after a build failure]" \
   "(--after --from --resume-after --resume-from -a -f)"{--after,--resume-after,-a}"[Skips modules until just after the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
   "(--after --from --resume-after --resume-from -a -f)"{--from,--resume-from,-f}"[Skips modules until just before the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
-  "(--resume-refresh-build-first -R)"{--resume-refresh-build-first,-R}"[Resume after a build failure and start the build from scratch of first project]" \
+  "(--resume-rebuild-first --resume-refresh-build-first -R)"{--resume-rebuild-first,--resume-refresh-build-first,-R}"[Resume after a build failure and start the build from scratch of first project]" \
   --revision"[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the projects with support for running their test suite]" \
   --self-update"[Update kde-builder itself]" \

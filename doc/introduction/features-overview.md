@@ -55,7 +55,7 @@ KDE Builder features include:
   building a base KDE single-user installation from the source code.
 
 - Forced full rebuilds, by running `kde-builder` with the
-  `--refresh-build` option.
+  `--rebuild` option.
 
 - You can specify various environment values to be used during the
   build, including `CXXFLAGS`.

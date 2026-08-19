@@ -1,5 +1,10 @@
 # Changelog
 
+2026-08-20
+: Added options `--rebuild`, `--rebuild-first` and `--resume-rebuild-first` as preferred names
+: for the existing `--refresh-build`, `--refresh-build-first` and `resume-refresh-build-first`.
+: The old option names continue to be supported.
+
 2026-02-15
 : Removed option `build-when-unchanged`.
 

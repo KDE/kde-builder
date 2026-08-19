@@ -69,7 +69,7 @@ with the [`--query`](#cmdline-query) option.
 ## Troubleshooting
 
 - Did you try building from a clean build
-  directory? If your answer is "No" then try using `--refresh-build`
+  directory? If your answer is "No" then try using `--rebuild`
   with your next kde-builder run to force a clean build directory to be used.
 
 - If you've been running a kde-builder-based install for a long time then it

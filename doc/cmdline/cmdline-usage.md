@@ -57,7 +57,7 @@ Only process the selected projects, skipping their dependencies. Useful
 when you have changed only selected projects, and you are sure you do not
 need to rebuild the others.
 
-`--refresh-build` (or `-r`)  
+`--rebuild` (or `-r`, `--refresh-build`)  
 This option forces kde-builder to build the given projects from an
 absolutely fresh start point. Any existing build directory for that
 project is removed and it is rebuilt. This option is useful if you have

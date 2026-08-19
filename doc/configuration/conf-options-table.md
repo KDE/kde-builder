@@ -788,12 +788,12 @@ Type: Boolean, Default value: False
 
 Related command-line option: [--reconfigure](#cmdline-reconfigure).
 
-(conf-refresh-build)=
-[`refresh-build`](conf-refresh-build)
+(conf-rebuild)=
+[`rebuild`](conf-rebuild) (or `refresh-build`)
 
 Type: Boolean, Default value: False
 
-Related command-line option: [--refresh-build](#cmdline-refresh-build).
+Related command-line option: [--rebuild](#cmdline-rebuild).
 
 (conf-remove-after-install)=
 [`remove-after-install`](conf-remove-after-install)
