@@ -94,7 +94,7 @@ class BuildContext(PathResolvingOptions):
             "ignore-projects": "",
             "niceness": 10,
             "pretend": "",
-            "refresh-build": "",
+            "rebuild": "",
         }
 
         # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
@@ -156,7 +156,6 @@ class BuildContext(PathResolvingOptions):
         self.global_options_without_parameter = {
             "build-system-only": "",
             "reconfigure": "",
-            "refresh-build-first": "",
             "metadata-only": "",
         }
 
@@ -206,7 +205,7 @@ class BuildContext(PathResolvingOptions):
         """Stores info from repo-metadata."""
 
         self.options = self.build_options["global"]
-        boolean_extra_specified_options = ["colorful-output", "pretend", "refresh-build"]
+        boolean_extra_specified_options = ["colorful-output", "pretend", "rebuild"]
         self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
 
     def setup_operating_environment(self) -> None:

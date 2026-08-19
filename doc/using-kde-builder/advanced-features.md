@@ -94,7 +94,7 @@ rebuild the project:
 - If the buildsystem does not exist (even if kde-builder did not delete
   it) then kde-builder will automatically re-create it. This is useful
   to allow for performing a full
-  [--refresh-build](#cmdline-refresh-build) for a specific project
+  [--rebuild](#cmdline-rebuild) for a specific project
   without having that performed on other projects.
 
 (manual-rebuilds)=
@@ -104,7 +104,7 @@ If you make a change to a project's option settings, or the project's
 source code changes in a way kde-builder does not recognize, you may
 need to manually rebuild the project.
 
-You can do this by simply running `kde-builder --refresh-build project`.
+You can do this by simply running `kde-builder --rebuild project`.
 
 If you would like to have kde-builder automatically rebuild the project
 during the next normal build update instead, you can create a special

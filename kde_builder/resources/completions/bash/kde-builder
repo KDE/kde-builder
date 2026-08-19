@@ -160,9 +160,10 @@ _kde_builder_filter_options() {
         ["--no-use-idle-io-priority"]="--use-idle-io-priority"
         ["--stop-on-failure"]="--no-stop-on-failure"
         ["--no-stop-on-failure"]="--stop-on-failure"
+        ["--rebuild"]="--reconfigure"
         ["--refresh-build"]="--reconfigure"
         ["-r"]="--reconfigure"
-        ["--reconfigure"]="--refresh-build -r"
+        ["--reconfigure"]="--rebuild --refresh-build -r"
         ["--check-self-updates"]="--no-check-self-updates"
         ["--no-check-self-updates"]="--check-self-updates"
         ["--compile-commands-export"]="--no-compile-commands-export"
@@ -256,8 +257,8 @@ _kde_builder() {
     --ninja-options --no-metadata -M --no-src -S -s --num-cores-low-mem --num-cores
     --override-build-system --persistent-data-file --dry-run --pretend -p --purge-old-logs
     --no-purge-old-logs --qmake-options --qt-install-dir --query --rc-file --rebuild-failures
-    --reconfigure --refresh-build-first --refresh-build -r --remove-after-install --resume
-    --after --resume-after -a --from --resume-from -f --resume-refresh-build-first -R
+    --reconfigure --rebuild-first --refresh-build-first --rebuild --refresh-build -r --remove-after-install --resume
+    --after --resume-after -a --from --resume-from -f --resume-rebuild-first --resume-refresh-build-first -R
     --revision --run-tests --no-run-tests --self-update --set-project-option-value --show-info
     --show-options-specifiers --source-dir --source-when-start-program --src-only
     --stop-after --to --stop-before --until --stop-on-failure --no-stop-on-failure --tag
