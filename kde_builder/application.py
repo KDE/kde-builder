@@ -337,7 +337,7 @@ class Application:
             Debug().set_pretending(was_pretending)
 
             module_source = metadata_module.fullpath("source")
-            update_desired = not ctx.get_option("no-metadata") and ctx.phases.has("update")
+            update_desired = not ctx.get_option("no-metadata")
             update_needed = (not os.path.exists(module_source)) or (not os.listdir(module_source))
 
             if not update_desired and not update_needed:
