@@ -100,17 +100,18 @@ class Application:
         # We download repo-metadata before reading config, because config already includes the build-configs from it.
         self._download_kde_project_metadata()  # Skipped automatically in testing mode
 
-        # After we are sure the repo-metadata is cloned, initialize metadata.
-        ctx.set_metadata()
-
         # The user might only want metadata to update to allow for a later --pretend run, check for that here.
         # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
         if "metadata-only" in opts["global"]:
             # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
             sys.exit(0)
 
-        # We do check the repo-metadata-format before reading config, because build-configs may become incompatible (indicated by increased number of "kde-builder-format").
+        # We do check the repo-metadata-format before reading the rest of the metadata, because it may become incompatible.
+        # This is also before reading config, because build-configs may become incompatible.
         self._check_metadata_format_version()  # Skipped automatically in testing mode
+
+        # After we are sure the repo-metadata is cloned, and kde-builder-format is matched, initialize metadata.
+        ctx.set_metadata()
 
         ctx.absolutize_config_file_path_and_ensure_it_exists()
 
