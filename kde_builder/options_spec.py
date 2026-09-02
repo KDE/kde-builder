@@ -3,9 +3,24 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+from argparse import ArgumentParser
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+
+
+def add_bootstrap_arguments(parser: ArgumentParser) -> None:
+    """
+    We need to reuse that in the bootstrap parser, and in the cmd_line parser.
+
+    This way we will be able to see bootstrap options in cmd_line parser.
+    """
+    parser.add_argument("--initial-setup", action="store_true", help="")
+    parser.add_argument("--install-distro-packages", action="store_true", help="")
+    parser.add_argument("--generate-config", action="store_true", help="")
+    parser.add_argument("--prompt-answer", nargs=1, help="")
+    parser.add_argument("--debug", action="store_true", help="")
+    parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append", help="")
 
 
 @dataclass

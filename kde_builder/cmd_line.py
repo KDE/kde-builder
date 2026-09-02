@@ -9,6 +9,7 @@ from typing import NoReturn
 
 from kde_builder.debug import KBLogger
 from kde_builder.options_spec import OptionsSpec
+from kde_builder.options_spec import add_bootstrap_arguments
 from kde_builder.os_support import OSSupport
 from kde_builder.phase_list import PhaseList
 from kde_builder.util.textwrap_mod import dedent
@@ -96,6 +97,8 @@ class Cmdline:
         found_options = {}
 
         parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+
+        add_bootstrap_arguments(parser)  # To be able to see initial options in main parser too (for help text).
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
