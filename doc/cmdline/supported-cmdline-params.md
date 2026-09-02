@@ -770,9 +770,3 @@ Only display simple help on this script.
 Displays information about kde-builder and the operating system, that
 may prove useful in bug reports or when asking for help in forums or
 mailing lists.
-
-(cmdline-show-options-specifiers)=
-[`--show-options-specifiers`](cmdline-show-options-specifiers)  
-Print the specifier lines (in the format that GetOpts::Long accepts) for
-all command line options supported by the script. This may be used by
-developers, for example, for generating zsh autocompletion functions.

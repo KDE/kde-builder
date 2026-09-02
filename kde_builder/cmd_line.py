@@ -98,8 +98,6 @@ class Cmdline:
 
         parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
 
-        supported_options = Cmdline._supported_options()
-
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
         run_index = -1
@@ -128,47 +126,6 @@ class Cmdline:
         parser.add_argument("--set-project-option-value", type=validate_set_project_option_value, action="append")
 
         parser.add_argument("--target", action="append")
-
-        # Handle `parser.add_argument(...)`.
-        # This is done by parsing supported_options and extracting option variants (long, alias, short ...), parameter numbers and default values.
-        for key in supported_options:
-            # global flags and global options are not duplicating options defined in options in _supported_options(). That function ensures that.
-
-            line = key
-            kwargs = {}
-
-            if line.endswith("=s"):
-                kwargs["nargs"] = 1
-                line = line.removesuffix("=s")
-            elif line.endswith("!"):  # negatable boolean
-                kwargs["action"] = argparse.BooleanOptionalAction
-                line = line.removesuffix("!")
-            elif line.endswith("=s{,}"):  # one or more option values
-                kwargs["nargs"] = "+"
-                line = line.removesuffix("=s{,}")
-            elif line.endswith(":s"):  # optional string argument
-                kwargs["nargs"] = "?"
-                line = line.removesuffix(":s")
-            elif line.endswith("=i"):
-                kwargs["nargs"] = 1
-                line = line.removesuffix("=i")
-            elif line.endswith(":10"):  # for --nice
-                kwargs["nargs"] = "?"
-                kwargs["type"] = int
-                kwargs["default"] = 10
-                line = line.removesuffix(":10")
-            else:  # for example, for "-p" to not eat selector.
-                kwargs["action"] = "store_true"
-
-            parts = line.split("|")
-            dashed_parts = []
-            for part in parts:
-                if len(part) == 1:
-                    dashed_parts.append("-" + part)
-                else:
-                    dashed_parts.append("--" + part)
-
-            parser.add_argument(*dashed_parts, **kwargs)
 
         parser.add_argument("--ignore-projects", "-!", nargs="+")
         parser.add_argument("-d", action="store_true")
@@ -206,8 +163,6 @@ class Cmdline:
             self._show_info_and_exit()
         if args.version:
             self._show_version_and_exit()
-        if args.show_options_specifiers:
-            self._show_options_specifiers_and_exit()
         if args.help:
             self._show_help_and_exit()
         if args.self_update:
@@ -358,42 +313,3 @@ class Cmdline:
             OS: {os_vendor}
             """))
         exit()
-
-    @staticmethod
-    def _show_options_specifiers_and_exit() -> NoReturn:
-        supported_options = Cmdline._supported_options()
-
-        # The initial setup options are handled outside the Cmdline (in the starting script).
-        initial_options = ["initial-setup", "install-distro-packages", "generate-config"]
-
-        for option in [*supported_options, *initial_options, "debug"]:
-            print(option)
-
-        exit()
-
-    @staticmethod
-    def _supported_options() -> list[str]:
-        """
-        Return option names ready to be fed into GetOptionsFromArray.
-        """
-        # See https://perldoc.perl.org/5.005/Getopt::Long for options specification format
-
-        # For now, place the options we specified above
-        options = []
-
-        # Remove stuff like ! and =s from list above;
-        opt_names = [re.search(r"([a-zA-Z-]+)", option).group(1) for option in options]
-
-        # Make sure this doesn't overlap with BuildContext default flags and options
-        opts_seen = {optName: 1 for optName in opt_names}
-
-        violators = [key for key, value in opts_seen.items() if value > 1]
-        if violators:
-            errmsg = "The following options overlap in Cmdline: [" + ", ".join(violators) + "]!"
-            raise Exception(errmsg)
-
-        # Now, place the rest of the options, that have specifier dependent on group
-        options.extend([
-        ])
-
-        return options

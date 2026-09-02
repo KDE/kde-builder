@@ -157,7 +157,6 @@ class OptionsSpec:
         Option(name="resume-refresh-build-first", aliases=["R"], default=""),
         Option(name="self-update", default=""),
         Option(name="show-info", default=""),
-        Option(name="show-options-specifiers", default=""),
         Option(name="version", aliases=["v"], default=""),
     ]
 

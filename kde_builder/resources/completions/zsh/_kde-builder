@@ -83,7 +83,6 @@ _arguments \
   --self-update"[Update kde-builder itself]" \
   --set-project-option-value"[Override an option in your configuration file for a specific project]"":argument:" \
   --show-info"[Show tool information]" \
-  --show-options-specifiers"[Show options information]" \
   --source-dir"[Directory that stores the KDE sources]"":argument:" \
   --source-when-start-program"[Source a file before starting the project]"":argument:" \
   "(--src-only -S -s --no-src)"{--src-only,-s}"[Only perform update source code]" \
