@@ -259,7 +259,7 @@ _kde_builder() {
     --reconfigure --refresh-build-first --refresh-build -r --remove-after-install --resume
     --after --resume-after -a --from --resume-from -f --resume-refresh-build-first -R
     --revision --run-tests --no-run-tests --self-update --set-project-option-value --show-info
-    --show-options-specifiers --source-dir --source-when-start-program --src-only
+    --source-dir --source-when-start-program --src-only
     --stop-after --to --stop-before --until --stop-on-failure --no-stop-on-failure --tag --target
     --taskset-cpu-list --uninstall --use-clean-install --no-use-clean-install
     --use-idle-io-priority --no-use-idle-io-priority

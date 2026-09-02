@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import SetOptionError
+from kde_builder.options_spec import OptionsSpec
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
@@ -233,9 +234,7 @@ class OptionsBase:
         self.set_option("#entry_num", OptionsBase.moduleID)
         OptionsBase.moduleID += 1
 
-        from kde_builder.cmd_line import Cmdline
-        phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
-        all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
+        all_possible_options = OptionsSpec.all_possible_options_names()
 
         for option, value in node_opts.items():
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables

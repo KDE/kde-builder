@@ -25,6 +25,7 @@ from kde_builder.metadata.metadata import Metadata
 from kde_builder.module.branch_group_resolver import ModuleBranchGroupResolver
 from kde_builder.module.module import Module
 from kde_builder.options_base import PathResolvingOptions
+from kde_builder.options_spec import OptionsSpec
 from kde_builder.phase_list import PhaseList
 from kde_builder.status_view import StatusView
 from kde_builder.util.textwrap_mod import dedent
@@ -66,115 +67,9 @@ class BuildContext(PathResolvingOptions):
     def __init__(self):
         super().__init__(ctx=None, name="global")
 
-        # There doesn't seem to be a great way to get this from CMake easily, but we can
-        # reason that if there is a /usr/lib64 (and it's not just a compat symlink),
-        # there will likely end up being a ${install-dir}/lib64 once kde-builder gets
-        # done installing it
-        self.libname = "lib"
-        if os.path.isdir("/usr/lib64") and not os.path.islink("/usr/lib64"):
-            self.libname = "lib64"
-        if os.path.isdir("/usr/lib/x86_64-linux-gnu"):
-            self.libname = "lib/x86_64-linux-gnu"
-
-        # These options are used for internal state, they are _not_ exposed as cmdline options
-        self.global_options_private = {
-            "build-configs-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs",
-            "filter-out-phases": "",
-            "git-push-protocol": "git",
-            "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
-            "repository": "kde-projects",
-            "set-env": {},  # dict of environment vars to set
-            "use-projects": ""
-        }
-
-        # These options are exposed as cmdline options, but _not from here_.
-        # Their more complex specifier is made in `Cmdline` _supported_options().
-        # If adding new option here, and it is boolean, do not forget to add it in the boolean_extra_specified_options.
-        self.global_options_with_extra_specifier = {
-            "colorful-output": True,
-            "ignore-projects": "",
-            "niceness": 10,
-            "pretend": "",
-            "refresh-build": "",
-            "targets": {},
-        }
-
-        # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
-        self.global_options_with_negatable_form = {
-            "async": True,
-            "check-self-updates": True,
-            "compile-commands-export": True,
-            "compile-commands-linking": True,
-            "generate-clion-project-config": False,
-            "generate-vscode-project-config": False,
-            "generate-qtcreator-project-config": False,
-            "hold-performance-profile": True,
-            "hold-work-branches": True,
-            "include-dependencies": True,
-            "install-login-session": True,
-            "purge-old-logs": True,
-            "run-tests": False,
-            "stop-on-failure": True,
-            "use-clean-install": False,
-            "use-idle-io-priority": False,
-        }
-
-        # These options are exposed as cmdline options that require some parameter
-        self.global_options_with_parameter = {
-            "binpath": "",
-            "branch": "",
-            "branch-group": "latest-kf6",
-            "build-dir": os.getenv("HOME") + "/kde/build",
-            "cmake-generator": "",
-            "cmake-options": "",
-            "configure-flags": "",
-            "cxxflags": "-pipe",
-            "directory-layout": "flat",
-            "dest-dir": "${MODULE}",
-            "git-user": "",
-            "install-dir": os.getenv("HOME") + "/kde/usr",
-            "libname": self.libname,
-            "libpath": "",
-            "log-dir": os.getenv("HOME") + "/kde/log",
-            "make-install-prefix": "",  # Some people need sudo
-            "make-options": "",
-            "meson-options": "",
-            "ninja-options": "",
-            "num-cores": "",  # Used for build constraints
-            "num-cores-low-mem": "2",  # Needs to be a string, not int
-            "override-build-system": "",
-            "persistent-data-file": "",
-            "qmake-options": "",
-            "qt-install-dir": "",
-            "remove-after-install": "none",  # { none, builddir, all }
-            "revision": "",
-            "source-dir": os.getenv("HOME") + "/kde/src",
-            "source-when-start-program": "/dev/null",
-            "tag": "",
-            "taskset-cpu-list": "",
-        }
-
-        # These options are exposed as cmdline options without parameters
-        self.global_options_without_parameter = {
-            "build-system-only": "",
-            "reconfigure": "",
-            "refresh-build-first": "",
-            "metadata-only": "",
-        }
-
         self.modules: list[Module] = []
         """List of modules to build."""
 
-        self.build_options = {
-            "global": {
-                **self.global_options_private,
-                **self.global_options_with_extra_specifier,
-                **self.global_options_without_parameter,
-                **self.global_options_with_negatable_form,
-                **self.global_options_with_parameter,
-            },
-            # Module options are stored under here as well, keyed by module.name
-        }
         self.phases = PhaseList()
         """Replaces Module.phases"""
 
@@ -207,9 +102,7 @@ class BuildContext(PathResolvingOptions):
         self.metadata: Metadata | None = None
         """Stores info from repo-metadata."""
 
-        self.options = self.build_options["global"]
-        boolean_extra_specified_options = ["colorful-output", "pretend", "refresh-build"]
-        self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
+        self.options = OptionsSpec.all_global_options_defaults()
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
@@ -761,5 +654,5 @@ class BuildContext(PathResolvingOptions):
 
     @override
     def verify_option_value_type(self, option_name, option_value) -> None:
-        if option_name in self.all_boolean_options and not isinstance(option_value, bool):
+        if option_name in OptionsSpec.all_boolean_options_names() and not isinstance(option_value, bool):
             raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid boolean value \"{option_value}\".")

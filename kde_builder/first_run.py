@@ -12,10 +12,10 @@ import time
 from typing import NoReturn
 
 from kde_builder import KB_PACKAGE_DIR
-from kde_builder.build_context import BuildContext
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBException
 from kde_builder.kb_exception import SetupError
+from kde_builder.options_spec import OptionsSpec
 from kde_builder.os_support import OSSupport
 
 logger_fr = KBLogger.getLogger("first-run")
@@ -228,7 +228,7 @@ class FirstRun:
         sample_rc = sample_rc.replace("%{num_cores}", "\"" + "auto" + "\"")
         sample_rc = sample_rc.replace("%{num_cores_low}", "\"" + "auto" + "\"")
 
-        gl = BuildContext().build_options["global"]  # real global defaults
+        gl = OptionsSpec.all_global_options_defaults()
 
         def fill_placeholder(option_name, mode="") -> None:
             value = gl[option_name]
