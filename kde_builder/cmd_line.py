@@ -176,6 +176,9 @@ class Cmdline:
         for opt in OptionsSpec.global_options_without_parameter:
             parser.add_argument(*opt.dashed(), action="store_true")
 
+        for opt in OptionsSpec.global_options_with_parameter:
+            parser.add_argument(*opt.dashed(), nargs=1)
+
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
 
@@ -213,7 +216,6 @@ class Cmdline:
             opts["run_mode"] = "install"
             phases.reset_to(["install"])
         if args.install_dir:
-            found_options["install-dir"] = args.install_dir[0]
             found_options["reconfigure"] = True
         if args.query:
             arg = args.query[0]
@@ -261,11 +263,11 @@ class Cmdline:
                 found_options[key] = val
 
         # handling options with one argument
-        for key in BuildContext().global_options_with_parameter.keys():
-            opt_name = key.replace("-", "_")
-            val = getattr(args, opt_name)
-            if val:
-                found_options[key] = val[0]
+        for optspec in OptionsSpec.global_options_with_parameter:
+            ns_name = optspec.name.replace("-", "_")
+            val = getattr(args, ns_name)
+            if val is not None:
+                found_options[optspec.name] = val[0]
 
         # handling options without arguments
         for optspec in OptionsSpec.global_options_without_parameter:
@@ -293,9 +295,6 @@ class Cmdline:
 
         if args.dependency_tree_fullpath:
             found_options["dependency-tree-fullpath"] = True
-
-        if args.directory_layout is not None:
-            found_options["directory-layout"] = args.directory_layout[0]
 
         if args.include_dependencies is not None:
             found_options["include-dependencies"] = args.include_dependencies
@@ -327,93 +326,15 @@ class Cmdline:
         if args.resume_from is not None:
             found_options["resume-from"] = args.resume_from[0]
 
-        if args.revision is not None:
-            found_options["revision"] = args.revision[0]
-
         if args.stop_after is not None:
             found_options["stop-after"] = args.stop_after[0]
 
         if args.stop_before is not None:
             found_options["stop-before"] = args.stop_before[0]
 
-        if args.binpath is not None:
-            found_options["binpath"] = args.binpath[0]
-
-        if args.branch is not None:
-            found_options["branch"] = args.branch[0]
-
-        if args.branch_group is not None:
-            found_options["branch-group"] = args.branch_group[0]
-
-        if args.build_dir is not None:
-            found_options["build-dir"] = args.build_dir[0]
-
-        if args.cmake_generator is not None:
-            found_options["cmake-generator"] = args.cmake_generator[0]
-
-        if args.cmake_options is not None:
-            found_options["cmake-options"] = args.cmake_options[0]
-
-        if args.configure_flags is not None:
-            found_options["configure-flags"] = args.configure_flags[0]
-
-        if args.cxxflags is not None:
-            found_options["cxxflags"] = args.cxxflags[0]
-
-        if args.dest_dir is not None:
-            found_options["dest-dir"] = args.dest_dir[0]
-
         if args.install_login_session_only:
             opts["run_mode"] = "install-login-session-only"
             phases.clear()
-
-        if args.libname is not None:
-            found_options["libname"] = args.libname[0]
-
-        if args.libpath is not None:
-            found_options["libpath"] = args.libpath[0]
-
-        if args.log_dir is not None:
-            found_options["log-dir"] = args.log_dir[0]
-
-        if args.make_install_prefix is not None:
-            found_options["make-install-prefix"] = args.make_install_prefix[0]
-
-        if args.make_options is not None:
-            found_options["make-options"] = args.make_options[0]
-
-        if args.meson_options is not None:
-            found_options["meson-options"] = args.meson_options[0]
-
-        if args.ninja_options is not None:
-            found_options["ninja-options"] = args.ninja_options[0]
-
-        if args.num_cores is not None:
-            found_options["num-cores"] = args.num_cores[0]
-
-        if args.num_cores_low_mem is not None:
-            found_options["num-cores-low-mem"] = args.num_cores_low_mem[0]
-
-        if args.override_build_system is not None:
-            found_options["override-build-system"] = args.override_build_system[0]
-
-        if args.persistent_data_file is not None:
-            found_options["persistent-data-file"] = args.persistent_data_file[0]
-
-        if args.qmake_options is not None:
-            found_options["qmake-options"] = args.qmake_options[0]
-
-        if args.qt_install_dir is not None:
-            found_options["qt-install-dir"] = args.qt_install_dir[0]
-
-        if args.remove_after_install is not None:
-            found_options["remove-after-install"] = args.remove_after_install[0]
-
-        if args.source_dir is not None:
-            found_options["source-dir"] = args.source_dir[0]
-
-        if args.tag is not None:
-            found_options["tag"] = args.tag[0]
 
         # </editor-fold desc="all other args handlers">
 
@@ -529,9 +450,6 @@ class Cmdline:
         for key in BuildContext().global_options_with_negatable_form:
             opts_seen[key] = opts_seen.get(key, 0) + 1
 
-        for key in BuildContext().global_options_with_parameter:
-            opts_seen[key] = opts_seen.get(key, 0) + 1
-
         violators = [key for key, value in opts_seen.items() if value > 1]
         if violators:
             errmsg = "The following options overlap in Cmdline: [" + ", ".join(violators) + "]!"
@@ -540,7 +458,6 @@ class Cmdline:
         # Now, place the rest of the options, that have specifier dependent on group
         options.extend([
             *[f"{key}!" for key in BuildContext().global_options_with_negatable_form],
-            *[f"{key}=s" for key in BuildContext().global_options_with_parameter],
         ])
 
         return options

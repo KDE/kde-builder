@@ -67,16 +67,6 @@ class BuildContext(PathResolvingOptions):
     def __init__(self):
         super().__init__(ctx=None, name="global")
 
-        # There doesn't seem to be a great way to get this from CMake easily, but we can
-        # reason that if there is a /usr/lib64 (and it's not just a compat symlink),
-        # there will likely end up being a ${install-dir}/lib64 once kde-builder gets
-        # done installing it
-        self.libname = "lib"
-        if os.path.isdir("/usr/lib64") and not os.path.islink("/usr/lib64"):
-            self.libname = "lib64"
-        if os.path.isdir("/usr/lib/x86_64-linux-gnu"):
-            self.libname = "lib/x86_64-linux-gnu"
-
         # These options are used for internal state, they are _not_ exposed as cmdline options
         self.global_options_private = {
             "build-configs-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs",
@@ -120,41 +110,6 @@ class BuildContext(PathResolvingOptions):
             "use-idle-io-priority": False,
         }
 
-        # These options are exposed as cmdline options that require some parameter
-        self.global_options_with_parameter = {
-            "binpath": "",
-            "branch": "",
-            "branch-group": "latest-kf6",
-            "build-dir": os.getenv("HOME") + "/kde/build",
-            "cmake-generator": "",
-            "cmake-options": "",
-            "configure-flags": "",
-            "cxxflags": "-pipe",
-            "directory-layout": "flat",
-            "dest-dir": "${MODULE}",
-            "git-user": "",
-            "install-dir": os.getenv("HOME") + "/kde/usr",
-            "libname": self.libname,
-            "libpath": "",
-            "log-dir": os.getenv("HOME") + "/kde/log",
-            "make-install-prefix": "",  # Some people need sudo
-            "make-options": "",
-            "meson-options": "",
-            "ninja-options": "",
-            "num-cores": "",  # Used for build constraints
-            "num-cores-low-mem": "2",  # Needs to be a string, not int
-            "override-build-system": "",
-            "persistent-data-file": "",
-            "qmake-options": "",
-            "qt-install-dir": "",
-            "remove-after-install": "none",  # { none, builddir, all }
-            "revision": "",
-            "source-dir": os.getenv("HOME") + "/kde/src",
-            "source-when-start-program": "/dev/null",
-            "tag": "",
-            "taskset-cpu-list": "",
-        }
-
         self.modules: list[Module] = []
         """List of modules to build."""
 
@@ -163,7 +118,6 @@ class BuildContext(PathResolvingOptions):
                 **self.global_options_private,
                 **self.global_options_with_extra_specifier,
                 **self.global_options_with_negatable_form,
-                **self.global_options_with_parameter,
             },
         }
         all_options_defaults = OptionsSpec.all_global_options_defaults()

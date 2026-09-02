@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import os
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -35,6 +36,16 @@ class OptionsSpec:
     Determines option names, their description and default values.
     """
 
+    # There doesn't seem to be a great way to get this from CMake easily, but we can
+    # reason that if there is a /usr/lib64 (and it's not just a compat symlink),
+    # there will likely end up being a ${install-dir}/lib64 once kde-builder gets
+    # done installing it
+    libname = "lib"
+    if os.path.isdir("/usr/lib64") and not os.path.islink("/usr/lib64"):
+        libname = "lib64"
+    if os.path.isdir("/usr/lib/x86_64-linux-gnu"):
+        libname = "lib/x86_64-linux-gnu"
+
     # These options are exposed as cmdline options without parameters
     global_options_without_parameter = [
         Option(name="build-system-only", default=""),
@@ -43,10 +54,47 @@ class OptionsSpec:
         Option(name="metadata-only", default=""),
     ]
 
+    # These options are exposed as cmdline options that require some parameter
+    global_options_with_parameter = [
+        Option(name="binpath", default=""),
+        Option(name="branch", default=""),
+        Option(name="branch-group", default="latest-kf6"),
+        Option(name="build-dir", default=os.getenv("HOME") + "/kde/build"),
+        Option(name="cmake-generator", default=""),
+        Option(name="cmake-options", default=""),
+        Option(name="configure-flags", default=""),
+        Option(name="cxxflags", default="-pipe"),
+        Option(name="directory-layout", default="flat"),
+        Option(name="dest-dir", default="${MODULE}"),
+        Option(name="git-user", default=""),
+        Option(name="install-dir", default=os.getenv("HOME") + "/kde/usr"),
+        Option(name="libname", default=libname),
+        Option(name="libpath", default=""),
+        Option(name="log-dir", default=os.getenv("HOME") + "/kde/log"),
+        Option(name="make-install-prefix", default=""),  # Some people need sudo
+        Option(name="make-options", default=""),
+        Option(name="meson-options", default=""),
+        Option(name="ninja-options", default=""),
+        Option(name="num-cores", default=""),  # Used for build constraints
+        Option(name="num-cores-low-mem", default="2"),  # Needs to be a string, not int
+        Option(name="override-build-system", default=""),
+        Option(name="persistent-data-file", default=""),
+        Option(name="qmake-options", default=""),
+        Option(name="qt-install-dir", default=""),
+        Option(name="remove-after-install", default="none"),  # { none, builddir, all }
+        Option(name="revision", default=""),
+        Option(name="source-dir", default=os.getenv("HOME") + "/kde/src"),
+        Option(name="source-when-start-program", default="/dev/null"),
+        Option(name="tag", default=""),
+        Option(name="taskset-cpu-list", default=""),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}
         for option in cls.global_options_without_parameter:
+            ret[option.name] = option
+        for option in cls.global_options_with_parameter:
             ret[option.name] = option
         return ret
 
@@ -54,5 +102,7 @@ class OptionsSpec:
     def all_global_options_defaults(cls) -> dict[str, Any]:
         ret = {}
         for option in cls.global_options_without_parameter:
+            ret[option.name] = option.default
+        for option in cls.global_options_with_parameter:
             ret[option.name] = option.default
         return ret
