@@ -89,12 +89,34 @@ class OptionsSpec:
         Option(name="taskset-cpu-list", default=""),
     ]
 
+    # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
+    global_options_with_negatable_form = [
+        Option(name="async", default=True),
+        Option(name="check-self-updates", default=True),
+        Option(name="compile-commands-export", default=True),
+        Option(name="compile-commands-linking", default=True),
+        Option(name="generate-clion-project-config", default=False),
+        Option(name="generate-vscode-project-config", default=False),
+        Option(name="generate-qtcreator-project-config", default=False),
+        Option(name="hold-performance-profile", default=True),
+        Option(name="hold-work-branches", default=True),
+        Option(name="include-dependencies", default=True),
+        Option(name="install-login-session", default=True),
+        Option(name="purge-old-logs", default=True),
+        Option(name="run-tests", default=False),
+        Option(name="stop-on-failure", default=True),
+        Option(name="use-clean-install", default=False),
+        Option(name="use-idle-io-priority", default=False),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}
         for option in cls.global_options_without_parameter:
             ret[option.name] = option
         for option in cls.global_options_with_parameter:
+            ret[option.name] = option
+        for option in cls.global_options_with_negatable_form:
             ret[option.name] = option
         return ret
 
@@ -104,5 +126,7 @@ class OptionsSpec:
         for option in cls.global_options_without_parameter:
             ret[option.name] = option.default
         for option in cls.global_options_with_parameter:
+            ret[option.name] = option.default
+        for option in cls.global_options_with_negatable_form:
             ret[option.name] = option.default
         return ret

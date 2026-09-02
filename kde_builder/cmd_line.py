@@ -179,6 +179,9 @@ class Cmdline:
         for opt in OptionsSpec.global_options_with_parameter:
             parser.add_argument(*opt.dashed(), nargs=1)
 
+        for opt in OptionsSpec.global_options_with_negatable_form:
+            parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction)
+
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
 
@@ -256,11 +259,11 @@ class Cmdline:
         # </editor-fold desc="arg functions">
 
         # handling flag options
-        for key in BuildContext().global_options_with_negatable_form.keys():
-            opt_name = key.replace("-", "_")
-            val = getattr(args, opt_name)
+        for optspec in OptionsSpec.global_options_with_negatable_form:
+            ns_name = optspec.name.replace("-", "_")
+            val = getattr(args, ns_name)
             if val is not None:
-                found_options[key] = val
+                found_options[optspec.name] = val
 
         # handling options with one argument
         for optspec in OptionsSpec.global_options_with_parameter:
@@ -295,9 +298,6 @@ class Cmdline:
 
         if args.dependency_tree_fullpath:
             found_options["dependency-tree-fullpath"] = True
-
-        if args.include_dependencies is not None:
-            found_options["include-dependencies"] = args.include_dependencies
 
         if args.list_installed:
             found_options["list-installed"] = True
@@ -447,9 +447,6 @@ class Cmdline:
         # Make sure this doesn't overlap with BuildContext default flags and options
         opts_seen = {optName: 1 for optName in opt_names}
 
-        for key in BuildContext().global_options_with_negatable_form:
-            opts_seen[key] = opts_seen.get(key, 0) + 1
-
         violators = [key for key, value in opts_seen.items() if value > 1]
         if violators:
             errmsg = "The following options overlap in Cmdline: [" + ", ".join(violators) + "]!"
@@ -457,7 +454,6 @@ class Cmdline:
 
         # Now, place the rest of the options, that have specifier dependent on group
         options.extend([
-            *[f"{key}!" for key in BuildContext().global_options_with_negatable_form],
         ])
 
         return options

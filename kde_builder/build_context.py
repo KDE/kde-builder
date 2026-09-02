@@ -90,26 +90,6 @@ class BuildContext(PathResolvingOptions):
             "targets": {},
         }
 
-        # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
-        self.global_options_with_negatable_form = {
-            "async": True,
-            "check-self-updates": True,
-            "compile-commands-export": True,
-            "compile-commands-linking": True,
-            "generate-clion-project-config": False,
-            "generate-vscode-project-config": False,
-            "generate-qtcreator-project-config": False,
-            "hold-performance-profile": True,
-            "hold-work-branches": True,
-            "include-dependencies": True,
-            "install-login-session": True,
-            "purge-old-logs": True,
-            "run-tests": False,
-            "stop-on-failure": True,
-            "use-clean-install": False,
-            "use-idle-io-priority": False,
-        }
-
         self.modules: list[Module] = []
         """List of modules to build."""
 
@@ -117,7 +97,6 @@ class BuildContext(PathResolvingOptions):
             "global": {
                 **self.global_options_private,
                 **self.global_options_with_extra_specifier,
-                **self.global_options_with_negatable_form,
             },
         }
         all_options_defaults = OptionsSpec.all_global_options_defaults()
@@ -157,7 +136,7 @@ class BuildContext(PathResolvingOptions):
 
         self.options = self.build_options["global"]
         boolean_extra_specified_options = ["colorful-output", "pretend", "refresh-build"]
-        self.all_boolean_options = [*self.global_options_with_negatable_form.keys(), *boolean_extra_specified_options]
+        self.all_boolean_options = [el.name for el in OptionsSpec.global_options_with_negatable_form] + boolean_extra_specified_options
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
