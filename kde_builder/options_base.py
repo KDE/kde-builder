@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import SetOptionError
+from kde_builder.options_spec import OptionsSpec
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext

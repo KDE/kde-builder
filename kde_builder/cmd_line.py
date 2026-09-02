@@ -9,6 +9,7 @@ from typing import NoReturn
 
 from kde_builder.build_context import BuildContext
 from kde_builder.debug import KBLogger
+from kde_builder.options_spec import OptionsSpec
 from kde_builder.os_support import OSSupport
 from kde_builder.phase_list import PhaseList
 from kde_builder.util.textwrap_mod import dedent
