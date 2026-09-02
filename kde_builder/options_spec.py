@@ -3,9 +3,24 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
+from argparse import ArgumentParser
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
+
+
+def add_bootstrap_arguments(parser: ArgumentParser) -> None:
+    """
+    We need to reuse that in the bootstrap parser, and in the cmd_line parser.
+
+    This way we will be able to see bootstrap options in cmd_line parser.
+    """
+    parser.add_argument("--initial-setup", action="store_true", help="Installs Plasma env vars (~/.bashrc), required system pkgs, and a base config file")
+    parser.add_argument("--install-distro-packages", action="store_true", help="Installs required system pkgs")
+    parser.add_argument("--generate-config", action="store_true", help="Installs a base config file")
+    parser.add_argument("--prompt-answer", nargs=1, help="Automatically answer when installing distro packages")
+    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append", help="Set specific logger to specific level")
 
 
 @dataclass
@@ -17,6 +32,7 @@ class Option:
     name: str
     default: Any
     aliases: list[str] = field(default_factory=list)
+    help: str = ""
 
     def dashed(self) -> list[str]:
         parts = [self.name, *self.aliases]
@@ -48,134 +64,133 @@ class OptionsSpec:
 
     # These options are exposed as cmdline options without parameters
     global_options_without_parameter = [
-        Option(name="build-system-only", default=""),
-        Option(name="reconfigure", default=""),
-        Option(name="refresh-build", aliases=["r"], default=""),
-        Option(name="refresh-build-first", default=""),
-        Option(name="metadata-only", default=""),
-        Option(name="pretend", aliases=["dry-run", "p"], default=""),
+        Option(name="build-system-only", default="", help="Abort building a project just before the make command"),
+        Option(name="reconfigure", default="", help="Run cmake or configure again, without cleaning the build directory"),
+        Option(name="refresh-build", aliases=["r"], default="", help="Start the build from scratch"),
+        Option(name="refresh-build-first", default="", help="Start the build from scratch of first project"),
+        Option(name="metadata-only", default="", help="Only perform the metadata download process"),
+        Option(name="pretend", aliases=["dry-run", "p"], default="", help="Dont actually take major actions, instead describe what would be done"),
     ]
 
     # These options are exposed as cmdline options that require some parameter
     global_options_with_parameter = [
-        Option(name="binpath", default=""),
-        Option(name="branch", default=""),
-        Option(name="branch-group", default="latest-kf6"),
-        Option(name="build-dir", default=os.getenv("HOME") + "/kde/build"),
-        Option(name="cmake-generator", default=""),
-        Option(name="cmake-options", default=""),
-        Option(name="configure-flags", default=""),
-        Option(name="cxxflags", default="-pipe"),
-        Option(name="directory-layout", default="flat"),
-        Option(name="dest-dir", default="${MODULE}"),
-        Option(name="git-user", default=""),
-        Option(name="install-dir", default=os.getenv("HOME") + "/kde/usr"),
-        Option(name="libname", default=libname),
-        Option(name="libpath", default=""),
-        Option(name="log-dir", default=os.getenv("HOME") + "/kde/log"),
-        Option(name="make-install-prefix", default=""),  # Some people need sudo
-        Option(name="make-options", default=""),
-        Option(name="meson-options", default=""),
-        Option(name="niceness", aliases=["nice"], default=10),
-        Option(name="ninja-options", default=""),
-        Option(name="num-cores", default=""),  # Used for build constraints
-        Option(name="num-cores-low-mem", default="2"),  # Needs to be a string, not int
-        Option(name="override-build-system", default=""),
-        Option(name="persistent-data-file", default=""),
-        Option(name="qmake-options", default=""),
-        Option(name="qt-install-dir", default=""),
-        Option(name="remove-after-install", default="none"),  # { none, builddir, all }
-        Option(name="revision", default=""),
-        Option(name="source-dir", default=os.getenv("HOME") + "/kde/src"),
-        Option(name="source-when-start-program", default="/dev/null"),
-        Option(name="tag", default=""),
-        Option(name="taskset-cpu-list", default=""),
+        Option(name="binpath", default="", help="Set the environment variable PATH while building"),
+        Option(name="branch", default="", help="Checkout the specified branch"),
+        Option(name="branch-group", default="latest-kf6", help="General group from which you want projects to be chosen"),
+        Option(name="build-dir", default=os.getenv("HOME") + "/kde/build", help="The directory that contains the built sources"),
+        Option(name="cmake-generator", default="", help="Which generator to use with CMake"),
+        Option(name="cmake-options", default="", help="Flags to pass to CMake when creating the build system for the project"),
+        Option(name="configure-flags", default="", help="Flags to pass to ./configure"),
+        Option(name="cxxflags", default="-pipe", help="Flags to use for building the project"),
+        Option(name="directory-layout", default="flat", help="Layout which kde-builder should use when creating source and build directories"),
+        Option(name="dest-dir", default="${MODULE}", help="The name a project is given on disk"),
+        Option(name="git-user", default="", help="Specify user identity for newly cloned projects"),
+        Option(name="install-dir", default=os.getenv("HOME") + "/kde/usr", help="Where to install the project after it is built"),
+        Option(name="libname", default=libname, help="Default name of the installed library directory"),
+        Option(name="libpath", default="", help="Set the environment variable LD_LIBRARY_PATH while building"),
+        Option(name="log-dir", default=os.getenv("HOME") + "/kde/log", help="Directory used to hold the log files generated by the script"),
+        Option(name="make-install-prefix", default="", help="A command and its options to precede the make install command used to install projects"),  # Some people need sudo
+        Option(name="make-options", default="", help="Pass command line options to the make command"),
+        Option(name="meson-options", default="", help="Pass command line options to the meson configure command"),
+        Option(name="niceness", aliases=["nice"], default=10, help="Priority kde-builder will set for itself"),
+        Option(name="ninja-options", default="", help="Pass command line options to the ninja build command"),
+        Option(name="num-cores", default="", help="Set the number of available CPUs"),  # Used for build constraints
+        Option(name="num-cores-low-mem", default="2", help="Set the number of CPUs that is deemed safe for heavyweight or other highly-intensive projects"),  # Needs to be a string, not int
+        Option(name="override-build-system", default="", help="Manually specify the correct build type"),
+        Option(name="persistent-data-file", default="", help="Change where kde-builder stores its persistent data"),
+        Option(name="qmake-options", default="", help="Options passed to the qmake command"),
+        Option(name="qt-install-dir", default="", help="Where to install qt projects (modules) after build"),
+        Option(name="remove-after-install", default="none", help="Delete the source and/or build directory after the project is successfully installed"),  # { none, builddir, all }
+        Option(name="revision", default="", help="Checkout a specific numbered revision"),
+        Option(name="source-dir", default=os.getenv("HOME") + "/kde/src", help="Directory that stores the KDE sources"),
+        Option(name="source-when-start-program", default="/dev/null", help="Source a file before starting the project"),
+        Option(name="tag", default="", help="Download a specific release of a project"),
+        Option(name="taskset-cpu-list", default="", help="Limit the build/install process to certain CPU cores"),
     ]
 
     # These options are exposed as cmdline options without parameters, and having the negatable form with "--no-".
     global_options_with_negatable_form = [
-        Option(name="async", default=True),
-        Option(name="check-self-updates", default=True),
-        Option(name="colorful-output", aliases=["color"], default=True),
-        Option(name="compile-commands-export", default=True),
-        Option(name="compile-commands-linking", default=True),
-        Option(name="generate-clion-project-config", default=False),
-        Option(name="generate-vscode-project-config", default=False),
-        Option(name="generate-qtcreator-project-config", default=False),
-        Option(name="hold-performance-profile", default=True),
-        Option(name="hold-work-branches", default=True),
-        Option(name="include-dependencies", default=True),
-        Option(name="install-login-session", default=True),
-        Option(name="purge-old-logs", default=True),
-        Option(name="run-tests", default=False),
-        Option(name="stop-on-failure", default=True),
-        Option(name="use-clean-install", default=False),
-        Option(name="use-idle-io-priority", default=False),
+        Option(name="async", default=True, help="Perform source update and build process in parallel"),
+        Option(name="check-self-updates", default=True, help="Show a message when kde-builder detects it is outdated"),
+        Option(name="colorful-output", aliases=["color"], default=True, help="Toggle colorful output"),
+        Option(name="compile-commands-export", default=True, help="Generation of a compile_commands.json"),
+        Option(name="compile-commands-linking", default=True, help="Creation of symbolic links from compile_commands.json to source directory"),
+        Option(name="generate-clion-project-config", default=False, help="Generate a clion project config"),
+        Option(name="generate-vscode-project-config", default=False, help="Generate a vscode project config"),
+        Option(name="generate-qtcreator-project-config", default=False, help="Generate a qtcreator project config"),
+        Option(name="hold-performance-profile", default=True, help="Use power-profiles-daemon to hold performance profile"),
+        Option(name="hold-work-branches", default=True, help="Skip updating projects which are currently at work/* or mr/* branch"),
+        Option(name="include-dependencies", default=True, help="Builds/Skip KDE-based dependencies"),
+        Option(name="install-login-session", default=True, help="Install a login session"),
+        Option(name="purge-old-logs", default=True, help="Automatically delete old log directories"),
+        Option(name="run-tests", default=False, help="Built the projects with support for running their test suite"),
+        Option(name="stop-on-failure", default=True, help="Stops/Does not stop the build as soon as a project fails to build"),
+        Option(name="use-clean-install", default=False, help="Run make uninstall directly before running make install"),
+        Option(name="use-idle-io-priority", default=False, help="Use lower priority for disk and other I/O"),
     ]
 
     # These options are exposed as cmdline options, but handled differently.
     global_options_with_extra_specifier = [
-        Option(name="ignore-projects", aliases=["!"], default=""),
-        Option(name="targets", default={}),
+        Option(name="ignore-projects", aliases=["!"], default="", help="Do not include specified projects in the update/build process"),
+        Option(name="targets", default={}, help="Specifies custom build targets"),
     ]
 
     # These options are used for internal state, they are _not_ exposed as cmdline options
     global_options_private = [
-        Option(name="build-configs-dir", default=os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs"),
-        Option(name="filter-out-phases", default=""),
-        Option(name="git-push-protocol", default="git"),
-        Option(name="git-repository-base", default={"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"}),
-        Option(name="repository", default="kde-projects"),
-        Option(name="set-env", default={}),  # dict of environment vars to set
-        Option(name="use-projects", default=""),
+        Option(name="build-configs-dir", default=os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs", help=""),
+        Option(name="filter-out-phases", default="", help=""),
+        Option(name="git-push-protocol", default="git", help=""),
+        Option(name="git-repository-base", default={"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"}, help=""),
+        Option(name="repository", default="kde-projects", help=""),
+        Option(name="set-env", default={}, help=""),  # dict of environment vars to set
+        Option(name="use-projects", default="", help=""),
     ]
 
     phase_changing_options = [
-        Option(name="build-only", default=""),
-        Option(name="install-only", default=""),
-        Option(name="no-build", default=""),
-        Option(name="no-install", default=""),
-        Option(name="no-src", aliases=["S"], default=""),
-        Option(name="src-only", aliases=["s"], default=""),
-        Option(name="uninstall", default=""),
+        Option(name="build-only", default="", help="Only perform the build process"),
+        Option(name="install-only", default="", help="Only perform the install process"),
+        Option(name="no-build", default="", help="Do not build the sources"),
+        Option(name="no-install", default="", help="Skip the install process"),
+        Option(name="no-src", aliases=["S"], default="", help="Do not perform update source code"),
+        Option(name="src-only", aliases=["s"], default="", help="Only perform update source code"),
+        Option(name="uninstall", default="", help="Uninstalls the project"),
     ]
 
     non_context_options_without_parameter = [
-        Option(name="dependency-tree", default=""),
-        Option(name="dependency-tree-fullpath", default=""),
-        Option(name="list-installed", default=""),
-        Option(name="no-metadata", aliases=["M"], default=""),
-        Option(name="rebuild-failures", default=""),
+        Option(name="dependency-tree", default="", help="Print out dependency information on the projects that would be built"),
+        Option(name="dependency-tree-fullpath", default="", help="Print out dependency information (fullpath) on the projects that would be built"),
+        Option(name="list-installed", default="", help="Print installed projects and exit"),
+        Option(name="no-metadata", aliases=["M"], default="", help="Skip the metadata download process"),
+        Option(name="rebuild-failures", default="", help="Only those projects which failed to build on a previous run"),
     ]
 
     non_context_options_without_parameter_manually_handled = [
-        Option(name="all-config-projects", default=""),
-        Option(name="all-kde-projects", default=""),
-        Option(name="help", aliases=["h"], default=""),
-        Option(name="install-login-session-only", default=""),
-        Option(name="resume", default=""),
-        Option(name="resume-refresh-build-first", aliases=["R"], default=""),
-        Option(name="self-update", default=""),
-        Option(name="show-info", default=""),
-        Option(name="version", aliases=["v"], default=""),
+        Option(name="all-config-projects", default="", help="Select all projects defined in user config"),
+        Option(name="all-kde-projects", default="", help="Select all known kde projects defined in metadata"),
+        Option(name="install-login-session-only", default="", help="Skip updating and building everything and only install a login session"),
+        Option(name="resume", default="", help="Resume after a build failure"),
+        Option(name="resume-refresh-build-first", aliases=["R"], default="", help="Resume after a build failure and start the build from scratch of first project"),
+        Option(name="self-update", default="", help="Update kde-builder itself"),
+        Option(name="show-info", default="", help="Show tool information"),
+        Option(name="version", aliases=["v"], default="", help="Script information"),
     ]
 
     non_context_options_with_parameter = [
-        Option(name="resume-after", aliases=["after", "a"], default=""),
-        Option(name="resume-from", aliases=["from", "f"], default=""),
-        Option(name="stop-after", aliases=["to"], default=""),
-        Option(name="stop-before", aliases=["until"], default=""),
+        Option(name="resume-after", aliases=["after", "a"], default="", help="Skips modules until just after the given project, then operates as normal"),
+        Option(name="resume-from", aliases=["from", "f"], default="", help="Skips modules until just before the given project, then operates as normal"),
+        Option(name="stop-after", aliases=["to"], default="", help="Stops just after the given project is reached"),
+        Option(name="stop-before", aliases=["until"], default="", help="Stops just before the given project is reached"),
     ]
 
     non_context_options_with_parameter_manually_handled = [
-        Option(name="query", default=""),
-        Option(name="rc-file", default=""),
+        Option(name="query", default="", help="Query a parameter of the projects in the build list"),
+        Option(name="rc-file", default="", help="Read configuration from filename instead of default"),
     ]
 
     non_context_options_with_extra_specifier = [
-        Option(name="set-project-option-value", default=""),
-        Option(name="d", default=""),
-        Option(name="D", default=""),
+        Option(name="set-project-option-value", default="", help="Override an option in your configuration file for a specific project"),
+        Option(name="d", default="", help="Builds KDE-based dependencies"),
+        Option(name="D", default="", help="Skip KDE-based dependencies"),
     ]
 
     @classmethod
@@ -224,3 +239,11 @@ class OptionsSpec:
     def all_boolean_options_names(cls) -> list[str]:
         ret = [el.name for el in cls.global_options_with_negatable_form]
         return ret
+
+    @classmethod
+    def get_option_by_name(cls, opt_name: str) -> Option:
+        extra_specified_options = cls.global_options_with_extra_specifier + cls.non_context_options_with_extra_specifier
+        for opt in extra_specified_options:
+            if opt.name == opt_name:
+                return opt
+        raise KeyError(f"Option {opt_name} is not found in extra specified")

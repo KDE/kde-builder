@@ -59,18 +59,11 @@ def main():
     import setproctitle  # noqa: E402
     setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
 
-    parser = argparse.ArgumentParser(prog="ProgramName",
-                                     description="What the program does",
-                                     epilog="Text at the bottom of help",
-                                     add_help=False)
-    parser.add_argument("--initial-setup", action="store_true")
-    parser.add_argument("--install-distro-packages", action="store_true")
-    parser.add_argument("--generate-config", action="store_true")
-    parser.add_argument("--prompt-answer",  nargs=1)
-    parser.add_argument("--debug", action="store_true")
-    parser.add_argument("--log-level", type=lambda x: x.split("=", 2), action="append")  # allowing repeating several times
+    bootstrap_parser = argparse.ArgumentParser(add_help=False)
+    from kde_builder.options_spec import add_bootstrap_arguments
+    add_bootstrap_arguments(bootstrap_parser)
 
-    args, unknown = parser.parse_known_args()
+    args, unknown = bootstrap_parser.parse_known_args()
 
     # ---
 

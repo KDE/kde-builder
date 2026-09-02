@@ -9,6 +9,7 @@ from typing import NoReturn
 
 from kde_builder.debug import KBLogger
 from kde_builder.options_spec import OptionsSpec
+from kde_builder.options_spec import add_bootstrap_arguments
 from kde_builder.os_support import OSSupport
 from kde_builder.phase_list import PhaseList
 from kde_builder.util.textwrap_mod import dedent
@@ -95,7 +96,23 @@ class Cmdline:
         }
         found_options = {}
 
-        parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+        epilog_text = dedent("""
+            Documentation: https://kde-builder.kde.org
+                Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
+                Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
+
+            """)
+
+        parser = argparse.ArgumentParser(
+            prog="kde-builder",
+            description="A tool to streamline the process of setting up and maintaining a development environment for KDE software",
+            allow_abbrev=False,
+            epilog=epilog_text,
+            add_help=True,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
+
+        add_bootstrap_arguments(parser)  # To be able to see initial options in main parser too (for help text).
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
@@ -122,37 +139,44 @@ class Cmdline:
                 logger_app.error(f" r[*] Invalid value in --set-project-option-value option. See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html#cmdline-set-project-option-value.")
                 exit(1)  # Do not continue
 
-        parser.add_argument("--set-project-option-value", type=validate_set_project_option_value, action="append")
+        opt = OptionsSpec.get_option_by_name("set-project-option-value")
+        parser.add_argument(*opt.dashed(), type=validate_set_project_option_value, action="append", help=opt.help)
 
-        parser.add_argument("--target", action="append")
+        opt = OptionsSpec.get_option_by_name("targets")
+        parser.add_argument("--target", action="append", help=opt.help)
 
-        parser.add_argument("--ignore-projects", "-!", nargs="+")
-        parser.add_argument("-d", action="store_true")
-        parser.add_argument("-D", action="store_true")
+        opt = OptionsSpec.get_option_by_name("ignore-projects")
+        parser.add_argument(*opt.dashed(), nargs="+", help=opt.help)
+
+        opt = OptionsSpec.get_option_by_name("d")
+        parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
+
+        opt = OptionsSpec.get_option_by_name("D")
+        parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.global_options_without_parameter:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.global_options_with_parameter:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         for opt in OptionsSpec.global_options_with_negatable_form:
-            parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction)
+            parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction, help=opt.help)
 
         for opt in OptionsSpec.phase_changing_options:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_without_parameter:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_without_parameter_manually_handled:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_with_parameter:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         for opt in OptionsSpec.non_context_options_with_parameter_manually_handled:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
@@ -162,8 +186,6 @@ class Cmdline:
             self._show_info_and_exit()
         if args.version:
             self._show_version_and_exit()
-        if args.help:
-            self._show_help_and_exit()
         if args.self_update:
             found_options["self-update"] = True
             found_options["no-metadata"] = True  # Implied --no-metadata
@@ -289,18 +311,6 @@ class Cmdline:
     def _show_version_and_exit() -> NoReturn:
         version = "kde-builder " + Version.script_version()
         print(version)
-        exit()
-
-    @staticmethod
-    def _show_help_and_exit() -> NoReturn:
-        print(dedent("""
-            KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
-
-            Documentation: https://kde-builder.kde.org
-                Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
-                Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
-
-            """))
         exit()
 
     @staticmethod
