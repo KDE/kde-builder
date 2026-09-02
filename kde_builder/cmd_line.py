@@ -173,6 +173,9 @@ class Cmdline:
 
             parser.add_argument(*dashed_parts, **kwargs)
 
+        for opt in OptionsSpec.global_options_without_parameter:
+            parser.add_argument(*opt.dashed(), action="store_true")
+
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
 
@@ -264,6 +267,13 @@ class Cmdline:
             if val:
                 found_options[key] = val[0]
 
+        # handling options without arguments
+        for optspec in OptionsSpec.global_options_without_parameter:
+            ns_name = optspec.name.replace("-", "_")
+            val = getattr(args, ns_name)
+            if val:
+                found_options[optspec.name] = True
+
         # Module selectors (i.e. an actual argument)
         for unknown_arg in unknown_args:
             opts["selectors"].append(unknown_arg)
@@ -274,9 +284,6 @@ class Cmdline:
 
         if args.all_kde_projects:
             opts["special-selectors"].append("all-kde-projects")
-
-        if args.build_system_only:
-            found_options["build-system-only"] = True
 
         if args.colorful_output is not None:
             found_options["colorful-output"] = args.colorful_output
@@ -296,9 +303,6 @@ class Cmdline:
         if args.list_installed:
             found_options["list-installed"] = True
 
-        if args.metadata_only:
-            found_options["metadata-only"] = True
-
         if args.niceness != 10:
             found_options["niceness"] = args.niceness
 
@@ -311,13 +315,10 @@ class Cmdline:
         if args.rebuild_failures:
             found_options["rebuild-failures"] = True
 
-        if args.reconfigure:
-            found_options["reconfigure"] = True
-
         if args.refresh_build:
             found_options["refresh-build"] = True
 
-        if args.refresh_build_first or args.resume_refresh_build_first:
+        if args.resume_refresh_build_first:
             found_options["refresh-build-first"] = True
 
         if args.resume_after is not None:
@@ -531,9 +532,6 @@ class Cmdline:
         for key in BuildContext().global_options_with_parameter:
             opts_seen[key] = opts_seen.get(key, 0) + 1
 
-        for key in BuildContext().global_options_without_parameter:
-            opts_seen[key] = opts_seen.get(key, 0) + 1
-
         violators = [key for key, value in opts_seen.items() if value > 1]
         if violators:
             errmsg = "The following options overlap in Cmdline: [" + ", ".join(violators) + "]!"
@@ -543,7 +541,6 @@ class Cmdline:
         options.extend([
             *[f"{key}!" for key in BuildContext().global_options_with_negatable_form],
             *[f"{key}=s" for key in BuildContext().global_options_with_parameter],
-            *[f"{key}" for key in BuildContext().global_options_without_parameter]
         ])
 
         return options
