@@ -207,3 +207,20 @@ class OptionsSpec:
         for option in cls.global_options_private:
             ret[option.name] = option.default
         return ret
+
+    @classmethod
+    def all_global_options_names(cls) -> list[str]:
+        ret = list(cls.all_global_options().keys())
+        return ret
+
+    @classmethod
+    def all_possible_options_names(cls) -> list[str]:
+        global_options = cls.all_global_options_names()
+        phase_changing_options = [el.name for el in OptionsSpec.phase_changing_options]
+        ret = sorted(global_options + phase_changing_options)
+        return ret
+
+    @classmethod
+    def all_boolean_options_names(cls) -> list[str]:
+        ret = [el.name for el in cls.global_options_with_negatable_form]
+        return ret

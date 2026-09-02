@@ -7,7 +7,6 @@ import argparse
 import re
 from typing import NoReturn
 
-from kde_builder.build_context import BuildContext
 from kde_builder.debug import KBLogger
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.os_support import OSSupport

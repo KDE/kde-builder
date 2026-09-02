@@ -234,8 +234,7 @@ class OptionsBase:
         self.set_option("#entry_num", OptionsBase.moduleID)
         OptionsBase.moduleID += 1
 
-        phase_changing_options_canonical = [el.name for el in OptionsSpec.phase_changing_options]
-        all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
+        all_possible_options = OptionsSpec.all_possible_options_names()
 
         for option, value in node_opts.items():
             if option.startswith("_"):  # option names starting with underscore are treated as user custom variables

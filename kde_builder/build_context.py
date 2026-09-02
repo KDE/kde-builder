@@ -70,13 +70,6 @@ class BuildContext(PathResolvingOptions):
         self.modules: list[Module] = []
         """List of modules to build."""
 
-        self.build_options = {
-            "global": {
-            },
-        }
-        all_options_defaults = OptionsSpec.all_global_options_defaults()
-        self.build_options["global"].update(all_options_defaults)
-
         self.phases = PhaseList()
         """Replaces Module.phases"""
 
@@ -109,8 +102,7 @@ class BuildContext(PathResolvingOptions):
         self.metadata: Metadata | None = None
         """Stores info from repo-metadata."""
 
-        self.options = self.build_options["global"]
-        self.all_boolean_options = [el.name for el in OptionsSpec.global_options_with_negatable_form]
+        self.options = OptionsSpec.all_global_options_defaults()
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
@@ -662,5 +654,5 @@ class BuildContext(PathResolvingOptions):
 
     @override
     def verify_option_value_type(self, option_name, option_value) -> None:
-        if option_name in self.all_boolean_options and not isinstance(option_value, bool):
+        if option_name in OptionsSpec.all_boolean_options_names() and not isinstance(option_value, bool):
             raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid boolean value \"{option_value}\".")
