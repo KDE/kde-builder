@@ -175,6 +175,8 @@ class OptionsSpec:
 
     non_context_options_with_extra_specifier = [
         Option(name="set-project-option-value", default=""),
+        Option(name="d", default=""),
+        Option(name="D", default=""),
     ]
 
     @classmethod

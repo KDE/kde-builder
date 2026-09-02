@@ -171,6 +171,8 @@ class Cmdline:
             parser.add_argument(*dashed_parts, **kwargs)
 
         parser.add_argument("--ignore-projects", "-!", nargs="+")
+        parser.add_argument("-d", action="store_true")
+        parser.add_argument("-D", action="store_true")
 
         for opt in OptionsSpec.global_options_without_parameter:
             parser.add_argument(*opt.dashed(), action="store_true")
@@ -376,13 +378,8 @@ class Cmdline:
         """
         # See https://perldoc.perl.org/5.005/Getopt::Long for options specification format
 
-        options_converted_to_canonical = [
-            "d",  # --include-dependencies, which is already pulled in via `BuildContext` default Global Flags
-            "D",  # --no-include-dependencies, which is already pulled in via `BuildContext` default Global Flags
-        ]
-
         # For now, place the options we specified above
-        options = [*options_converted_to_canonical]
+        options = []
 
         # Remove stuff like ! and =s from list above;
         opt_names = [re.search(r"([a-zA-Z-]+)", option).group(1) for option in options]
