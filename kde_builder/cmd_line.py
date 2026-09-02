@@ -125,13 +125,20 @@ class Cmdline:
                 logger_app.error(f" r[*] Invalid value in --set-project-option-value option. See https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html#cmdline-set-project-option-value.")
                 exit(1)  # Do not continue
 
-        parser.add_argument("--set-project-option-value", type=validate_set_project_option_value, action="append")
+        opt = OptionsSpec.get_option_by_name("set-project-option-value")
+        parser.add_argument(*opt.dashed(), type=validate_set_project_option_value, action="append")
 
+        opt = OptionsSpec.get_option_by_name("targets")
         parser.add_argument("--target", action="append")
 
-        parser.add_argument("--ignore-projects", "-!", nargs="+")
-        parser.add_argument("-d", action="store_true")
-        parser.add_argument("-D", action="store_true")
+        opt = OptionsSpec.get_option_by_name("ignore-projects")
+        parser.add_argument(*opt.dashed(), nargs="+")
+
+        opt = OptionsSpec.get_option_by_name("d")
+        parser.add_argument(*opt.dashed(), action="store_true")
+
+        opt = OptionsSpec.get_option_by_name("D")
+        parser.add_argument(*opt.dashed(), action="store_true")
 
         for opt in OptionsSpec.global_options_without_parameter:
             parser.add_argument(*opt.dashed(), action="store_true")

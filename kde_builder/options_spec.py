@@ -239,3 +239,11 @@ class OptionsSpec:
     def all_boolean_options_names(cls) -> list[str]:
         ret = [el.name for el in cls.global_options_with_negatable_form]
         return ret
+
+    @classmethod
+    def get_option_by_name(cls, opt_name: str) -> Option:
+        extra_specified_options = cls.global_options_with_extra_specifier + cls.non_context_options_with_extra_specifier
+        for opt in extra_specified_options:
+            if opt.name == opt_name:
+                return opt
+        raise KeyError(f"Option {opt_name} is not found in extra specified")
