@@ -167,7 +167,6 @@ class OptionsSpec:
     non_context_options_without_parameter_manually_handled = [
         Option(name="all-config-projects", default="", help="Select all projects defined in user config"),
         Option(name="all-kde-projects", default="", help="Select all known kde projects defined in metadata"),
-        Option(name="help", aliases=["h"], default="", help="Displays help on commandline options"),
         Option(name="install-login-session-only", default="", help="Skip updating and building everything and only install a login session"),
         Option(name="resume", default="", help="Resume after a build failure"),
         Option(name="resume-refresh-build-first", aliases=["R"], default="", help="Resume after a build failure and start the build from scratch of first project"),

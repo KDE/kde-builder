@@ -96,7 +96,21 @@ class Cmdline:
         }
         found_options = {}
 
-        parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
+        epilog_text = dedent("""
+            Documentation: https://kde-builder.kde.org
+                Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
+                Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
+
+            """)
+
+        parser = argparse.ArgumentParser(
+            prog="kde-builder",
+            description="A tool to streamline the process of setting up and maintaining a development environment for KDE software",
+            allow_abbrev=False,
+            epilog=epilog_text,
+            add_help=True,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
 
         add_bootstrap_arguments(parser)  # To be able to see initial options in main parser too (for help text).
 
@@ -172,8 +186,6 @@ class Cmdline:
             self._show_info_and_exit()
         if args.version:
             self._show_version_and_exit()
-        if args.help:
-            self._show_help_and_exit()
         if args.self_update:
             found_options["self-update"] = True
             found_options["no-metadata"] = True  # Implied --no-metadata
@@ -299,18 +311,6 @@ class Cmdline:
     def _show_version_and_exit() -> NoReturn:
         version = "kde-builder " + Version.script_version()
         print(version)
-        exit()
-
-    @staticmethod
-    def _show_help_and_exit() -> NoReturn:
-        print(dedent("""
-            KDE Builder tool automates the download, build, and install process for KDE software using the latest available source code.
-
-            Documentation: https://kde-builder.kde.org
-                Supported command-line parameters:              https://kde-builder.kde.org/en/cmdline/supported-cmdline-params.html
-                Table of available configuration options:       https://kde-builder.kde.org/en/configuration/conf-options-table.html
-
-            """))
         exit()
 
     @staticmethod
