@@ -140,6 +140,43 @@ class OptionsSpec:
         Option(name="uninstall", default=""),
     ]
 
+    non_context_options_without_parameter = [
+        Option(name="dependency-tree", default=""),
+        Option(name="dependency-tree-fullpath", default=""),
+        Option(name="list-installed", default=""),
+        Option(name="no-metadata", aliases=["M"], default=""),
+        Option(name="rebuild-failures", default=""),
+    ]
+
+    non_context_options_without_parameter_manually_handled = [
+        Option(name="all-config-projects", default=""),
+        Option(name="all-kde-projects", default=""),
+        Option(name="help", aliases=["h"], default=""),
+        Option(name="install-login-session-only", default=""),
+        Option(name="resume", default=""),
+        Option(name="resume-refresh-build-first", aliases=["R"], default=""),
+        Option(name="self-update", default=""),
+        Option(name="show-info", default=""),
+        Option(name="show-options-specifiers", default=""),
+        Option(name="version", aliases=["v"], default=""),
+    ]
+
+    non_context_options_with_parameter = [
+        Option(name="resume-after", aliases=["after", "a"], default=""),
+        Option(name="resume-from", aliases=["from", "f"], default=""),
+        Option(name="stop-after", aliases=["to"], default=""),
+        Option(name="stop-before", aliases=["until"], default=""),
+    ]
+
+    non_context_options_with_parameter_manually_handled = [
+        Option(name="query", default=""),
+        Option(name="rc-file", default=""),
+    ]
+
+    non_context_options_with_extra_specifier = [
+        Option(name="set-project-option-value", default=""),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}

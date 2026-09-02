@@ -117,8 +117,6 @@ class Cmdline:
                 logger_app.error("You need to specify a project binary with the --run option")
                 exit(1)  # Do not continue
 
-        supported_options.remove("set-project-option-value=s")  # specify differently, allowing it to be repeated in cmdline
-
         def validate_set_project_option_value(inp_str: str):
             try:
                 project_name, option_name, option_value = inp_str.split(",", 2)
@@ -186,6 +184,18 @@ class Cmdline:
         for opt in OptionsSpec.phase_changing_options:
             parser.add_argument(*opt.dashed(), action="store_true")
 
+        for opt in OptionsSpec.non_context_options_without_parameter:
+            parser.add_argument(*opt.dashed(), action="store_true")
+
+        for opt in OptionsSpec.non_context_options_without_parameter_manually_handled:
+            parser.add_argument(*opt.dashed(), action="store_true")
+
+        for opt in OptionsSpec.non_context_options_with_parameter:
+            parser.add_argument(*opt.dashed(), nargs=1)
+
+        for opt in OptionsSpec.non_context_options_with_parameter_manually_handled:
+            parser.add_argument(*opt.dashed(), nargs=1)
+
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
 
@@ -224,7 +234,7 @@ class Cmdline:
             phases.reset_to(["install"])
         if args.install_dir:
             found_options["reconfigure"] = True
-        if args.query:
+        if args.query is not None:
             arg = args.query[0]
 
             valid_mode = re.compile(r"^[a-zA-Z0-9_#][a-zA-Z0-9_-]*$")
@@ -245,7 +255,6 @@ class Cmdline:
             # resume list requires such modules).
             found_options["include-dependencies"] = False
 
-        # Hack to set project options
         if args.set_project_option_value:
             for module, option, value in args.set_project_option_value:
                 if module and option:
@@ -274,8 +283,20 @@ class Cmdline:
             if val is not None:
                 found_options[optspec.name] = val[0]
 
+        for optspec in OptionsSpec.non_context_options_with_parameter:
+            ns_name = optspec.name.replace("-", "_")
+            val = getattr(args, ns_name)
+            if val is not None:
+                found_options[optspec.name] = val[0]
+
         # handling options without arguments
         for optspec in OptionsSpec.global_options_without_parameter:
+            ns_name = optspec.name.replace("-", "_")
+            val = getattr(args, ns_name)
+            if val:
+                found_options[optspec.name] = True
+
+        for optspec in OptionsSpec.non_context_options_without_parameter:
             ns_name = optspec.name.replace("-", "_")
             val = getattr(args, ns_name)
             if val:
@@ -292,38 +313,11 @@ class Cmdline:
         if args.all_kde_projects:
             opts["special-selectors"].append("all-kde-projects")
 
-        if args.dependency_tree:
-            found_options["dependency-tree"] = True
-
-        if args.dependency_tree_fullpath:
-            found_options["dependency-tree-fullpath"] = True
-
-        if args.list_installed:
-            found_options["list-installed"] = True
-
-        if args.no_metadata:
-            found_options["no-metadata"] = True
-
         if args.rc_file is not None:
             found_options["rc-file"] = args.rc_file[0]
 
-        if args.rebuild_failures:
-            found_options["rebuild-failures"] = True
-
         if args.resume_refresh_build_first:
             found_options["refresh-build-first"] = True
-
-        if args.resume_after is not None:
-            found_options["resume-after"] = args.resume_after[0]
-
-        if args.resume_from is not None:
-            found_options["resume-from"] = args.resume_from[0]
-
-        if args.stop_after is not None:
-            found_options["stop-after"] = args.stop_after[0]
-
-        if args.stop_before is not None:
-            found_options["stop-before"] = args.stop_before[0]
 
         if args.install_login_session_only:
             opts["run_mode"] = "install-login-session-only"
@@ -382,38 +376,13 @@ class Cmdline:
         """
         # See https://perldoc.perl.org/5.005/Getopt::Long for options specification format
 
-        non_context_options = [
-            "all-config-projects",
-            "all-kde-projects",
-            "dependency-tree",
-            "dependency-tree-fullpath",
-            "help|h",
-            "install-login-session-only",
-            "list-installed",
-            "no-metadata|M",
-            "query=s",
-            "rc-file=s",
-            "rebuild-failures",
-            "resume",
-            "resume-after|after|a=s",
-            "resume-from|from|f=s",
-            "resume-refresh-build-first|R",
-            "self-update",
-            "set-project-option-value=s",
-            "show-info",
-            "show-options-specifiers",
-            "stop-after|to=s",
-            "stop-before|until=s",
-            "version|v",
-        ]
-
         options_converted_to_canonical = [
             "d",  # --include-dependencies, which is already pulled in via `BuildContext` default Global Flags
             "D",  # --no-include-dependencies, which is already pulled in via `BuildContext` default Global Flags
         ]
 
         # For now, place the options we specified above
-        options = [*non_context_options, *options_converted_to_canonical]
+        options = [*options_converted_to_canonical]
 
         # Remove stuff like ! and =s from list above;
         opt_names = [re.search(r"([a-zA-Z-]+)", option).group(1) for option in options]
