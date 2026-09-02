@@ -130,6 +130,16 @@ class OptionsSpec:
         Option(name="use-projects", default=""),
     ]
 
+    phase_changing_options = [
+        Option(name="build-only", default=""),
+        Option(name="install-only", default=""),
+        Option(name="no-build", default=""),
+        Option(name="no-install", default=""),
+        Option(name="no-src", aliases=["S"], default=""),
+        Option(name="src-only", aliases=["s"], default=""),
+        Option(name="uninstall", default=""),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}

@@ -234,8 +234,7 @@ class OptionsBase:
         self.set_option("#entry_num", OptionsBase.moduleID)
         OptionsBase.moduleID += 1
 
-        from kde_builder.cmd_line import Cmdline
-        phase_changing_options_canonical = [element.split("|")[0] for element in Cmdline.phase_changing_options]
+        phase_changing_options_canonical = [el.name for el in OptionsSpec.phase_changing_options]
         all_possible_options = sorted(list(ctx.build_options["global"].keys()) + phase_changing_options_canonical)
 
         for option, value in node_opts.items():

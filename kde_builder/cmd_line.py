@@ -183,6 +183,9 @@ class Cmdline:
         for opt in OptionsSpec.global_options_with_negatable_form:
             parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction)
 
+        for opt in OptionsSpec.phase_changing_options:
+            parser.add_argument(*opt.dashed(), action="store_true")
+
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
 
@@ -372,16 +375,6 @@ class Cmdline:
 
         exit()
 
-    phase_changing_options = [
-        "build-only",
-        "install-only",
-        "no-build",
-        "no-install",
-        "no-src|S",
-        "src-only|s",
-        "uninstall",
-    ]
-
     @staticmethod
     def _supported_options() -> list[str]:
         """
@@ -420,7 +413,7 @@ class Cmdline:
         ]
 
         # For now, place the options we specified above
-        options = [*non_context_options, *Cmdline.phase_changing_options, *options_converted_to_canonical]
+        options = [*non_context_options, *options_converted_to_canonical]
 
         # Remove stuff like ! and =s from list above;
         opt_names = [re.search(r"([a-zA-Z-]+)", option).group(1) for option in options]
