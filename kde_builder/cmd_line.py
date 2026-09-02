@@ -129,7 +129,6 @@ class Cmdline:
 
         parser.add_argument("--set-project-option-value", type=validate_set_project_option_value, action="append")
 
-        supported_options.remove("target=s@")  # specify differently, allowing it to be repeated in cmdline
         parser.add_argument("--target", action="append")
 
         # Handle `parser.add_argument(...)`.
@@ -172,6 +171,8 @@ class Cmdline:
                     dashed_parts.append("--" + part)
 
             parser.add_argument(*dashed_parts, **kwargs)
+
+        parser.add_argument("--ignore-projects", "-!", nargs="+")
 
         for opt in OptionsSpec.global_options_without_parameter:
             parser.add_argument(*opt.dashed(), action="store_true")
@@ -231,8 +232,6 @@ class Cmdline:
             found_options["query"] = arg
             found_options["pretend"] = True  # Implied pretend mode
             found_options["no-metadata"] = True  # Implied --no-metadata
-        if args.pretend:
-            found_options["pretend"] = True
         if args.resume or args.resume_refresh_build_first:
             found_options["resume"] = True
             phases.filter_out_phase("update")  # Implied --no-src
@@ -290,9 +289,6 @@ class Cmdline:
         if args.all_kde_projects:
             opts["special-selectors"].append("all-kde-projects")
 
-        if args.colorful_output is not None:
-            found_options["colorful-output"] = args.colorful_output
-
         if args.dependency_tree:
             found_options["dependency-tree"] = True
 
@@ -302,9 +298,6 @@ class Cmdline:
         if args.list_installed:
             found_options["list-installed"] = True
 
-        if args.niceness != 10:
-            found_options["niceness"] = args.niceness
-
         if args.no_metadata:
             found_options["no-metadata"] = True
 
@@ -313,9 +306,6 @@ class Cmdline:
 
         if args.rebuild_failures:
             found_options["rebuild-failures"] = True
-
-        if args.refresh_build:
-            found_options["refresh-build"] = True
 
         if args.resume_refresh_build_first:
             found_options["refresh-build-first"] = True
@@ -424,22 +414,13 @@ class Cmdline:
             "version|v",
         ]
 
-        context_options_with_extra_specifier = [
-            "colorful-output|color!",
-            "ignore-projects|!=s{,}",
-            "niceness|nice:10",
-            "pretend|dry-run|p",
-            "refresh-build|r",
-            "target=s@",
-        ]
-
         options_converted_to_canonical = [
             "d",  # --include-dependencies, which is already pulled in via `BuildContext` default Global Flags
             "D",  # --no-include-dependencies, which is already pulled in via `BuildContext` default Global Flags
         ]
 
         # For now, place the options we specified above
-        options = [*non_context_options, *Cmdline.phase_changing_options, *context_options_with_extra_specifier, *options_converted_to_canonical]
+        options = [*non_context_options, *Cmdline.phase_changing_options, *options_converted_to_canonical]
 
         # Remove stuff like ! and =s from list above;
         opt_names = [re.search(r"([a-zA-Z-]+)", option).group(1) for option in options]

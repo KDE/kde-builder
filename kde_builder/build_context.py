@@ -78,25 +78,12 @@ class BuildContext(PathResolvingOptions):
             "use-projects": ""
         }
 
-        # These options are exposed as cmdline options, but _not from here_.
-        # Their more complex specifier is made in `Cmdline` _supported_options().
-        # If adding new option here, and it is boolean, do not forget to add it in the boolean_extra_specified_options.
-        self.global_options_with_extra_specifier = {
-            "colorful-output": True,
-            "ignore-projects": "",
-            "niceness": 10,
-            "pretend": "",
-            "refresh-build": "",
-            "targets": {},
-        }
-
         self.modules: list[Module] = []
         """List of modules to build."""
 
         self.build_options = {
             "global": {
                 **self.global_options_private,
-                **self.global_options_with_extra_specifier,
             },
         }
         all_options_defaults = OptionsSpec.all_global_options_defaults()
@@ -135,8 +122,7 @@ class BuildContext(PathResolvingOptions):
         """Stores info from repo-metadata."""
 
         self.options = self.build_options["global"]
-        boolean_extra_specified_options = ["colorful-output", "pretend", "refresh-build"]
-        self.all_boolean_options = [el.name for el in OptionsSpec.global_options_with_negatable_form] + boolean_extra_specified_options
+        self.all_boolean_options = [el.name for el in OptionsSpec.global_options_with_negatable_form]
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority

@@ -50,8 +50,10 @@ class OptionsSpec:
     global_options_without_parameter = [
         Option(name="build-system-only", default=""),
         Option(name="reconfigure", default=""),
+        Option(name="refresh-build", aliases=["r"], default=""),
         Option(name="refresh-build-first", default=""),
         Option(name="metadata-only", default=""),
+        Option(name="pretend", aliases=["dry-run", "p"], default=""),
     ]
 
     # These options are exposed as cmdline options that require some parameter
@@ -74,6 +76,7 @@ class OptionsSpec:
         Option(name="make-install-prefix", default=""),  # Some people need sudo
         Option(name="make-options", default=""),
         Option(name="meson-options", default=""),
+        Option(name="niceness", aliases=["nice"], default=10),
         Option(name="ninja-options", default=""),
         Option(name="num-cores", default=""),  # Used for build constraints
         Option(name="num-cores-low-mem", default="2"),  # Needs to be a string, not int
@@ -93,6 +96,7 @@ class OptionsSpec:
     global_options_with_negatable_form = [
         Option(name="async", default=True),
         Option(name="check-self-updates", default=True),
+        Option(name="colorful-output", aliases=["color"], default=True),
         Option(name="compile-commands-export", default=True),
         Option(name="compile-commands-linking", default=True),
         Option(name="generate-clion-project-config", default=False),
@@ -109,6 +113,12 @@ class OptionsSpec:
         Option(name="use-idle-io-priority", default=False),
     ]
 
+    # These options are exposed as cmdline options, but handled differently.
+    global_options_with_extra_specifier = [
+        Option(name="ignore-projects", aliases=["!"], default=""),
+        Option(name="targets", default={}),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}
@@ -117,6 +127,8 @@ class OptionsSpec:
         for option in cls.global_options_with_parameter:
             ret[option.name] = option
         for option in cls.global_options_with_negatable_form:
+            ret[option.name] = option
+        for option in cls.global_options_with_extra_specifier:
             ret[option.name] = option
         return ret
 
@@ -128,5 +140,7 @@ class OptionsSpec:
         for option in cls.global_options_with_parameter:
             ret[option.name] = option.default
         for option in cls.global_options_with_negatable_form:
+            ret[option.name] = option.default
+        for option in cls.global_options_with_extra_specifier:
             ret[option.name] = option.default
         return ret
