@@ -126,43 +126,43 @@ class Cmdline:
                 exit(1)  # Do not continue
 
         opt = OptionsSpec.get_option_by_name("set-project-option-value")
-        parser.add_argument(*opt.dashed(), type=validate_set_project_option_value, action="append")
+        parser.add_argument(*opt.dashed(), type=validate_set_project_option_value, action="append", help=opt.help)
 
         opt = OptionsSpec.get_option_by_name("targets")
-        parser.add_argument("--target", action="append")
+        parser.add_argument("--target", action="append", help=opt.help)
 
         opt = OptionsSpec.get_option_by_name("ignore-projects")
-        parser.add_argument(*opt.dashed(), nargs="+")
+        parser.add_argument(*opt.dashed(), nargs="+", help=opt.help)
 
         opt = OptionsSpec.get_option_by_name("d")
-        parser.add_argument(*opt.dashed(), action="store_true")
+        parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         opt = OptionsSpec.get_option_by_name("D")
-        parser.add_argument(*opt.dashed(), action="store_true")
+        parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.global_options_without_parameter:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.global_options_with_parameter:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         for opt in OptionsSpec.global_options_with_negatable_form:
-            parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction)
+            parser.add_argument(*opt.dashed(), action=argparse.BooleanOptionalAction, help=opt.help)
 
         for opt in OptionsSpec.phase_changing_options:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_without_parameter:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_without_parameter_manually_handled:
-            parser.add_argument(*opt.dashed(), action="store_true")
+            parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
         for opt in OptionsSpec.non_context_options_with_parameter:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         for opt in OptionsSpec.non_context_options_with_parameter_manually_handled:
-            parser.add_argument(*opt.dashed(), nargs=1)
+            parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
         # Actually read the options.
         args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
