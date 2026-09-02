@@ -119,6 +119,17 @@ class OptionsSpec:
         Option(name="targets", default={}),
     ]
 
+    # These options are used for internal state, they are _not_ exposed as cmdline options
+    global_options_private = [
+        Option(name="build-configs-dir", default=os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs"),
+        Option(name="filter-out-phases", default=""),
+        Option(name="git-push-protocol", default="git"),
+        Option(name="git-repository-base", default={"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"}),
+        Option(name="repository", default="kde-projects"),
+        Option(name="set-env", default={}),  # dict of environment vars to set
+        Option(name="use-projects", default=""),
+    ]
+
     @classmethod
     def all_global_options(cls) -> dict[str, Option]:
         ret = {}
@@ -129,6 +140,8 @@ class OptionsSpec:
         for option in cls.global_options_with_negatable_form:
             ret[option.name] = option
         for option in cls.global_options_with_extra_specifier:
+            ret[option.name] = option
+        for option in cls.global_options_private:
             ret[option.name] = option
         return ret
 
@@ -142,5 +155,7 @@ class OptionsSpec:
         for option in cls.global_options_with_negatable_form:
             ret[option.name] = option.default
         for option in cls.global_options_with_extra_specifier:
+            ret[option.name] = option.default
+        for option in cls.global_options_private:
             ret[option.name] = option.default
         return ret

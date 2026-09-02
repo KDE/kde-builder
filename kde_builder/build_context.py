@@ -67,23 +67,11 @@ class BuildContext(PathResolvingOptions):
     def __init__(self):
         super().__init__(ctx=None, name="global")
 
-        # These options are used for internal state, they are _not_ exposed as cmdline options
-        self.global_options_private = {
-            "build-configs-dir": os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/build-configs",
-            "filter-out-phases": "",
-            "git-push-protocol": "git",
-            "git-repository-base": {"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"},
-            "repository": "kde-projects",
-            "set-env": {},  # dict of environment vars to set
-            "use-projects": ""
-        }
-
         self.modules: list[Module] = []
         """List of modules to build."""
 
         self.build_options = {
             "global": {
-                **self.global_options_private,
             },
         }
         all_options_defaults = OptionsSpec.all_global_options_defaults()
