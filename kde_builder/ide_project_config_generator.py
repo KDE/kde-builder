@@ -108,6 +108,7 @@ class IdeProjectConfigGenerator:
         prefix_content = prefix_content.replace("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "${env:XDG_DATA_DIRS}:/usr/local/share/:/usr/share/")
         prefix_content = prefix_content.replace("${XDG_CONFIG_DIRS:-/etc/xdg}", "${env:XDG_CONFIG_DIRS}:/etc/xdg")
         prefix_content = prefix_content.replace("$QT_PLUGIN_PATH", "${env:QT_PLUGIN_PATH}")
+        prefix_content = prefix_content.replace("$QML_IMPORT_PATH", "${env:QML_IMPORT_PATH}")
         prefix_content = prefix_content.replace("$QML2_IMPORT_PATH", "${env:QML2_IMPORT_PATH}")
         prefix_content = prefix_content.replace("$QT_QUICK_CONTROLS_STYLE_PATH", "${env:QT_QUICK_CONTROLS_STYLE_PATH}")
 
@@ -203,6 +204,7 @@ class IdeProjectConfigGenerator:
         prefix_content = prefix_content.replace("${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "$XDG_DATA_DIRS$:/usr/local/share/:/usr/share/")
         prefix_content = prefix_content.replace("${XDG_CONFIG_DIRS:-/etc/xdg}", "$XDG_CONFIG_DIRS$:/etc/xdg")
         prefix_content = prefix_content.replace("$QT_PLUGIN_PATH", "$QT_PLUGIN_PATH$")
+        prefix_content = prefix_content.replace("$QML_IMPORT_PATH", "$QML_IMPORT_PATH$")
         prefix_content = prefix_content.replace("$QML2_IMPORT_PATH", "$QML2_IMPORT_PATH$")
         prefix_content = prefix_content.replace("$QT_QUICK_CONTROLS_STYLE_PATH", "$QT_QUICK_CONTROLS_STYLE_PATH$")
 
@@ -259,6 +261,7 @@ class IdeProjectConfigGenerator:
         prefix_content = prefix_content.replace(":${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}", "")
         prefix_content = prefix_content.replace(":${XDG_CONFIG_DIRS:-/etc/xdg}", "")
         prefix_content = prefix_content.replace(":$QT_PLUGIN_PATH", "")
+        prefix_content = prefix_content.replace(":$QML_IMPORT_PATH", "")
         prefix_content = prefix_content.replace(":$QML2_IMPORT_PATH", "")
         prefix_content = prefix_content.replace(":$QT_QUICK_CONTROLS_STYLE_PATH", "")
         prefix_content = prefix_content.replace("=", "=+")  # "=+" means prepend, "+=" means append. We prepend.
