@@ -191,6 +191,7 @@ class OptionsSpec:
         Option(name="set-project-option-value", default="", help="Override an option in your configuration file for a specific project"),
         Option(name="d", default="", help="Builds KDE-based dependencies"),
         Option(name="D", default="", help="Skip KDE-based dependencies"),
+        Option(name="run", aliases=["start-program"], default="", help="Start a program built with kde-builder"),
     ]
 
     @classmethod

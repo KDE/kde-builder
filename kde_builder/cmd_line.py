@@ -116,20 +116,8 @@ class Cmdline:
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".
-        run_index = -1
-        for i in list(range(0, len(options))):
-            if options[i] == "--run" or options[i] == "--start-program":
-                run_index = i
-                break
-
-        if run_index != -1:
-            found_options["no-metadata"] = True  # Implied --no-metadata
-            opts["start-program"] = options[run_index + 1:len(options)]
-            options = options[0:run_index]  # remove all after --run, and the --run itself # pl2py: in python the stop index is not included, so we add +1
-
-            if not opts["start-program"]:  # check this here, because later the empty list will be treated as not wanting to start program
-                logger_app.error("You need to specify a project binary with the --run option")
-                exit(1)  # Do not continue
+        opt = OptionsSpec.get_option_by_name("run")
+        parser.add_argument(*opt.dashed(), dest="start_program", nargs=argparse.REMAINDER, help=opt.help)
 
         def validate_set_project_option_value(inp_str: str):
             try:
@@ -300,6 +288,13 @@ class Cmdline:
         if args.install_login_session_only:
             opts["run_mode"] = "install-login-session-only"
             phases.clear()
+
+        if args.start_program is not None:
+            if not args.start_program:  # check this here, because later the empty list will be treated as not wanting to start program
+                logger_app.error("You need to specify a project binary with the --run option")
+                exit(1)  # Do not continue
+            found_options["no-metadata"] = True  # Implied --no-metadata
+            opts["start-program"] = args.start_program
 
         # </editor-fold desc="all other args handlers">
 
