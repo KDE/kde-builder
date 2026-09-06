@@ -13,7 +13,6 @@
 # See issue #64
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 def test_no_cmdline_override():
@@ -32,7 +31,6 @@ def test_no_cmdline_override():
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
     assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper pre-override"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_cmdline_makeoption():
@@ -51,7 +49,6 @@ def test_cmdline_makeoption():
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
     assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper post-override"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_cmdline_numcores():
@@ -70,4 +67,3 @@ def test_cmdline_numcores():
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
     assert module_list[3].get_option("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

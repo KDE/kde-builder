@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 def test_cmdline_selector_not_eaten():
@@ -25,4 +24,3 @@ def test_cmdline_selector_not_eaten():
 
     assert len(module_list) == 1, "Right number of modules (just one)"
     assert module_list[0].name == "setmod3", "mod list[2] == setmod3"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

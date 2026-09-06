@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 def test_set_project_option():
@@ -30,4 +29,3 @@ def test_set_project_option():
     assert ref_type == "tag", "cmdline options block came back as tag"
 
     assert not module.is_kde_project(), "setmod2 is *not* a \"KDE\" project"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

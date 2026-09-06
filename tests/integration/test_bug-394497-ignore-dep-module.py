@@ -6,7 +6,6 @@
 import pytest
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 @pytest.fixture
@@ -58,7 +57,6 @@ def test_include_deps(mock_app_res_mod_dep_graph):
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[1].name == "setmod2", "mod list[1] == setmod2"
     assert module_list[2].name == "setmod3", "mod list[2] == setmod3"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
@@ -75,7 +73,6 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
     assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-projects)"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[1].name == "setmod3", "mod list[1] == setmod3"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
@@ -90,4 +87,3 @@ def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
 
     assert len(module_list) == 1, "Right number of modules (ignore module-set)"
     assert module_list[0].name == "module2", "mod list[0] == module2"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

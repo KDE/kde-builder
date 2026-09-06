@@ -7,7 +7,6 @@ import os
 import sys
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 
 
@@ -93,4 +92,3 @@ def test_option_reading(monkeypatch):
 
     # See https://phabricator.kde.org/D18165
     assert module_list[0].get_option("cxxflags") == "", "empty cxxflags renders with no whitespace in module"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -5,7 +5,6 @@
 
 from kde_builder.application import Application
 from kde_builder.build_system.kde_cmake import BuildSystemKDECMake
-from kde_builder.debug import Debug
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 
 
@@ -67,4 +66,3 @@ def test_cmake_prefix(monkeypatch):
     assert len(prefixes) == 1, "Only one set prefix path in manual mode"
     if prefixes:
         assert prefixes[0] == "-DCMAKE_PREFIX_PATH:PATH=BAR", "Manual-set prefix path is as set by user"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

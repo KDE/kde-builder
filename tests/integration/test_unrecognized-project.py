@@ -5,7 +5,6 @@
 import pytest
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 from kde_builder.kb_exception import UnknownKdeProjectException
 
 
@@ -27,5 +26,3 @@ def test_unrecognized_project():
         app.generate_module_list()
     except UnknownKdeProjectException:
         pytest.fail("Unexpectedly raised UnknownKdeProjectException when there was no unknown project selector in command line")
-
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

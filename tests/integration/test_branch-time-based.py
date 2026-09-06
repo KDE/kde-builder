@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 def test_tag_names_based_on_time():
@@ -23,5 +22,3 @@ def test_tag_names_based_on_time():
         assert ref_value == "master@{3 weeks ago}", "Right tag name"
         assert ref_type == "tag", "Result came back as a tag with detached HEAD"
         assert ref_type == "tag", "Result came back as a tag with detached HEAD"
-
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton

@@ -6,7 +6,6 @@
 import pytest
 
 from kde_builder.application import Application
-from kde_builder.debug import Debug
 
 
 @pytest.fixture
@@ -54,7 +53,6 @@ def test_no_include_deps(mock_application):
     assert len(module_list) == 2, "Right number of modules (include-dependencies)"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[1].name == "setmod3", "mod list[2] == setmod3"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
 
 
 def test_no_include_deps_ignore_modules(mock_application):
@@ -66,4 +64,3 @@ def test_no_include_deps_ignore_modules(mock_application):
     assert len(module_list) == 2, "Right number of modules (include-dependencies+ignore-projects)"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
     assert module_list[1].name == "setmod3", "mod list[1] == setmod3"
-    Debug().set_pretending(False)  # disable pretending, to not influence on other tests, because Debug is singleton
