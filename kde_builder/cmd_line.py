@@ -65,7 +65,7 @@ class Cmdline:
                 "selectors": [
                     "juk",
                     "frameworks-set",
-                    # etc.  MAY BE EMPTY in which case the command should build everything known
+                    # etc.  MAY BE EMPTY
                 ],
                 "ignore-projects": [
                     "plasma-nm",
@@ -166,8 +166,15 @@ class Cmdline:
         for opt in OptionsSpec.non_context_options_with_parameter_manually_handled:
             parser.add_argument(*opt.dashed(), nargs=1, help=opt.help)
 
+        parser.add_argument("selectors", nargs="*", metavar="project_or_group")
+
         # Actually read the options.
-        args, unknown_args = parser.parse_known_args(options)  # unknown_args - Required to read non-option args
+        args, unknown_args = parser.parse_known_intermixed_args(options)
+
+        if unknown_args:
+            for unknown_arg in unknown_args:
+                logger_app.error(f" r[*] Unrecognized option was used: {unknown_arg}")
+            exit(1)
 
         # <editor-fold desc="arg functions">
         if args.show_info:
@@ -268,9 +275,8 @@ class Cmdline:
             if val:
                 found_options[optspec.name] = True
 
-        # Module selectors (i.e. an actual argument)
-        for unknown_arg in unknown_args:
-            opts["selectors"].append(unknown_arg)
+        if args.selectors:
+            opts["selectors"] = args.selectors
 
         # <editor-fold desc="all other args handlers">
         if args.all_config_projects:

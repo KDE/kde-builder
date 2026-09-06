@@ -180,9 +180,7 @@ def main():
         repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
         active = repo_data.get("active", False)
         msg = ""
-        if unrecognized_name.startswith("-"):
-            msg = f" r[*] Unrecognized option y[{unrecognized_name}] was used."
-        elif repo_data and not active:
+        if repo_data and not active:
             msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
         else:
             msg = dedent(f"""
