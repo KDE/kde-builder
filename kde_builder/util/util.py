@@ -357,12 +357,12 @@ class Util:
                 os.execvp(args[0], args)
             except Exception as e:
                 cmd_string = " ".join(args)
-                logger_util.error(dedent(f"""
-                    r[b[Unable to execute "{cmd_string}"]!
+                print(dedent(f"""
+                    Unable to execute "{cmd_string}"!
                     {e}
 
                     Please check your binpath setting (it controls the PATH used by kde-builder).
-                    Currently it is set to g[{os.environ.get("PATH")}].
+                    Currently it is set to {os.environ.get("PATH")}.
 
                     """))
                 # Don't use return, this is the child still!
