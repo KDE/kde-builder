@@ -1,5 +1,8 @@
 # Changelog
 
+2026-09-09
+: Added `post-install-commands` config option.
+
 2024-09-08
 : Reduced long alias `--resume-refresh-build-first` of `-R` option.
 : Deprecated `--refresh-build` in favor of `--clean-build`.
