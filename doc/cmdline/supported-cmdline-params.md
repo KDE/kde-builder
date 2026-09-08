@@ -348,8 +348,8 @@ missing dependency causes the build failure. Once you correct the error
 you can quickly get back into building the projects you were building
 before, without fiddling with `--resume-from` and `--stop-before`.
 
-(cmdline-resume-refresh-build-first)=
-[`--resume-refresh-build-first`](cmdline-resume-refresh-build-first) (or `-R`)  
+(cmdline-R)=
+[`-R`](cmdline-R)  
 This option is an alias for using `--resume` and `--refresh-build-first` at the same time.
 It is convenient to use when some project failed to build, and you want to refresh build it,
 and then continue (re-)building projects after that one, as if it was built successfully in
@@ -582,7 +582,7 @@ The corresponding configuration file option is
 (cmdline-refresh-build-first)=
 [`--refresh-build-first`](cmdline-refresh-build-first)  
 Enables the `refresh-build` option for the first project appeared in final projects list to build.
-Useful in conjunction with `--resume`. See also [`--resume-refresh-build-first`](#cmdline-resume-refresh-build-first).
+Useful in conjunction with `--resume`. See also [`-R`](#cmdline-R).
 
 (cmdline-target)=
 [`--target`](cmdline-target) \<name\>  

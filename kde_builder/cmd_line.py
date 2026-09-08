@@ -218,7 +218,7 @@ class Cmdline:
             found_options["query"] = arg
             found_options["pretend"] = True  # Implied pretend mode
             found_options["no-metadata"] = True  # Implied --no-metadata
-        if args.resume or args.resume_refresh_build_first:
+        if args.resume or args.R:
             found_options["resume"] = True
             phases.filter_out_phase("update")  # Implied --no-src
             found_options["no-metadata"] = True  # Implied --no-metadata
@@ -288,7 +288,7 @@ class Cmdline:
         if args.rc_file is not None:
             found_options["rc-file"] = args.rc_file[0]
 
-        if args.resume_refresh_build_first:
+        if args.R:
             found_options["refresh-build-first"] = True
 
         if args.install_login_session_only:

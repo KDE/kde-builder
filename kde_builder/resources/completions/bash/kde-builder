@@ -257,7 +257,7 @@ _kde_builder() {
     --override-build-system --persistent-data-file --dry-run --pretend -p --purge-old-logs
     --no-purge-old-logs --qmake-options --qt-install-dir --query --rc-file --rebuild-failures
     --reconfigure --refresh-build-first --refresh-build -r --remove-after-install --resume
-    --after --resume-after -a --from --resume-from -f --resume-refresh-build-first -R
+    --after --resume-after -a --from --resume-from -f -R
     --revision --run-tests --no-run-tests --self-update --set-project-option-value --show-info
     --source-dir --source-when-start-program --src-only
     --stop-after --to --stop-before --until --stop-on-failure --no-stop-on-failure --tag --target

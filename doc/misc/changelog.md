@@ -1,5 +1,8 @@
 # Changelog
 
+2024-09-08
+: Reduced long alias `--resume-refresh-build-first` of `-R` option.
+
 2026-08-29
 : Added `--target` option.
 

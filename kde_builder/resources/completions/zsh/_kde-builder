@@ -79,7 +79,7 @@ _arguments \
   --resume"[Resume after a build failure]" \
   "(--after --from --resume-after --resume-from -a -f)"{--after,--resume-after,-a}"[Skips modules until just after the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
   "(--after --from --resume-after --resume-from -a -f)"{--from,--resume-from,-f}"[Skips modules until just before the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \
-  "(--resume-refresh-build-first -R)"{--resume-refresh-build-first,-R}"[Resume after a build failure and start the build from scratch of first project]" \
+  -R"[Resume after a build failure and start the build from scratch of first project]" \
   --revision"[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the projects with support for running their test suite]" \
   --self-update"[Update kde-builder itself]" \
