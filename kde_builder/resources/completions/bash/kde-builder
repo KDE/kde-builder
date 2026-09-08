@@ -160,9 +160,9 @@ _kde_builder_filter_options() {
         ["--no-use-idle-io-priority"]="--use-idle-io-priority"
         ["--stop-on-failure"]="--no-stop-on-failure"
         ["--no-stop-on-failure"]="--stop-on-failure"
-        ["--refresh-build"]="--reconfigure"
-        ["-r"]="--reconfigure"
-        ["--reconfigure"]="--refresh-build -r"
+        ["--clean-build"]="--reconfigure"
+        ["-c"]="--reconfigure"
+        ["--reconfigure"]="--clean-build -c"
         ["--check-self-updates"]="--no-check-self-updates"
         ["--no-check-self-updates"]="--check-self-updates"
         ["--compile-commands-export"]="--no-compile-commands-export"
@@ -256,7 +256,7 @@ _kde_builder() {
     --ninja-options --no-metadata -M --no-src -S -s --num-cores-low-mem --num-cores
     --override-build-system --persistent-data-file --dry-run --pretend -p --purge-old-logs
     --no-purge-old-logs --qmake-options --qt-install-dir --query --rc-file --rebuild-failures
-    --reconfigure --refresh-build-first --refresh-build -r --remove-after-install --resume
+    --reconfigure --clean-build-first --clean-build -c --remove-after-install --resume
     --after --resume-after -a --from --resume-from -f -R
     --revision --run-tests --no-run-tests --self-update --set-project-option-value --show-info
     --source-dir --source-when-start-program --src-only

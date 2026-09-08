@@ -142,6 +142,9 @@ class Cmdline:
         opt = OptionsSpec.get_option_by_name("D")
         parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
+        opt = OptionsSpec.get_option_by_name("refresh-build")
+        parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
+
         for opt in OptionsSpec.global_options_without_parameter:
             parser.add_argument(*opt.dashed(), action="store_true", help=opt.help)
 
@@ -240,6 +243,11 @@ class Cmdline:
 
         if args.ignore_projects:
             opts["ignore-projects"] = args.ignore_projects
+
+        if args.refresh_build:
+            # TODO: Remove after 12.12.2026
+            logger_app.warning(" y[*] r[--refresh-build] (r[-r]) is deprecated and will be removed in future release. Use g[--clean-build] (g[-c]) instead.")
+            found_options["clean-build"] = True
         # </editor-fold desc="arg functions">
 
         # handling flag options
@@ -289,7 +297,7 @@ class Cmdline:
             found_options["rc-file"] = args.rc_file[0]
 
         if args.R:
-            found_options["refresh-build-first"] = True
+            found_options["clean-build-first"] = True
 
         if args.install_login_session_only:
             opts["run_mode"] = "install-login-session-only"

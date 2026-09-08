@@ -73,8 +73,8 @@ _arguments \
   --rc-file"[Read configuration from filename instead of default]"":::_files" \
   --rebuild-failures"[Only those projects which failed to build on a previous run.]" \
   --reconfigure"[Run cmake or configure again, without cleaning the build directory]" \
-  --refresh-build-first"[Start the build from scratch of first project]" \
-  "(--refresh-build -r)"{--refresh-build,-r}"[Start the build from scratch]" \
+  --clean-build-first"[Start the build from scratch of first project]" \
+  "(--clean-build -c)"{--clean-build,-c}"[Start the build from scratch]" \
   --remove-after-install"[Delete the source and/or build directory after the project is successfully installed]"":argument:" \
   --resume"[Resume after a build failure]" \
   "(--after --from --resume-after --resume-from -a -f)"{--after,--resume-after,-a}"[Skips modules until just after the given project, then operates as normal]"":::_kde-builder_projects_and_groups" \

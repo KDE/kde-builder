@@ -771,12 +771,12 @@ Type: Boolean, Default value: False
 
 Related command-line option: [--reconfigure](#cmdline-reconfigure).
 
-(conf-refresh-build)=
-[`refresh-build`](conf-refresh-build)
+(conf-clean-build)=
+[`clean-build`](conf-clean-build)
 
 Type: Boolean, Default value: False
 
-Related command-line option: [--refresh-build](#cmdline-refresh-build).
+Related command-line option: [--clean-build](#cmdline-clean-build).
 
 (conf-remove-after-install)=
 [`remove-after-install`](conf-remove-after-install)

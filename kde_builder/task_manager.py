@@ -271,7 +271,7 @@ class TaskManager:
         It will create the build directory if it doesn't already exist.
 
         If builddir/module/.refresh-me exists, the function will
-        completely rebuild the module (as if --refresh-build were passed for that
+        completely rebuild the module (as if --clean-build were passed for that
         module).
 
         This function is running only in main kde-builder process (kde-builder-build).
@@ -285,8 +285,8 @@ class TaskManager:
         if not modules:
             return 0
 
-        if ctx.get_option("refresh-build-first"):
-            modules[0].set_option("refresh-build", True)
+        if ctx.get_option("clean-build-first"):
+            modules[0].set_option("clean-build", True)
 
         # IPC queue should have a message saying whether or not to bother with the
         # build.

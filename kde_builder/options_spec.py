@@ -66,8 +66,8 @@ class OptionsSpec:
     global_options_without_parameter = [
         Option(name="build-system-only", default="", help="Abort building a project just before the make command"),
         Option(name="reconfigure", default="", help="Run cmake or configure again, without cleaning the build directory"),
-        Option(name="refresh-build", aliases=["r"], default="", help="Start the build from scratch"),
-        Option(name="refresh-build-first", default="", help="Start the build from scratch of first project"),
+        Option(name="clean-build", aliases=["c"], default="", help="Start the build from scratch"),
+        Option(name="clean-build-first", default="", help="Start the build from scratch of first project"),
         Option(name="metadata-only", default="", help="Only perform the metadata download process"),
         Option(name="pretend", aliases=["dry-run", "p"], default="", help="Dont actually take major actions, instead describe what would be done"),
     ]
@@ -133,6 +133,7 @@ class OptionsSpec:
     global_options_with_extra_specifier = [
         Option(name="ignore-projects", aliases=["!"], default="", help="Do not include specified projects in the update/build process"),
         Option(name="targets", default={}, help="Specifies custom build targets"),
+        Option(name="refresh-build", aliases=["r"], default="", help="Deprecated, use --clean-build instead"),
     ]
 
     # These options are used for internal state, they are _not_ exposed as cmdline options

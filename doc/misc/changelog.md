@@ -2,6 +2,7 @@
 
 2024-09-08
 : Reduced long alias `--resume-refresh-build-first` of `-R` option.
+: Deprecated `--refresh-build` in favor of `--clean-build`.
 
 2026-08-29
 : Added `--target` option.
