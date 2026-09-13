@@ -109,13 +109,15 @@ class Updater:
         if ref_type == "none":
             ref_value = "HEAD"
 
-        process = subprocess.Popen(f"git ls-remote --exit-code {repo} {ref_value}".split(" "), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["git", "ls-remote", "--exit-code", repo, ref_value]
         try:
-            _, _ = process.communicate(timeout=10)
-            result = process.returncode
+            result = subprocess.run(
+                cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=10,
+            ).returncode
         except subprocess.TimeoutExpired:
-            process.kill()
-            _, _ = process.communicate()
             result = -1
 
         if result == 2:  # Connection successful, but ref_value not found
