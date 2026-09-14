@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
 import logging
 import os.path
@@ -118,6 +119,41 @@ class Updater:
                 timeout=10,
             ).returncode
         except subprocess.TimeoutExpired:
+            result = -1
+
+        if result == 2:  # Connection successful, but ref_value not found
+            raise KBRuntimeError(f"\t{self.module.name} repository at {repo} has no ref y[{ref_value}]")
+        if result == 0:  # Ref is present
+            return
+
+        raise KBRuntimeError(f"\tgit had error exit {result} when verifying {ref_value} present in repository at {repo}")
+
+    async def _verify_ref_present_async(self, repo: str) -> None:
+        ref_value, ref_type = self.determine_preferred_checkout_source()
+
+        if kde_builder.is_pretending:
+            return
+
+        if ref_type == "none":
+            ref_value = "HEAD"
+
+        cmd = ["git", "ls-remote", "--exit-code", repo, ref_value]
+        proc = None
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            await asyncio.wait_for(proc.wait(), timeout=10)
+            result = proc.returncode
+        except (asyncio.TimeoutError, Exception):
+            if proc is not None and proc.returncode is None:
+                try:
+                    proc.kill()
+                    await proc.wait()
+                except OSError:
+                    pass
             result = -1
 
         if result == 2:  # Connection successful, but ref_value not found
