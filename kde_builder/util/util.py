@@ -250,18 +250,24 @@ class Util:
         return return_str
 
     @staticmethod
-    def _run_logged_internal(module: Module, logpath: str, args: list[str], callback_func: Callable | None) -> int:
+    def _run_logged_internal(module: Module, logpath: str, directory: str | None, args: list[str], callback_func: Callable | None) -> int:
         prepared_env = module.get_prepared_environment()
 
         # Redirect STDIN to /dev/null so that the handle is open but fails when
         # being read from (to avoid waiting forever for e.g. a password prompt that the user can't see).
         stdin_target = None if "KDE_BUILDER_USE_TTY" in prepared_env else subprocess.DEVNULL
 
+        orig_wd = os.getcwd()
+        cwd_target = directory if (directory and directory != orig_wd) else None
+        directory = cwd_target if cwd_target else orig_wd
+
+        logger_logged_cmd.debug(f"\tSubprocess directory: {directory}")
+
         try:
             with open(logpath, "w") as f_logpath:
                 # Don't leave empty output files, give an indication of the particular command run.
                 f_logpath.write("# kde-builder running: '" + "' '".join(args) + "'\n")
-                f_logpath.write("# from directory: " + os.getcwd() + "\n")
+                f_logpath.write("# from directory: " + directory + "\n")
                 if module.current_phase != "update":
                     f_logpath.write("# with environment: " + module.fullpath("build") + "/kde-builder.env\n")
                 f_logpath.flush()
@@ -272,6 +278,7 @@ class Util:
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     env=prepared_env,
+                    cwd=cwd_target,
                 )
 
                 dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
@@ -360,24 +367,7 @@ class Util:
 
         logger_logged_cmd.info(f"run_logged(): Project {module}, Command: " + " ".join(args))
 
-        if not directory:
-            directory = ""
-
-        orig_wd = os.getcwd()
-
-        if directory == orig_wd:
-            # This will simplify debug log, by skipping messages of cd-ing to where we already are.
-            directory = ""
-
-        if directory:
-            logger_logged_cmd.debug("\tGoing to the specified working directory before running _run_logged_internal().")
-            Util.p_chdir(directory)
-
-        exitcode = Util._run_logged_internal(module, logpath, args, callback_func)
-
-        if directory:
-            logger_logged_cmd.debug("\tReturning to the original working directory after running _run_logged_internal().")
-            Util.p_chdir(orig_wd)
+        exitcode = Util._run_logged_internal(module, logpath, directory, args, callback_func)
 
         logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename)}\n")
         if not exitcode == 0:
