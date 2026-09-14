@@ -43,6 +43,7 @@ class Updater:
     def __init__(self, module: Module):
         self.module = module
         self.ipc: IPC | None = None
+        self.srcdir = module.fullpath("source")
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
@@ -86,12 +87,12 @@ class Updater:
         """
         if commit is None:
             raise ProgramError("\tMust specify git-commit to retrieve id for")
-        module = self.module
+        srcdir = self.srcdir
 
-        gitdir = module.fullpath("source") + "/.git"
+        gitdir = srcdir + "/.git"
 
         # Note that the --git-dir must come before the git command itself.
-        an_id = Util.get_program_output("git", "--git-dir", gitdir, "rev-parse", commit)
+        an_id = Util.get_program_output(["git", "--git-dir", gitdir, "rev-parse", commit], cwd=srcdir)
         if an_id:
             an_id = an_id[0].removesuffix("\n")
         else:
@@ -138,7 +139,7 @@ class Updater:
              Exception: If an error occurs.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
         args = ["--", git_repo, srcdir]
 
         if not self.ipc:
@@ -153,15 +154,10 @@ class Updater:
 
         logger_updater.warning(f"\tCloning g[{module}] pointing to {ref_type} b[{ref_value}]")
 
-        Util.p_chdir(module.get_source_dir())
-
-
         exitcode = Util.run_logged(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
 
         if not exitcode == 0:
             raise KBRuntimeError("\tFailed to make initial clone of project")
-
-        Util.p_chdir(srcdir)
 
         # Setup user configuration
         if name := module.get_option("git-user"):
@@ -175,19 +171,20 @@ class Updater:
                                      " (should be in format 'User Name <username@example.net>'")
 
             logger_updater.debug(f"\tAdding git identity {name} for project {module}")
-            result = Util.safe_system(["git", "config", "--local", "user.name", username])
-            result = Util.safe_system(["git", "config", "--local", "user.email", email]) or result
+            result = Util.safe_system(["git", "config", "--local", "user.name", username], cwd=srcdir)
+            result = Util.safe_system(["git", "config", "--local", "user.email", email], cwd=srcdir) or result
             if result:
                 logger_updater.warning(f"\tUnable to set user.name and/or user.email git config for y[b[{module}]!")
         return 1  # success
 
-    @staticmethod
-    def _verify_safe_to_clone_into_source_dir(module: Module, srcdir: str) -> None:
+    def _verify_safe_to_clone_into_source_dir(self) -> None:
         """
         Check that the required source dir is either not already present or is empty.
 
         Throws an exception if that's not true.
         """
+        module = self.module
+        srcdir = self.srcdir
         if os.path.exists(f"{srcdir}") and os.listdir(srcdir):
             logger_updater.error(dedent(f"""
                 \tr[*] The desired source directory for b[{module}] is: y[b[{srcdir}]
@@ -210,7 +207,7 @@ class Updater:
              Exception: On an update error.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
 
         git_repo: str = module.get_option("#resolved-repository")
         if not git_repo:
@@ -223,7 +220,7 @@ class Updater:
             # Note that this function will throw an exception on failure.
             return self.update_existing_clone()
         else:
-            self._verify_safe_to_clone_into_source_dir(module, srcdir)
+            self._verify_safe_to_clone_into_source_dir()
 
             self._verify_ref_present(git_repo)
 
@@ -258,13 +255,14 @@ class Updater:
             remote: name (alias) of the remote to configure
         """
         module = self.module
+        srcdir = self.srcdir
         repo = module.get_option("#resolved-repository")
         has_old_remote = self.has_remote(remote)
 
         if has_old_remote:
             logger_updater.debug(f"\tUpdating the URL for git remote {remote} of {module} ({repo})")
 
-            old_repo = subprocess.run(f"git config --get remote.{remote}.url", shell=True, capture_output=True, text=True).stdout.strip()
+            old_repo = subprocess.run(f"git config --get remote.{remote}.url", shell=True, capture_output=True, text=True, cwd=srcdir).stdout.strip()
 
             if old_repo and (repo != old_repo):
                 logger_updater.warning(dedent(f"""
@@ -273,12 +271,12 @@ class Updater:
                     \ty[b[*]   to   b[{repo}]
                     \ty[b[*] The url for git remote named b[{remote}] has been updated.
                     """))
-            exitcode = Util.run_logged(module, "git-remote-set-url", None, ["git", "remote", "set-url", remote, repo])
+            exitcode = Util.run_logged(module, "git-remote-set-url", srcdir, ["git", "remote", "set-url", remote, repo])
             if not exitcode == 0:
                 raise KBRuntimeError(f"\tUnable to update the URL for git remote {remote} of {module} ({repo})")
         else:
             logger_updater.debug(f"\tAdding new git remote {remote} of {module} ({repo})")
-            exitcode = Util.run_logged(module, "git-remote-add", None, ["git", "remote", "add", remote, repo])
+            exitcode = Util.run_logged(module, "git-remote-add", srcdir, ["git", "remote", "add", remote, repo])
             if not exitcode == 0:
                 raise KBRuntimeError(f"\tUnable to add new git remote {remote} of {module} ({repo})")
 
@@ -294,14 +292,14 @@ class Updater:
         # same as updating the push URL directly because of the remote set-url
         # executed previously by this function for the fetch URL.
 
-        existing_push_url = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True).stdout.strip()
+        existing_push_url = subprocess.run(f"git config --get remote.{remote}.pushurl", shell=True, capture_output=True, text=True, cwd=srcdir).stdout.strip()
 
         if not existing_push_url:
             return
 
         logger_updater.info(f"\tRemoving preconfigured push URL for git remote {remote} of {module}: {existing_push_url}")
 
-        exitcode = Util.run_logged(module, "git-remote-unset-pushurl", None, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
+        exitcode = Util.run_logged(module, "git-remote-unset-pushurl", srcdir, ["git", "config", "--unset", f"remote.{remote}.pushurl"])
         if not exitcode == 0:
             raise KBRuntimeError(f"\tUnable to remove preconfigured push URL for {module}!")
         return
@@ -320,9 +318,10 @@ class Updater:
              True - if decided to refuse to stash, False - if decided to try stashing normally.
         """
         module = self.module
+        srcdir = self.srcdir
 
         # Let us check if we have uncommitted changes
-        status_lines = Util.get_program_output("git", "status", "--porcelain", "--untracked-files=no")
+        status_lines = Util.get_program_output(["git", "status", "--porcelain", "--untracked-files=no"], cwd=srcdir)
         have_uncommitted_changes = bool(status_lines)
 
         if not have_uncommitted_changes:
@@ -330,7 +329,7 @@ class Updater:
 
         # Let us check if we are staying on the same branch, or will switch to another one.
 
-        current_branch = next(iter(Util.get_program_output("git", "branch", "--show-current")), None)
+        current_branch = next(iter(Util.get_program_output(["git", "branch", "--show-current"], cwd=srcdir)), None)
         if current_branch is not None:
             current_branch = current_branch.removesuffix("\n")
 
@@ -374,27 +373,25 @@ class Updater:
         Exception may be thrown if unable to create a local branch.
         """
         module = self.module
-
+        srcdir = self.srcdir
         local_branch = self._detect_existing_local_branch_tracking_remote_branch(remote_name, remote_branch)
-
-        chdir_to = module.fullpath("source")
 
         if not local_branch:
             new_local_branch = remote_branch
-            status = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{new_local_branch}"])
+            status = subprocess.call(["git", "show-ref", "--quiet", "--verify", "--", f"refs/heads/{new_local_branch}"], cwd=srcdir)
             if status != 1:
                 raise KBRuntimeError(f"\tLocal branch y[{new_local_branch}] already exists, but it is not tracking remote branch!")
 
-            result = Util.run_logged(module, "git-checkout-branch", chdir_to, ["git", "checkout", "-b", new_local_branch, f"{remote_name}/{remote_branch}"])
+            result = Util.run_logged(module, "git-checkout-branch", srcdir, ["git", "checkout", "-b", new_local_branch, f"{remote_name}/{remote_branch}"])
             croak_reason = f"\tUnable to perform a git checkout of {remote_name}/{remote_branch}"
         else:
-            result = Util.run_logged(module, "git-checkout-update", chdir_to, ["git", "checkout", local_branch])
+            result = Util.run_logged(module, "git-checkout-update", srcdir, ["git", "checkout", local_branch])
             croak_reason = f"\tUnable to perform a git checkout to existing branch {local_branch}"
 
             if result == 0:
                 # Given that we're starting with a "clean" checkout, it's now simply a fast-forward to the remote HEAD
                 # (previously we pulled, incurring additional network I/O).
-                result = Util.run_logged(module, "git-rebase", None, ["git", "reset", "--hard", f"{remote_name}/{remote_branch}"])
+                result = Util.run_logged(module, "git-rebase", srcdir, ["git", "reset", "--hard", f"{remote_name}/{remote_branch}"])
                 croak_reason = f"\t{module}: Unable to reset to remote development branch {remote_branch}"
 
         if not result == 0:
@@ -423,7 +420,7 @@ class Updater:
              boolean success flag.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
 
         logger_updater.info(f"\tDetaching head to b[{commit}]")
 
@@ -442,24 +439,23 @@ class Updater:
             Exception: On an error.
         """
         module = self.module
+        srcdir = self.srcdir
         cur_repo = module.get_option("#resolved-repository")
 
-        Util.p_chdir((module.fullpath("source")))
-
         if module.get_option("hold-work-branches"):
-            current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True).stdout.strip()
+            current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True, cwd=srcdir).stdout.strip()
             if current_branch.startswith("work/") or current_branch.startswith("mr/"):
                 logger_updater.warning(f"\tHolding g[{module}] at branch b[{current_branch}]")
                 return 0
 
         # Try to save the user if they are doing a merge or rebase
-        if os.path.exists(".git/MERGE_HEAD") or os.path.exists(".git/rebase-merge") or os.path.exists(".git/rebase-apply"):
+        if os.path.exists(f"{srcdir}/.git/MERGE_HEAD") or os.path.exists(f"{srcdir}/.git/rebase-merge") or os.path.exists(f"{srcdir}/.git/rebase-apply"):
             raise KBRuntimeError(f"\tAborting git update for {module}, you appear to have a rebase or merge in progress!")
 
         remote_name = self._determine_remote_name()
         self._set_remote_url(remote_name)
         logger_updater.info(f"\tFetching remote changes to g[{module}]")
-        exitcode = Util.run_logged(module, "git-fetch", None, ["git", "fetch", "-f", "--tags", remote_name])
+        exitcode = Util.run_logged(module, "git-fetch", srcdir, ["git", "fetch", "-f", "--tags", remote_name])
 
         # Download updated objects. This also updates remote heads so do this
         # before we start comparing branches and such.
@@ -478,11 +474,10 @@ class Updater:
         start_commit = self.commit_id("HEAD")
 
         self.stash_and_update(ref_type, remote_name, ref_value)
-        ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"]).decode().strip())
+        ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"], cwd=srcdir).decode().strip())
         return ret
 
-    @staticmethod
-    def _detect_default_remote_head(remote_name: str) -> str:
+    def _detect_default_remote_head(self, remote_name: str) -> str:
         """
         Try to determine the best remote branch name to use as a default if the user hasn't selected one.
 
@@ -491,11 +486,12 @@ class Updater:
         output of "git remote show $REMOTE_NAME" or "git branch -r" but these are
         incredibly slow.
         """
-        if not os.path.isdir(".git"):
+        srcdir = self.srcdir
+        if not os.path.isdir(f"{srcdir}/.git"):
             caller_name = inspect.currentframe().f_back.f_code.co_name
             raise ProgramError("\tRun " + caller_name + " from git repo!")
 
-        with open(f".git/refs/remotes/{remote_name}/HEAD", "r") as file:
+        with open(f"{srcdir}/.git/refs/remotes/{remote_name}/HEAD", "r") as file:
             data = file.read()
 
         if not data:
@@ -582,7 +578,7 @@ class Updater:
         """
         # The git-config line shows all option names of the form submodule.foo.active,
         # filtering down to options for which the option is set to "true"
-        config_lines = Util.get_program_output("git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
+        config_lines = Util.get_program_output(["git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true"])
         return len(config_lines) > 0
 
     @staticmethod
@@ -593,9 +589,10 @@ class Updater:
 
     def count_stash(self, description=None) -> int:
         module = self.module
+        srcdir = self.srcdir
 
-        if os.path.exists(".git/refs/stash"):
-            p = subprocess.run("git rev-list --walk-reflogs --count refs/stash", shell=True, text=True, capture_output=True)
+        if os.path.exists(f"{srcdir}/.git/refs/stash"):
+            p = subprocess.run("git rev-list --walk-reflogs --count refs/stash", shell=True, text=True, capture_output=True, cwd=srcdir)
             print(p.stderr, end="")  # pl2py: in case git warns about something, for example about deprecated grafts. Unfortunately, subprocess washes the colors, but not a big deal.
             count = p.stdout
             if count:
@@ -632,11 +629,12 @@ class Updater:
              1 or raises exception on error.
         """
         module = self.module
+        srcdir = self.srcdir
         date = time.strftime("%F-%R", time.gmtime())  # ISO Date, hh:mm time
         stash_name = f"kde-builder auto-stash at {date}"
 
         # first, log the git status prior to kde-builder taking over the reins in the repo
-        result = Util.run_logged(module, "git-status-before-update", None, ["git", "status"])
+        result = Util.run_logged(module, "git-status-before-update", srcdir, ["git", "status"])
 
         old_stash_count = self.count_stash()
 
@@ -648,7 +646,7 @@ class Updater:
             will_refuse_stashing = self._decide_if_refuse_to_stash(remote_name, commit_id)
             if will_refuse_stashing:
                 raise KBRuntimeError(f"\tRefusing to stash changes from other branch.")
-            result = Util.run_logged(module, "git-stash-push", None, ["git", "stash", "push", "--quiet", "--message", stash_name])
+            result = Util.run_logged(module, "git-stash-push", srcdir, ["git", "stash", "push", "--quiet", "--message", stash_name])
 
         if result == 0:
             pass
@@ -659,7 +657,7 @@ class Updater:
             # out what the original merge conflicts were afterwards.
             self._notify_post_build_message(f"b[{module}] may have local changes that we couldn't handle, so the project was left alone.")
 
-            result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
+            result = Util.run_logged(module, "git-status-after-error", srcdir, ["git", "status"])
             raise KBRuntimeError(f"\tUnable to stash local changes (if any) for {module}, aborting update.")
 
         # next: check if the stash was truly necessary.
@@ -677,7 +675,7 @@ class Updater:
         if result:
             result = 1
         else:
-            result = Util.run_logged(module, "git-status-after-error", None, ["git", "status"])
+            result = Util.run_logged(module, "git-status-after-error", srcdir, ["git", "status"])
             raise KBRuntimeError(f"\tUnable to update source code for {module}")
 
         # we ignore git-status exit code deliberately, it's a debugging aid
@@ -687,7 +685,7 @@ class Updater:
         else:
             # If the stash had been needed then try to re-apply it before we build, so
             # that KDE developers working on changes do not have to manually re-apply.
-            exitcode = Util.run_logged(module, "git-stash-pop", None, ["git", "stash", "pop"])
+            exitcode = Util.run_logged(module, "git-stash-pop", srcdir, ["git", "stash", "pop"])
             if exitcode != 0:
                 message = f"r[b[*] Unable to restore local changes for b[{module}]! You should manually inspect the new stash: b[{stash_name}]"
                 logger_updater.warning(f"\t{message}")
@@ -699,8 +697,7 @@ class Updater:
 
         return result
 
-    @staticmethod
-    def _detect_existing_local_branch_tracking_remote_branch(remote_name: str, remote_branch: str) -> str:
+    def _detect_existing_local_branch_tracking_remote_branch(self, remote_name: str, remote_branch: str) -> str:
         """
         Determine if there is existing local branch that tracks specified remote branch of the specified remote.
 
@@ -715,7 +712,8 @@ class Updater:
         Returns:
             Empty string if no match is found, or the name of the local remote-tracking branch if one exists.
         """
-        lines = Util.get_program_output("git", "for-each-ref", "refs/heads", "--format", "%(refname) %(upstream)")
+        srcdir = self.srcdir
+        lines = Util.get_program_output(["git", "for-each-ref", "refs/heads", "--format", "%(refname) %(upstream)"], cwd=srcdir)
         for line in lines:
             line = line.removesuffix("\n")
             refname, upstream = line.split(" ")
@@ -743,9 +741,10 @@ class Updater:
             A name of the remote to use.
         """
         module = self.module
+        srcdir = self.srcdir
         resolved_repository = module.get_option("#resolved-repository")
 
-        lines = Util.get_program_output("git", "config", "--get-regexp", r"remote\..*\.url", ".")
+        lines = Util.get_program_output(["git", "config", "--get-regexp", r"remote\..*\.url", "."], cwd=srcdir)
 
         for line in lines:
             line = line.removesuffix("\n")
@@ -766,14 +765,14 @@ class Updater:
                 continue
         return Updater.DEFAULT_GIT_REMOTE
 
-    @staticmethod
-    def has_remote(remote: str) -> bool:
+    def has_remote(self, remote: str) -> bool:
         """
         Return true if the git module in the current directory has a remote of the name given by the first parameter.
         """
+        srcdir = self.srcdir
         has_remote = False
 
-        existing_remotes = Util.get_program_output("git", "remote")
+        existing_remotes = Util.get_program_output(["git", "remote"], cwd=srcdir)
         existing_remotes = [el.removesuffix("\n") for el in existing_remotes]
 
         for existing_remote in existing_remotes:

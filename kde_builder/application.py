@@ -355,15 +355,12 @@ class Application:
                 Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status.
 
             if update_desired or update_needed:
-                orig_wd = os.getcwd()
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
                 if not Debug().is_testing():
                     metadata_module.scm.update_internal()
                 logger_app.warning("")  # Space after "Updating repo-metadata" block
                 metadata_module.current_phase = None
-                logger_app.debug("Return to the original working directory after metadata downloading")  # This is needed to pick the config file from that directory
-                Util.p_chdir(orig_wd)
                 # "last-metadata-update" will be set after config is read, so value will be overriden
 
             Debug().set_pretending(was_pretending)
