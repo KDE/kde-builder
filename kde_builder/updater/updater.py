@@ -43,6 +43,7 @@ class Updater:
     def __init__(self, module: Module):
         self.module = module
         self.ipc: IPC | None = None
+        self.srcdir = module.fullpath("source")
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
@@ -86,9 +87,9 @@ class Updater:
         """
         if commit is None:
             raise ProgramError("\tMust specify git-commit to retrieve id for")
-        module = self.module
+        srcdir = self.srcdir
 
-        gitdir = module.fullpath("source") + "/.git"
+        gitdir = srcdir + "/.git"
 
         # Note that the --git-dir must come before the git command itself.
         an_id = Util.get_program_output(["git", "--git-dir", gitdir, "rev-parse", commit])
@@ -138,7 +139,7 @@ class Updater:
              Exception: If an error occurs.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
         args = ["--", git_repo, srcdir]
 
         if not self.ipc:
@@ -181,13 +182,14 @@ class Updater:
                 logger_updater.warning(f"\tUnable to set user.name and/or user.email git config for y[b[{module}]!")
         return 1  # success
 
-    @staticmethod
-    def _verify_safe_to_clone_into_source_dir(module: Module, srcdir: str) -> None:
+    def _verify_safe_to_clone_into_source_dir(self) -> None:
         """
         Check that the required source dir is either not already present or is empty.
 
         Throws an exception if that's not true.
         """
+        module = self.module
+        srcdir = self.srcdir
         if os.path.exists(f"{srcdir}") and os.listdir(srcdir):
             logger_updater.error(dedent(f"""
                 \tr[*] The desired source directory for b[{module}] is: y[b[{srcdir}]
@@ -210,7 +212,7 @@ class Updater:
              Exception: On an update error.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
 
         git_repo: str = module.get_option("#resolved-repository")
         if not git_repo:
@@ -223,7 +225,7 @@ class Updater:
             # Note that this function will throw an exception on failure.
             return self.update_existing_clone()
         else:
-            self._verify_safe_to_clone_into_source_dir(module, srcdir)
+            self._verify_safe_to_clone_into_source_dir()
 
             self._verify_ref_present(git_repo)
 
@@ -377,7 +379,7 @@ class Updater:
 
         local_branch = self._detect_existing_local_branch_tracking_remote_branch(remote_name, remote_branch)
 
-        chdir_to = module.fullpath("source")
+        chdir_to = self.srcdir
 
         if not local_branch:
             new_local_branch = remote_branch
@@ -423,7 +425,7 @@ class Updater:
              boolean success flag.
         """
         module = self.module
-        srcdir = module.fullpath("source")
+        srcdir = self.srcdir
 
         logger_updater.info(f"\tDetaching head to b[{commit}]")
 
@@ -444,7 +446,7 @@ class Updater:
         module = self.module
         cur_repo = module.get_option("#resolved-repository")
 
-        Util.p_chdir((module.fullpath("source")))
+        Util.p_chdir(self.srcdir)
 
         if module.get_option("hold-work-branches"):
             current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True).stdout.strip()
