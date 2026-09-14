@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import multiprocessing
 import os.path
@@ -140,6 +141,91 @@ class TaskManager:
             # only work from within the build process
             module.set_persistent_option("source-dir", module.fullpath("source"))
             cur_module += 1
+
+        ipc.send_ipc_message(IPC.ALL_DONE, f"had_errors: {had_error}")
+        return had_error
+
+    @staticmethod
+    async def _handle_updates_async(ipc: IPC, ctx: BuildContext) -> int:
+        """
+        Update a list of modules.
+
+        Args:
+            ipc: IPC module to pass results to.
+            ctx: Build Context, which will be used to determine the module update list.
+
+        The ipc parameter contains an object that is responsible for communicating
+        the status of building the modules. This function must account for every
+        module in ctx's update phase to the ipc object before returning.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
+        Returns:
+             0 on success, non-zero on error.
+        """
+        update_list: list[Module] = ctx.modules_in_phase("update")
+
+        # No reason to print out the text if we're not doing anything.
+        if not update_list:
+            ipc.send_ipc_message(IPC.ALL_UPDATING, "update-list-empty")
+            ipc.send_ipc_message(IPC.ALL_DONE, "update-list-empty")
+            return 0
+
+        kdesrc = ctx.get_source_dir()
+        if not os.path.exists(kdesrc):
+            if not ipc.supports_concurrency():
+                logger_taskmanager.warning(f"Creating global source directory")
+
+            logger_taskmanager.debug("\tKDE source download directory doesn't exist, creating.\n")
+
+            if not Util.super_mkdir(kdesrc):
+                logger_taskmanager.error(f"\tUnable to make directory r[{kdesrc}]!")
+                ipc.send_ipc_message(IPC.ALL_FAILURE, "no-source-dir")
+                return 1
+
+        # Once at this point, any errors we get should be limited to a module,
+        # which means we can tell the build thread to start.
+        ipc.send_ipc_message(IPC.ALL_UPDATING, "starting-updates")
+
+        had_error = 0
+        cur_module = 1
+        num_modules = len(update_list)
+
+        num_simultaneous_updates = 10
+        semaphore = asyncio.Semaphore(num_simultaneous_updates)
+        lock = asyncio.Lock()
+
+        async def worker(module: Module) -> None:
+            nonlocal had_error
+            nonlocal cur_module
+
+            async with semaphore:
+                if TaskManager.DO_STOP:
+                    logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
+                    return
+
+                async with lock:
+                    ipc.set_logged_module(module.name)
+
+                    if not ipc.supports_concurrency():
+                        block_substr = TaskManager._form_block_substring(module)
+                        logger_taskmanager.warning(f"Updating {block_substr} ({cur_module}/{num_modules})")
+                    cur_module += 1
+
+                success = await module.update_async(ipc, ctx)
+
+                async with lock:
+                    if not success:
+                        had_error = 1
+
+                # Cache module directories, e.g. to be consumed in kde-builder --run
+                # This is needed for --no-async mode where the buildSingleModule won't run
+                # But the other one is needed for --async mode since persistent options
+                # only work from within the build process
+                module.set_persistent_option("source-dir", module.fullpath("source"))
+
+        tasks = [worker(module) for module in update_list]
+        await asyncio.gather(*tasks)
 
         ipc.send_ipc_message(IPC.ALL_DONE, f"had_errors: {had_error}")
         return had_error
