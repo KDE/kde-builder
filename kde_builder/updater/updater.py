@@ -567,6 +567,55 @@ class Updater:
         ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"], cwd=srcdir).decode().strip())
         return ret
 
+    async def update_existing_clone_async(self) -> int:
+        """
+        Update an already existing git checkout by running git pull.
+
+        Returns:
+             Number of pulled commits.
+
+        Raises:
+            Exception: On an error.
+        """
+        module = self.module
+        srcdir = self.srcdir
+        cur_repo = module.get_option("#resolved-repository")
+
+        if module.get_option("hold-work-branches"):
+            current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True, cwd=srcdir).stdout.strip()
+            if current_branch.startswith("work/") or current_branch.startswith("mr/"):
+                logger_updater.warning(f"\tHolding g[{module}] at branch b[{current_branch}]")
+                return 0
+
+        # Try to save the user if they are doing a merge or rebase
+        if os.path.exists(f"{srcdir}/.git/MERGE_HEAD") or os.path.exists(f"{srcdir}/.git/rebase-merge") or os.path.exists(f"{srcdir}/.git/rebase-apply"):
+            raise KBRuntimeError(f"\tAborting git update for {module}, you appear to have a rebase or merge in progress!")
+
+        remote_name = self._determine_remote_name()
+        self._set_remote_url(remote_name)
+        logger_updater.info(f"\tFetching remote changes to g[{module}]")
+        exitcode = await Util.run_logged_async(module, "git-fetch", srcdir, ["git", "fetch", "-f", "--tags", remote_name])
+
+        # Download updated objects. This also updates remote heads so do this
+        # before we start comparing branches and such.
+
+        if not exitcode == 0:
+            raise KBRuntimeError(f"\tUnable to perform git fetch for {remote_name} ({cur_repo})")
+
+        # Now we need to figure out if we should update a branch, or simply
+        # checkout a specific tag/SHA1/etc.
+        ref_value, ref_type = self.determine_preferred_checkout_source()
+        if ref_type == "none":
+            ref_type = "branch"
+            ref_value = self._detect_default_remote_head(remote_name)
+
+        logger_updater.warning(f"\tMerging g[{module}] changes from {ref_type} b[{ref_value}]")
+        start_commit = self.commit_id("HEAD")
+
+        self.stash_and_update(ref_type, remote_name, ref_value)
+        ret = int(subprocess.check_output(["git", "rev-list", f"{start_commit}..HEAD", "--count"], cwd=srcdir).decode().strip())
+        return ret
+
     def _detect_default_remote_head(self, remote_name: str) -> str:
         """
         Try to determine the best remote branch name to use as a default if the user hasn't selected one.
