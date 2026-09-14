@@ -91,7 +91,7 @@ class Updater:
         gitdir = module.fullpath("source") + "/.git"
 
         # Note that the --git-dir must come before the git command itself.
-        an_id = Util.get_program_output("git", "--git-dir", gitdir, "rev-parse", commit)
+        an_id = Util.get_program_output(["git", "--git-dir", gitdir, "rev-parse", commit])
         if an_id:
             an_id = an_id[0].removesuffix("\n")
         else:
@@ -322,7 +322,7 @@ class Updater:
         module = self.module
 
         # Let us check if we have uncommitted changes
-        status_lines = Util.get_program_output("git", "status", "--porcelain", "--untracked-files=no")
+        status_lines = Util.get_program_output(["git", "status", "--porcelain", "--untracked-files=no"])
         have_uncommitted_changes = bool(status_lines)
 
         if not have_uncommitted_changes:
@@ -330,7 +330,7 @@ class Updater:
 
         # Let us check if we are staying on the same branch, or will switch to another one.
 
-        current_branch = next(iter(Util.get_program_output("git", "branch", "--show-current")), None)
+        current_branch = next(iter(Util.get_program_output(["git", "branch", "--show-current"])), None)
         if current_branch is not None:
             current_branch = current_branch.removesuffix("\n")
 
@@ -582,7 +582,7 @@ class Updater:
         """
         # The git-config line shows all option names of the form submodule.foo.active,
         # filtering down to options for which the option is set to "true"
-        config_lines = Util.get_program_output("git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true")
+        config_lines = Util.get_program_output(["git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true"])
         return len(config_lines) > 0
 
     @staticmethod
@@ -715,7 +715,7 @@ class Updater:
         Returns:
             Empty string if no match is found, or the name of the local remote-tracking branch if one exists.
         """
-        lines = Util.get_program_output("git", "for-each-ref", "refs/heads", "--format", "%(refname) %(upstream)")
+        lines = Util.get_program_output(["git", "for-each-ref", "refs/heads", "--format", "%(refname) %(upstream)"])
         for line in lines:
             line = line.removesuffix("\n")
             refname, upstream = line.split(" ")
@@ -745,7 +745,7 @@ class Updater:
         module = self.module
         resolved_repository = module.get_option("#resolved-repository")
 
-        lines = Util.get_program_output("git", "config", "--get-regexp", r"remote\..*\.url", ".")
+        lines = Util.get_program_output(["git", "config", "--get-regexp", r"remote\..*\.url", "."])
 
         for line in lines:
             line = line.removesuffix("\n")
@@ -773,7 +773,7 @@ class Updater:
         """
         has_remote = False
 
-        existing_remotes = Util.get_program_output("git", "remote")
+        existing_remotes = Util.get_program_output(["git", "remote"])
         existing_remotes = [el.removesuffix("\n") for el in existing_remotes]
 
         for existing_remote in existing_remotes:

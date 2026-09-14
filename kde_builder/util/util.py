@@ -177,15 +177,12 @@ class Util:
             del os.environ["LC_ALL"]
 
     @staticmethod
-    def get_program_output(program: str, *args) -> list[str]:
+    def get_program_output(args: list[str]) -> list[str]:
         """
         Return a list of output lines from a program.
-
-        Args:
-            program: The program to run (either full path or something
-                accessible in PATH).
-            *args: All remaining arguments are passed to the program.
         """
+        program = args.pop(0)
+
         logger_util.debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
 
         # Check early for whether an executable exists.
