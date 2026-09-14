@@ -255,21 +255,17 @@ class Module(PathResolvingOptions):
             logger_module.error(f"\tError creating r[{self.name}]'s build system!")
             return False
 
-        # Now we're in the checkout directory
-        # So, switch to the build dir.
-        # builddir is automatically set to the right value for qt
-        Util.p_chdir(builddir)
-
         if not build_system.configure_internal():
             logger_module.error(f"\tUnable to configure r[{self.name}] with " + self.build_system.name())
 
-            # Add undocumented ".refresh-me" file to build directory to flag
-            # for --clean-build for this module on next run. See also the
-            # "needs_refreshed" function.
-            if fh := open(".refresh-me", "w"):
-                print("# Build directory will be re-generated next kde-builder run", file=fh)
-                print("# due to failing to complete configuration on the last run", file=fh)
-                fh.close()
+            # Add ".refresh-me" file to build directory to flag for --clean-build for this project on next run.
+            # See also the needs_refreshed() function.
+            try:
+                with open(builddir + "/.refresh-me", "w") as fh:
+                    print("# Build directory will be re-generated next kde-builder run", file=fh)
+                    print("# due to failing to complete configuration on the last run", file=fh)
+            except OSError as e:
+                pass
             return False
         return True
 
