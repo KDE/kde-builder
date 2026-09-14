@@ -164,9 +164,6 @@ class UtilLoggedSubprocess:
 
         def _begin(retval):
             # in a child process
-            if dir_to_run_from:
-                Util.p_chdir(dir_to_run_from)
-
             if self._disable_translations:
                 Util.disable_locale_message_translation()
 
@@ -181,7 +178,7 @@ class UtilLoggedSubprocess:
 
                 callback = clbk
 
-            result = Util.run_logged(module, filename, None, command, callback)
+            result = Util.run_logged(module, filename, dir_to_run_from, command, callback)
             retval.value = result
 
         async def subprocess_progress_handler():
