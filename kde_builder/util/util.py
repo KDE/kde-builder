@@ -76,7 +76,7 @@ class Util:
         os.unlink(path)
 
     @staticmethod
-    def safe_system(cmd_list: list[str]) -> int:
+    def safe_system(cmd_list: list[str], cwd: str | None = None) -> int:
         """
         Execute the system call on the given list if the pretend global option is not set.
 
@@ -85,7 +85,7 @@ class Util:
         """
         if not Debug().pretending():
             logger_util.debug("\tExecuting g['" + "' '".join(cmd_list) + "'")
-            return subprocess.run(cmd_list).returncode
+            return subprocess.run(cmd_list, cwd=cwd).returncode
 
         logger_util.debug("\tWould have run g['" + "' '".join(cmd_list) + "'")
         return 0  # Return true (success code)
@@ -177,7 +177,7 @@ class Util:
             del os.environ["LC_ALL"]
 
     @staticmethod
-    def get_program_output(args: list[str]) -> list[str]:
+    def get_program_output(args: list[str], cwd: str | None = None) -> list[str]:
         """
         Return a list of output lines from a program.
         """
@@ -190,7 +190,7 @@ class Util:
             raise KBRuntimeError(f"Can't find {program} in PATH!")
 
         # todo Originally, the Util.disable_locale_message_translation() was applied to the subprocess, check if it is needed
-        p = subprocess.run([program, *args], shell=False, capture_output=True)
+        p = subprocess.run([program, *args], shell=False, capture_output=True, cwd=cwd)
         exit_code = p.returncode
         child_output = p.stdout.decode()
 
