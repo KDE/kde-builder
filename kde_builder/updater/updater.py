@@ -321,6 +321,45 @@ class Updater:
                 ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
                 return ret
 
+    async def update_checkout_async(self) -> int:
+        """
+        Either performs the initial checkout or updates the current git checkout as appropriate.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
+        Returns:
+             Number of commits pulled.
+             If not cloned yet, and in pretending mode, pretends that 1 commit was pulled.
+             If already cloned, and in pretending mode, pretends that 0 commits were pulled.
+
+        Raises:
+             Exception: On an update error.
+        """
+        module = self.module
+        srcdir = self.srcdir
+
+        git_repo: str = module.get_option("#resolved-repository")
+        if not git_repo:
+            msg = f"\tThere was no y[b[repository] specified for the {module.name}."
+            raise ConfigError(msg)
+
+        # While .git is usually a directory, it can also be a file in case of a
+        # worktree checkout (https://git-scm.com/docs/gitrepository-layout)
+        if os.path.exists(f"{srcdir}/.git"):
+            # Note that this function will throw an exception on failure.
+            return await self.update_existing_clone_async()
+        else:
+            self._verify_safe_to_clone_into_source_dir()
+
+            await self._verify_ref_present_async(git_repo)
+
+            await self._clone_async(git_repo)  # can handle pretending mode
+            if kde_builder.is_pretending:
+                return 1  # pretend like there was 1 commit pulled
+            else:
+                ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
+                return ret
+
     def is_push_url_managed(self) -> bool:
         """
         Determine whether _setup_remote should manage the configuration of the git push URL for the repo.
