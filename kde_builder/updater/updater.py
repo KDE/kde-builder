@@ -215,6 +215,58 @@ class Updater:
                 logger_updater.warning(f"\tUnable to set user.name and/or user.email git config for y[b[{module}]!")
         return 1  # success
 
+    async def _clone_async(self, git_repo: str) -> int:
+        """
+        Perform a git clone to checkout the latest branch of a given git module.
+
+        Args:
+            git_repo: The repository (typically URL) to use.
+
+        Returns:
+            int: 1
+
+        Raises:
+             Exception: If an error occurs.
+        """
+        module = self.module
+        srcdir = self.srcdir
+        args = ["--", git_repo, srcdir]
+
+        if not self.ipc:
+            raise ProgramError("\tMissing IPC object")
+        ipc = self.ipc
+
+        ref_value, ref_type = self.determine_preferred_checkout_source()
+
+        if ref_type != "none":
+            ref_value = ref_value.removeprefix("refs/tags/")  # git-clone -b doesn't like refs/tags/
+            args = ["-b", ref_value] + args  # Checkout branch right away
+
+        logger_updater.warning(f"\tCloning g[{module}] pointing to {ref_type} b[{ref_value}]")
+
+        exitcode = await Util.run_logged_async(module, "git-clone", module.get_source_dir(), ["git", "clone", "--recursive", *args])
+
+        if not exitcode == 0:
+            raise KBRuntimeError("\tFailed to make initial clone of project")
+
+        # Setup user configuration
+        if name := module.get_option("git-user"):
+            username, email = None, None
+            match = re.match(r"^([^<]+) +<([^>]+)>$", name)
+            if match:
+                username, email = match.groups()
+
+            if not username or not email:
+                raise KBRuntimeError(f"\tInvalid username or email for git-user option: {name}" +
+                                     " (should be in format 'User Name <username@example.net>'")
+
+            logger_updater.debug(f"\tAdding git identity {name} for project {module}")
+            result = Util.safe_system(["git", "config", "--local", "user.name", username], cwd=srcdir)
+            result = Util.safe_system(["git", "config", "--local", "user.email", email], cwd=srcdir) or result
+            if result:
+                logger_updater.warning(f"\tUnable to set user.name and/or user.email git config for y[b[{module}]!")
+        return 1  # success
+
     def _verify_safe_to_clone_into_source_dir(self) -> None:
         """
         Check that the required source dir is either not already present or is empty.
