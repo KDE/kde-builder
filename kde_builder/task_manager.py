@@ -478,7 +478,7 @@ class TaskManager:
         signal.signal(signal.SIGHUP, handle_sighup)
 
         logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
-        result: int = TaskManager._handle_updates(ipc, ctx)
+        result: int = asyncio.run(TaskManager._handle_updates_async(ipc, ctx))
 
         logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
         result: int = TaskManager._handle_build(ipc, ctx) or result
@@ -591,7 +591,7 @@ class TaskManager:
         root_logger.handlers.clear()
         root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
 
-        exitcode = TaskManager._handle_updates(ipc_obj, ctx_obj)
+        exitcode = asyncio.run(TaskManager._handle_updates_async(ipc_obj, ctx_obj))
         # print("Updater process exiting with code", exitcode)
         sys.exit(exitcode)
 
