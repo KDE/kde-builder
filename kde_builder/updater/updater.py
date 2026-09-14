@@ -61,6 +61,21 @@ class Updater:
         self.ipc = None
         return num_commits
 
+    async def update_internal_async(self, ipc=IPCNull()) -> int:
+        """
+        Update procedure.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
+        Returns:
+             Number of commits pulled.
+        """
+        self.srcdir = self.module.fullpath("source")
+        self.ipc = ipc
+        num_commits = await self.update_checkout_async()
+        self.ipc = None
+        return num_commits
+
     def _resolve_branch_group(self, branch_group: str) -> str | None:
         """
         Resolve the requested branch-group for this Updater's module.
