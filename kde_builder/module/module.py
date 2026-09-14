@@ -555,6 +555,93 @@ class Module(PathResolvingOptions):
         logger_module.info("")  # Print empty line.
         return return_value
 
+    async def update_async(self, ipc: IPC, ctx: BuildContext) -> bool:
+        """
+        Execute the update (or pretends to do so) using the appropriate source control system.
+
+        This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
+
+        Returns:
+             False on failure, True on success.
+        """
+        module_name = self.name
+        if ctx.get_option("source-dir") != self.get_option("source-dir"):
+            module_src_dir = self.get_source_dir()
+            # This module has a different source directory, ensure it exists.
+            if not Util.super_mkdir(module_src_dir):
+                logger_module.error(f"\tUnable to create separate source directory for r[{self.name}]: {module_src_dir}")
+                ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
+                self.current_phase = None
+                logger_module.info("")  # Print empty line.
+                return False
+
+        # Check for whether path to source dir has changed due to directory-layout
+        # option or changes to metadata.
+        fullpath = self.fullpath("source")
+        old_source_dir = self.get_option("#last-source-dir")
+        if not kde_builder.is_pretending and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
+            logger_module.warning(dedent(f"""
+                \ty[b[*] Source directory setting has changed to {fullpath}.
+                \ty[b[*] Moving old source directory at {old_source_dir} to the new location.
+                """))
+
+            try:
+                shutil.move(old_source_dir, fullpath)
+            except Exception as e:
+                logger_module.warning(dedent(f"""
+                    \tr[b[*] Unable to move {old_source_dir}
+                    \tr[b[*] to {fullpath}
+                    \tr[b[*] Error: {e}
+                    \ty[b[*] Will proceed, generating a new source dir.
+                    """))
+
+        self.current_phase = "update"
+
+        try:
+            count = await self.scm.update_internal_async(ipc)
+        except Exception as e:
+            if not isinstance(e, KBException):
+                # Do not print traceback for our KBException type exceptions, as we want just a short error message in the output.
+                # Still print the traceback in case it is other Exception type, as this may help to debug problems in case something went wrong in our code.
+                traceback.print_exc()
+
+            ctx.mark_module_phase_failed("update", self)
+
+            if isinstance(e, KBException):
+                e_str = e.message
+            else:
+                e_str = str(e)
+
+            logger_module.error(f"{e_str}")
+            if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
+                logfile = self.get_option("#error-log-file")
+                logger_module.error(f"\tError log: r[" + logfile)
+
+            ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
+            return_value = False
+        else:  # executed if there were no exceptions in try block
+            message = ""
+            if count:
+                if count == 1:
+                    message = "1 commit pulled."
+                if count != 1:
+                    message = f"{count} commits pulled."
+                ipc.notify_update_success(module_name, message)
+            else:
+                message = "0 commits pulled."
+                ipc.send_ipc_message(IPC.MODULE_UPTODATE, f"{module_name}")
+
+            # We doing e.g. --src-only, the build phase that normally outputs
+            # number of files updated doesn't get run, so manually mention it
+            # here.
+            if not ipc.supports_concurrency():
+                logger_module.info(f"\t{self.name} update complete, {message}")
+
+            return_value = True
+        self.current_phase = None
+        logger_module.info("")  # Print empty line.
+        return return_value
+
     @override
     def set_option(self, opt_name: str, opt_val) -> None:
         """
