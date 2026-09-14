@@ -14,14 +14,10 @@ import os.path
 import re
 import shlex
 import shutil
-import signal
 import subprocess
-import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Callable
-
-import setproctitle
 
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
@@ -255,119 +251,77 @@ class Util:
 
     @staticmethod
     def _run_logged_internal(module: Module, logpath: str, args: list[str], callback_func: Callable | None) -> int:
-        # Fork a child, with its stdout connected to CHILD.
-        pipe_read, pipe_write = os.pipe()
-        pid = os.fork()
+        prepared_env = module.get_prepared_environment()
 
-        if pid:
-            # Parent
-            os.close(pipe_write)
+        # Redirect STDIN to /dev/null so that the handle is open but fails when
+        # being read from (to avoid waiting forever for e.g. a password prompt that the user can't see).
+        stdin_target = None if "KDE_BUILDER_USE_TTY" in prepared_env else subprocess.DEVNULL
 
-            dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
+        try:
+            with open(logpath, "w") as f_logpath:
+                # Don't leave empty output files, give an indication of the particular command run.
+                f_logpath.write("# kde-builder running: '" + "' '".join(args) + "'\n")
+                f_logpath.write("# from directory: " + os.getcwd() + "\n")
+                if module.current_phase != "update":
+                    f_logpath.write("# with environment: " + module.fullpath("build") + "/kde-builder.env\n")
+                f_logpath.flush()
 
-            if not callback_func and logger_logged_cmd.isEnabledFor(logging.DEBUG):
-                with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
-                    # If no other callback given, pass to debug() if debug-mode is on.
-                    while True:
-                        line = dec.decode(os.read(pipe_read, 4096))
-                        if not line:
-                            break
-                        if line.strip():
-                            print(line.strip())
-                        f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
+                proc = subprocess.Popen(
+                    args,
+                    stdin=stdin_target,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    env=prepared_env,
+                )
 
-            if callback_func:
-                with open(logpath, "w") as f_logpath:  # pl2py: they have written both to file and to pipe from child. We instead just write to pipe from child, and write to file from here
-                    while True:
-                        line = dec.decode(os.read(pipe_read, 4096))
-                        if not line:
-                            break
-                        callback_func(line)  # Note that line may contain several lines (a string containing "\n")
-                        f_logpath.write(line)  # pl2py: actually write to file, which was done by tee in child in perl
+                dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
+                should_print = logger_logged_cmd.isEnabledFor(logging.DEBUG)
+                have_callback = bool(callback_func)
 
-            _, return_code = os.waitpid(pid, 0)
-            try:
-                os.close(pipe_read)
-            except OSError as e:
-                raise ProgramError(f"syscall failed waiting on run_logged() to finish: {e}")
-
-            # Append the line with exit code to the log file that child process created
-            with open(logpath, "a") as f:
-                f.write(f"\n# exit code was: {return_code}\n")
-
-            # kernel stuff went OK but the child gave a failing exit code
-            if return_code != 0:
-                logger_util.debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
-                return return_code
-            return 0
-        else:
-            # Child. Note here that we need to avoid running our exit cleanup
-            # handlers in here. For that we need sys.exit.
-
-            setproctitle.setproctitle("kde-builder _run_logged_internal: " + " ".join(args))
-
-            # Apply altered environment variables.
-            prepared_env = module.get_prepared_environment()
-            os.environ.update(prepared_env)
-
-            signal.signal(signal.SIGPIPE, signal.SIG_IGN)
-
-            def sigint_handler(signum, frame):
-                sys.stdout.close()  # This should be a pipe
-                sys.stderr.close()
-                sys.exit(signal.SIGINT)
-
-            signal.signal(signal.SIGINT, sigint_handler)
-
-            # Redirect STDIN to /dev/null so that the handle is open but fails when
-            # being read from (to avoid waiting forever for e.g. a password prompt
-            # that the user can't see.
-
-            if "KDE_BUILDER_USE_TTY" not in os.environ:
-                with open("/dev/null", "r") as dev_null:
-                    os.dup2(dev_null.fileno(), 0)
-
-            if callback_func or logger_logged_cmd.isEnabledFor(logging.DEBUG):
-                # pl2py: in perl here they created another pipe to tee command. It connected stdout of child to tee stdin, and the tee have written to file.
-                # I (Andrew Shark) will instead catch the output there from parent and write to file from there.
-                os.close(1)
-                os.dup2(pipe_write, 1)  # pl2py : redirect the stdout of child to the pipe
-            else:
                 try:
-                    f_logpath = open(logpath, "w")
-                    os.close(1)  # close stdout
-                    os.dup2(f_logpath.fileno(), 1)  # open stdout, that will be the logpath file
-                except OSError as e:
-                    logger_util.error(f"Error {e} opening log to {logpath}!")
+                    for raw_line in iter(proc.stdout.readline, b""):
+                        chunk_str = dec.decode(raw_line)
 
-            # Make sure we log everything.
-            os.close(2)  # close stderr
-            os.dup2(1, 2)  # open stderr, that will be our stdout
+                        f_logpath.write(chunk_str)
+                        if should_print:
+                            print(chunk_str, end="")
+                        if have_callback:
+                            callback_func(chunk_str)
 
-            # Don't leave empty output files, give an indication of the particular
-            # command run.
-            print("# kde-builder running: '" + "' '".join(args) + "'")
-            print("# from directory: ", os.getcwd())
-            if module.current_phase != "update":
-                print("# with environment: ", module.fullpath("build") + "/kde-builder.env")
+                    return_code = proc.wait()
+                finally:
+                    # In case of user interrupt, ensure we have no hanging subprocess
+                    if proc.poll() is None:
+                        proc.terminate()
+                        try:
+                            proc.wait(timeout=2)
+                        except subprocess.TimeoutExpired:
+                            proc.kill()
+                            proc.wait()
 
-            # disable_locale_message_translation();
+                # Append the line with exit code to the log file that child process created
+                f_logpath.write(f"\n# exit code was: {return_code}\n")
 
-            # External command.
-            try:
-                os.execvp(args[0], args)
-            except Exception as e:
-                cmd_string = " ".join(args)
-                logger_util.error(dedent(f"""
-                    r[b[Unable to execute "{cmd_string}"]!
-                    {e}
+                if return_code != 0:
+                    logger_util.debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
+                    return return_code
+                return 0
 
-                    Please check your binpath setting (it controls the PATH used by kde-builder).
-                    Currently it is set to g[{os.environ.get("PATH")}].
+        except FileNotFoundError as e:
+            cmd_string = " ".join(args)
+            logger_util.error(dedent(f"""
+                r[b[Unable to execute "{cmd_string}"]!
+                {e}
 
-                    """))
-                # Don't use return, this is the child still!
-                sys.exit(1)
+                Please check your binpath setting (it controls the PATH used by kde-builder).
+                Currently it is set to g[{os.environ.get("PATH")}].
+
+                """))
+            return 1
+
+        except Exception as e:
+            logger_util.error(f"Error executing command: {e}")
+            return 1
 
     @staticmethod
     def good_exitcode(exitcode: int) -> bool:
