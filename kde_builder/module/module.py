@@ -849,32 +849,32 @@ class Module(PathResolvingOptions):
         """
         self.env = {}
 
-    def commit_environment_changes(self) -> None:
+    def get_prepared_environment(self) -> dict[str, str]:
         """
-        Apply all changes queued by queue_environment_variable to the actual environment irretrievably.
-
-        Use this before exec()'ing another child, for instance.
+        Return dict containing the environment that includes changes queued by queue_environment_variable.
         """
-        for key, value in self.env.items():
-            logger_module.debug(f"\tSetting environment variable g[{key}] to g[b[{value}]")
-            os.environ[key] = value
+        prepared_env = os.environ.copy()
 
-        if self.name == "sysadmin-repo-metadata":
-            return
+        if len(self.env):
+            logger_module.debug(f"\tSetting environment variables:")
+            for key, value in self.env.items():
+                logger_module.debug(f"\tg[{key}]=g[b[{value}]")
+                prepared_env[key] = value
 
-        if self.current_phase == "update":
+        if self.current_phase != "update":
             # Skip creating build dir in the update phase, to not confuse user if they just update sources.
             # And in the update phase, we do not set environment variables anyway.
-            return
 
-        build_dir = self.fullpath("build")
-        if not os.path.exists(build_dir):
-            Util.super_mkdir(build_dir)
+            build_dir = self.fullpath("build")
+            if not os.path.exists(build_dir):
+                Util.super_mkdir(build_dir)
 
-        with open(self.fullpath("build") + "/kde-builder.env", "w") as f:
-            f.write("# kate: syntax bash;\n")
-            for key, value in self.env.items():
-                f.write(f"{key}={value}\n")
+            with open(self.fullpath("build") + "/kde-builder.env", "w") as f:
+                f.write("# kate: syntax bash;\n")
+                for key, value in self.env.items():
+                    f.write(f"{key}={value}\n")
+
+        return prepared_env
 
     def prepend_environment_value(self, env_name: str, path_element: str) -> None:
         """

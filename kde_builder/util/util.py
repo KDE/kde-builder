@@ -307,7 +307,8 @@ class Util:
             setproctitle.setproctitle("kde-builder _run_logged_internal: " + " ".join(args))
 
             # Apply altered environment variables.
-            module.commit_environment_changes()
+            prepared_env = module.get_prepared_environment()
+            os.environ.update(prepared_env)
 
             signal.signal(signal.SIGPIPE, signal.SIG_IGN)
 
