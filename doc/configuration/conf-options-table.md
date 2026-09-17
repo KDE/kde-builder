@@ -741,11 +741,17 @@ This option specifies list of commands that will be run after project installati
 Example:
 ```yaml
 global:
+  # Commands to run after every project has built and installed.
   post-install-commands:
-    - sudo systemd-sysext refresh
+    # Refresh the sysext so the new files are in place.
+    - sudo systemd-sysext refresh --always-refresh=yes
+    # Restart plasmashell so it sees the new app/app version/shell component/etc.
+    - systemctl --user restart plasma-plasmashell.service
 
-project kcalc:
-  post-install-commands: []
+project kwin:
+  post-install-commands:
+    # When building KWin, also replace the active KWin instance so the changes are active in the session.
+    - kwin_wayland --replace
 ```
 
 This option can only be set in config file. Command line option is not provided.
