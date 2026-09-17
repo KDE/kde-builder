@@ -142,6 +142,7 @@ class OptionsSpec:
         Option(name="filter-out-phases", default="", help=""),
         Option(name="git-push-protocol", default="git", help=""),
         Option(name="git-repository-base", default={"qt6-copy": "https://invent.kde.org/qt/qt/", "_": "fake/"}, help=""),
+        Option(name="post-install-commands", default=[], help="List of commands to run after project install"),
         Option(name="repository", default="kde-projects", help=""),
         Option(name="set-env", default={}, help=""),  # dict of environment vars to set
         Option(name="use-projects", default="", help=""),

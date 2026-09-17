@@ -731,6 +731,27 @@ meson
 
 Related command-line option: [--override-build-system](#cmdline-override-build-system).
 
+(conf-post-install-commands)=
+[`post-install-commands`](conf-post-install-commands)
+
+Type: List of Strings, Default value: empty list
+
+This option specifies list of commands that will be run after project installation.
+
+Example:
+```yaml
+global:
+  post-install-commands:
+    - sudo systemd-sysext refresh
+
+project kcalc:
+  post-install-commands: []
+```
+
+This option can only be set in config file. Command line option is not provided.
+
+Note that project-scope option value does not override global-scope option value, but extends it.
+
 (conf-purge-old-logs)=
 [`purge-old-logs`](conf-purge-old-logs)
 
