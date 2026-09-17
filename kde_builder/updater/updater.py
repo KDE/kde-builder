@@ -43,19 +43,18 @@ class Updater:
     def __init__(self, module: Module):
         self.module = module
         self.ipc: IPC | None = None
-        self.srcdir = module.fullpath("source")
+        self.srcdir = ""  # Will be set later, after we know the source-dir value
 
     def update_internal(self, ipc=IPCNull()) -> int:
         """
         Update procedure.
-
-        May change the current directory as necessary.
 
         This function could be run by both: main kde-builder process (kde-builder-build), and updater process (kde-builder-updater).
 
         Returns:
              Number of commits pulled.
         """
+        self.srcdir = self.module.fullpath("source")
         self.ipc = ipc
         num_commits = self.update_checkout()
         self.ipc = None
