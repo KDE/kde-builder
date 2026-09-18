@@ -78,6 +78,7 @@ class Updater:
             raise KBRuntimeError("\t_resolve_branch_group is implemented only for KDE Projects.")
 
     def current_revision_internal(self) -> str:
+        self.srcdir = self.module.fullpath("source")  # When using --async mode, the main (build) process sets it here.
         return self.commit_id("HEAD")
 
     def commit_id(self, commit: str) -> str:
