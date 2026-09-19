@@ -210,3 +210,19 @@ def backslash_decode(src):
                 dst += "\\" + char  # keep backslash-escapes like \n or \t
             slashes = 0
     return dst
+
+
+def set_proc_title(title: str) -> None:
+    """
+    Set the name of the thread/sub-process so that is is visible in htop or other process monitor.
+
+    Currently disabled on macOS because setproctitle crashes there.
+    """
+    if sys.platform == "darwin":
+        return
+
+    try:
+        import setproctitle
+        setproctitle.setproctitle(title)
+    except ImportError:
+        pass

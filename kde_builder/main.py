@@ -15,6 +15,7 @@ from kde_builder import KB_PACKAGE_DIR
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
+from kde_builder.os_support import set_proc_title
 from kde_builder.util.textwrap_mod import dedent
 
 
@@ -24,7 +25,7 @@ def ensure_runtime_pymodules_installed():
     """
     required_modules = [
         "yaml",
-        "setproctitle",
+        "setproctitle"
     ]
     missing_modules = []
 
@@ -56,8 +57,7 @@ def ensure_runtime_pymodules_installed():
 def main():
     ensure_runtime_pymodules_installed()
 
-    import setproctitle  # noqa: E402
-    setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
+    set_proc_title("kde-builder main: " + " ".join(sys.argv))
 
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments
