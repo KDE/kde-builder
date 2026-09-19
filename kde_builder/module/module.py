@@ -200,7 +200,8 @@ class Module(PathResolvingOptions):
         if not build_result:
             return False
 
-        self.set_persistent_option("last-build-rev", self.current_scm_revision())
+        if not Debug().pretending():
+            self.set_persistent_option("last-build-rev", self.current_scm_revision())
 
         if self.get_option("run-tests"):
             self.build_system.run_testsuite()
@@ -318,7 +319,6 @@ class Module(PathResolvingOptions):
                     return False
 
         if Debug().pretending():
-            logger_module.debug(f"\tWould have installed g[{self.name}]")
             return True
 
         # Past this point we know we've successfully installed, for real.
