@@ -201,6 +201,7 @@ class Application:
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --resume, ignoring them.")
             cmdline_selectors = module_list
+            opts["special-selectors"].clear()
 
         if "rebuild-failures" in cmdline_global_options:
             module_list: list[str] = ctx.get_persistent_option("global", "last-failed-module-list")
@@ -211,6 +212,7 @@ class Application:
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --rebuild-failures, ignoring them.")
             cmdline_selectors = module_list
+            opts["special-selectors"].clear()
 
         if "list-installed" in cmdline_global_options:
             for key in ctx.persistent_options.keys():
