@@ -193,24 +193,24 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
 
         if "resume" in cmdline_global_options:
-            module_list = ctx.get_persistent_option("global", "resume-list")
+            module_list: list[str] = ctx.get_persistent_option("global", "resume-list")
             if not module_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 raise KBRuntimeError("Invalid --resume flag")
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --resume, ignoring them.")
-            cmdline_selectors = module_list.split(", ")
+            cmdline_selectors = module_list
 
         if "rebuild-failures" in cmdline_global_options:
-            module_list = ctx.get_persistent_option("global", "last-failed-module-list")
+            module_list: list[str] = ctx.get_persistent_option("global", "last-failed-module-list")
             if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which projects have previously failed to build.")
                 raise KBRuntimeError("Invalid --rebuild-failures flag")
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --rebuild-failures, ignoring them.")
-            cmdline_selectors = re.split(r",\s*", module_list)
+            cmdline_selectors = module_list
 
         if "list-installed" in cmdline_global_options:
             for key in ctx.persistent_options.keys():
@@ -598,7 +598,7 @@ class Application:
 
         # Record all failed modules. Unlike the "resume-list" option this doesn't
         # include any successfully-built modules in between failures.
-        failed_modules = ",".join(map(str, ctx.list_failed_modules()))
+        failed_modules: list[str] = [str(module) for module in ctx.list_failed_modules()]
         if failed_modules:
             # We don't clear the list of failed modules on success so that
             # someone can build one or two modules and still use

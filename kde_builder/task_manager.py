@@ -355,7 +355,7 @@ class TaskManager:
 
                 if result == 0:
                     # No failures yet, mark this as resume point
-                    module_list = ", ".join([f"{elem}" for elem in [module] + modules])
+                    module_list: list[str] = [str(elem) for elem in (module, *modules)]
                     ctx.set_persistent_option("global", "resume-list", module_list)
                 result = 1
 
