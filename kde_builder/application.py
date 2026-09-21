@@ -10,6 +10,7 @@ import atexit
 import fileinput
 import glob
 import hashlib
+import importlib
 import os
 import re
 import shutil
@@ -1328,6 +1329,47 @@ class Application:
             signal.signal(sig, handler_func)
 
     def _hold_performance_power_profile_if_possible(self) -> None:
+        # Try firstly sdbus and if not installed fallback dbus python
+        if importlib.util.find_spec("sdbus"):
+            self._hold_performance_power_profile_if_possible_sdbus()
+        else:
+            self._hold_performance_power_profile_if_possible_dbus_python()
+
+    def _hold_performance_power_profile_if_possible_sdbus(self):
+        import sdbus
+
+        from kde_builder.dbus.power_management import PowerManagementInhibitInterface
+        from kde_builder.dbus.power_profile import PowerProfilesInterface
+
+        try:
+            if Debug().pretending():
+                logger_app.info("Would hold performance profile")
+                return
+
+            logger_app.info("Holding performance profile")
+            pp_interface = PowerProfilesInterface(
+                "org.freedesktop.UPower.PowerProfiles",
+                "/org/freedesktop/UPower/PowerProfiles",
+                bus=sdbus.sd_bus_open_system(),
+            )
+            # The hold will be automatically released once kde-builder exits
+            pp_interface.hold_profile(
+                "performance",
+                f"building projects (pid: {self._base_pid})",
+                "kde-builder",
+            )
+
+            inhibit_iface = PowerManagementInhibitInterface(
+                "org.freedesktop.PowerManagement",
+                "/org/freedesktop/PowerManagement/Inhibit",
+                bus=sdbus.sd_bus_open_user(),
+            )
+            # The inhibition will be automatically released once kde-builder exits
+            inhibit_iface.inhibit("kde-builder", "Building projects")
+        except sdbus.DbusFailedError as e:  # TODO best exception handling
+            logger_app.warning(f"Error accessing dbus: {e.__class__.__name__}: {e}")
+
+    def _hold_performance_power_profile_if_possible_dbus_python(self):
         try:
             import dbus  # Do not import in the beginning of file, user may have not installed dbus-python module (we optionally require it)
 
