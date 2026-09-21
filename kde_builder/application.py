@@ -1328,42 +1328,60 @@ class Application:
             signal.signal(sig, handler_func)
 
     def _hold_performance_power_profile_if_possible(self) -> None:
-        try:
-            import dbus  # Do not import in the beginning of file, user may have not installed dbus-python module (we optionally require it)
-
-            # Even when dbus-python is not installed, this module may still be imported successfully.
-            # So check if dbus has some needed attributes, that way we will be sure that module can be used.
-            if not hasattr(dbus, "SystemBus"):
-                logger_app.warning("Looks like python-dbus package is not installed. Skipping dbus calls.")
-                return
-
-            try:
-                system_bus = dbus.SystemBus()
-
-                if Debug().pretending():
-                    logger_app.info("Would hold performance profile")
-                    return
-
-                logger_app.info("Holding performance profile")
-
-                service = system_bus.get_object("org.freedesktop.UPower.PowerProfiles", "/org/freedesktop/UPower/PowerProfiles")
-                ppd = dbus.Interface(service, "org.freedesktop.UPower.PowerProfiles")
-
-                # The hold will be automatically released once kde-builder exits
-                ppd.HoldProfile("performance", f"building projects (pid: {self._base_pid})", "kde-builder")
-
-                session_bus = dbus.SessionBus()
-                proxy = session_bus.get_object("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
-                iface = dbus.Interface(proxy, "org.freedesktop.PowerManagement.Inhibit")
-
-                # The inhibition will be automatically released once kde-builder exits
-                iface.Inhibit("kde-builder", "Building projects")
-
-            except dbus.DBusException as e:
-                logger_app.warning(f"Error accessing dbus: {e}")
-        except ImportError:  # even though the import is going ok even in case python-dbus is not installed, just to be safe, will catch import error
-            logger_app.warning("Could not import dbus module. Skipping dbus calls.")
+        if sys.platform != "linux":
+            logger_app.debug("Not holding performance profile, because OS is not Linux")
             return
+
+        if Debug().pretending():
+            logger_app.info("Would hold performance profile")
+            return
+
+        logger_app.info("Holding performance profile")
+
+        from jeepney import DBusAddress
+        from jeepney import DBusErrorResponse
+        from jeepney import new_method_call
+        from jeepney.io.blocking import open_dbus_connection
+
+        self._dbus_system_conn = None
+        self._dbus_session_conn = None
+        try:
+            self._dbus_system_conn = open_dbus_connection(bus="SYSTEM")
+            upower_addr = DBusAddress(
+                "/org/freedesktop/UPower/PowerProfiles",
+                bus_name="org.freedesktop.UPower.PowerProfiles",
+                interface="org.freedesktop.UPower.PowerProfiles",
+            )
+            upower_msg = new_method_call(
+                upower_addr, method="HoldProfile", signature="sss",
+                body=("performance", f"building projects (pid: {self._base_pid})", "kde-builder")
+            )
+
+            # The hold will be automatically released once kde-builder exits
+            self._dbus_system_conn.send_and_get_reply(upower_msg)
+
+            self._dbus_session_conn = open_dbus_connection(bus="SESSION")
+            pm_addr = DBusAddress(
+                "/org/freedesktop/PowerManagement/Inhibit",
+                bus_name="org.freedesktop.PowerManagement",
+                interface="org.freedesktop.PowerManagement.Inhibit",
+            )
+            pm_msg = new_method_call(
+                pm_addr, method="Inhibit", signature="ss",
+                body=("kde-builder", f"building projects (pid: {self._base_pid})")
+            )
+            # The inhibition will be automatically released once kde-builder exits
+            self._dbus_session_conn.send_and_get_reply(pm_msg)
+
+        except (DBusErrorResponse, OSError, ConnectionError) as e:
+            logger_app.warning(f"Error accessing dbus: {e}")
+            if self._dbus_system_conn is not None:
+                try:
+                    self._dbus_system_conn.close()
+                except Exception:
+                    pass
+            self._dbus_system_conn = None
+            self._dbus_session_conn = None
 
     def _warn_if_branch_group_does_not_exists(self, user_branch_group):
         possible_branch_groups = self.context.branch_group_resolver.layers
