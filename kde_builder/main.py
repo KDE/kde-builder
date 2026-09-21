@@ -24,7 +24,6 @@ def ensure_runtime_pymodules_installed():
     """
     required_modules = [
         "yaml",
-        "setproctitle",
     ]
     missing_modules = []
 
@@ -55,9 +54,6 @@ def ensure_runtime_pymodules_installed():
 
 def main():
     ensure_runtime_pymodules_installed()
-
-    import setproctitle  # noqa: E402
-    setproctitle.setproctitle("kde-builder main: " + " ".join(sys.argv))
 
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments

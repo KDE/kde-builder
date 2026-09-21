@@ -11,7 +11,7 @@ requires-python = ">=3.12"
 dependencies = [
     "jeepney; sys_platform == 'linux'",
     "pyyaml",
-    "setproctitle",
+    "setproctitle; sys_platform != 'darwin'",
 ]
 
 [dependency-groups]

@@ -12,14 +12,13 @@ import signal
 import sys
 from typing import TYPE_CHECKING
 
-import setproctitle
-
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
 from kde_builder.ipc.null import IPCNull
 from kde_builder.ipc.pipe import IPCPipe
 from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
 
 if TYPE_CHECKING:
@@ -483,7 +482,7 @@ class TaskManager:
 
                 signal.signal(signal.SIGHUP, sighup_handler)
 
-                setproctitle.setproctitle("kde-builder-updater")
+                setproctitle("kde-builder-updater")
                 updater_to_monitor_ipc.set_sender()
                 Debug().set_ipc(updater_to_monitor_ipc)
 
@@ -517,7 +516,7 @@ class TaskManager:
 
                 signal.signal(signal.SIGHUP, sighup_handler)
 
-                setproctitle.setproctitle("kde-builder-monitor")
+                setproctitle("kde-builder-monitor")
                 monitor_to_build_ipc.set_sender()
                 updater_to_monitor_ipc.set_receiver()
 
@@ -544,7 +543,7 @@ class TaskManager:
 
             signal.signal(signal.SIGHUP, signal_handler)
 
-            setproctitle.setproctitle("kde-builder-build")
+            setproctitle("kde-builder-build")
             monitor_to_build_ipc.set_receiver()
             result: int = self._handle_build(monitor_to_build_ipc, ctx)
 

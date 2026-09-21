@@ -13,6 +13,7 @@ from typing import Callable
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
+from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
 
 if sys.platform == "darwin":
@@ -164,6 +165,7 @@ class UtilLoggedSubprocess:
 
         def _begin(retval):
             # in a child process
+            setproctitle(f"kde-builder-inspector:{filename}:{self._module.name}")
             if self._disable_translations:
                 Util.disable_locale_message_translation()
 

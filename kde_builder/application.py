@@ -123,18 +123,12 @@ class Application:
 
         # Install signal handlers to ensure that the lockfile gets closed.
         def signal_handler(signum, frame):
-            # import setproctitle
             if self._already_got_signal:
-                # if not os.getpid() == self._base_pid:
-                #     print(f"\nWarning: Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in main process {os.getpid()} ({setproctitle.getproctitle()}), but already received it, ignoring.")
-                # else:
-                #     print(f"\nWarning: Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in subprocess {os.getpid()} ({setproctitle.getproctitle()}), but already received it, ignoring.")
                 return
 
             self._already_got_signal = True
 
             if not os.getpid() == self._base_pid:
-                # print(f"\Signal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received in subprocess {os.getpid()} ({setproctitle.getproctitle()}).")
                 sys.exit(signum)
             else:
                 print(f"\nSignal {signal.strsignal(signum)} ({signal.Signals(signum).name}) received, terminating.")
