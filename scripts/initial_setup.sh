@@ -56,7 +56,7 @@ install_runtime_packages() {
   else
     echo -e "${Yellow}Warning: Unsupported OS: $ID, skipping installation of runtime packages.${Color_Off}" 1>&2
 
-    if ! command git &> /dev/null; then
+    if ! command -v git &> /dev/null; then
       echo -e "${Red}The git binary is missing. Please install git package manually.${Color_Off}"
       err_report  # manually show error message
       exit 1
