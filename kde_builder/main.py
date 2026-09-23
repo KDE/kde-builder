@@ -18,43 +18,7 @@ from kde_builder.kb_exception import UnknownKdeProjectException
 from kde_builder.util.textwrap_mod import dedent
 
 
-def ensure_runtime_pymodules_installed():
-    """
-    Ensure that required Python modules are available so that the user isn't surprised later with an exception.
-    """
-    required_modules = [
-        "yaml",
-    ]
-    missing_modules = []
-
-    def validate_mod(mod_name):
-        import importlib
-        try:
-            importlib.import_module(mod_name)
-            return True
-        except ImportError:
-            return False
-
-    for needed_module in required_modules:
-        if validate_mod(needed_module):
-            continue
-        missing_modules.append(needed_module)
-
-    if missing_modules:
-        print(dedent("""
-            Some mandatory Python modules are missing, and kde-builder cannot operate without them. Please ensure these modules are installed:
-            """))
-        for missing_module in missing_modules:
-            print("\t" + missing_module)
-
-        print(dedent(f"""
-            KDE Builder can do this for you on many distros. Consult the installation process in project documentation at https://kde-builder.kde.org
-            """))
-        sys.exit(1)
-
 def main():
-    ensure_runtime_pymodules_installed()
-
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments
     add_bootstrap_arguments(bootstrap_parser)

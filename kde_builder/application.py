@@ -1332,10 +1332,14 @@ class Application:
 
         logger_app.info("Holding performance profile")
 
-        from jeepney import DBusAddress
-        from jeepney import DBusErrorResponse
-        from jeepney import new_method_call
-        from jeepney.io.blocking import open_dbus_connection
+        try:
+            from jeepney import DBusAddress
+            from jeepney import DBusErrorResponse
+            from jeepney import new_method_call
+            from jeepney.io.blocking import open_dbus_connection
+        except ImportError:
+            logger_app.debug("Not holding performance profile, because \"jeepney\" is not installed.")
+            return
 
         self._dbus_system_conn = None
         self._dbus_session_conn = None

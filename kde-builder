@@ -4,7 +4,54 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from kde_builder.main import main
+"""
+This file is used to launch KDE Builder without virtual environment (the legacy way).
+"""  # noqa: D404
+
+import sys
+
+
+def ensure_runtime_pymodules_installed():
+    """
+    Ensure that required Python modules are available so that the user isn't surprised later with an exception.
+    """
+    required_modules = [
+        "yaml",
+    ]
+    missing_modules = []
+
+    def validate_mod(mod_name):
+        import importlib
+        try:
+            importlib.import_module(mod_name)
+            return True
+        except ImportError:
+            return False
+
+    for needed_module in required_modules:
+        if validate_mod(needed_module):
+            continue
+        missing_modules.append(needed_module)
+
+    if missing_modules:
+        print("Some mandatory Python packages are missing, and kde-builder cannot operate without them. "
+              "Please ensure these packages are installed:")
+        for missing_module in missing_modules:
+            print("\t" + missing_module)
+
+        print("Consult the installation process in project documentation at https://kde-builder.kde.org")
+        sys.exit(1)
+
+    if sys.platform == "linux":
+        if not validate_mod("jeepney"):
+            print("Optional Python package \"jeepney\" is missing. kde-builder will not hold performance profile.")
+
+    if sys.platform != "darwin":
+        if not validate_mod("setproctitle"):
+            print("Optional Python package \"setproctitle\" is missing. kde-builder will not set title for subprocesses in async build.")
 
 if __name__ == "__main__":
+    print("")  # To indicate when user runs kde-builder from this wrapper script
+    ensure_runtime_pymodules_installed()
+    from kde_builder.main import main
     main()

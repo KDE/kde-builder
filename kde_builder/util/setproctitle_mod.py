@@ -11,5 +11,8 @@ def setproctitle(title: str):
     if sys.platform == "darwin":
         return
 
-    import setproctitle
-    setproctitle.setproctitle(title)
+    try:
+        import setproctitle
+        setproctitle.setproctitle(title)
+    except ImportError:
+        pass
