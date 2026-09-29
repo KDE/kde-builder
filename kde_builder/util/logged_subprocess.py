@@ -6,20 +6,12 @@
 from __future__ import annotations
 
 import asyncio
-import queue
-import sys
 from typing import Callable
 
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
-from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
-
-if sys.platform == "darwin":
-    import multiprocess as multiprocessing
-else:
-    import multiprocessing
 
 logger_logged_cmd = KBLogger.getLogger("logged-command")
 
@@ -147,64 +139,21 @@ class UtilLoggedSubprocess:
         # a callback to filter through it.
         needs_callback = bool(self.child_output_handler)
 
-        succeeded = 0
-        exitcode = -1
-        lines_queue = multiprocessing.Queue()
-
-        async def subprocess_run(target: Callable):
-            nonlocal exitcode
-
-            multiprocessing.set_start_method("fork", True)  # We use it currently, because we need to Pickle a function.
-            retval = multiprocessing.Value("i", -1)
-            subproc = multiprocessing.Process(target=target, args=(retval,))
-            subproc.start()
-            await asyncio.get_running_loop().run_in_executor(None, subproc.join)
-
-            exitcode = retval.value
-            lines_queue.put(None) # end of data token
-
-        def _begin(retval):
-            # in a child process
-            setproctitle(f"kde-builder-inspector:{filename}:{self._module.name}")
-            if self._disable_translations:
-                Util.disable_locale_message_translation()
-
-            callback = None
-            if needs_callback:
-                def clbk(lines):
-                    if lines is None:
-                        return
-                    for line in lines.split("\n"):
-                        if line:
-                            lines_queue.put(line)
-
-                callback = clbk
-
-            result = Util.run_logged(module, filename, dir_to_run_from, command, callback)
-            retval.value = result
-
-        async def subprocess_progress_handler():
-            nonlocal lines_queue
-            while True:
-                # multiprocessing.Queue is multi-process, but not awaitable. Need to shunt it off to
-                # a worker thread to make it awaitable.
-                # The get() blocks process termination if the queue isn't fed (like during process
-                # termination...), so let it time out occasionally to relinquish control.
-                try:
-                    line = await asyncio.get_running_loop().run_in_executor(None, lines_queue.get, True, 0.3)
-                except queue.Empty:
-                    continue
-                if line is None: # end of data token
+        callback = None
+        if needs_callback:
+            def clbk(lines):
+                if lines is None:
                     return
-                self.child_output_handler(line)
+                for line in lines.split("\n"):
+                    if line:
+                        self.child_output_handler(line)
+            callback = clbk
 
-        # Now we need to run the subprocess_progress_handler() and the subprocess at the same time.
-        # so we create an async loop for this.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        task1 = loop.create_task(subprocess_progress_handler())
-        task2 = loop.create_task(subprocess_run(_begin))
-        loop.run_until_complete(asyncio.gather(task1, task2))
+        exitcode = loop.run_until_complete(
+            Util.run_logged_async(module, filename, dir_to_run_from, command, callback)
+        )
         loop.close()
 
         # Now we have our subprocess finished, and we can continue
