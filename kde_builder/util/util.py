@@ -424,6 +424,43 @@ class Util:
         return exitcode == 0
 
     @staticmethod
+    async def run_logged_async(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
+        """
+        Run the command, and log it.
+
+        Args:
+            module: The Module object for which the command in args does something
+            filename: A filename to use for log.
+            directory: The working directory to run in. If it is None, the directory is not changed.
+            args: The command to run - args[0] is the executable, the rest - its arguments.
+            callback_func: Optional. Will be invoked for every non-empty line of stdout from the command.
+                           Useful for e.g. munging out the progress of the build.
+
+        Returns:
+            Exit status of the command. This is a shell return code, so 0 is success,
+            and non-zero is failure.
+        """
+        if Debug().pretending():
+            args_str = "', '".join(args)
+            logger_logged_cmd.debug(f"\tWould have run] (g['{args_str}'])")
+            return 0
+
+        if filename.endswith(".log") or "/" in filename:
+            raise ProgramError(f"Incorrect basename passed: {filename}")
+        filename = filename + ".log"
+
+        logpath = module.get_log_path(filename)
+
+        logger_logged_cmd.info(f"run_logged(): Project {module}, Command: " + " ".join(args))
+
+        exitcode = await Util._run_logged_internal_async(module, logpath, directory, args, callback_func)
+
+        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename)}\n")
+        if not exitcode == 0:
+            module.set_error_logfile(filename)
+        return exitcode
+
+    @staticmethod
     def run_logged(module: Module, filename: str, directory: str | None, args: list[str], callback_func: Callable | None = None) -> int:
         """
         Run the command, and log it.
