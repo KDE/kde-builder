@@ -46,7 +46,7 @@ class Version:
     @staticmethod
     def self_update() -> NoReturn:
         logger_app.info("b[*] Running g[git pull] in the " + KB_REPO_DIR)
-        subprocess.run("git pull", shell=True, cwd=KB_REPO_DIR)
+        subprocess.run("git pull origin master", shell=True, cwd=KB_REPO_DIR)
         exit()
 
     @staticmethod
