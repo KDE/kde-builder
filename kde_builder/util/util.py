@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import codecs
 import hashlib
@@ -245,6 +246,94 @@ class Util:
         return_str = ", ".join(str_list)
         return_str = re.sub(r", ([^,]*)$", r" and \1", return_str)  # Replace last ", " with " and ".
         return return_str
+
+    @staticmethod
+    async def _run_logged_internal_async(module: Module, logpath: str, directory: str | None, args: list[str], callback_func: Callable | None) -> int:
+        prepared_env = module.get_prepared_environment()
+
+        # Redirect STDIN to /dev/null so that the handle is open but fails when
+        # being read from (to avoid waiting forever for e.g. a password prompt that the user can't see).
+        stdin_target = None if "KDE_BUILDER_USE_TTY" in prepared_env else subprocess.DEVNULL
+
+        orig_wd = os.getcwd()
+        cwd_target = directory if (directory and directory != orig_wd) else None
+        directory = cwd_target if cwd_target else orig_wd
+
+        logger_logged_cmd.debug(f"\tSubprocess directory: {directory}")
+
+        try:
+            with open(logpath, "w") as f_logpath:
+                # Don't leave empty output files, give an indication of the particular command run.
+                f_logpath.write("# kde-builder running: '" + "' '".join(args) + "'\n")
+                f_logpath.write("# from directory: " + directory + "\n")
+                if module.current_phase != "update":
+                    f_logpath.write("# with environment: " + module.fullpath("build") + "/kde-builder.env\n")
+                f_logpath.flush()
+
+                proc = await asyncio.create_subprocess_exec(
+                    *args,
+                    stdin=stdin_target,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    env=prepared_env,
+                    cwd=cwd_target,
+                )
+
+                dec = codecs.getincrementaldecoder("utf8")()  # We need incremental decoder, because our pipe may be split in half of multibyte character, see https://stackoverflow.com/a/62027284/7869636
+                should_print = logger_logged_cmd.isEnabledFor(logging.DEBUG)
+                have_callback = bool(callback_func)
+
+                try:
+                    while True:
+                        raw_line = await proc.stdout.readline()
+                        if not raw_line:
+                            break
+
+                        chunk_str = dec.decode(raw_line)
+
+                        f_logpath.write(chunk_str)
+                        if should_print:
+                            print(chunk_str, end="")
+                        if have_callback:
+                            callback_func(chunk_str)
+
+                    return_code = await proc.wait()
+                finally:
+                    # In case of user interrupt, ensure we have no hanging subprocess
+                    if proc.returncode is None:
+                        proc.terminate()
+                        try:
+                            await asyncio.wait_for(proc.wait(), timeout=2)
+                        except (asyncio.TimeoutError, Exception):
+                            try:
+                                proc.kill()
+                                await proc.wait()
+                            except Exception:
+                                pass
+
+                # Append the line with exit code to the log file that child process created
+                f_logpath.write(f"\n# exit code was: {return_code}\n")
+
+                if return_code != 0:
+                    logger_util.debug(f"{module} command logged to {logpath} gave non-zero exit: {return_code}")
+                    return return_code
+                return 0
+
+        except FileNotFoundError as e:
+            cmd_string = " ".join(args)
+            logger_util.error(dedent(f"""
+                r[b[Unable to execute "{cmd_string}"]!
+                {e}
+
+                Please check your binpath setting (it controls the PATH used by kde-builder).
+                Currently it is set to g[{os.environ.get("PATH")}].
+
+                """))
+            return 1
+
+        except Exception as e:
+            logger_util.error(f"Error executing command: {e}")
+            return 1
 
     @staticmethod
     def _run_logged_internal(module: Module, logpath: str, directory: str | None, args: list[str], callback_func: Callable | None) -> int:
