@@ -7,6 +7,8 @@
 (install-with-uv)=
 ### Install KDE Builder
 
+We will use `uv` utility. In case it is unavailable on your system, see [](#alternative-installation).
+
 Install `uv` utility with any way you prefer. See [official documentation](https://docs.astral.sh/uv/getting-started/installation/) for available options.
 
 You do not need to install python of any version, because uv will do it automatically inside the virtual environment.
