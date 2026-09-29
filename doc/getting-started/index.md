@@ -7,7 +7,6 @@ nosearch:
 
 ```{toctree}
 before-building
-legacy-installation
 bash-completion-setup
 configure-data
 building-and-troubleshooting
