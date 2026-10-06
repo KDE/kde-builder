@@ -390,6 +390,9 @@ class Application:
         metadata_module = self.context.metadata_module
         metadata_dir = metadata_module.fullpath("source")
 
+        inst_type = Version.detect_installation_type()
+        upg_cmd = Version.get_upgrade_command(inst_type)
+
         try:
             with open(f"{metadata_dir}/config/repo-metadata-format.yaml", "r") as f:
                 repo_metadata_format_yaml = yaml.safe_load(f.read())
@@ -397,8 +400,8 @@ class Application:
             msg = dedent(f"""
                  r[b[*] Cannot check kde-builder-format in repo-metadata, because r[repo-metadata-format.yaml] is missing in repo-metadata.
                  r[*] It is possible that either kde-builder or repo-metadata are out of date.
-                 r[*] To update kde-builder, use y[--self-update].
-                 r[*] To update repo-metadata, use y[--metadata-only].
+                 r[*] To update kde-builder, run y[{upg_cmd}].
+                 r[*] To update repo-metadata, run y[kde-builder --metadata-only].
                 """, preserve_len=1)
             logger_app.error(msg)
             exit()
@@ -410,8 +413,8 @@ class Application:
                  r[b[*] Repo-metadata format has changed. Please update kde-builder.
                  r[*] kde-builder-format currently supported: b[{current_installation_format}]
                  r[*] kde-builder-format from repo-metadata: b[{repo_metadata_format}]
-                 r[*] To update kde-builder, use y[--self-update].
-                 r[*] To update repo-metadata, use y[--metadata-only].
+                 r[*] To update kde-builder, run y[{upg_cmd}].
+                 r[*] To update repo-metadata, run y[kde-builder --metadata-only].
                 """, preserve_len=1)
             logger_app.error(msg)
             exit()

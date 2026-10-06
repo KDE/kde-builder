@@ -172,7 +172,7 @@ class OptionsSpec:
         Option(name="install-login-session-only", default="", help="Skip updating and building everything and only install a login session"),
         Option(name="resume", default="", help="Resume after a build failure"),
         Option(name="R", default="", help="Resume after a build failure and start the build from scratch of first project"),
-        Option(name="self-update", default="", help="Update kde-builder itself"),
+        Option(name="self-update", default="", help="Update kde-builder itself (only for git-managed installations of kde-builder)"),
         Option(name="show-info", default="", help="Show tool information"),
         Option(name="version", aliases=["v"], default="", help="Script information"),
     ]

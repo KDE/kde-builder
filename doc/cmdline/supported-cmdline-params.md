@@ -754,6 +754,7 @@ Prevent the interactive prompts, and use the _value_ as the prompt answer. Such 
 [`--self-update`](cmdline-self-update)  
 Convenience shortcut for updating kde-builder to the latest revision.
 Performs a `git pull` command in the kde-builder installation directory.
+Applicable only for git-managed installations of kde-builder.
 
 ## Script information
 

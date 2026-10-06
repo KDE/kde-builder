@@ -82,7 +82,7 @@ _arguments \
   -R"[Resume after a build failure and start the build from scratch of first project]" \
   --revision"[Checkout a specific numbered revision]"":argument:" \
   "(--run-tests --no-run-tests)"{--run-tests,--no-run-tests}"[Built the projects with support for running their test suite]" \
-  --self-update"[Update kde-builder itself]" \
+  --self-update"[Update kde-builder itself (only for git-managed installations of kde-builder)]" \
   --set-project-option-value"[Override an option in your configuration file for a specific project]"":argument:" \
   --show-info"[Show tool information]" \
   --source-dir"[Directory that stores the KDE sources]"":argument:" \

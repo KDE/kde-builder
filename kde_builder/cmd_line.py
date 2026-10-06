@@ -5,12 +5,10 @@
 
 import argparse
 import re
-from typing import NoReturn
 
 from kde_builder.debug import KBLogger
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.options_spec import add_bootstrap_arguments
-from kde_builder.os_support import OSSupport
 from kde_builder.phase_list import PhaseList
 from kde_builder.util.textwrap_mod import dedent
 from kde_builder.version import Version
@@ -181,9 +179,9 @@ class Cmdline:
 
         # <editor-fold desc="arg functions">
         if args.show_info:
-            self._show_info_and_exit()
+            Version.show_info_and_exit()
         if args.version:
-            self._show_version_and_exit()
+            Version.show_version_and_exit()
         if args.self_update:
             found_options["self-update"] = True
             found_options["no-metadata"] = True  # Implied --no-metadata
@@ -315,19 +313,3 @@ class Cmdline:
         opts["global"] = found_options
         opts["phases"] = phases.phaselist
         return opts
-
-    @staticmethod
-    def _show_version_and_exit() -> NoReturn:
-        version = "kde-builder " + Version.script_version()
-        print(version)
-        exit()
-
-    @staticmethod
-    def _show_info_and_exit() -> NoReturn:
-        os_vendor = OSSupport().ID
-        version = "kde-builder " + Version.script_version()
-        print(dedent(f"""
-            {version}
-            OS: {os_vendor}
-            """))
-        exit()
