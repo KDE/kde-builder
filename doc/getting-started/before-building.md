@@ -1,28 +1,8 @@
 (before-building)=
-# Installation and initial configuration
+# Initial configuration
 
 (initial-setup-of-kde-builder)=
 ## Initial Setup of KDE Builder
-
-(install-with-uv)=
-### Install KDE Builder
-
-We will use `uv` utility. In case it is unavailable on your system, see [](#alternative-installation).
-
-Install `uv` utility with any way you prefer. See [official documentation](https://docs.astral.sh/uv/getting-started/installation/) for available options.
-
-You do not need to install python of any version, because uv will do it automatically inside the virtual environment.
-
-Run the installation command:
-```bash
-uv tool install git+https://invent.kde.org/sdk/kde-builder.git
-```
-
-Make sure it works by running:
-
-```bash
-kde-builder --version
-```
 
 (generate-rcfile)=
 ### Prepare the configuration file

@@ -1,23 +1,23 @@
 (editable-installation)=
 # Editable installation
 
-If you want to develop kde-builder, or test some changes from merge request to kde-builder,
-you can make an "editable installation". That is a type of installation when the tool is
-still available in your system, but the code it uses points to your local repository. You can
-change the kde-builder code in the IDE, and test modified behavior right in your system, without
-the need to reinstall the new version.
+If you want to develop `kde-builder` or test some changes from a merge request, you can use
+an "editable installation". That type of installation keeps the tool available system-wide,
+but points it directly to your local repository. You can modify the `kde-builder` code in
+your IDE and test the updated behavior immediately without needing to reinstall the tool.
 
-To make an editable installation, use the following command:
-```shell
-uv tool install --editable /home/user/Development/kde-builder
+To perform an editable installation, run the following command:
+```bash
+uv tool install --editable "/home/user/Development/kde-builder"
 ```
 
-In the above example we assume that you cloned kde-builder into
-`/home/user/Development/kde-builder` directory. Change it to the actual path that you use
-for developing projects.
+In the example above, we assume that you cloned `kde-builder` into the
+`/home/user/Development/kde-builder` directory. Replace it with the actual path to your
+local repository.
 
-If you have uncommited changes, in the `--version` you will see ".dYYYYMMDD" suffix:
+If you have uncommited changes, running `--version` will append `.dYYYYMMDD` suffix to
+the version string:
 ```text
-kde-builder --version
-kde-builder 0.0.post898+g42cb943fc.d20260928
+$ kde-builder --version
+kde-builder 26.10.post5+g123abc.d20261128
 ```

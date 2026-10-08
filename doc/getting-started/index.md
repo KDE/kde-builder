@@ -6,8 +6,8 @@ nosearch:
 # Getting Started
 
 ```{toctree}
+installation
 before-building
-alternative-installation
 bash-completion-setup
 configure-data
 building-and-troubleshooting
