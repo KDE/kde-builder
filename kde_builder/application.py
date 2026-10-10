@@ -1374,7 +1374,7 @@ class Application:
             # The inhibition will be automatically released once kde-builder exits
             self._dbus_session_conn.send_and_get_reply(pm_msg)
 
-        except (DBusErrorResponse, OSError, ConnectionError) as e:
+        except (DBusErrorResponse, OSError, ConnectionError, KeyError) as e:
             logger_app.warning(f"Error accessing dbus: {e}")
             if self._dbus_system_conn is not None:
                 try:
