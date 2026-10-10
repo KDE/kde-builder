@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Callable
 
-from kde_builder.debug import Debug
+import kde_builder
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
@@ -71,7 +71,7 @@ class Util:
         """
         Unlink the given symlink if global-pretend isn't set.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_util.debug(f"\tWould have unlinked {path}.")
             return
         os.unlink(path)
@@ -84,7 +84,7 @@ class Util:
         Returns:
              The shell error code, so 0 means success, non-zero means failure.
         """
-        if not Debug().pretending():
+        if not kde_builder.is_pretending:
             logger_util.debug("\tExecuting g['" + "' '".join(cmd_list) + "'")
             return subprocess.run(cmd_list, cwd=cwd).returncode
 
@@ -101,7 +101,7 @@ class Util:
         try:
             os.chdir(directory)
         except OSError as e:
-            if Debug().pretending():
+            if kde_builder.is_pretending:
                 return
             raise KBRuntimeError(f"Could not change to directory {directory}: {e}")
 
@@ -118,7 +118,7 @@ class Util:
         if not hasattr(Util, "createdPaths"):
             Util.createdPaths = {}
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             if pathname not in Util.createdPaths and not os.path.exists(pathname):
                 logger_util.debug(f"\tWould have created g[{pathname}]")
             Util.createdPaths[pathname] = True
@@ -203,7 +203,7 @@ class Util:
 
         if exit_code:
             # other errors might still be serious but don't need a backtrace
-            if Debug().pretending():
+            if kde_builder.is_pretending:
                 logger_util.debug(f"{program} gave error exit code {exit_code}")
             else:
                 logger_util.warning(f"{program} gave error exit code {exit_code}")
@@ -440,7 +440,7 @@ class Util:
             Exit status of the command. This is a shell return code, so 0 is success,
             and non-zero is failure.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             args_str = "', '".join(args)
             logger_logged_cmd.debug(f"\tWould have run] (g['{args_str}'])")
             return 0
@@ -477,7 +477,7 @@ class Util:
             Exit status of the command. This is a shell return code, so 0 is success,
             and non-zero is failure.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             args_str = "', '".join(args)
             logger_logged_cmd.debug(f"\tWould have run] (g['{args_str}'])")
             return 0
@@ -529,7 +529,7 @@ class Util:
         user_path = path
         user_path = re.sub(r"^" + os.environ["HOME"], "~", user_path)
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_util.debug(f"Would have removed all files/folders in {user_path}")
             return True
 

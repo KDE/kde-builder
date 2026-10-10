@@ -5,8 +5,8 @@
 
 import yaml
 
+import kde_builder
 from kde_builder import KB_REPO_DIR
-from kde_builder.debug import Debug
 from kde_builder.kb_exception import KBRuntimeError
 
 
@@ -27,7 +27,7 @@ class Metadata:
         """
         path = self.path_to_metadata + "/ignore-kde-projects"
 
-        if Debug().is_testing():
+        if kde_builder.is_testing:
             path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/ignore-kde-projects"
 
         ignore_projects = []
@@ -51,7 +51,7 @@ class Metadata:
         """
         path = self.path_to_metadata + "/branch-groups.yaml"
 
-        if Debug().is_testing():
+        if kde_builder.is_testing:
             path = KB_REPO_DIR + "/tests/fixtures/repo-metadata/branch-groups.yaml"
 
         try:

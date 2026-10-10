@@ -4,13 +4,13 @@
 
 import pytest
 
-from kde_builder.debug import Debug
+import kde_builder
 
 
 @pytest.fixture(autouse=True)
 def reset_pretending():
     """
-    Disable pretending after test, to not influence on other tests, because Debug is singleton.
+    Disable pretending after test, to not influence on other tests.
     """
     yield
-    Debug().set_pretending(False)
+    kde_builder.is_pretending = False

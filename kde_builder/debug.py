@@ -7,6 +7,8 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
+import kde_builder
+
 if TYPE_CHECKING:
     from kde_builder.ipc.pipe import IPCPipe
 
@@ -41,7 +43,7 @@ class Debug:
             Debug.WARNING: "WARNING",
             Debug.ERROR: "ERROR"
         }
-        return f"debugLevel: {debug_level_names[self.debug_level]}, isPretending: {self.is_pretending}"
+        return f"debugLevel: {debug_level_names[self.debug_level]}"
 
     def __init__(self):
         if not self.__initialized:
@@ -51,7 +53,6 @@ class Debug:
             self._pending_screen_log_text = ""
             """Store screen text that was printed before we determined log-dir."""
 
-            self.is_pretending = False
             self.debug_level = Debug.INFO
 
             self.ipc: IPCPipe | None = None
@@ -77,20 +78,6 @@ class Debug:
         text = text.replace("b[", self.BOLD)
         return text
 
-    def pretending(self) -> bool:
-        """
-        Subroutine which returns true if pretend mode is on.
-        """
-        return self.is_pretending
-
-    def set_pretending(self, val: bool) -> None:
-        self.is_pretending = val
-
-    @staticmethod
-    def is_testing() -> bool:
-        # return "HARNESS_ACTIVE" in os.environ
-        return "unittest" in sys.modules
-
     def set_colorful_output(self, use_color: bool) -> None:
         # No colors unless output to a tty.
         if not sys.stdout.isatty():
@@ -114,7 +101,7 @@ class Debug:
             self.BOLD = ""
 
     def set_log_file(self, file_name) -> None:
-        if self.pretending():
+        if kde_builder.is_pretending:
             return
         try:
             self.screen_log_fh = open(file_name, "w")
@@ -173,7 +160,7 @@ class KBLogger(logging.Logger):
         real_level_method = getattr(super(KBLogger, kblogger), message_level)  # the method of logging.Logger for the specific level, for example, the logging.Logger.warning() method
         real_level_method(d.colorize(msg + "]"))
 
-        if not d.pretending():
+        if not kde_builder.is_pretending:
             # todo: This should be just another handler for the logger
             int_message_level = KBLogger.level_names_mapping[message_level.upper()]
             if kblogger.isEnabledFor(int_message_level):

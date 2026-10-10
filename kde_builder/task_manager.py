@@ -12,6 +12,7 @@ import signal
 import sys
 from typing import TYPE_CHECKING
 
+import kde_builder
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
@@ -283,7 +284,7 @@ class TaskManager:
         failed_to_update_log_timestamped = f"{logdir_timestamped}/failed-to-update.log"
         failed_to_update_log_latest = f"{logdir_latest}/failed-to-update.log"
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             status_list_log_timestamped = "/dev/null"
             failed_to_build_log_timestamped = "/dev/null"
             failed_to_update_log_timestamped = "/dev/null"
@@ -365,7 +366,7 @@ class TaskManager:
         failed_to_update_fh.close()
         successfully_build_fh.close()
 
-        if not Debug().pretending():
+        if not kde_builder.is_pretending:
             if os.path.exists(status_list_log_latest):
                 os.remove(status_list_log_latest)
             os.symlink(status_list_log_timestamped, status_list_log_latest)

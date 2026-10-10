@@ -8,8 +8,8 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
+import kde_builder
 from kde_builder import KB_PACKAGE_DIR
-from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
 
@@ -36,7 +36,7 @@ class IdeProjectConfigGenerator:
         This populates the settings VSCode needs to work with most KDE projects,
         such as C++ support, correct build directory, and LSP / IntelliSense.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_ide_proj.debug("\tWould have generated .vscode directory")
             return False
 
@@ -139,7 +139,7 @@ class IdeProjectConfigGenerator:
         return True
 
     def _generate_clion_config(self) -> bool:
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_ide_proj.debug("\tWould have generated .idea directory")
             return False
 
@@ -231,7 +231,7 @@ class IdeProjectConfigGenerator:
         Currently, CMakeLists.txt.shared configurations import are not supported by Qt Creator.
         See developers documentation for more info.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_ide_proj.debug("\tWould have generated .qtcreator directory")
             return False
 

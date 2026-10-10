@@ -12,6 +12,7 @@ import sys
 import time
 from typing import TYPE_CHECKING
 
+import kde_builder
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
@@ -215,7 +216,7 @@ class BuildSystem:
         # It is possible to make it here if there's no source dir and if we're
         # pretending. If we're not actually pretending then this should be a
         # bug...
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return True
         raise ProgramError("We were not supposed to get to this point...")
 
@@ -287,7 +288,7 @@ class BuildSystem:
         srcdir = module.fullpath("source")
         builddir = module.fullpath("build")
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_buildsystem.debug(f"\tWould have cleaned build system for g[{module}]")
             return 1
 

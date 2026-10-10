@@ -6,8 +6,8 @@
 import glob
 from typing import override
 
+import kde_builder
 from kde_builder.build_system.build_system import BuildSystem
-from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.util import Util
@@ -53,7 +53,7 @@ class BuildSystemQMake6(BuildSystem):
         qmake_opts = [el for el in qmake_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         project_files = glob.glob(f"{sourcedir}/*.pro")
 
-        if not project_files and Debug().pretending():
+        if not project_files and kde_builder.is_pretending:
             project_files = [f"{module}.pro"]
 
         if not project_files or not project_files[0]:

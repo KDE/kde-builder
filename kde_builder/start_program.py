@@ -8,7 +8,7 @@ import os
 from typing import TYPE_CHECKING
 from typing import NoReturn
 
-from kde_builder.debug import Debug
+import kde_builder
 from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
 
@@ -112,7 +112,7 @@ class StartProgram:
             f"""Arguments:          {" ".join(args)}"""
         )
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             exit(0)
 
         try:

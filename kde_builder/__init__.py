@@ -7,6 +7,10 @@ A tool to streamline the process of setting up and maintaining development envir
 """
 
 import os
+import sys
 
 KB_PACKAGE_DIR: str = os.path.abspath(os.path.dirname(__file__))
 KB_REPO_DIR: str = os.path.normpath(KB_PACKAGE_DIR + "/..")
+
+is_pretending = False
+is_testing: bool = "pytest" in sys.modules

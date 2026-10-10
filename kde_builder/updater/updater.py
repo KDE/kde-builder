@@ -14,7 +14,7 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from kde_builder.debug import Debug
+import kde_builder
 from kde_builder.debug import KBLogger
 from kde_builder.ipc.null import IPCNull
 from kde_builder.kb_exception import ConfigError
@@ -103,7 +103,7 @@ class Updater:
     def _verify_ref_present(self, repo: str) -> None:
         ref_value, ref_type = self.determine_preferred_checkout_source()
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return
 
         if ref_type == "none":
@@ -225,7 +225,7 @@ class Updater:
             self._verify_ref_present(git_repo)
 
             self._clone(git_repo)  # can handle pretending mode
-            if Debug().pretending():
+            if kde_builder.is_pretending:
                 return 1  # pretend like there was 1 commit pulled
             else:
                 ret = int(subprocess.check_output(["git", "--git-dir", f"{srcdir}/.git", "rev-list", "HEAD", "--count"]).decode().strip())
@@ -640,7 +640,7 @@ class Updater:
 
         logger_updater.debug("\tStashing local changes if any...")
 
-        if Debug().pretending():  # probably best not to do anything if pretending
+        if kde_builder.is_pretending:  # probably best not to do anything if pretending
             result = 0
         else:
             will_refuse_stashing = self._decide_if_refuse_to_stash(remote_name, commit_id)

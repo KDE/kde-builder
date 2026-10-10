@@ -23,6 +23,7 @@ from typing import NoReturn
 
 import yaml
 
+import kde_builder
 from kde_builder import KB_PACKAGE_DIR
 from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
@@ -229,7 +230,7 @@ class Application:
             sp = StartProgram(ctx)
             sp.execute_built_binary(start_program_and_args)  # noreturn
 
-        if not Debug().is_testing():
+        if not kde_builder.is_testing:
             # Running in a test harness, avoid downloading metadata which will be
             # ignored in the test or making changes to git config
             Updater.verify_git_config(ctx)
@@ -322,17 +323,17 @@ class Application:
         ctx = self.context
         update_needed = False
 
-        was_pretending = Debug().pretending()
+        was_pretending = kde_builder.is_pretending
 
         try:
             metadata_module = ctx.metadata_module
 
             source_dir = metadata_module.get_source_dir()
-            Debug().set_pretending(False)  # We will create the source-dir for metadata even if we were in pretending mode
+            kde_builder.is_pretending = False  # We will create the source-dir for metadata even if we were in pretending mode
             if not Util.super_mkdir(source_dir):
                 update_needed = True
                 raise KBRuntimeError(f"Could not create {source_dir} directory!")
-            Debug().set_pretending(was_pretending)
+            kde_builder.is_pretending = was_pretending
 
             module_source = metadata_module.fullpath("source")
             update_desired = not ctx.get_option("no-metadata")
@@ -342,10 +343,10 @@ class Application:
                 ctx.set_option("metadata-update-skipped", 1)
 
             if update_needed:
-                if Debug().pretending():
+                if kde_builder.is_pretending:
                     logger_app.warning(" y[b[*] Ignoring y[b[--pretend] option to download required metadata\n" +
                                        " y[b[*] --pretend mode will resume after metadata is available.")
-                    Debug().set_pretending(False)
+                    kde_builder.is_pretending = False
 
                 # This must be not in pretending mode, because we use "kde:" alias in the repository option of repo-metadata module, and so we really need to edit user's git config.
                 Updater.verify_git_config(ctx)  # Set "kde:" aliases, that may not yet be configured at first run, causing git 128 exit status.
@@ -353,16 +354,16 @@ class Application:
             if update_desired or update_needed:
                 metadata_module.current_phase = "update"
                 logger_app.warning(f"Updating g[repo-metadata]")
-                if not Debug().is_testing():
+                if not kde_builder.is_testing:
                     metadata_module.scm.update_internal()
                 logger_app.warning("")  # Space after "Updating repo-metadata" block
                 metadata_module.current_phase = None
                 # "last-metadata-update" will be set after config is read, so value will be overriden
 
-            Debug().set_pretending(was_pretending)
+            kde_builder.is_pretending = was_pretending
 
         except KBRuntimeError as err:
-            Debug().set_pretending(was_pretending)
+            kde_builder.is_pretending = was_pretending
 
             logger_app.warning("\tb[r[*] Unable to update repo-metadata.")
             logger_app.warning(err.message)
@@ -380,7 +381,7 @@ class Application:
 
         This is used to gracefully exit with a helpful message in case there were incompatible changes.
         """
-        if Debug().is_testing():
+        if kde_builder.is_testing:
             return
 
         with open(f"{KB_PACKAGE_DIR}/resources/supported-formats.yaml", "r") as f:
@@ -426,7 +427,7 @@ class Application:
         branch_group = ctx.get_option("branch-group")
 
         dependency_files = []
-        if Debug().is_testing():
+        if kde_builder.is_testing:
             dependency_files.append(KB_REPO_DIR + "/tests/fixtures/repo-metadata/kde-dependencies/kde-dependencies")
         else:
             srcdir = metadata_module.fullpath("source")
@@ -551,7 +552,7 @@ class Application:
             return 0
 
         # After this call, we must run the finish() method to cleanly complete process execution.
-        if not Debug().pretending() and not self.context.take_lock():
+        if not kde_builder.is_pretending and not self.context.take_lock():
             exit(1)  # Don't finish(), it's not our lockfile!
 
         result = None  # shell-style (0 == success)
@@ -617,7 +618,7 @@ class Application:
                 last_self_updates_check = 0
 
             check_period = 604800  # 604800 - number of seconds in one week
-            if last_self_updates_check + check_period <= int(time()) and not Debug().pretending():
+            if last_self_updates_check + check_period <= int(time()) and not kde_builder.is_pretending:
                 Version.check_for_updates()
                 ctx.set_persistent_option("global", "last-self-updates-check", int(time()))
 
@@ -654,7 +655,7 @@ class Application:
         # the execution with Ctrl+C.
         ctx.status_view.progress_bar_disable()
 
-        if Debug().pretending() or self._base_pid != os.getpid():
+        if kde_builder.is_pretending or self._base_pid != os.getpid():
             # Abort early if pretending or if we're not the same process
             # that was started by the user (e.g. async mode, forked pipe-opens
             exit(exitcode)
@@ -1016,7 +1017,7 @@ class Application:
 
             for module in failures:
                 out_str = f"r[{module}]"
-                if not Debug().pretending():
+                if not kde_builder.is_pretending:
                     logfile = module.get_option("#error-log-file")
 
                     # async updates may cause us not to have an error log file stored. There is only
@@ -1146,10 +1147,10 @@ class Application:
             existing_md5 = ctx.get_persistent_option("/digests", md5_key_name) or ""
 
             if hashlib.md5(open(dest_file_path, "rb").read()).hexdigest() != existing_md5:
-                if not Debug().pretending():
+                if not kde_builder.is_pretending:
                     shutil.copy(dest_file_path, f"{dest_file_path}.kde-builder-backup")
 
-        if not Debug().pretending():
+        if not kde_builder.is_pretending:
             Application._install_templated_file(source_file_path, dest_file_path, ctx)
             ctx.set_persistent_option("/digests", md5_key_name, hashlib.md5(open(dest_file_path, "rb").read()).hexdigest())
 
@@ -1166,7 +1167,7 @@ class Application:
         then the installation script is invoked. Otherwise, invocation is skipped, so user is not asked to enter sudo
         password.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return 0
 
         ctx = self.context
@@ -1277,7 +1278,7 @@ class Application:
         qt_installdir = ctx.get_option("qt-install-dir")
         preferred_paths = [f"{installdir}/bin", f"{qt_installdir}/bin"]
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return False
 
         build_modules = ctx.modules_in_phase("build")
@@ -1329,7 +1330,7 @@ class Application:
             logger_app.debug("Not holding performance profile, because OS is not Linux")
             return
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_app.info("Would hold performance profile")
             return
 

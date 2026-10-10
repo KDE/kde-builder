@@ -5,8 +5,8 @@
 import os
 import re
 
+import kde_builder
 from kde_builder.build_context import BuildContext
-from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.util.util import Util
@@ -60,7 +60,7 @@ class LogDir:
         In other words, we allow user to store directories like ".idea" or ".vscode" in "latest", and
         such files/folders will not be removed.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return
 
         logdir = ctx.get_absolute_path("log-dir")

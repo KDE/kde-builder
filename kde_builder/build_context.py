@@ -15,6 +15,7 @@ import tempfile
 from pathlib import Path
 from typing import override
 
+import kde_builder
 from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
@@ -473,7 +474,7 @@ class BuildContext(PathResolvingOptions):
         if opt_name == "colorful-output":
             Debug().set_colorful_output(opt_val)
         elif opt_name == "pretend":
-            Debug().set_pretending(opt_val)
+            kde_builder.is_pretending = opt_val
 
     # Persistent option handling
 
@@ -545,7 +546,7 @@ class BuildContext(PathResolvingOptions):
 
         The directory used is the same directory that contains the rc file in use.
         """
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return
 
         file_name = self.persistent_option_file_name()

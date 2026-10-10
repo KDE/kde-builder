@@ -8,7 +8,7 @@ from __future__ import annotations
 import asyncio
 from typing import Callable
 
-from kde_builder.debug import Debug
+import kde_builder
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.util import Util
@@ -131,7 +131,7 @@ class UtilLoggedSubprocess:
         dir_to_run_from = self._chdir_to
         command = args
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_logged_cmd.debug("\tWould have run] ('g[" + "]', 'g[".join(command) + "]')")
             return 0
 

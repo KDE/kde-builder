@@ -16,13 +16,13 @@ import traceback
 from typing import TYPE_CHECKING
 from typing import override
 
+import kde_builder
 from kde_builder.build_system.autotools import BuildSystemAutotools
 from kde_builder.build_system.build_system import BuildSystem
 from kde_builder.build_system.kde_cmake import BuildSystemKDECMake
 from kde_builder.build_system.meson import BuildSystemMeson
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
 from kde_builder.build_system.qmake6 import BuildSystemQMake6
-from kde_builder.debug import Debug
 from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
 from kde_builder.kb_exception import KBException
@@ -185,7 +185,7 @@ class Module(PathResolvingOptions):
         """
         build_system = self.build_system
 
-        if build_system.name() == "generic" and not Debug().pretending():
+        if build_system.name() == "generic" and not kde_builder.is_pretending:
             logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
             return False
 
@@ -200,7 +200,7 @@ class Module(PathResolvingOptions):
         if not build_result:
             return False
 
-        if not Debug().pretending():
+        if not kde_builder.is_pretending:
             self.set_persistent_option("last-build-rev", self.current_scm_revision())
 
         if self.get_option("run-tests"):
@@ -219,7 +219,7 @@ class Module(PathResolvingOptions):
         """
         build_system = self.build_system
 
-        if build_system.name() == "generic" and not Debug().pretending():
+        if build_system.name() == "generic" and not kde_builder.is_pretending:
             raise ProgramError("Build system determination still pending when build attempted.")
 
         # Check if a previous build has happened in a different directory (which
@@ -227,7 +227,7 @@ class Module(PathResolvingOptions):
         # toggled)
         builddir = self.fullpath("build")
         old_build_dir = self.get_option("#last-build-dir")
-        if not Debug().pretending() and builddir != old_build_dir and os.path.isdir(old_build_dir) and not os.path.exists(builddir):
+        if not kde_builder.is_pretending and builddir != old_build_dir and os.path.isdir(old_build_dir) and not os.path.exists(builddir):
             logger_module.warning(f"\ty[b[*] Build directory setting has changed to {builddir}.")
             logger_module.warning(f"\ty[b[*] Moving old build directory at {old_build_dir} to the new location.")
 
@@ -281,7 +281,7 @@ class Module(PathResolvingOptions):
         builddir = self.fullpath("build")
         build_sys_file = self.build_system.configured_module_file_name()
 
-        if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
+        if not kde_builder.is_pretending and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
             logger_module.warning("\tTherefore, we can't install it. y[:-(].")
             return False
@@ -318,7 +318,7 @@ class Module(PathResolvingOptions):
                     logger_module.error(message)
                     return False
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             return True
 
         # Past this point we know we've successfully installed, for real.
@@ -357,7 +357,7 @@ class Module(PathResolvingOptions):
         builddir = self.fullpath("build")
         build_sys_file = self.build_system.configured_module_file_name()
 
-        if not Debug().pretending() and not os.path.exists(f"{builddir}/{build_sys_file}"):
+        if not kde_builder.is_pretending and not os.path.exists(f"{builddir}/{build_sys_file}"):
             logger_module.warning(f"\tThe build system doesn't exist for r[{self.name}].")
             logger_module.warning("\tTherefore, we can't uninstall it.")
             return False
@@ -372,7 +372,7 @@ class Module(PathResolvingOptions):
             self.context.mark_module_phase_failed("uninstall", self)
             return False
 
-        if Debug().pretending():
+        if kde_builder.is_pretending:
             logger_module.debug(f"\tWould have uninstalled g[{self.name}]")
             return True
 
@@ -492,7 +492,7 @@ class Module(PathResolvingOptions):
         # option or changes to metadata.
         fullpath = self.fullpath("source")
         old_source_dir = self.get_option("#last-source-dir")
-        if not Debug().pretending() and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
+        if not kde_builder.is_pretending and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
             logger_module.warning(dedent(f"""
                 \ty[b[*] Source directory setting has changed to {fullpath}.
                 \ty[b[*] Moving old source directory at {old_source_dir} to the new location.

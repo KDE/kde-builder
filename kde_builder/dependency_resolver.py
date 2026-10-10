@@ -10,7 +10,7 @@ import re
 from functools import cmp_to_key
 from io import TextIOWrapper
 
-from kde_builder.debug import Debug
+import kde_builder
 from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
@@ -222,7 +222,7 @@ class DependencyResolver:
                 logger_depres.debug(f"Already resolved {dep_module_name} -- skipping")
                 return dep_module_graph["traces"]["result"]
             else:
-                if not Debug().is_testing():
+                if not kde_builder.is_testing:
                     logger_depres.error(f"Found a dependency cycle at: {dep_module_name} while tracing {module_name}")
                 dep_module_graph["traces"]["result"] = 1
         else:
