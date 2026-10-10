@@ -6,8 +6,8 @@
 from __future__ import annotations
 
 import logging
+import multiprocessing
 import os.path
-import selectors
 import signal
 import sys
 from typing import TYPE_CHECKING
@@ -17,7 +17,6 @@ from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
 from kde_builder.ipc.null import IPCNull
 from kde_builder.ipc.pipe import IPCPipe
-from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
 
@@ -36,21 +35,6 @@ class TaskManager:
 
     The detailed list of tasks includes module update, build_system setup, configure, build, and
     install jobs. The :class:`Application` sets up a :class:`BuildContext` for the current build.
-
-    A notable aspect handled by TaskManager is that the concurrent portion of the build is
-    concentrated more-or-less entirely within "run_all_tasks", although other parts of the tool
-    have to be aware of concurrency.
-
-    Examples:
-    ::
-
-        Util.assert_isa(app, Application)
-        mgr = TaskManager(app)
-
-        # build context must be setup first
-        result = mgr.run_all_tasks()
-
-        # all module updates/builds/etc. complete
     """
 
     def __init__(self, app: Application):
@@ -63,21 +47,12 @@ class TaskManager:
 
         This function is running only in main kde-builder process (kde-builder-build).
         """
-        # What we're going to do is fork another child to perform the source
-        # updates while we build.  Setup for this first by initializing some
-        # shared memory.
         ctx = self.ksb_app.context
         result = 0
         ipc = None
 
         def update_opts_sub(mod_name, k, v):
             ctx.set_persistent_option(mod_name, k, v)
-
-        if sys.platform == "darwin":
-            # There were reports that macOS does not play well with async mode. See https://invent.kde.org/sdk/kde-builder/-/issues/79
-            if ctx.get_option("async"):
-                logger_ipc.warning("Disabling async mode due to macOS detected.")
-                ctx.set_option("async", False)
 
         if ctx.uses_concurrent_phases() and ctx.get_option("async"):
             ipc = IPCPipe()
@@ -417,9 +392,9 @@ class TaskManager:
 
         return result
 
-    def _handle_async_build(self, monitor_to_build_ipc: IPCPipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, ipc: IPCPipe, ctx: BuildContext) -> int:
         """
-        Special-cases the handling of the update and build phases, by performing them concurrently (where possible), using forked processes.
+        Special-cases the handling of the update and build phases, by performing them concurrently (where possible).
 
         Only one thread or process of execution will return from this procedure. Any
         other processes will be forced to exit after running their assigned module
@@ -432,134 +407,85 @@ class TaskManager:
         This function is running only in main kde-builder process (kde-builder-build).
 
         Args:
-            monitor_to_build_ipc: IPC Object to use for sending/receiving update/build status. It must be
+            ipc: IPC Object to use for sending/receiving update/build status. It must be
                 an object type that supports IPC concurrency (e.g. IPCPipe).
             ctx: Build Context to use, from which the module lists will be determined.
 
         Returns:
              0 on success, non-zero on failure.
         """
-        # The exact method for async is that two children are forked.  One child
-        # is a source update process.  The other child is a monitor process which will
-        # hold status updates from the update process so that the updates may
-        # happen without waiting for us to be ready to read.
-
         print()  # Space out from metadata messages.
 
-        # Before we fork we should pre-calculate where the logs will go so that the
+        # Before we run updater subprocess, we should pre-calculate where the logs will go so that the
         # children do not try to do the same calculation independently because they
         # didn't know it's already been figured out.
         for module in ctx.modules:
             module.get_log_dir()
 
         result = 0
-        monitor_pid = os.fork()
-        updater_pid = None
 
-        if monitor_pid == 0:
-            # child of build (i.e. monitor and updater)
-            updater_to_monitor_ipc = IPCPipe()
-            updater_pid = os.fork()
+        def updater_entrypoint(ipc_obj, ctx_obj):
+            setproctitle("kde-builder-updater")
 
-            if updater_pid == 0:
-                # child of monitor (i.e. updater)
+            def sigint_handler(sig, frame):
+                # print("[updater process] received SIGINT.")
+                def unraisable_hook(unraisable):
+                    pass
 
-                def sigint_handler(sig, frame):
-                    # print("[updater process] received SIGINT.")
-                    def unraisable_hook(unraisable):
-                        pass
+                sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
+                sys.exit(signal.SIGINT)
 
-                    sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
-                    sys.exit(signal.SIGINT)
+            signal.signal(signal.SIGINT, sigint_handler)
 
-                signal.signal(signal.SIGINT, sigint_handler)
-
-                # If the user sends SIGHUP during the build, we should allow the
-                # current module to complete and then exit early.
-                def sighup_handler(signum, frame):
-                    print(f"[updater process] recv SIGHUP, will end after updating {updater_to_monitor_ipc.logged_module} project.")
-                    self.DO_STOP = 1
-
-                signal.signal(signal.SIGHUP, sighup_handler)
-
-                setproctitle("kde-builder-updater")
-                updater_to_monitor_ipc.set_sender()
-                Debug().set_ipc(updater_to_monitor_ipc)
-
-                exitcode = self._handle_updates(updater_to_monitor_ipc, ctx)
-                # print("Updater process exiting with code", exitcode)
-                sys.exit(exitcode)
-            else:
-                # still monitor
-
-                def sigint_handler(sig, frame):
-                    # print("[monitor process] received SIGINT.")
-
-                    def unraisable_hook(unraisable):
-                        pass
-
-                    sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
-                    sys.exit(signal.SIGINT)
-
-                signal.signal(signal.SIGINT, sigint_handler)
-
-                # If the user sends SIGHUP during the build, we should allow the
-                # current module to complete and then exit early.
-                def sighup_handler(signum, frame):
-                    print("[monitor process] recv SIGHUP, will end after updater process finishes.")
-
-                    # If we haven't recv'd yet, forward to monitor in case user didn't
-                    # send to process group
-                    if not self.DO_STOP:
-                        os.kill(updater_pid, signal.SIGHUP)
-                    self.DO_STOP = 1
-
-                signal.signal(signal.SIGHUP, sighup_handler)
-
-                setproctitle("kde-builder-monitor")
-                monitor_to_build_ipc.set_sender()
-                updater_to_monitor_ipc.set_receiver()
-
-                monitor_to_build_ipc.set_logged_module("#monitor#")  # This /should/ never be used...
-                Debug().set_ipc(monitor_to_build_ipc)
-
-                exitcode = self._handle_monitoring(monitor_to_build_ipc, updater_to_monitor_ipc)
-                os.waitpid(updater_pid, 0)
-                # print("Monitor process exiting with code", exitcode)
-                sys.exit(exitcode)
-        else:
-            # Still the parent, let's do the build.
-
-            # If the user sends SIGHUP during the build, we should allow the current
-            # module to complete and then exit early.
-            def signal_handler(signum, frame):
-                print("[build process] recv SIGHUP, will end after this project")
-
-                # If we haven't recv'd yet, forward to monitor in case user didn't
-                # send to process group
-                if not self.DO_STOP:
-                    os.kill(monitor_pid, signal.SIGHUP)
+            # If the user sends SIGHUP during the build, we should allow the
+            # current module to complete and then exit early.
+            def sighup_handler(signum, frame):
+                print(f"[updater process] recv SIGHUP, will end after updating {ipc_obj.logged_module} project.")
                 self.DO_STOP = 1
 
-            signal.signal(signal.SIGHUP, signal_handler)
+            signal.signal(signal.SIGHUP, sighup_handler)
 
-            setproctitle("kde-builder-build")
-            monitor_to_build_ipc.set_receiver()
-            result: int = self._handle_build(monitor_to_build_ipc, ctx)
+            Debug().set_ipc(ipc_obj)
 
-            if result and ctx.get_option("stop-on-failure"):
-                # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
-                # We will ask monitor to ask updater to finish gracefully.
-                # If the monitor process already finished (in Zombie state), sending signal is not harmful (i.e. obviously has no effect, but will not raise exception).
+            exitcode = self._handle_updates(ipc_obj, ctx)
+            # print("Updater process exiting with code", exitcode)
+            sys.exit(exitcode)
 
-                # print("Asking to stop updates gracefully")
-                os.kill(monitor_pid, signal.SIGHUP)
+        updater_process = multiprocessing.Process(
+            target=updater_entrypoint,
+            args=(ipc, ctx)
+        )
+        updater_process.start()
 
-        monitor_to_build_ipc.wait_for_end()
+        setproctitle("kde-builder-build")
+
+        # If the user sends SIGHUP during the build, we should allow the current
+        # module to complete and then exit early.
+        def signal_handler(signum, frame):
+            print("[build process] recv SIGHUP, will end after this project")
+
+            # If we haven't received yet, forward to updater in case user didn't
+            # send to process group
+            if not self.DO_STOP:
+                os.kill(updater_process.pid, signal.SIGHUP)
+            self.DO_STOP = 1
+
+        signal.signal(signal.SIGHUP, signal_handler)
+
+        result: int = self._handle_build(ipc, ctx)
+
+        if result and ctx.get_option("stop-on-failure"):
+            # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
+            # We will ask updater to finish gracefully.
+
+            # print("Asking to stop updates gracefully")
+            os.kill(updater_process.pid, signal.SIGHUP)
+
+        ipc.wait_for_end()
 
         # Display a message for updated modules not listed because they were not
         # built.
-        unseen_modules: dict[str, str] = monitor_to_build_ipc.unacknowledged_modules()
+        unseen_modules: dict[str, str] = ipc.unacknowledged_modules()
         if unseen_modules:
             # The only current way we should get unacknowledged modules is if the
             # build thread manages to end earlier than the update thread.  This
@@ -570,89 +496,12 @@ class TaskManager:
             # one-by-one the modules that successfully updated.
             logger_taskmanager.debug("Some projects were updated but not built")
 
-        pid, status = os.waitpid(monitor_pid, 0)
-        if os.WEXITSTATUS(status) != 0:
+        updater_process.join()
+        if updater_process.exitcode != 0:
             result = 1
 
-        monitor_to_build_ipc.close()
+        ipc.close()
         return result
-
-    @staticmethod
-    def _handle_monitoring(ipc_to_build: IPCPipe, ipc_from_updater: IPCPipe) -> int:
-        """
-        Handle monitoring process when using :class:`IPCPipe`.
-
-        It reads in all status reports from the source update process and then holds
-        on to them. When the build process is ready to read information we send what
-        we have. Otherwise, we're waiting on the update process to send us something.
-
-        This convoluted arrangement is required to allow the source update
-        process to go from start to finish without undue interruption on it waiting
-        to write out its status to the build process (which is usually busy).
-
-        This function is running only in monitor kde-builder process (kde-builder-monitor).
-
-        Args:
-            ipc_to_build: the IPC object to use to send to build process.
-            ipc_from_updater: the IPC object to use to receive from update process.
-
-        Returns:
-             0 on success, non-zero on failure.
-        """
-        msgs: list[bytes] = []  # Message queue.
-
-        # We will write to the build process and read from the update process.
-
-        send_fh = ipc_to_build.fh
-        if not send_fh:
-            raise KBRuntimeError("??? missing pipe to build proc")
-        recv_fh = ipc_from_updater.fh
-        if not recv_fh:
-            raise KBRuntimeError("??? missing pipe from monitor")
-
-        sel = selectors.DefaultSelector()
-        sel.register(recv_fh, selectors.EVENT_READ)
-        sel.register(send_fh, selectors.EVENT_WRITE)
-
-        # Start the loop.  We will be waiting on either read or write ends.
-        # Whenever select() returns we must check both sets.
-        while len(sel.get_map()) == 2:  # the number of watched pipes is 2, when we unregister the read pipe, then we will write all the rest messages after the loop
-            events = sel.select()
-
-            for key, _ in events:  # events is a list of tuples
-                # Check for source updates first.
-                if key.fileobj == recv_fh:
-                    try:
-                        msg = ipc_from_updater.receive_message()
-                    except Exception as e:
-                        raise e
-
-                    if msg == b"":  # means the other side is presumably done
-                        sel.unregister(recv_fh)  # Select no longer needed, just output to build.
-                        break
-                    else:
-                        msgs.append(msg)
-
-                # Now check for build updates.
-                if key.fileobj == send_fh:
-                    # If we're here the update is still going.  If we have no messages
-                    # to send wait for that first.
-                    if not msgs:
-                        pass
-                    else:
-                        # Send the message (if we got one).
-                        while msgs:
-                            if not ipc_to_build.send_message(msgs.pop(0)):
-                                logger_taskmanager.error("r[mon]: Build process stopped too soon!")
-                                return 1
-
-        sel.unregister(send_fh)  # stop watching the write pipe
-        # Send all remaining messages.
-        for msg in msgs:
-            if not ipc_to_build.send_message(msg):
-                logger_taskmanager.error("r[mon]: Build process stopped too soon!")
-                return 1
-        return 0
 
     @staticmethod
     def _form_block_substring(module: Module) -> str:

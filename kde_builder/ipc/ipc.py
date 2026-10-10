@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import re
-import struct
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from typing import Callable
@@ -64,6 +63,8 @@ class IPC:
     """A message to print after all work done (sent when could not stash or unstash changes)."""
 
     def __init__(self):
+        self.queue = None
+
         self.updated: dict[str, str] = {}
         """Holds update status ("skipped", "success", "failed") for the modules."""
 
@@ -111,8 +112,7 @@ class IPC:
         """
         Sets which module messages stored by send_log_message() are supposed to be associated with.
 
-        This function could be run by all processes: main kde-builder process (kde-builder-build), updater process (kde-builder-updater),
-        and monitor process (kde-builder-monitor).
+        This function could be run by both: main kde-builder process (kde-builder-build), updater process (kde-builder-updater).
         """
         self.logged_module = module_name
 
@@ -356,24 +356,7 @@ class IPC:
         All remaining parameters are sent to the object's send_message()
          procedure.
         """
-        encoded_msg: bytes = struct.pack("!l", ipc_type) + msg.encode("utf-8")
-        return self.send_message(encoded_msg)
-
-    @staticmethod
-    def unpack_msg(msg: bytes) -> tuple[int, str]:
-        """
-        Unpack a message.
-
-        This function is running only in main kde-builder process (kde-builder-build).
-
-        Args:
-            msg: The message.
-
-        Returns:
-             The IPC message type and message content.
-        """
-        return_type, out_buffer = struct.unpack("!l", msg[:4])[0], msg[4:].decode("utf-8")
-        return return_type, out_buffer
+        return self.send_message((ipc_type, msg))
 
     def receive_ipc_message(self) -> tuple[int, str]:
         """
@@ -386,13 +369,9 @@ class IPC:
         """
         if self.updates_done:
             raise ProgramError("Trying to pull message from closed IPC channel!")
-        msg: bytes = self.receive_message()
-        return self.unpack_msg(msg) if msg else (0, "")
+        return self.receive_message()
 
-    # These must be reimplemented.  They must be able to handle scalars without
-    # any extra frills.
-
-    def send_message(self, msg: bytes) -> bool:
+    def send_message(self, msg: tuple[int, str]) -> bool:
         """
         Send message.
 
@@ -407,22 +386,23 @@ class IPC:
         Raises:
              KBRuntimeError: in case of failure.
         """
-        raise ProgramError("Unimplemented.")
+        self.queue.put(msg)
+        return True
 
-    def receive_message(self) -> bytes:
+    def receive_message(self) -> tuple[int, str]:
         """
-        Return a message received from the other side, or None for EOF or error.
+        Return a message received from the other side.
 
         This function is running only in main kde-builder process (kde-builder-build).
         """
-        raise ProgramError("Unimplemented.")
+        raise NotImplementedError()
 
     @staticmethod
     def supports_concurrency() -> bool:
-        return False
+        raise NotImplementedError()
 
     def close(self) -> None:
-        pass
+        self.queue.close()
 
 
 class MsgType(IntEnum):

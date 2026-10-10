@@ -7,7 +7,6 @@ nosearch:
 ```{toctree}
 editable-installation
 concepts
-IPC-notes
 adding-logger
 ide-configs-generation
 ```

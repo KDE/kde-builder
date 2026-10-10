@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import queue
 from typing import override
 
 from kde_builder.ipc.ipc import IPC
@@ -14,17 +15,16 @@ class IPCNull(IPC):
     """
 
     def __init__(self):
-        IPC.__init__(self)
-        self.msgList: list[bytes] = []
-        """List of messages."""
+        super().__init__()
+        self.queue = queue.Queue()
 
     @override
-    def send_message(self, msg: bytes) -> bool:
-        self.msgList.append(msg)
-        return True
+    def receive_message(self) -> tuple[int, str]:
+        try:
+            return self.queue.get_nowait()
+        except queue.Empty:
+            return 0, ""
 
-    @override
-    def receive_message(self) -> bytes:
-        if not len(self.msgList) > 0:
-            return b""
-        return self.msgList.pop(0)
+    @staticmethod
+    def supports_concurrency() -> bool:
+        return False
