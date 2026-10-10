@@ -13,11 +13,10 @@ import sys
 from typing import TYPE_CHECKING
 
 import kde_builder
-from kde_builder.debug import Debug
-from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
 from kde_builder.ipc.null import IPCNull
 from kde_builder.ipc.pipe import IPCPipe
+from kde_builder.kb_logging import IPCQueueLoggingHandler
 from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
 
@@ -26,8 +25,8 @@ if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
     from kde_builder.module.module import Module
 
-logger_ipc = KBLogger.getLogger("ipc")
-logger_taskmanager = KBLogger.getLogger("taskmanager")
+logger_ipc = logging.getLogger("ipc")
+logger_taskmanager = logging.getLogger("taskmanager")
 
 
 class TaskManager:
@@ -401,10 +400,6 @@ class TaskManager:
         other processes will be forced to exit after running their assigned module
         phase(s).
 
-        We also redirect :class:`Debug` output messages to be sent to a single process
-        for display on the terminal instead of allowing them all to interrupt each
-        other.
-
         This function is running only in main kde-builder process (kde-builder-build).
 
         Args:
@@ -446,7 +441,9 @@ class TaskManager:
 
             signal.signal(signal.SIGHUP, sighup_handler)
 
-            Debug().set_ipc(ipc_obj)
+            root_logger = logging.getLogger()
+            root_logger.handlers.clear()
+            root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
 
             exitcode = self._handle_updates(ipc_obj, ctx)
             # print("Updater process exiting with code", exitcode)

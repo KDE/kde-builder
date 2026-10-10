@@ -6,14 +6,14 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import Callable
 
 import kde_builder
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.util import Util
 
-logger_logged_cmd = KBLogger.getLogger("logged-command")
+logger_logged_cmd = logging.getLogger("logged-command")
 
 
 class UtilLoggedSubprocess:

@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 import os.path
 from pathlib import Path
 
@@ -12,11 +13,10 @@ import yaml
 
 import kde_builder
 from kde_builder import KB_REPO_DIR
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import NoKDEProjectsFound
 
-logger_moduleset = KBLogger.getLogger("module-set")
+logger_moduleset = logging.getLogger("module-set")
 
 
 class KDEProjectsReader:

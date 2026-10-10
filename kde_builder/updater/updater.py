@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import inspect
+import logging
 import os.path
 import re
 import subprocess
@@ -15,7 +16,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import kde_builder
-from kde_builder.debug import KBLogger
 from kde_builder.ipc.null import IPCNull
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from kde_builder.ipc.ipc import IPC
     from kde_builder.module.module import Module
 
-logger_updater = KBLogger.getLogger("updater")
+logger_updater = logging.getLogger("updater")
 
 
 class Updater:

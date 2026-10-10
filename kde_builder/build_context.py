@@ -8,6 +8,7 @@ from __future__ import annotations
 import datetime
 import errno
 import json
+import logging
 import os
 import re
 import sys
@@ -16,11 +17,11 @@ from pathlib import Path
 from typing import override
 
 import kde_builder
-from kde_builder.debug import Debug
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
+from kde_builder.kb_logging import colorize
+from kde_builder.kb_logging import main_handler
 from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
 from kde_builder.metadata.metadata import Metadata
 from kde_builder.module.branch_group_resolver import ModuleBranchGroupResolver
@@ -32,7 +33,7 @@ from kde_builder.status_view import StatusView
 from kde_builder.util.textwrap_mod import dedent
 from kde_builder.util.util import Util
 
-logger_buildcontext = KBLogger.getLogger("build-context")
+logger_buildcontext = logging.getLogger("build-context")
 
 
 class BuildContext(PathResolvingOptions):
@@ -164,16 +165,14 @@ class BuildContext(PathResolvingOptions):
                 try:
                     os.kill(int(pid), 0)
 
-                    # Something *is* running, likely kde-builder.  Don't use error,
-                    # it'll scan for $!
-                    print(Debug().colorize(" r[*y[*r[*] kde-builder appears to be running.  Do you want to:\n"))
-                    print(Debug().colorize("  (b[Q])uit, (b[P])roceed anyways?: "))
+                    print(colorize(" r[*y[*r[*] kde-builder appears to be running.  Do you want to:\n"))
+                    print(colorize("  (b[Q])uit, (b[P])roceed anyways?: "))
 
                     choice = input() or ""
                     choice = choice.removesuffix("\n")
 
                     if choice.lower() != "p":
-                        print(Debug().colorize(" y[*] kde-builder run canceled."))
+                        print(colorize(" y[*] kde-builder run canceled."))
                         return False
 
                     # We still can't grab the lockfile, let's just hope things
@@ -472,7 +471,7 @@ class BuildContext(PathResolvingOptions):
 
         # Automatically respond to various global option changes.
         if opt_name == "colorful-output":
-            Debug().set_colorful_output(opt_val)
+            main_handler.formatter.set_colorful_output(opt_val)
         elif opt_name == "pretend":
             kde_builder.is_pretending = opt_val
 

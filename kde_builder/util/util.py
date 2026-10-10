@@ -21,7 +21,6 @@ from typing import TYPE_CHECKING
 from typing import Callable
 
 import kde_builder
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.textwrap_mod import dedent
@@ -29,8 +28,8 @@ from kde_builder.util.textwrap_mod import dedent
 if TYPE_CHECKING:
     from kde_builder.module.module import Module
 
-logger_logged_cmd = KBLogger.getLogger("logged-command")
-logger_util = KBLogger.getLogger("util")
+logger_logged_cmd = logging.getLogger("logged-command")
+logger_util = logging.getLogger("util")
 
 
 class Util:

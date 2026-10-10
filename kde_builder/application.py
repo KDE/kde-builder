@@ -10,6 +10,7 @@ import atexit
 import fileinput
 import glob
 import hashlib
+import logging
 import os
 import re
 import shutil
@@ -29,12 +30,11 @@ from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
 from kde_builder.cmd_line import Cmdline
-from kde_builder.debug import Debug
-from kde_builder.debug import KBLogger
 from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
+from kde_builder.kb_logging import main_handler
 from kde_builder.log_dir import LogDir
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
@@ -48,7 +48,7 @@ from kde_builder.util.textwrap_mod import dedent
 from kde_builder.util.util import Util
 from kde_builder.version import Version
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 
 class Application:
@@ -71,7 +71,7 @@ class Application:
         self._base_pid = os.getpid()  # See finish()
 
         # Default to colorized output if sending to TTY
-        Debug().set_colorful_output(True if sys.stdout.isatty() else False)
+        main_handler.formatter.set_colorful_output(True if sys.stdout.isatty() else False)
 
         self.dependency_resolver: DependencyResolver = None
         self.modules: list[Module] = []
@@ -740,7 +740,7 @@ class Application:
             ctx.merge_options_from(global_opts)
 
         # Now we have determined log-dir, and can set screen log file.
-        Debug().set_log_file(ctx.get_log_dir() + "/screen.log")
+        main_handler.set_log_file(ctx.get_log_dir() + "/screen.log")
 
         # Now, after global options were resolved and set, we can resolve paths in include lines and read those config files.
         node_reader = RecursiveConfigNodesIterator(config_content, rcfile, ctx)

@@ -7,7 +7,6 @@ from typing import Any
 
 import pytest
 
-from kde_builder.debug import KBLogger
 from kde_builder.version import InstallationType
 from kde_builder.version import Version
 
@@ -176,7 +175,7 @@ from kde_builder.version import Version
     ],
 )
 def test_check_for_updates(monkeypatch, caplog, case: dict[str, Any]):
-    logger_app = KBLogger.getLogger("application")
+    logger_app = logging.getLogger("application")
     logger_app.setLevel(logging.INFO)
     logger_app.addHandler(caplog.handler)
 

@@ -6,15 +6,16 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import argparse
+import logging
 import logging.config
 import os
 import sys
 import traceback
 
 from kde_builder import KB_PACKAGE_DIR
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
+from kde_builder.kb_logging import main_handler
 from kde_builder.util.textwrap_mod import dedent
 
 
@@ -84,20 +85,16 @@ def main():
     config = merge_dicts(config, override_config)
     logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
 
-    # Now will create our KBLogger loggers, set up their levels and handlers
-    for logger_name, logger_config in config.get("loggers", {}).items():
-        level = logger_config.get("level", logging.NOTSET)  # get level from the config
-        handlers = logging.getLogger(logger_name).handlers  # get the object handlers that were set for standard logger (their formatters are already set)
-
-        kblogger = KBLogger.getLogger(logger_name, level)  # instantiating our kblogger, and its level becomes set
-        for handler in handlers:
-            kblogger.addHandler(handler)
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)  # Default level
+    root_logger.addHandler(main_handler)
 
     if args.debug:
-        # setting all loggers to logging.DEBUG level
-        for logger_name, _ in config.get("loggers", {}).items():
-            kblogger = KBLogger.getLogger(logger_name)
-            kblogger.setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
+        for logger_name in config.get("loggers", {}):
+            if logger_name == "asyncio":
+                continue
+            logging.getLogger(logger_name).setLevel(logging.NOTSET)
         sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
     # </editor-fold>
 
@@ -113,11 +110,8 @@ def main():
             setup_steps.append("generate-config")
 
     if setup_steps:
-        from kde_builder.debug import Debug
         from kde_builder.first_run import FirstRun
 
-        d = Debug()
-        d.set_colorful_output(True)
         prompt_answer = args.prompt_answer[0] if args.prompt_answer is not None else None
         fr = FirstRun(prompt_answer)
         exit(fr.setup_user_system(setup_steps))
@@ -134,7 +128,7 @@ def main():
         result = app.run_all_module_phases()
         app.finish(result)
     except UnknownKdeProjectException as err:
-        logger_app = KBLogger.getLogger("application")
+        logger_app = logging.getLogger("application")
         unrecognized_name = err.unknown_project_name
         ctx = app.context
         repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
@@ -171,7 +165,7 @@ def main():
         exit(99)  # if app couldn't be created
 
     except KBException as err:
-        logger_app = KBLogger.getLogger("application")
+        logger_app = logging.getLogger("application")
         logger_app.error(str(err))
         if app:
             app.finish(99)  # noreturn

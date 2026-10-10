@@ -4,21 +4,20 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 from typing import TYPE_CHECKING
 
 import yaml
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ConfigError
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
-
-logger_var_subst = KBLogger.getLogger("variables_substitution")
-logger_app = KBLogger.getLogger("application")
+logger_var_subst = logging.getLogger("variables_substitution")
+logger_app = logging.getLogger("application")
 
 
 class RecursiveConfigNodesIterator:

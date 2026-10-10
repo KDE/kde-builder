@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 import subprocess
@@ -12,13 +13,12 @@ import time
 from typing import NoReturn
 
 from kde_builder import KB_PACKAGE_DIR
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBException
 from kde_builder.kb_exception import SetupError
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.os_support import OSSupport
 
-logger_fr = KBLogger.getLogger("first-run")
+logger_fr = logging.getLogger("first-run")
 
 
 class FirstRun:

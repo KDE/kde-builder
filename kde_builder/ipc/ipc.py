@@ -5,19 +5,19 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from enum import IntEnum
 from typing import TYPE_CHECKING
 from typing import Callable
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 
 if TYPE_CHECKING:
     from kde_builder.module.module import Module
 
-logger_ipc = KBLogger.getLogger("ipc")
+logger_ipc = logging.getLogger("ipc")
 
 
 class IPC:
@@ -51,7 +51,7 @@ class IPC:
 
 
     MODULE_LOGMSG = 9
-    """Tagged message should be put to TTY for module. (for passing messages via ipc, see Debug.print_clr())."""
+    """Tagged message should be put to TTY for module. (for passing messages via ipc, see IPCQueueLoggingHandler)."""
 
     MODULE_PERSIST_OPT = 10
     """Change to a persistent module option."""
@@ -137,7 +137,9 @@ class IPC:
         logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
         if not re.match(r"^\s+", msg):
             msg = f"\t{msg}"  # Automatically adds tabulation if message misses it.
-        KBLogger.print_clr(logger_name, message_level, msg)
+        logger = logging.getLogger(logger_name)
+        log_method = getattr(logger, message_level.lower())
+        log_method(msg)
 
     def _update_seen_modules_from_message(self, ipc_type: int, buffer: str) -> str:
         """
@@ -288,7 +290,9 @@ class IPC:
                     logger_name, message_level, msg = combined_msg.split(",", maxsplit=2)
                     if not re.match(r"^\s+", msg):
                         msg = f"\t{msg}"  # Automatically adds tabulation if message misses it.
-                    KBLogger.print_clr(logger_name, message_level, msg)
+                    logger = logging.getLogger(logger_name)
+                    log_method = getattr(logger, message_level.lower())
+                    log_method(msg)
         self.messages.clear()
 
     def forget_module(self, module: Module) -> None:

@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 import copy
+import logging
 from typing import TYPE_CHECKING
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBException
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import NoKDEProjectsFound
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from kde_builder.dependency_resolver import DependencyResolver
     from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
 
-logger_modres = KBLogger.getLogger("module-resolver")
+logger_modres = logging.getLogger("module-resolver")
 
 
 class ModuleResolver:

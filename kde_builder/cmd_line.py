@@ -4,16 +4,16 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import argparse
+import logging
 import re
 
-from kde_builder.debug import KBLogger
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.options_spec import add_bootstrap_arguments
 from kde_builder.phase_list import PhaseList
 from kde_builder.util.textwrap_mod import dedent
 from kde_builder.version import Version
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 
 class Cmdline:

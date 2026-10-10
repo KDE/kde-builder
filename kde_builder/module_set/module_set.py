@@ -5,10 +5,10 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 from typing import override
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import NoKDEProjectsFound
 from kde_builder.kb_exception import SetOptionError
 from kde_builder.module.module import Module
@@ -17,7 +17,7 @@ from kde_builder.options_base import OptionsBase
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
-logger_moduleset = KBLogger.getLogger("module-set")
+logger_moduleset = logging.getLogger("module-set")
 
 
 class ModuleSet(OptionsBase):

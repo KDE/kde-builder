@@ -6,19 +6,19 @@
 from __future__ import annotations
 
 import copy
+import logging
 import os
 import re
 from typing import TYPE_CHECKING
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import SetOptionError
 from kde_builder.options_spec import OptionsSpec
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
-logger_optbase = KBLogger.getLogger("options-base")
-logger_var_subst = KBLogger.getLogger("variables_substitution")
+logger_optbase = logging.getLogger("options-base")
+logger_var_subst = logging.getLogger("variables_substitution")
 
 
 class OptionsBase:

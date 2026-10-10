@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 
-from kde_builder.debug import Debug
+from kde_builder.kb_logging import colorize
 
 
 class StatusView:
@@ -83,9 +83,9 @@ class StatusView:
             # Build up message in reverse order
             tail_msg = f"{mod_total} projects"
             if mod_failed:
-                tail_msg = Debug().colorize(f"r[b[{mod_failed}] failed, ") + tail_msg
+                tail_msg = colorize(f"r[b[{mod_failed}] failed, ") + tail_msg
             if mod_success:
-                tail_msg = Debug().colorize(f"g[b[{mod_success}] built, ") + tail_msg
+                tail_msg = colorize(f"g[b[{mod_success}] built, ") + tail_msg
 
             status_line = status_line + f" ({tail_msg})"
 
@@ -128,7 +128,7 @@ class StatusView:
         """
         For TTY outputs, this clears the line (if we actually had dirtied it) so the rest of the program can resume output from where it'd been left off.
         """
-        StatusView._clear_line_and_update(Debug().colorize(msg))
+        StatusView._clear_line_and_update(colorize(msg))
 
     @staticmethod
     def _clear_line_and_update(msg: str) -> None:

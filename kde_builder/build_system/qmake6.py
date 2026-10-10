@@ -4,15 +4,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import glob
+import logging
 from typing import override
 
 import kde_builder
 from kde_builder.build_system.build_system import BuildSystem
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.util import Util
 
-logger_buildsystem = KBLogger.getLogger("build-system")
+logger_buildsystem = logging.getLogger("build-system")
 
 
 class BuildSystemQMake6(BuildSystem):

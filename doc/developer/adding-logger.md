@@ -14,23 +14,23 @@ loggers:
     ...
 ```
 
-set the level to `INFO` (the default level used in kdesrc-build). The user could edit the level to `DEBUG` if he/she wants.
+set the level to `INFO` (the default level). The user could edit the level to `DEBUG` if he/she wants.
 
 ```{note}
 See [](#changing-verbosity) for the user documentation on changing verbosity level.
 ```
 
-Then in the python module, import the `kbLogger` module:
+Then in the python module, import the `logging` module:
 ```python
-from Debug import kbLogger
+import logging
 ```
 
 Then create a logger:
 ```python
-logger_res_deps = kbLogger.getLogger("resolving-dependencies")
+logger_res_deps = logging.getLogger("resolving-dependencies")
 ```
 
-After that, you can use it as normal `logging.Logger` logger, for example:
+After that, you can use it, for example:
 ```python
 logger_res_deps.debug("Starting resolving dependencies for kcalc:")
 ```
@@ -45,7 +45,7 @@ So the original perl's project loggers were reworked.
 
 Global log messages, that were appeared like this:
 ```python
-Debug().error(f"r[Invalid dependency declaration: b[{dep}]]")
+logger.error(f"r[Invalid dependency declaration: b[{dep}]]")
 ```
 
 were assigned to specific loggers, with the corresponding severity level:
@@ -55,8 +55,8 @@ logger_res_deps.error(f"r[Invalid dependency declaration: b[{dep}]]")
 
 Note that colorizing (the elements like `r[` and `]`) still can be used.
 
-The `Debug().note()` statements were considered as `Debug().warning()`,  
-and the `Debug().whisper()` and `Debug().pretend()` statements were considered as `Debug().debug()`.
+The `logger.note()` statements were considered as `logger.warning()`,  
+and the `logger.whisper()` and `logger.pretend()` statements were considered as `logger.debug()`.
 
 This is a table of log levels that was used with that conversion: 
 

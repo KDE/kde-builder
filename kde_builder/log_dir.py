@@ -2,16 +2,16 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import logging
 import os
 import re
 
 import kde_builder
 from kde_builder.build_context import BuildContext
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.util.util import Util
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 
 class LogDir:

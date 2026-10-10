@@ -4,18 +4,18 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import TYPE_CHECKING
 from typing import NoReturn
 
 import kde_builder
-from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 
 class StartProgram:

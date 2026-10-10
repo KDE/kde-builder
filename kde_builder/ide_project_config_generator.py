@@ -5,18 +5,18 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import TYPE_CHECKING
 
 import kde_builder
 from kde_builder import KB_PACKAGE_DIR
-from kde_builder.debug import KBLogger
 from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
     from kde_builder.module.module import Module
 
-logger_ide_proj = KBLogger.getLogger("ide_project_configs")
+logger_ide_proj = logging.getLogger("ide_project_configs")
 
 
 class IdeProjectConfigGenerator:

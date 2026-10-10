@@ -6,17 +6,17 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from functools import cmp_to_key
 from io import TextIOWrapper
 
 import kde_builder
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
 
-logger_depres = KBLogger.getLogger("dependency-resolver")
+logger_depres = logging.getLogger("dependency-resolver")
 
 
 class DependencyResolver:

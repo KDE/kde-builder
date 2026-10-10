@@ -5,20 +5,20 @@
 
 from __future__ import annotations
 
+import logging
 import os.path
 import re
 import sys
 from typing import override
 
 from kde_builder.build_system.build_system import BuildSystem
-from kde_builder.debug import KBLogger
 from kde_builder.ide_project_config_generator import IdeProjectConfigGenerator
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 from kde_builder.util.textwrap_mod import dedent
 from kde_builder.util.util import Util
 
-logger_buildsystem = KBLogger.getLogger("build-system")
+logger_buildsystem = logging.getLogger("build-system")
 
 
 class BuildSystemKDECMake(BuildSystem):

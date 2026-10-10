@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+import logging
 import os
 import re
 import subprocess
@@ -14,11 +15,10 @@ from importlib.metadata import version
 from typing import NoReturn
 
 from kde_builder import KB_REPO_DIR
-from kde_builder.debug import KBLogger
 from kde_builder.os_support import OSSupport
 from kde_builder.util.textwrap_mod import dedent
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 class InstallationType(Enum):
     """

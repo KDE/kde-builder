@@ -13,18 +13,16 @@ import time
 from typing import TYPE_CHECKING
 
 import kde_builder
-from kde_builder.debug import Debug
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import ProgramError
+from kde_builder.kb_logging import colorize
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 from kde_builder.util.util import Util
 
 if TYPE_CHECKING:
     from kde_builder.module.module import Module
 
-
-logger_logged_cmd = KBLogger.getLogger("logged-command")
-logger_buildsystem = KBLogger.getLogger("build-system")
+logger_logged_cmd = logging.getLogger("logged-command")
+logger_buildsystem = logging.getLogger("build-system")
 
 
 class BuildSystem:
@@ -443,7 +441,7 @@ class BuildSystem:
         a_time = int(time.time())
 
         status_viewer = ctx.status_view
-        status_viewer.status = Debug().colorize(f"\t{message}")
+        status_viewer.status = colorize(f"\t{message}")
         status_viewer.current_project_phase = self.module.current_phase
         status_viewer.update()
 

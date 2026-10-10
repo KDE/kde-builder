@@ -5,15 +5,15 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 import subprocess
 import sys
 
-from kde_builder.debug import KBLogger
 from kde_builder.kb_exception import KBRuntimeError
 
-logger_app = KBLogger.getLogger("application")
+logger_app = logging.getLogger("application")
 
 
 class OSSupport:

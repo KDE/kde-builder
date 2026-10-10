@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import copy
 import glob
+import logging
 import os
 import re
 import shutil
@@ -23,7 +24,6 @@ from kde_builder.build_system.kde_cmake import BuildSystemKDECMake
 from kde_builder.build_system.meson import BuildSystemMeson
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
 from kde_builder.build_system.qmake6 import BuildSystemQMake6
-from kde_builder.debug import KBLogger
 from kde_builder.ipc.ipc import IPC
 from kde_builder.kb_exception import KBException
 from kde_builder.kb_exception import KBRuntimeError
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from kde_builder.module_set.module_set import ModuleSet
     from kde_builder.phase_list import PhaseList
 
-logger_module = KBLogger.getLogger("module")
+logger_module = logging.getLogger("module")
 
 
 class Module(PathResolvingOptions):
