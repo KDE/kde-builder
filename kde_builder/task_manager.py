@@ -61,21 +61,7 @@ class TaskManager:
             if logger_ipc.level == logging.DEBUG:
                 ipc.output_pending_logged_messages()
         else:
-            logger_taskmanager.debug("Using no IPC mechanism\n")
-
-            # If the user sends SIGHUP during the build, we should allow the
-            # current module to complete and then exit early.
-            def handle_sighup(signum, frame):
-                print("[noasync] recv SIGHUP, will end after this project")
-                self.DO_STOP = 1
-
-            signal.signal(signal.SIGHUP, handle_sighup)
-
-            logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
-            result: int = self._handle_updates(ipc, ctx)
-
-            logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
-            result: int = self._handle_build(ipc, ctx) or result
+            result = self._handle_noasync_build(ipc, ctx)
 
         for ipc_module_name in ipc.persistent_opts:
             for item in ipc.persistent_opts[ipc_module_name]:
@@ -388,6 +374,25 @@ class TaskManager:
         if len(build_done) > 0:
             logger_taskmanager.info("g[<<<  PROJECTS SUCCESSFULLY BUILT  >>>]")
             logger_taskmanager.info("g[" + "]\ng[".join(build_done) + "]")
+
+        return result
+
+    def _handle_noasync_build(self, ipc: IPCNull, ctx) -> int:
+        logger_taskmanager.debug("Using no IPC mechanism\n")
+
+        # If the user sends SIGHUP during the build, we should allow the
+        # current module to complete and then exit early.
+        def handle_sighup(signum, frame):
+            print("[noasync] recv SIGHUP, will end after this project")
+            self.DO_STOP = 1
+
+        signal.signal(signal.SIGHUP, handle_sighup)
+
+        logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
+        result: int = self._handle_updates(ipc, ctx)
+
+        logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
+        result: int = self._handle_build(ipc, ctx) or result
 
         return result
 
