@@ -9,7 +9,6 @@ import logging
 import re
 from enum import IntEnum
 from typing import TYPE_CHECKING
-from typing import Callable
 
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
@@ -79,8 +78,8 @@ class IPC:
         self.updates_done: bool = False
         """This flag is set after receiving IPC.ALL_DONE"""
 
-        self.opt_update_handler: Callable | None = None
-        """Callback for persistent option changes."""
+        self.persistent_opts: dict[str, list[tuple[str, str]]] = {}
+        """Holds values for persistent options changes."""
 
     def notify_persistent_option_change(self, module_name: str, opt_name: str, opt_value: str) -> None:
         """
@@ -160,6 +159,7 @@ class IPC:
         """
         updated = self.updated
         messages = self.messages
+        persistent_opts = self.persistent_opts
         message = ""
 
         if not ipc_type:
@@ -177,10 +177,10 @@ class IPC:
             ipc_module_name = buffer
             updated[ipc_module_name] = "skipped"
         elif ipc_type == IPC.MODULE_PERSIST_OPT:
-            ipc_module_name, opt_name, value = buffer.split(",")
-            if self.opt_update_handler:
-                # Call into callback to update persistent options
-                self.opt_update_handler(ipc_module_name, opt_name, value)
+            ipc_module_name, opt_name, value = buffer.split(",", maxsplit=2)
+            if ipc_module_name not in persistent_opts:
+                persistent_opts[ipc_module_name] = []
+            persistent_opts[ipc_module_name].append((opt_name, value))
         elif ipc_type == IPC.MODULE_LOGMSG:
             ipc_module_name, log_message = buffer.split(",", maxsplit=1)
 
@@ -199,16 +199,6 @@ class IPC:
         else:
             raise ProgramError(f"Unhandled IPC type: {ipc_type}")
         return message
-
-    def set_persistent_option_handler(self, handler: Callable) -> None:
-        """
-        Assign a callback / function to use for updating persistent options based on IPC update messages.
-
-        The function should itself take a key and value pair.
-
-        This function is running only in main kde-builder process (kde-builder-build).
-        """
-        self.opt_update_handler = handler
 
     def wait_for_end(self) -> None:
         """

@@ -51,15 +51,10 @@ class TaskManager:
         result = 0
         ipc = None
 
-        def update_opts_sub(mod_name, k, v):
-            ctx.set_persistent_option(mod_name, k, v)
-
         if ctx.uses_concurrent_phases() and ctx.get_option("async"):
             ipc = IPCPipe()
         else:
             ipc = IPCNull()
-
-        ipc.set_persistent_option_handler(update_opts_sub)
 
         if ipc.supports_concurrency():
             result = self._handle_async_build(ipc, ctx)
@@ -81,6 +76,10 @@ class TaskManager:
 
             logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
             result: int = self._handle_build(ipc, ctx) or result
+
+        for ipc_module_name in ipc.persistent_opts:
+            for item in ipc.persistent_opts[ipc_module_name]:
+                ctx.set_persistent_option(ipc_module_name, item[0], item[1])
 
         ctx.status_view.progress_bar_disable()
         return result
