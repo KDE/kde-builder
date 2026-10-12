@@ -37,9 +37,10 @@ class TaskManager:
     install jobs. The :class:`Application` sets up a :class:`BuildContext` for the current build.
     """
 
+    DO_STOP = 0
+
     def __init__(self, app: Application):
         self.ksb_app = app
-        self.DO_STOP = 0
 
     def run_all_tasks(self) -> int:
         """
@@ -118,7 +119,7 @@ class TaskManager:
         num_modules = len(update_list)
 
         for module in update_list:
-            if self.DO_STOP:
+            if TaskManager.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, aborting updates.")
                 break
 
@@ -290,7 +291,7 @@ class TaskManager:
 
         while modules:
             module = modules.pop(0)
-            if self.DO_STOP:
+            if TaskManager.DO_STOP:
                 logger_taskmanager.warning(" y[b[* * *] Early exit requested, cancelling build of further projects.")
                 break
 
@@ -384,7 +385,7 @@ class TaskManager:
         # current module to complete and then exit early.
         def handle_sighup(signum, frame):
             print("[noasync] recv SIGHUP, will end after this project")
-            self.DO_STOP = 1
+            TaskManager.DO_STOP = 1
 
         signal.signal(signal.SIGHUP, handle_sighup)
 
@@ -441,7 +442,7 @@ class TaskManager:
             # current module to complete and then exit early.
             def sighup_handler(signum, frame):
                 print(f"[updater process] recv SIGHUP, will end after updating {ipc_obj.logged_module} project.")
-                self.DO_STOP = 1
+                TaskManager.DO_STOP = 1
 
             signal.signal(signal.SIGHUP, sighup_handler)
 
@@ -468,9 +469,9 @@ class TaskManager:
 
             # If we haven't received yet, forward to updater in case user didn't
             # send to process group
-            if not self.DO_STOP:
+            if not TaskManager.DO_STOP:
                 os.kill(updater_process.pid, signal.SIGHUP)
-            self.DO_STOP = 1
+            TaskManager.DO_STOP = 1
 
         signal.signal(signal.SIGHUP, signal_handler)
 
