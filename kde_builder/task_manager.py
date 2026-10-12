@@ -73,7 +73,8 @@ class TaskManager:
 
     # Internal API
 
-    def _handle_updates(self, ipc: IPC, ctx: BuildContext) -> int:
+    @staticmethod
+    def _handle_updates(ipc: IPC, ctx: BuildContext) -> int:
         """
         Update a list of modules.
 
@@ -126,7 +127,7 @@ class TaskManager:
             ipc.set_logged_module(module.name)
 
             if not ipc.supports_concurrency():
-                block_substr = self._form_block_substring(module)
+                block_substr = TaskManager._form_block_substring(module)
                 logger_taskmanager.warning(f"Updating {block_substr} ({cur_module}/{num_modules})")
 
             # Note that this must be in this order to avoid accidentally not
@@ -216,7 +217,8 @@ class TaskManager:
         module.set_persistent_option("failure-count", 0)
         return ""
 
-    def _handle_build(self, ipc: IPC, ctx: BuildContext) -> int:
+    @staticmethod
+    def _handle_build(ipc: IPC, ctx: BuildContext) -> int:
         """
         Handle the build process.
 
@@ -296,7 +298,7 @@ class TaskManager:
                 break
 
             module_name = module.name
-            block_substr = self._form_block_substring(module)
+            block_substr = TaskManager._form_block_substring(module)
             logger_taskmanager.warning(f"Building {block_substr} ({cur_module}/{num_modules})")
             status_viewer.mod_current = cur_module
             status_viewer.reset_progress()  # Resetting previous project's progress
@@ -390,10 +392,10 @@ class TaskManager:
         signal.signal(signal.SIGHUP, handle_sighup)
 
         logger_taskmanager.warning("\n b[<<<  Update Process  >>>]\n")
-        result: int = self._handle_updates(ipc, ctx)
+        result: int = TaskManager._handle_updates(ipc, ctx)
 
         logger_taskmanager.warning(" b[<<<  Build Process  >>>]\n")
-        result: int = self._handle_build(ipc, ctx) or result
+        result: int = TaskManager._handle_build(ipc, ctx) or result
 
         return result
 
@@ -450,7 +452,7 @@ class TaskManager:
             root_logger.handlers.clear()
             root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
 
-            exitcode = self._handle_updates(ipc_obj, ctx)
+            exitcode = TaskManager._handle_updates(ipc_obj, ctx)
             # print("Updater process exiting with code", exitcode)
             sys.exit(exitcode)
 
@@ -475,7 +477,7 @@ class TaskManager:
 
         signal.signal(signal.SIGHUP, signal_handler)
 
-        result: int = self._handle_build(ipc, ctx)
+        result: int = TaskManager._handle_build(ipc, ctx)
 
         if result and ctx.get_option("stop-on-failure"):
             # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
