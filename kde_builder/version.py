@@ -4,6 +4,7 @@
 
 import logging
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -206,6 +207,7 @@ class Version:
             Version: {ver}
             Installation type: {inst_type}
             OS: {os_vendor}
+            Python: {platform.python_version()} ({sys.executable})
             """))
         sys.exit()
 
