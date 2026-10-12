@@ -427,37 +427,8 @@ class TaskManager:
 
         result = 0
 
-        def updater_entrypoint(ipc_obj, ctx_obj):
-            setproctitle("kde-builder-updater")
-
-            def sigint_handler(sig, frame):
-                # print("[updater process] received SIGINT.")
-                def unraisable_hook(unraisable):
-                    pass
-
-                sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
-                sys.exit(signal.SIGINT)
-
-            signal.signal(signal.SIGINT, sigint_handler)
-
-            # If the user sends SIGHUP during the build, we should allow the
-            # current module to complete and then exit early.
-            def sighup_handler(signum, frame):
-                print(f"[updater process] recv SIGHUP, will end after updating {ipc_obj.logged_module} project.")
-                TaskManager.DO_STOP = 1
-
-            signal.signal(signal.SIGHUP, sighup_handler)
-
-            root_logger = logging.getLogger()
-            root_logger.handlers.clear()
-            root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
-
-            exitcode = TaskManager._handle_updates(ipc_obj, ctx)
-            # print("Updater process exiting with code", exitcode)
-            sys.exit(exitcode)
-
         updater_process = multiprocessing.Process(
-            target=updater_entrypoint,
+            target=TaskManager.updater_entrypoint,
             args=(ipc, ctx)
         )
         updater_process.start()
@@ -507,6 +478,36 @@ class TaskManager:
 
         ipc.close()
         return result
+
+    @staticmethod
+    def updater_entrypoint(ipc_obj, ctx_obj):
+        setproctitle("kde-builder-updater")
+
+        def sigint_handler(sig, frame):
+            # print("[updater process] received SIGINT.")
+            def unraisable_hook(unraisable):
+                pass
+
+            sys.unraisablehook = unraisable_hook  # To prevent printing error "Exception ignored in".
+            sys.exit(signal.SIGINT)
+
+        signal.signal(signal.SIGINT, sigint_handler)
+
+        # If the user sends SIGHUP during the build, we should allow the
+        # current module to complete and then exit early.
+        def sighup_handler(signum, frame):
+            print(f"[updater process] recv SIGHUP, will end after updating {ipc_obj.logged_module} project.")
+            TaskManager.DO_STOP = 1
+
+        signal.signal(signal.SIGHUP, sighup_handler)
+
+        root_logger = logging.getLogger()
+        root_logger.handlers.clear()
+        root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
+
+        exitcode = TaskManager._handle_updates(ipc_obj, ctx_obj)
+        # print("Updater process exiting with code", exitcode)
+        sys.exit(exitcode)
 
     @staticmethod
     def _form_block_substring(module: Module) -> str:
