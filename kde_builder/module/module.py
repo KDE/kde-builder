@@ -956,7 +956,8 @@ class Module(PathResolvingOptions):
         logdir = self.get_log_dir()
 
         if self.has_option("#error-log-file"):
-            logger_module.error(f"\tr[b[*] {self.name} already has error log set, tried to set to r[b[{logfile}]")
+            prev_val = self.get_option("#error-log-file")
+            logger_module.error(f"\tr[b[*] {self.name} already has error log set to {prev_val}, tried to set to r[b[{logfile}]")
             return
 
         self.set_option("#error-log-file", f"{logdir}/{logfile}")

@@ -157,11 +157,4 @@ class UtilLoggedSubprocess:
         loop.close()
 
         # Now we have our subprocess finished, and we can continue
-
-        succeeded = exitcode == 0
-
-        # If an exception was thrown or we didn't succeed, set error log
-        if not succeeded:
-            module.set_error_logfile(f"{filename}.log")
-
         return exitcode

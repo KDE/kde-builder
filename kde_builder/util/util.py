@@ -450,11 +450,11 @@ class Util:
 
         logpath = module.get_log_path(filename)
 
-        logger_logged_cmd.info(f"run_logged(): Project {module}, Command: " + " ".join(args))
+        logger_logged_cmd.info(f"run_logged_async(): Project {module}, Command: " + " ".join(args))
 
         exitcode = await Util._run_logged_internal_async(module, logpath, directory, args, callback_func)
 
-        logger_logged_cmd.info(f"run_logged() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename)}\n")
+        logger_logged_cmd.info(f"run_logged_async() completed with exitcode: {exitcode}. Log file: {module.get_log_path(filename)}\n")
         if not exitcode == 0:
             module.set_error_logfile(filename)
         return exitcode
