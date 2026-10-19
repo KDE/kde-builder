@@ -15,7 +15,7 @@ class IPCPipe(IPC):
     IPC class that uses pipes in addition to forking for IPC.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.queue = multiprocessing.Queue()
 

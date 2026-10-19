@@ -61,7 +61,7 @@ class BuildSystemKDECMake(BuildSystem):
         "Eclipse CDT4 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"]
     }
 
-    def __init__(self, module):
+    def __init__(self, module) -> None:
         BuildSystem.__init__(self, module)
         self.cmake_generator: str | None = None
         self.cmake_toolchain: str | None = None

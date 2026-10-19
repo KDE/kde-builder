@@ -61,7 +61,7 @@ class IPC:
     MODULE_POSTBUILD_MSG = 12
     """A message to print after all work done (sent when could not stash or unstash changes)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.queue = None
 
         self.updated: dict[str, str] = {}

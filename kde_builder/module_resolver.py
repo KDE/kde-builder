@@ -32,7 +32,7 @@ class ModuleResolver:
     This includes option handling and resolution of module selectors into actual modules.
     """
 
-    def __init__(self, ctx: BuildContext):
+    def __init__(self, ctx: BuildContext) -> None:
         self.context = ctx
 
         self.ignored_selectors: set[str] = set()

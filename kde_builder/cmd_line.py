@@ -36,7 +36,7 @@ class Cmdline:
         * Modules to *ignore* building, using ``--ignore-projects``, which gobbles up all remaining options.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     def read_command_line_options_and_selectors(self, options: list[str]) -> dict:

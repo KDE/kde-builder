@@ -12,7 +12,7 @@ from kde_builder.module.module import Module
 
 @pytest.fixture
 def mock_module_from_attrs(monkeypatch):
-    def mock__init__(self, **kwargs):
+    def mock__init__(self, **kwargs) -> None:
         self.name = kwargs.get("name", None)
         self.create_id = kwargs.get("create_id", 0)
 

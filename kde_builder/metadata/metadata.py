@@ -15,7 +15,7 @@ class Metadata:
     Stores data (ignored projects and branch groups) that is read from repo-metadata repository.
     """
 
-    def __init__(self, path_to_metadata: str):
+    def __init__(self, path_to_metadata: str) -> None:
         self.path_to_metadata = path_to_metadata
 
         self.ignored_projects = self._read_ignore_kde_projects()

@@ -13,7 +13,7 @@ class KBException(Exception):  # noqa: N818
     A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified.
     """
 
-    def __init__(self, exception_type: str, msg: str):
+    def __init__(self, exception_type: str, msg: str) -> None:
         self.exception_type = exception_type
         self.message = msg
 
@@ -26,7 +26,7 @@ class ConfigError(KBException):
     Use for "config errors".
     """
 
-    def __init__(self, msg: str):
+    def __init__(self, msg: str) -> None:
         super().__init__("Config", msg)
 
 
@@ -38,7 +38,7 @@ class SetOptionError(KBException):
     which will add filename and line number information to the message.
     """
 
-    def __init__(self, bad_option_name: str, msg: str):
+    def __init__(self, bad_option_name: str, msg: str) -> None:
         super().__init__("Config", msg)
         self.config_invalid_option_name = bad_option_name
 
@@ -88,7 +88,7 @@ class UnknownKdeProjectException(KBException):
     Raised when a specific project name is not found in repo-metadata kde projects and is not a defined module in config.
     """
 
-    def __init__(self, message: str, unknown_project_name: str):
+    def __init__(self, message: str, unknown_project_name: str) -> None:
         self.message = message
         self.unknown_project_name = unknown_project_name
 
@@ -97,7 +97,7 @@ class NoKDEProjectsFound(KBException):
     Raised when searching in kde projects database by path component resulted in empty list.
     """
 
-    def __init__(self, message: str):
+    def __init__(self, message: str) -> None:
         self.message = message
 
 class ProgramError(KBException):
@@ -107,7 +107,7 @@ class ProgramError(KBException):
     As this type of exception indicate bug in KDE Builder itself, we will print the traceback in the end of the script.
     """
 
-    def __init__(self, msg: str):
+    def __init__(self, msg: str) -> None:
         super().__init__("Internal", msg)
 
 
@@ -116,7 +116,7 @@ class KBRuntimeError(KBException):
     Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
     """
 
-    def __init__(self, msg: str):
+    def __init__(self, msg: str) -> None:
         super().__init__("Runtime", msg)
 
 
@@ -125,5 +125,5 @@ class SetupError(KBException):
     Use for "setup errors" in FirstRun.
     """
 
-    def __init__(self, msg: str):
+    def __init__(self, msg: str) -> None:
         super().__init__("Setup", msg)

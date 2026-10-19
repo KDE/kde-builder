@@ -14,7 +14,7 @@ class IPCNull(IPC):
     Dummy IPC module in case SysVIPC doesn't work or async mode is not needed.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.queue = queue.Queue()
 

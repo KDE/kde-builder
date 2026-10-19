@@ -22,7 +22,7 @@ class PhaseList:
             phases.filter_out_phase("update")
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.phaselist = ["update", "build", "install"]
 
     def filter_out_phase(self, phase: str) -> None:

@@ -32,7 +32,7 @@ class FirstRun:
         exit(exitcode)
     """
 
-    def __init__(self, prefilled_prompt_answer: str | None = None):
+    def __init__(self, prefilled_prompt_answer: str | None = None) -> None:
         self.oss = OSSupport()
         self.prefilled_prompt_answer = prefilled_prompt_answer
 

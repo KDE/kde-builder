@@ -40,7 +40,7 @@ class Updater:
 
     DEFAULT_GIT_REMOTE = "origin"
 
-    def __init__(self, module: Module):
+    def __init__(self, module: Module) -> None:
         self.module = module
         self.ipc: IPC | None = None
         self.srcdir = ""  # Will be set later, after we know the source-dir value

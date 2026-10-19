@@ -61,7 +61,7 @@ class Application:
     the build process, and reporting the results to the user.
     """
 
-    def __init__(self, options: list[str]):
+    def __init__(self, options: list[str]) -> None:
         self.context = BuildContext()
         ctx = self.context
 

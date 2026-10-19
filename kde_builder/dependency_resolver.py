@@ -27,7 +27,7 @@ class DependencyResolver:
     given by the KDE Project database (e.g. extragear/utils/kdesrc-build).
     """
 
-    def __init__(self, module_resolver: ModuleResolver):
+    def __init__(self, module_resolver: ModuleResolver) -> None:
         self.dependencies_of = {}
 
         self.module_resolver = module_resolver

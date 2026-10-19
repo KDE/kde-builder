@@ -18,7 +18,7 @@ class StatusView:
     extending this to a GUI or even web server as options.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_project_phase: str | None = None
         """
         We update progress bar percenatage for current project only for "build" phase, not for "install" phase.

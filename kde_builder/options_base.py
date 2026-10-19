@@ -35,7 +35,7 @@ class OptionsBase:
     what options to set, see :class:`Application` and its friends.
     """
 
-    def __init__(self, ctx: BuildContext | None = None, name: str = ""):
+    def __init__(self, ctx: BuildContext | None = None, name: str = "") -> None:
         self.options = {"set-env": {}}
         self.context = ctx
         self.name = name

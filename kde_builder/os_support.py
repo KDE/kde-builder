@@ -30,7 +30,7 @@ class OSSupport:
         print("Current OS is: " + os.vendor_id)
     """
 
-    def __init__(self, os_release_file: str = ""):
+    def __init__(self, os_release_file: str = "") -> None:
         """
         Initialize OSSupport.
 

@@ -42,7 +42,7 @@ class BuildSystem:
         results = buildsys.build_internal()
     """
 
-    def __init__(self, module: Module):
+    def __init__(self, module: Module) -> None:
         self.module = module
 
     def has_toolchain(self) -> bool:

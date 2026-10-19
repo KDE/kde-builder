@@ -11,7 +11,7 @@ from kde_builder.module.module import Module
 
 @pytest.fixture
 def mock_module(monkeypatch):
-    def mock__init__(self, name, count, failed_phase):
+    def mock__init__(self, name, count, failed_phase) -> None:
         self.count = count
         self.name = name
         self.failed_phase = failed_phase

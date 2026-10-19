@@ -24,7 +24,7 @@ class ColorFormatter(logging.Formatter):
     of each log message.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         # Colors
@@ -82,7 +82,7 @@ class TTYAndScreenLogHandler(logging.Handler):
     application's log directory is fully initialized.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.screen_log_fh = None
         """Filehandle pointing to the "screen.log"."""

@@ -41,7 +41,7 @@ class ModuleSet(OptionsBase):
     See also: git-repository-base, use-projects
     """
 
-    def __init__(self, ctx: BuildContext, name: str = ""):
+    def __init__(self, ctx: BuildContext, name: str = "") -> None:
         super().__init__(ctx=ctx, name=name)
         self.start_for_create_id: int = 0
         self.options["repository"] = "kde-projects"

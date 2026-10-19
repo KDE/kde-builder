@@ -11,7 +11,7 @@ class ModuleBranchGroupResolver:
     Provides an object that can be used to look up the appropriate git branch to use for a given KDE project and given desired branch group.
     """
 
-    def __init__(self, yaml_data: dict):
+    def __init__(self, yaml_data: dict) -> None:
         self.layers: list[str] = yaml_data.get("layers", [])
         self.groups: dict[str, dict[str, str]] = yaml_data.get("groups", {})
 

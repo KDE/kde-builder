@@ -25,7 +25,7 @@ class DebugOrderHints:
     missing dependency).
     """
 
-    def __init__(self, module_graph: dict):
+    def __init__(self, module_graph: dict) -> None:
         self.module_graph = module_graph
 
     @staticmethod

@@ -24,7 +24,7 @@ class KDEProjectsReader:
     Enumerates and provides basic metadata of KDE projects, based on the metadata.yaml included in sysadmin/repo-metadata.
     """
 
-    def __init__(self, repo_metadata_fullpath: str):
+    def __init__(self, repo_metadata_fullpath: str) -> None:
         """
         Construct a new KDEProjectsReader. This doesn't contradict any part of the class documentation which claims this class is a singleton.
 

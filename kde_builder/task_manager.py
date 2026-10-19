@@ -39,7 +39,7 @@ class TaskManager:
 
     DO_STOP = 0
 
-    def __init__(self, app: Application):
+    def __init__(self, app: Application) -> None:
         self.ksb_app = app
 
     def run_all_tasks(self) -> int:

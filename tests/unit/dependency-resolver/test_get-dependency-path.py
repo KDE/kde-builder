@@ -11,7 +11,7 @@ from kde_builder.module.module import Module
 
 @pytest.fixture
 def mock_module_fullproject(monkeypatch):
-    def mock__init__(self, name: str, repo_path="", is_kde=True):
+    def mock__init__(self, name: str, repo_path="", is_kde=True) -> None:
         self.name = name
         self.repo_path = repo_path
         self.is_kde = is_kde

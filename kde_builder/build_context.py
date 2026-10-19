@@ -66,7 +66,7 @@ class BuildContext(PathResolvingOptions):
     LOCKFILE_NAME = ".kde-builder-lock"
     PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(ctx=None, name="global")
 
         self.modules: list[Module] = []

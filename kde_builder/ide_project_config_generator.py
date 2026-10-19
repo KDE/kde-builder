@@ -24,7 +24,7 @@ class IdeProjectConfigGenerator:
     Class responsible for creating IDE-specific files in source directories of modules.
     """
 
-    def __init__(self, module: Module, cmake_opts: list[str]):
+    def __init__(self, module: Module, cmake_opts: list[str]) -> None:
         self.module = module
         self.build_opts = module.build_system.get_build_options()
         self.cmake_opts = cmake_opts

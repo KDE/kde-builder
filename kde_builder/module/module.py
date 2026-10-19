@@ -63,7 +63,7 @@ class Module(PathResolvingOptions):
             print(f"module name: {module}")
     """
 
-    def __init__(self, ctx: BuildContext, name: str):
+    def __init__(self, ctx: BuildContext, name: str) -> None:
         super().__init__(ctx=ctx, name=name)
 
         if not self.name:
