@@ -443,7 +443,10 @@ class TaskManager:
             # If we haven't received yet, forward to updater in case user didn't
             # send to process group
             if not TaskManager.DO_STOP:
-                os.kill(updater_process.pid, signal.SIGHUP)
+                try:
+                    os.kill(updater_process.pid, signal.SIGHUP)
+                except ProcessLookupError:
+                    pass
             TaskManager.DO_STOP = 1
 
         signal.signal(signal.SIGHUP, signal_handler)
@@ -452,10 +455,12 @@ class TaskManager:
 
         if result and ctx.get_option("stop-on-failure"):
             # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
-            # We will ask updater to finish gracefully.
-
-            # print("Asking to stop updates gracefully")
-            os.kill(updater_process.pid, signal.SIGHUP)
+            try:
+                # print("Asking to stop updates gracefully")
+                os.kill(updater_process.pid, signal.SIGHUP)
+            except ProcessLookupError:
+                # It is also possible that updater process was already finished.
+                pass
 
         ipc.wait_for_end()
 
