@@ -206,7 +206,7 @@ class OptionsBase:
 
         # Replace tildes with home directory.
         while re.search(r"(^|:|=)~/", value):
-            value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.getenv("HOME") + "/", value)
+            value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.path.expanduser("~") + "/", value)
 
         # Check for false keyword and convert it to Python False.
         # pl2py: in perl this is done a bit before, but we do this here. This is because value can be of type bool, and perl automatically compares int (they do not have bool) as a string.
@@ -327,7 +327,7 @@ class PathResolvingOptions(OptionsBase):
 
         # If it starts with a tilde, expand it out.
         if directory.startswith("~"):
-            directory = re.sub(r"^~", os.getenv("HOME"), directory)
+            directory = re.sub(r"^~", os.path.expanduser("~"), directory)
         else:
             # Relative directory, tack it on to the end of kdesrcdir.
             kdesrcdir = self.get_option("source-dir")

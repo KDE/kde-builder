@@ -85,7 +85,7 @@ def test_option_reading(monkeypatch):
     assert cmd[8] == "-DCMAKE_BUILD_TYPE=a b", "CMake options can be quoted"
     assert cmd[9] == "bar=c", "CMake option quoting does not eat all options"
     assert cmd[10] == "baz", "Plain CMake options are preserved correctly"
-    assert cmd[11] == f"""-DCMAKE_INSTALL_PREFIX={os.environ.get("HOME")}/kde/usr""", "Prefix is passed to cmake"
+    assert cmd[11] == f"-DCMAKE_INSTALL_PREFIX={os.path.expanduser("~")}/kde/usr", "Prefix is passed to cmake"
     if sys.prefix != sys.base_prefix:
         assert cmd[12] == "-DPython3_FIND_VIRTUALENV=STANDARD", "If in venv, Python3_FIND_VIRTUALENV is appended"
         assert cmd[13] == "-DPython3_FIND_UNVERSIONED_NAMES=FIRST", "If in venv, Python3_FIND_UNVERSIONED_NAMES is appended"

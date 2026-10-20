@@ -55,11 +55,11 @@ class BuildContext(PathResolvingOptions):
     `get_option()` calls for most (though not all!) options.
     """
 
-    xdg_state_home = os.getenv("XDG_STATE_HOME", os.getenv("HOME") + "/.local/state")  # If XDG_STATE_HOME is not set, defaults to ~/.local/state
-    xdg_state_home_short = xdg_state_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
+    xdg_state_home = os.getenv("XDG_STATE_HOME", os.path.expanduser("~") + "/.local/state")  # If XDG_STATE_HOME is not set, defaults to ~/.local/state
+    xdg_state_home_short = xdg_state_home.replace(os.path.expanduser("~"), "~")  # Replace $HOME with ~
 
-    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.getenv("HOME") + "/.config")  # If XDG_CONFIG_HOME is not set, defaults to ~/.config
-    xdg_config_home_short = xdg_config_home.replace(os.getenv("HOME"), "~")  # Replace $HOME with ~
+    xdg_config_home = os.getenv("XDG_CONFIG_HOME", os.path.expanduser("~") + "/.config")  # If XDG_CONFIG_HOME is not set, defaults to ~/.config
+    xdg_config_home_short = xdg_config_home.replace(os.path.expanduser("~"), "~")  # Replace $HOME with ~
 
     rcfiles = ["./kde-builder.yaml",
                f"{xdg_config_home}/kde-builder.yaml"]
@@ -369,7 +369,7 @@ class BuildContext(PathResolvingOptions):
                 """))
             raise KBRuntimeError("No configuration available")
 
-        config_file = re.sub(r"^~", os.environ.get("HOME"), config_file)
+        config_file = re.sub(r"^~", os.path.expanduser("~"), config_file)
         config_file = os.path.abspath(config_file)
 
         if not os.path.exists(config_file):
@@ -484,7 +484,7 @@ class BuildContext(PathResolvingOptions):
         file = self.get_option("persistent-data-file")
 
         if file:
-            file = file.replace("~", os.getenv("HOME"))
+            file = file.replace("~", os.path.expanduser("~"))
         else:
             config_dir = self.base_config_directory()
             if config_dir == BuildContext.xdg_config_home:
@@ -631,7 +631,7 @@ class BuildContext(PathResolvingOptions):
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
         metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
         metadata_module.set_option("branch", "master")
-        metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state"))
+        metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.path.expanduser("~") + "/.local/state"))
         metadata_module.set_option("log-dir", "log")  # overwrite default value, because user may store his directories not under "~/kde"
 
         # Ensure we only ever try to update source, not build.

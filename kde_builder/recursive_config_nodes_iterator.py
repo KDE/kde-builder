@@ -82,7 +82,7 @@ class RecursiveConfigNodesIterator:
                     prefix = self.stack_base_path[-1]
 
                     if filename.startswith("~/"):
-                        filename = re.sub(r"^~", os.getenv("HOME"), filename)  # Tilde-expand
+                        filename = re.sub(r"^~", os.path.expanduser("~"), filename)  # Tilde-expand
                     if not filename.startswith("/"):
                         filename = f"{prefix}/{filename}"
 

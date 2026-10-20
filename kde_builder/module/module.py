@@ -709,7 +709,7 @@ class Module(PathResolvingOptions):
             directory = self.get_option("build-dir")
 
         if directory.startswith("~"):
-            directory = re.sub(r"^~", os.getenv("HOME"), directory)
+            directory = re.sub(r"^~", os.path.expanduser("~"), directory)
 
         fullpath = f"{directory}/{destdir}"
         return fullpath

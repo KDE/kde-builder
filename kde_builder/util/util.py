@@ -526,7 +526,7 @@ class Util:
         """
         # Pretty user-visible path
         user_path = path
-        user_path = re.sub(r"^" + os.environ["HOME"], "~", user_path)
+        user_path = re.sub(r"^" + os.path.expanduser("~"), "~", user_path)
 
         if kde_builder.is_pretending:
             logger_util.debug(f"Would have removed all files/folders in {user_path}")

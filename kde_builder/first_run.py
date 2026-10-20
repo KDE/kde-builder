@@ -50,7 +50,7 @@ class FirstRun:
                 except SystemExit:
                     pass
 
-                metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.environ["HOME"] + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
+                metadata_distro_deps_path = os.environ.get("XDG_STATE_HOME", os.path.expanduser("~") + "/.local/state") + "/sysadmin-repo-metadata/distro-dependencies"
                 self._install_system_packages(metadata_distro_deps_path)
             if "generate-config" in setup_steps:
                 logger_fr.warning("=== generate-config ===")
@@ -204,11 +204,11 @@ class FirstRun:
     def _setup_base_configuration() -> None:
         # According to XDG spec, if $XDG_CONFIG_HOME is not set, then we should
         # default to ~/.config
-        xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.environ.get("HOME") + "/.config")
-        xdg_config_home_short = xdg_config_home.replace(os.environ.get("HOME"), "~")  # Replace $HOME with ~
+        xdg_config_home = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~") + "/.config")
+        xdg_config_home_short = xdg_config_home.replace(os.path.expanduser("~"), "~")  # Replace $HOME with ~
         known_locations = [os.getcwd() + "/kde-builder.yaml",
                            f"{xdg_config_home}/kde-builder.yaml",
-                           os.environ.get("HOME") + "/kde-builder.yaml"]
+                           os.path.expanduser("~") + "/kde-builder.yaml"]
         located_file = None
         for known_location in known_locations:
             if os.path.isfile(known_location):
@@ -216,7 +216,7 @@ class FirstRun:
                 break
 
         if located_file:
-            printable_located_file = located_file.replace(os.environ.get("HOME"), "~")
+            printable_located_file = located_file.replace(os.path.expanduser("~"), "~")
             logger_fr.warning(f"b[*] You already have a configuration file: b[y[{printable_located_file}]")
             return
 
@@ -237,7 +237,7 @@ class FirstRun:
                 # But it will be convenient to users to use "true"/"false" strings in their config files.
                 value = "true" if value else "false"
             elif mode == "home_to_tilde":
-                value = re.sub(rf"""^{os.environ.get("HOME")}""", "~", value)
+                value = re.sub(rf"^{os.path.expanduser("~")}", "~", value)
             nonlocal sample_rc
             sample_rc = sample_rc.replace(f"%{{{option_name}}}", value)
 
