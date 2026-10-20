@@ -8,6 +8,7 @@ from __future__ import annotations
 import logging
 import os.path
 from pathlib import Path
+from typing import TypedDict
 
 import yaml
 
@@ -17,6 +18,16 @@ from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import NoKDEProjectsFound
 
 logger_moduleset = logging.getLogger("module-set")
+
+class RepositoryInfo(TypedDict):
+    """
+    Info from metadata.yaml file.
+    """
+
+    invent_name: str
+    repo: str
+    name: str
+    active: bool
 
 
 class KDEProjectsReader:
@@ -31,7 +42,7 @@ class KDEProjectsReader:
         Args:
             repo_metadata_fullpath: string that is a path to repo-metadata.
         """
-        self.repositories: dict[str, dict[str, str | bool]] = {}
+        self.repositories: dict[str, RepositoryInfo] = {}
         """Maps short names to repo info blocks."""
 
         self._read_project_data(repo_metadata_fullpath)
@@ -67,7 +78,7 @@ class KDEProjectsReader:
         repo_path = proj_data["repopath"]
         repo_name = proj_data["identifier"]
 
-        cur_repository = {
+        cur_repository: RepositoryInfo = {
             "invent_name": repo_path,
             "repo": f"kde:{repo_path}.git",
             "name": repo_name,
@@ -89,7 +100,7 @@ class KDEProjectsReader:
         repositories = self.repositories
         sorted_keys = sorted(repositories.keys())
 
-        all_matched_metadata: list[dict[str, str | bool]] = []
+        all_matched_metadata: list[RepositoryInfo] = []
         for key in sorted_keys:
             if self._repopath_matches_selector(repositories[key]["invent_name"], selector):
                 all_matched_metadata.append(repositories[key])
@@ -99,7 +110,7 @@ class KDEProjectsReader:
             # or because of some kde projects are inactive), we will raise exception.
             raise NoKDEProjectsFound(f"No KDE projects with such path component: {selector}")
 
-        active_matched_metadata: list[dict[str, str | bool]] = [metadata for metadata in all_matched_metadata if metadata.get("active")]
+        active_matched_metadata: list[RepositoryInfo] = [metadata for metadata in all_matched_metadata if metadata.get("active")]
 
         if not active_matched_metadata:
             logger_moduleset.warning(f" y[b[*] Selector y[{selector}] is expanded only to inactive projects!")

@@ -1397,12 +1397,12 @@ class Application:
     def _warn_if_ignored_unexisting_project_or_group(self, ignored_projects: set[str]):
         module_resolver = self.module_resolver
         for el in ignored_projects:
-            repo_data = self.context.projects_db.repositories.get(el, {})
+            repo_data = self.context.projects_db.repositories.get(el)
             if not repo_data:
                 if el not in [*module_resolver.defined_projects, *module_resolver.defined_groups]:
                     logger_app.warning(f" y[*] ignore-projects contains unexisting project or group: y[{el}]")
                     continue
             else:
-                active = repo_data.get("active", False)
+                active = repo_data["active"]
                 if not active:
                     logger_app.warning(f" y[*] ignore-projects contains archived KDE project: y[{el}]")

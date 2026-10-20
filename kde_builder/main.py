@@ -131,10 +131,9 @@ def main():
         logger_app = logging.getLogger("application")
         unrecognized_name = err.unknown_project_name
         ctx = app.context
-        repo_data = ctx.projects_db.repositories.get(unrecognized_name, {})
-        active = repo_data.get("active", False)
+        repo_data = ctx.projects_db.repositories.get(unrecognized_name, None)
         msg = ""
-        if repo_data and not active:
+        if repo_data and not repo_data["active"]:
             msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
         else:
             msg = dedent(f"""
