@@ -14,6 +14,7 @@ from enum import auto
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version
 from typing import NoReturn
+from typing import TypedDict
 
 from kde_builder import KB_REPO_DIR
 from kde_builder.os_support import OSSupport
@@ -31,6 +32,16 @@ class InstallationType(Enum):
     PIPX = auto()
     UNKNOWN = auto()
 
+
+class VersionComponents(TypedDict):
+    """
+    Version of kde-builder divided to its components.
+    """
+
+    base: str
+    post: str | None
+    hash: str | None
+    date: str | None
 
 class Version:
     """
@@ -145,8 +156,7 @@ class Version:
             logger_app.warning(f" y[*] Cannot parse local version: {current_ver}")
             return
 
-        # noinspection bad-assignment
-        local_tag: str = ver_components["base"]
+        local_tag = ver_components["base"]
         local_hash = ver_components["hash"]
 
         latest_remote_tag = cls.latest_remote_tag()
@@ -298,7 +308,7 @@ class Version:
         return tup_versions[latest_version]
 
     @staticmethod
-    def extract_version_components(version_str: str) -> dict[str, str | None] | None:
+    def extract_version_components(version_str: str) -> VersionComponents | None:
         """
         Separate the kde-builder version into its components.
         """
