@@ -30,6 +30,7 @@ from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
 from kde_builder.cmd_line import Cmdline
+from kde_builder.cmd_line import ParsedCmdLine
 from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
@@ -77,7 +78,7 @@ class Application:
         self.modules: list[Module] = []
 
         c = Cmdline()
-        opts: dict = c.read_command_line_options_and_selectors(options)
+        opts: ParsedCmdLine = c.read_command_line_options_and_selectors(options)
         self.cmdline_opts = opts
 
         ctx.phases.reset_to(opts["phases"])

@@ -6,6 +6,8 @@
 import argparse
 import logging
 import re
+from typing import Any
+from typing import TypedDict
 
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.options_spec import add_bootstrap_arguments
@@ -14,6 +16,17 @@ from kde_builder.util.textwrap_mod import dedent
 from kde_builder.version import Version
 
 logger_app = logging.getLogger("application")
+
+ParsedCmdLine = TypedDict("ParsedCmdLine", {
+    "global": dict[str, Any],
+    "per_project": dict[str, Any],
+    "phases": list[str],
+    "run_mode": str,
+    "selectors": list[str],
+    "special-selectors": list[str],
+    "ignore-projects": list[str],
+    "start-program": list[str],
+})
 
 
 class Cmdline:
@@ -39,7 +52,7 @@ class Cmdline:
     def __init__(self) -> None:
         pass
 
-    def read_command_line_options_and_selectors(self, options: list[str]) -> dict:
+    def read_command_line_options_and_selectors(self, options: list[str]) -> ParsedCmdLine:
         """
         Decode the command line options passed into it and return a dictionary describing what actions to take.
 
@@ -82,7 +95,7 @@ class Cmdline:
         program entirely.
         """
         phases = PhaseList()
-        opts = {
+        opts: ParsedCmdLine = {
             "global": {},
             "per_project": {},
             "phases": [],
