@@ -103,8 +103,6 @@ class RecursiveConfigNodesIterator:
                     return node_name, node, self.current_filename
             else:
                 self.pop_file_from_stack()
-                if self.current_dictionary is None:
-                    raise StopIteration
                 continue
 
     def add_file_to_stack(self, nodes_dict: dict, filename: str, new_basepath: str) -> None:
@@ -121,8 +119,11 @@ class RecursiveConfigNodesIterator:
         self.stack_base_path.append(new_basepath)
 
     def pop_file_from_stack(self) -> None:
-        self.current_dictionary = self.stack_dictionaries.pop() if len(self.stack_dictionaries) else None
-        self.current_filename = self.stack_filenames.pop() if len(self.stack_filenames) else None
-        self.current_index = self.stack_indexes.pop() if len(self.stack_indexes) else None
-        self.current_keys_list = self.stack_keys_lists.pop() if len(self.stack_keys_lists) else None
+        if not self.stack_dictionaries:
+            raise StopIteration
+
+        self.current_dictionary = self.stack_dictionaries.pop()
+        self.current_filename = self.stack_filenames.pop()
+        self.current_index = self.stack_indexes.pop()
+        self.current_keys_list = self.stack_keys_lists.pop()
         self.stack_base_path.pop()
