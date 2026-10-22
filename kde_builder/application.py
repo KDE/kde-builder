@@ -67,14 +67,14 @@ class Application:
         ctx = self.context
 
         self.metadata_module = None
-        self.module_resolver: ModuleResolver | None = None
+        self._module_resolver: ModuleResolver | None = None
         """ModuleResolver object, that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
 
         # Default to colorized output if sending to TTY
         main_handler.formatter.set_colorful_output(True if sys.stdout.isatty() else False)
 
-        self.dependency_resolver: DependencyResolver = None
+        self._dependency_resolver: DependencyResolver | None = None
         self.modules: list[Module] = []
 
         c = Cmdline()
@@ -145,6 +145,18 @@ class Application:
                 self.finish(5)
 
         self._install_signal_handlers(signal_handler)
+
+    @property
+    def module_resolver(self) -> ModuleResolver:
+        if self._module_resolver is None:
+            raise KBRuntimeError("ModuleResolver has not been initialized yet.")
+        return self._module_resolver
+
+    @property
+    def dependency_resolver(self) -> DependencyResolver:
+        if self._dependency_resolver is None:
+            raise KBRuntimeError("DependencyResolver has not been initialized in yet.")
+        return self._dependency_resolver
 
     def generate_module_list(self) -> None:
         """
@@ -252,7 +264,7 @@ class Application:
         module_resolver.expand_all_groups()
         module_resolver.set_explicit_cmdline_selectors(cmdline_selectors)
 
-        self.module_resolver = module_resolver
+        self._module_resolver = module_resolver
         self._warn_if_ignored_unexisting_project_or_group(ignored_selectors)
 
         modules: list[Module] = []
@@ -288,7 +300,7 @@ class Application:
         branch_group = ctx.get_option("branch-group")
         self._warn_if_branch_group_does_not_exists(branch_group)
 
-        self.dependency_resolver = DependencyResolver(self.module_resolver)
+        self._dependency_resolver = DependencyResolver(self.module_resolver)
         self._read_kde_dependencies()
         self._resolve_module_dependency_graph(modules)
 

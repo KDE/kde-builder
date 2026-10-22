@@ -11,6 +11,7 @@ import os
 import re
 from typing import TYPE_CHECKING
 
+from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
 from kde_builder.options_spec import OptionsSpec
 
@@ -37,8 +38,14 @@ class OptionsBase:
 
     def __init__(self, ctx: BuildContext | None = None, name: str = "") -> None:
         self.options = {"set-env": {}}
-        self.context = ctx
+        self._context = ctx
         self.name = name
+
+    @property
+    def context(self) -> BuildContext:
+        if self._context is None:
+            raise ProgramError(f"Tried to access the context that has not been set.")
+        return self._context
 
     def has_option(self, key: str) -> bool:
         """
@@ -151,7 +158,7 @@ class OptionsBase:
         if option_name == "ignore-projects":  # when reading the ignore-projects from global node from the config
             if not isinstance(option_value, list):
                 raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid value type \"{option_value.__class__.__name__}\", but \"list\" is expected.")
-        if self.context:
+        if self._context:
             self.context.verify_option_value_type(option_name, option_value)
         else:
             return

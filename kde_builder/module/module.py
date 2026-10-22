@@ -81,7 +81,7 @@ class Module(PathResolvingOptions):
         self.phases: PhaseList = phases
 
         self.scm: Updater = Updater(self)
-        self.build_system: BuildSystem | None = None
+        self._build_system: BuildSystem | None = None
         self.module_set: ModuleSet | None = None  # in perl it was called module-set (i.e. via "-")
         self.post_build_msgs: list[str] = []
         self.env: dict[str, str] = {}
@@ -98,6 +98,16 @@ class Module(PathResolvingOptions):
 
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
+
+    @property
+    def build_system(self) -> BuildSystem:
+        if self._build_system is None:
+            raise RuntimeError(f"Build system for module {self.name} has not been autodetected yet")
+        return self._build_system
+
+    @build_system.setter
+    def build_system(self, value: BuildSystem | None) -> None:
+        self._build_system = value
 
     def set_module_set(self, module_set: ModuleSet) -> None:
         """

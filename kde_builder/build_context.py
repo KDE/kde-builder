@@ -90,21 +90,44 @@ class BuildContext(PathResolvingOptions):
         self.persistent_options = {}
         """These are kept across multiple script runs."""
 
-        self.metadata_module: Module | None = None
+        self._metadata_module: Module | None = None
         """A Module for repo-metadata."""
 
-        self.branch_group_resolver: ModuleBranchGroupResolver | None = None
+        self._branch_group_resolver: ModuleBranchGroupResolver | None = None
         """Used to determine a git branch for kde projects (when the branch-group option is in use)."""
 
         self.status_view: StatusView = StatusView()
 
-        self.projects_db: KDEProjectsReader | None = None
-        """See set_projects_db()."""
+        self._projects_db: KDEProjectsReader | None = None
 
-        self.metadata: Metadata | None = None
+        self._metadata: Metadata | None = None
         """Stores info from repo-metadata."""
 
         self.options = OptionsSpec.all_global_options_defaults()
+
+    @property
+    def metadata_module(self) -> Module:
+        if self._metadata_module is None:
+            raise KBRuntimeError("Metadata Module has not been initialized yet.")
+        return self._metadata_module
+
+    @property
+    def branch_group_resolver(self) -> ModuleBranchGroupResolver:
+        if self._branch_group_resolver is None:
+            raise KBRuntimeError("Branch group resolver has not been initialized yet.")
+        return self._branch_group_resolver
+
+    @property
+    def projects_db(self) -> KDEProjectsReader:
+        if self._projects_db is None:
+            raise KBRuntimeError("KDE Projects Reader has not been initialized yet.")
+        return self._projects_db
+
+    @property
+    def metadata(self) -> Metadata:
+        if self._metadata is None:
+            raise KBRuntimeError("Metadata has not been initialized yet.")
+        return self._metadata
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
@@ -637,7 +660,7 @@ class BuildContext(PathResolvingOptions):
         # Ensure we only ever try to update source, not build.
         metadata_module.phases.reset_to(["update"])
 
-        self.metadata_module = metadata_module
+        self._metadata_module = metadata_module
 
     def set_metadata(self) -> None:
         """
@@ -648,9 +671,9 @@ class BuildContext(PathResolvingOptions):
             raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")
 
         repo_metadata_fullpath: str = project_database_module.fullpath("source")
-        self.projects_db = KDEProjectsReader(repo_metadata_fullpath)
-        self.metadata = Metadata(repo_metadata_fullpath)
-        self.branch_group_resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
+        self._projects_db = KDEProjectsReader(repo_metadata_fullpath)
+        self._metadata = Metadata(repo_metadata_fullpath)
+        self._branch_group_resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
 
     @override
     def verify_option_value_type(self, option_name, option_value) -> None:
