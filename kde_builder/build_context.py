@@ -14,6 +14,7 @@ import re
 import sys
 import tempfile
 from pathlib import Path
+from typing import Any
 from typing import override
 
 import kde_builder
@@ -87,7 +88,7 @@ class BuildContext(PathResolvingOptions):
         self.rc_files = BuildContext.rcfiles
         self.rc_file = None
 
-        self.persistent_options = {}
+        self.persistent_options: dict[str, dict[str, Any]] = {}
         """These are kept across multiple script runs."""
 
         self._metadata_module: Module | None = None
@@ -531,22 +532,6 @@ class BuildContext(PathResolvingOptions):
 
         The directory used is the same directory that contains the rc file in use.
         """
-        # pl2py note: this was commented there.
-        # We need to keep persistent data with the context instead of with the
-        # applicable modules since otherwise we might forget to write out
-        # persistent data for modules we didn't build in this run. So, we just
-        # store it all.
-        #
-        # Layout of this data:
-        #  self.persistent_options = {
-        #    "module-name": {
-        #      option: value,
-        #      # for each option/value pair
-        #    },
-        #    # for each module
-        #  }
-        self.persistent_options = {}
-
         fname = self.persistent_option_file_name()
         if not os.path.exists(fname):
             return
@@ -599,7 +584,7 @@ class BuildContext(PathResolvingOptions):
         Return type - for example used in
           int - global last-metadata-update
         """
-        persistent_opts = self.persistent_options if hasattr(self, "persistent_options") else []
+        persistent_opts = self.persistent_options
 
         if module_name not in persistent_opts:
             return None
