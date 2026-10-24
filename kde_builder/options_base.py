@@ -36,6 +36,8 @@ class OptionsBase:
     what options to set, see :class:`Application` and its friends.
     """
 
+    module_id = 0
+
     def __init__(self, ctx: BuildContext | None = None, name: str = "") -> None:
         self.options = {"set-env": {}}
         self._context = ctx
@@ -234,12 +236,9 @@ class OptionsBase:
             node_opts: A dict of options read from one node from config.
             file_name: A full path for file name that is read.
         """
-        if not hasattr(OptionsBase, "moduleID"):
-            OptionsBase.moduleID = 0
-
         self._mark_config_source(file_name)
-        self.set_option("#entry_num", OptionsBase.moduleID)
-        OptionsBase.moduleID += 1
+        self.set_option("#entry_num", OptionsBase.module_id)
+        OptionsBase.module_id += 1
 
         all_possible_options = OptionsSpec.all_possible_options_names()
 

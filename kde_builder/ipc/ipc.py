@@ -28,6 +28,8 @@ class IPC:
     IPCPipe, which both fall back to common methods implemented here.
     """
 
+    waited = 0
+
     # IPC message types
 
     MODULE_SUCCESS = 1
@@ -313,9 +315,6 @@ class IPC:
 
         This function is running only in main kde-builder process (kde-builder-build).
         """
-        if not hasattr(IPC, "waited"):
-            IPC.waited = 0
-
         if IPC.waited:
             return
 

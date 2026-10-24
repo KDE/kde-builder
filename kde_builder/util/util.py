@@ -37,6 +37,8 @@ class Util:
     Helper methods that may be used across the KDE Builder code.
     """
 
+    created_paths: dict[str, bool] = {}
+
     @staticmethod
     def locate_exe(prog: str, preferred: list[str] | None = None) -> str | None:
         """
@@ -114,13 +116,10 @@ class Util:
 
         Throws an exception on failure. See Path.
         """
-        if not hasattr(Util, "createdPaths"):
-            Util.createdPaths = {}
-
         if kde_builder.is_pretending:
-            if pathname not in Util.createdPaths and not os.path.exists(pathname):
+            if pathname not in Util.created_paths and not os.path.exists(pathname):
                 logger_util.debug(f"\tWould have created g[{pathname}]")
-            Util.createdPaths[pathname] = True
+            Util.created_paths[pathname] = True
             return True
         else:
             try:
