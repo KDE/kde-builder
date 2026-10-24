@@ -656,3 +656,22 @@ class Util:
                 return 0
 
         return 1  # success (pointed to correct location already)
+
+
+    @staticmethod
+    def get_num_cores_for_low_memory() -> int:
+        """
+        Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available.
+        """
+        num_cores_physical = os.cpu_count() or 4
+
+        try:
+            mem_bytes = os.sysconf("SC_PHYS_PAGES") * os.sysconf("SC_PAGE_SIZE")
+            mem_gib = mem_bytes // (1024**3)
+            # Assuming each core will take 2 GiB.
+            safe_cores_by_memory = mem_gib // 2
+            safe_cores_by_memory = max(1, safe_cores_by_memory)
+        except (AttributeError, ValueError):
+            safe_cores_by_memory = 2
+
+        return min(safe_cores_by_memory, num_cores_physical)

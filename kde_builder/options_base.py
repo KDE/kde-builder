@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
 from kde_builder.options_spec import OptionsSpec
+from kde_builder.util.util import Util
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
@@ -127,8 +128,7 @@ class OptionsBase:
             try:
                 int(opt_val)  # any value that can be cast to int.
             except ValueError:  # some string like "auto" is set.
-                from kde_builder.os_support import CoresAndMemorySupport
-                opt_val = str(CoresAndMemorySupport.get_num_cores_for_low_memory())
+                opt_val = str(Util.get_num_cores_for_low_memory())
 
         # Everything else can be dumped straight into our dict.
         self.verify_option_value_type(opt_name, opt_val)
