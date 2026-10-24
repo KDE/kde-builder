@@ -169,7 +169,7 @@ class Application:
         expanded, and we will have downloaded kde-projects metadata.
         """
         ctx = self.context
-        opts: dict = self.cmdline_opts
+        opts: ParsedCmdLine = self.cmdline_opts
 
         cmdline_selectors: list[str] = opts["selectors"]
         cmdline_per_project_options: dict = opts["per_project"]
@@ -736,21 +736,20 @@ class Application:
         elif first_node_content != 2:
             raise ConfigError(f"Unrecognized config version number. The version 2 was expected, but {first_node_content} was given.")
 
-        first_node = next(iter(config_content))
-        first_node_content = config_content.pop(first_node)
+        global_node = next(iter(config_content))
+        global_node_content = config_content.pop(global_node)
 
-        if first_node != "global":
-            # First key in kde-builder.yaml should be "global".
+        if global_node != "global":
+            # Second key in kde-builder.yaml should be "global".
             logger_app.error(f"Invalid configuration file: {rcfile}.")
             logger_app.error(f"Expecting global settings node!")
             raise ConfigError("Missing global section")
         else:
-            global_opts = OptionsBase()
-            global_opts.apply_config_options(ctx, first_node_content, rcfile)
             # For those options that user passed in cmdline, we do not want their corresponding config options to overwrite build context, so we forget them.
             for key in cmdline_global_options.keys():
-                global_opts.options.pop(key, None)
-            ctx.merge_options_from(global_opts)
+                if key in global_node_content:
+                    del global_node_content[key]
+            ctx.apply_config_options(ctx, global_node_content, rcfile)
 
         # Now we have determined log-dir, and can set screen log file.
         main_handler.set_log_file(ctx.get_log_dir() + "/screen.log")
