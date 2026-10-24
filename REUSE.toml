@@ -21,6 +21,7 @@ path = [
     "tests/fixtures/**",
     "pyproject.toml",
     "ruff.toml",
+    "uv.lock",
     ]
 SPDX-FileCopyrightText = "none"
 SPDX-License-Identifier = "CC0-1.0"
