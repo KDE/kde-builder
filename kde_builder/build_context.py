@@ -20,7 +20,6 @@ from typing import override
 import kde_builder
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
-from kde_builder.kb_exception import SetOptionError
 from kde_builder.kb_logging import colorize
 from kde_builder.kb_logging import main_handler
 from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
@@ -653,8 +652,3 @@ class BuildContext(PathResolvingOptions):
         self._projects_db = KDEProjectsReader(repo_metadata_fullpath)
         self._metadata = Metadata(repo_metadata_fullpath)
         self._branch_group_resolver = ModuleBranchGroupResolver(self.metadata.branch_groups)
-
-    @override
-    def verify_option_value_type(self, option_name, option_value) -> None:
-        if option_name in OptionsSpec.all_boolean_options_names() and not isinstance(option_value, bool):
-            raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid boolean value \"{option_value}\".")

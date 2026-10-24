@@ -157,13 +157,11 @@ class OptionsBase:
         """
         Ensure we are setting the correct type for value of option.
         """
-        if option_name == "ignore-projects":  # when reading the ignore-projects from global node from the config
+        if option_name == "ignore-projects":
             if not isinstance(option_value, list):
                 raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid value type \"{option_value.__class__.__name__}\", but \"list\" is expected.")
-        if self._context:
-            self.context.verify_option_value_type(option_name, option_value)
-        else:
-            return
+        if option_name in OptionsSpec.all_boolean_options_names() and not isinstance(option_value, bool):
+            raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid boolean value \"{option_value}\".")
 
     @staticmethod
     def _substitute_value(ctx: BuildContext, unresolved_value: str | bool | list | dict | int | None, file_name: str) -> str | bool | list | dict | int:

@@ -985,10 +985,3 @@ class Module(PathResolvingOptions):
 
         if os.path.exists(logdir):  # pl2py: in unit test, the log dir is not created. In perl symlinking just does not care and proceeds, but in python the exception is thrown. So we make this check.
             os.symlink(f"{logfile}", f"{logdir}/error.log")
-
-    @override
-    def verify_option_value_type(self, option_name, option_value) -> None:
-        """
-        Ensure we are setting the correct type for value of option.
-        """
-        self.context.verify_option_value_type(option_name, option_value)

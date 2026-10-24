@@ -141,10 +141,3 @@ class ModuleSet(OptionsBase):
 
         self.project_objects_list = module_list
         return module_list
-
-    @override
-    def verify_option_value_type(self, option_name, option_value) -> None:
-        """
-        Ensure we are setting the correct type for value of option.
-        """
-        self.context.verify_option_value_type(option_name, option_value)
