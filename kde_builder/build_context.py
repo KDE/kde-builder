@@ -446,13 +446,7 @@ class BuildContext(PathResolvingOptions):
         Search for a module with a name that matches the provided parameter, and return its :class:`Module` object.
 
         Returns None if no match was found.
-        As a special-case, returns the BuildContext itself if the name passed is
-        "global", since the BuildContext also is a (in the "is-a" OOP sense)
-        :class:`Module`, specifically the "global" one.
         """
-        if module_name == "global":
-            return self
-
         options = [module for module in self.modules if module.name == module_name]
         if not options:
             return None
