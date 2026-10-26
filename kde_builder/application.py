@@ -7,13 +7,10 @@
 from __future__ import annotations
 
 import atexit
-import fileinput
 import glob
 import hashlib
 import logging
 import os
-import re
-import shutil
 import signal
 import subprocess
 import sys
@@ -1067,104 +1064,6 @@ class Application:
                             "interesting' to 'probably least interesting' failure:\n")
             for item in sorted_for_debug[:top]:  # pl2py: in python the stop point is not included, so we add +1
                 logger_app.info(f"\tr[b[{item}]")
-
-    @staticmethod
-    def _install_templated_file(source_path: str, destination_path: str, ctx: BuildContext) -> None:
-        """
-        Take a given file and a build context, and install it to a given location while expanding out template entries within the source file.
-
-        The template language is *extremely* simple: <% foo %> is replaced entirely
-        with the result of `ctx.get_option(foo)`. If the result
-        evaluates false for any reason than an exception is thrown. No quoting of
-        any sort is used in the result, and there is no way to prevent expansion of
-        something that resembles the template format.
-
-        Multiple template entries on a line will be replaced.
-
-        The destination file will be created if it does not exist. If the file
-        already exists then an exception will be thrown.
-
-        Error handling: Any errors will result in an exception being thrown.
-
-        Args:
-            source_path: Pathname to the source file (use absolute paths)
-            destination_path: Pathname to the destination file (use absolute paths)
-            ctx: Build context to use for looking up template values
-
-        Returns:
-             None
-        """
-        try:
-            input_file = fileinput.FileInput(files=source_path, mode="r")
-        except OSError as e:
-            raise KBRuntimeError(f"Unable to open template source {source_path}: {e}")
-
-        try:
-            output_file = open(destination_path, "w")
-        except OSError as e:
-            raise KBRuntimeError(f"Unable to open template output {destination_path}: {e}")
-
-        for line in input_file:
-            if line is None:
-                os.unlink(destination_path)
-                raise KBRuntimeError(f"Failed to read from {source_path} at line {input_file.filelineno()}")
-
-            # Some lines should only be present in the source as they aid with testing.
-            if "kde-builder: filter" in line:
-                continue
-
-            pattern = re.compile(
-                r"<% \s*"  # Template bracket and whitespace
-                r"([^\s%]+)"  # Capture variable name
-                r"\s*%>"  # remaining whitespace and closing bracket
-            )
-            match = re.search(pattern, line)
-            if match:
-                def repl():
-                    optval = ctx.get_option(match.group(1))
-                    if optval is None:  # pl2py: perl // "logical defined-or" operator checks the definedness, not truth. So empty string is considered as normal value.
-                        raise KBRuntimeError(f"Invalid variable {match.group(1)}")
-                    return optval
-
-                line = re.sub(pattern, repl(), line)  # Replace all matching expressions, use extended regexp with comments, and replacement is Python code to execute.
-
-            try:
-                output_file.write(line)
-            except Exception as e:
-                raise KBRuntimeError(f"Unable to write line to {destination_path}: {e}")
-
-    @staticmethod
-    def _install_custom_file(ctx: BuildContext, source_file_path: str, dest_file_path: str, md5_key_name: str) -> None:
-        """
-        Installs a source file to a destination path.
-
-        Assuming the source file is a "templated" source file (see also _install_templated_file), and
-        records a digest of the file actually installed. This function will overwrite
-        a destination if the destination is identical to the last-installed file.
-
-        Error handling: Any errors will result in an exception being thrown.
-
-        Args:
-            ctx: Build context to use for looking up template values.
-            source_file_path: The full path to the source file.
-            dest_file_path: The full path to the destination file (incl. name).
-            md5_key_name: The key name to use for searching/recording installed MD5 digest.
-
-        Returns:
-             None
-        """
-        base_name = os.path.basename(source_file_path)
-
-        if os.path.exists(dest_file_path):
-            existing_md5 = ctx.get_persistent_option("/digests", md5_key_name) or ""
-
-            if hashlib.md5(open(dest_file_path, "rb").read()).hexdigest() != existing_md5:
-                if not kde_builder.is_pretending:
-                    shutil.copy(dest_file_path, f"{dest_file_path}.kde-builder-backup")
-
-        if not kde_builder.is_pretending:
-            Application._install_templated_file(source_file_path, dest_file_path, ctx)
-            ctx.set_persistent_option("/digests", md5_key_name, hashlib.md5(open(dest_file_path, "rb").read()).hexdigest())
 
     def install_login_session(self) -> int:
         """
