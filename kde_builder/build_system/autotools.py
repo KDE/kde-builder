@@ -74,7 +74,7 @@ class BuildSystemAutotools(BuildSystem):
         builddir = module.fullpath("build")
         installdir = module.installation_path()
 
-        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", "module"))
+        bootstrap_options = Util.split_quoted_on_whitespace(module.get_option("configure-flags", str, "module"))
         try:
             configure_command = self._autogen()
             exitcode = Util.run_logged(module, "configure", builddir, [f"{sourcedir}/{configure_command}", f"--prefix={installdir}", *bootstrap_options])

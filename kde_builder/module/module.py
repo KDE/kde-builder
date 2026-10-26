@@ -154,7 +154,7 @@ class Module(PathResolvingOptions):
         The reason why we do not call this function immediately in generate_module_list() is that we need to handle
         updates first, because we need to inspect source code files to autodetect build system.
         """
-        if user_build_system := self.get_option("override-build-system"):
+        if user_build_system := self.get_option("override-build-system", str):
             self.build_system = self.build_system_from_name(user_build_system)
             return
 
@@ -201,7 +201,7 @@ class Module(PathResolvingOptions):
 
         if not self.setup_build_system():
             return False
-        if self.get_option("build-system-only"):
+        if self.get_option("build-system-only", bool):
             return True
 
         self.current_phase = "build"
@@ -213,7 +213,7 @@ class Module(PathResolvingOptions):
         if not kde_builder.is_pretending:
             self.set_persistent_option("last-build-rev", self.current_scm_revision())
 
-        if self.get_option("run-tests"):
+        if self.get_option("run-tests", bool):
             self.build_system.run_testsuite()
 
         return True
@@ -236,7 +236,7 @@ class Module(PathResolvingOptions):
         # can happen due to name changes on KDE.org side or flat-layout option
         # toggled)
         builddir = self.fullpath("build")
-        old_build_dir = self.get_option("#last-build-dir")
+        old_build_dir = self.get_option("#last-build-dir", str)
         if not kde_builder.is_pretending and builddir != old_build_dir and os.path.isdir(old_build_dir) and not os.path.exists(builddir):
             logger_module.warning(f"\ty[b[*] Build directory setting has changed to {builddir}.")
             logger_module.warning(f"\ty[b[*] Moving old build directory at {old_build_dir} to the new location.")
@@ -298,12 +298,12 @@ class Module(PathResolvingOptions):
 
         self.setup_environment()
 
-        make_install_opts = self.get_option("make-install-prefix").split(" ")
+        make_install_opts = self.get_option("make-install-prefix", str).split(" ")
         make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         # We can optionally uninstall prior to installing
         # to weed out old unused files.
-        if self.get_option("use-clean-install") and self.get_persistent_option("last-install-rev"):
+        if self.get_option("use-clean-install", bool) and self.get_persistent_option("last-install-rev"):
             if not self.build_system.uninstall_internal(make_install_opts):
                 logger_module.warning(f"\tUnable to uninstall r[{self.name}] before installing the new build.")
                 logger_module.warning("\tContinuing anyways...")
@@ -315,8 +315,8 @@ class Module(PathResolvingOptions):
             self.context.mark_module_phase_failed("install", self)
             return False
 
-        gl_commands = self.context.get_option("post-install-commands") or []
-        pr_commands = self.get_option("post-install-commands", "module") or []
+        gl_commands = self.context.get_option("post-install-commands", list[str]) or []
+        pr_commands = self.get_option("post-install-commands", list[str], "module") or []
         commands: list[str] = gl_commands + pr_commands
         if commands:
             for index, command in enumerate(commands):
@@ -336,7 +336,7 @@ class Module(PathResolvingOptions):
         self.set_persistent_option("last-install-rev", self.current_scm_revision())
         self._remember_project_binaries()
 
-        remove_setting = self.get_option("remove-after-install")
+        remove_setting = self.get_option("remove-after-install", str)
 
         # Possibly remove the srcdir and builddir after install for users with
         # a little bit of HD space.
@@ -374,7 +374,7 @@ class Module(PathResolvingOptions):
 
         self.setup_environment()
 
-        make_install_opts = self.get_option("make-install-prefix").split(" ")
+        make_install_opts = self.get_option("make-install-prefix", str).split(" ")
         make_install_opts = [el for el in make_install_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
 
         if not self.build_system.uninstall_internal(make_install_opts):
@@ -398,9 +398,9 @@ class Module(PathResolvingOptions):
         if self.build_system.name() != "KDE CMake":
             return
 
-        install_dir = self.get_option("install-dir")
+        install_dir = self.get_option("install-dir", str)
         bin_dir = f"{install_dir}/bin/"
-        libname = self.get_option("libname")
+        libname = self.get_option("libname", str)
         libexec_dir = f"{install_dir}/{libname}/libexec/"
         build_dir = self.fullpath("build")
         install_manifest = build_dir + "/install_manifest.txt"
@@ -424,8 +424,8 @@ class Module(PathResolvingOptions):
 
         Should be run before forking off commands for e.g. updates, builds, installs, etc.
         """
-        module_set_env_dict = self.get_option("set-env", "module")  # limit inheritance when searching
-        global_set_env_dict = self.context.get_option("set-env")
+        module_set_env_dict = self.get_option("set-env", dict[str, str], "module")  # limit inheritance when searching
+        global_set_env_dict = self.context.get_option("set-env", dict[str, str])
 
         # Add global set-env to module set-env (only for those variables that are not defined in module, i.e. those that are not overriding the global).
         for key, value in global_set_env_dict.items():
@@ -440,9 +440,9 @@ class Module(PathResolvingOptions):
         if build_system.has_toolchain():
             logger_module.debug(f"\tNot setting environment variables for b[{self.name}]: a custom toolchain is used")
         else:
-            installdir = self.get_option("install-dir")
-            qt_installdir = self.get_option("qt-install-dir")
-            libname = self.get_option("libname")  # e.g. "lib" or "lib64"
+            installdir = self.get_option("install-dir", str)
+            qt_installdir = self.get_option("qt-install-dir", str)
+            libname = self.get_option("libname", str)  # e.g. "lib" or "lib64"
 
             # Ensure the platform libraries we're building can be found, as long as they
             # are not the system's own libraries.
@@ -456,8 +456,8 @@ class Module(PathResolvingOptions):
                 self.prepend_environment_value("LD_LIBRARY_PATH", f"{platform_dir}/{libname}")
                 self.prepend_environment_value("PATH", f"{platform_dir}/bin")
 
-            binpath = self.get_option("binpath")
-            libpath = self.get_option("libpath")
+            binpath = self.get_option("binpath", str)
+            libpath = self.get_option("libpath", str)
 
             if binpath:
                 self.prepend_environment_value("PATH", binpath)
@@ -488,7 +488,7 @@ class Module(PathResolvingOptions):
              False on failure, True on success.
         """
         module_name = self.name
-        if ctx.get_option("source-dir") != self.get_option("source-dir"):
+        if ctx.get_option("source-dir", str) != self.get_option("source-dir", str):
             module_src_dir = self.get_source_dir()
             # This module has a different source directory, ensure it exists.
             if not Util.super_mkdir(module_src_dir):
@@ -501,7 +501,7 @@ class Module(PathResolvingOptions):
         # Check for whether path to source dir has changed due to directory-layout
         # option or changes to metadata.
         fullpath = self.fullpath("source")
-        old_source_dir = self.get_option("#last-source-dir")
+        old_source_dir = self.get_option("#last-source-dir", str)
         if not kde_builder.is_pretending and fullpath != old_source_dir and os.path.isdir(old_source_dir) and not os.path.exists(fullpath):
             logger_module.warning(dedent(f"""
                 \ty[b[*] Source directory setting has changed to {fullpath}.
@@ -537,7 +537,7 @@ class Module(PathResolvingOptions):
 
             logger_module.error(f"{e_str}")
             if not ipc.supports_concurrency():  # Because in async mode, this will be written by kde-builder-build (main) process.
-                logfile = self.get_option("#error-log-file")
+                logfile = self.get_option("#error-log-file", str)
                 logger_module.error(f"\tError log: r[" + logfile)
 
             ipc.send_ipc_message(IPC.MODULE_FAILURE, module_name)
@@ -622,7 +622,7 @@ class Module(PathResolvingOptions):
         super().set_option(opt_name, opt_val)
 
     @override
-    def get_option(self, key: str, level_limit="allow-inherit") -> str | dict:
+    def get_option[T](self, key: str, value_type: type[T], level_limit="allow-inherit") -> T:
         """
         Return an option value for a given module.
 
@@ -639,6 +639,7 @@ class Module(PathResolvingOptions):
 
         Args:
             key: Name of option
+            value_type: Type of returned value
             level_limit: Level limit (optional). If not present, then the value
                 "allow-inherit" is used. Options:
                   - allow-inherit: Module value is used if present (with exceptions),
@@ -658,7 +659,7 @@ class Module(PathResolvingOptions):
         if level_limit == "module":
             return self.options[key] if key in self.options else ""
 
-        ctx_value = ctx.get_option(key)  # we'll use this a lot from here
+        ctx_value = ctx.get_option(key, value_type)  # we'll use this a lot from here
 
         # Some options append to the global (e.g. conf flags)
         conf_flags = ["cmake-options", "configure-flags", "cxxflags", "meson-options"]
@@ -714,9 +715,9 @@ class Module(PathResolvingOptions):
         destdir = self.dest_dir()
         directory = ""
         if dirtype == "source":
-            directory = self.get_option("source-dir")
+            directory = self.get_option("source-dir", str)
         if dirtype == "build":
-            directory = self.get_option("build-dir")
+            directory = self.get_option("build-dir", str)
 
         if directory.startswith("~"):
             directory = re.sub(r"^~", os.path.expanduser("~"), directory)
@@ -750,11 +751,11 @@ class Module(PathResolvingOptions):
         but even with git this value may change for KDE-based repositories to set subdirectories that match KDE project
         paths. Supports expanding "$MODULE" or "${MODULE}" sequences to what otherwise would have been the dest-dir.
         """
-        dest_dir = self.get_option("dest-dir")
+        dest_dir = self.get_option("dest-dir", str)
 
         # Note the default dest-dir option is "${MODULE}"
         if "${MODULE}" in dest_dir or "$MODULE" in dest_dir:
-            layout = self.get_option("directory-layout")
+            layout = self.get_option("directory-layout", str)
             if layout == "flat":
                 base_path = self.name
             elif layout == "invent":  # invent layout is the modern layout for proper KDE projects
@@ -780,7 +781,7 @@ class Module(PathResolvingOptions):
         The user may use "$MODULE" or "${MODULE}" in the "install-dir" option to have
         them replaced by the name of the module in question.
         """
-        path = self.get_option("install-dir")
+        path = self.get_option("install-dir", str)
         module_name = self.name
         path = re.sub(r"(\$\{MODULE})|(\$MODULE\b)", module_name, path)
 
@@ -810,8 +811,8 @@ class Module(PathResolvingOptions):
 
         Resolved value is either a full url like "https://invent.kde.org/sysadmin/dummy.git" or an aliased shortened url like "kde:sysadmin/dummy.git".
         """
-        selected_repo = self.get_option("repository")
-        repo_set: dict = self.context.get_option("git-repository-base")
+        selected_repo = self.get_option("repository", str)
+        repo_set: dict = self.context.get_option("git-repository-base", dict[str, str])
 
         if not selected_repo:
             # Empty repository ("") does not immediately mean error. For example, user may want to work on their new/tutorial project,
@@ -966,7 +967,7 @@ class Module(PathResolvingOptions):
         logdir = self.get_log_dir()
 
         if self.has_option("#error-log-file"):
-            prev_val = self.get_option("#error-log-file")
+            prev_val = self.get_option("#error-log-file", str)
             logger_module.error(f"\tr[b[*] {self.name} already has error log set to {prev_val}, tried to set to r[b[{logfile}]")
             return
 

@@ -16,6 +16,7 @@ import subprocess
 import sys
 from time import sleep
 from time import time
+from typing import Any
 from typing import Callable
 from typing import NoReturn
 
@@ -185,7 +186,7 @@ class Application:
         ctx.load_persistent_options()
 
         # After we have read config, we know owr persistent options, and can read/overwrite them.
-        if ctx.get_option("metadata-update-skipped"):
+        if ctx.get_option("metadata-update-skipped", int):
             last_update = ctx.get_persistent_option("global", "last-metadata-update") or 0
             if (int(time()) - last_update) >= 7200:
                 # Do not increase the level of this message, keep it at "debug" level.
@@ -294,7 +295,7 @@ class Application:
         if cmdline_selectors_len:
             modules = modules + module_resolver.resolve_selectors_into_modules(cmdline_selectors)
 
-        branch_group = ctx.get_option("branch-group")
+        branch_group = ctx.get_option("branch-group", str)
         self._warn_if_branch_group_does_not_exists(branch_group)
 
         self._dependency_resolver = DependencyResolver(self.module_resolver)
@@ -346,7 +347,7 @@ class Application:
             kde_builder.is_pretending = was_pretending
 
             module_source = metadata_module.fullpath("source")
-            update_desired = not ctx.get_option("no-metadata")
+            update_desired = not ctx.get_option("no-metadata", bool)
             update_needed = (not os.path.exists(module_source)) or (not os.listdir(module_source))
 
             if not update_desired and not update_needed:
@@ -434,7 +435,7 @@ class Application:
         ctx = self.context
         metadata_module = ctx.metadata_module
         dependency_resolver = self.dependency_resolver
-        branch_group = ctx.get_option("branch-group")
+        branch_group = ctx.get_option("branch-group", str)
 
         dependency_files = []
         if kde_builder.is_testing:
@@ -492,7 +493,7 @@ class Application:
         run_mode = self.run_mode
 
         if run_mode == "query":
-            query_mode = ctx.get_option("query")
+            query_mode = ctx.get_option("query", str)
 
             if query_mode == "project-info":
                 dependency_graph = self.dependency_resolver.dependency_graph
@@ -551,7 +552,7 @@ class Application:
                         return "<not a cmake build system>"
             else:  # Default to .get_option() as query method.
                 def query(x):
-                    return x.get_option(query_mode)
+                    return x.get_option(query_mode, Any)
 
             for m in modules:
                 res = query(m)
@@ -567,7 +568,7 @@ class Application:
 
         result = None  # shell-style (0 == success)
 
-        if ctx.get_option("hold-performance-profile"):
+        if ctx.get_option("hold-performance-profile", bool):
             # If power-profiles-daemon is in use, request switching to performance mode.
             self._hold_performance_power_profile_if_possible()
 
@@ -601,7 +602,7 @@ class Application:
         elif run_mode == "uninstall":
             result = Application._handle_uninstall(ctx)
 
-        if ctx.get_option("purge-old-logs"):
+        if ctx.get_option("purge-old-logs", bool):
             LogDir.delete_unreferenced_log_directories(ctx)
 
         self._print_failed_modules_in_each_phase(ctx)
@@ -615,12 +616,12 @@ class Application:
             # --rebuild-failures
             ctx.set_persistent_option("global", "last-failed-module-list", failed_modules)
 
-        if ctx.get_option("install-login-session") or run_mode == "install-login-session-only":
+        if ctx.get_option("install-login-session", bool) or run_mode == "install-login-session-only":
             res = self.install_login_session()
             if res and not result:
                 result = res
 
-        if ctx.get_option("check-self-updates"):
+        if ctx.get_option("check-self-updates", bool):
             last_self_updates_check = ctx.get_persistent_option("global", "last-self-updates-check") or 0
             try:
                 last_self_updates_check = int(last_self_updates_check)
@@ -859,7 +860,7 @@ class Application:
             module.set_build_system()
             failed = not module.install() or failed
 
-            if failed and module.get_option("stop-on-failure"):
+            if failed and module.get_option("stop-on-failure", bool):
                 logger_app.warning("y[Stopping here].")
                 return True  # Error
         return failed
@@ -894,7 +895,7 @@ class Application:
             module.set_build_system()
             failed = not module.uninstall() or failed
 
-            if failed and module.get_option("stop-on-failure"):
+            if failed and module.get_option("stop-on-failure", bool):
                 logger_app.warning("y[Stopping here].")
                 return True  # Error
         return failed
@@ -905,10 +906,10 @@ class Application:
         """
         ctx = self.context
 
-        resume_from = ctx.get_option("resume-from")
-        resume_after = ctx.get_option("resume-after")
-        stop_before = ctx.get_option("stop-before")
-        stop_after = ctx.get_option("stop-after")
+        resume_from = ctx.get_option("resume-from", str)
+        resume_after = ctx.get_option("resume-after", str)
+        stop_before = ctx.get_option("stop-before", str)
+        stop_after = ctx.get_option("stop-after", str)
 
         if not resume_from and not resume_after and not stop_before and not stop_after:
             logger_app.debug("Not slicing project list because --resume-from, --resume-after, --stop-before, --stop-after options are not present.")
@@ -1027,7 +1028,7 @@ class Application:
             for module in failures:
                 out_str = f"r[{module}]"
                 if not kde_builder.is_pretending:
-                    logfile = module.get_option("#error-log-file")
+                    logfile = module.get_option("#error-log-file", str)
 
                     # async updates may cause us not to have an error log file stored. There is only
                     # one place it should be though, take advantage of side-effect of run_logged() to find it.
@@ -1082,12 +1083,12 @@ class Application:
             return 0
 
         ctx = self.context
-        layout = ctx.get_option("directory-layout")
+        layout = ctx.get_option("directory-layout", str)
         pws_dest_dir = "/plasma/plasma-workspace" if layout == "invent" else "/plasma-workspace"
-        pws_builddir = ctx.get_option("build-dir") + pws_dest_dir
+        pws_builddir = ctx.get_option("build-dir", str) + pws_dest_dir
         install_sessions_script = pws_builddir + "/login-sessions/install-sessions.sh"
         startplasma_dev_script = pws_builddir + "/login-sessions/startplasma-dev.sh"
-        libexecdir = f"""{ctx.get_option("install-dir")}/{ctx.get_option("libname")}/libexec"""
+        libexecdir = f"{ctx.get_option("install-dir", str)}/{ctx.get_option("libname", str)}/libexec"
 
         if not os.path.isfile(install_sessions_script) or not os.path.isfile(startplasma_dev_script):
             if not os.path.isdir(pws_builddir):
@@ -1131,7 +1132,7 @@ class Application:
 
         def gen_new_files_map():
             plasmaver = ""
-            if "6" in ctx.get_option("branch-group"):
+            if "6" in ctx.get_option("branch-group", str):
                 plasmaver = "6"
 
             # User may build plasma-workspace with "-DWITH_X11_SESSION=OFF", and have no plasmax11-dev6.desktop file.
@@ -1147,7 +1148,7 @@ class Application:
             check_match(f"{KB_PACKAGE_DIR}/resources/00-plasma.conf.in",
                         "/etc/dbus-1/session.d/00-plasma.conf")
 
-            dbus1_files_dir = ctx.get_option("install-dir") + "/share/dbus-1"
+            dbus1_files_dir = ctx.get_option("install-dir", str) + "/share/dbus-1"
 
             needed_dbus1_files = sorted([item.removeprefix(dbus1_files_dir) for item in glob.glob(dbus1_files_dir + "/**/*", recursive=True) if os.path.isfile(item)])
 
@@ -1185,8 +1186,8 @@ class Application:
             return False
 
         ctx = self.context
-        installdir = ctx.get_option("install-dir")
-        qt_installdir = ctx.get_option("qt-install-dir")
+        installdir = ctx.get_option("install-dir", str)
+        qt_installdir = ctx.get_option("qt-install-dir", str)
         preferred_paths = [f"{installdir}/bin", f"{qt_installdir}/bin"]
 
         if kde_builder.is_pretending:

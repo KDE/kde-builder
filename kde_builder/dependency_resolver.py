@@ -309,7 +309,7 @@ class DependencyResolver:
         module_name = module_desc["module_name"]
         branch = module_desc["branch"]
         pretty_branch = branch if branch else "*"
-        include_dependencies = module.get_option("include-dependencies") if module else False
+        include_dependencies = module.get_option("include-dependencies", bool) if module else False
 
         errors = {
             "syntax_errors": 0,

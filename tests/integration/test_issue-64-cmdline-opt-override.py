@@ -23,14 +23,14 @@ def test_no_cmdline_override():
     app.generate_module_list()
     module_list = app.modules
 
-    assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
+    assert app.context.get_option("num-cores", str) == "8", "No cmdline option leaves num-cores value alone"
 
     assert len(module_list) == 4, "Right number of modules"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
-    assert module_list[0].get_option("make-options") == "-j4", "make-options base value proper pre-override"
+    assert module_list[0].get_option("make-options", str) == "-j4", "make-options base value proper pre-override"
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
-    assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper pre-override"
+    assert module_list[3].get_option("make-options", str) == "-j 8", "module-override make-options proper pre-override"
 
 
 def test_cmdline_makeoption():
@@ -41,14 +41,14 @@ def test_cmdline_makeoption():
     app.generate_module_list()
     module_list = app.modules
 
-    assert app.context.get_option("num-cores") == "8", "No cmdline option leaves num-cores value alone"
+    assert app.context.get_option("num-cores", str) == "8", "No cmdline option leaves num-cores value alone"
 
     assert len(module_list) == 4, "Right number of modules"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
-    assert module_list[0].get_option("make-options") == "j3", "make-options base value proper post-override"
+    assert module_list[0].get_option("make-options", str) == "j3", "make-options base value proper post-override"
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
-    assert module_list[3].get_option("make-options") == "-j 8", "module-override make-options proper post-override"
+    assert module_list[3].get_option("make-options", str) == "-j 8", "module-override make-options proper post-override"
 
 
 def test_cmdline_numcores():
@@ -59,11 +59,11 @@ def test_cmdline_numcores():
     app.generate_module_list()
     module_list = app.modules
 
-    assert app.context.get_option("num-cores") == "5", "Updated cmdline option changes global value"
+    assert app.context.get_option("num-cores", str) == "5", "Updated cmdline option changes global value"
 
     assert len(module_list) == 4, "Right number of modules"
     assert module_list[0].name == "setmod1", "mod list[0] == setmod1"
-    assert module_list[0].get_option("make-options") == "-j4", "make-options base value proper post-override (indirect value)"
+    assert module_list[0].get_option("make-options", str) == "-j4", "make-options base value proper post-override (indirect value)"
 
     assert module_list[3].name == "module2", "mod list[3] == module2"
-    assert module_list[3].get_option("make-options") == "-j 5", "module-override make-options proper post-override (indirect value)"
+    assert module_list[3].get_option("make-options", str) == "-j 5", "module-override make-options proper post-override (indirect value)"

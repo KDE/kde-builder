@@ -122,7 +122,7 @@ class IdeProjectConfigGenerator:
 
         launch_json = launch_json.replace("%{launch_env_entries}", launch_env_entries_str)
 
-        extra_run_env = module.get_option("source-when-start-program")
+        extra_run_env = module.get_option("source-when-start-program", str)
         # Currently, sourcing a _script_ is not possible, see https://github.com/microsoft/vscode-cpptools/issues/9329 feature request.
         # For now, will just use an envFile, hoping user is aware of this behavior in vs code, and used the env file in the value of source-when-start-program option.
         launch_json = launch_json.replace("%{envFile}", extra_run_env)
@@ -143,7 +143,7 @@ class IdeProjectConfigGenerator:
             logger_ide_proj.debug("\tWould have generated .idea directory")
             return False
 
-        branch_group = self.module.context.get_option("branch-group")
+        branch_group = self.module.context.get_option("branch-group", str)
         project_name = self.module.name
         if branch_group != "kf6-qt6":
             project_name += f" ({branch_group})"
@@ -186,7 +186,7 @@ class IdeProjectConfigGenerator:
         self._write_to_file(f"{config_dir}/cmake.xml", cmake_xml)
 
         run_conf_xml = self._read_file(f"{data_dir}/KDE_Builder_run_debug_configuration.xml.in")
-        extra_run_env = module.get_option("source-when-start-program")
+        extra_run_env = module.get_option("source-when-start-program", str)
         run_conf_xml = run_conf_xml.replace("%{ENVFILE}", extra_run_env)
         install_dir = module.installation_path()
         executable = install_dir + "/bin/" + module.name
@@ -334,20 +334,20 @@ class IdeProjectConfigGenerator:
         Trigger generation IDE project configs for all enabled IDEs.
         """
         module = self.module
-        if module.get_option("generate-vscode-project-config"):
+        if module.get_option("generate-vscode-project-config", bool):
             self._generate_vs_code_config()
         else:
             logger_ide_proj.debug("\tGenerating .vscode directory - disabled for this project")
 
-        if module.get_option("generate-clion-project-config"):
+        if module.get_option("generate-clion-project-config", bool):
             self._generate_clion_config()
         else:
             logger_ide_proj.debug("\tGenerating .idea directory - disabled for this project")
 
-        if module.get_option("generate-qtcreator-project-config"):
+        if module.get_option("generate-qtcreator-project-config", bool):
             self._generate_qtcreator_config()
         else:
             logger_ide_proj.debug("\tGenerating qtcreator configs - disabled for this project")
 
-        if module.get_option("generate-vscode-project-config"):
+        if module.get_option("generate-vscode-project-config", bool):
             self._convert_prefixsh_to_env()

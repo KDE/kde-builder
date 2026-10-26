@@ -159,7 +159,7 @@ class BuildSystemKDECMake(BuildSystem):
 
     def _determine_cmake_toolchain(self) -> str:
         module = self.module
-        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
+        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options", str))
 
         toolchain = self._find_toolchain_in_cmake_options(cmake_options)
         if not self._check_toolchain_ok(toolchain):
@@ -191,8 +191,8 @@ class BuildSystemKDECMake(BuildSystem):
 
     def _determine_cmake_generator(self) -> str:
         module = self.module
-        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
-        generator = next((gen for gen in (self._find_generator_in_cmake_options(cmake_options), module.get_option("cmake-generator"), "Unix Makefiles") if self._check_generator_is_whitelisted(gen)), None)
+        cmake_options = Util.split_quoted_on_whitespace(module.get_option("cmake-options", str))
+        generator = next((gen for gen in (self._find_generator_in_cmake_options(cmake_options), module.get_option("cmake-generator", str), "Unix Makefiles") if self._check_generator_is_whitelisted(gen)), None)
 
         if not generator:
             raise ProgramError(f"Unable to determine CMake generator for: {module}")
@@ -233,7 +233,7 @@ class BuildSystemKDECMake(BuildSystem):
             module.prepend_environment_value("QT_PLUGIN_PATH", f"{prefix}/lib64/plugins:{prefix}/lib/plugins")
             module.prepend_environment_value("XDG_DATA_DIRS", f"{prefix}/share")
 
-        qt_installdir = module.get_option("qt-install-dir")
+        qt_installdir = module.get_option("qt-install-dir", str)
         if qt_installdir and qt_installdir != prefix:
             # Ensure we can find Qt's own CMake modules
             module.prepend_environment_value("CMAKE_PREFIX_PATH", qt_installdir)
@@ -316,7 +316,7 @@ class BuildSystemKDECMake(BuildSystem):
 
         # handle the linking of compile_commands.json back to source directory if wanted
         # allows stuff like clangd to function out of the box
-        if module.get_option("compile-commands-linking"):
+        if module.get_option("compile-commands-linking", bool):
             # symlink itself will keep existing files untouched!
             builddir = module.fullpath("build")
             srcdir = module.fullpath("source")
@@ -340,7 +340,7 @@ class BuildSystemKDECMake(BuildSystem):
         module = self.module
         toolchain = self.get_cmake_toolchain()
 
-        commands = Util.split_quoted_on_whitespace(module.get_option("cmake-options"))
+        commands = Util.split_quoted_on_whitespace(module.get_option("cmake-options", str))
 
         # grep out empty fields
         commands = [command for command in commands if not re.match(r"^\s*$", command)]
@@ -351,12 +351,12 @@ class BuildSystemKDECMake(BuildSystem):
             commands.insert(0, f"-DCMAKE_TOOLCHAIN_FILE={toolchain}")
 
         # generate a compile_commands.json if requested for e.g. clangd tooling
-        if module.get_option("compile-commands-export"):
+        if module.get_option("compile-commands-export", bool):
             commands.insert(0, "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON")
 
         # Get the user's CXXFLAGS, use them if specified and not already given
         # on the command line.
-        cxxflags = module.get_option("cxxflags")
+        cxxflags = module.get_option("cxxflags", str)
         if cxxflags and not [command for command in commands if re.match(r"^-DCMAKE_CXX_FLAGS(:\w+)?=", command)]:
             commands.append(f"-DCMAKE_CXX_FLAGS:STRING={cxxflags}")
 
@@ -365,11 +365,11 @@ class BuildSystemKDECMake(BuildSystem):
         commands.append(f"-DCMAKE_INSTALL_PREFIX={installdir}")
 
         # Add custom Qt to the installdir (but don't overwrite a user-set install-dir)
-        qt_installdir = module.get_option("qt-install-dir")
+        qt_installdir = module.get_option("qt-install-dir", str)
         if qt_installdir and qt_installdir != installdir and not [command for command in commands if re.match(r"^\s*-DCMAKE_PREFIX_PATH", command)]:
             commands.append(f"-DCMAKE_PREFIX_PATH={qt_installdir}")
 
-        if module.get_option("run-tests"):
+        if module.get_option("run-tests", bool):
             found_build_testing_index = -1
             for index, command in enumerate(commands):
                 if not re.match(r"^\s*-DBUILD_TESTING(:BOOL)?=", command):
@@ -422,7 +422,7 @@ class BuildSystemKDECMake(BuildSystem):
         old_options = module.get_persistent_option("last-cmake-options") or ""
         builddir = module.fullpath("build")
 
-        if old_options != Util.get_list_digest(commands) or module.get_option("reconfigure") or \
+        if old_options != Util.get_list_digest(commands) or module.get_option("reconfigure", bool) or \
                 not os.path.exists(f"{builddir}/CMakeCache.txt"):  # File should exist only on successful cmake run
             logger_buildsystem.info(f"\tRunning g[cmake] targeting b[{generator}]...")
 

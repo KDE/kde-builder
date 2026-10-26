@@ -52,7 +52,7 @@ class TaskManager:
         result = 0
         ipc = None
 
-        if ctx.uses_concurrent_phases() and ctx.get_option("async"):
+        if ctx.uses_concurrent_phases() and ctx.get_option("async", bool):
             ipc = IPCPipe()
         else:
             ipc = IPCNull()
@@ -197,7 +197,7 @@ class TaskManager:
         if not module.build():
             return "build"  # phase failed at
 
-        has_custom_targets = module.get_option("targets")
+        has_custom_targets = module.get_option("targets", list[str])
         if has_custom_targets:
             module.set_persistent_option("failure-count", 0)
             return ""  # Do not continue with normal installation.
@@ -247,7 +247,7 @@ class TaskManager:
         if not modules:
             return 0
 
-        if ctx.get_option("clean-build-first"):
+        if ctx.get_option("clean-build-first", bool):
             modules[0].set_option("clean-build", True)
 
         # IPC queue should have a message saying whether or not to bother with the
@@ -321,12 +321,12 @@ class TaskManager:
                     ctx.set_persistent_option("global", "resume-list", module_list)
                 result = 1
 
-                if module.get_option("stop-on-failure"):
+                if module.get_option("stop-on-failure", bool):
                     logger_taskmanager.warning(f"\n{module} didn't build, stopping here.")
                     result = 1
                     break
 
-                logfile = module.get_option("#error-log-file")
+                logfile = module.get_option("#error-log-file", str)
 
                 # Async updates do not send setting "#error-log-file" option over IPC.
                 # But if the failed command was run via run_logged() (that is not always),
@@ -453,7 +453,7 @@ class TaskManager:
 
         result: int = TaskManager._handle_build(ipc, ctx)
 
-        if result and ctx.get_option("stop-on-failure"):
+        if result and ctx.get_option("stop-on-failure", bool):
             # It's possible if build fails on some near-first module, and returned because of stop-on-failure option, the git update process may still be running.
             try:
                 # print("Asking to stop updates gracefully")

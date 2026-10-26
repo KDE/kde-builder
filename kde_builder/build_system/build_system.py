@@ -72,7 +72,7 @@ class BuildSystem:
         """
         Return cpu cores limit to apply during the build.
         """
-        num_cores: str = self.module.get_option("num-cores")
+        num_cores: str = self.module.get_option("num-cores", str)
 
         # If set to empty, accept user's decision
         if num_cores == "":
@@ -106,7 +106,7 @@ class BuildSystem:
             return "the build directory doesn't exist"
         if os.path.exists(f"{builddir}/.refresh-me"):
             return "the last configure failed"  # see module.py
-        if module.get_option("clean-build"):
+        if module.get_option("clean-build", bool):
             return "the option clean-build was set"
         if not os.path.exists(f"{builddir}/{conf_file_key}"):
             return f"{builddir}/{conf_file_key} is missing"
@@ -174,7 +174,7 @@ class BuildSystem:
         # automatically below. So filter out the naked -j for configs where what
         # previously might have been "-j 4" is now only "-j". See
         # https://invent.kde.org/sdk/kdesrc-build/-/issues/78
-        option_val = self.module.get_option(options_name)
+        option_val = self.module.get_option(options_name, str)
 
         # Look for -j being present but not being followed by digits
         if re.search(r"(^|[^a-zA-Z0-9_])-j$", option_val) or re.search(r"(^|[^a-zA-Z_])-j(?! *[0-9]+)", option_val):
@@ -195,7 +195,7 @@ class BuildSystem:
 
     def build_internal(self) -> bool:
         build_options = self.get_build_options()
-        custom_targets = self.module.get_option("targets")
+        custom_targets = self.module.get_option("targets", list[str])
         if custom_targets:
             msg = "Building custom targets..."
             targets = custom_targets
@@ -350,7 +350,7 @@ class BuildSystem:
         prefix_opts = prefix_options
 
         taskset_args = []
-        taskset_opt = module.get_option("taskset-cpu-list")
+        taskset_opt = module.get_option("taskset-cpu-list", str)
 
         if taskset_opt:
             arg_str = taskset_opt

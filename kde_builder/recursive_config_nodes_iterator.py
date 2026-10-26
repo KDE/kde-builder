@@ -8,6 +8,7 @@ import logging
 import os
 import re
 from typing import TYPE_CHECKING
+from typing import Any
 
 import yaml
 
@@ -68,7 +69,7 @@ class RecursiveConfigNodesIterator:
                     sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None
 
                     while sub_var_name:
-                        sub_var_value = ctx.get_option(sub_var_name) or ""
+                        sub_var_value = ctx.get_option(sub_var_name, Any) or ""
                         if not ctx.has_option(sub_var_name):
                             logger_var_subst.warning(f" *\n * WARNING: {sub_var_name} used in {self.current_filename} is not set in global context.\n *")
 

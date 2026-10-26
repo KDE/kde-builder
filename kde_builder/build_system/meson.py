@@ -34,7 +34,7 @@ class BuildSystemMeson(BuildSystem):
         builddir = module.fullpath("build")
         installdir = module.installation_path()
 
-        setup_options = Util.split_quoted_on_whitespace(module.get_option("meson-options"))
+        setup_options = Util.split_quoted_on_whitespace(module.get_option("meson-options", str))
 
         exitcode = Util.run_logged(module, "meson-setup", sourcedir, ["meson", "setup", builddir, "--prefix", installdir, *setup_options])
         return Util.good_exitcode(exitcode)

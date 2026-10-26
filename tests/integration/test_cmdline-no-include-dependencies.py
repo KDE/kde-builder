@@ -26,7 +26,7 @@ def mock_application(monkeypatch):
                 "votes": {
                     "setmod3": 1
                 },
-                "build": bool(self.context.get_option("include-dependencies")),
+                "build": bool(self.context.get_option("include-dependencies", bool)),
                 "module": new_module
             },
             "setmod3": {

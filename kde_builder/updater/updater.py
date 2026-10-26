@@ -160,7 +160,7 @@ class Updater:
             raise KBRuntimeError("\tFailed to make initial clone of project")
 
         # Setup user configuration
-        if name := module.get_option("git-user"):
+        if name := module.get_option("git-user", str):
             username, email = None, None
             match = re.match(r"^([^<]+) +<([^>]+)>$", name)
             if match:
@@ -209,7 +209,7 @@ class Updater:
         module = self.module
         srcdir = self.srcdir
 
-        git_repo: str = module.get_option("#resolved-repository")
+        git_repo: str = module.get_option("#resolved-repository", str)
         if not git_repo:
             msg = f"\tThere was no y[b[repository] specified for the {module.name}."
             raise ConfigError(msg)
@@ -256,7 +256,7 @@ class Updater:
         """
         module = self.module
         srcdir = self.srcdir
-        repo = module.get_option("#resolved-repository")
+        repo = module.get_option("#resolved-repository", str)
         has_old_remote = self.has_remote(remote)
 
         if has_old_remote:
@@ -440,9 +440,9 @@ class Updater:
         """
         module = self.module
         srcdir = self.srcdir
-        cur_repo = module.get_option("#resolved-repository")
+        cur_repo = module.get_option("#resolved-repository", str)
 
-        if module.get_option("hold-work-branches"):
+        if module.get_option("hold-work-branches", bool):
             current_branch = subprocess.run(f"git branch --show-current", shell=True, capture_output=True, text=True, cwd=srcdir).stdout.strip()
             if current_branch.startswith("work/") or current_branch.startswith("mr/"):
                 logger_updater.warning(f"\tHolding g[{module}] at branch b[{current_branch}]")
@@ -540,7 +540,7 @@ class Updater:
 
         matched_checkout_source = None
         for checkout_source in priority_ordered_checkout_sources:
-            if ref_string := module.get_option(checkout_source.option_name, checkout_source.inherit_mode):
+            if ref_string := module.get_option(checkout_source.option_name, str, checkout_source.inherit_mode):
                 matched_checkout_source = checkout_source
                 break
 
@@ -557,7 +557,7 @@ class Updater:
             ref_string = self._resolve_branch_group(ref_string)
 
             if not ref_string:
-                branch_group = module.get_option("branch-group")
+                branch_group = module.get_option("branch-group", str)
                 logger_updater.debug(f"\tNo specific branch set for {module} and {branch_group}, using master!")
                 ref_string = "master"
 
@@ -742,7 +742,7 @@ class Updater:
         """
         module = self.module
         srcdir = self.srcdir
-        resolved_repository = module.get_option("#resolved-repository")
+        resolved_repository = module.get_option("#resolved-repository", str)
 
         lines = Util.get_program_output(["git", "config", "--get-regexp", r"remote\..*\.url", "."], cwd=srcdir)
 
@@ -791,7 +791,7 @@ class Updater:
         Returns:
              False on failure of any sort, True otherwise.
         """
-        protocol = context_options.get_option("git-push-protocol") or "git"
+        protocol = context_options.get_option("git-push-protocol", str) or "git"
 
         push_url_prefix = ""
         other_push_url_prefix = ""

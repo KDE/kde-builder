@@ -57,11 +57,11 @@ class StartProgram:
             logger_app.error("Executable name is missing")
             exit(1)
 
-        extra_run_env = self.ctx.get_option("source-when-start-program")
+        extra_run_env = self.ctx.get_option("source-when-start-program", str)
 
-        install_dir = self.ctx.get_option("install-dir")
+        install_dir = self.ctx.get_option("install-dir", str)
         bin_dir = f"{install_dir}/bin"
-        libname = self.ctx.get_option("libname")
+        libname = self.ctx.get_option("libname", str)
         libexec_dir = f"{install_dir}/{libname}/libexec"
         exec_path_bin = f"{bin_dir}/{executable}"
         exec_path_libexec = f"{libexec_dir}/{executable}"
@@ -138,7 +138,7 @@ class StartProgram:
                     return build_dir_prefix_sh_path
 
         # Try to fall back to common prefix.sh
-        install_dir = self.ctx.get_option("install-dir")
+        install_dir = self.ctx.get_option("install-dir", str)
         common_prefix_sh_path = f"{install_dir}/prefix.sh"
         if os.path.exists(common_prefix_sh_path):
             logger_app.debug("Using prefix.sh from install directory")

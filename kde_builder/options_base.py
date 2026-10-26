@@ -10,6 +10,7 @@ import logging
 import os
 import re
 from typing import TYPE_CHECKING
+from typing import Any
 
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
@@ -59,7 +60,7 @@ class OptionsBase:
         ret = key in self.options
         return ret
 
-    def get_option(self, key: str) -> str | dict | list | bool:
+    def get_option[T](self, key: str, value_type: type[T]) -> T:
         """
         Return the value of the given option. If no such option is present, returns an empty string.
 
@@ -117,7 +118,7 @@ class OptionsBase:
                 if not repo or not url:
                     raise SetOptionError(repo_option, f"Invalid git-repository-base setting: {value}")
 
-                dictionary = self.get_option(repo_option)
+                dictionary = self.get_option(repo_option, dict[str, str])
                 if dictionary == "":  # pl2py: in perl they checked if _reference_ was defined (i.e. its id, but not that the hash (dict) is empty itself).
                     dictionary = {}
                 dictionary[repo] = url
@@ -200,7 +201,7 @@ class OptionsBase:
         sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
 
         while sub_var_name:
-            sub_var_value = ctx.get_option(sub_var_name) or ""
+            sub_var_value = ctx.get_option(sub_var_name, Any) or ""
             if not ctx.has_option(sub_var_name):
                 logger_optbase.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{file_name}\n *")
 
@@ -274,7 +275,7 @@ class OptionsBase:
         An OptionsBase can be tagged under multiple files.
         """
         key = "#defined-at"
-        sources = self.get_option(key) if self.has_option(key) else []
+        sources = self.get_option(key, list[str]) if self.has_option(key) else []
 
         sources.append(config_source)
         self.set_option(key, sources)
@@ -284,7 +285,7 @@ class OptionsBase:
         Return rcfile sources (comma-separated).
         """
         key = "#defined-at"
-        sources = self.get_option(key) or []
+        sources = self.get_option(key, list[str]) or []
         return ", ".join(sources)
 
 
@@ -319,7 +320,7 @@ class PathResolvingOptions(OptionsBase):
         Args:
             option_name: The option key (e.g. "build-dir" or "log-dir") to read and interpret.
         """
-        directory = self.get_option(option_name)
+        directory = self.get_option(option_name, str)
 
         # If build-dir starts with a slash, it is an absolute path.
         if directory.startswith("/"):
@@ -334,7 +335,7 @@ class PathResolvingOptions(OptionsBase):
             directory = re.sub(r"^~", os.path.expanduser("~"), directory)
         else:
             # Relative directory, tack it on to the end of kdesrcdir.
-            kdesrcdir = self.get_option("source-dir")
+            kdesrcdir = self.get_option("source-dir", str)
             directory = f"{kdesrcdir}/{directory}"
 
         return directory

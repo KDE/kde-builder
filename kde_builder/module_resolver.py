@@ -320,7 +320,7 @@ class ModuleResolver:
                     else:
                         logger_modres.debug(f"Group y[{module_set_name}] is ignored, so project y[{module.name}] was removed.")
                 continue
-            elif module_set_name == "qt6-set" and module.get_option("install-dir") == "":
+            elif module_set_name == "qt6-set" and module.get_option("install-dir", str) == "":
                 # User may have set their qt-install-dir option to empty string (the default), which means disabling building qt modules.
                 # But still user can accidentally request to build some qt modules (by explicitly specifying such modules in cmdline, or
                 # by building all). We should not allow building qt modules in such case.
@@ -340,7 +340,7 @@ class ModuleResolver:
                 # i.e. those projects where they *have* a branch-group, and it's set to be empty ("").
                 ctx = self.context
                 resolver = ctx.branch_group_resolver
-                branch_group = ctx.get_option("branch-group")
+                branch_group = ctx.get_option("branch-group", str)
                 repopath = module.get_repopath()
                 branch = resolver.resolve_branch_group(repopath, branch_group)
                 if branch == "":  # Note that None means it was not mentioned, while "" means it was explicitly disabled
@@ -365,7 +365,7 @@ class ModuleResolver:
           - User explicitly required that specific custom qt lib.
           - User explicitly required some other custom qt lib, which included that specific custom qt lib as a dependency.
         """
-        using_non_system_qt = self.context.get_option("qt-install-dir")
+        using_non_system_qt = self.context.get_option("qt-install-dir", str)
         if using_non_system_qt:
             return
 

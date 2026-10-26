@@ -49,7 +49,7 @@ class BuildSystemQMake6(BuildSystem):
         builddir = module.fullpath("build")
         sourcedir = module.fullpath("source")
 
-        qmake_opts = module.get_option("qmake-options").split(" ")
+        qmake_opts = module.get_option("qmake-options", str).split(" ")
         qmake_opts = [el for el in qmake_opts if el != ""]  # pl2py: split in perl makes 0 elements for empty string. In python split leaves one empty element. Remove it.
         project_files = glob.glob(f"{sourcedir}/*.pro")
 

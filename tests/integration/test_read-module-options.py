@@ -91,4 +91,4 @@ def test_option_reading(monkeypatch):
         assert cmd[13] == "-DPython3_FIND_UNVERSIONED_NAMES=FIRST", "If in venv, Python3_FIND_UNVERSIONED_NAMES is appended"
 
     # See https://phabricator.kde.org/D18165
-    assert module_list[0].get_option("cxxflags") == "", "empty cxxflags renders with no whitespace in module"
+    assert module_list[0].get_option("cxxflags", str) == "", "empty cxxflags renders with no whitespace in module"

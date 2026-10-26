@@ -131,10 +131,10 @@ class BuildContext(PathResolvingOptions):
 
     def setup_operating_environment(self) -> None:
         # Set the CPU priority
-        os.nice(int(self.get_option("niceness")))
+        os.nice(int(self.get_option("niceness", int)))
 
         # Set the IO priority.
-        if self.get_option("use-idle-io-priority"):
+        if self.get_option("use-idle-io-priority", bool):
             # The "idle" priority is class 3.
             ret_code = Util.safe_system(["ionice", "-c", "3", "-p", str(os.getpid())])
 
@@ -350,7 +350,7 @@ class BuildContext(PathResolvingOptions):
                     self.rc_file = os.path.abspath(file)
                     return
 
-            if self.get_option("metadata-only"):
+            if self.get_option("metadata-only", bool):
                 # If configuration file in default location was not found, and no --rc-file option was used, and metadata-only option was used.
 
                 # In FirstRun user may decide to use --install-distro-packages before --generate-config.
@@ -498,7 +498,7 @@ class BuildContext(PathResolvingOptions):
         """
         Return the name of the file to use for persistent data.
         """
-        file = self.get_option("persistent-data-file")
+        file = self.get_option("persistent-data-file", str)
 
         if file:
             file = file.replace("~", os.path.expanduser("~"))
