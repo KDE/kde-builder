@@ -90,7 +90,7 @@ class Application:
 
         cmdline_rc_file = opts["global"].get("rc-file", "")
         if cmdline_rc_file:
-            ctx.rc_file = cmdline_rc_file
+            ctx.config_file = cmdline_rc_file
 
         for opt_name, opt_val in opts["global"].items():
             ctx.set_option(opt_name, opt_val)
@@ -104,7 +104,7 @@ class Application:
         # The user might only want metadata to update to allow for a later --pretend run, check for that here.
         # We do this "metadata-only" check here (before _check_metadata_format_version()), to not disturb with repo-metadata-format check in case the user just wanted to download metadata.
         if "metadata-only" in opts["global"]:
-            # todo When --metadata-only was used and self.context.rc_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
+            # todo When --metadata-only was used and self.context.config_file is not /fake/dummy_config, before exiting, it should store persistent option for last-metadata-update.
             sys.exit(0)
 
         # We do check the repo-metadata-format before reading the rest of the metadata, because it may become incompatible.
@@ -181,7 +181,7 @@ class Application:
         # module-specific options to any returned modules/sets.
         modules_and_sets_from_userconfig: list[Module | ModuleSet]
         overrides_from_userconfig: list[OptionsBase]  # "override" nodes.
-        modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.rc_file, cmdline_global_options)
+        modules_and_sets_from_userconfig, overrides_from_userconfig = self._process_configs_content(ctx, ctx.config_file, cmdline_global_options)
 
         ctx.load_persistent_options()
 
@@ -715,14 +715,14 @@ class Application:
         Raises:
             SetOptionError
         """
-        with open(ctx.rc_file, "r") as f:
+        with open(ctx.config_file, "r") as f:
             try:
                 config_content = yaml.safe_load(f)
             except yaml.YAMLError as exc:
                 exc_msgs = "\n  " + "\n  ".join(str(x) for x in exc.args)
                 raise ConfigError("Error parsing yaml configuration file:" + exc_msgs)
         module_and_module_set_list = []
-        rcfile = ctx.rc_file
+        rcfile = ctx.config_file
 
         first_node = next(iter(config_content))
         first_node_content = config_content.pop(first_node)

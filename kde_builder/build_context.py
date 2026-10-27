@@ -85,7 +85,7 @@ class BuildContext(PathResolvingOptions):
         """
 
         self.rc_files = BuildContext.rcfiles
-        self.rc_file = None
+        self._config_file: str | None = None
 
         self.persistent_options: dict[str, dict[str, Any]] = {}
         """These are kept across multiple script runs."""
@@ -104,6 +104,16 @@ class BuildContext(PathResolvingOptions):
         """Stores info from repo-metadata."""
 
         self.options = OptionsSpec.all_global_options_defaults()
+
+    @property
+    def config_file(self) -> str:
+        if self._config_file is None:
+            raise KBRuntimeError("Config file has not been initialized yet.")
+        return self._config_file
+
+    @config_file.setter
+    def config_file(self, value: str | None) -> None:
+        self._config_file = value
 
     @property
     def metadata_module(self) -> Module:
@@ -332,13 +342,13 @@ class BuildContext(PathResolvingOptions):
 
     def absolutize_config_file_path_and_ensure_it_exists(self) -> None:
         """
-        Changes the self.rc_file value to a config absolute path, and checks if it exists.
+        Changes the self._config_file value to a config absolute path, and checks if it exists.
 
         If a config file was not set via command line, we will search in the default path.
         If unable to find or open the file, an exception is raised.
         Empty config files are supported.
         """
-        config_file = self.rc_file
+        config_file = self._config_file
 
         if not config_file:
             # If we are here, user did not specify the --rc-file in the command line.
@@ -347,7 +357,7 @@ class BuildContext(PathResolvingOptions):
             default_config_file_locations = self.rc_files
             for file in default_config_file_locations:
                 if os.path.exists(file):
-                    self.rc_file = os.path.abspath(file)
+                    self.config_file = os.path.abspath(file)
                     return
 
             if self.get_option("metadata-only", bool):
@@ -378,7 +388,7 @@ class BuildContext(PathResolvingOptions):
                 temp_file_path = temp_file.name
                 temp_file.close()
 
-                self.rc_file = temp_file_path
+                self.config_file = temp_file_path
                 return
 
             # If not found anything in the default location, and user did not specify the --rc-file in the command line, warn the user and fail.
@@ -404,7 +414,7 @@ class BuildContext(PathResolvingOptions):
 
             """))
             raise KBRuntimeError(f"Missing {config_file}")
-        self.rc_file = config_file
+        self.config_file = config_file
 
     def base_config_directory(self) -> str:
         """
@@ -415,10 +425,8 @@ class BuildContext(PathResolvingOptions):
 
         The RC file must have been found and loaded first, obviously.
         """
-        rcfile = self.rc_file
-        if not rcfile:
-            raise ProgramError("Call to base_config_directory() before absolutize_config_file_path_and_ensure_it_exists().")
-        return os.path.dirname(rcfile)
+        config_file = self.config_file
+        return os.path.dirname(config_file)
 
     def modules_in_phase(self, phase: str) -> list[Module]:
         modules_list = [module for module in self.modules if module.phases.has(phase)]
@@ -511,10 +519,10 @@ class BuildContext(PathResolvingOptions):
                 # Local config is used. Store the data file in the same directory.
                 file = config_dir + "/" + BuildContext.PERSISTENT_FILE_NAME
 
-            if self.rc_file not in BuildContext.rcfiles:
+            if self.config_file not in BuildContext.rcfiles:
                 # If the used config file isn't one of the default ones, and persistent-data-file is not set.
                 # In this case, append the name of the config file to the persistent data file name, to associate it with that specific config file.
-                rc_file_name = os.path.basename(self.rc_file)
+                rc_file_name = os.path.basename(self.config_file)
                 file = f"{file}-{rc_file_name}"
 
         return file
