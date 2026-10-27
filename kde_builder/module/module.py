@@ -93,8 +93,8 @@ class Module(PathResolvingOptions):
 
         # Record current values of what would be last source/build dir, if present,
         # before they are potentially reset during the module build.
-        self.set_option("#last-source-dir", self.get_persistent_option("source-dir") or "")
-        self.set_option("#last-build-dir", self.get_persistent_option("build-dir") or "")
+        self.set_option("#last-source-dir", self.get_persistent_option("source-dir", str) or "")
+        self.set_option("#last-build-dir", self.get_persistent_option("build-dir", str) or "")
 
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
@@ -303,7 +303,7 @@ class Module(PathResolvingOptions):
 
         # We can optionally uninstall prior to installing
         # to weed out old unused files.
-        if self.get_option("use-clean-install", bool) and self.get_persistent_option("last-install-rev"):
+        if self.get_option("use-clean-install", bool) and self.get_persistent_option("last-install-rev", str):
             if not self.build_system.uninstall_internal(make_install_opts):
                 logger_module.warning(f"\tUnable to uninstall r[{self.name}] before installing the new build.")
                 logger_module.warning("\tContinuing anyways...")
@@ -670,18 +670,19 @@ class Module(PathResolvingOptions):
         ret = self.options.get(key, ctx_value)
         return ret
 
-    def get_persistent_option(self, key: str) -> str | int | None:
+    def get_persistent_option[T](self, key: str, value_type: type[T]) -> T | None:
         """
         Return option value that had been set in a previous kde-builder run (saved in a file on disk).
 
         Args:
              key: The name of the option to lookup.
+             value_type: Type of returned value.
 
         None is returned if the option is not set, although even if the option is set, the value returned might be empty.
 
         Return types: the same as :meth:`BuildContext.get_persistent_option()`
         """
-        return self.context.get_persistent_option(self.name, key)
+        return self.context.get_persistent_option(self.name, key, value_type)
 
     def set_persistent_option(self, key: str, value) -> None:
         """

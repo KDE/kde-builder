@@ -419,7 +419,7 @@ class BuildSystemKDECMake(BuildSystem):
         # Generate IDE configs now, so if cmake configure fails, user already have them, and could then debug cmake script in their IDE.
         IdeProjectConfigGenerator(module, commands).generate_ide_project_configs()
 
-        old_options = module.get_persistent_option("last-cmake-options") or ""
+        old_options = module.get_persistent_option("last-cmake-options", str) or ""
         builddir = module.fullpath("build")
 
         if old_options != Util.get_list_digest(commands) or module.get_option("reconfigure", bool) or \

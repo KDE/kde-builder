@@ -17,7 +17,7 @@ def mock_module(monkeypatch):
         self.failed_phase = failed_phase
 
     # Redefine `Module` to stub get_persistent_option() results
-    def mock_get_persistent_option(self, option):
+    def mock_get_persistent_option(self, option, value_type):
         assert option == "failure-count", "only the \"failure-count\" should be queried"
         return self.count
 

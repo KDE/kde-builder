@@ -562,7 +562,7 @@ class BuildContext(PathResolvingOptions):
             logger_buildcontext.error(f"Unable to save persistent data: b[r[{e}]")
             return
 
-    def get_persistent_option(self, module_name: str, key=None) -> str | int | None:
+    def get_persistent_option[T](self, module_name: str, key: str, value_type: type[T]) -> T | None:
         """
         Return the value of a "persistent" option (normally read in as part of startup), or None if there is no value stored.
 
@@ -573,6 +573,7 @@ class BuildContext(PathResolvingOptions):
                 point so if an option is present globally but not for a module you
                 must check both if that's what you want.
             key: The name of the value to retrieve (i.e. the key)
+            value_type: Type of returned value.
 
         Return type - for example used in
           int - global last-metadata-update

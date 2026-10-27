@@ -130,8 +130,8 @@ class DebugOrderHints:
         # someone does not need prodding if they have been working on it
         # for the past X builds or so already.
 
-        fail_count_a = a.get_persistent_option("failure-count")
-        fail_count_b = b.get_persistent_option("failure-count")
+        fail_count_a = a.get_persistent_option("failure-count", int)
+        fail_count_b = b.get_persistent_option("failure-count", int)
         fail_count = (fail_count_a or 0) - (fail_count_b or 0)
 
         if fail_count:

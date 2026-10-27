@@ -187,7 +187,7 @@ class Application:
 
         # After we have read config, we know owr persistent options, and can read/overwrite them.
         if ctx.get_option("metadata-update-skipped", int):
-            last_update = ctx.get_persistent_option("global", "last-metadata-update") or 0
+            last_update = ctx.get_persistent_option("global", "last-metadata-update", int) or 0
             if (int(time()) - last_update) >= 7200:
                 # Do not increase the level of this message, keep it at "debug" level.
                 # By default, metadata is updated automatically anyway. And if it is not, user knows what they are doing.
@@ -199,7 +199,7 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
 
         if "resume" in cmdline_global_options:
-            module_list: list[str] = ctx.get_persistent_option("global", "resume-list")
+            module_list: list[str] | None = ctx.get_persistent_option("global", "resume-list", list[str])
             if not module_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
@@ -210,7 +210,7 @@ class Application:
             opts["special-selectors"].clear()
 
         if "rebuild-failures" in cmdline_global_options:
-            module_list: list[str] = ctx.get_persistent_option("global", "last-failed-module-list")
+            module_list: list[str] | None = ctx.get_persistent_option("global", "last-failed-module-list", list[str])
             if not module_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which projects have previously failed to build.")
@@ -622,7 +622,7 @@ class Application:
                 result = res
 
         if ctx.get_option("check-self-updates", bool):
-            last_self_updates_check = ctx.get_persistent_option("global", "last-self-updates-check") or 0
+            last_self_updates_check = ctx.get_persistent_option("global", "last-self-updates-check", int) or 0
             try:
                 last_self_updates_check = int(last_self_updates_check)
             except ValueError:
@@ -1043,11 +1043,11 @@ class Application:
                 logger_app.warning(out_str)
 
         # See if any modules fail continuously and warn specifically for them.
-        recurring_build_fails_modules = [module for module in ctx.modules if (module.get_persistent_option("failure-count") or 0) > 3 and module.phases.has("build")]
+        recurring_build_fails_modules = [module for module in ctx.modules if (module.get_persistent_option("failure-count", int) or 0) > 3 and module.phases.has("build")]
 
         for m in recurring_build_fails_modules:
             # These messages will print immediately after this function completes.
-            num_failures = m.get_persistent_option("failure-count")
+            num_failures = m.get_persistent_option("failure-count", int)
             m.add_post_build_message(f"y[{m}] has failed to build b[{num_failures}] times.")
 
         top = 5

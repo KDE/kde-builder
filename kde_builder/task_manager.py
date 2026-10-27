@@ -161,7 +161,7 @@ class TaskManager:
         module.set_persistent_option("build-dir", module.fullpath("build"))
         module.set_persistent_option("install-dir", module.installation_path())
 
-        fail_count: int = module.get_persistent_option("failure-count") or 0
+        fail_count: int = module.get_persistent_option("failure-count", int) or 0
         result_status_of_update: str
         message: str
         result_status_of_update, message = ipc.wait_for_module(module)
