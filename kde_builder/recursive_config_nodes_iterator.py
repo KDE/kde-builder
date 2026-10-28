@@ -8,16 +8,15 @@ import logging
 import os
 import re
 from typing import TYPE_CHECKING
-from typing import Any
 
 import yaml
 
 from kde_builder.kb_exception import ConfigError
+from kde_builder.util.util import Util
 
 if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
-logger_var_subst = logging.getLogger("variables_substitution")
 logger_app = logging.getLogger("application")
 
 
@@ -55,30 +54,15 @@ class RecursiveConfigNodesIterator:
                 if node_name.startswith("include "):
                     # Include found, extract file name and open file.
                     match = re.match(r"^\s*include\s+(.+?)\s*$", node_name)
-                    filename = None
+                    filename = ""
                     if match:
                         filename = match.group(1)
 
                     if not filename:
                         raise ConfigError(f"Unable to handle file include \"{node_name}\" from {self.current_filename}")
 
-                    option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
                     ctx = self.context
-
-                    # Replace reference to global option with their value.
-                    sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None
-
-                    while sub_var_name:
-                        sub_var_value = ctx.get_option(sub_var_name, Any) or ""
-                        if not ctx.has_option(sub_var_name):
-                            logger_var_subst.warning(f" *\n * WARNING: {sub_var_name} used in {self.current_filename} is not set in global context.\n *")
-
-                        logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
-
-                        filename = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, filename)
-
-                        # Replace other references as well. Keep this RE up to date with the other one.
-                        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, filename)) else None
+                    filename = Util.substitute_value(ctx, filename, self.current_filename)
 
                     prefix = self.stack_base_path[-1]
 

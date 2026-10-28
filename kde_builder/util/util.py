@@ -18,6 +18,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Callable
 
 import kde_builder
@@ -26,10 +27,12 @@ from kde_builder.kb_exception import ProgramError
 from kde_builder.util.textwrap_mod import dedent
 
 if TYPE_CHECKING:
+    from kde_builder.build_context import BuildContext
     from kde_builder.module.module import Module
 
 logger_logged_cmd = logging.getLogger("logged-command")
 logger_util = logging.getLogger("util")
+logger_var_subst = logging.getLogger("variables_substitution")
 
 
 class Util:
@@ -675,3 +678,30 @@ class Util:
             safe_cores_by_memory = 2
 
         return min(safe_cores_by_memory, num_cores_physical)
+
+    @staticmethod
+    def substitute_value(ctx: BuildContext, unresolved_value: str, file_name: str) -> str:
+        assert isinstance(unresolved_value, str)
+        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+
+        # Simplify whitespace.
+        value = re.sub(r"\s+", " ", unresolved_value)
+
+        # Replace reference to global option with their value.
+        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else ""
+
+        while sub_var_name:
+            if not ctx.has_option(sub_var_name):
+                logger_var_subst.warning(f" y[*] WARNING: r[\"${{{sub_var_name}}}\"] used in y[{file_name}] is not set in global context.")
+
+            sub_var_value = ctx.get_option(sub_var_name, Any) or ""
+            assert isinstance(sub_var_value, str)
+
+            logger_var_subst.debug(f"Substituting \"${sub_var_name}\" with \"{sub_var_value}\"")
+
+            value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
+
+            # Replace other references as well. Keep this RE up to date with the other one.
+            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else ""
+
+        return value

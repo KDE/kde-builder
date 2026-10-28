@@ -10,7 +10,6 @@ import logging
 import os
 import re
 from typing import TYPE_CHECKING
-from typing import Any
 
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
@@ -21,7 +20,6 @@ if TYPE_CHECKING:
     from kde_builder.build_context import BuildContext
 
 logger_optbase = logging.getLogger("options-base")
-logger_var_subst = logging.getLogger("variables_substitution")
 
 
 class OptionsBase:
@@ -192,33 +190,12 @@ class OptionsBase:
         if unresolved_value is None:  # in tests, there is a config that does not specify value
             return ""
 
-        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
-
-        # Simplify whitespace.
-        value = re.sub(r"\s+", " ", unresolved_value)
-
-        # Replace reference to global option with their value.
-        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
-
-        while sub_var_name:
-            sub_var_value = ctx.get_option(sub_var_name, Any) or ""
-            if not ctx.has_option(sub_var_name):
-                logger_optbase.warning(f" *\n * WARNING: {sub_var_name} is not set at line y[{file_name}\n *")
-
-            logger_var_subst.debug(f"Substituting ${sub_var_name} with {sub_var_value}")
-
-            value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
-
-            # Replace other references as well. Keep this RE up to date with the other one.
-            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else None
+        value = Util.substitute_value(ctx, unresolved_value, file_name)
 
         # Replace tildes with home directory.
         while re.search(r"(^|:|=)~/", value):
             value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.path.expanduser("~") + "/", value)
 
-        # Check for false keyword and convert it to Python False.
-        # pl2py: in perl this is done a bit before, but we do this here. This is because value can be of type bool, and perl automatically compares int (they do not have bool) as a string.
-        # If we did that conversion there, we would need to convert it back to string in checks above.
         if value.lower() == "false":
             value = False
 
