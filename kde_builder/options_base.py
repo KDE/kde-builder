@@ -190,7 +190,7 @@ class OptionsBase:
         if unresolved_value is None:  # in tests, there is a config that does not specify value
             return ""
 
-        value = Util.substitute_value(ctx, unresolved_value, file_name)
+        value = Util.replace_placeholders(ctx, unresolved_value, file_name)
 
         # Replace tildes with home directory.
         while re.search(r"(^|:|=)~/", value):

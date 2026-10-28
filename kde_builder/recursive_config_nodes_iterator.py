@@ -62,7 +62,7 @@ class RecursiveConfigNodesIterator:
                         raise ConfigError(f"Unable to handle file include \"{node_name}\" from {self.current_filename}")
 
                     ctx = self.context
-                    filename = Util.substitute_value(ctx, filename, self.current_filename)
+                    filename = Util.replace_placeholders(ctx, filename, self.current_filename)
 
                     prefix = self.stack_base_path[-1]
 

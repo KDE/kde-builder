@@ -34,6 +34,9 @@ logger_logged_cmd = logging.getLogger("logged-command")
 logger_util = logging.getLogger("util")
 logger_var_subst = logging.getLogger("variables_substitution")
 
+PLACEHOLDER_RE = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")
+"""Matches placeholders for substitution, e.g. `${foo}` and `${_bar}`."""
+
 
 class Util:
     """
@@ -680,28 +683,43 @@ class Util:
         return min(safe_cores_by_memory, num_cores_physical)
 
     @staticmethod
-    def substitute_value(ctx: BuildContext, unresolved_value: str, file_name: str) -> str:
-        assert isinstance(unresolved_value, str)
-        option_re = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")  # Example of matched string is "${option-name}" or "${_option-name}".
+    def _find_placeholder(string: str) -> str | None:
+        """
+        Checks whether string contains a placeholder.
+
+        Returns:
+            The placeholder's key if the string contains one, otherwise None.
+        """
+        matches = PLACEHOLDER_RE.findall(string)
+        if len(matches) > 0:
+            return matches[0]
+        else:
+            return None
+
+    @staticmethod
+    def replace_placeholders(ctx: BuildContext, string: str, file_name: str) -> str:
+        """
+        Substitute placeholders in the string with values from the context.
+
+        Example of placeholders: `${foo}` and `${_bar}`.
+        """
+        assert isinstance(string, str)
 
         # Simplify whitespace.
-        value = re.sub(r"\s+", " ", unresolved_value)
+        string = re.sub(r"\s+", " ", string)
 
-        # Replace reference to global option with their value.
-        sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else ""
+        key = Util._find_placeholder(string)
 
-        while sub_var_name:
-            if not ctx.has_option(sub_var_name):
-                logger_var_subst.warning(f" y[*] WARNING: r[\"${{{sub_var_name}}}\"] used in y[{file_name}] is not set in global context.")
+        while key is not None:
+            if not ctx.has_option(key):
+                repl = ""
+                logger_var_subst.warning(f" y[*] WARNING: r[\"${{{key}}}\"] used in y[{file_name}] is not set in global context.")
+            else:
+                repl = ctx.get_option(key, Any)
+                assert isinstance(repl, str)
 
-            sub_var_value = ctx.get_option(sub_var_name, Any) or ""
-            assert isinstance(sub_var_value, str)
+            logger_var_subst.debug(f"Substituting \"${key}\" with \"{repl}\"")
+            string = re.sub(r"\$\{" + key + r"}", repl, string)
+            key = Util._find_placeholder(string)
 
-            logger_var_subst.debug(f"Substituting \"${sub_var_name}\" with \"{sub_var_value}\"")
-
-            value = re.sub(r"\$\{" + sub_var_name + r"}", sub_var_value, value)
-
-            # Replace other references as well. Keep this RE up to date with the other one.
-            sub_var_name = found_vars[0] if (found_vars := re.findall(option_re, value)) else ""
-
-        return value
+        return string
