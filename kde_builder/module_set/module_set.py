@@ -77,9 +77,7 @@ class ModuleSet(OptionsBase):
 
     @override
     def set_option(self, opt_name: str, opt_val) -> None:
-        """
-        Handle module-set specific options for OptionsBase's set_option.
-        """
+        """Handle module-set specific options for OptionsBase's set_option."""
         # Special-case handling
         if opt_name == "use-projects":
             assert isinstance(opt_val, list)

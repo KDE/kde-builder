@@ -66,9 +66,7 @@ class FirstRun:
 
     @staticmethod
     def _read_packages(vendor, deps_data_path) -> dict:
-        """
-        Read from the files from data/pkg and dump the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource).
-        """
+        """Read from the files from data/pkg and dump the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource)."""
         packages = {}
         cur_key = ""
 

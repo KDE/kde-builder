@@ -53,9 +53,7 @@ class StatusView:
         """
 
     def set_progress(self, new_progress) -> None:
-        """
-        Set the amount of progress made vs. the total progress possible.
-        """
+        """Set the amount of progress made vs. the total progress possible."""
         old_progress = self.current_project_cur_progress
         self.current_project_cur_progress = new_progress
 
@@ -125,9 +123,7 @@ class StatusView:
 
     @staticmethod
     def release_tty(msg: str = "") -> None:
-        """
-        For TTY outputs, this clears the line (if we actually had dirtied it) so the rest of the program can resume output from where it'd been left off.
-        """
+        """For TTY outputs, this clears the line (if we actually had dirtied it) so the rest of the program can resume output from where it'd been left off."""
         StatusView._clear_line_and_update(colorize(msg))
 
     @staticmethod

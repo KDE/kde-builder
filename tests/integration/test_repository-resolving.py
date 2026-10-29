@@ -6,9 +6,7 @@ from kde_builder.application import Application
 
 
 def test_repository_resolution():
-    """
-    Verify that "repository" option is resolved correctly for first-party and third-party projects.
-    """
+    """Verify that "repository" option is resolved correctly for first-party and third-party projects."""
     args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-repository-resolving.yaml --all-config-projects".split(" ")
     app = Application(args)
     app.generate_module_list()

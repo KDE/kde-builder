@@ -9,9 +9,7 @@ from kde_builder.util.textwrap_mod import dedent
 
 
 class KBException(Exception):  # noqa: N818
-    """
-    A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified.
-    """
+    """A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified."""
 
     def __init__(self, exception_type: str, msg: str) -> None:
         self.exception_type = exception_type
@@ -22,9 +20,7 @@ class KBException(Exception):  # noqa: N818
 
 
 class ConfigError(KBException):
-    """
-    Use for "config errors".
-    """
+    """Use for "config errors"."""
 
     def __init__(self, msg: str) -> None:
         super().__init__("Config", msg)
@@ -43,9 +39,7 @@ class SetOptionError(KBException):
         self.config_invalid_option_name = bad_option_name
 
     def option_usage_explanation(self) -> str:
-        """
-        Return a lengthy explanation of how to use a given option for use in error messages.
-        """
+        """Return a lengthy explanation of how to use a given option for use in error messages."""
         result = ""
         option_name = self.config_invalid_option_name
 
@@ -84,18 +78,14 @@ class SetOptionError(KBException):
 
 
 class UnknownKdeProjectException(KBException):
-    """
-    Raised when a specific project name is not found in repo-metadata kde projects and is not a defined module in config.
-    """
+    """Raised when a specific project name is not found in repo-metadata kde projects and is not a defined module in config."""
 
     def __init__(self, message: str, unknown_project_name: str) -> None:
         self.message = message
         self.unknown_project_name = unknown_project_name
 
 class NoKDEProjectsFound(KBException):
-    """
-    Raised when searching in kde projects database by path component resulted in empty list.
-    """
+    """Raised when searching in kde projects database by path component resulted in empty list."""
 
     def __init__(self, message: str) -> None:
         self.message = message
@@ -112,18 +102,14 @@ class ProgramError(KBException):
 
 
 class KBRuntimeError(KBException):
-    """
-    Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself).
-    """
+    """Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself)."""
 
     def __init__(self, msg: str) -> None:
         super().__init__("Runtime", msg)
 
 
 class SetupError(KBException):
-    """
-    Use for "setup errors" in FirstRun.
-    """
+    """Use for "setup errors" in FirstRun."""
 
     def __init__(self, msg: str) -> None:
         super().__init__("Setup", msg)

@@ -32,9 +32,7 @@ def mock_module_fullproject(monkeypatch):
 
 
 def test_dependency_path(mock_module_fullproject):
-    """
-    Verify that _get_dependency_path_of() works properly.
-    """
+    """Verify that _get_dependency_path_of() works properly."""
     module1 = Module(name="mod1", repo_path="kdepath/mod1", is_kde=True)
 
     assert DependencyResolver._get_dependency_path_of(module1) == "kdepath/mod1", "should return full project path if a KDE module object is passed"

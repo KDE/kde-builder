@@ -11,9 +11,7 @@ from kde_builder.application import Application
 @pytest.fixture
 def mock_app_res_mod_dep_graph(monkeypatch):
     def mock_resolve_module_dependency_graph(self, modules: list):
-        """
-        Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module.
-        """
+        """Redefine :meth:`Application._resolveModuleDependencies` to avoid requiring metadata module."""
         new_module = self.module_resolver.resolve_module_if_present("setmod2")
         graph = self.dependency_resolver.dependency_graph
 
@@ -76,9 +74,7 @@ def test_include_deps_and_ignore_module(mock_app_res_mod_dep_graph):
 
 
 def test_include_deps_and_ignore_module_set(mock_app_res_mod_dep_graph):
-    """
-    Verify that --include-dependencies on a module_set name filters out the whole set.
-    """
+    """Verify that --include-dependencies on a module_set name filters out the whole set."""
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --all-config-projects --ignore-projects set1".split(" ")
 
     app = Application(args)

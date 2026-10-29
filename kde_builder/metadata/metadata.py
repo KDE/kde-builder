@@ -11,9 +11,7 @@ from kde_builder.kb_exception import KBRuntimeError
 
 
 class Metadata:
-    """
-    Stores data (ignored projects and branch groups) that is read from repo-metadata repository.
-    """
+    """Stores data (ignored projects and branch groups) that is read from repo-metadata repository."""
 
     def __init__(self, path_to_metadata: str) -> None:
         self.path_to_metadata = path_to_metadata
@@ -22,9 +20,7 @@ class Metadata:
         self.branch_groups = self._read_branch_groups()
 
     def _read_ignore_kde_projects(self) -> list[str]:
-        """
-        Return a list of the full kde-project paths for each project to ignore.
-        """
+        """Return a list of the full kde-project paths for each project to ignore."""
         path = self.path_to_metadata + "/ignore-kde-projects"
 
         if kde_builder.is_testing:

@@ -459,9 +459,7 @@ class Application:
             dependency_resolver.dependencies_of.clear()
 
     def _resolve_module_dependency_graph(self, modules: list[Module]) -> None:
-        """
-        Construct a graph of Modules according to the KDE project database dependency information.
-        """
+        """Construct a graph of Modules according to the KDE project database dependency information."""
         dependency_resolver = self.dependency_resolver
 
         try:
@@ -901,9 +899,7 @@ class Application:
         return failed
 
     def _slice_resume_and_stop_points(self, module_list: list[Module]) -> list[Module]:
-        """
-        Remove starting and/or ending elements from list according to --resume-{from,after} and --stop-{before,after} options.
-        """
+        """Remove starting and/or ending elements from list according to --resume-{from,after} and --stop-{before,after} options."""
         ctx = self.context
 
         resume_from = ctx.get_option("resume-from", str)

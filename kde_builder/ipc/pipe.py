@@ -11,9 +11,7 @@ from kde_builder.ipc.ipc import IPC
 
 
 class IPCPipe(IPC):
-    """
-    IPC class that uses pipes in addition to forking for IPC.
-    """
+    """IPC class that uses pipes in addition to forking for IPC."""
 
     def __init__(self) -> None:
         super().__init__()

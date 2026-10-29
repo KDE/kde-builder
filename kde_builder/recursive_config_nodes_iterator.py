@@ -21,9 +21,7 @@ logger_app = logging.getLogger("application")
 
 
 class RecursiveConfigNodesIterator:
-    """
-    Iterate over main config nodes, but in place of "include" lines, return nodes from corresponding file.
-    """
+    """Iterate over main config nodes, but in place of "include" lines, return nodes from corresponding file."""
 
     def __init__(self, initial_dictionary: dict, rcfile: str, ctx: BuildContext) -> None:
         self.context = ctx

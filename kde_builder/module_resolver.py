@@ -125,9 +125,7 @@ class ModuleResolver:
         self.deferred_options = final_opts
 
     def set_initial_projects_and_groups(self, projects_and_groups: list[Module | ModuleSet]) -> None:
-        """
-        Initial fill-up of lookup dictionaries.
-        """
+        """Initial fill-up of lookup dictionaries."""
         for pr_or_gr in projects_and_groups:
             if isinstance(pr_or_gr, ModuleSet):
                 self.defined_groups[pr_or_gr.name] = pr_or_gr
@@ -135,16 +133,12 @@ class ModuleResolver:
                 self.defined_projects[pr_or_gr.name] = pr_or_gr
 
     def handle_initial_projects(self):
-        """
-        Apply command line and override options to projects directly-defined in config.
-        """
+        """Apply command line and override options to projects directly-defined in config."""
         projects: list[Module] = [el for el in self.defined_projects.values()]
         self._apply_options(projects)
 
     def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
-        """
-        Apply cmdline and deferred options to the given modules or module-sets.
-        """
+        """Apply cmdline and deferred options to the given modules or module-sets."""
         for m in modules:
             name = m.name
             opts = copy.deepcopy(self.deferred_options.get(name, {}))

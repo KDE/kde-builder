@@ -22,9 +22,7 @@ logger_buildsystem = logging.getLogger("build-system")
 
 
 class BuildSystemKDECMake(BuildSystem):
-    """
-    Class responsible for building CMake-based modules, with special support for KDE modules.
-    """
+    """Class responsible for building CMake-based modules, with special support for KDE modules."""
 
     BASE_GENERATOR_MAP = {
         "Ninja": {
@@ -177,9 +175,7 @@ class BuildSystemKDECMake(BuildSystem):
 
     @override
     def supports_auto_parallelism(self) -> bool:
-        """
-        Return true if CMake is run with ninja, which supports setting -j automatically.
-        """
+        """Return true if CMake is run with ninja, which supports setting -j automatically."""
         generator = self.get_cmake_generator()
         generator_opts = BuildSystemKDECMake.GENERATOR_MAP[generator]["options_name"]
 
@@ -252,9 +248,7 @@ class BuildSystemKDECMake(BuildSystem):
 
     @override
     def build_commands(self) -> list[str]:
-        """
-        Return a list of possible build commands to run, any one of which should be supported by the build system.
-        """
+        """Return a list of possible build commands to run, any one of which should be supported by the build system."""
         generator = self.get_cmake_generator()
         progs = BuildSystemKDECMake.GENERATOR_MAP[generator]["build_commands"]
         return progs

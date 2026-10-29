@@ -13,9 +13,7 @@ from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 
 
 def test_logged_subprocess():
-    """
-    Test that LoggedSubprocess works (and works reentrantly no less).
-    """
+    """Test that LoggedSubprocess works (and works reentrantly no less)."""
     origdir = os.getcwd()
     ctx = BuildContext()
     m = Module(ctx, "test")

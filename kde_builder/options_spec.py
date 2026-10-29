@@ -25,9 +25,7 @@ def add_bootstrap_arguments(parser: ArgumentParser) -> None:
 
 @dataclass
 class Option:
-    """
-    Single option specification.
-    """
+    """Single option specification."""
 
     name: str
     default: Any

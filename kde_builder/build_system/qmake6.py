@@ -16,9 +16,7 @@ logger_buildsystem = logging.getLogger("build-system")
 
 
 class BuildSystemQMake6(BuildSystem):
-    """
-    A build system used to build modules that use qmake.
-    """
+    """A build system used to build modules that use qmake."""
 
     possible_qmake_names = ["qmake-qt6", "qmake6", "qmake-mac", "qmake"]
 

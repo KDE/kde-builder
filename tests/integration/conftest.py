@@ -9,8 +9,6 @@ import kde_builder
 
 @pytest.fixture(autouse=True)
 def reset_pretending():
-    """
-    Disable pretending after test, to not influence on other tests.
-    """
+    """Disable pretending after test, to not influence on other tests."""
     yield
     kde_builder.is_pretending = False

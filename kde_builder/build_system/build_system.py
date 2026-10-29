@@ -60,18 +60,14 @@ class BuildSystem:
 
     @staticmethod
     def auto_cores_number() -> int:
-        """
-        Get the number of cores to use if user set their num-cores or taskset-cpu-list to auto.
-        """
+        """Get the number of cores to use if user set their num-cores or taskset-cpu-list to auto."""
         max_cores = os.cpu_count()
         if max_cores is None or max_cores <= 1:
             return 1
         return int(max_cores * 0.8)
 
     def _num_cores_to_use(self) -> int | None:
-        """
-        Return cpu cores limit to apply during the build.
-        """
+        """Return cpu cores limit to apply during the build."""
         num_cores: str = self.module.get_option("num-cores", str)
 
         # If set to empty, accept user's decision
@@ -137,9 +133,7 @@ class BuildSystem:
         return "make-options"
 
     def build_commands(self) -> list[str]:
-        """
-        Return a list of possible build commands to run, any one of which should be supported by the build system.
-        """
+        """Return a list of possible build commands to run, any one of which should be supported by the build system."""
         # Non Linux systems can sometimes fail to build when GNU Make would work,
         # so prefer GNU Make if present, otherwise try regular make.
         return ["gmake", "make"]
@@ -220,9 +214,7 @@ class BuildSystem:
 
     @staticmethod
     def configured_module_file_name() -> str:
-        """
-        Return name of file that should exist (relative to the module's build directory) if the module has been configured.
-        """
+        """Return name of file that should exist (relative to the module's build directory) if the module has been configured."""
         return "Makefile"
 
     def run_testsuite(self) -> False:

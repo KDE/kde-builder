@@ -23,9 +23,7 @@ from kde_builder.util.textwrap_mod import dedent
 logger_app = logging.getLogger("application")
 
 class InstallationType(Enum):
-    """
-    Types of KDE Builder installations.
-    """
+    """Types of KDE Builder installations."""
 
     GIT = auto()
     UV = auto()
@@ -34,9 +32,7 @@ class InstallationType(Enum):
 
 
 class VersionComponents(TypedDict):
-    """
-    Version of kde-builder divided to its components.
-    """
+    """Version of kde-builder divided to its components."""
 
     base: str
     post: str | None
@@ -44,9 +40,7 @@ class VersionComponents(TypedDict):
     date: str | None
 
 class Version:
-    """
-    Can determine kde-builder version, installation type, upgrade command.
-    """
+    """Can determine kde-builder version, installation type, upgrade command."""
 
     UPSTREAM_URL = "https://invent.kde.org/sdk/kde-builder.git"
     UPSTREAM_BRANCH = "master"
@@ -309,9 +303,7 @@ class Version:
 
     @staticmethod
     def extract_version_components(version_str: str) -> VersionComponents | None:
-        """
-        Separate the kde-builder version into its components.
-        """
+        """Separate the kde-builder version into its components."""
         pattern = re.compile(
             r"^(?P<base>\d+\.\d+(?:\.\d+)?)"  # Tag version
             r"(?:\.post(?P<post>\d+))?"  # Number of commits after tag (optional)
@@ -333,9 +325,7 @@ class Version:
 
     @classmethod
     def remote_branch_head_commit_hash(cls) -> str | None:
-        """
-        Commit hash of the HEAD of remote branch.
-        """
+        """Commit hash of the HEAD of remote branch."""
         repo_url = cls.UPSTREAM_URL
         branch = cls.UPSTREAM_BRANCH
         res = subprocess.run(["git", "ls-remote", repo_url, f"refs/heads/{branch}"], capture_output=True, text=True, check=False)
@@ -346,9 +336,7 @@ class Version:
 
     @classmethod
     def remote_tag_commit_hash(cls, tag_name: str) -> str | None:
-        """
-        Returns the commit SHA for a given remote tag.
-        """
+        """Returns the commit SHA for a given remote tag."""
         repo_url = cls.UPSTREAM_URL
         res = subprocess.run(["git", "ls-remote", repo_url, f"refs/tags/{tag_name}"], capture_output=True, text=True, check=False)
         if res.returncode != 0 or not res.stdout.strip():

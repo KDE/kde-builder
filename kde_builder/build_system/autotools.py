@@ -28,9 +28,7 @@ class BuildSystemAutotools(BuildSystem):
         return "autotools"
 
     def _autogen(self) -> str:
-        """
-        Run "autogen.sh" (if presented), and return "autogen.sh" or "configure" (depending on if "configure" is presented (after running "autogen.sh" or in repo)).
-        """
+        """Run "autogen.sh" (if presented), and return "autogen.sh" or "configure" (depending on if "configure" is presented (after running "autogen.sh" or in repo))."""
         module = self.module
         sourcedir = module.fullpath("source")
 

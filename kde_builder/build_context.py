@@ -247,9 +247,7 @@ class BuildContext(PathResolvingOptions):
         return True
 
     def close_lock(self) -> None:
-        """
-        Releases the lock obtained by take_lock.
-        """
+        """Releases the lock obtained by take_lock."""
         base_dir = self.base_config_directory()
         lock_file = f"{base_dir}/{BuildContext.LOCKFILE_NAME}"
 
@@ -467,16 +465,12 @@ class BuildContext(PathResolvingOptions):
         module.failed_phase = phase
 
     def failed_modules_in_phase(self, phase: str) -> list[Module]:
-        """
-        Return a list of Modules that failed to complete the given phase.
-        """
+        """Return a list of Modules that failed to complete the given phase."""
         failures = [module for module in self.modules if self.errors.get(module.name, "") == phase]
         return failures
 
     def list_failed_modules(self) -> list[Module]:
-        """
-        Return a list of modules that had a failure of some sort, in the order the modules are listed in our current module list.
-        """
+        """Return a list of modules that had a failure of some sort, in the order the modules are listed in our current module list."""
         modules = self.modules
 
         # grepping for failures instead of returning error list directly maintains ordering
@@ -503,9 +497,7 @@ class BuildContext(PathResolvingOptions):
     # Persistent option handling
 
     def persistent_option_file_name(self) -> str:
-        """
-        Return the name of the file to use for persistent data.
-        """
+        """Return the name of the file to use for persistent data."""
         file = self.get_option("persistent-data-file", str)
 
         if file:
@@ -629,9 +621,7 @@ class BuildContext(PathResolvingOptions):
         persistent_opts[module_name][key] = value
 
     def set_metadata_module(self) -> None:
-        """
-        Create special repo-metadata Module and set it to self.metadata_module.
-        """
+        """Create special repo-metadata Module and set it to self.metadata_module."""
         module_name = "sysadmin/repo-metadata"
 
         metadata_module = Module(self, re.sub("/", "-", module_name))
@@ -650,9 +640,7 @@ class BuildContext(PathResolvingOptions):
         self._metadata_module = metadata_module
 
     def set_metadata(self) -> None:
-        """
-        Set data from repo-metadata.
-        """
+        """Set data from repo-metadata."""
         project_database_module = self.metadata_module
         if not project_database_module:
             raise KBRuntimeError(f"kde-projects repository information could not be downloaded: {str(sys.exc_info()[1])}")

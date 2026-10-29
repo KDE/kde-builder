@@ -134,9 +134,7 @@ class OptionsBase:
         self.options[opt_name] = opt_val
 
     def delete_option(self, key: str) -> None:
-        """
-        Remove the given option (and its value), if present.
-        """
+        """Remove the given option (and its value), if present."""
         if key in self.options.keys():
             del self.options[key]
 
@@ -153,9 +151,7 @@ class OptionsBase:
             self.set_option(opt_name, opt_val)
 
     def verify_option_value_type(self, option_name, option_value) -> None:
-        """
-        Ensure we are setting the correct type for value of option.
-        """
+        """Ensure we are setting the correct type for value of option."""
         if option_name == "ignore-projects":
             if not isinstance(option_value, list):
                 raise SetOptionError(option_name, f"Option \"{option_name}\" has invalid value type \"{option_value.__class__.__name__}\", but \"list\" is expected.")
@@ -258,18 +254,14 @@ class OptionsBase:
         self.set_option(key, sources)
 
     def get_config_sources(self) -> str:
-        """
-        Return rcfile sources (comma-separated).
-        """
+        """Return rcfile sources (comma-separated)."""
         key = "#defined-at"
         sources = self.get_option(key, list[str]) or []
         return ", ".join(sources)
 
 
 class PathResolvingOptions(OptionsBase):
-    """
-    Common methods for BuildContext and Module, but not for ModuleSet.
-    """
+    """Common methods for BuildContext and Module, but not for ModuleSet."""
 
     def get_log_dir(self) -> str:
         """

@@ -49,9 +49,7 @@ class OSSupport:
         self.best_distro_match = self._find_best_distro_match()
 
     def is_based_on(self, id_str: str) -> bool:
-        """
-        Return true if passed id_str matches ID or is contained in ID_LIKE of /etc/os-release.
-        """
+        """Return true if passed id_str matches ID or is contained in ID_LIKE of /etc/os-release."""
         if self.ID == id_str:
             return True
 
@@ -115,9 +113,7 @@ class OSSupport:
 
 
 def backslash_decode(src):
-    """
-    Decode backslash-escapes.
-    """
+    """Decode backslash-escapes."""
     slashes = 0  # count backslashes
     dst = ""
     for loc in range(0, len(src)):

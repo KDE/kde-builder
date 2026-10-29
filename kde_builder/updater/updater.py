@@ -82,9 +82,7 @@ class Updater:
         return self.commit_id("HEAD")
 
     def commit_id(self, commit: str) -> str:
-        """
-        Return the current sha1 of the given git "commit-ish".
-        """
+        """Return the current sha1 of the given git "commit-ish"."""
         if commit is None:
             raise ProgramError("\tMust specify git-commit to retrieve id for")
         srcdir = self.srcdir
@@ -766,9 +764,7 @@ class Updater:
         return Updater.DEFAULT_GIT_REMOTE
 
     def has_remote(self, remote: str) -> bool:
-        """
-        Return true if the git module in the current directory has a remote of the name given by the first parameter.
-        """
+        """Return true if the git module in the current directory has a remote of the name given by the first parameter."""
         srcdir = self.srcdir
         has_remote = False
 

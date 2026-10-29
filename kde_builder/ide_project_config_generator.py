@@ -20,9 +20,7 @@ logger_ide_proj = logging.getLogger("ide_project_configs")
 
 
 class IdeProjectConfigGenerator:
-    """
-    Class responsible for creating IDE-specific files in source directories of modules.
-    """
+    """Class responsible for creating IDE-specific files in source directories of modules."""
 
     def __init__(self, module: Module, cmake_opts: list[str]) -> None:
         self.module = module
@@ -330,9 +328,7 @@ class IdeProjectConfigGenerator:
                 f.write(env_content)
 
     def generate_ide_project_configs(self) -> None:
-        """
-        Trigger generation IDE project configs for all enabled IDEs.
-        """
+        """Trigger generation IDE project configs for all enabled IDEs."""
         module = self.module
         if module.get_option("generate-vscode-project-config", bool):
             self._generate_vs_code_config()

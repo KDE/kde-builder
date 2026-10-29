@@ -10,9 +10,7 @@ from kde_builder.ipc.ipc import IPC
 
 
 class IPCNull(IPC):
-    """
-    Dummy IPC module in case SysVIPC doesn't work or async mode is not needed.
-    """
+    """Dummy IPC module in case SysVIPC doesn't work or async mode is not needed."""
 
     def __init__(self) -> None:
         super().__init__()

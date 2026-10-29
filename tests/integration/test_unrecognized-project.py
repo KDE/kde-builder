@@ -9,9 +9,7 @@ from kde_builder.kb_exception import UnknownKdeProjectException
 
 
 def test_unrecognized_project():
-    """
-    Test project name that is not a kde project, and is not defined in config.
-    """
+    """Test project name that is not a kde project, and is not defined in config."""
     with pytest.raises(UnknownKdeProjectException) as excinfo:
         # kcalc is defined in test project metadata (see _load_mock_project_data). "gnome-calc" is our unrecognized selector.
         app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/sample-rc/kde-builder.yaml", "kcalc", "gnome-calc"])

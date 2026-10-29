@@ -39,9 +39,7 @@ PLACEHOLDER_RE = re.compile(r"\$\{([a-zA-Z0-9-_]+)}")
 
 
 class Util:
-    """
-    Helper methods that may be used across the KDE Builder code.
-    """
+    """Helper methods that may be used across the KDE Builder code."""
 
     created_paths: dict[str, bool] = {}
 
@@ -75,9 +73,7 @@ class Util:
 
     @staticmethod
     def safe_unlink(path) -> None:
-        """
-        Unlink the given symlink if global-pretend isn't set.
-        """
+        """Unlink the given symlink if global-pretend isn't set."""
         if kde_builder.is_pretending:
             logger_util.debug(f"\tWould have unlinked {path}.")
             return
@@ -100,9 +96,7 @@ class Util:
 
     @staticmethod
     def p_chdir(directory) -> None:
-        """
-        Is exactly like "chdir", but it will also print out a message saying that we're switching to the directory when debugging.
-        """
+        """Is exactly like "chdir", but it will also print out a message saying that we're switching to the directory when debugging."""
         logger_util.debug(f"\tcd g[{directory}]")
 
         try:
@@ -183,9 +177,7 @@ class Util:
 
     @staticmethod
     def get_program_output(args: list[str], cwd: str | None = None) -> list[str]:
-        """
-        Return a list of output lines from a program.
-        """
+        """Return a list of output lines from a program."""
         program = args.pop(0)
 
         logger_util.debug(f"""\tSlurping '{program}' '{"' '".join(args)}'""")
@@ -422,9 +414,7 @@ class Util:
 
     @staticmethod
     def good_exitcode(exitcode: int) -> bool:
-        """
-        Return True if exitcode is 0, False otherwise.
-        """
+        """Return True if exitcode is 0, False otherwise."""
         return exitcode == 0
 
     @staticmethod
@@ -666,9 +656,7 @@ class Util:
 
     @staticmethod
     def get_num_cores_for_low_memory() -> int:
-        """
-        Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available.
-        """
+        """Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available."""
         num_cores_physical = os.cpu_count() or 4
 
         try:

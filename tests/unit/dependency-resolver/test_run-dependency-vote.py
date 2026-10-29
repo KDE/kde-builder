@@ -7,9 +7,7 @@ from kde_builder.dependency_resolver import DependencyResolver
 
 
 def test_vote_dependencies():
-    """
-    Test running the full vote for dependencies.
-    """
+    """Test running the full vote for dependencies."""
     graph1 = {
         "a": {
             "votes": {},

@@ -4,17 +4,13 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""
-This file is used to launch KDE Builder without virtual environment (the legacy way).
-"""  # noqa: D404
+"""This file is used to launch KDE Builder without virtual environment (the legacy way)."""  # noqa: D404
 
 import sys
 
 
 def ensure_runtime_pymodules_installed():
-    """
-    Ensure that required Python modules are available so that the user isn't surprised later with an exception.
-    """
+    """Ensure that required Python modules are available so that the user isn't surprised later with an exception."""
     required_modules = [
         "yaml",
     ]

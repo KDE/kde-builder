@@ -19,9 +19,7 @@ logger_app = logging.getLogger("application")
 
 
 class StartProgram:
-    """
-    Run the installed binary of some project.
-    """
+    """Run the installed binary of some project."""
 
     def __init__(self, ctx: BuildContext) -> None:
         self.ctx = ctx
@@ -34,9 +32,7 @@ class StartProgram:
                 self.bin_to_proj_map[binary] = proj_name
 
     def execute_built_binary(self, args: list[str]) -> NoReturn:
-        """
-        Execute the binary from install-dir/bin, and sources the environment file before that.
-        """
+        """Execute the binary from install-dir/bin, and sources the environment file before that."""
         opt_fork = 0
 
         # We manually care of options. They can only appear in front of executable name.

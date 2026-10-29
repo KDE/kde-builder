@@ -7,9 +7,7 @@ from kde_builder.os_support import OSSupport
 
 
 def test_ossupport():
-    """
-    Test OSSupport.
-    """
+    """Test OSSupport."""
     # Unit test of _read_os_release
     kv_pairs = OSSupport._read_os_release("tests/integration/fixtures/os-release")
     assert len(kv_pairs) == 4, "Right number of key/value pairs"

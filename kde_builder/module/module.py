@@ -110,9 +110,7 @@ class Module(PathResolvingOptions):
         self._build_system = value
 
     def set_module_set(self, module_set: ModuleSet) -> None:
-        """
-        Specify the `ModuleSet` this module was spawned from. Optional.
-        """
+        """Specify the `ModuleSet` this module was spawned from. Optional."""
         self.module_set = module_set
 
     def current_scm_revision(self) -> str:
@@ -727,9 +725,7 @@ class Module(PathResolvingOptions):
         return fullpath
 
     def is_kde_project(self) -> bool:
-        """
-        Return True if this module belongs to kde projects, i.e. found in repo-metadata database.
-        """
+        """Return True if this module belongs to kde projects, i.e. found in repo-metadata database."""
         # Special case repo-metadata, because at that moment we do not have projects database yet.
         if self.name == "sysadmin-repo-metadata":
             return False
@@ -842,9 +838,7 @@ class Module(PathResolvingOptions):
         return
 
     def add_post_build_message(self, new_msg: str) -> None:
-        """
-        Add the given message to the list of post-build messages to show to the user.
-        """
+        """Add the given message to the list of post-build messages to show to the user."""
         self.post_build_msgs.append(new_msg)
 
     def queue_environment_variable(self, key: str, value: str) -> None:
@@ -865,15 +859,11 @@ class Module(PathResolvingOptions):
         self.env[key] = resolved_value
 
     def reset_environment(self) -> None:
-        """
-        Clear the list of environment variables to set for run_logged() runs.
-        """
+        """Clear the list of environment variables to set for run_logged() runs."""
         self.env = {}
 
     def get_prepared_environment(self) -> dict[str, str]:
-        """
-        Return dict containing the environment that includes changes queued by queue_environment_variable.
-        """
+        """Return dict containing the environment that includes changes queued by queue_environment_variable."""
         prepared_env = os.environ.copy()
 
         if len(self.env):

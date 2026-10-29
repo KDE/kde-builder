@@ -42,9 +42,7 @@ def mock_application(monkeypatch):
 
 
 def test_no_include_deps(mock_application):
-    """
-    Verify that --no-include-dependencies is recognized and results in right value.
-    """
+    """Verify that --no-include-dependencies is recognized and results in right value."""
     args = "--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder-with-deps.yaml --no-include-dependencies setmod1 setmod3".split(" ")
     app = Application(args)
     app.generate_module_list()

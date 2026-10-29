@@ -20,9 +20,7 @@ from kde_builder.kb_exception import NoKDEProjectsFound
 logger_moduleset = logging.getLogger("module-set")
 
 class RepositoryInfo(TypedDict):
-    """
-    Info from metadata.yaml file.
-    """
+    """Info from metadata.yaml file."""
 
     invent_name: str
     repo: str
@@ -31,9 +29,7 @@ class RepositoryInfo(TypedDict):
 
 
 class KDEProjectsReader:
-    """
-    Enumerates and provides basic metadata of KDE projects, based on the metadata.yaml included in sysadmin/repo-metadata.
-    """
+    """Enumerates and provides basic metadata of KDE projects, based on the metadata.yaml included in sysadmin/repo-metadata."""
 
     def __init__(self, repo_metadata_fullpath: str) -> None:
         """

@@ -6,9 +6,7 @@ from kde_builder.application import Application
 
 
 def test_install_login_session(monkeypatch):
-    """
-    Test use of --install-login-session-only.
-    """
+    """Test use of --install-login-session-only."""
     app = Application("--pretend --rc-file tests/integration/fixtures/sample-rc/kde-builder.yaml --install-login-session-only".split(" "))
     assert app.run_mode == "install-login-session-only"
     app.generate_module_list()

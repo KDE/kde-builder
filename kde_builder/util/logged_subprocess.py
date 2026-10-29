@@ -67,9 +67,7 @@ class UtilLoggedSubprocess:
         self.child_output_handler: None | Callable = None
 
     def module(self, module):
-        """
-        Set the ``Module`` that is being executed against.
-        """
+        """Set the ``Module`` that is being executed against."""
         self._module = module
         return self
 

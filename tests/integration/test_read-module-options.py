@@ -11,9 +11,7 @@ from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 
 
 def test_option_reading(monkeypatch):
-    """
-    Test basic option reading from rc-files.
-    """
+    """Test basic option reading from rc-files."""
     cmd = []
 
     # Override UtilLoggedSubprocess.set_command for final test to see if it is called with "cmake"

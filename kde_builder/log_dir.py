@@ -15,9 +15,7 @@ logger_app = logging.getLogger("application")
 
 
 class LogDir:
-    """
-    Responsible for created log directories.
-    """
+    """Responsible for created log directories."""
 
     @staticmethod
     def delete_unreferenced_log_directories(ctx: BuildContext) -> None:

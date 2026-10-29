@@ -7,9 +7,7 @@ from kde_builder.application import Application
 
 
 def test_tag_names_based_on_time():
-    """
-    Test tag names based on time.
-    """
+    """Test tag names based on time."""
     app = Application(["--pretend", "--rc-file", "tests/integration/fixtures/branch-time-based/kde-builder.yaml", "--all-config-projects"])
     app.generate_module_list()
     module_list = app.modules

@@ -7,9 +7,7 @@ from __future__ import annotations
 
 
 class ModuleBranchGroupResolver:
-    """
-    Provides an object that can be used to look up the appropriate git branch to use for a given KDE project and given desired branch group.
-    """
+    """Provides an object that can be used to look up the appropriate git branch to use for a given KDE project and given desired branch group."""
 
     def __init__(self, yaml_data: dict) -> None:
         self.layers: list[str] = yaml_data.get("layers", [])

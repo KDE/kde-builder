@@ -7,9 +7,7 @@ from kde_builder.application import Application
 
 
 def test_kde_projects():
-    """
-    Verify that test kde-project data still results in workable build.
-    """
+    """Verify that test kde-project data still results in workable build."""
     # The file has a module-set that only refers to juk but should expand to
     # kcalc juk in that order
     args = "--pretend --rc-file tests/integration/fixtures/kde-projects/kde-builder-with-deps.yaml --all-config-projects".split(" ")

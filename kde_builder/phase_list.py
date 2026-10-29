@@ -26,9 +26,7 @@ class PhaseList:
         self.phaselist = ["update", "build", "install"]
 
     def filter_out_phase(self, phase: str) -> None:
-        """
-        Remove the given phase from the list, if present.
-        """
+        """Remove the given phase from the list, if present."""
         self.phaselist = [item for item in self.phaselist if item != phase]
 
     def add_phase(self, phase: str) -> None:
@@ -42,9 +40,7 @@ class PhaseList:
             self.phaselist.append(phase)
 
     def has(self, phase: str) -> bool:
-        """
-        Return true if the given phase is in the phase list.
-        """
+        """Return true if the given phase is in the phase list."""
         return any(element == phase for element in self.phaselist)
 
     def reset_to(self, args: list[str]) -> None:
@@ -56,7 +52,5 @@ class PhaseList:
         self.phaselist = args
 
     def clear(self) -> None:
-        """
-        Empty the phase list.
-        """
+        """Empty the phase list."""
         self.phaselist = []
