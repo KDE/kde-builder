@@ -2,3 +2,10 @@
 .venv/
 __pycache__/
 *.py[cod]
+
+# PyTest Coverage: Database
+.coverage
+# PyTest Coverage: Reports
+htmlcov
+coverage.json
+coverage.xml
