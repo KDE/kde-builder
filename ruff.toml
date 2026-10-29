@@ -20,9 +20,8 @@ ignore = [
     "D103", # We do not always document functions.
     "D105", # We do not always document magic methods.
     "D107", # We do not always document __init__ methods.
-    "D200", # We do not agree that one line docstrings should open and close on the same line, as this makes inconsistent look of them.
     "D203", # Just to be explicit. Already disabled by following google pydocstyle convention. We use D211 rule instead.
-    "D212", # We use D213 rule instead.
+    "D212", # We use D213 rule instead, see below.
     "D406", # Just to be explicit. Already disabled by following google pydocstyle convention.
     "D407", # Just to be explicit. Already disabled by following google pydocstyle convention.
     "D413", # Just to be explicit. Already disabled by following google pydocstyle convention.
@@ -31,6 +30,7 @@ ignore = [
 
 # Enable rules on top of google pydocstyle convention.
 extend-select = [
+    "D213", # Put the docstring summary on the second line.
     "D204", # Follow pep257 convention: add blank line after _class_ docstring.
     "D404", # Follow pep257 convention: do not start docstring with "this" word.
 ]
