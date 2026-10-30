@@ -1,6 +1,7 @@
 include = ["kde-builder", "kde_builder/**/*.py", "tests/**/*.py", "scripts/gen_zsh_completions.py"]
 
 [lint]
+preview = true
 select = [
     "D",
     "E",
