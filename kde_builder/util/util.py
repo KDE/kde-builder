@@ -653,7 +653,6 @@ class Util:
 
         return 1  # success (pointed to correct location already)
 
-
     @staticmethod
     def get_num_cores_for_low_memory() -> int:
         """Return the highest number of cores we can use based on available memory, but without exceeding the base number of cores available."""

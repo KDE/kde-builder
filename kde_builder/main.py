@@ -65,7 +65,6 @@ def main():
         for i in reversed(indices_to_remove):
             sys.argv.pop(i)
 
-
     # Merges dict "b" into dict "a", overwriting existing entries. Mutates dict "a". Also, returns "a".
     def merge_dicts(a: dict, b: dict, path=None):
         if path is None:
@@ -80,7 +79,6 @@ def main():
             else:
                 a[key] = b[key]
         return a
-
 
     config = merge_dicts(config, override_config)
     logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
@@ -183,6 +181,7 @@ def main():
         if app:
             app.finish(99)  # noreturn
         exit(99)  # if app couldn't be created
+
 
 if __name__ == "__main__":
     main()

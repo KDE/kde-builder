@@ -101,7 +101,7 @@ class StatusView:
         # phase is run after "build" phase, and it resets the progress back to 0.
         # Otherwise, user will see progress bar ugly jumps back.
         if self.current_project_phase == "build":
-             self.progress_bar_update()
+            self.progress_bar_update()
 
     def progress_bar_update(self):
         mod_current = self.mod_current

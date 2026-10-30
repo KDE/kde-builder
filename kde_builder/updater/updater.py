@@ -521,13 +521,13 @@ class Updater:
             git_type: str
 
         priority_ordered_checkout_sources = [
-            CheckoutSource(option_name="commit",       inherit_mode="module",        git_type="tag"   ),
-            CheckoutSource(option_name="revision",     inherit_mode="module",        git_type="tag"   ),
-            CheckoutSource(option_name="tag",          inherit_mode="module",        git_type="tag"   ),
-            CheckoutSource(option_name="branch",       inherit_mode="module",        git_type="branch"),
-            CheckoutSource(option_name="branch-group", inherit_mode="module",        git_type="branch"),
+            CheckoutSource(option_name="commit", inherit_mode="module", git_type="tag"),
+            CheckoutSource(option_name="revision", inherit_mode="module", git_type="tag"),
+            CheckoutSource(option_name="tag", inherit_mode="module", git_type="tag"),
+            CheckoutSource(option_name="branch", inherit_mode="module", git_type="branch"),
+            CheckoutSource(option_name="branch-group", inherit_mode="module", git_type="branch"),
             # "commit", "revision", "tag" - don't make sense for git as globals
-            CheckoutSource(option_name="branch",       inherit_mode="allow-inherit", git_type="branch"),
+            CheckoutSource(option_name="branch", inherit_mode="allow-inherit", git_type="branch"),
             CheckoutSource(option_name="branch-group", inherit_mode="allow-inherit", git_type="branch"),
         ]
 

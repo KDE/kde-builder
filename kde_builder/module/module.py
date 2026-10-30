@@ -318,9 +318,9 @@ class Module(PathResolvingOptions):
         commands: list[str] = gl_commands + pr_commands
         if commands:
             for index, command in enumerate(commands):
-                logger_module.warning(f"\tRunning post-install command ({index+1} of {len(commands)})")
+                logger_module.warning(f"\tRunning post-install command ({index + 1} of {len(commands)})")
                 args = Util.split_quoted_on_whitespace(command)
-                exitcode = Util.run_logged(self, "post-install" + f"_{index+1}", None, args)
+                exitcode = Util.run_logged(self, "post-install" + f"_{index + 1}", None, args)
                 if exitcode != 0:
                     message = f"\t  r[b[*] post-install command failed"
                     logger_module.error(message)

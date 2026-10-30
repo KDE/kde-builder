@@ -41,15 +41,11 @@ class IPC:
     MODULE_UPTODATE = 4
     """Used for successful sources checkout (if zero commits pulled)."""
 
-
-    # One of these messages should be the first message placed on the queue.
-
     ALL_FAILURE = 6
     """Used to indicate a major update failure (don't build) (if could not create source dir)."""
 
     ALL_UPDATING = 7
     """Informational message, feel free to start the build. (if no ALL_FAILURE happened, sent before starting updates)."""
-
 
     MODULE_LOGMSG = 9
     """Tagged message should be put to TTY for module. (for passing messages via ipc, see IPCQueueLoggingHandler)."""

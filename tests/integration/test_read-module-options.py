@@ -73,9 +73,9 @@ def test_option_reading(monkeypatch):
         assert len(cmd) == 12
 
     assert cmd[0] == "cmake", "CMake command should start with cmake"
-    assert cmd[1] == "-B",    "Passed build dir to cmake"
-    assert cmd[2] == ".",     "Passed cur dir as build dir to cmake"
-    assert cmd[3] == "-S",    "Pass source dir to cmake"
+    assert cmd[1] == "-B", "Passed build dir to cmake"
+    assert cmd[2] == ".", "Passed cur dir as build dir to cmake"
+    assert cmd[3] == "-S", "Pass source dir to cmake"
     assert cmd[4] == "/tmp/setmod2", "CMake command should specify source directory after -S"
     assert cmd[5] == "-G", "CMake generator should be specified explicitly"
     assert cmd[6] == "Unix Makefiles", "Expect the default CMake generator to be used"

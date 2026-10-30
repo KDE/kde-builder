@@ -46,6 +46,7 @@ def ensure_runtime_pymodules_installed():
         if not validate_mod("setproctitle"):
             print("Optional Python package \"setproctitle\" is missing. kde-builder will not set title for subprocesses in async build.")
 
+
 if __name__ == "__main__":
     print("")  # To indicate when user runs kde-builder from this wrapper script
     ensure_runtime_pymodules_installed()

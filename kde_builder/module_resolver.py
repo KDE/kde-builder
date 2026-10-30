@@ -387,6 +387,7 @@ class ModuleResolver:
                 logger_modres.debug(f"Removing y[{custom_qt_lib}] from building, because it is not required.")
                 graph_item["build"] = False
 
+
 """
 This class uses a multi-pass option resolving system, in accordance with
 the way kde-builder handles options. Consider a simple kde-builder.yaml:

@@ -631,7 +631,7 @@ class BuildContext(PathResolvingOptions):
         # We do use alias (i.e. not the https address) here, because we want to support git push protocol for the metadata module (so it is easier to contribute to metadata in the future).
         metadata_module.set_option("dest-dir", "sysadmin-repo-metadata")  # Hardcode the on-disk path, so it is independent of directory-layout option.
         metadata_module.set_option("branch", "master")
-        metadata_module.set_option("source-dir",  os.environ.get("XDG_STATE_HOME", os.path.expanduser("~") + "/.local/state"))
+        metadata_module.set_option("source-dir", os.environ.get("XDG_STATE_HOME", os.path.expanduser("~") + "/.local/state"))
         metadata_module.set_option("log-dir", "log")  # overwrite default value, because user may store his directories not under "~/kde"
 
         # Ensure we only ever try to update source, not build.

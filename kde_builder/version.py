@@ -22,6 +22,7 @@ from kde_builder.util.textwrap_mod import dedent
 
 logger_app = logging.getLogger("application")
 
+
 class InstallationType(Enum):
     """Types of KDE Builder installations."""
 
@@ -38,6 +39,7 @@ class VersionComponents(TypedDict):
     post: str | None
     hash: str | None
     date: str | None
+
 
 class Version:
     """Can determine kde-builder version, installation type, upgrade command."""

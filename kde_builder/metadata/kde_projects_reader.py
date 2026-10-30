@@ -19,6 +19,7 @@ from kde_builder.kb_exception import NoKDEProjectsFound
 
 logger_moduleset = logging.getLogger("module-set")
 
+
 class RepositoryInfo(TypedDict):
     """Info from metadata.yaml file."""
 

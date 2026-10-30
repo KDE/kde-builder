@@ -304,9 +304,9 @@ class Application:
 
         if "dependency-tree" in cmdline_global_options or "dependency-tree-fullpath" in cmdline_global_options:
             if "dependency-tree" in cmdline_global_options:
-                mode="tree"
+                mode = "tree"
             else:
-                mode="fullpath"
+                mode = "fullpath"
 
             self.dependency_resolver.walk_module_dependency_trees(
                 mode,
