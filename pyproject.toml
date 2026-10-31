@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "kde-builder"
 dynamic = ["version"]
 description = "A tool to streamline the process of setting up and maintaining development environment for KDE software"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 
 dependencies = [
     "jeepney; sys_platform == 'linux'",
