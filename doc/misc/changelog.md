@@ -1,5 +1,8 @@
 # Changelog
 
+2026-10-31
+: Removed deprecated "Extra Generators" from supported CMake Generators.
+
 2026-09-17
 : Added `post-install-commands` config option.
 

@@ -345,11 +345,6 @@ Type: String, Default value: Unix Makefiles
 
 The generator that will be used by cmake. You can use `Ninja` or `Unix Makefiles` on Linux.
 
-```{note}
-The Extra Generators (like `Kate - Ninja`) are also supported. But note that they are deprecated since cmake version 3.27.
-See [documentation](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#extra-generators).
-```
-
 If you specify invalid value, it will be ignored.
 
 Also note, that you may also specify the generator directly in [cmake-options](#conf-cmake-options) (with "-G" option). In this case, if it is valid, it 
