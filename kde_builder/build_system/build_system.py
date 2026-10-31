@@ -430,7 +430,7 @@ class BuildSystem:
 
             return result
 
-        a_time = int(time.time())
+        start_time = int(time.time())
 
         status_viewer = ctx.status_view
         status_viewer.status = colorize(f"\t{message}")
@@ -487,9 +487,9 @@ class BuildSystem:
             result = False
 
         # Cleanup TTY output.
-        a_time = Util.prettify_seconds(int(time.time()) - a_time)
+        elapsed_time = Util.prettify_seconds(int(time.time()) - start_time)
         status = "g[b[succeeded]" if result else "r[b[failed]"
-        status_viewer.release_tty(f"\t{message} {status} (after {a_time})\n")
+        status_viewer.release_tty(f"\t{message} {status} (after {elapsed_time})\n")
 
         if warnings:
             if warnings < 3:

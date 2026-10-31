@@ -90,13 +90,13 @@ class Updater:
         gitdir = srcdir + "/.git"
 
         # Note that the --git-dir must come before the git command itself.
-        an_id = Util.get_program_output(["git", "--git-dir", gitdir, "rev-parse", commit], cwd=srcdir)
-        if an_id:
-            an_id = an_id[0].removesuffix("\n")
+        output_lines = Util.get_program_output(["git", "--git-dir", gitdir, "rev-parse", commit], cwd=srcdir)
+        if output_lines:
+            sha_id = output_lines[0].removesuffix("\n")
         else:
-            an_id = ""  # if it was empty list, make it str
+            sha_id = ""  # if it was empty list, make it str
 
-        return an_id
+        return sha_id
 
     def _verify_ref_present(self, repo: str) -> None:
         ref_value, ref_type = self.determine_preferred_checkout_source()

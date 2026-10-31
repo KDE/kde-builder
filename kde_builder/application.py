@@ -199,25 +199,25 @@ class Application:
             ctx.set_persistent_option("global", "last-metadata-update", int(time()))  # do not care of previous value, just overwrite if it was there
 
         if "resume" in cmdline_global_options:
-            module_list: list[str] | None = ctx.get_persistent_option("global", "resume-list", list[str])
-            if not module_list:
+            resume_list: list[str] | None = ctx.get_persistent_option("global", "resume-list", list[str])
+            if not resume_list:
                 logger_app.error("b[--resume] specified, but unable to find resume point!")
                 logger_app.error("Perhaps try b[--resume-from] or b[--resume-after]?")
                 raise KBRuntimeError("Invalid --resume flag")
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --resume, ignoring them.")
-            cmdline_selectors = module_list
+            cmdline_selectors = resume_list
             opts["special-selectors"].clear()
 
         if "rebuild-failures" in cmdline_global_options:
-            module_list: list[str] | None = ctx.get_persistent_option("global", "last-failed-module-list", list[str])
-            if not module_list:
+            last_failed_list: list[str] | None = ctx.get_persistent_option("global", "last-failed-module-list", list[str])
+            if not last_failed_list:
                 logger_app.error("b[y[--rebuild-failures] was specified, but unable to determine")
                 logger_app.error("which projects have previously failed to build.")
                 raise KBRuntimeError("Invalid --rebuild-failures flag")
             if cmdline_selectors:
                 logger_app.debug("Some command line selectors were presented alongside with --rebuild-failures, ignoring them.")
-            cmdline_selectors = module_list
+            cmdline_selectors = last_failed_list
             opts["special-selectors"].clear()
 
         if "list-installed" in cmdline_global_options:
@@ -451,9 +451,9 @@ class Application:
                     logger_app.debug(f" -- Reading dependencies from {dependency_file}")
                     dependency_resolver.read_dependency_data(dependencies)
         except FileNotFoundError as e:
-            e = str(e).replace("[", "").replace("]", "")
+            e_str = str(e).replace("[", "").replace("]", "")
             logger_app.warning(" r[b[*] Unable to read kde-dependencies:")
-            logger_app.warning(f" r[b[*] {e}")
+            logger_app.warning(f" r[b[*] {e_str}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
 
             dependency_resolver.dependencies_of.clear()
@@ -465,9 +465,9 @@ class Application:
         try:
             dependency_resolver.resolve_to_module_graph(modules)
         except Exception as e:
-            e = str(e).replace("[", "").replace("]", "")
+            e_str = str(e).replace("[", "").replace("]", "")
             logger_app.warning(" r[b[*] Problems encountered trying to determine correct project graph:")
-            logger_app.warning(f" r[b[*] {e}")
+            logger_app.warning(f" r[b[*] {e_str}")
             logger_app.warning(" r[b[*] Will attempt to continue.")
 
             dependency_resolver.dependency_graph.clear()

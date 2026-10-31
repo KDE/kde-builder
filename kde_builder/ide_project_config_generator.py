@@ -165,16 +165,16 @@ class IdeProjectConfigGenerator:
         module: Module = self.module
         build_dir = module.fullpath("build")
         cmake_opts = self.cmake_opts[5:]  # The first 5 elements are ["cmake", "-B", ".", "-S", srcdir], we are not interested in them
-        cmake_opts = " ".join(cmake_opts)
+        cmake_opts_str = " ".join(cmake_opts)
         build_opts = self.build_opts
-        build_opts = " ".join(build_opts)
+        build_opts_str = " ".join(build_opts)
 
         data_dir = f"{KB_PACKAGE_DIR}/resources/clion"
 
         cmake_xml = self._read_file(f"{data_dir}/cmake.xml.in")
         cmake_xml = cmake_xml.replace("%{GENERATION_DIR}", build_dir)
-        cmake_xml = cmake_xml.replace("%{GENERATION_OPTIONS}", cmake_opts)
-        cmake_xml = cmake_xml.replace("%{BUILD_OPTIONS}", build_opts)
+        cmake_xml = cmake_xml.replace("%{GENERATION_OPTIONS}", cmake_opts_str)
+        cmake_xml = cmake_xml.replace("%{BUILD_OPTIONS}", build_opts_str)
         env_entries_str = ""
         for key, val in module.env.items():
             env_entries_str += " " * 12 + f"""<env name="{key}" value="{val}" />\n"""
@@ -243,8 +243,8 @@ class IdeProjectConfigGenerator:
         os.makedirs(config_dir, exist_ok=True)
 
         cmake_opts = self.cmake_opts[7:]  # The first 7 elements are ["cmake", "-B", ".", "-S", srcdir, "-G", generator], we are not interested in them
-        cmake_opts = "\n".join(cmake_opts) + "\n"
-        self._write_to_file(f"{config_dir}/cmake_Initial_Configuration.txt", cmake_opts)
+        cmake_opts_str = "\n".join(cmake_opts) + "\n"
+        self._write_to_file(f"{config_dir}/cmake_Initial_Configuration.txt", cmake_opts_str)
 
         configure_and_build_env_str = ""
         for key, val in module.env.items():
