@@ -155,6 +155,10 @@ def main():
 
             """))
 
+        notes: list[str] = getattr(err, "__notes__", [])
+        for note in notes:
+            print("\n%s", note)
+
         print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
         traceback.print_exc()
