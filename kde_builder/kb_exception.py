@@ -11,19 +11,18 @@ from kde_builder.util.textwrap_mod import dedent
 class KBException(Exception):  # noqa: N818
     """A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified."""
 
-    def __init__(self, exception_type: str, msg: str) -> None:
-        self.exception_type = exception_type
+    def __init__(self, msg: str) -> None:
         self.message = msg
 
     def __str__(self) -> str:
-        return self.exception_type + " Error: " + self.message
+        return self.message
 
 
 class ConfigError(KBException):
     """Use for "config errors"."""
 
     def __init__(self, msg: str) -> None:
-        super().__init__("Config", msg)
+        super().__init__(msg)
 
 
 class SetOptionError(KBException):
@@ -35,7 +34,7 @@ class SetOptionError(KBException):
     """
 
     def __init__(self, bad_option_name: str, msg: str) -> None:
-        super().__init__("Config", msg)
+        super().__init__(msg)
         self.config_invalid_option_name = bad_option_name
 
     def option_usage_explanation(self) -> str:
@@ -100,18 +99,18 @@ class ProgramError(KBException):
     """
 
     def __init__(self, msg: str) -> None:
-        super().__init__("Internal", msg)
+        super().__init__(msg)
 
 
 class KBRuntimeError(KBException):
     """Use for "runtime errors" (i.e. unrecoverable runtime problems that don't indicate a bug in the program itself)."""
 
     def __init__(self, msg: str) -> None:
-        super().__init__("Runtime", msg)
+        super().__init__(msg)
 
 
 class SetupError(KBException):
     """Use for "setup errors" in FirstRun."""
 
     def __init__(self, msg: str) -> None:
-        super().__init__("Setup", msg)
+        super().__init__(msg)
