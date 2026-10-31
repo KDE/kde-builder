@@ -14,23 +14,23 @@ def test_vote_dependencies():
             "all_deps": {
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "b": {
             "votes": {},
             "all_deps": {
                 "items": {
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "c": {
             "votes": {},
             "all_deps": {
-                "items": {}
-            }
+                "items": {},
+            },
         },
         #
         # an item might depend through multiple (transitive) paths on the same
@@ -41,16 +41,16 @@ def test_vote_dependencies():
             "all_deps": {
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "e": {
             "votes": {},
             "all_deps": {
-                "items": {}
-            }
-        }
+                "items": {},
+            },
+        },
     }
 
     expected1 = {
@@ -59,46 +59,46 @@ def test_vote_dependencies():
             "all_deps": {
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "b": {
             "votes": {
                 "a": 1,
-                "d": 1
+                "d": 1,
             },
             "all_deps": {
                 "items": {
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "c": {
             "votes": {
                 "a": 1,
                 "b": 1,
-                "d": 1
+                "d": 1,
             },
             "all_deps": {
-                "items": {}
-            }
+                "items": {},
+            },
         },
         "d": {
             "votes": {},
             "all_deps": {
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "e": {
             "votes": {},
             "all_deps": {
-                "items": {}
-            }
-        }
+                "items": {},
+            },
+        },
     }
 
     dr = DependencyResolver(None)

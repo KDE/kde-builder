@@ -12,12 +12,12 @@ def test_trivial_cycle():
     graph1 = {
         "a": {
             "deps": {
-                "a": {}
-            }
+                "a": {},
+            },
         },
         "b": {
-            "deps": {}
-        }
+            "deps": {},
+        },
     }
 
     dr = DependencyResolver(None)
@@ -29,14 +29,14 @@ def test_cycle_to_self():
     graph2 = {
         "a": {
             "deps": {
-                "b": {}
-            }
+                "b": {},
+            },
         },
         "b": {
             "deps": {
-                "a": {}
-            }
-        }
+                "a": {},
+            },
+        },
     }
 
     dr = DependencyResolver(None)
@@ -50,12 +50,12 @@ def test_no_cycles():
     graph3 = {
         "a": {
             "deps": {
-                "b": {}
-            }
+                "b": {},
+            },
         },
         "b": {
-            "deps": {}
-        }
+            "deps": {},
+        },
     }
 
     dr = DependencyResolver(None)

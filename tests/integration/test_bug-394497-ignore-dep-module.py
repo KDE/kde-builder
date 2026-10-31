@@ -27,14 +27,14 @@ def mock_app_res_mod_dep_graph(monkeypatch):
         if "setmod1" in graph:
             graph["setmod1"]["votes"] = {
                 "setmod2": 1,
-                "setmod3": 1
+                "setmod3": 1,
             }
 
             # setmod1 is only user of setmod2
             if "setmod2" not in graph:
                 graph["setmod2"] = {
                     "votes": {
-                        "setmod3": 1
+                        "setmod3": 1,
                     },
                     "build": 1,
                     "module": new_module,

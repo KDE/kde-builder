@@ -73,14 +73,14 @@ class DependencyResolver:
         if f"{dep_name}:*" not in self.dependencies_of:
             self.dependencies_of[f"{dep_name}:*"] = {
                 "-": [],
-                "+": []
+                "+": [],
             }
 
         # Create actual branch entry if not present
         if f"{dep_name}:{dep_branch}" not in self.dependencies_of:
             self.dependencies_of[f"{dep_name}:{dep_branch}"] = {
                 "-": [],
-                "+": []
+                "+": [],
             }
 
         self.dependencies_of[f"{dep_name}:{dep_branch}"][dep_key].append(f"{src_name}:{src_branch}")
@@ -110,7 +110,7 @@ class DependencyResolver:
             r"(?:\s*\["  # Open a non-capture group...
             r"([^]\s]+)"  # (4) Capture branch name without brackets
             r"])?"  # Close group, make optional
-            r"$"  # Ensure no trailing cruft.
+            r"$",  # Ensure no trailing cruft.
         )
 
         for line in fh:
@@ -177,7 +177,7 @@ class DependencyResolver:
         result = {
             "syntax_errors": 0,
             "trivial_cycles": 0,
-            "dependencies": {}
+            "dependencies": {},
         }
 
         for dep in direct_deps:
@@ -202,7 +202,7 @@ class DependencyResolver:
                 if dep_branch == "" or dep_branch == "*":
                     dep_branch = None
                 result["dependencies"][dep_module_name] = {
-                    "branch": dep_branch
+                    "branch": dep_branch,
                 }
         return result
 
@@ -314,7 +314,7 @@ class DependencyResolver:
         errors = {
             "syntax_errors": 0,
             "trivial_cycles": 0,
-            "branch_errors": 0
+            "branch_errors": 0,
         }
 
         logger_depres.debug(f"Resolving dependencies for project: b[{module_name}]")
@@ -349,7 +349,7 @@ class DependencyResolver:
                         "deps": {},
                         "all_deps": {},
                         "module": None,
-                        "traces": {}
+                        "traces": {},
                     }
 
                     continue
@@ -366,13 +366,13 @@ class DependencyResolver:
                     "deps": dep_lookup_result["dependencies"],
                     "all_deps": {},
                     "module": dep_module,
-                    "traces": {}
+                    "traces": {},
                 }
 
                 dep_module_desc = {
                     "module": dep_module,
                     "module_name": dep_module_name,
-                    "branch": dep_branch
+                    "branch": dep_branch,
                 }
 
                 if not module_graph[dep_module_name]["build"]:
@@ -401,7 +401,7 @@ class DependencyResolver:
             "path_errors": 0,
             "trivial_cycles": 0,
             "syntax_errors": 0,
-            "cycles": 0
+            "cycles": 0,
         }
 
         for module in modules:
@@ -433,13 +433,13 @@ class DependencyResolver:
                     "module": module,
                     "deps": dep_lookup_result["dependencies"],
                     "all_deps": {},
-                    "traces": {}
+                    "traces": {},
                 }
 
                 module_desc = {
                     "module_name": module_name,
                     "branch": branch,
-                    "module": module
+                    "module": module,
                 }
 
                 resolv_errors = self._resolve_dependencies_for_module_description(module_desc)
@@ -515,7 +515,7 @@ class DependencyResolver:
                 "current_module_name": module_name,
                 "current_branch": branch,
                 "parent_module_name": current_module_name,
-                "parent_branch": current_branch
+                "parent_branch": current_branch,
             }
             self._descend_module_graph(mode, item_info, context)
             item_index += 1
@@ -528,7 +528,7 @@ class DependencyResolver:
         context = {
             "stack": [""],
             "depth": 0,
-            "report": lambda *args: print(*args, sep="", end="\n")
+            "report": lambda *args: print(*args, sep="", end="\n"),
         }
 
         for module in modules:
@@ -543,7 +543,7 @@ class DependencyResolver:
                 "current_module_name": module_name,
                 "current_branch": branch,
                 "parent_module_name": "",
-                "parent_branch": ""
+                "parent_branch": "",
             }
             self._descend_module_graph(mode, info, context)
             item_index += 1

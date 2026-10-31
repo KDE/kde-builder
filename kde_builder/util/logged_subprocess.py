@@ -150,7 +150,7 @@ class UtilLoggedSubprocess:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         exitcode = loop.run_until_complete(
-            Util.run_logged_async(module, filename, dir_to_run_from, command, callback)
+            Util.run_logged_async(module, filename, dir_to_run_from, command, callback),
         )
         loop.close()
 

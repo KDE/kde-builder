@@ -105,7 +105,7 @@ class StartProgram:
         logger_app.warning(
             "#" * 80 + "\n" +
             f"Executable:         {executable}\n" +
-            f"""Arguments:          {" ".join(args)}"""
+            f"""Arguments:          {" ".join(args)}""",
         )
 
         if kde_builder.is_pretending:

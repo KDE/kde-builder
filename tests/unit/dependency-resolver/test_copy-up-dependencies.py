@@ -11,19 +11,19 @@ def test_vote_for_dependencies():
     graph1 = {
         "a": {
             "deps": {
-                "b": 1
+                "b": 1,
             },
-            "all_deps": {}
+            "all_deps": {},
         },
         "b": {
             "deps": {
-                "c": 1
+                "c": 1,
             },
-            "all_deps": {}
+            "all_deps": {},
         },
         "c": {
             "deps": {},
-            "all_deps": {}
+            "all_deps": {},
         },
         #
         # an item might depend through multiple (transitive) paths on the same
@@ -32,67 +32,67 @@ def test_vote_for_dependencies():
         "d": {
             "deps": {
                 "b": 1,
-                "c": 1
+                "c": 1,
             },
-            "all_deps": {}
+            "all_deps": {},
         },
         "e": {
             "deps": {},
-            "all_deps": {}
-        }
+            "all_deps": {},
+        },
     }
 
     expected1 = {
         "a": {
             "deps": {
-                "b": 1
+                "b": 1,
             },
             "all_deps": {
                 "done": 1,
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "b": {
             "deps": {
-                "c": 1
+                "c": 1,
             },
             "all_deps": {
                 "done": 1,
                 "items": {
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "c": {
             "deps": {},
             "all_deps": {
                 "done": 1,
-                "items": {}
-            }
+                "items": {},
+            },
         },
         "d": {
             "deps": {
                 "b": 1,
-                "c": 1
+                "c": 1,
             },
             "all_deps": {
                 "done": 1,
                 "items": {
                     "b": 1,
-                    "c": 1
-                }
-            }
+                    "c": 1,
+                },
+            },
         },
         "e": {
             "deps": {},
             "all_deps": {
                 "done": 1,
-                "items": {}
-            }
-        }
+                "items": {},
+            },
+        },
     }
 
     dr = DependencyResolver(None)

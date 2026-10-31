@@ -17,23 +17,23 @@ def mock_application(monkeypatch):
             "setmod1": {
                 "votes": {
                     "setmod2": 1,
-                    "setmod3": 1
+                    "setmod3": 1,
                 },
                 "build": 1,
-                "module": modules[0]
+                "module": modules[0],
             },
             "setmod2": {
                 "votes": {
-                    "setmod3": 1
+                    "setmod3": 1,
                 },
                 "build": bool(self.context.get_option("include-dependencies", bool)),
-                "module": new_module
+                "module": new_module,
             },
             "setmod3": {
                 "votes": {},
                 "build": 1,
-                "module": modules[1]
-            }
+                "module": modules[1],
+            },
         }
 
         return

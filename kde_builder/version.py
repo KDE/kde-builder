@@ -310,7 +310,7 @@ class Version:
             r"^(?P<base>\d+\.\d+(?:\.\d+)?)"  # Tag version
             r"(?:\.post(?P<post>\d+))?"  # Number of commits after tag (optional)
             r"(?:\+g(?P<hash>[a-f0-9]+))?"  # Commit hash (optional)
-            r"(?:\.d(?P<date>\d{8}))?$"  # Date of dirty build (optional)
+            r"(?:\.d(?P<date>\d{8}))?$",  # Date of dirty build (optional)
         )
 
         match = pattern.match(version_str)

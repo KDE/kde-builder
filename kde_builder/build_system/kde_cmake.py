@@ -29,7 +29,7 @@ class BuildSystemKDECMake(BuildSystem):
             "options_name": "ninja-options",
             "install_target": "install",
             "required_programs": ["ninja", "cmake"],
-            "build_commands": ["ninja"]
+            "build_commands": ["ninja"],
         },
         "Unix Makefiles": {
             "options_name": "make-options",
@@ -37,8 +37,8 @@ class BuildSystemKDECMake(BuildSystem):
             "required_programs": ["cmake"],
             # Non Linux systems can sometimes fail to build when GNU Make would work,
             # so prefer GNU Make if present, otherwise try regular make.
-            "build_commands": ["gmake", "make"]
-        }
+            "build_commands": ["gmake", "make"],
+        },
     }
 
     # Extra generators that are compatible to the base generators above.
@@ -56,7 +56,7 @@ class BuildSystemKDECMake(BuildSystem):
         "CodeLite - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
         "Sublime Text 2 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
         "Kate - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
-        "Eclipse CDT4 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"]
+        "Eclipse CDT4 - Unix Makefiles": BASE_GENERATOR_MAP["Unix Makefiles"],
     }
 
     def __init__(self, module) -> None:

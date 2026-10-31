@@ -310,7 +310,7 @@ class Application:
 
             self.dependency_resolver.walk_module_dependency_trees(
                 mode,
-                modules
+                modules,
             )
 
             return
@@ -1264,7 +1264,7 @@ class Application:
             )
             upower_msg = new_method_call(
                 upower_addr, method="HoldProfile", signature="sss",
-                body=("performance", f"building projects (pid: {self._base_pid})", "kde-builder")
+                body=("performance", f"building projects (pid: {self._base_pid})", "kde-builder"),
             )
 
             # The hold will be automatically released once kde-builder exits
@@ -1278,7 +1278,7 @@ class Application:
             )
             pm_msg = new_method_call(
                 pm_addr, method="Inhibit", signature="ss",
-                body=("kde-builder", f"building projects (pid: {self._base_pid})")
+                body=("kde-builder", f"building projects (pid: {self._base_pid})"),
             )
             # The inhibition will be automatically released once kde-builder exits
             self._dbus_session_conn.send_and_get_reply(pm_msg)

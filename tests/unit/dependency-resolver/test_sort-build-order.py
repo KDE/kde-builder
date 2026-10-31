@@ -25,7 +25,7 @@ def graph1(mock_module_from_attrs):
         "a": {
             "votes": {
                 "b": 1,
-                "d": 1
+                "d": 1,
             },
             "build": 1,
             "module": Module(name="a", create_id=1),
@@ -37,7 +37,7 @@ def graph1(mock_module_from_attrs):
         },
         "c": {
             "votes": {
-                "d": 1
+                "d": 1,
             },
             "build": 1,
             "module": Module(name="c", create_id=1),

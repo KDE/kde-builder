@@ -429,7 +429,7 @@ class TaskManager:
 
         updater_process = multiprocessing.Process(
             target=TaskManager.updater_entrypoint,
-            args=(ipc, ctx)
+            args=(ipc, ctx),
         )
         updater_process.start()
 

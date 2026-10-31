@@ -38,35 +38,35 @@ def test_debug_order(mock_module):
         c1.name: {
             "votes": {},
             "deps": {},
-            "module": c1
+            "module": c1,
         },
         d1.name: {
             "votes": {},
             "deps": {},
-            "module": d1
+            "module": d1,
         },
         e1.name: {
             "votes": {
-                a1.name: 1
+                a1.name: 1,
             },
             "deps": {},
-            "module": e1
+            "module": e1,
         },
         b1.name: {
             "votes": {
-                a1.name: 1
+                a1.name: 1,
             },
             "deps": {"foo": 1},
-            "module": b1
+            "module": b1,
         },
         a1.name: {
             "votes": {},
             "deps": {
                 e1.name: 1,
-                b1.name: 1
+                b1.name: 1,
             },
-            "module": a1
-        }
+            "module": a1,
+        },
     }
 
     extra_debug_info1 = {
@@ -114,33 +114,33 @@ def test_debug_order(mock_module):
         p_b1.name: {
             "votes": {},
             "deps": {},
-            "module": p_b1
+            "module": p_b1,
         },
         p_b2.name: {
             "votes": {},
             "deps": {},
-            "module": p_b2
+            "module": p_b2,
         },
         p_i.name: {
             "votes": {},
             "deps": {},
-            "module": p_i
+            "module": p_i,
         },
         p_t.name: {
             "votes": {},
             "deps": {},
-            "module": p_t
+            "module": p_t,
         },
         p_u.name: {
             "votes": {},
             "deps": {},
-            "module": p_u
+            "module": p_u,
         },
         p_x.name: {
             "votes": {},
             "deps": {},
-            "module": p_x
-        }
+            "module": p_x,
+        },
     }
 
     extra_debug_info2 = {

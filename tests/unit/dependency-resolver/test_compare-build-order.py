@@ -25,7 +25,7 @@ def test_comparison(mock_module_from_attrs):
         "a": {
             "votes": {
                 "b": 1,
-                "d": 1
+                "d": 1,
             },
             "module": Module(name="a"),
         },
@@ -35,7 +35,7 @@ def test_comparison(mock_module_from_attrs):
         },
         "c": {
             "votes": {
-                "d": 1
+                "d": 1,
             },
             "module": Module(name="c"),
         },

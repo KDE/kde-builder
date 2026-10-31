@@ -156,7 +156,7 @@ class ModuleResolver:
             # Most of the time cmdline per project options will be empty
             if self.cmdline_per_project_options:
                 module_cmdline_args = {
-                    **(self.cmdline_per_project_options.get(name, {}))
+                    **(self.cmdline_per_project_options.get(name, {})),
                 }
 
                 # Remove any options that would interfere with cmdline args
