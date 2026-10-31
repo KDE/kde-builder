@@ -2,6 +2,7 @@
 
 # SPDX-FileCopyrightText: 2010, 2011, 2012, 2013, 2017, 2018, 2022 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -164,6 +165,11 @@ def main():
     except KBException as err:
         logger_app = logging.getLogger("application")
         logger_app.error(str(err))
+
+        notes: list[str] = getattr(err, "__notes__", [])
+        for note in notes:
+            logger_app.error("\n%s", note)
+
         if app:
             app.finish(99)  # noreturn
         exit(99)  # if app couldn't be created
