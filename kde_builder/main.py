@@ -11,7 +11,6 @@ import logging
 import logging.config
 import os
 import sys
-import traceback
 
 from kde_builder import KB_PACKAGE_DIR
 from kde_builder.kb_exception import ProgramError
@@ -157,7 +156,7 @@ def main():
 
         print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
-        traceback.print_exc()
+        sys.excepthook(err.__class__, err, err.__traceback__)
         if app:
             app.finish(99)  # noreturn
         exit(99)  # if app couldn't be created
@@ -183,7 +182,7 @@ def main():
 
             """))
 
-        traceback.print_exc()
+        sys.excepthook(err.__class__, err, err.__traceback__)
         if app:
             app.finish(99)  # noreturn
         exit(99)  # if app couldn't be created
