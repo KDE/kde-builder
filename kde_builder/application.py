@@ -29,7 +29,6 @@ from kde_builder.build_context import BuildContext
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
 from kde_builder.cmd_line import Cmdline
 from kde_builder.cmd_line import ParsedCmdLine
-from kde_builder.console import colors_enabled
 from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
@@ -69,9 +68,6 @@ class Application:
         self._module_resolver: ModuleResolver | None = None
         """ModuleResolver object, that makes a new Module. See generate_module_list()."""
         self._base_pid = os.getpid()  # See finish()
-
-        # Default to colorized output if sending to TTY
-        main_handler.formatter.set_colorful_output(colors_enabled())
 
         self._dependency_resolver: DependencyResolver | None = None
         self.modules: list[Module] = []

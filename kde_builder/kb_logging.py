@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 import kde_builder
 from kde_builder.console import ColorFormatter
+from kde_builder.console import color_formatter
 
 if TYPE_CHECKING:
     from kde_builder.ipc.pipe import IPCPipe
@@ -26,14 +27,14 @@ class TTYAndScreenLogHandler(logging.Handler):
     application's log directory is fully initialized.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, color_formatter: ColorFormatter) -> None:
         super().__init__()
         self.screen_log_fh = None
         """Filehandle pointing to the "screen.log"."""
         self._pending_screen_log_text = ""
         """Store screen text that was printed before we determined log-dir."""
 
-        self.formatter = ColorFormatter()
+        self.formatter = color_formatter
 
     def set_log_file(self, file_name: str) -> None:
         if kde_builder.is_pretending:
@@ -88,9 +89,8 @@ class IPCQueueLoggingHandler(logging.Handler):
             self.handleError(record)
 
 
-main_handler = TTYAndScreenLogHandler()
-main_handler.formatter.set_colorful_output(True)
+main_handler = TTYAndScreenLogHandler(color_formatter)
 
 
 def colorize(text: str) -> str:
-    return main_handler.formatter.format_string(text)
+    return color_formatter.format_string(text)

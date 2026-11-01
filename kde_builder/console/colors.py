@@ -103,6 +103,10 @@ def colors_enabled() -> bool:
     return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
 
+color_formatter = ColorFormatter()
+color_formatter.set_colorful_output(colors_enabled())
+
+
 def force_colors(value: bool) -> None:
     """
     Forcefully enables or disables colors by setting environment variables.
@@ -118,3 +122,5 @@ def force_colors(value: bool) -> None:
 
     # Don't let python do its own thing.
     os.environ.pop("PYTHON_COLORS", None)
+
+    color_formatter.set_colorful_output(value)
