@@ -9,3 +9,6 @@ __pycache__/
 htmlcov
 coverage.json
 coverage.xml
+
+# Sphinx
+doc/_build
