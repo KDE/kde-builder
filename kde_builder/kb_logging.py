@@ -36,7 +36,7 @@ class ColorFormatter(logging.Formatter):
         self.BOLD = ""
 
     def set_colorful_output(self, use_color: bool) -> None:
-        if use_color and sys.stdout.isatty():
+        if use_color:
             # Colors
             self.RED = "\033[31m"  # "r["
             self.GREEN = "\033[32m"  # "g["
