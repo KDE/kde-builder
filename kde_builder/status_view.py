@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import sys
 
-from kde_builder.kb_logging import colorize
+from kde_builder.console import colorize
 
 
 class StatusView:

@@ -124,3 +124,8 @@ def force_colors(value: bool) -> None:
     os.environ.pop("PYTHON_COLORS", None)
 
     color_formatter.set_colorful_output(value)
+
+
+def colorize(text: str) -> str:
+    """Colorizes a string using the global `ColorFormatter`."""
+    return color_formatter.format_string(text)

@@ -13,8 +13,8 @@ import time
 from typing import TYPE_CHECKING
 
 import kde_builder
+from kde_builder.console import colorize
 from kde_builder.kb_exception import ProgramError
-from kde_builder.kb_logging import colorize
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 from kde_builder.util.util import Util
 

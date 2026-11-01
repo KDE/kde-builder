@@ -90,7 +90,3 @@ class IPCQueueLoggingHandler(logging.Handler):
 
 
 main_handler = TTYAndScreenLogHandler(color_formatter)
-
-
-def colorize(text: str) -> str:
-    return color_formatter.format_string(text)
