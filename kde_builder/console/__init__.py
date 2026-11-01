@@ -5,7 +5,9 @@
 """Emit and log terminal output."""
 
 from kde_builder.console.colors import colors_enabled
+from kde_builder.console.colors import force_colors
 
 __all__ = [
     "colors_enabled",
+    "force_colors",
 ]

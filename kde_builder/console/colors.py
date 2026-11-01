@@ -44,3 +44,20 @@ def colors_enabled() -> bool:
         return False
 
     return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+
+
+def force_colors(value: bool) -> None:
+    """
+    Forcefully enables or disables colors by setting environment variables.
+
+    The usual memory safety concerns regarding setting environment variables on
+    certain platforms apply, in particular in multi-threaded contexts.
+    """
+    if value:
+        os.environ.pop("NO_COLOR", None)
+        os.environ["FORCE_COLOR"] = "1"
+    else:
+        os.environ["NO_COLOR"] = "1"
+
+    # Don't let python do its own thing.
+    os.environ.pop("PYTHON_COLORS", None)
