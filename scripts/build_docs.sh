@@ -13,4 +13,4 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 DOC_ROOT="${ROOT}/doc"
 
-sphinx-build -M html "$DOC_ROOT" "$DOC_ROOT"/_build/
+uv run --group docs sphinx-build -M html "$DOC_ROOT" "$DOC_ROOT"/_build/
