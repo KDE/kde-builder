@@ -5,7 +5,7 @@ nosearch:
 # Developers documentation
 
 ```{toctree}
-editable-installation
+dev-env-setup
 concepts
 adding-logger
 ide-configs-generation

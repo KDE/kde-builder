@@ -1,5 +1,9 @@
 # Installation
 
+```{note}
+If you plan to work on KDE Builder, see the [](#dev-env-setup) section instead.
+```
+
 The preferred installation method is using `uv`.
 
 However, you can choose [alternative installation](#alternative-installation) methods if needed.
@@ -51,7 +55,3 @@ If `uv` is unavailable on your system, you can fall back to `pipx`. For example:
 ```bash
 pipx install "git+https://invent.kde.org/sdk/kde-builder.git"
 ```
-
-### Developer Installation
-
-If you plan to develop `kde-builder` itself or test changes, please see [](#editable-installation) in the Developer Documentation chapter.
