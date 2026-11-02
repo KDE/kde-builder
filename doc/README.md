@@ -16,14 +16,9 @@ Then navigate to the path `public/en/index.html` and click on it.
 
 ## Building documentation locally
 
-You can run the `scripts/build_docs.sh` script to build documentation. Then navigate to `doc/_build/html/index.html` and open it.
+You can run the `scripts/build_docs.sh` script to build documentation. There are two modes of operation:
 
-If you want to work on documentation, you would like to use live preview. Run this command in terminal:
+Running the script without any arguments builds the documentation and places the output in `doc/_build/html/index.html`.
 
-```bash
-sphinx-autobuild doc doc/_build/html
-```
-
-It will launch a local web server, and watch if changes are made to files. Click on the link it prints, this will open the `index.html`
-in your browser. When sphinx-autobuild detects changes in files, it will automatically rebuild documentation, and refresh the page in
-browser.
+Running the script with the `--watch` flag will watch the source files for changes and rebuild the documentation as needed.
+It also starts a web server on a random port, and opens the browser to show a live preview. You may need to reload the page once.
