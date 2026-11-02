@@ -12,5 +12,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 DOC_ROOT="${ROOT}/doc"
+DOC_BUILD="${DOC_ROOT}/_build"
 
-uv run --group docs sphinx-build -M html "$DOC_ROOT" "$DOC_ROOT"/_build/
+ARG1="${1:-""}"
+if [ "${ARG1}" == "--watch" ] ; then
+    uv run --group docs sphinx-autobuild -M html "$DOC_ROOT" "$DOC_BUILD" \
+        --port 0 --open-browser
+else
+    uv run --group docs sphinx-build -M html "$DOC_ROOT" "$DOC_BUILD"
+fi
