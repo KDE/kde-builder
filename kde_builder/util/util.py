@@ -64,7 +64,7 @@ class Util:
         if re.match(r"^/", prog):
             return prog
 
-        paths = preferred if preferred else os.environ.get("PATH").split(":")
+        paths = preferred if preferred else os.environ.get("PATH", "").split(":")
         for path in paths:
             if os.access(f"{path}/{prog}", os.X_OK):
                 return f"{path}/{prog}"

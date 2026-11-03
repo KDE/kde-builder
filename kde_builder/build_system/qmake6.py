@@ -39,7 +39,7 @@ class BuildSystemQMake6(BuildSystem):
         co-installability with previous Qt versions.
         If no suitable qmake can be found, None is returned.
         """
-        return next((p for p in cls.possible_qmake_names if Util.locate_exe(p)), None)
+        return next((p for p in cls.possible_qmake_names if Util.locate_exe(p)), "")
 
     @override
     def configure_internal(self) -> bool:

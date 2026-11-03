@@ -561,7 +561,7 @@ class Application:
         if not kde_builder.is_pretending and not self.context.take_lock():
             exit(1)  # Don't finish(), it's not our lockfile!
 
-        result = None  # shell-style (0 == success)
+        result = 0  # shell-style (0 == success)
 
         if ctx.get_option("hold-performance-profile", bool):
             # If power-profiles-daemon is in use, request switching to performance mode.

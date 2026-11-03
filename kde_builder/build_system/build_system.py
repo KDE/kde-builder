@@ -141,8 +141,8 @@ class BuildSystem:
         # Convert the path to an absolute path since I've encountered a sudo
         # that is apparently unable to guess.  Maybe it's better that it
         # doesn't guess anyways from a security point-of-view.
-        build_command = next((bc for bc in self.build_commands() if Util.locate_exe(bc)), None)
-        if build_command is None:
+        build_command = next((bc for bc in self.build_commands() if Util.locate_exe(bc)), "")
+        if not build_command:
             logger_buildsystem.warning(" y[*] Not found any of these executables: '" + "' '".join(self.build_commands()) + "'. build_command will be undefined.")
         return build_command
 

@@ -191,7 +191,7 @@ class OptionsBase:
             value = re.sub(r"(^|:|=)~/", lambda m: m.group(1) + os.path.expanduser("~") + "/", value)
 
         if value.lower() == "false":
-            value = False
+            return False
 
         return value
 
