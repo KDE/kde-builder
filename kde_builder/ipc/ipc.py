@@ -8,6 +8,7 @@ import logging
 import re
 from enum import IntEnum
 from typing import TYPE_CHECKING
+from typing import Any
 
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
@@ -59,7 +60,7 @@ class IPC:
     """A message to print after all work done (sent when could not stash or unstash changes)."""
 
     def __init__(self) -> None:
-        self.queue = None
+        self.queue: Any = None
 
         self.updated: dict[str, str] = {}
         """Holds update status ("skipped", "success", "failed") for the modules."""

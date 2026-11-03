@@ -74,10 +74,10 @@ class BuildContext(PathResolvingOptions):
         self.phases = PhaseList()
         """Replaces Module.phases"""
 
-        self.errors = {}
+        self.errors: dict[str, str] = {}
         """A map from module *names* to the phase name at which they failed."""
 
-        self.log_paths = {}
+        self.log_paths: dict[str, str] = {}
         """
         Holds a dict of log path bases as expanded by get_absolute_path() (e.g. [source-dir]/log) to the actual log dir *this run*,
         with the date and unique id added. You must still add the module name to use.

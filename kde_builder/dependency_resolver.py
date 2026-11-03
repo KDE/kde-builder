@@ -9,6 +9,7 @@ import logging
 import re
 from functools import cmp_to_key
 from io import TextIOWrapper
+from typing import Any
 
 import kde_builder
 from kde_builder.kb_exception import KBRuntimeError
@@ -27,14 +28,14 @@ class DependencyResolver:
     """
 
     def __init__(self, module_resolver: ModuleResolver) -> None:
-        self.dependencies_of = {}
+        self.dependencies_of: dict[str, dict[str, list[str]]] = {}
 
         self.module_resolver = module_resolver
         """
         ModuleResolver object, that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
         """
 
-        self.dependency_graph = {}
+        self.dependency_graph: dict[str, dict[str, Any]] = {}
 
     @staticmethod
     def _shorten_module_name(name: str) -> str:
@@ -547,7 +548,7 @@ class DependencyResolver:
             self._descend_module_graph(mode, info, context)
             item_index += 1
 
-    def _compare_build_order_depends(self, a, b):
+    def _compare_build_order_depends(self, a, b) -> int:
         module_graph = self.dependency_graph
 
         # comparison results uses:

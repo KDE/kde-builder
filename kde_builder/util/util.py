@@ -106,7 +106,7 @@ class Util:
             raise KBRuntimeError(f"Could not change to directory {directory}: {e}")
 
     @staticmethod
-    def super_mkdir(pathname) -> bool:
+    def super_mkdir(pathname: str) -> bool:
         """
         Create a directory, including any parent directories that may also need created.
 

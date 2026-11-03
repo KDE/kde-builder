@@ -715,7 +715,7 @@ class Application:
             except yaml.YAMLError as exc:
                 exc_msgs = "\n  " + "\n  ".join(str(x) for x in exc.args)
                 raise ConfigError("Error parsing yaml configuration file:" + exc_msgs)
-        module_and_module_set_list = []
+        module_and_module_set_list: list[Module | ModuleSet] = []
         rcfile = ctx.config_file
 
         first_node = next(iter(config_content))
@@ -755,8 +755,8 @@ class Application:
 
         nothing_defined = True
         creation_order = 0
-        seen_modules = {}  # NOTE! *not* module-sets, *just* modules.
-        seen_module_sets = {}  # and vice versa
+        seen_modules: dict[str, Module] = {}  # NOTE! *not* module-sets, *just* modules.
+        seen_module_sets: dict[str, ModuleSet] = {}  # and vice versa
         # seen_module_set_items = {}  # To track option override modules.
         deferred_options: list[OptionsBase] = []
 
@@ -1187,7 +1187,7 @@ class Application:
 
         build_modules = ctx.modules_in_phase("build")
         required_programs: set[str] = set()
-        modules_requiring_program = {}
+        modules_requiring_program: dict[str, dict[str, int]] = {}
 
         for module in ctx.modules_in_phase("build"):
             progs = module.build_system.required_programs()

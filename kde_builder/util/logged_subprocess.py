@@ -59,7 +59,7 @@ class UtilLoggedSubprocess:
         self._module = None
         self._log_to = None
         self._chdir_to = None
-        self._set_command = None
+        self._set_command: list[str] | None = None
         self._disable_translations = False
         # end of attributes
 

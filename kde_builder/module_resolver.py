@@ -39,7 +39,7 @@ class ModuleResolver:
         Holds selectors that should be ignored.
         """
 
-        self.cmdline_per_project_options = {}
+        self.cmdline_per_project_options: dict[str, dict[str, str]] = {}
         """
         The options that should be applied to modules when they are created.
 
@@ -96,7 +96,7 @@ class ModuleResolver:
 
             # Use KDE project database to pull list of matching `Module`s
             for m in referenced_modules:
-                _empty_list = []
+                _empty_list: list[str] = []
                 names: list[str] = proj_db.get_identifiers_for_selector(m, _empty_list)
                 for name in names:
                     if name not in final_opts:
@@ -131,7 +131,7 @@ class ModuleResolver:
             elif isinstance(pr_or_gr, Module):
                 self.defined_projects[pr_or_gr.name] = pr_or_gr
 
-    def handle_initial_projects(self):
+    def handle_initial_projects(self) -> None:
         """Apply command line and override options to projects directly-defined in config."""
         projects: list[Module] = [el for el in self.defined_projects.values()]
         self._apply_options(projects)
@@ -251,7 +251,7 @@ class ModuleResolver:
         resolve_module_if_present().
         """
         names: list[str] = []
-        _empty_list = []
+        _empty_list: list[str] = []
         for selector in selectors:
             try:
                 # If selector is a full repopath of kde project, like "utilities/kcalc",

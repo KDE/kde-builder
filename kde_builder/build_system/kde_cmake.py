@@ -8,6 +8,7 @@ import logging
 import os.path
 import re
 import sys
+from typing import Any
 from typing import override
 
 from kde_builder.build_system.build_system import BuildSystem
@@ -23,7 +24,7 @@ logger_buildsystem = logging.getLogger("build-system")
 class BuildSystemKDECMake(BuildSystem):
     """Class responsible for building CMake-based modules, with special support for KDE modules."""
 
-    GENERATOR_MAP = {
+    GENERATOR_MAP: dict[str, dict[str, Any]] = {
         "Ninja": {
             "options_name": "ninja-options",
             "install_target": "install",

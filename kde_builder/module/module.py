@@ -155,7 +155,7 @@ class Module(PathResolvingOptions):
             self.build_system = self.build_system_from_name(user_build_system)
             return
 
-        build_type = None
+        build_type: BuildSystem | None = None
         source_dir = self.fullpath("source")
 
         if not build_type and (os.path.exists(f"{source_dir}/CMakeLists.txt") or self.is_kde_project()):

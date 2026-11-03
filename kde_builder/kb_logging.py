@@ -6,6 +6,7 @@
 import logging
 import sys
 from logging import LogRecord
+from typing import IO
 from typing import TYPE_CHECKING
 
 import kde_builder
@@ -28,7 +29,7 @@ class TTYAndScreenLogHandler(logging.Handler):
 
     def __init__(self, color_formatter: ColorFormatter) -> None:
         super().__init__()
-        self.screen_log_fh = None
+        self.screen_log_fh: IO[str] | None = None
         """Filehandle pointing to the "screen.log"."""
         self._pending_screen_log_text = ""
         """Store screen text that was printed before we determined log-dir."""

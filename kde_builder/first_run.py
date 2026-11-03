@@ -64,9 +64,9 @@ class FirstRun:
     # Internal functions
 
     @staticmethod
-    def _read_packages(vendor, deps_data_path) -> dict:
+    def _read_packages(vendor, deps_data_path) -> dict[str, list[str]]:
         """Read from the files from data/pkg and dump the contents in a dict keyed by filename (the "[pkg/vendor/version]" part between each resource)."""
-        packages = {}
+        packages: dict[str, list[str]] = {}
         cur_key = ""
 
         if vendor == "unknown":
@@ -112,7 +112,7 @@ class FirstRun:
         logger_fr.info(f"Best match: {best_vendor}")
 
         packages: list[str] = []
-        packages_collections: dict = self._read_packages(best_vendor, deps_data_path)
+        packages_collections: dict[str, list[str]] = self._read_packages(best_vendor, deps_data_path)
         for opt in [f"pkg/{best_vendor}/{version}", f"pkg/{best_vendor}/unknown"]:
             if opt in packages_collections.keys():
                 logger_fr.info(f"Using collection of packages: {opt.removeprefix('pkg/')}")
