@@ -3,8 +3,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from __future__ import annotations
-
 
 class ModuleBranchGroupResolver:
     """Provides an object that can be used to look up the appropriate git branch to use for a given KDE project and given desired branch group."""
