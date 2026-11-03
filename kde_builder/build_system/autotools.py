@@ -55,10 +55,6 @@ class BuildSystemAutotools(BuildSystem):
                 print(f"Failed to run make distclean, exit code {exitcode}")
                 exit(1)
 
-            # Now recheck
-            configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
-            return configure_command
-
         configure_command = next((item for item in ["configure", "autogen.sh"] if os.path.exists(f"{sourcedir}/{item}")), None)
         if not configure_command:
             raise KBRuntimeError("No configure command available")
