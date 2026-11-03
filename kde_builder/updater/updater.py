@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 
-import inspect
 import logging
 import os.path
 import re
@@ -485,8 +484,7 @@ class Updater:
         """
         srcdir = self.srcdir
         if not os.path.isdir(f"{srcdir}/.git"):
-            caller_name = inspect.currentframe().f_back.f_code.co_name
-            raise ProgramError("\tRun " + caller_name + " from git repo!")
+            raise ProgramError("\tRun _detect_default_remote_head from git repo!")
 
         with open(f"{srcdir}/.git/refs/remotes/{remote_name}/HEAD", "r") as file:
             data = file.read()
@@ -577,12 +575,6 @@ class Updater:
         # filtering down to options for which the option is set to "true"
         config_lines = Util.get_program_output(["git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true"])
         return len(config_lines) > 0
-
-    @staticmethod
-    def _split_uri(uri) -> tuple[str, str, str, str, str]:
-        match = re.match(r"(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?", uri)
-        scheme, authority, path, query, fragment = match.groups()
-        return scheme, authority, path, query, fragment
 
     def count_stash(self, description=None) -> int:
         module = self.module
