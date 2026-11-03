@@ -26,6 +26,7 @@ from kde_builder import KB_PACKAGE_DIR
 from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
 from kde_builder.build_system.qmake5 import BuildSystemQMake5
+from kde_builder.build_system.qmake6 import BuildSystemQMake6
 from kde_builder.cmd_line import Cmdline
 from kde_builder.cmd_line import ParsedCmdLine
 from kde_builder.debug_order_hints import DebugOrderHints
@@ -1207,7 +1208,7 @@ class Application:
 
             # qmake is not necessarily named "qmake"
             if not program_path and prog == "qmake":
-                program_path = BuildSystemQMake5.abs_path_to_qmake()
+                program_path = BuildSystemQMake5.abs_path_to_qmake() or BuildSystemQMake6.abs_path_to_qmake()
 
             if not program_path:
                 was_error = True
