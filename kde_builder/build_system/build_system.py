@@ -216,7 +216,7 @@ class BuildSystem:
         """Return name of file that should exist (relative to the module's build directory) if the module has been configured."""
         return "Makefile"
 
-    def run_testsuite(self) -> False:
+    def run_testsuite(self) -> bool:
         """
         Run the testsuite for the given module.
 

@@ -42,7 +42,7 @@ class BuildSystemKDECMake(BuildSystem):
     }
 
     def __init__(self, module) -> None:
-        BuildSystem.__init__(self, module)
+        super().__init__(module)
         self.cmake_generator: str | None = None
         self.cmake_toolchain: str | None = None
 

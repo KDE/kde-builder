@@ -24,7 +24,7 @@ class StartProgram:
         self.ctx = ctx
         self.pers_opts = self.ctx.persistent_options
 
-        self.bin_to_proj_map: dict[str, list[str]] = {}
+        self.bin_to_proj_map: dict[str, str] = {}
         for proj_name, proj_data in self.pers_opts.items():
             binaries = proj_data.get("installed-binaries", [])
             for binary in binaries:

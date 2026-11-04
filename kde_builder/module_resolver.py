@@ -7,6 +7,7 @@
 import copy
 import logging
 from typing import TYPE_CHECKING
+from typing import Sequence
 
 from kde_builder.kb_exception import KBException
 from kde_builder.kb_exception import KBRuntimeError
@@ -136,7 +137,7 @@ class ModuleResolver:
         projects: list[Module] = [el for el in self.defined_projects.values()]
         self._apply_options(projects)
 
-    def _apply_options(self, modules: list[Module | ModuleSet]) -> None:
+    def _apply_options(self, modules: Sequence[Module | ModuleSet]) -> None:
         """Apply cmdline and deferred options to the given modules or module-sets."""
         for m in modules:
             name = m.name

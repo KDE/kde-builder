@@ -49,7 +49,7 @@ class TaskManager:
         """
         ctx = self.ksb_app.context
         result = 0
-        ipc = None
+        ipc: IPC
 
         if ctx.uses_concurrent_phases() and ctx.get_option("async", bool):
             ipc = IPCPipe()
@@ -379,7 +379,7 @@ class TaskManager:
 
         return result
 
-    def _handle_noasync_build(self, ipc: IPCNull, ctx) -> int:
+    def _handle_noasync_build(self, ipc: IPC, ctx) -> int:
         logger_taskmanager.debug("Using no IPC mechanism\n")
 
         # If the user sends SIGHUP during the build, we should allow the
@@ -398,7 +398,7 @@ class TaskManager:
 
         return result
 
-    def _handle_async_build(self, ipc: IPCPipe, ctx: BuildContext) -> int:
+    def _handle_async_build(self, ipc: IPC, ctx: BuildContext) -> int:
         """
         Special-cases the handling of the update and build phases, by performing them concurrently (where possible).
 
