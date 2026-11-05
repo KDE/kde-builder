@@ -1,5 +1,9 @@
 include = ["kde-builder", "kde_builder/**/*.py", "tests/**/*.py", "scripts/gen_zsh_completions.py"]
 
+# We are currently moving towards enforcing a line-length of 120 characters.
+# However, we want to do style changes file-by-file, so we won't enable E501 yet.
+line-length = 120
+
 [lint]
 preview = true
 select = [
