@@ -561,21 +561,6 @@ class Updater:
 
         return ref_string, matched_checkout_source.git_type
 
-    @staticmethod
-    def _has_submodules() -> bool:
-        """
-        Try to check whether the git module is using submodules or not.
-
-        Currently, we just check the .git/config file (using git-config) to determine whether
-        there are any "active" submodules.
-
-        MUST BE RUN FROM THE SOURCE DIR
-        """
-        # The git-config line shows all option names of the form submodule.foo.active,
-        # filtering down to options for which the option is set to "true"
-        config_lines = Util.get_program_output(["git", "config", "--local", "--get-regexp", r"^submodule\..*\.active", "true"])
-        return len(config_lines) > 0
-
     def count_stash(self, description=None) -> int:
         module = self.module
         srcdir = self.srcdir
