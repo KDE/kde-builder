@@ -1,12 +1,12 @@
 # SPDX-FileCopyrightText: 2015 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 
-import sys
-
 from kde_builder.console import colorize
+from kde_builder.console import print_if_tty
 
 
 class StatusView:
@@ -115,10 +115,10 @@ class StatusView:
             percent = passed_by_other_projects + passed_by_current_project
         else:
             percent = passed_by_other_projects
-        print(f"\033]9;4;1;{percent}\033\\", end="")
+        print_if_tty(f"\033]9;4;1;{percent}\033\\", end="")
 
     def progress_bar_disable(self):
-        print("\033]9;4;0;0\033\\", end="")
+        print_if_tty("\033]9;4;0;0\033\\", end="")
 
     @staticmethod
     def release_tty(msg: str = "") -> None:
@@ -132,5 +132,4 @@ class StatusView:
 
         Then print message and return to column 1 again in case somewhere else uses the tty.
         """
-        print(f"\033[1G\033[K{msg}\033[1G", end="")
-        sys.stdout.flush()
+        print_if_tty(f"\033[1G\033[K{msg}\033[1G", end="", flush=True)
