@@ -4,16 +4,8 @@
 
 """Emit and log terminal output."""
 
-from kde_builder.console.colors import ColorFormatter
-from kde_builder.console.colors import color_formatter
-from kde_builder.console.colors import colorize
-from kde_builder.console.colors import colors_enabled
-from kde_builder.console.colors import force_colors
-
-__all__ = [
-    "ColorFormatter",
-    "color_formatter",
-    "colorize",
-    "colors_enabled",
-    "force_colors",
-]
+from kde_builder.console.colors import ColorFormatter as ColorFormatter
+from kde_builder.console.colors import color_formatter as color_formatter
+from kde_builder.console.colors import colorize as colorize
+from kde_builder.console.colors import colors_enabled as colors_enabled
+from kde_builder.console.colors import force_colors as force_colors
