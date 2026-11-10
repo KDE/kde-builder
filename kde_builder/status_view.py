@@ -7,6 +7,8 @@
 
 from kde_builder.console import colorize
 from kde_builder.console import print_if_tty
+from kde_builder.console.widgets import hide_progress_bar
+from kde_builder.console.widgets import show_progress_bar
 
 
 class StatusView:
@@ -115,10 +117,10 @@ class StatusView:
             percent = passed_by_other_projects + passed_by_current_project
         else:
             percent = passed_by_other_projects
-        print_if_tty(f"\033]9;4;1;{percent}\033\\", end="")
+        show_progress_bar(percent)
 
     def progress_bar_disable(self):
-        print_if_tty("\033]9;4;0;0\033\\", end="")
+        hide_progress_bar()
 
     @staticmethod
     def release_tty(msg: str = "") -> None:
