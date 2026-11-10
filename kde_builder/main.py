@@ -13,6 +13,7 @@ import os
 import sys
 
 from kde_builder import KB_PACKAGE_DIR
+from kde_builder.console import use_as_output
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
 from kde_builder.kb_logging import main_handler
@@ -20,6 +21,10 @@ from kde_builder.util.textwrap_mod import dedent
 
 
 def main():
+
+    # Ensure that the output stream for the console package is properly initialized.
+    use_as_output(sys.stdout)
+
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments
     add_bootstrap_arguments(bootstrap_parser)
