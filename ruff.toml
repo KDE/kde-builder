@@ -41,6 +41,11 @@ extend-select = [
     "D404", # Follow pep257 convention: do not start docstring with "this" word.
 ]
 
+[lint.per-file-ignores]
+"tests/**/*.py" = [
+    "D101"
+]
+
 [lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
