@@ -43,6 +43,9 @@ they recommend updating the progress bar state at least once every second.
 [2]: https://ghostty.org/docs/vt/osc/conemu
 """
 
+from contextlib import AbstractContextManager
+from typing import Any
+from typing import Self
 
 from kde_builder.console.stdout import print_if_tty
 
@@ -67,3 +70,137 @@ def show_progress_bar(percent: float | int):
     The rounded value of `percent` is clamped to the range `[0, 100]`.
     """
     _show_progress_bar(_round_and_clamp(percent))
+
+
+class ProgressBar(AbstractContextManager):
+    """
+    Show a percentage using a progress bar.
+
+    This class is intended to be used as a context manager, like so:
+
+    ```python
+    with ProgressBar() as progress:
+        for i in range(0, 20):
+            progress.value = i * 5
+    ```
+
+    It is also possible to increment or decrement the progress bar value, either
+    by an integer or by a fractional amount:
+
+    ```python
+    with ProgressBar() as progress:
+        for _ in range(0, 200):
+            progress.value += 0.5
+    ```
+
+    As shorthand, you can use the `+=` and `-=` operators:
+
+    ```python
+    with ProgressBar() as progress:
+        for _ in range(0, 40):
+            progress += 2.5
+    ```
+
+    A `ProgressBar()` instance can be compared with regular numbers:
+
+    ```python
+    with ProgressBar() as progress:
+        for i in range(0, 100):
+            progress.value = i
+            if progress == 95:
+                print("Almost there!")
+    ```
+
+    The `<`, `>`, `<=`, `>=`, `==`, and `!=` operators can be used to compare
+    a `ProgressBar` with `int` and `float`. The comparisons are always performed
+    by rounding and clamping both values to the range `[0, 100]`.
+
+    The above is equivalent to comparing the `ProgressBar.rounded_and_clamped`
+    property with a number.
+
+    If you need to compare the progress including the fractional part with a
+    number, use the `ProgressBar.value` property instead.
+    """
+
+    def __init__(self):
+        self._value: float | int = 0.0
+        self._rounded_and_clamped: int = 0
+        self._visible = False
+
+    def __enter__(self) -> Self:
+        self._visible = True
+        show_progress_bar(self._rounded_and_clamped)
+        return self
+
+    def __exit__(self, *_args) -> bool:
+        hide_progress_bar()
+        self._visible = False
+        return False
+
+    def __ge__(self, other: float | int) -> bool:
+        return self._rounded_and_clamped >= _round_and_clamp(other)
+
+    def __gt__(self, other: float | int) -> bool:
+        return self._rounded_and_clamped > _round_and_clamp(other)
+
+    def __le__(self, other: float | int) -> bool:
+        return self._rounded_and_clamped <= _round_and_clamp(other)
+
+    def __lt__(self, other: float | int) -> bool:
+        return self._rounded_and_clamped < _round_and_clamp(other)
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self._rounded_and_clamped == _round_and_clamp(other)
+
+        return False
+
+    def __ne__(self, other: Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self._rounded_and_clamped != _round_and_clamp(other)
+
+        return True
+
+    def __str__(self) -> str:
+        return f"{self._value:.1f}%"
+
+    @property
+    def rounded_and_clamped(self) -> int:
+        return self._rounded_and_clamped
+
+    @property
+    def value(self) -> float | int:
+        return self._value
+
+    def _set_value(self, value: float | int) -> Self:
+        """Update the percentage to the given value."""
+        self._value = max(0.0, min(value, 100.0))
+        self._rounded_and_clamped = round(self._value)
+        self.refresh()
+        return self
+
+    @value.setter
+    def value(self, value: float | int) -> None:
+        self._set_value(value)
+
+    def hide(self) -> None:
+        self._visible = False
+        hide_progress_bar()
+
+    def show(self) -> None:
+        self._visible = True
+        _show_progress_bar(self._rounded_and_clamped)
+
+    def refresh(self) -> None:
+        if self._visible:
+            _show_progress_bar(self._rounded_and_clamped)
+        else:
+            hide_progress_bar()
+
+    def __iadd__(self, delta: float | int) -> Self:
+        """Add the given delta to the percentage."""
+        return self._set_value(self._value + delta)
+
+    def __isub__(self, delta: float | int) -> Self:
+        """Subtract the given delta to the percentage."""
+        return self._set_value(self._value - delta)
