@@ -528,7 +528,7 @@ class DependencyResolver:
         context = {
             "stack": [""],
             "depth": 0,
-            "report": lambda *args: print(*args, sep="", end="\n"),
+            "report": lambda *args: logger_depres.info(*args),
         }
 
         for module in modules:
@@ -627,7 +627,7 @@ class DependencyResolver:
         current_module_name = node_info["current_module_name"]
         current_branch = node_info["current_branch"]
 
-        build_status = "built" if build else "not built"
+        build_status = "g[built]" if build else "r[not built]"
         status_info = f"({build_status}: {current_branch})" if current_branch else f"({build_status})"
 
         connector_stack = context["stack"]
