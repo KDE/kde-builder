@@ -58,9 +58,29 @@ class ColorFormatter(logging.Formatter):
 
         return text
 
-    def format(self, record: logging.LogRecord) -> str:
-        record.msg = self.format_string(str(record.msg))
-        return super().format(record) + self.NORMAL
+    # ruff: ignore[invalid-function-name]
+    # This is an override, so we have no choice regarding the naming.
+    def formatMessage(self, record: logging.LogRecord) -> str:
+        """
+        Return the string that should be substituted for `%(message)s`.
+
+        It sets the `record.message` attribute, which overrides the value that
+        `Formatter.format()` computes with `LogRecord.getMessage()`, which is
+        assumed to use percent-style formatting (i.e. `.msg % .args`).
+
+        Since the every `Formatter` overwrites `record.message` when formatting
+        a record, this has no effect on other formatters rendering this record.
+        """
+        if record.args:
+            message = self.format_string(str(record.msg)) % record.args
+        else:
+            message = self.format_string(str(record.msg))
+
+        # The record.message attribute is the only attribute that can be safely
+        # overwritten without affecting other formatters.
+        record.message = message + self.NORMAL
+
+        return super().formatMessage(record)
 
 
 def colors_enabled() -> bool:
