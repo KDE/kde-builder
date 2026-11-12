@@ -6,6 +6,12 @@
 import logging
 import os
 import sys
+from typing import TYPE_CHECKING
+from typing import Any
+from typing import Literal
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class ColorFormatter(logging.Formatter):
@@ -17,8 +23,22 @@ class ColorFormatter(logging.Formatter):
     automatically reset back to normal at the end of each log message.
     """
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        fmt: str | None = None,
+        datefmt: str | None = None,
+        style: Literal["%", "{", "$"] = "%",
+        validate: bool = True,
+        defaults: Mapping[str, Any] | None = None,
+    ) -> None:
+
+        super().__init__(
+            fmt=fmt,
+            style=style,
+            datefmt=datefmt,
+            validate=validate,
+            defaults=defaults,
+        )
 
         # Colors
         self.RED = ""
