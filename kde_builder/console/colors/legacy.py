@@ -14,32 +14,16 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
 
-class ColorFormatter(logging.Formatter):
+class Colorizer:
     """
-    Custom logging formatter that parses color and text-formatting tags.
+    Format strings by replacing tags with escape sequences.
 
     Translates custom styling tags like "r[" (red), "g[" (green), "y[" (yellow),
     "b[" (bold) into ANSI terminal escape sequences. It ensures that colors are
     automatically reset back to normal at the end of each log message.
     """
 
-    def __init__(
-        self,
-        fmt: str | None = None,
-        datefmt: str | None = None,
-        style: Literal["%", "{", "$"] = "%",
-        validate: bool = True,
-        defaults: Mapping[str, Any] | None = None,
-    ) -> None:
-
-        super().__init__(
-            fmt=fmt,
-            style=style,
-            datefmt=datefmt,
-            validate=validate,
-            defaults=defaults,
-        )
-
+    def __init__(self) -> None:
         # Colors
         self.RED = ""
         self.GREEN = ""
@@ -66,7 +50,7 @@ class ColorFormatter(logging.Formatter):
             self.NORMAL = ""
             self.BOLD = ""
 
-    def format_string(self, text: str) -> str:
+    def colorize(self, text: str) -> str:
         """Colorize a string."""
         # Colors
         text = text.replace("r[", self.RED)
@@ -76,7 +60,46 @@ class ColorFormatter(logging.Formatter):
         text = text.replace("]", self.NORMAL)
         text = text.replace("b[", self.BOLD)
 
-        return text
+        return text + self.NORMAL
+
+
+decolorizer = Colorizer()
+
+
+def strip_color_tags(text: str) -> str:
+    """Remove styling tags from a string."""
+    return decolorizer.colorize(text)
+
+
+class ColorFormatter(logging.Formatter):
+    """
+    Custom logging formatter that parses color and text-formatting tags.
+
+    Translates custom styling tags like "r[" (red), "g[" (green), "y[" (yellow),
+    "b[" (bold) into ANSI terminal escape sequences. It ensures that colors are
+    automatically reset back to normal at the end of each log message.
+    """
+
+    def __init__(
+        self,
+        colorizer: Colorizer,
+        *,
+        fmt: str | None = None,
+        datefmt: str | None = None,
+        style: Literal["%", "{", "$"] = "%",
+        validate: bool = True,
+        defaults: Mapping[str, Any] | None = None,
+    ) -> None:
+
+        super().__init__(
+            fmt=fmt,
+            style=style,
+            datefmt=datefmt,
+            validate=validate,
+            defaults=defaults,
+        )
+
+        self._legacy_colorizer = colorizer
 
     # ruff: ignore[invalid-function-name]
     # This is an override, so we have no choice regarding the naming.
@@ -92,12 +115,12 @@ class ColorFormatter(logging.Formatter):
         a record, this has no effect on other formatters rendering this record.
         """
         if record.args:
-            message = self.format_string(str(record.msg)) % record.args
+            message = self._legacy_colorizer.colorize(str(record.msg)) % record.args
         else:
-            message = self.format_string(str(record.msg))
+            message = self._legacy_colorizer.colorize(str(record.msg))
 
         # The record.message attribute is the only attribute that can be safely
         # overwritten without affecting other formatters.
-        record.message = message + self.NORMAL
+        record.message = message
 
         return super().formatMessage(record)

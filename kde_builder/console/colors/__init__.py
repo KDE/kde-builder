@@ -5,6 +5,7 @@
 """Colorization support."""
 
 from kde_builder.console.colors.legacy import ColorFormatter as ColorFormatter
+from kde_builder.console.colors.legacy import strip_color_tags as strip_color_tags
 
 # Import statements that modify state must come last!
 from kde_builder.console.colors.state import color_formatter as color_formatter

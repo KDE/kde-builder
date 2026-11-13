@@ -7,9 +7,12 @@
 from kde_builder.console.colors.environment import get_colors_from_env
 from kde_builder.console.colors.environment import set_colors_env_vars
 from kde_builder.console.colors.legacy import ColorFormatter
+from kde_builder.console.colors.legacy import Colorizer
 
-color_formatter = ColorFormatter()
-color_formatter.set_colorful_output(get_colors_from_env())
+colorizer = Colorizer()
+colorizer.set_colorful_output(get_colors_from_env())
+
+color_formatter = ColorFormatter(colorizer)
 
 
 def force_colors(value: bool) -> None:
@@ -21,9 +24,9 @@ def force_colors(value: bool) -> None:
     """
     set_colors_env_vars(value)
 
-    color_formatter.set_colorful_output(value)
+    colorizer.set_colorful_output(value)
 
 
 def colorize(text: str) -> str:
-    """Colorize a string using the global `ColorFormatter`."""
-    return color_formatter.format_string(text)
+    """Colorize a string, provided that colors are enabled."""
+    return colorizer.colorize(text)
