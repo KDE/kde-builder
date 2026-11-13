@@ -8,7 +8,7 @@ import sys
 
 def get_colors_from_env() -> bool:
     """
-    Determines whether colors should be enabled.
+    Determine whether colors should be enabled.
 
     Broadly replicates Python's approach to controlling color. It performs the
     following checks in order:
@@ -48,7 +48,7 @@ def get_colors_from_env() -> bool:
 
 def set_colors_env_vars(value: bool) -> None:
     """
-    Sets environment variables that control colors.
+    Set environment variables that control colors.
 
     The usual memory safety concerns regarding setting environment variables on
     certain platforms apply, in particular in multi-threaded contexts.

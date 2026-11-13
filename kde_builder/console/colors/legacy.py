@@ -67,7 +67,7 @@ class ColorFormatter(logging.Formatter):
             self.BOLD = ""
 
     def format_string(self, text: str) -> str:
-        """May be used externally from this class, for colorizing any string."""
+        """Colorize a string."""
         # Colors
         text = text.replace("r[", self.RED)
         text = text.replace("g[", self.GREEN)

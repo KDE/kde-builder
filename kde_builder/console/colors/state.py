@@ -14,7 +14,7 @@ color_formatter.set_colorful_output(get_colors_from_env())
 
 def force_colors(value: bool) -> None:
     """
-    Forcefully enables or disables colors by setting environment variables.
+    Forcefully enable or disable colors by setting environment variables.
 
     The usual memory safety concerns regarding setting environment variables on
     certain platforms apply, in particular in multi-threaded contexts.
@@ -25,5 +25,5 @@ def force_colors(value: bool) -> None:
 
 
 def colorize(text: str) -> str:
-    """Colorizes a string using the global `ColorFormatter`."""
+    """Colorize a string using the global `ColorFormatter`."""
     return color_formatter.format_string(text)
