@@ -131,9 +131,12 @@ def main():
         else:
             msg = dedent(
                 f"""
-                 r[*] y[{unrecognized_name}] is not found in KDE projects, and there is no defined third-party project with such name in the config.
-                 r[*] Note that kde-builder only recognizes KDE projects that are marked in repo-metadata as "software" kind.
-                 r[*] Such kinds as "website", "infrastructure", "packaging", "other" are ignored.
+                 r[*] KDE Builder cannot build y["{unrecognized_name}"].
+
+                   If you didn't make a typo, and you're trying to build a KDE project,
+                   note that KDE Builder can only build y["software"] projects. Other
+                   kinds of projects, such as "website", "infrastructure", or "packaging"
+                   are not supported.
                 """,
                 preserve_len=1,
             )
