@@ -22,6 +22,8 @@ from kde_builder.util.textwrap_mod import dedent
 
 def main():
 
+    unhandled_argv = sys.argv[1:]
+
     # Ensure that the output stream for the console package is properly initialized.
     use_as_output(sys.stdout)
 
@@ -29,7 +31,7 @@ def main():
     from kde_builder.options_spec import add_bootstrap_arguments
     add_bootstrap_arguments(bootstrap_parser)
 
-    args, unknown = bootstrap_parser.parse_known_args()
+    args, unhandled_argv = bootstrap_parser.parse_known_args(unhandled_argv)
 
     # ---
 
@@ -55,20 +57,6 @@ def main():
             if override_config["loggers"].get(logger_name, None) is None:
                 override_config["loggers"][logger_name] = {}
             override_config["loggers"][logger_name]["level"] = level_name
-
-        # remove them, so we can pass sys.argv to Application
-        indices_to_remove = []
-        for i, arg in enumerate(sys.argv):
-            if i in indices_to_remove:
-                continue  # prevent analyzing the value of log-level argument (as users may try to do something like `kde-builder --log-level --log-level`)
-
-            if arg == "--log-level":
-                indices_to_remove.append(i)
-                indices_to_remove.append(i + 1)
-            elif arg.startswith("--log-level="):
-                indices_to_remove.append(i)
-        for i in reversed(indices_to_remove):
-            sys.argv.pop(i)
 
     # Merges dict "b" into dict "a", overwriting existing entries. Mutates dict "a". Also, returns "a".
     def merge_dicts(a: dict, b: dict, path=None):
@@ -98,7 +86,6 @@ def main():
             if logger_name == "asyncio":
                 continue
             logging.getLogger(logger_name).setLevel(logging.NOTSET)
-        sys.argv.remove("--debug")  # remove it, so we can pass sys.argv to Application
     # </editor-fold>
 
     # ---
@@ -126,7 +113,7 @@ def main():
 
     app = None
     try:
-        app = Application(sys.argv[1:])  # the 0 element is script name
+        app = Application(unhandled_argv)
         app.generate_module_list()
         result = app.run_all_module_phases()
         app.finish(result)
