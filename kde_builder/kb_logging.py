@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 import kde_builder
 from kde_builder.console import ColorFormatter
 from kde_builder.console import color_formatter
+from kde_builder.console import strip_color_tags
 
 if TYPE_CHECKING:
     from kde_builder.ipc.pipe import IPCPipe
@@ -51,9 +52,7 @@ class TTYAndScreenLogHandler(logging.Handler):
             print(color_msg)
 
             if not kde_builder.is_pretending:
-                clean_msg = record.msg
-                for tag in ["r[", "g[", "y[", "]", "b["]:
-                    clean_msg = clean_msg.replace(tag, "")
+                clean_msg = strip_color_tags(record.msg)
 
                 if self.screen_log_fh:
                     print(clean_msg, file=self.screen_log_fh)
