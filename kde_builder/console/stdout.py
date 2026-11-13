@@ -29,6 +29,11 @@ _output: OutputProtocol = sys.stdout
 _is_tty = _output.isatty()
 
 
+def is_tty() -> bool:
+    """Return whether the registered output stream identifies as a TTY."""
+    return _is_tty
+
+
 def use_as_output(stream: OutputProtocol):
     """
     Set the stream to be used as output stream.
