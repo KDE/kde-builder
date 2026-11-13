@@ -29,6 +29,7 @@ def main():
 
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments
+
     add_bootstrap_arguments(bootstrap_parser)
 
     args, unhandled_argv = bootstrap_parser.parse_known_args(unhandled_argv)
@@ -74,7 +75,7 @@ def main():
         return a
 
     config = merge_dicts(config, override_config)
-    logging.config.dictConfig(config)  # this will create standard Logger loggers and their handlers with their formatters will be set up
+    logging.config.dictConfig(config)  # instantiates configured loggers, handlers, and formatters
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)  # Default level
@@ -126,16 +127,20 @@ def main():
         if repo_data and not repo_data["active"]:
             msg = f" r[*] y[{unrecognized_name}] is archived KDE project."
         else:
-            msg = dedent(f"""
+            msg = dedent(
+                f"""
                  r[*] y[{unrecognized_name}] is not found in KDE projects, and there is no defined third-party project with such name in the config.
                  r[*] Note that kde-builder only recognizes KDE projects that are marked in repo-metadata as "software" kind.
                  r[*] Such kinds as "website", "infrastructure", "packaging", "other" are ignored.
-                """, preserve_len=1)
+                """,
+                preserve_len=1,
+            )
 
         logger_app.error(msg)
         exit(99)
     except ProgramError as err:
-        print(dedent(f"""
+        print(
+            dedent(f"""
 
             kde-builder encountered an exceptional error condition:
             ========
@@ -144,7 +149,8 @@ def main():
             Can't continue, so stopping now.
 
 
-            """))
+            """),
+        )
 
         print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
 
@@ -167,12 +173,14 @@ def main():
 
     except Exception as err:
         # We encountered some other kind of error that didn't raise a `KBException`
-        print(dedent(f"""
+        print(
+            dedent(f"""
             Encountered an error in the execution of the script.
             --> {err}
             Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
 
-            """))
+            """),
+        )
 
         sys.excepthook(err.__class__, err, err.__traceback__)
         if app:
