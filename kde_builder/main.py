@@ -125,7 +125,7 @@ def main():
         unrecognized_name = err.unknown_project_name
         ctx = app.context
         repo_data = ctx.projects_db.repositories.get(unrecognized_name, None)
-        msg = ""
+
         if repo_data and not repo_data["active"]:
             msg = f" r[*] y[{unrecognized_name}] is an archived KDE project."
         else:
