@@ -19,6 +19,8 @@ from kde_builder.kb_exception import UnknownKdeProjectException
 from kde_builder.kb_logging import main_handler
 from kde_builder.util.textwrap_mod import dedent
 
+ISSUE_TRACKER_URL = "https://invent.kde.org/sdk/kde-builder/-/issues"
+
 
 def main():
 
@@ -152,7 +154,7 @@ def main():
             """),
         )
 
-        print("Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues")
+        print(f"Please submit a bug against kde-builder on {ISSUE_TRACKER_URL}")
 
         sys.excepthook(err.__class__, err, err.__traceback__)
         if app:
@@ -177,7 +179,7 @@ def main():
             dedent(f"""
             Encountered an error in the execution of the script.
             --> {err}
-            Please submit a bug against kde-builder on https://invent.kde.org/sdk/kde-builder/-/issues
+            Please submit a bug against kde-builder on {ISSUE_TRACKER_URL}
 
             """),
         )
