@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 import os
-import sys
+
+from kde_builder.console.stdout import is_tty
 
 
 def get_colors_from_env() -> bool:
@@ -22,7 +23,8 @@ def get_colors_from_env() -> bool:
 
     If the `TERM` environment variable is set to `dumb`, colors are disabled.
 
-    If `sys.stdout.isatty()` is True, colors are enabled, otherwise disabled.
+    Finally, if the registered output stream identifies as a TTY, colors are
+    enabled, and disabled otherwise.
     """
     # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHON_COLORS
     python_colors = os.getenv("PYTHON_COLORS")
@@ -43,7 +45,7 @@ def get_colors_from_env() -> bool:
     if os.getenv("TERM", "") == "dumb":
         return False
 
-    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+    return is_tty()
 
 
 def set_colors_env_vars(value: bool) -> None:
