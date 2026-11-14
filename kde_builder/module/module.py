@@ -217,12 +217,15 @@ class Module(PathResolvingOptions):
 
     def setup_build_system(self) -> bool:
         """
-        Set up the build system for the module to permit :meth:`build()` to work, including creating build dir, running cmake/configure/etc.
+        Set up the build system for the module to permit :meth:`build()` to work.
 
-        It is called automatically but will not take any action if the build system is already established.
+        This includes creating the build dir, running cmake/configure/etc.
 
         Returns:
              True on success, False (0) on failure.
+
+        Raises:
+            ProgramError: If build_system is not determined.
         """
         build_system = self.build_system
 
