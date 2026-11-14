@@ -189,17 +189,14 @@ class Module(PathResolvingOptions):
 
         Returns:
              False on failure, True on success.
+
+        Raises:
+            ProgramError: If build_system is not determined.
         """
         build_system = self.build_system
 
         if build_system.name() == "generic" and not kde_builder.is_pretending:
-            logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
-            return False
-
-        if not self.setup_build_system():
-            return False
-        if self.get_option("build-system-only", bool):
-            return True
+            raise ProgramError(f"Attempted to build {self.name} before build_system was determined.")
 
         self.current_phase = "build"
         build_result = build_system.build_internal()
@@ -217,12 +214,15 @@ class Module(PathResolvingOptions):
 
     def setup_build_system(self) -> bool:
         """
-        Set up the build system for the module to permit :meth:`build()` to work, including creating build dir, running cmake/configure/etc.
+        Set up the build system for the module to permit :meth:`build()` to work.
 
-        It is called automatically but will not take any action if the build system is already established.
+        This includes creating the build dir, running cmake/configure/etc.
 
         Returns:
              True on success, False (0) on failure.
+
+        Raises:
+            ProgramError: If build_system is not determined.
         """
         build_system = self.build_system
 
