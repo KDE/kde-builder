@@ -198,9 +198,6 @@ class Module(PathResolvingOptions):
         if build_system.name() == "generic" and not kde_builder.is_pretending:
             raise ProgramError(f"Attempted to build {self.name} before build_system was determined.")
 
-        if self.get_option("build-system-only", bool):
-            return True
-
         self.current_phase = "build"
         build_result = build_system.build_internal()
         self.current_phase = None

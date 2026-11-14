@@ -200,6 +200,9 @@ class TaskManager:
         if not module.setup_build_system():
             return "build"
 
+        if module.get_option("build-system-only", bool):
+            return ""
+
         if not module.build():
             return "build"  # phase failed at
 
