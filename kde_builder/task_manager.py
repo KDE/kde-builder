@@ -193,6 +193,10 @@ class TaskManager:
         # value to write. If the build succeeds we'll reset to 0 then.
         module.set_persistent_option("failure-count", fail_count + 1)
 
+        if module.build_system.name() == "generic" and not kde_builder.is_pretending:
+            logger_taskmanager.error(f"\tr[b[{module.name}] does not seem to have a determined build system to use.")
+            return "build"
+
         if not module.build():
             return "build"  # phase failed at
 
