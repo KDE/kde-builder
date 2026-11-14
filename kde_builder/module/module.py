@@ -189,15 +189,15 @@ class Module(PathResolvingOptions):
 
         Returns:
              False on failure, True on success.
+
+        Raises:
+            ProgramError: If build_system is not determined.
         """
         build_system = self.build_system
 
         if build_system.name() == "generic" and not kde_builder.is_pretending:
-            logger_module.error(f"\tr[b[{self.name}] does not seem to have a build system to use.")
-            return False
+            raise ProgramError(f"Attempted to build {self.name} before build_system was determined.")
 
-        if not self.setup_build_system():
-            return False
         if self.get_option("build-system-only", bool):
             return True
 
