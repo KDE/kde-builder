@@ -197,6 +197,9 @@ class TaskManager:
             logger_taskmanager.error(f"\tr[b[{module.name}] does not seem to have a determined build system to use.")
             return "build"
 
+        if not module.setup_build_system():
+            return "build"
+
         if not module.build():
             return "build"  # phase failed at
 
