@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-"""This file is used to launch KDE Builder without virtual environment (the legacy way)."""  # noqa: D404
+"""Launch KDE Builder without virtual environment (the legacy way)."""
 
 import sys
 
