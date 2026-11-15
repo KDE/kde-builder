@@ -1,5 +1,8 @@
 # Changelog
 
+2026-11-01
+: Added support for the `NO_COLOR` and `FORCE_COLOR` environment variables.
+
 2026-10-31
 : Removed deprecated "Extra Generators" from supported CMake Generators.
 
