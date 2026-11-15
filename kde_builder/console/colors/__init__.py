@@ -4,6 +4,7 @@
 
 """Colorization support."""
 
+from kde_builder.console.colors.clap import inject_colors_args as inject_colors_args
 from kde_builder.console.colors.legacy import ColorFormatter as ColorFormatter
 from kde_builder.console.colors.legacy import strip_color_tags as strip_color_tags
 
