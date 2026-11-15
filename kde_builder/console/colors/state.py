@@ -20,6 +20,12 @@ def colors_enabled() -> bool:
 colorizer = Colorizer()
 colorizer.set_colorful_output(_colors_enabled)
 
+
+def colorize(text: str) -> str:
+    """Colorize a string, provided that colors are enabled."""
+    return colorizer.colorize(text)
+
+
 color_formatter = ColorFormatter(colorizer)
 
 
@@ -38,8 +44,3 @@ def force_colors(value: bool) -> None:
     set_colors_env_vars(value)
 
     colorizer.set_colorful_output(value)
-
-
-def colorize(text: str) -> str:
-    """Colorize a string, provided that colors are enabled."""
-    return colorizer.colorize(text)
