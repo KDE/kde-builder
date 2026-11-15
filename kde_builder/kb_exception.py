@@ -7,7 +7,8 @@
 from kde_builder.util.textwrap_mod import dedent
 
 
-class KBException(Exception):  # noqa: N818
+# ruff: ignore[error-suffix-on-exception-name]
+class KBException(Exception):
     """A class to wrap "exception" messages for the script, allowing them to be dispatch based on type and automatically stringified."""
 
     def __init__(self, msg: str) -> None:
