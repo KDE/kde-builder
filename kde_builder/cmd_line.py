@@ -9,6 +9,7 @@ import re
 from typing import Any
 from typing import TypedDict
 
+from kde_builder.console import inject_colors_args
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.options_spec import add_bootstrap_arguments
 from kde_builder.phase_list import PhaseList
@@ -123,7 +124,9 @@ class Cmdline:
             formatter_class=argparse.RawDescriptionHelpFormatter,
         )
 
-        add_bootstrap_arguments(parser)  # To be able to see initial options in main parser too (for help text).
+        # Inject externally handled options into parser (for the help text):
+        inject_colors_args(parser)
+        add_bootstrap_arguments(parser)
 
         # If we have --run option, grab all the rest arguments to pass to the corresponding parser.
         # This way the arguments after --run could start with "-" or "--".

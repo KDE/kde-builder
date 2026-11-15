@@ -13,6 +13,7 @@ import os
 import sys
 
 from kde_builder import KB_PACKAGE_DIR
+from kde_builder.console import parse_colors_args
 from kde_builder.console import use_as_output
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
@@ -28,6 +29,9 @@ def main():
 
     # Ensure that the output stream for the console package is properly initialized.
     use_as_output(sys.stdout)
+
+    # Set up colorization early, so that stack traces respect the user's wishes.
+    unhandled_argv = parse_colors_args(unhandled_argv)
 
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     from kde_builder.options_spec import add_bootstrap_arguments

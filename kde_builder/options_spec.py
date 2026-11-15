@@ -110,7 +110,6 @@ class OptionsSpec:
     global_options_with_negatable_form = [
         Option(name="async", default=True, help="Perform source update and build process in parallel"),
         Option(name="check-self-updates", default=True, help="Show a message when kde-builder detects it is outdated"),
-        Option(name="colorful-output", aliases=["color"], default=True, help="Toggle colorful output"),
         Option(name="compile-commands-export", default=True, help="Generation of a compile_commands.json"),
         Option(name="compile-commands-linking", default=True, help="Creation of symbolic links from compile_commands.json to source directory"),
         Option(name="generate-clion-project-config", default=False, help="Generate a clion project config"),
@@ -233,12 +232,24 @@ class OptionsSpec:
     def all_possible_options_names(cls) -> list[str]:
         global_options = cls.all_global_options_names()
         phase_changing_options = [el.name for el in OptionsSpec.phase_changing_options]
-        ret = sorted(global_options + phase_changing_options)
+
+        # Settings which have their command-line options defined externally:
+        externally_defined_options = [
+            "colorful-output",
+        ]
+
+        ret = sorted(global_options + phase_changing_options + externally_defined_options)
         return ret
 
     @classmethod
     def all_boolean_options_names(cls) -> list[str]:
         ret = [el.name for el in cls.global_options_with_negatable_form]
+
+        # Settings which have their command-line options defined externally:
+        ret += [
+            "colorful-output",
+        ]
+
         return ret
 
     @classmethod
