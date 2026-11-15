@@ -38,7 +38,7 @@ def main():
 
     # ---
 
-    import yaml  # noqa: E402
+    import yaml
 
     # <editor-fold desc="Applying loggers configuration">
     with open(f"{KB_PACKAGE_DIR}/resources/kde-builder-logging.yaml", "r") as f:
@@ -109,8 +109,8 @@ def main():
         fr = FirstRun(prompt_answer)
         exit(fr.setup_user_system(setup_steps))
 
-    from kde_builder.application import Application  # noqa: E402
-    from kde_builder.kb_exception import KBException  # noqa: E402
+    from kde_builder.application import Application
+    from kde_builder.kb_exception import KBException
 
     # Script starts.
 
