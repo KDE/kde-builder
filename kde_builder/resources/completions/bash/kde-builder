@@ -141,10 +141,8 @@ _kde_builder_filter_options() {
     local -A exclusions=(
         ["--async"]="--no-async"
         ["--no-async"]="--async"
-        ["--color"]="--no-color --no-colorful-output"
-        ["--colorful-output"]="--no-color --no-colorful-output"
-        ["--no-color"]="--color --colorful-output"
-        ["--no-colorful-output"]="--color --colorful-output"
+        ["--color"]="--no-color"
+        ["--no-color"]="--color"
         ["--include-dependencies"]="--no-include-dependencies -d"
         ["-D"]="--no-include-dependencies -d"
         ["--no-include-dependencies"]="--include-dependencies -D"
@@ -240,7 +238,7 @@ _kde_builder() {
     --branch --build-dir --build-only --no-build --build-system-only
     --check-self-updates
     --no-check-self-updates --cmake-generator --cmake-options --color
-    --no-color --colorful-output --no-colorful-output --compile-commands-export
+    --no-color --compile-commands-export
     --no-compile-commands-export --compile-commands-linking --no-compile-commands-linking
     --configure-flags --cxxflags --debug --dependency-tree
     --dependency-tree-fullpath --dest-dir --directory-layout

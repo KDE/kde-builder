@@ -659,7 +659,7 @@ by default.
 The corresponding configuration file option is [async](#conf-async).
 
 (cmdline-color)=
-[`--color`](cmdline-color) (or `--colorful-output`), `--no-color` (or `--no-colorful-output`)  
+[`--color`](cmdline-color), `--no-color`  
 Enable or disable colorful output. By default, this option is enabled
 for interactive terminals.
 
