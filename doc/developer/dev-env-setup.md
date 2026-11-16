@@ -90,13 +90,6 @@ you can always add missing license information with [`git history fixup`][5].
 
 ## Testing
 
-```{warning}
-**Do not run the tests inside of a Git hook!**
-
-There is currently an unmitigated interaction between the environment as set up
-by some Git hooks and the integration tests that **will break** the repository.
-```
-
 KDE Builder comes with unit tests and integration tests built on [pytest][6].
 You can run the entire test suite using
 
