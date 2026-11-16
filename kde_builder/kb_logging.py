@@ -11,9 +11,9 @@ from typing import TYPE_CHECKING
 from typing import override
 
 import kde_builder
-from kde_builder.console import ColorFormatter
-from kde_builder.console import color_formatter
 from kde_builder.console import strip_color_tags
+from kde_builder.logging import ColorFormatter
+from kde_builder.logging import color_formatter
 
 if TYPE_CHECKING:
     from kde_builder.ipc.pipe import IPCPipe
