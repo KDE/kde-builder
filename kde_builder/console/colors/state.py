@@ -12,7 +12,7 @@ from kde_builder.console.colors.clap import inject_colors_args
 from kde_builder.console.colors.environment import get_colors_from_env
 from kde_builder.console.colors.environment import set_colors_env_vars
 from kde_builder.console.colors.legacy import ColorFormatter
-from kde_builder.console.colors.legacy import Colorizer
+from kde_builder.console.colors.legacy import LegacyColorizer
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -25,16 +25,16 @@ def colors_enabled() -> bool:
     return _colors_enabled
 
 
-colorizer = Colorizer()
-colorizer.set_colorful_output(_colors_enabled)
+legacy_colorizer = LegacyColorizer()
+legacy_colorizer.set_colorful_output(_colors_enabled)
 
 
 def colorize(text: str) -> str:
     """Colorize a string, provided that colors are enabled."""
-    return colorizer.colorize(text)
+    return legacy_colorizer.colorize(text)
 
 
-color_formatter = ColorFormatter(colorizer)
+color_formatter = ColorFormatter(legacy_colorizer)
 
 
 def force_colors(value: bool) -> None:
@@ -51,7 +51,7 @@ def force_colors(value: bool) -> None:
 
     set_colors_env_vars(value)
 
-    colorizer.set_colorful_output(value)
+    legacy_colorizer.set_colorful_output(value)
 
 
 def parse_colors_args(

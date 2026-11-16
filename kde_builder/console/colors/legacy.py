@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
 
-class Colorizer:
+class LegacyColorizer:
     """
     Format strings by replacing tags with escape sequences.
 
@@ -64,7 +64,7 @@ class Colorizer:
         return text + self.NORMAL
 
 
-decolorizer = Colorizer()
+decolorizer = LegacyColorizer()
 
 
 def strip_color_tags(text: str) -> str:
@@ -83,7 +83,7 @@ class ColorFormatter(logging.Formatter):
 
     def __init__(
         self,
-        colorizer: Colorizer,
+        legacy_colorizer: LegacyColorizer,
         *,
         fmt: str | None = None,
         datefmt: str | None = None,
@@ -100,7 +100,7 @@ class ColorFormatter(logging.Formatter):
             defaults=defaults,
         )
 
-        self._legacy_colorizer = colorizer
+        self._legacy_colorizer = legacy_colorizer
 
     @override
     def formatMessage(self, record: logging.LogRecord) -> str:
