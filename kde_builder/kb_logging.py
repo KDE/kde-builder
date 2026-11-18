@@ -8,6 +8,7 @@ import sys
 from logging import LogRecord
 from typing import IO
 from typing import TYPE_CHECKING
+from typing import override
 
 import kde_builder
 from kde_builder.console import ColorFormatter
@@ -46,6 +47,7 @@ class TTYAndScreenLogHandler(logging.Handler):
         except IOError:
             sys.stderr.write(f"Unable to open log file {file_name}!")
 
+    @override
     def emit(self, record: logging.LogRecord) -> None:
         try:
             color_msg = self.formatter.format(record)
@@ -77,6 +79,7 @@ class IPCQueueLoggingHandler(logging.Handler):
         super().__init__()
         self.ipc = ipc_obj
 
+    @override
     def emit(self, record: LogRecord) -> None:
         try:
             logger_name = record.name

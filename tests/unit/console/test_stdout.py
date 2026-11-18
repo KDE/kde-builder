@@ -6,6 +6,7 @@
 import io
 import sys
 from typing import Any
+from typing import override
 
 import pytest
 
@@ -66,15 +67,18 @@ class MockOutput(io.StringIO):
         super().__init__()
         self.is_tty = is_tty
 
+    @override
     def isatty(self) -> bool:
         return self.is_tty
 
+    @override
     def write(self, s: str) -> int:
         print(f"write({s!r})", file=sys.stderr)
         n = super().write(s)
         print(f" -> {self.getvalue()!r}\n", file=sys.stderr)
         return n
 
+    @override
     def flush(self) -> None:
         print("flush()", file=sys.stderr)
         super().flush()

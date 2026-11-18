@@ -9,6 +9,7 @@ import logging
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
+from typing import override
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -101,8 +102,7 @@ class ColorFormatter(logging.Formatter):
 
         self._legacy_colorizer = colorizer
 
-    # ruff: ignore[invalid-function-name]
-    # This is an override, so we have no choice regarding the naming.
+    @override
     def formatMessage(self, record: logging.LogRecord) -> str:
         """
         Return the string that should be substituted for `%(message)s`.

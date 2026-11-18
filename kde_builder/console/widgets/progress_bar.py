@@ -46,6 +46,7 @@ they recommend updating the progress bar state at least once every second.
 from contextlib import AbstractContextManager
 from typing import Any
 from typing import Self
+from typing import override
 
 from kde_builder.console.stdout import print_if_tty
 
@@ -127,11 +128,13 @@ class ProgressBar(AbstractContextManager):
         self._rounded_and_clamped: int = 0
         self._visible = False
 
+    @override
     def __enter__(self) -> Self:
         self._visible = True
         show_progress_bar(self._rounded_and_clamped)
         return self
 
+    @override
     def __exit__(self, *_args) -> bool:
         hide_progress_bar()
         self._visible = False
@@ -149,18 +152,21 @@ class ProgressBar(AbstractContextManager):
     def __lt__(self, other: float | int) -> bool:
         return self._rounded_and_clamped < _round_and_clamp(other)
 
+    @override
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, int) or isinstance(other, float):
             return self._rounded_and_clamped == _round_and_clamp(other)
 
         return False
 
+    @override
     def __ne__(self, other: Any) -> bool:
         if isinstance(other, int) or isinstance(other, float):
             return self._rounded_and_clamped != _round_and_clamp(other)
 
         return True
 
+    @override
     def __str__(self) -> str:
         return f"{self._value:.1f}%"
 

@@ -53,6 +53,7 @@ class ModuleSet(OptionsBase):
 
         self.project_objects_list: list[Module] = []
 
+    @override
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
 

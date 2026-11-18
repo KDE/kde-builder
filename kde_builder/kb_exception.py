@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from typing import override
 
 from kde_builder.util.textwrap_mod import dedent
 
@@ -14,6 +15,7 @@ class KBException(Exception):
     def __init__(self, msg: str) -> None:
         self.message = msg
 
+    @override
     def __str__(self) -> str:
         return self.message
 

@@ -95,6 +95,7 @@ class Module(PathResolvingOptions):
         self.set_option("#last-source-dir", self.get_persistent_option("source-dir", str) or "")
         self.set_option("#last-build-dir", self.get_persistent_option("build-dir", str) or "")
 
+    @override
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
 

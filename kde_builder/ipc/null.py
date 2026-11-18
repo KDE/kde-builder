@@ -23,6 +23,7 @@ class IPCNull(IPC):
         except queue.Empty:
             return 0, ""
 
+    @override
     @staticmethod
     def supports_concurrency() -> bool:
         return False
