@@ -47,9 +47,22 @@ def inject_colors_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
     return parser
 
 
-def extract_color_arg(namespace: argparse.Namespace | Any, *, default: bool) -> bool:
-    """Extract the value of the argument that controls colors from a namespace."""
-    value = getattr(namespace, _COLOR_DEST, default)
+def extract_color_arg[T](namespace: argparse.Namespace | Any, *, default: T) -> bool | T:
+    """
+    Extract the value of the argument that controls colors from a namespace.
+
+    Args:
+        namespace: The object to extract the attribute from.
+        default: The fallback value.
+
+    Returns:
+        The value of the corresponding namespace attribute, if it is set on
+        namespace and is not None, and default otherwise.
+
+    Raises:
+        TypeError: The value of the namespace attribute was not a boolean.
+    """
+    value = getattr(namespace, _COLOR_DEST, None)
 
     if value is None:
         return default
