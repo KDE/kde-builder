@@ -1,0 +1,801 @@
+{
+  "version": 0,
+  "files": {
+    "doc/conf.py": [
+      {
+        "rule": "deprecated",
+        "startColumn": 27,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/application.py": [
+      {
+        "rule": "invalid-assignment",
+        "startColumn": 8,
+        "endColumn": 43,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/build_context.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 28,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 28,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/dependency_resolver.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 35,
+        "endColumn": 74,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-explicit-return",
+        "startColumn": 15,
+        "endColumn": 27,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 82,
+        "endColumn": 88,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/kb_logging.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 24,
+        "endColumn": 45,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/log_dir.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 16,
+        "endColumn": 63,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/main.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 14,
+        "endColumn": 25,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/module/module.py": [
+      {
+        "rule": "redundant-condition",
+        "startColumn": 15,
+        "endColumn": 25,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-explicit-return",
+        "startColumn": 19,
+        "endColumn": 67,
+        "lineCount": 1
+      },
+      {
+        "rule": "unsupported-operator",
+        "startColumn": 20,
+        "endColumn": 63,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-explicit-return",
+        "startColumn": 15,
+        "endColumn": 18,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/module_resolver.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 55,
+        "endColumn": 63,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 39,
+        "endColumn": 56,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/module_set/module_set.py": [
+      {
+        "rule": "invalid-assignment",
+        "startColumn": 8,
+        "endColumn": 51,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/options_base.py": [
+      {
+        "rule": "invalid-explicit-return",
+        "startColumn": 15,
+        "endColumn": 18,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-assignment",
+        "startColumn": 8,
+        "endColumn": 40,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/task_manager.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 47,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 24,
+        "endColumn": 43,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/updater/updater.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 8,
+        "endColumn": 46,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 38,
+        "endColumn": 119,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 38,
+        "endColumn": 124,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 38,
+        "endColumn": 126,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 38,
+        "endColumn": 122,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/util/logged_subprocess.py": [
+      {
+        "rule": "not-callable",
+        "startColumn": 24,
+        "endColumn": 55,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 34,
+        "endColumn": 40,
+        "lineCount": 1
+      }
+    ],
+    "kde_builder/util/util.py": [
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 41,
+        "endColumn": 61,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 41,
+        "endColumn": 61,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-union-attribute",
+        "startColumn": 12,
+        "endColumn": 21,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_bug-394497-ignore-dep-module.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_bug-395627-keep-cmake-prefix.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_bug-402509-masked-cmdline-opts.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_cmdline-no-include-dependencies.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_install-login-session.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 137,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_issue-64-cmdline-opt-override.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_kde-projects-basics.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_read-module-options.py": [
+      {
+        "rule": "invalid-raise",
+        "startColumn": 18,
+        "endColumn": 36,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 130,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_repository-resolving.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 26,
+        "lineCount": 1
+      }
+    ],
+    "tests/integration/test_set-project-option-value.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 22,
+        "endColumn": 232,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/build-environment/test_platform-env-prepend.py": [
+      {
+        "rule": "no-matching-overload",
+        "startColumn": 15,
+        "endColumn": 46,
+        "lineCount": 1
+      },
+      {
+        "rule": "no-matching-overload",
+        "startColumn": 15,
+        "endColumn": 46,
+        "lineCount": 1
+      },
+      {
+        "rule": "no-matching-overload",
+        "startColumn": 15,
+        "endColumn": 46,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/build-system/test_empty-num-cores.py": [
+      {
+        "rule": "missing-attribute",
+        "startColumn": 4,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-attribute",
+        "startColumn": 8,
+        "endColumn": 34,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-attribute",
+        "startColumn": 15,
+        "endColumn": 41,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-attribute",
+        "startColumn": 15,
+        "endColumn": 41,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/debug-hints/test_compare-debug-order.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 16,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 32,
+        "endColumn": 33,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 35,
+        "endColumn": 57,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 16,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 32,
+        "endColumn": 33,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 35,
+        "endColumn": 57,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 16,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 32,
+        "endColumn": 33,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 35,
+        "endColumn": 57,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 16,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 32,
+        "endColumn": 33,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 35,
+        "endColumn": 57,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 16,
+        "endColumn": 30,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 32,
+        "endColumn": 33,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 35,
+        "endColumn": 57,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 18,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 29,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 31,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 18,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 29,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 31,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 29,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 31,
+        "endColumn": 53,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 23,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 25,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 28,
+        "endColumn": 47,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 25,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 27,
+        "endColumn": 28,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 30,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 17,
+        "endColumn": 26,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 29,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 31,
+        "endColumn": 53,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_compare-build-order.py": [
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 38,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 38,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 38,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 38,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_copy-up-dependencies.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_detect-cycles.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_get-dependency-path.py": [
+      {
+        "rule": "missing-argument",
+        "startColumn": 14,
+        "endColumn": 72,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 34,
+        "endColumn": 58,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 60,
+        "endColumn": 71,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 14,
+        "endColumn": 61,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 34,
+        "endColumn": 46,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 48,
+        "endColumn": 60,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_run-dependency-vote.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/dependency-resolver/test_sort-build-order.py": [
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "missing-argument",
+        "startColumn": 22,
+        "endColumn": 51,
+        "lineCount": 1
+      },
+      {
+        "rule": "unknown-argument",
+        "startColumn": 39,
+        "endColumn": 50,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      },
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 28,
+        "endColumn": 32,
+        "lineCount": 1
+      }
+    ],
+    "tests/unit/util/test_prune_under_directory.py": [
+      {
+        "rule": "invalid-argument-type",
+        "startColumn": 31,
+        "endColumn": 34,
+        "lineCount": 1
+      }
+    ]
+  }
+}

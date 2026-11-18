@@ -21,6 +21,7 @@ path = [
     "tests/fixtures/**",
     "pyproject.toml",
     "ruff.toml",
+    "ty-baseline.json",
     "uv.lock",
     ]
 SPDX-FileCopyrightText = "none"
