@@ -75,6 +75,19 @@ Ruff is very fast, so you may want to consider adding it to a `pre-commit` hook.
 This will prevent you from committing Python sources that violate KDE Builder's
 conventions.
 
+### ty
+
+We use [ty][7] as the type checker for our Python sources.
+
+The project has some known rule violations. You can mask them by using the baseline file:
+
+```console
+uv run ty check --baseline ty-baseline.json
+```
+
+You are not expected to fix type issues in existing code. Newly added code however should
+not introduce additional violations.
+
 ### Reuse
 
 We use [reuse][3] to ensure we comply with the [KDE Licensing Policy][4]. Check
@@ -130,3 +143,4 @@ For more details, consult the `README.md` file in the `doc` folder.
 [4]: https://community.kde.org/Policies/Licensing_Policy
 [5]: https://git-scm.com/docs/git-history#Documentation/git-history.txt-fixupcommit
 [6]: https://pytest.org
+[7]: https://docs.astral.sh/ty/
