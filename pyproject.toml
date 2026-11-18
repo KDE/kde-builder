@@ -20,6 +20,7 @@ dev = [
     "pytest-cov",
     "reuse",
     "ruff",
+    "ty",
 ]
 docs = [
     # From staticweb/build.sh in sysadmin/ci-images:
