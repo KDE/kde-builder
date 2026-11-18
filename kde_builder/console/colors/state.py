@@ -13,20 +13,22 @@ from kde_builder.console.colors.environment import get_colors_from_env
 from kde_builder.console.colors.environment import set_colors_env_vars
 from kde_builder.console.colors.legacy import ColorFormatter
 from kde_builder.console.colors.legacy import LegacyColorizer
+from kde_builder.util.forceable import ForceableBool
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-_colors_enabled = get_colors_from_env()
+
+_colors_enabled = ForceableBool("colors_enabled", get_colors_from_env())
 
 
 def colors_enabled() -> bool:
     """Return whether colors are enabled."""
-    return _colors_enabled
+    return _colors_enabled.value
 
 
 legacy_colorizer = LegacyColorizer()
-legacy_colorizer.set_colorful_output(_colors_enabled)
+legacy_colorizer.set_colorful_output(_colors_enabled.value)
 
 
 def colorize(text: str) -> str:
@@ -37,21 +39,31 @@ def colorize(text: str) -> str:
 color_formatter = ColorFormatter(legacy_colorizer)
 
 
-def force_colors(value: bool) -> None:
+def set_colors_enabled(value: bool, *, force: bool = False) -> None:
     """
-    Forcefully enable or disable colors.
+    Enable or disable colors.
 
-    This sets environment variables. The usual memory safety concerns regarding
-    setting environment variables on certain platforms apply, in particular in
-    multi-threaded contexts.
+    This may set environment variables. The usual memory safety concerns
+    regarding setting environment variables on certain platforms apply, in
+    particular in multi-threaded contexts.
+
+    Args:
+        value:
+            The new setting value.
+        force:
+            Whether to force the setting.
+
+            If force is True, the new value is always set.
+
+            If force is False, the new value is only applied if the setting was
+            not forced previously.
     """
-    global _colors_enabled
+    if _colors_enabled.set_checked(value, force=force):
+        # We only need to update synchronized state if the setting changes.
 
-    _colors_enabled = value
+        set_colors_env_vars(_colors_enabled.value)
 
-    set_colors_env_vars(value)
-
-    legacy_colorizer.set_colorful_output(value)
+        legacy_colorizer.set_colorful_output(_colors_enabled.value)
 
 
 def parse_colors_args(
@@ -72,6 +84,10 @@ def parse_colors_args(
 
     namespace, unhandled_args = parser.parse_known_args(args)
 
-    force_colors(extract_color_arg(namespace, default=_colors_enabled))
+    value = extract_color_arg(namespace, default=None)
+
+    if value is not None:
+        # The command-line argument has the final say, so we force the setting.
+        set_colors_enabled(value, force=True)
 
     return unhandled_args

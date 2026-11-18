@@ -12,5 +12,5 @@ from kde_builder.console.colors.legacy import strip_color_tags as strip_color_ta
 from kde_builder.console.colors.state import color_formatter as color_formatter
 from kde_builder.console.colors.state import colorize as colorize
 from kde_builder.console.colors.state import colors_enabled as colors_enabled
-from kde_builder.console.colors.state import force_colors as force_colors
 from kde_builder.console.colors.state import parse_colors_args as parse_colors_args
+from kde_builder.console.colors.state import set_colors_enabled as set_colors_enabled

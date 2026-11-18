@@ -18,7 +18,7 @@ from typing import override
 
 import kde_builder
 from kde_builder.console import colorize
-from kde_builder.console import force_colors
+from kde_builder.console import set_colors_enabled
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
@@ -489,7 +489,7 @@ class BuildContext(PathResolvingOptions):
 
         # Automatically respond to various global option changes.
         if opt_name == "colorful-output":
-            force_colors(opt_val)
+            set_colors_enabled(opt_val)
         elif opt_name == "pretend":
             kde_builder.is_pretending = opt_val
 
