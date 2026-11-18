@@ -25,8 +25,6 @@ import kde_builder
 from kde_builder import KB_PACKAGE_DIR
 from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
-from kde_builder.build_system.qmake5 import BuildSystemQMake5
-from kde_builder.build_system.qmake6 import BuildSystemQMake6
 from kde_builder.cmd_line import Cmdline
 from kde_builder.cmd_line import ParsedCmdLine
 from kde_builder.debug_order_hints import DebugOrderHints
@@ -572,22 +570,6 @@ class Application:
         if run_mode == "build":
             # build and (by default) install.  This will involve two simultaneous
             # processes performing update and build at the same time by default.
-
-            # _have_missing_build_tools() requires build_system to already be set. But we can only set it after we download source code.
-            # So disable this for now.
-            # todo: Enable this after refactoring kde-builder flow that will make the "update" phase be finished completely
-            #  for all projects before starting "build" phase for all projects. In other words, we need to unparallelize them.
-            # # Check for absolutely essential programs now.
-            # if self._have_missing_build_tools():
-            #     logger_app.error(dedent("""
-            #          r[*] Please ensure the development packages are installed by using your distribution's package manager.
-            #          r[*] On many distributions, kde-builder automatically does it with g[--install-distro-packages].
-            #          r[b[*] Aborting now to save a lot of wasted time. Export b[KDE_BUILDER_IGNORE_MISSING_PROGRAMS=1] and re-run to continue anyway.
-            #         """, preserve_len=1))
-            #     result = 1
-            # else:
-            #     ...
-
             runner = TaskManager(self)
             result = runner.run_all_tasks()
         elif run_mode == "install":
@@ -1167,56 +1149,6 @@ class Application:
         else:
             logger_app.debug(" b[*] No need to run install-sessions.sh, all files are already installed and up to date.")
             return 0
-
-    def _have_missing_build_tools(self) -> bool:
-        """
-        Check if programs which are absolutely essential to the *build* process are available. The check is made for modules that are actually present in the build context.
-
-        Returns:
-            False if all required programs are present. True otherwise.
-        """
-        if os.environ.get("KDE_BUILDER_IGNORE_MISSING_PROGRAMS"):
-            return False
-
-        ctx = self.context
-        installdir = ctx.get_option("install-dir", str)
-        qt_installdir = ctx.get_option("qt-install-dir", str)
-        preferred_paths = [f"{installdir}/bin", f"{qt_installdir}/bin"]
-
-        if kde_builder.is_pretending:
-            return False
-
-        build_modules = ctx.modules_in_phase("build")
-        required_programs: set[str] = set()
-        modules_requiring_program: dict[str, dict[str, int]] = {}
-
-        for module in ctx.modules_in_phase("build"):
-            progs = module.build_system.required_programs()
-
-            required_programs.update(progs)
-
-            for prog in progs:
-                if not modules_requiring_program.get(prog, None):
-                    modules_requiring_program[prog] = {}
-                modules_requiring_program[prog][module.name] = 1
-
-        was_error = False
-        for prog in required_programs:
-
-            preferred_path = Util.locate_exe(prog, preferred_paths)
-            program_path = preferred_path or Util.locate_exe(prog)
-
-            # qmake is not necessarily named "qmake"
-            if not program_path and prog == "qmake":
-                program_path = BuildSystemQMake5.abs_path_to_qmake() or BuildSystemQMake6.abs_path_to_qmake()
-
-            if not program_path:
-                was_error = True
-
-                modules_needing = modules_requiring_program[prog].keys()
-
-                logger_app.error(f" r[*] Unable to find r[b[{prog}]. This program is absolutely essential for building the projects: y[{', '.join(modules_needing)}].\n")
-        return was_error
 
     @staticmethod
     def _install_signal_handlers(handler_func: Callable) -> None:
