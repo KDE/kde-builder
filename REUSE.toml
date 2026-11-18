@@ -22,6 +22,7 @@ path = [
     "pyproject.toml",
     "ruff.toml",
     "ty-baseline.json",
+    "ty.toml",
     "uv.lock",
     ]
 SPDX-FileCopyrightText = "none"
