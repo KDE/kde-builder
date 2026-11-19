@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2015, 2022 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -9,7 +10,6 @@ import os
 import re
 from typing import TYPE_CHECKING
 
-from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import SetOptionError
 from kde_builder.options_spec import OptionsSpec
 from kde_builder.util.util import Util
@@ -36,16 +36,9 @@ class OptionsBase:
 
     module_id = 0
 
-    def __init__(self, ctx: BuildContext | None = None, name: str = "") -> None:
+    def __init__(self, name: str = "") -> None:
         self.options = {"set-env": {}}
-        self._context = ctx
         self.name = name
-
-    @property
-    def context(self) -> BuildContext:
-        if self._context is None:
-            raise ProgramError(f"Tried to access the context that has not been set.")
-        return self._context
 
     def has_option(self, key: str) -> bool:
         """

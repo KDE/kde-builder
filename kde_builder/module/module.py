@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2012, 2013, 2016, 2019, 2020, 2022 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2020 Johan Ouwerkerk <jm.ouwerkerk@gmail.com>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -63,7 +64,9 @@ class Module(PathResolvingOptions):
     """
 
     def __init__(self, ctx: BuildContext, name: str) -> None:
-        super().__init__(ctx=ctx, name=name)
+        super().__init__(name=name)
+
+        self._context = ctx
 
         if not self.name:
             raise ProgramError("Empty Module constructed")
@@ -98,6 +101,10 @@ class Module(PathResolvingOptions):
     @override
     def __str__(self) -> str:  # Add stringify operator.
         return self.name
+
+    @property
+    def context(self) -> BuildContext:
+        return self._context
 
     @property
     def build_system(self) -> BuildSystem:

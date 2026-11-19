@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2013, 2016, 2022 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -41,7 +42,10 @@ class ModuleSet(OptionsBase):
     """
 
     def __init__(self, ctx: BuildContext, name: str = "") -> None:
-        super().__init__(ctx=ctx, name=name)
+        super().__init__(name=name)
+
+        self._context = ctx
+
         self.start_for_create_id: int = 0
         self.options["repository"] = "kde-projects"
 
@@ -56,6 +60,10 @@ class ModuleSet(OptionsBase):
     @override
     def __str__(self):  # pl2py: In perl there were no stringify for module-set, but we will make it, for convenience.
         return self.name
+
+    @property
+    def context(self) -> BuildContext:
+        return self._context
 
     def _initialize_new_module(self, new_module: Module) -> None:
         """

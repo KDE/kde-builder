@@ -796,7 +796,7 @@ class Application:
             if node_name.startswith("override "):
                 options_name = node_name.split(" ", maxsplit=1)[1]
                 assert options_name  # ensure the options has some name
-                options: OptionsBase = OptionsBase(ctx, options_name)
+                options: OptionsBase = OptionsBase(options_name)
                 options.apply_config_options(ctx, node, config_filename)
 
                 deferred_options.append(options)

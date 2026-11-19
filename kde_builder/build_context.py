@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: 2012, 2013, 2014, 2015, 2017, 2022, 2023 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -66,7 +67,7 @@ class BuildContext(PathResolvingOptions):
     PERSISTENT_FILE_NAME = "kde-builder-persistent-data.json"
 
     def __init__(self) -> None:
-        super().__init__(ctx=None, name="global")
+        super().__init__(name="global")
 
         self.modules: list[Module] = []
         """List of modules to build."""
