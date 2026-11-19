@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -10,5 +11,5 @@ import sys
 KB_PACKAGE_DIR: str = os.path.abspath(os.path.dirname(__file__))
 KB_REPO_DIR: str = os.path.normpath(KB_PACKAGE_DIR + "/..")
 
-is_pretending = False
+is_pretending: bool = False
 is_testing: bool = "pytest" in sys.modules
