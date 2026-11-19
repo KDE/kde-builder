@@ -31,24 +31,24 @@ def ensure_runtime_pymodules_installed():
 
     if missing_modules:
         print("Some mandatory Python packages are missing, and kde-builder cannot operate without them. "
-              "Please ensure these packages are installed:")
+              "Please ensure these packages are installed:", file=sys.stderr)
         for missing_module in missing_modules:
-            print("\t" + missing_module)
+            print("\t" + missing_module, file=sys.stderr)
 
-        print("Consult the installation process in project documentation at https://kde-builder.kde.org")
+        print("Consult the installation process in project documentation at https://kde-builder.kde.org", file=sys.stderr)
         sys.exit(1)
 
     if sys.platform == "linux":
         if not validate_mod("jeepney"):
-            print("Optional Python package \"jeepney\" is missing. kde-builder will not hold performance profile.")
+            print("Optional Python package \"jeepney\" is missing. kde-builder will not hold performance profile.", file=sys.stderr)
 
     if sys.platform != "darwin":
         if not validate_mod("setproctitle"):
-            print("Optional Python package \"setproctitle\" is missing. kde-builder will not set title for subprocesses in async build.")
+            print("Optional Python package \"setproctitle\" is missing. kde-builder will not set title for subprocesses in async build.", file=sys.stderr)
 
 
 if __name__ == "__main__":
-    print("")  # To indicate when user runs kde-builder from this wrapper script
+    print("", file=sys.stderr)  # To indicate when user runs kde-builder from this wrapper script
     ensure_runtime_pymodules_installed()
     from kde_builder.main import main
     main()
