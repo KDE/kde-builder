@@ -51,7 +51,8 @@ class TTYAndScreenLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             color_msg = self.formatter.format(record)
-            print(color_msg)
+            output = sys.stderr if record.levelno >= logging.WARNING else sys.stdout
+            print(color_msg, file=output)
 
             if not kde_builder.is_pretending:
                 clean_msg = strip_color_tags(record.msg)
