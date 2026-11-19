@@ -7,6 +7,8 @@
 import argparse
 from typing import Any
 
+from kde_builder.util.clap import extract_bool_arg_or_default
+
 _COLOR_DEST = "colors"
 
 _COLOR_GROUP_TITLE = "color options"
@@ -62,12 +64,4 @@ def extract_color_arg[T](namespace: argparse.Namespace | Any, *, default: T) -> 
     Raises:
         TypeError: The value of the namespace attribute was not a boolean.
     """
-    value = getattr(namespace, _COLOR_DEST, None)
-
-    if value is None:
-        return default
-
-    if isinstance(value, bool):
-        return value
-
-    raise TypeError(f"namespace.{_COLOR_DEST} was {type(value)} instead of a boolean")
+    return extract_bool_arg_or_default(namespace, attribute=_COLOR_DEST, default=default)
