@@ -51,14 +51,6 @@
         "lineCount": 1
       }
     ],
-    "kde_builder/kb_logging.py": [
-      {
-        "rule": "missing-union-attribute",
-        "startColumn": 24,
-        "endColumn": 45,
-        "lineCount": 1
-      }
-    ],
     "kde_builder/log_dir.py": [
       {
         "rule": "missing-union-attribute",

@@ -4,65 +4,12 @@
 
 
 import logging
-import sys
 from logging import LogRecord
-from typing import IO
 from typing import TYPE_CHECKING
 from typing import override
 
-import kde_builder
-from kde_builder.console import strip_color_tags
-from kde_builder.logging import ColorFormatter
-from kde_builder.logging import color_formatter
-
 if TYPE_CHECKING:
     from kde_builder.ipc.pipe import IPCPipe
-
-
-class TTYAndScreenLogHandler(logging.Handler):
-    """
-    Main process logging handler for simultaneous terminal output and file logging.
-
-    Formats and prints colorized log records directly to the standard output (TTY).
-    Additionally, it strips formatting tags to write clean text into the "screen.log"
-    file, managing an internal buffer for any log messages generated before the
-    application's log directory is fully initialized.
-    """
-
-    def __init__(self, color_formatter: ColorFormatter) -> None:
-        super().__init__()
-        self.screen_log_fh: IO[str] | None = None
-        """Filehandle pointing to the "screen.log"."""
-        self._pending_screen_log_text = ""
-        """Store screen text that was printed before we determined log-dir."""
-
-        self.formatter = color_formatter
-
-    def set_log_file(self, file_name: str) -> None:
-        if kde_builder.is_pretending:
-            return
-        try:
-            self.screen_log_fh = open(file_name, "w")
-            print(self._pending_screen_log_text, file=self.screen_log_fh, end="")  # flush pended text to log file
-        except IOError:
-            sys.stderr.write(f"Unable to open log file {file_name}!")
-
-    @override
-    def emit(self, record: logging.LogRecord) -> None:
-        try:
-            color_msg = self.formatter.format(record)
-            print(color_msg)
-
-            if not kde_builder.is_pretending:
-                clean_msg = strip_color_tags(record.msg)
-
-                if self.screen_log_fh:
-                    print(clean_msg, file=self.screen_log_fh)
-                else:
-                    self._pending_screen_log_text += clean_msg + "\n"
-
-        except Exception:
-            self.handleError(record)
 
 
 class IPCQueueLoggingHandler(logging.Handler):
@@ -89,6 +36,3 @@ class IPCQueueLoggingHandler(logging.Handler):
             self.ipc.send_log_message(logger_name, message_level, msg)
         except Exception:
             self.handleError(record)
-
-
-main_handler = TTYAndScreenLogHandler(color_formatter)
