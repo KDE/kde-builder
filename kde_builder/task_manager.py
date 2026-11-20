@@ -13,9 +13,9 @@ from typing import TYPE_CHECKING
 
 import kde_builder
 from kde_builder.ipc.ipc import IPC
+from kde_builder.ipc.logging import IPCQueueLoggingHandler
 from kde_builder.ipc.null import IPCNull
 from kde_builder.ipc.pipe import IPCPipe
-from kde_builder.kb_logging import IPCQueueLoggingHandler
 from kde_builder.logging import replace_root_handlers
 from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
