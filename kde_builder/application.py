@@ -32,8 +32,9 @@ from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
 from kde_builder.kb_exception import KBRuntimeError
-from kde_builder.kb_logging import main_handler
 from kde_builder.log_dir import LogDir
+from kde_builder.logging import disable_screen_log
+from kde_builder.logging import set_log_directory
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
 from kde_builder.module_set.module_set import ModuleSet
@@ -734,8 +735,10 @@ class Application:
                     del global_node_content[key]
             ctx.apply_config_options(ctx, global_node_content, rcfile)
 
-        # Now we have determined log-dir, and can set screen log file.
-        main_handler.set_log_file(ctx.get_log_dir() + "/screen.log")
+        if kde_builder.is_pretending:
+            disable_screen_log()
+        else:
+            set_log_directory(ctx.get_log_dir())  # This flushes buffered records to disk.
 
         # Now, after global options were resolved and set, we can resolve paths in include lines and read those config files.
         node_reader = RecursiveConfigNodesIterator(config_content, rcfile, ctx)

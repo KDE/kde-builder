@@ -17,7 +17,7 @@ from kde_builder.console import parse_colors_args
 from kde_builder.console import use_as_output
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
-from kde_builder.kb_logging import main_handler
+from kde_builder.logging.root import set_log_level
 from kde_builder.util.textwrap_mod import dedent
 
 ISSUE_TRACKER_URL = "https://invent.kde.org/sdk/kde-builder/-/issues"
@@ -83,12 +83,8 @@ def main():
     config = merge_dicts(config, override_config)
     logging.config.dictConfig(config)  # instantiates configured loggers, handlers, and formatters
 
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)  # Default level
-    root_logger.addHandler(main_handler)
-
     if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
+        set_log_level(logging.DEBUG)
         for logger_name in config.get("loggers", {}):
             if logger_name == "asyncio":
                 continue

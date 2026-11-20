@@ -16,6 +16,7 @@ from kde_builder.ipc.ipc import IPC
 from kde_builder.ipc.null import IPCNull
 from kde_builder.ipc.pipe import IPCPipe
 from kde_builder.kb_logging import IPCQueueLoggingHandler
+from kde_builder.logging import replace_root_handlers
 from kde_builder.util.setproctitle_mod import setproctitle
 from kde_builder.util.util import Util
 
@@ -515,9 +516,7 @@ class TaskManager:
 
         signal.signal(signal.SIGHUP, sighup_handler)
 
-        root_logger = logging.getLogger()
-        root_logger.handlers.clear()
-        root_logger.addHandler(IPCQueueLoggingHandler(ipc_obj))
+        replace_root_handlers(IPCQueueLoggingHandler(ipc_obj))
 
         exitcode = TaskManager._handle_updates(ipc_obj, ctx_obj)
         # print("Updater process exiting with code", exitcode)
