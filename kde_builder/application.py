@@ -27,6 +27,7 @@ from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
 from kde_builder.cmd_line import Cmdline
 from kde_builder.cmd_line import ParsedCmdLine
+from kde_builder.console import redirect_stdout
 from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
@@ -507,7 +508,11 @@ class Application:
                     for project, info in dependency_graph.items()
                     if info["module"]
                 }
-                print(yaml.dump(results, default_flow_style=False, indent=2))
+
+                # Ensure the query result ends up on standard output.
+                with redirect_stdout(require_tty=False):
+                    print(yaml.dump(results, default_flow_style=False, indent=2))
+
                 return 0
 
             if query_mode == "source-dir":
@@ -551,7 +556,10 @@ class Application:
                 res = query(m)
                 if not isinstance(res, str):
                     res = str(res)
-                print(f"{m}: " + res)
+
+                # Ensure the query result ends up on standard output.
+                with redirect_stdout(require_tty=False):
+                    print(f"{m}: " + res)
 
             return 0
 
