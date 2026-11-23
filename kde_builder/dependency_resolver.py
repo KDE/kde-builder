@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2012, 2013, 2014, 2015, 2020, 2022, 2023 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2019 Johan Ouwerkerk <jm.ouwerkerk@gmail.com>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -12,6 +13,8 @@ from io import TextIOWrapper
 from typing import Any
 
 import kde_builder
+from kde_builder.console import colorize
+from kde_builder.console import redirect_stdout
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
@@ -528,7 +531,7 @@ class DependencyResolver:
         context = {
             "stack": [""],
             "depth": 0,
-            "report": lambda *args: logger_depres.info(*args),
+            "report": lambda *args: print(colorize("".join(args))),
         }
 
         for module in modules:
@@ -545,7 +548,11 @@ class DependencyResolver:
                 "parent_module_name": "",
                 "parent_branch": "",
             }
-            self._descend_module_graph(mode, info, context)
+
+            # Ensure the result ends up on standard output.
+            with redirect_stdout(require_tty=False):
+                self._descend_module_graph(mode, info, context)
+
             item_index += 1
 
     def _compare_build_order_depends(self, a, b) -> int:
