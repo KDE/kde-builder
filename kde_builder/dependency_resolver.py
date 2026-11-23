@@ -10,7 +10,9 @@ import logging
 import re
 from functools import cmp_to_key
 from io import TextIOWrapper
+from typing import TYPE_CHECKING
 from typing import Any
+from typing import TypedDict
 
 import kde_builder
 from kde_builder.console import colorize
@@ -19,7 +21,23 @@ from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 logger_depres = logging.getLogger("dependency-resolver")
+
+
+class _Context(TypedDict):
+    """Data transfer object for private DependencyResolver methods."""
+
+    stack: list[str]
+    depth: int
+    report: Callable[[str], None]
+
+
+def _default_context_report(text: str) -> None:
+    """Default report function for _Context."""
+    print(colorize(text))
 
 
 class DependencyResolver:
@@ -488,7 +506,7 @@ class DependencyResolver:
         self._run_dependency_vote()
         return
 
-    def _descend_module_graph(self, mode: str, node_info, context) -> None:
+    def _descend_module_graph(self, mode: str, node_info, context: _Context) -> None:
         module_graph = self.dependency_graph
         depth = node_info["depth"]
         current_module_name = node_info["current_module_name"]
@@ -528,10 +546,10 @@ class DependencyResolver:
         item_count = len(modules)
         item_index = 1
 
-        context = {
+        context: _Context = {
             "stack": [""],
             "depth": 0,
-            "report": lambda *args: print(colorize("".join(args))),
+            "report": _default_context_report,
         }
 
         for module in modules:
@@ -626,7 +644,7 @@ class DependencyResolver:
         return None
 
     @staticmethod
-    def _yield_module_dependency_tree_entry(node_info: dict, module: Module, context: dict) -> None:
+    def _yield_module_dependency_tree_entry(node_info: dict, module: Module, context: _Context) -> None:
         depth = node_info["depth"]
         index = node_info["idx"]
         count = node_info["count"]
@@ -658,7 +676,7 @@ class DependencyResolver:
         context["report"](connector + current_module_name + " " + status_info)
 
     @staticmethod
-    def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: dict) -> None:
+    def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: _Context) -> None:
         depth = node_info["depth"]
         current_module_name = node_info["current_module_name"]
 
