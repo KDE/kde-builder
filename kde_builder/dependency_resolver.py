@@ -40,6 +40,17 @@ def _default_context_report(text: str) -> None:
     print(colorize(text))
 
 
+class _NodeInfo(TypedDict):
+    current_module_name: str
+    current_branch: str
+    parent_module_name: str
+    parent_branch: str
+    depth: int
+    idx: int
+    count: int
+    build: bool
+
+
 class DependencyResolver:
     """
     Handle resolving dependencies between modules.
@@ -506,7 +517,7 @@ class DependencyResolver:
         self._run_dependency_vote()
         return
 
-    def _descend_module_graph(self, mode: str, node_info, context: _Context) -> None:
+    def _descend_module_graph(self, mode: str, node_info: _NodeInfo, context: _Context) -> None:
         module_graph = self.dependency_graph
         depth = node_info["depth"]
         current_module_name = node_info["current_module_name"]
@@ -528,7 +539,7 @@ class DependencyResolver:
         for module_name in module_names:
             sub_graph = module_graph[module_name]
             branch = sub_graph.get("branch", "")
-            item_info = {
+            item_info: _NodeInfo = {
                 "build": sub_graph["build"],
                 "depth": depth,
                 "idx": item_index,
@@ -556,7 +567,7 @@ class DependencyResolver:
             module_name = module.name
             sub_graph = module_graph[module_name]
             branch = sub_graph.get("branch", "")
-            info = {
+            info: _NodeInfo = {
                 "build": sub_graph["build"],
                 "depth": 0,
                 "idx": item_index,
@@ -644,7 +655,7 @@ class DependencyResolver:
         return None
 
     @staticmethod
-    def _yield_module_dependency_tree_entry(node_info: dict, module: Module, context: _Context) -> None:
+    def _yield_module_dependency_tree_entry(node_info: _NodeInfo, module: Module, context: _Context) -> None:
         depth = node_info["depth"]
         index = node_info["idx"]
         count = node_info["count"]
@@ -676,7 +687,7 @@ class DependencyResolver:
         context["report"](connector + current_module_name + " " + status_info)
 
     @staticmethod
-    def _yield_module_dependency_tree_entry_full_path(node_info: dict, module: Module, context: _Context) -> None:
+    def _yield_module_dependency_tree_entry_full_path(node_info: _NodeInfo, module: Module, context: _Context) -> None:
         depth = node_info["depth"]
         current_module_name = node_info["current_module_name"]
 
