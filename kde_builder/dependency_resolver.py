@@ -669,4 +669,5 @@ class DependencyResolver:
         connector_stack.append(prefix + current_module_name + "/")
 
         context["depth"] = depth + 1
-        context["report"](connector + current_module_name)
+        if node_info["build"]:
+            context["report"](connector + current_module_name)
