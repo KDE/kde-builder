@@ -3,13 +3,18 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from typing import TYPE_CHECKING
+
 from kde_builder.dependency_resolver import DependencyResolver
+
+if TYPE_CHECKING:
+    from kde_builder.dependency_resolver import _DependencyGraphItem
 
 
 def test_trivial_cycle():
     """Test detection of dependency cycles in a dependency graph."""
     # trivial cycle a -> a
-    graph1 = {
+    graph1: dict[str, _DependencyGraphItem] = {
         "a": {
             "deps": {
                 "a": {},
@@ -26,7 +31,7 @@ def test_trivial_cycle():
 
 
 def test_cycle_to_self():
-    graph2 = {
+    graph2: dict[str, _DependencyGraphItem] = {
         "a": {
             "deps": {
                 "b": {},
@@ -47,7 +52,7 @@ def test_cycle_to_self():
 
 def test_no_cycles():
     # no cycles, should therefore not "detect" any false positives
-    graph3 = {
+    graph3: dict[str, _DependencyGraphItem] = {
         "a": {
             "deps": {
                 "b": {},

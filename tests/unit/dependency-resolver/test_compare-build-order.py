@@ -4,10 +4,15 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.module.module import Module
+
+if TYPE_CHECKING:
+    from kde_builder.dependency_resolver import _DependencyGraphItem
 
 
 @pytest.fixture
@@ -21,7 +26,7 @@ def mock_module_from_attrs(monkeypatch):
 
 def test_comparison(mock_module_from_attrs):
     """Test comparison operation for sorting modules into build order."""
-    graph1 = {
+    graph1: dict[str, _DependencyGraphItem] = {
         "a": {
             "votes": {
                 "b": 1,

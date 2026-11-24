@@ -3,12 +3,17 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+from typing import TYPE_CHECKING
+
 from kde_builder.dependency_resolver import DependencyResolver
+
+if TYPE_CHECKING:
+    from kde_builder.dependency_resolver import _DependencyGraphItem
 
 
 def test_vote_dependencies():
     """Test running the full vote for dependencies."""
-    graph1 = {
+    graph1: dict[str, _DependencyGraphItem] = {
         "a": {
             "votes": {},
             "all_deps": {

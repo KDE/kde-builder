@@ -11,7 +11,6 @@ import re
 from functools import cmp_to_key
 from io import TextIOWrapper
 from typing import TYPE_CHECKING
-from typing import Any
 from typing import TypedDict
 
 import kde_builder
@@ -51,6 +50,16 @@ class _NodeInfo(TypedDict):
     build: bool
 
 
+class _DependencyGraphItem(TypedDict, total=False):
+    votes: dict
+    build: bool
+    branch: str
+    deps: dict
+    all_deps: dict
+    module: Module | None
+    traces: dict
+
+
 class DependencyResolver:
     """
     Handle resolving dependencies between modules.
@@ -67,7 +76,7 @@ class DependencyResolver:
         ModuleResolver object, that will properly create a `Module` from a given kde-project module name. Used to support automatically adding dependencies to a build.
         """
 
-        self.dependency_graph: dict[str, dict[str, Any]] = {}
+        self.dependency_graph: dict[str, _DependencyGraphItem] = {}
 
     @staticmethod
     def _shorten_module_name(name: str) -> str:
@@ -426,7 +435,7 @@ class DependencyResolver:
         return errors
 
     def resolve_to_module_graph(self, modules: list[Module]) -> None:
-        module_graph = self.dependency_graph
+        module_graph: dict[str, _DependencyGraphItem] = self.dependency_graph
 
         errors = {
             "branch_errors": 0,
