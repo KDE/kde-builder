@@ -218,9 +218,11 @@ class Application:
             opts["special-selectors"].clear()
 
         if "list-installed" in cmdline_global_options:
-            for key in ctx.persistent_options.keys():
-                if "install-dir" in ctx.persistent_options[key]:
-                    print(key)
+            # Ensure the result ends up on standard output.
+            with redirect_stdout(require_tty=False):
+                for key in ctx.persistent_options.keys():
+                    if "install-dir" in ctx.persistent_options[key]:
+                        print(key)
             exit(0)
 
         ignored_in_global_section: set[str] = set(ctx.options["ignore-projects"])
