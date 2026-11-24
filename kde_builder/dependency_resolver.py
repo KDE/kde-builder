@@ -621,8 +621,8 @@ class DependencyResolver:
         # simply sort by the order contained within the configuration file (if
         # present), which would be setup as the rc-file is read.
 
-        a_rc_order: int = module_graph[a]["module"].create_id
-        b_rc_order: int = module_graph[b]["module"].create_id
+        a_rc_order: int = module_graph[a]["module"].create_id  # ty: ignore[missing-union-attribute]
+        b_rc_order: int = module_graph[b]["module"].create_id  # ty: ignore[missing-union-attribute]
         config_order = (a_rc_order > b_rc_order) - (a_rc_order < b_rc_order)
 
         if config_order:
@@ -637,7 +637,7 @@ class DependencyResolver:
         resolved = list(module_graph.keys())
         built = [el for el in resolved if module_graph[el]["build"] and module_graph[el]["module"]]
         prioritised = sorted(built, key=cmp_to_key(self._compare_build_order_depends))
-        modules = [module_graph[key]["module"] for key in prioritised]
+        modules: list[Module] = [module_graph[key]["module"] for key in prioritised]  # ty: ignore[invalid-assignment]
         return modules
 
     @staticmethod
