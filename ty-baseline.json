@@ -43,12 +43,6 @@
         "startColumn": 15,
         "endColumn": 27,
         "lineCount": 1
-      },
-      {
-        "rule": "invalid-argument-type",
-        "startColumn": 82,
-        "endColumn": 88,
-        "lineCount": 1
       }
     ],
     "kde_builder/log_dir.py": [

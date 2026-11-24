@@ -438,7 +438,7 @@ class DependencyResolver:
 
         for module in modules:
             module_name = module.name
-            branch = self._get_branch_of(module)
+            branch = self._get_branch_of(module) or ""
 
             if module_name in module_graph and module_graph[module_name]:
                 logger_depres.debug(f"Project pulled in previously through (transitive) dependencies: {module_name}")
