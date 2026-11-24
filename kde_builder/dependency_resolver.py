@@ -525,9 +525,9 @@ class DependencyResolver:
 
         sub_graph = module_graph[current_module_name]
         if mode == "tree":
-            self._yield_module_dependency_tree_entry(node_info, sub_graph["module"], context)
+            self._yield_module_dependency_tree_entry(node_info, context)
         else:
-            self._yield_module_dependency_tree_entry_full_path(node_info, sub_graph["module"], context)
+            self._yield_module_dependency_tree_entry_full_path(node_info, context)
 
         depth += 1
 
@@ -655,7 +655,7 @@ class DependencyResolver:
         return None
 
     @staticmethod
-    def _yield_module_dependency_tree_entry(node_info: _NodeInfo, module: Module, context: _Context) -> None:
+    def _yield_module_dependency_tree_entry(node_info: _NodeInfo, context: _Context) -> None:
         depth = node_info["depth"]
         index = node_info["idx"]
         count = node_info["count"]
@@ -687,7 +687,7 @@ class DependencyResolver:
         context["report"](connector + current_module_name + " " + status_info)
 
     @staticmethod
-    def _yield_module_dependency_tree_entry_full_path(node_info: _NodeInfo, module: Module, context: _Context) -> None:
+    def _yield_module_dependency_tree_entry_full_path(node_info: _NodeInfo, context: _Context) -> None:
         depth = node_info["depth"]
         current_module_name = node_info["current_module_name"]
 
