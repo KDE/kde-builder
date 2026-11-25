@@ -7,12 +7,20 @@ import logging
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Literal
+from typing import Protocol
 from typing import override
+from typing import runtime_checkable
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-from kde_builder.console.color.legacy import LegacyColorizer
+
+@runtime_checkable
+class ColorizerProtocol(Protocol):
+    """Colorize text, when enabled."""
+
+    def colorize(self, text: str) -> str:
+        """Colorize text, if enabled."""
 
 
 class ColorFormatter(logging.Formatter):
@@ -26,7 +34,7 @@ class ColorFormatter(logging.Formatter):
 
     def __init__(
         self,
-        legacy_colorizer: LegacyColorizer,
+        colorizer: ColorizerProtocol,
         *,
         fmt: str | None = None,
         datefmt: str | None = None,
@@ -43,7 +51,7 @@ class ColorFormatter(logging.Formatter):
             defaults=defaults,
         )
 
-        self._legacy_colorizer = legacy_colorizer
+        self._colorizer = colorizer
 
     @override
     def formatMessage(self, record: logging.LogRecord) -> str:
@@ -58,9 +66,9 @@ class ColorFormatter(logging.Formatter):
         a record, this has no effect on other formatters rendering this record.
         """
         if record.args:
-            message = self._legacy_colorizer.colorize(str(record.msg)) % record.args
+            message = self._colorizer.colorize(str(record.msg)) % record.args
         else:
-            message = self._legacy_colorizer.colorize(str(record.msg))
+            message = self._colorizer.colorize(str(record.msg))
 
         # The record.message attribute is the only attribute that can be safely
         # overwritten without affecting other formatters.
