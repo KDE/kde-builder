@@ -9,7 +9,7 @@ from typing import Any
 
 from kde_builder.util.clap import extract_bool_arg_or_default
 
-_COLOR_DEST = "colors"
+_COLOR_DEST = "color"
 
 _COLOR_GROUP_TITLE = "color options"
 
@@ -21,8 +21,8 @@ environment variables, or by using any of the options in this group.
 """
 
 
-def inject_colors_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
-    """Inject arguments that control colors into a parser."""
+def inject_color_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """Inject arguments that control color into a parser."""
     group = parser.add_argument_group(
         title=_COLOR_GROUP_TITLE,
         description=_COLOR_GROUP_DESC,
@@ -36,7 +36,7 @@ def inject_colors_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
         "--color",
         dest=_COLOR_DEST,
         action=argparse.BooleanOptionalAction,
-        help="enable or disable colors",
+        help="enable or disable color",
     )
 
     group.add_argument(
@@ -51,7 +51,7 @@ def inject_colors_args(parser: argparse.ArgumentParser) -> argparse.ArgumentPars
 
 def extract_color_arg[T](namespace: argparse.Namespace | Any, *, default: T) -> bool | T:
     """
-    Extract the value of the argument that controls colors from a namespace.
+    Extract the value of the argument that controls color from a namespace.
 
     Args:
         namespace: The object to extract the attribute from.

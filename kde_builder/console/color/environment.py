@@ -7,23 +7,23 @@ import os
 from kde_builder.console.stdout import is_tty
 
 
-def get_colors_from_env() -> bool:
+def get_color_from_env() -> bool:
     """
-    Determine whether colors should be enabled.
+    Determine whether color should be enabled.
 
     Broadly replicates Python's approach to controlling color. It performs the
     following checks in order:
 
     If the `PYTHON_COLORS` environment variable is set, then we enable colors
-    if its value is equal to `1`, and disable colors if it is set to `0`.
+    if its value is equal to `1`, and disable color if it is set to `0`.
 
-    If the `NO_COLOR` environment variable is present, colors are disabled.
+    If the `NO_COLOR` environment variable is present, color are disabled.
 
-    If the `FORCE_COLOR` environment variable is present, colors are enabled.
+    If the `FORCE_COLOR` environment variable is present, color are enabled.
 
-    If the `TERM` environment variable is set to `dumb`, colors are disabled.
+    If the `TERM` environment variable is set to `dumb`, color are disabled.
 
-    Finally, if the registered output stream identifies as a TTY, colors are
+    Finally, if the registered output stream identifies as a TTY, color are
     enabled, and disabled otherwise.
     """
     # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHON_COLORS
@@ -48,9 +48,9 @@ def get_colors_from_env() -> bool:
     return is_tty()
 
 
-def set_colors_env_vars(value: bool) -> None:
+def set_color_env_vars(value: bool) -> None:
     """
-    Set environment variables that control colors.
+    Set environment variables that control color.
 
     The usual memory safety concerns regarding setting environment variables on
     certain platforms apply, in particular in multi-threaded contexts.

@@ -12,7 +12,7 @@ from typing import override
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-from kde_builder.console.colors.legacy import LegacyColorizer
+from kde_builder.console.color.legacy import LegacyColorizer
 
 
 class ColorFormatter(logging.Formatter):

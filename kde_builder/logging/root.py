@@ -9,7 +9,7 @@ from logging import StreamHandler
 from logging.handlers import MemoryHandler
 from pathlib import Path
 
-from kde_builder.console.colors.legacy import decolorizer
+from kde_builder.console.color.legacy import decolorizer
 from kde_builder.logging.formatter import ColorFormatter
 from kde_builder.logging.state import color_formatter
 
