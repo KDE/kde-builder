@@ -36,7 +36,24 @@ def colorize(text: str) -> str:
     return legacy_colorizer.colorize(text)
 
 
-def set_color_enabled(value: bool, *, force: bool = False) -> None:
+def set_color_enabled(value: bool) -> None:
+    """
+    Enable or disable color.
+
+    This may set environment variables. The usual memory safety concerns
+    regarding setting environment variables on certain platforms apply, in
+    particular in multi-threaded contexts.
+
+    If the setting has already been forced, this function has no effect.
+
+    Args:
+        value:
+            The new setting value.
+    """
+    _set_color_enabled(value, force=False)
+
+
+def _set_color_enabled(value: bool, *, force: bool = False) -> None:
     """
     Enable or disable color.
 
@@ -85,6 +102,6 @@ def parse_color_args(
 
     if value is not None:
         # The command-line argument has the final say, so we force the setting.
-        set_color_enabled(value, force=True)
+        _set_color_enabled(value, force=True)
 
     return unhandled_args
