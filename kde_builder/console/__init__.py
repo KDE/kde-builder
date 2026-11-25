@@ -13,4 +13,6 @@ from kde_builder.console.color import strip_color_tags as strip_color_tags
 from kde_builder.console.state import is_tty as is_tty
 from kde_builder.console.state import print_if_tty as print_if_tty
 from kde_builder.console.state import redirect_stdout as redirect_stdout
-from kde_builder.console.state import use_as_output as use_as_output
+from kde_builder.console.state import stderr as stderr
+from kde_builder.console.state import stdout as stdout
+from kde_builder.console.state import use_as_outputs as use_as_outputs

@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from kde_builder.console.color.state import legacy_colorizer
+from kde_builder.console import stderr
 from kde_builder.logging.formatter import ColorFormatter
 
-color_formatter = ColorFormatter(colorizer=legacy_colorizer)
+color_formatter = ColorFormatter(colorizer=stderr)

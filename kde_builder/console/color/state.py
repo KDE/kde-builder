@@ -11,29 +11,25 @@ from kde_builder.console.color.clap import extract_color_arg
 from kde_builder.console.color.clap import inject_color_args
 from kde_builder.console.color.env_vars import get_color_from_env
 from kde_builder.console.color.env_vars import set_color_env_vars
-from kde_builder.console.color.legacy import LegacyColorizer
-from kde_builder.console.state import is_tty
-from kde_builder.util.forceable import ForceableBool
+from kde_builder.console.color.stream import ConfigurableColorStream
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+_color_from_env = get_color_from_env(None)
 
-_color_enabled = ForceableBool("color_enabled", get_color_from_env(is_tty()))
+stdout = ConfigurableColorStream("stdout", _color_from_env)
+stderr = ConfigurableColorStream("stderr", _color_from_env)
 
 
 def color_enabled() -> bool:
     """Return whether color are enabled."""
-    return _color_enabled.value
-
-
-legacy_colorizer = LegacyColorizer()
-legacy_colorizer.set_colorful_output(_color_enabled.value)
+    return stdout.color
 
 
 def colorize(text: str) -> str:
     """Colorize a string, provided that color are enabled."""
-    return legacy_colorizer.colorize(text)
+    return stdout.colorize(text)
 
 
 def set_color_enabled(value: bool) -> None:
@@ -72,12 +68,12 @@ def _set_color_enabled(value: bool, *, force: bool = False) -> None:
             If force is False, the new value is only applied if the setting was
             not forced previously.
     """
-    if _color_enabled.set_checked(value, force=force):
+    stdout_changed = stdout.set_color(value, force=force)
+    stderr_changed = stderr.set_color(value, force=force)
+
+    if stdout_changed or stderr_changed:
         # We only need to update synchronized state if the setting changes.
-
-        set_color_env_vars(_color_enabled.value)
-
-        legacy_colorizer.set_colorful_output(_color_enabled.value)
+        set_color_env_vars(value)
 
 
 def parse_color_args(

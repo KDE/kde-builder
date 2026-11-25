@@ -14,7 +14,7 @@ import sys
 
 from kde_builder import KB_PACKAGE_DIR
 from kde_builder.console import parse_color_args
-from kde_builder.console import use_as_output
+from kde_builder.console import use_as_outputs
 from kde_builder.kb_exception import ProgramError
 from kde_builder.kb_exception import UnknownKdeProjectException
 from kde_builder.logging.root import set_log_level
@@ -28,7 +28,7 @@ def main():
     unhandled_argv = sys.argv[1:]
 
     # Ensure that the output stream for the console package is properly initialized.
-    use_as_output(sys.stdout)
+    use_as_outputs(sys.stdout, sys.stderr)
 
     # Set up colorization early, so that stack traces respect the user's wishes.
     unhandled_argv = parse_color_args(unhandled_argv)

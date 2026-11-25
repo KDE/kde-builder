@@ -12,3 +12,5 @@ from kde_builder.console.color.state import color_enabled as color_enabled
 from kde_builder.console.color.state import colorize as colorize
 from kde_builder.console.color.state import parse_color_args as parse_color_args
 from kde_builder.console.color.state import set_color_enabled as set_color_enabled
+from kde_builder.console.color.state import stderr as stderr
+from kde_builder.console.color.state import stdout as stdout

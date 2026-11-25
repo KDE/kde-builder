@@ -4,10 +4,13 @@
 
 import contextlib
 
+from kde_builder.console.color import stderr as _stderr
+from kde_builder.console.color import stdout as _stdout
+from kde_builder.console.color.stream import ColorStream
 from kde_builder.console.stream import OutputProtocol
-from kde_builder.console.stream import Stream
 
-_stdout = Stream("stdout")
+stdout: ColorStream = _stdout
+stderr: ColorStream = _stderr
 
 
 def is_tty() -> bool:
@@ -15,13 +18,15 @@ def is_tty() -> bool:
     return _stdout.is_tty
 
 
-def use_as_output(stream: OutputProtocol):
+def use_as_outputs(stdout: OutputProtocol, stderr: OutputProtocol):
     """
-    Set the stream to be used as output stream.
+    Set the streams to be used as stdout and stderr.
 
-    This does not replace `sys.stdout`. See `redirect_stdout()`.
+    Does not modify `sys.stdout` or `sys.sdtderr`. use the `intercept()` method
+    on `console.stdout` and `console.stderr` for that purpose.
     """
-    _stdout.output = stream
+    _stdout.output = stdout
+    _stderr.output = stderr
 
 
 def redirect_stdout(require_tty: bool = True) -> contextlib.AbstractContextManager[None]:
@@ -50,4 +55,4 @@ def print_if_tty(
 
     If you want to print many things, see `redirect_stdout()` instead.
     """
-    _stdout.print_if_tty(*values, sep=sep, end=end, flush=flush)
+    _stdout.print_as_is_if_tty(*values, sep=sep, end=end, flush=flush)
