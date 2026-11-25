@@ -12,7 +12,7 @@ from kde_builder.console.color.clap import inject_color_args
 from kde_builder.console.color.env_vars import get_color_from_env
 from kde_builder.console.color.env_vars import set_color_env_vars
 from kde_builder.console.color.legacy import LegacyColorizer
-from kde_builder.console.stdout import is_tty
+from kde_builder.console.state import is_tty
 from kde_builder.util.forceable import ForceableBool
 
 if TYPE_CHECKING:

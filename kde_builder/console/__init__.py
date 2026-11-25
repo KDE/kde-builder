@@ -10,7 +10,7 @@ from kde_builder.console.color import inject_color_args as inject_color_args
 from kde_builder.console.color import parse_color_args as parse_color_args
 from kde_builder.console.color import set_color_enabled as set_color_enabled
 from kde_builder.console.color import strip_color_tags as strip_color_tags
-from kde_builder.console.stdout import is_tty as is_tty
-from kde_builder.console.stdout import print_if_tty as print_if_tty
-from kde_builder.console.stdout import redirect_stdout as redirect_stdout
-from kde_builder.console.stdout import use_as_output as use_as_output
+from kde_builder.console.state import is_tty as is_tty
+from kde_builder.console.state import print_if_tty as print_if_tty
+from kde_builder.console.state import redirect_stdout as redirect_stdout
+from kde_builder.console.state import use_as_output as use_as_output

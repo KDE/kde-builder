@@ -10,17 +10,18 @@ from typing import override
 
 import pytest
 
-import kde_builder.console.stdout as stdout
+from kde_builder.console.stream import OutputProtocol
+from kde_builder.console.stream import Stream
 
 
 def test_protocol_matches_stdout(capsys: pytest.CaptureFixture[str]):
     with capsys.disabled():
-        assert isinstance(sys.stdout, stdout.OutputProtocol)
+        assert isinstance(sys.stdout, OutputProtocol)
 
 
 def test_protocol_matches_stderr(capsys: pytest.CaptureFixture[str]):
     with capsys.disabled():
-        assert isinstance(sys.stderr, stdout.OutputProtocol)
+        assert isinstance(sys.stderr, OutputProtocol)
 
 
 class NoIsatty:
@@ -48,7 +49,7 @@ class NoFlush:
 
 
 @pytest.mark.parametrize(
-    argnames="stream",
+    argnames="output",
     argvalues=[
         NoIsatty(),
         NoWrite(),
@@ -57,9 +58,10 @@ class NoFlush:
     ],
     ids=lambda x: x.__class__.__qualname__,
 )
-def test_use_as_output_rejects_unsuitable_type(stream: Any):
+def test_stream_output_rejects_unsuitable_type(output: Any):
+    stream = Stream("stdout")
     with pytest.raises(TypeError):
-        stdout.use_as_output(stream)
+        stream.output = output
 
 
 class MockOutput(io.StringIO):
@@ -111,10 +113,11 @@ def parametrize_stdout_tests(fn):
     return fn
 
 
-def setup_output(is_tty: bool) -> MockOutput:
+def make_stream_and_output(is_tty: bool) -> tuple[Stream, MockOutput]:
+    stream = Stream("stdout")
     output = MockOutput(is_tty=is_tty)
-    stdout.use_as_output(output)
-    return output
+    stream.output = output
+    return stream, output
 
 
 @parametrize_stdout_tests
@@ -124,9 +127,9 @@ def test_print_if_tty(is_tty: bool, args: tuple, kwargs: dict):
     if is_tty:
         print(*args, **kwargs, file=expected)
 
-    output = setup_output(is_tty=is_tty)
+    stream, output = make_stream_and_output(is_tty=is_tty)
 
-    stdout.print_if_tty(*args, **kwargs)
+    stream.print_if_tty(*args, **kwargs)
 
     assert expected.getvalue() == output.getvalue()
 
@@ -138,9 +141,9 @@ def test_redirect_stdout_require_tty(is_tty: bool, args: tuple, kwargs: dict):
     if is_tty:
         print(*args, **kwargs, file=expected)
 
-    output = setup_output(is_tty=is_tty)
+    stream, output = make_stream_and_output(is_tty=is_tty)
 
-    with stdout.redirect_stdout(require_tty=True):
+    with stream.intercept(require_tty=True):
         print(*args, **kwargs)
 
     assert expected.getvalue() == output.getvalue()
@@ -148,12 +151,13 @@ def test_redirect_stdout_require_tty(is_tty: bool, args: tuple, kwargs: dict):
 
 @parametrize_stdout_tests
 def test_redirect_stdout_no_require_tty(is_tty: bool, args: tuple, kwargs: dict):
-    output = setup_output(is_tty=is_tty)
 
     expected = io.StringIO()
     print(*args, **kwargs, file=expected)
 
-    with stdout.redirect_stdout(require_tty=False):
+    stream, output = make_stream_and_output(is_tty=is_tty)
+
+    with stream.intercept(require_tty=False):
         print(*args, **kwargs)
 
     assert expected.getvalue() == output.getvalue()

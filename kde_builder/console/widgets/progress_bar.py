@@ -48,7 +48,7 @@ from typing import Any
 from typing import Self
 from typing import override
 
-from kde_builder.console.stdout import print_if_tty
+from kde_builder.console.state import print_if_tty
 
 
 def hide_progress_bar() -> None:
