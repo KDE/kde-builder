@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023 Michael Pyne <mpyne@kde.org>
 # SPDX-FileCopyrightText: 2019 Johan Ouwerkerk <jm.ouwerkerk@gmail.com>
 # SPDX-FileCopyrightText: 2023 - 2024 Andrew Shark <ashark@linuxcomp.ru>
+# SPDX-FileCopyrightText: 2026 Christoph Martin <foss@c14n.ch>
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
@@ -27,7 +28,7 @@ from kde_builder import KB_REPO_DIR
 from kde_builder.build_context import BuildContext
 from kde_builder.cmd_line import Cmdline
 from kde_builder.cmd_line import ParsedCmdLine
-from kde_builder.console import redirect_stdout
+from kde_builder.console import stdout
 from kde_builder.debug_order_hints import DebugOrderHints
 from kde_builder.dependency_resolver import DependencyResolver
 from kde_builder.kb_exception import ConfigError
@@ -219,7 +220,7 @@ class Application:
 
         if "list-installed" in cmdline_global_options:
             # Ensure the result ends up on standard output.
-            with redirect_stdout(require_tty=False):
+            with stdout.intercept(require_tty=False):
                 for key in ctx.persistent_options.keys():
                     if "install-dir" in ctx.persistent_options[key]:
                         print(key)
@@ -513,7 +514,7 @@ class Application:
                 }
 
                 # Ensure the query result ends up on standard output.
-                with redirect_stdout(require_tty=False):
+                with stdout.intercept(require_tty=False):
                     print(yaml.dump(results, default_flow_style=False, indent=2))
 
                 return 0
@@ -561,7 +562,7 @@ class Application:
                     res = str(res)
 
                 # Ensure the query result ends up on standard output.
-                with redirect_stdout(require_tty=False):
+                with stdout.intercept(require_tty=False):
                     print(f"{m}: " + res)
 
             return 0

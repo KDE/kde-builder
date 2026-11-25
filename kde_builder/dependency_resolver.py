@@ -14,7 +14,7 @@ from typing import Any
 
 import kde_builder
 from kde_builder.console import colorize
-from kde_builder.console import redirect_stdout
+from kde_builder.console import stdout
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
 from kde_builder.module_resolver import ModuleResolver
@@ -550,7 +550,7 @@ class DependencyResolver:
             }
 
             # Ensure the result ends up on standard output.
-            with redirect_stdout(require_tty=False):
+            with stdout.intercept(require_tty=False):
                 self._descend_module_graph(mode, info, context)
 
             item_index += 1

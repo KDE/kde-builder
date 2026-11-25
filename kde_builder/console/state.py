@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-import contextlib
 
 from kde_builder.console.color import stderr as _stderr
 from kde_builder.console.color import stdout as _stdout
@@ -22,18 +21,6 @@ def use_as_outputs(stdout: OutputProtocol, stderr: OutputProtocol):
     """
     _stdout.output = stdout
     _stderr.output = stderr
-
-
-def redirect_stdout(require_tty: bool = True) -> contextlib.AbstractContextManager[None]:
-    """
-    Redirect all writes to `sys.stdout` to the registered output stream.
-
-    If `require_tty` is `True`, and the registered output stream is not a TTY,
-    all writes are redirected to `os.devnull` instead.
-
-    If you only want to print a single thing, see `print_if_tty()` instead.
-    """
-    return _stdout.intercept(require_tty=require_tty)
 
 
 def print_if_tty(
