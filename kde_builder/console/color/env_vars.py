@@ -4,10 +4,8 @@
 
 import os
 
-from kde_builder.console.stdout import is_tty
 
-
-def get_color_from_env() -> bool:
+def get_color_from_env[T](default: T) -> bool | T:
     """
     Determine whether color should be enabled.
 
@@ -23,8 +21,7 @@ def get_color_from_env() -> bool:
 
     If the `TERM` environment variable is set to `dumb`, color are disabled.
 
-    Finally, if the registered output stream identifies as a TTY, color are
-    enabled, and disabled otherwise.
+    Finally, if neither of the above applies, return `default`.
     """
     # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHON_COLORS
     python_colors = os.getenv("PYTHON_COLORS")
@@ -45,7 +42,7 @@ def get_color_from_env() -> bool:
     if os.getenv("TERM", "") == "dumb":
         return False
 
-    return is_tty()
+    return default
 
 
 def set_color_env_vars(value: bool) -> None:

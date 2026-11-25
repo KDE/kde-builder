@@ -9,16 +9,17 @@ from typing import TYPE_CHECKING
 
 from kde_builder.console.color.clap import extract_color_arg
 from kde_builder.console.color.clap import inject_color_args
-from kde_builder.console.color.environment import get_color_from_env
-from kde_builder.console.color.environment import set_color_env_vars
+from kde_builder.console.color.env_vars import get_color_from_env
+from kde_builder.console.color.env_vars import set_color_env_vars
 from kde_builder.console.color.legacy import LegacyColorizer
+from kde_builder.console.stdout import is_tty
 from kde_builder.util.forceable import ForceableBool
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 
-_color_enabled = ForceableBool("color_enabled", get_color_from_env())
+_color_enabled = ForceableBool("color_enabled", get_color_from_env(is_tty()))
 
 
 def color_enabled() -> bool:
