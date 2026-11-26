@@ -18,8 +18,8 @@ from typing import Any
 from typing import override
 
 import kde_builder
-from kde_builder.console import colorize
 from kde_builder.console import set_color_enabled
+from kde_builder.console import stdout
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.kb_exception import ProgramError
 from kde_builder.metadata.kde_projects_reader import KDEProjectsReader
@@ -198,14 +198,14 @@ class BuildContext(PathResolvingOptions):
                 try:
                     os.kill(int(pid), 0)
 
-                    print(colorize(" r[*y[*r[*] kde-builder appears to be running.  Do you want to:\n"))
-                    print(colorize("  (b[Q])uit, (b[P])roceed anyways?: "))
+                    stdout.print(" r[*y[*r[*] kde-builder appears to be running.  Do you want to:\n")
+                    stdout.print("  (b[Q])uit, (b[P])roceed anyways?: ")
 
                     choice = input() or ""
                     choice = choice.removesuffix("\n")
 
                     if choice.lower() != "p":
-                        print(colorize(" y[*] kde-builder run canceled."))
+                        stdout.print(" y[*] kde-builder run canceled.")
                         return False
 
                     # We still can't grab the lockfile, let's just hope things

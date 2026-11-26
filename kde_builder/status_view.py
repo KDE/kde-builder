@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 
-from kde_builder.console import colorize
 from kde_builder.console import stdout
 from kde_builder.console.widgets import hide_progress_bar
 from kde_builder.console.widgets import show_progress_bar
@@ -76,17 +75,15 @@ class StatusView:
 
         mod_total, mod_success, mod_failed = self.mod_total, self.mod_success, self.mod_failed
 
-        status_line = self.status
-
         if mod_total > 1:
-            # Build up message in reverse order
-            tail_msg = f"{mod_total} projects"
             if mod_failed:
-                tail_msg = colorize(f"r[b[{mod_failed}] failed, ") + tail_msg
+                mod_status_msg = f"r[b[{mod_failed}] failed, "
             if mod_success:
-                tail_msg = colorize(f"g[b[{mod_success}] built, ") + tail_msg
+                mod_status_msg = f"g[b[{mod_success}] built, "
 
-            status_line = status_line + f" ({tail_msg})"
+            status_line = f"{self.status} ({mod_status_msg}, {mod_total} projects)"
+        else:
+            status_line = self.status
 
         if current_project_full_progress > 0:
             msg = f"{self.current_project_cur_progress * 100 / current_project_full_progress:.1f}%{status_line}"
@@ -125,7 +122,7 @@ class StatusView:
     @staticmethod
     def release_tty(msg: str = "") -> None:
         """For TTY outputs, this clears the line (if we actually had dirtied it) so the rest of the program can resume output from where it'd been left off."""
-        StatusView._clear_line_and_update(colorize(msg))
+        StatusView._clear_line_and_update(msg)
 
     @staticmethod
     def _clear_line_and_update(msg: str) -> None:

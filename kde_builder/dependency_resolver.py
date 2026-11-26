@@ -13,7 +13,6 @@ from io import TextIOWrapper
 from typing import Any
 
 import kde_builder
-from kde_builder.console import colorize
 from kde_builder.console import stdout
 from kde_builder.kb_exception import KBRuntimeError
 from kde_builder.module.module import Module
@@ -531,7 +530,8 @@ class DependencyResolver:
         context = {
             "stack": [""],
             "depth": 0,
-            "report": lambda *args: print(colorize("".join(args))),
+            # Ensure the result ends up on standard output:
+            "report": lambda *args: stdout.print(*args),
         }
 
         for module in modules:
@@ -549,9 +549,7 @@ class DependencyResolver:
                 "parent_branch": "",
             }
 
-            # Ensure the result ends up on standard output.
-            with stdout.intercept(require_tty=False):
-                self._descend_module_graph(mode, info, context)
+            self._descend_module_graph(mode, info, context)
 
             item_index += 1
 

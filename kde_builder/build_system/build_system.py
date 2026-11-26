@@ -12,7 +12,6 @@ import time
 from typing import TYPE_CHECKING
 
 import kde_builder
-from kde_builder.console import colorize
 from kde_builder.kb_exception import ProgramError
 from kde_builder.util.logged_subprocess import UtilLoggedSubprocess
 from kde_builder.util.util import Util
@@ -432,7 +431,7 @@ class BuildSystem:
         start_time = int(time.time())
 
         status_viewer = ctx.status_view
-        status_viewer.status = colorize(f"\t{message}")
+        status_viewer.status = f"\t{message}"
         status_viewer.current_project_phase = self.module.current_phase
         status_viewer.update()
 
