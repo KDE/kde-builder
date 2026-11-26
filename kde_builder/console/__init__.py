@@ -4,7 +4,6 @@
 
 """Emit and log terminal output."""
 
-from kde_builder.console.color import color_enabled as color_enabled
 from kde_builder.console.color import colorize as colorize
 from kde_builder.console.color import inject_color_args as inject_color_args
 from kde_builder.console.color import parse_color_args as parse_color_args

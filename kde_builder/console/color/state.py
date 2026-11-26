@@ -22,11 +22,6 @@ stdout = ConfigurableColorStream("stdout", _color_from_env)
 stderr = ConfigurableColorStream("stderr", _color_from_env)
 
 
-def color_enabled() -> bool:
-    """Return whether color are enabled."""
-    return stdout.color
-
-
 def colorize(text: str) -> str:
     """Colorize a string, provided that color are enabled."""
     return stdout.colorize(text)
