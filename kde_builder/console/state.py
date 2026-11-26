@@ -13,11 +13,6 @@ stdout: ColorStream = _stdout
 stderr: ColorStream = _stderr
 
 
-def is_tty() -> bool:
-    """Return whether the registered output stream identifies as a TTY."""
-    return _stdout.is_tty
-
-
 def use_as_outputs(stdout: OutputProtocol, stderr: OutputProtocol):
     """
     Set the streams to be used as stdout and stderr.
