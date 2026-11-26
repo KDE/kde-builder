@@ -5,7 +5,6 @@
 """Command-line argument processing."""
 
 import argparse
-from typing import Any
 
 from kde_builder.util.clap import extract_bool_arg_or_default
 
@@ -49,7 +48,7 @@ def inject_color_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParse
     return parser
 
 
-def extract_color_arg[T](namespace: argparse.Namespace | Any, *, default: T) -> bool | T:
+def extract_color_arg[T](namespace: argparse.Namespace | object, *, default: T) -> bool | T:
     """
     Extract the value of the argument that controls color from a namespace.
 

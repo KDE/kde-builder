@@ -5,11 +5,10 @@
 """Command-line argument processing helpers."""
 
 import argparse
-from typing import Any
 
 
 def extract_bool_arg_or_default[T](
-    namespace: argparse.Namespace | Any,
+    namespace: argparse.Namespace | object,
     *,
     attribute: str,
     default: T,
@@ -45,7 +44,7 @@ def extract_bool_arg_or_default[T](
 
 
 def extract_bool_arg_or_none(
-    namespace: argparse.Namespace | Any,
+    namespace: argparse.Namespace | object,
     *,
     attribute: str,
 ) -> bool | None:
