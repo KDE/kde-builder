@@ -42,22 +42,21 @@ they recommend updating the progress bar state at least once every second.
 [1]: https://conemu.github.io/en/AnsiEscapeCodes.html#ConEmu_specific_OSC
 [2]: https://ghostty.org/docs/vt/osc/conemu
 """
-
 from contextlib import AbstractContextManager
 from typing import Any
 from typing import Self
 from typing import override
 
-from kde_builder.console.state import print_if_tty
+from kde_builder.console import stdout
 
 
 def hide_progress_bar() -> None:
     """Hide the progress bar."""
-    print_if_tty("\033]9;4;0;0\033\\", end="", flush=True)
+    stdout.print_as_is_if_tty("\033]9;4;0;0\033\\", end="", flush=True)
 
 
 def _show_progress_bar(percent: int):
-    print_if_tty(f"\033]9;4;1;{percent}\033\\", end="", flush=True)
+    stdout.print_as_is_if_tty(f"\033]9;4;1;{percent}\033\\", end="", flush=True)
 
 
 def _round_and_clamp(number: float | int, /, at_least: int = 0, at_most: int = 100) -> int:

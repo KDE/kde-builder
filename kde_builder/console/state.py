@@ -21,20 +21,3 @@ def use_as_outputs(stdout: OutputProtocol, stderr: OutputProtocol):
     """
     _stdout.output = stdout
     _stderr.output = stderr
-
-
-def print_if_tty(
-    *values: object,
-    sep: str | None = " ",
-    end: str | None = "\n",
-    flush: bool = False,
-) -> None:
-    """
-    Print to the registered output stream, if it is a TTY.
-
-    If your code uses this function, it's worthwhile to investigate whether
-    adding an abstraction or widget to the console package would be appropriate.
-
-    If you want to print many things, see `redirect_stdout()` instead.
-    """
-    _stdout.print_as_is_if_tty(*values, sep=sep, end=end, flush=flush)

@@ -6,7 +6,7 @@
 
 
 from kde_builder.console import colorize
-from kde_builder.console import print_if_tty
+from kde_builder.console import stdout
 from kde_builder.console.widgets import hide_progress_bar
 from kde_builder.console.widgets import show_progress_bar
 
@@ -134,4 +134,4 @@ class StatusView:
 
         Then print message and return to column 1 again in case somewhere else uses the tty.
         """
-        print_if_tty(f"\033[1G\033[K{msg}\033[1G", end="", flush=True)
+        stdout.print_if_tty(f"\033[1G\033[K{msg}\033[1G", end="", flush=True)
